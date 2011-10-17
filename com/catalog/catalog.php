@@ -4,12 +4,20 @@ class FCom_Catalog extends BClass
 {
     static public function bootstrap()
     {
-        BEventRegistry::i()
-            ->on('FCom_Frontend::bootstrap', 'FCom_Catalog.bootFrontend');
-            ->on('FCom_Admin::bootstrap', 'FCom_Catalog.bootAdmin');
+        switch (FCom::area()) {
+            case 'frontend': self::frontend(); break;
+            case 'admin': self::admin(); break;
+        }
     }
 
-    public function bootFrontend()
+    static public function frontend()
+    {
+        BFrontController::i()
+            ->route('GET /', 'FCom_Catalog_Ctrl.index')
+        ;
+    }
+
+    static public function admin()
     {
 
     }
@@ -17,5 +25,8 @@ class FCom_Catalog extends BClass
 
 class FCom_Catalog_Ctrl extends BActionController
 {
-
+    public function action_index()
+    {
+        BResponse::i()->set('INDEX')->render();
+    }
 }
