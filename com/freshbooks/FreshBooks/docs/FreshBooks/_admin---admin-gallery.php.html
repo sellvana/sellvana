@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs for page admin-gallery.php</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="file-name"><img src="../media/images/Page_logo.png" alt="File" style="vertical-align: middle">/admin/admin-gallery.php</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+									<a href="#sec-includes">Includes</a>
+			|											<a href="#sec-functions">Functions</a>
+			</div>
+	<div class="info-box-body">	
+		<!-- ========== Info from phpDoc block ========= -->
+		
+			</div>
+</div>
+		
+
+	<a name="sec-includes"></a>	
+	<div class="info-box">
+		<div class="info-box-title">Includes</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Includes</span>
+			|													<a href="#sec-functions">Functions</a>
+					</div>
+		<div class="info-box-body">	
+			<a name="___/include/common_functions_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">include_once</span>
+			(<span class="include-name">"../include/common_functions.php"</span>)
+			(line <span class="line-number">2137</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+</div>
+<a name="_admin-startup_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">include_once</span>
+			(<span class="include-name">"admin-startup.php"</span>)
+			(line <span class="line-number">2138</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+</div>
+		</div>
+	</div>
+	
+	
+	
+	<a name="sec-functions"></a>	
+	<div class="info-box">
+		<div class="info-box-title">Functions</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-includes">Includes</a>
+				|												<span class="disabled">Functions</span>
+		</div>
+		<div class="info-box-body">	
+			<a name="functioncheck_date" id="functioncheck_date"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">check_date</span> (line <span class="line-number">2118</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">provera foramata datuma</p>
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			check_date
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$date</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$date</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$date</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$date</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionform_category_tree" id="functionform_category_tree"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">form_category_tree</span> (line <span class="line-number">763</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">form_category_tree()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			form_category_tree
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$dynamic_block</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$field_name</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$table</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$parent_category</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$category_level</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$row_no</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$per_page</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$dynamic_block</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$field_name</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$table</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$parent_category</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$category_level</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$row_no</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$per_page</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functiongallery_batch_edit" id="functiongallery_batch_edit"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_batch_edit</span> (line <span class="line-number">1778</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_batch_edit()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_batch_edit
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_batch_upload" id="functiongallery_batch_upload"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_batch_upload</span> (line <span class="line-number">1522</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_batch_upload()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_batch_upload
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_back_to_list" id="functiongallery_category_back_to_list"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_back_to_list</span> (line <span class="line-number">1084</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_back_to_list()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_back_to_list
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_delete" id="functiongallery_category_delete"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_delete</span> (line <span class="line-number">1093</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_delete()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_delete
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_list" id="functiongallery_category_list"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_list</span> (line <span class="line-number">886</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_list()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_list
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_move_down" id="functiongallery_category_move_down"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_move_down</span> (line <span class="line-number">1505</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_move_down()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_move_down
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_move_up" id="functiongallery_category_move_up"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_move_up</span> (line <span class="line-number">1490</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_move_up()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_move_up
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_category_new" id="functiongallery_category_new"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_category_new</span> (line <span class="line-number">1168</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_category_new()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_category_new
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_comment" id="functiongallery_comment"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_comment</span> (line <span class="line-number">1849</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_comment
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_comment_delete" id="functiongallery_comment_delete"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_comment_delete</span> (line <span class="line-number">2011</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_comment_delete
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_comment_edit" id="functiongallery_comment_edit"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_comment_edit</span> (line <span class="line-number">2027</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_comment_edit
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_delete_photo" id="functiongallery_delete_photo"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_delete_photo</span> (line <span class="line-number">678</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_delete_photo()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_delete_photo
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_list" id="functiongallery_list"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_list</span> (line <span class="line-number">48</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_list()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_list
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_move_down" id="functiongallery_move_down"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_move_down</span> (line <span class="line-number">865</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_move_down()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_move_down
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_move_up" id="functiongallery_move_up"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_move_up</span> (line <span class="line-number">847</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_move_up()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_move_up
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_new" id="functiongallery_new"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_new</span> (line <span class="line-number">336</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_new()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_new
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_resize" id="functiongallery_resize"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_resize</span> (line <span class="line-number">642</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_resize()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_resize
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functiongallery_set_main" id="functiongallery_set_main"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">gallery_set_main</span> (line <span class="line-number">8</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gallery_set_main()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			gallery_set_main
+		</span>
+				()
+			</div>
+
+		
+	
+</div>
+<a name="functionmove_category" id="functionmove_category"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">move_category</span> (line <span class="line-number">1461</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			move_category
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$parent_id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$category_id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$operator</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$parent_id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$category_id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$operator</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionmove_photo" id="functionmove_photo"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">move_photo</span> (line <span class="line-number">817</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">move_photo()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			move_photo
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$category_id</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$photo_id</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$operator</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$category_id</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$photo_id</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$operator</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsave_photo" id="functionsave_photo"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">save_photo</span> (line <span class="line-number">539</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">save_photo()</p>
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			save_photo
+		</span>
+					([<span class="var-type">bool</span>&nbsp;<span class="var-name">$redirect_on_exit</span> = <span class="var-default">TRUE</span>])
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$redirect_on_exit</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionto_sql_date" id="functionto_sql_date"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../media/images/Function.png" />
+		<span class="method-title">to_sql_date</span> (line <span class="line-number">2105</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">priprama datuma u sql formatu</p>
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			to_sql_date
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$date</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$date</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$date</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$date</span>			</li>
+				</ul>
+		
+	
+</div>
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 13 Mar 2009 10:36:31 +0100 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.1</a>
+	</p>
+	</div></body>
+</html>
