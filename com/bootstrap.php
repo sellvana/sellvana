@@ -78,7 +78,10 @@ class FCom extends BClass
             BDebug::i()->mode($modes[$ip]);
         }
 
-        BModuleRegistry::i()->scan('../../bucky/plugins')->scan('../market/*')->scan('../local/*');
+        BModuleRegistry::i()
+            ->scan(__DIR__.'/../../buckyball/bucky/plugins')
+            ->scan(__DIR__.'/../market/*')
+            ->scan(__DIR__.'/../local/*');
 
         BApp::i()->run();
     #echo '<hr>'.(microtime(true)-$time);
