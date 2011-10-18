@@ -2,154 +2,36 @@
 
 class FCom_PayPal extends BClass
 {
+    protected static $_apiVersion = '3.0';
+    protected static $_baseUrl;
+
     static public function bootstrap()
     {
-
+        BFrontController::i()->route('GET /.action', 'FCom_PayPal_Ctrl');
     }
-}
 
-class FCom_PayPal_Ctrl extends BActionController
-{
-
-}
-
-
-class FCom_Paypal extends BClass
-{
-    protected static $_version = '3.0';
-/*
-    protected static $_apiUrl = 'https://api-3t.sandbox.paypal.com/nvp';
-    protected static $_webUrl = 'https://www.sandbox.paypal.com/';
-    protected static $_apiUserName = 'm0sh3g_1237535915_biz_api1.gmail.com';
-    protected static $_apiPassword = '1237536002';
-    protected static $_apiSignature = 'ALBf.y66AU1jYhtcAmEPnWSft2J7Ad1OQnziH.yZQZAL1NgegB4HyHT0';
-*/
-    protected static $_apiUrl = 'https://api-3t.paypal.com/nvp';
-    protected static $_webUrl = 'https://www.paypal.com/cgi-bin/';
-    protected static $_apiUserName = 'paypal_api1.unirgy.com';
-    protected static $_apiPassword = 'F3NZNHDQ9369Q29H';
-    protected static $_apiSignature = 'Aw93-4ljEKoS7CBLEeEJe9JJpdkGAOsltfNpiQWWsj8uBcIwtX.IsoGv';
-
-    public static function sandbox()
+    public function __construct()
     {
-        if (!in_array($_SERVER['REMOTE_ADDR'], array('67.170.161.89'))) {
-            return;
+        if (($sUrl = BConfig::i()->get('secure_url'))) {
+            $m = BApp::m();
+            $m->base_url = $sUrl.'/'.$m->url_prefix;
         }
-        self::$_apiUrl = 'https://api-3t.sandbox.paypal.com/nvp';
-        self::$_webUrl = 'https://www.sandbox.paypal.com/';
-        self::$_apiUserName = 'm0sh3g_1237535915_biz_api1.gmail.com';
-        self::$_apiPassword = '1237536002';
-        self::$_apiSignature = 'ALBf.y66AU1jYhtcAmEPnWSft2J7Ad1OQnziH.yZQZAL1NgegB4HyHT0';
     }
 
-    public static function redirect()
+    public function call($methodName, $nvpArr)
     {
-        self::sandbox();
-
-        Cart::save(array(
-            'order_status' => 'paypal.started',
-            'license_agreed' => $_POST['license_agreed'],
-            'comments' => !empty($_POST['comments']) ? $_POST['comments'] : '',
-        ));
-        $nvpArr = array(
-            'INVNUM'        => Cart::get('id'),
-            'AMT'           => Cart::get('subtotal'),
-            'PAYMENTACTION' => 'Sale',
-            'CURRENCYCODE'  => 'USD',
-            'RETURNURL'     => 'http://dev.unirgy.com/u/paypal_return',
-            'CANCELURL'     => 'http://dev.unirgy.com/u/paypal_cancel',
-            //'RETURNURL'     => 'https://secure.unirgy.com/checkout/process.php?paypal=return',
-            //'CANCELURL'     => 'https://secure.unirgy.com/checkout/process.php?paypal=cancel',
-            //'PAGESTYLE'     => 'paypal',
-        );
-        $resArr = self::call('SetExpressCheckout', $nvpArr);
-#echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
-        if (false===$resArr) {
-            throw new BException(print_r($resArr, 1));
-        }
-        $sData =& BSession::i()->dataToUpdate();
-        $sData['paypal']['token'] = $resArr['TOKEN'];
-        BResponse::i()->redirect(self::$_webUrl.'webscr?cmd=_express-checkout&useraction=commit&token='.$resArr['TOKEN']);
-    }
-
-    public static function complete()
-    {
-        $sData =& BSession::i()->dataToUpdate();
-        self::sandbox();
-
-        $resArr = self::call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
-        if (false===$resArr) {
-            return false;
-        }
-        Cart::save(array(
-            'order_status' => 'paypal.returned',
-            'email' => $resArr['EMAIL'],
-            'firstname' => $resArr['FIRSTNAME'],
-            'lastname' => $resArr['LASTNAME'],
-            'company' => !empty($resArr['COMPANY']) ? $resArr['COMPANY'] : '',
-            'street1' => $resArr['SHIPTOSTREET'],
-            'street2' => !empty($resArr['SHIPTOSTREET2']) ? $resArr['SHIPTOSTREET2'] : '',
-            'city' => $resArr['SHIPTOCITY'],
-            'state' => !empty($resArr['SHIPTOSTATE']) ? $resArr['SHIPTOSTATE'] : '',
-            'zip' => !empty($resArr['SHIPTOZIP']) ? $resArr['SHIPTOZIP'] : '',
-            'country' => $resArr['SHIPTOCOUNTRYCODE'],
-            'paypal_payerid' => $resArr['PAYERID'],
-            #'paypal_correlationid' => $resArr['CORRELATIONID'],
-            'paypal_status' => '!/'.$resArr['PAYERSTATUS'].'/'.$resArr['ADDRESSSTATUS'],
-        ));
-
-        $nvpArr = array(
-            'TOKEN'         => $resArr['TOKEN'],
-            'PAYERID'       => $resArr['PAYERID'],
-            'PAYMENTACTION' => 'Sale',
-            'AMT'           => $sData['cart']['data']['subtotal'],
-            'CURRENCYCODE'  => 'USD',
-            'IPADDRESS'     => $_SERVER['SERVER_NAME'],
-            //'BUTTONSOURCE'  => '',
-        );
-
-         /* Make the call to PayPal to finalize payment
-            If an error occured, show the resulting errors
-            */
-        $resArr = self::call('DoExpressCheckoutPayment', $nvpArr);
-        if (false===$resArr) {
-            return false;
-        }
-        Cart::save(array(
-            'order_status' => 'complete',
-            'paypal_transactionid' => $resArr['TRANSACTIONID'],
-            'paypal_paid' => $resArr['AMT'],
-            'paypal_fee' => !empty($resArr['FEEAMT']) ? $resArr['FEEAMT'] : 0,
-            'paypal_tax' => !empty($resArr['TAXAMT']) ? $resArr['TAXAMT'] : 0,
-            'paypal_status' => $resArr['PAYMENTSTATUS']=='Completed' ? 'Completed' : $resArr['PAYMENTSTATUS'].'/'.$resArr['PENDINGREASON'].'/'.$resArr['REASONCODE'],
-        ));
-        //Cart::notify();
-
-        AOrder::i()->createFromCart(Cart::get('id'))->email('admin_notify')->email('customer_confirm')->email('customer_license');
-
-        $sData['last_order']['id'] = Cart::get('id');
-
-        FreshBooks::i()->invoice(true, true);
-        Cart::reset();
-        Cart::forget();
-        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout_success");
-    }
-
-    public static function cancel()
-    {
-        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout");
-    }
-
-    public static function call($methodName, $nvpArr)
-    {
-        self::sandbox();
+        $config = BConfig::i()->get('fcom.paypal');
+        $sandbox = $config['sandbox']['mode']=='on'
+            || $config['sandbox']['mode']=='ip'
+                && in_array(BRequest::i()->ip(), explode(',', $config['sandbox']['ip']));
+        $apiConfig = $config[$sandbox ? 'sandbox' : 'production'];
 
         $nvpArr = array_merge(array(
             'METHOD'    => $methodName,
-            'VERSION'   => self::$_version,
-            'USER'      => self::$_apiUserName,
-            'PWD'       => self::$_apiPassword,
-            'SIGNATURE' => self::$_apiSignature,
+            'VERSION'   => static::$_apiVersion,
+            'USER'      => $apiConfig['username'],
+            'PWD'       => $apiConfig['password'],
+            'SIGNATURE' => $apiConfig['signature'],
         ), $nvpArr);
         $resArr = BUtil::post(self::$_apiUrl, $nvpArr);
 
@@ -175,6 +57,112 @@ class FCom_Paypal extends BClass
         }
         $sData =& BSession::i()->dataToUpdate();
         $sData['checkout_error']['message'] = "[PAYPAL ERROR {$errorArr['code']}] {$errorArr['short_message']} - {$errorArr['long_message']}";
-        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout");
+        BResponse::i()->redirect(BApp::m('fcom.checkout')->baseUrl());
     }
 }
+
+class FCom_PayPal_Ctrl extends BActionController
+{
+    public static function redirect()
+    {
+        $config = BConfig::i()->get('fcom.paypal');
+        $cart = FCom_Cart::i()->sessionCart();
+        $baseUrl = BApp::m('fcom.paypal')->baseUrl();
+
+        Cart::save(array(
+            'order_status' => 'paypal.started',
+            'license_agreed' => $_POST['license_agreed'],
+            'comments' => !empty($_POST['comments']) ? $_POST['comments'] : '',
+        ));
+        $nvpArr = array(
+            'INVNUM'        => $cart->id,
+            'AMT'           => $cart->subtotal,
+            'PAYMENTACTION' => 'Sale',
+            'CURRENCYCODE'  => 'USD',
+            'RETURNURL'     => $baseUrl.'/return',
+            'CANCELURL'     => $baseUrl.'/cancel',
+            //'PAGESTYLE'     => 'paypal',
+        );
+        $resArr = FCom_PayPal::i()->call('SetExpressCheckout', $nvpArr);
+#echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
+        if (false===$resArr) {
+            throw new BException(print_r($resArr, 1));
+        }
+        $sData =& BSession::i()->dataToUpdate();
+        $sData['paypal']['token'] = $resArr['TOKEN'];
+        BResponse::i()->redirect(self::$_webUrl.'webscr?cmd=_express-checkout&useraction=commit&token='.$resArr['TOKEN']);
+    }
+
+    public static function complete()
+    {
+        $sData =& BSession::i()->dataToUpdate();
+        $cart = FCom_Cart::i()->sessionCart();
+
+        $resArr = FCom_PayPal::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
+        if (false===$resArr) {
+            return false;
+        }
+        $cart->set(array(
+            'order_status' => 'paypal.returned',
+            'email' => $resArr['EMAIL'],
+            'firstname' => $resArr['FIRSTNAME'],
+            'lastname' => $resArr['LASTNAME'],
+            'company' => !empty($resArr['COMPANY']) ? $resArr['COMPANY'] : '',
+            'street1' => $resArr['SHIPTOSTREET'],
+            'street2' => !empty($resArr['SHIPTOSTREET2']) ? $resArr['SHIPTOSTREET2'] : '',
+            'city' => $resArr['SHIPTOCITY'],
+            'state' => !empty($resArr['SHIPTOSTATE']) ? $resArr['SHIPTOSTATE'] : '',
+            'zip' => !empty($resArr['SHIPTOZIP']) ? $resArr['SHIPTOZIP'] : '',
+            'country' => $resArr['SHIPTOCOUNTRYCODE'],
+            'paypal_payerid' => $resArr['PAYERID'],
+            #'paypal_correlationid' => $resArr['CORRELATIONID'],
+            'paypal_status' => '!/'.$resArr['PAYERSTATUS'].'/'.$resArr['ADDRESSSTATUS'],
+        ))->save();
+
+        $nvpArr = array(
+            'TOKEN'         => $resArr['TOKEN'],
+            'PAYERID'       => $resArr['PAYERID'],
+            'PAYMENTACTION' => 'Sale',
+            'AMT'           => $sData['cart']['data']['subtotal'],
+            'CURRENCYCODE'  => 'USD',
+            'IPADDRESS'     => $_SERVER['SERVER_NAME'],
+            //'BUTTONSOURCE'  => '',
+        );
+
+         /* Make the call to PayPal to finalize payment
+            If an error occured, show the resulting errors
+            */
+        $resArr = FCom_PayPal::i()->call('DoExpressCheckoutPayment', $nvpArr);
+        if (false===$resArr) {
+            return false;
+        }
+        $cart->set(array(
+            'order_status' => 'complete',
+            'paypal_transactionid' => $resArr['TRANSACTIONID'],
+            'paypal_paid' => $resArr['AMT'],
+            'paypal_fee' => !empty($resArr['FEEAMT']) ? $resArr['FEEAMT'] : 0,
+            'paypal_tax' => !empty($resArr['TAXAMT']) ? $resArr['TAXAMT'] : 0,
+            'paypal_status' => $resArr['PAYMENTSTATUS']=='Completed' ? 'Completed' : $resArr['PAYMENTSTATUS'].'/'.$resArr['PENDINGREASON'].'/'.$resArr['REASONCODE'],
+        ))->save();
+        //Cart::notify();
+
+        $order = FCom_Order::i()->createFromCart($cart->id)
+            ->email('admin_notify')
+            ->email('customer_confirm')
+            ->email('customer_license');
+
+        $sData['last_order']['id'] = $order->id;
+
+        FCom_FreshBooks::i()->invoice(true, true);
+        Cart::reset();
+        Cart::forget();
+        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout_success");
+    }
+
+    public static function cancel()
+    {
+        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout");
+    }
+
+}
+

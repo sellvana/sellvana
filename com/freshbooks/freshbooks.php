@@ -4,18 +4,7 @@ class FCom_FreshBooks extends BClass
 {
     static public function bootstrap()
     {
-        //BApp::m()->autoload();
-
-        BEventRegistry::i()->on('FCom_Order::changeStatus.after', 'FCom_FreshBooks.onOrderStatus');
-    }
-
-    public function onOrderStatus($args)
-    {
-        $order = $args['order'];
-        $config = BConfig::i()->get('com.freshbooks');
-        if (in_array($order->status, (array)$config['order']['status.collect'])) {
-            $this->invoice($args['order'], $config['email']['autosend'], $order->is('paid'));
-        }
+        BPubSub::i()->on('FCom_Order::invoice', 'FCom_FreshBooks.createInvoiceFromOrder');
     }
 
     public function __construct()
@@ -28,7 +17,18 @@ class FCom_FreshBooks extends BClass
         FreshBooks_HttpClient::init($config['url'], $config['key']);
     }
 
-    public function invoice($order, $send=false, $paid=false)
+    public function createInvoiceFromOrder($args)
+    {
+        $order = $args['order'];
+        $config = BConfig::i()->get('com.freshbooks');
+        if (in_array($order->status, (array)$config['order']['status.collect'])) {
+            $this->postInvoice($order, $config['email']['autosend'], $order->is('paid'));
+            $order->set('status', $config['order']['status.set'])->save();
+        }
+        return $this;
+    }
+
+    public function postInvoice($order, $send=false, $paid=false, $newOrderStatus=null)
     {
         $er = error_reporting();
         error_reporting(E_ERROR | E_WARNING | E_PARSE);
@@ -93,7 +93,7 @@ class FCom_FreshBooks extends BClass
             $payment->date = date('Y-m-d', $order->ts!='0000-00-00 00:00:00' ? strtotime($order->ts) : time());
             $payment->amount = $totalAmount;
             $payment->type = 'Paypal';
-            $payment->notes = 'Imported; PayPal Transaction Id: '.Cart::get('paypal_transactionid');
+            $payment->notes = 'Imported; PayPal Transaction Id: '.$order->paypal_transactionid;
             $payment->create();
         }
         if ($send) {
@@ -103,13 +103,6 @@ class FCom_FreshBooks extends BClass
 
             $invoice->sendByEmail();
         }
-        $order
-        Cart::save(array('order_status'=>'invoiced'));
         error_reporting($er);
     }
-}
-
-class FCom_FreshBooks_Ctrl extends BActionController
-{
-
 }

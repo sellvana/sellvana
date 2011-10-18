@@ -4,7 +4,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
-require __DIR__."/../../buckyball/bucky/buckyball.php";
+require __DIR__."/../lib/b/buckyball.php";
 
 class FCom extends BClass
 {
@@ -79,7 +79,7 @@ class FCom extends BClass
         }
 
         BModuleRegistry::i()
-            ->scan(__DIR__.'/../../buckyball/bucky/plugins')
+            ->scan(__DIR__.'/../lib/b/plugins')
             ->scan(__DIR__.'/../market/*')
             ->scan(__DIR__.'/../local/*');
 
