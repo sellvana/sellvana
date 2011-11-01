@@ -1,0 +1,1458 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class FreshBooks_ElementAction</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../media/images/AbstractClass_logo.png"
+														alt="Abstract Class"
+														title="Abstract Class"
+														style="vertical-align: middle"> FreshBooks_ElementAction</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-vars">Vars</a>
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">An abstract class representing a an XML data block, with create/update/delete/get/list actions</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_ElementAction.php.html">/ElementAction.php</a> (line <span class="field">17</span>)
+		</p>
+		
+				
+		<pre><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a>
+   |
+   --FreshBooks_ElementAction</pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-vars">Vars</a>
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/AbstractClass.png"
+								 alt="Abstract class"
+								 title="Abstract class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_BaseInvoice.html">FreshBooks_BaseInvoice</a>
+					</td>
+					<td>
+											Class representing base invoice API - abstract class to be inherited in invoice, estimate, recurring
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Category.html">FreshBooks_Category</a>
+					</td>
+					<td>
+											Class representing category API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Client.html">FreshBooks_Client</a>
+					</td>
+					<td>
+											Class representing client API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Expense.html">FreshBooks_Expense</a>
+					</td>
+					<td>
+											Class representing expense API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Item.html">FreshBooks_Item</a>
+					</td>
+					<td>
+											Class representing item API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Payment.html">FreshBooks_Payment</a>
+					</td>
+					<td>
+											Class representing payment API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Project.html">FreshBooks_Project</a>
+					</td>
+					<td>
+											Class representing project API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Staff.html">FreshBooks_Staff</a>
+					</td>
+					<td>
+											Class representing staff API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Task.html">FreshBooks_Task</a>
+					</td>
+					<td>
+											Class representing task API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_TimeEntry.html">FreshBooks_TimeEntry</a>
+					</td>
+					<td>
+											Class representing time_entry API
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+																		<a href="#sec-vars">Vars</a>
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																							
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#create" title="details" class="method-name">create</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#delete" title="details" class="method-name">delete</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#get" title="details" class="method-name">get</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$id</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#listing" title="details" class="method-name">listing</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$rows</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$resultInfo</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$page</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$perPage</span> = <span class="var-default">25</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#update" title="details" class="method-name">update</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalCreate" title="details" class="method-name">_internalCreate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalDelete" title="details" class="method-name">_internalDelete</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalGet" title="details" class="method-name">_internalGet</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalListing" title="details" class="method-name">_internalListing</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$rows</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$resultInfo</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareCreate" title="details" class="method-name">_internalPrepareCreate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareDelete" title="details" class="method-name">_internalPrepareDelete</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareGet" title="details" class="method-name">_internalPrepareGet</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareListing" title="details" class="method-name">_internalPrepareListing</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareUpdate" title="details" class="method-name">_internalPrepareUpdate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalUpdate" title="details" class="method-name">_internalUpdate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a></span></p>
+					<blockquote>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../FreshBooks/FreshBooks_Element.html#var$lastError">FreshBooks_Element::$lastError</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../FreshBooks/FreshBooks_Element.html#var$_elementName">FreshBooks_Element::$_elementName</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-vars">Vars</a>
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodcreate" id="create"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">create</span> (line <span class="line-number">23</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">create remote element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			create
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#methodcreate">FreshBooks_Staff::create()</a>
+								: create not supported - returns false
+							</li>
+				</ul>
+	</div>
+<a name="methoddelete" id="delete"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">delete</span> (line <span class="line-number">79</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">delete remote element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			delete
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#methoddelete">FreshBooks_Staff::delete()</a>
+								: delete not supported - returns false
+							</li>
+				</ul>
+	</div>
+<a name="methodget" id="get"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">get</span> (line <span class="line-number">60</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">get remote element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$id</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodlisting" id="listing"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">listing</span> (line <span class="line-number">98</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">list/search remote elements</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			listing
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$rows</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$resultInfo</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$page</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$perPage</span> = <span class="var-default">25</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$rows</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$resultInfo</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$page</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$perPage</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filters</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodupdate" id="update"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">update</span> (line <span class="line-number">41</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">update remote element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			update
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#methodupdate">FreshBooks_Staff::update()</a>
+								: update not supported - returns false
+							</li>
+				</ul>
+	</div>
+<a name="method_internalCreate" id="_internalCreate"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalCreate</span> (line <span class="line-number">37</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for create</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalCreate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalCreate">FreshBooks_Estimate::_internalCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalCreate">FreshBooks_Invoice::_internalCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalCreate">FreshBooks_Recurring::_internalCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalCreate">FreshBooks_Category::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalCreate">FreshBooks_Client::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalCreate">FreshBooks_Expense::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalCreate">FreshBooks_Item::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalCreate">FreshBooks_Payment::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalCreate">FreshBooks_Project::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalCreate">FreshBooks_Staff::_internalCreate()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalCreate">FreshBooks_Task::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalCreate">FreshBooks_TimeEntry::_internalCreate()</a>
+								: process XML string response from CREATE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalDelete" id="_internalDelete"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalDelete</span> (line <span class="line-number">93</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for delete</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalDelete
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_BaseInvoice.html#method_internalDelete">FreshBooks_BaseInvoice::_internalDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalDelete">FreshBooks_Estimate::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalDelete">FreshBooks_Invoice::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalDelete">FreshBooks_Recurring::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalDelete">FreshBooks_Category::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalDelete">FreshBooks_Client::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalDelete">FreshBooks_Expense::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalDelete">FreshBooks_Item::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalDelete">FreshBooks_Payment::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalDelete">FreshBooks_Project::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalDelete">FreshBooks_Staff::_internalDelete()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalDelete">FreshBooks_Task::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalDelete">FreshBooks_TimeEntry::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalGet" id="_internalGet"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalGet</span> (line <span class="line-number">74</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for get</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalGet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalGet">FreshBooks_Estimate::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalGet">FreshBooks_Invoice::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalGet">FreshBooks_Recurring::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalGet">FreshBooks_Category::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalGet">FreshBooks_Client::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalGet">FreshBooks_Expense::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalGet">FreshBooks_Item::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalGet">FreshBooks_Payment::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalGet">FreshBooks_Project::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalGet">FreshBooks_Staff::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalGet">FreshBooks_Task::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalGet">FreshBooks_TimeEntry::_internalGet()</a>
+								: process XML string response from GET server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalListing" id="_internalListing"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalListing</span> (line <span class="line-number">113</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for list</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalListing
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$rows</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$resultInfo</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$rows</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$resultInfo</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalListing">FreshBooks_Estimate::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalListing">FreshBooks_Invoice::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalListing">FreshBooks_Recurring::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalListing">FreshBooks_Category::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalListing">FreshBooks_Client::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalListing">FreshBooks_Expense::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalListing">FreshBooks_Item::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalListing">FreshBooks_Payment::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalListing">FreshBooks_Project::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalListing">FreshBooks_Staff::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalListing">FreshBooks_Task::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalListing">FreshBooks_TimeEntry::_internalListing()</a>
+								: process XML string response from LIST server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareCreate" id="_internalPrepareCreate"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareCreate</span> (line <span class="line-number">33</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to generate xml request for create request</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareCreate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_BaseInvoice.html#method_internalPrepareCreate">FreshBooks_BaseInvoice::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalPrepareCreate">FreshBooks_Category::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalPrepareCreate">FreshBooks_Client::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalPrepareCreate">FreshBooks_Expense::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalPrepareCreate">FreshBooks_Item::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalPrepareCreate">FreshBooks_Payment::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalPrepareCreate">FreshBooks_Project::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalPrepareCreate">FreshBooks_Staff::_internalPrepareCreate()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalPrepareCreate">FreshBooks_Task::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalPrepareCreate">FreshBooks_TimeEntry::_internalPrepareCreate()</a>
+								: prepare XML string request for CREATE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareDelete" id="_internalPrepareDelete"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareDelete</span> (line <span class="line-number">89</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to generate xml request for delete request</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareDelete
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalPrepareDelete">FreshBooks_Estimate::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalPrepareDelete">FreshBooks_Invoice::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalPrepareDelete">FreshBooks_Recurring::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalPrepareDelete">FreshBooks_Category::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalPrepareDelete">FreshBooks_Client::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalPrepareDelete">FreshBooks_Expense::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalPrepareDelete">FreshBooks_Item::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalPrepareDelete">FreshBooks_Payment::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalPrepareDelete">FreshBooks_Project::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalPrepareDelete">FreshBooks_Staff::_internalPrepareDelete()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalPrepareDelete">FreshBooks_Task::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalPrepareDelete">FreshBooks_TimeEntry::_internalPrepareDelete()</a>
+								: prepare XML string request for DELETE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareGet" id="_internalPrepareGet"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareGet</span> (line <span class="line-number">70</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to generate xml request for get request</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareGet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalPrepareGet">FreshBooks_Estimate::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalPrepareGet">FreshBooks_Invoice::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalPrepareGet">FreshBooks_Recurring::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalPrepareGet">FreshBooks_Category::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalPrepareGet">FreshBooks_Client::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalPrepareGet">FreshBooks_Expense::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalPrepareGet">FreshBooks_Item::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalPrepareGet">FreshBooks_Payment::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalPrepareGet">FreshBooks_Project::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalPrepareGet">FreshBooks_Staff::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalPrepareGet">FreshBooks_Task::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalPrepareGet">FreshBooks_TimeEntry::_internalPrepareGet()</a>
+								: prepare XML string request for GET server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareListing" id="_internalPrepareListing"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareListing</span> (line <span class="line-number">109</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for list</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareListing
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filters</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_BaseInvoice.html#method_internalPrepareListing">FreshBooks_BaseInvoice::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalPrepareListing">FreshBooks_Invoice::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalPrepareListing">FreshBooks_Recurring::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalPrepareListing">FreshBooks_Category::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalPrepareListing">FreshBooks_Client::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalPrepareListing">FreshBooks_Expense::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalPrepareListing">FreshBooks_Item::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalPrepareListing">FreshBooks_Payment::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalPrepareListing">FreshBooks_Project::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalPrepareListing">FreshBooks_Staff::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalPrepareListing">FreshBooks_Task::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalPrepareListing">FreshBooks_TimeEntry::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareUpdate" id="_internalPrepareUpdate"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareUpdate</span> (line <span class="line-number">51</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to generate xml request for update request</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareUpdate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_BaseInvoice.html#method_internalPrepareUpdate">FreshBooks_BaseInvoice::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalPrepareUpdate">FreshBooks_Category::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalPrepareUpdate">FreshBooks_Client::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalPrepareUpdate">FreshBooks_Expense::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalPrepareUpdate">FreshBooks_Item::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalPrepareUpdate">FreshBooks_Payment::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalPrepareUpdate">FreshBooks_Project::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalPrepareUpdate">FreshBooks_Staff::_internalPrepareUpdate()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalPrepareUpdate">FreshBooks_Task::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalPrepareUpdate">FreshBooks_TimeEntry::_internalPrepareUpdate()</a>
+								: prepare XML string request for UPDATE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalUpdate" id="_internalUpdate"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalUpdate</span> (line <span class="line-number">55</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic how to process xml response object for update</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalUpdate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_BaseInvoice.html#method_internalUpdate">FreshBooks_BaseInvoice::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Category.html#method_internalUpdate">FreshBooks_Category::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Client.html#method_internalUpdate">FreshBooks_Client::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Expense.html#method_internalUpdate">FreshBooks_Expense::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Item.html#method_internalUpdate">FreshBooks_Item::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Payment.html#method_internalUpdate">FreshBooks_Payment::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Project.html#method_internalUpdate">FreshBooks_Project::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Staff.html#method_internalUpdate">FreshBooks_Staff::_internalUpdate()</a>
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Task.html#method_internalUpdate">FreshBooks_Task::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_TimeEntry.html#method_internalUpdate">FreshBooks_TimeEntry::_internalUpdate()</a>
+								: process XML string response from UPDATE server method
+							</li>
+				</ul>
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a></span></p>
+					<blockquote>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#methodloadXML">FreshBooks_Element::loadXML()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_getTagXML">FreshBooks_Element::_getTagXML()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_internalLoadXML">FreshBooks_Element::_internalLoadXML()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_processResponse">FreshBooks_Element::_processResponse()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_requestEnvelope">FreshBooks_Element::_requestEnvelope()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_sendRequest">FreshBooks_Element::_sendRequest()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	
+	<p class="notes" id="credit">
+		Documentation generated on Sat, 14 Mar 2009 18:57:54 +0100 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.1</a>
+	</p>
+	</div></body>
+</html>
