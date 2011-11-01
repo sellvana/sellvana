@@ -1,0 +1,1 @@
+<h1>Congratulations, you have successfully completed the installation wizard!</h1>

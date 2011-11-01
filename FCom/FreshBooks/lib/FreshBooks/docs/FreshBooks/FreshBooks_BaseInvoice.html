@@ -1,0 +1,1560 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class FreshBooks_BaseInvoice</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../media/images/AbstractClass_logo.png"
+														alt="Abstract Class"
+														title="Abstract Class"
+														style="vertical-align: middle"> FreshBooks_BaseInvoice</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+                <p class="implements">
+            Implements interfaces:
+            <ul>
+                <li><a href="../FreshBooks/FreshBooks_Element_Interface.html">FreshBooks_Element_Interface</a></li><li><a href="../FreshBooks/FreshBooks_ElementAction_Interface.html">FreshBooks_ElementAction_Interface</a></li>            </ul>
+        </p>
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Class representing base invoice API - abstract class to be inherited in invoice, estimate, recurring</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_BaseInvoice.php.html">/BaseInvoice.php</a> (line <span class="field">19</span>)
+		</p>
+		
+				
+		<pre><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a>
+   |
+   --<a href="../FreshBooks/FreshBooks_ElementAction.html">FreshBooks_ElementAction</a>
+      |
+      --FreshBooks_BaseInvoice</pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Estimate.html">FreshBooks_Estimate</a>
+					</td>
+					<td>
+											Class representing invoice API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Invoice.html">FreshBooks_Invoice</a>
+					</td>
+					<td>
+											Class representing invoice API
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../FreshBooks/FreshBooks_Recurring.html">FreshBooks_Recurring</a>
+					</td>
+					<td>
+											Class representing invoice API
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																																																																																																																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$amount" title="details" class="var-name">$amount</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$clientId" title="details" class="var-name">$clientId</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$date" title="details" class="var-name">$date</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$discount" title="details" class="var-name">$discount</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$firstName" title="details" class="var-name">$firstName</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$lastName" title="details" class="var-name">$lastName</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$lines" title="details" class="var-name">$lines</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$linkClientView" title="details" class="var-name">$linkClientView</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$linkEdit" title="details" class="var-name">$linkEdit</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$linkView" title="details" class="var-name">$linkView</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$notes" title="details" class="var-name">$notes</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$number" title="details" class="var-name">$number</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$organization" title="details" class="var-name">$organization</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pCity" title="details" class="var-name">$pCity</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pCode" title="details" class="var-name">$pCode</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pCountry" title="details" class="var-name">$pCountry</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$poNumber" title="details" class="var-name">$poNumber</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pState" title="details" class="var-name">$pState</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pStreet1" title="details" class="var-name">$pStreet1</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$pStreet2" title="details" class="var-name">$pStreet2</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$status" title="details" class="var-name">$status</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$terms" title="details" class="var-name">$terms</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#asXML" title="details" class="method-name">asXML</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#sendByEmail" title="details" class="method-name">sendByEmail</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalDelete" title="details" class="method-name">_internalDelete</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalLoadXML" title="details" class="method-name">_internalLoadXML</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareCreate" title="details" class="method-name">_internalPrepareCreate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareListing" title="details" class="method-name">_internalPrepareListing</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareSendByEmail" title="details" class="method-name">_internalPrepareSendByEmail</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalPrepareUpdate" title="details" class="method-name">_internalPrepareUpdate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/AbstractMethod.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalSendByEmail" title="details" class="method-name">_internalSendByEmail</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalUpdate" title="details" class="method-name">_internalUpdate</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_internalXMLContent" title="details" class="method-name">_internalXMLContent</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_linesAsXML" title="details" class="method-name">_linesAsXML</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_linksAsXML" title="details" class="method-name">_linksAsXML</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#_loadLines" title="details" class="method-name">_loadLines</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+<a name="var$amount" id="$amount"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$amount</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">23</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$clientId" id="$clientId"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$clientId</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">21</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$date" id="$date"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$date</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">25</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$discount" id="$discount"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$discount</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">27</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$firstName" id="$firstName"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$firstName</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">36</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$lastName" id="$lastName"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$lastName</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">37</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$lines" id="$lines"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$lines</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">49</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">invoice lines (items)</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$linkClientView" id="$linkClientView"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$linkClientView</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">31</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$linkEdit" id="$linkEdit"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$linkEdit</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">33</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$linkView" id="$linkView"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$linkView</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">32</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$notes" id="$notes"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$notes</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">28</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$number" id="$number"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$number</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">22</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$organization" id="$organization"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$organization</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">35</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pCity" id="$pCity"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pCity</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">41</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pCode" id="$pCode"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pCode</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">44</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pCountry" id="$pCountry"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pCountry</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">43</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$poNumber" id="$poNumber"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$poNumber</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">26</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pState" id="$pState"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pState</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">42</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pStreet1" id="$pStreet1"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pStreet1</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">39</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$pStreet2" id="$pStreet2"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$pStreet2</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">40</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$status" id="$status"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$status</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">24</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$terms" id="$terms"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$terms</span>
+			 = <span class="var-default"> &quot;&quot;</span>			(line <span class="line-number">29</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a></span></p>
+					<blockquote>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../FreshBooks/FreshBooks_Element.html#var$lastError">FreshBooks_Element::$lastError</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../FreshBooks/FreshBooks_Element.html#var$_elementName">FreshBooks_Element::$_elementName</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodasXML" id="asXML"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">asXML</span> (line <span class="line-number">83</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">return XML string</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			asXML
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../FreshBooks/FreshBooks_Element_Interface.html#methodasXML">FreshBooks_Element_Interface::asXML()</a></dt>
+						<dd>return XML data</dd>
+					</dl>
+			
+	</div>
+<a name="methodsendByEmail" id="sendByEmail"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">sendByEmail</span> (line <span class="line-number">255</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">send invoice by email</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sendByEmail
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_internalDelete" id="_internalDelete"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalDelete</span> (line <span class="line-number">202</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">prepare XML string request for DELETE server method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalDelete
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalDelete">FreshBooks_ElementAction::_internalDelete()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to process xml response object for delete</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalDelete">FreshBooks_Estimate::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalDelete">FreshBooks_Invoice::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalDelete">FreshBooks_Recurring::_internalDelete()</a>
+								: process XML string response from DELETE server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalLoadXML" id="_internalLoadXML"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalLoadXML</span> (line <span class="line-number">126</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">load obect properties from SimpleXML object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalLoadXML
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_Element.html#method_internalLoadXML">FreshBooks_Element::_internalLoadXML()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to populate object properties from xml</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalLoadXML">FreshBooks_Estimate::_internalLoadXML()</a>
+								: load obect properties from SimpleXML object
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalLoadXML">FreshBooks_Invoice::_internalLoadXML()</a>
+								: load obect properties from SimpleXML object
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalLoadXML">FreshBooks_Recurring::_internalLoadXML()</a>
+								: load obect properties from SimpleXML object
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareCreate" id="_internalPrepareCreate"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalPrepareCreate</span> (line <span class="line-number">178</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">prepare XML string request for CREATE server method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareCreate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareCreate">FreshBooks_ElementAction::_internalPrepareCreate()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to generate xml request for create request</dd>
+					</dl>
+			
+	</div>
+<a name="method_internalPrepareListing" id="_internalPrepareListing"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalPrepareListing</span> (line <span class="line-number">233</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">prepare XML string request for LIST server method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareListing
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$filters</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filters</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareListing">FreshBooks_ElementAction::_internalPrepareListing()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to process xml response object for list</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalPrepareListing">FreshBooks_Invoice::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalPrepareListing">FreshBooks_Recurring::_internalPrepareListing()</a>
+								: prepare XML string request for LIST server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareSendByEmail" id="_internalPrepareSendByEmail"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalPrepareSendByEmail</span> (line <span class="line-number">246</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic to generate request for sendByEmail method</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareSendByEmail
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalPrepareSendByEmail">FreshBooks_Estimate::_internalPrepareSendByEmail()</a>
+								: prepare XML string request for SENDBYEMAIL server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalPrepareSendByEmail">FreshBooks_Invoice::_internalPrepareSendByEmail()</a>
+								: prepare XML string request for SENDBYEMAIL server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalPrepareSendByEmail">FreshBooks_Recurring::_internalPrepareSendByEmail()</a>
+								: prepare XML string request for SENDBYEMAIL server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalPrepareUpdate" id="_internalPrepareUpdate"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalPrepareUpdate</span> (line <span class="line-number">186</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">prepare XML string request for UPDATE server method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalPrepareUpdate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$content</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$content</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareUpdate">FreshBooks_ElementAction::_internalPrepareUpdate()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to generate xml request for update request</dd>
+					</dl>
+			
+	</div>
+<a name="method_internalSendByEmail" id="_internalSendByEmail"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/AbstractMethod.png" />
+		<span class="method-title">_internalSendByEmail</span> (line <span class="line-number">250</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal hook to be implemented in child classes with particular logic to process response XML from sendByEmail method</p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalSendByEmail
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalSendByEmail">FreshBooks_Estimate::_internalSendByEmail()</a>
+								: process XML string response from SENDBYEMAIL server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalSendByEmail">FreshBooks_Invoice::_internalSendByEmail()</a>
+								: process XML string response from SENDBYEMAIL server method
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalSendByEmail">FreshBooks_Recurring::_internalSendByEmail()</a>
+								: process XML string response from SENDBYEMAIL server method
+							</li>
+				</ul>
+	</div>
+<a name="method_internalUpdate" id="_internalUpdate"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalUpdate</span> (line <span class="line-number">194</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">process XML string response from UPDATE server method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalUpdate
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$responseStatus</span>, <span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$responseStatus</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalUpdate">FreshBooks_ElementAction::_internalUpdate()</a></dt>
+						<dd>internal hook to be implemented in child classes with particular logic how to process xml response object for update</dd>
+					</dl>
+			
+	</div>
+<a name="method_internalXMLContent" id="_internalXMLContent"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_internalXMLContent</span> (line <span class="line-number">54</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">generate XML string from common properties</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_internalXMLContent
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../FreshBooks/FreshBooks_Estimate.html#method_internalXMLContent">FreshBooks_Estimate::_internalXMLContent()</a>
+								: return XML content
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Invoice.html#method_internalXMLContent">FreshBooks_Invoice::_internalXMLContent()</a>
+								: return XML content
+							</li>
+					<li>
+				<a href="../FreshBooks/FreshBooks_Recurring.html#method_internalXMLContent">FreshBooks_Recurring::_internalXMLContent()</a>
+								: return XML content
+							</li>
+				</ul>
+	</div>
+<a name="method_linesAsXML" id="_linesAsXML"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_linesAsXML</span> (line <span class="line-number">102</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">generate XML output from lines array</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_linesAsXML
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_linksAsXML" id="_linksAsXML"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_linksAsXML</span> (line <span class="line-number">91</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">generate XML output from links properties</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_linksAsXML
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_loadLines" id="_loadLines"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">_loadLines</span> (line <span class="line-number">157</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">load lines array from XML object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_loadLines
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$XMLObject</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$XMLObject</span>			</li>
+				</ul>
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../FreshBooks/FreshBooks_ElementAction.html">FreshBooks_ElementAction</a></span></p>
+					<blockquote>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#methodcreate">FreshBooks_ElementAction::create()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#methoddelete">FreshBooks_ElementAction::delete()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#methodget">FreshBooks_ElementAction::get()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#methodlisting">FreshBooks_ElementAction::listing()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#methodupdate">FreshBooks_ElementAction::update()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalCreate">FreshBooks_ElementAction::_internalCreate()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalDelete">FreshBooks_ElementAction::_internalDelete()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalGet">FreshBooks_ElementAction::_internalGet()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalListing">FreshBooks_ElementAction::_internalListing()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareCreate">FreshBooks_ElementAction::_internalPrepareCreate()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareDelete">FreshBooks_ElementAction::_internalPrepareDelete()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareGet">FreshBooks_ElementAction::_internalPrepareGet()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareListing">FreshBooks_ElementAction::_internalPrepareListing()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalPrepareUpdate">FreshBooks_ElementAction::_internalPrepareUpdate()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_ElementAction.html#method_internalUpdate">FreshBooks_ElementAction::_internalUpdate()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../FreshBooks/FreshBooks_Element.html">FreshBooks_Element</a></span></p>
+					<blockquote>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#methodloadXML">FreshBooks_Element::loadXML()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_getTagXML">FreshBooks_Element::_getTagXML()</a></span><br>
+													<img src="../media/images/AbstractMethod.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_internalLoadXML">FreshBooks_Element::_internalLoadXML()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_processResponse">FreshBooks_Element::_processResponse()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_requestEnvelope">FreshBooks_Element::_requestEnvelope()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../FreshBooks/FreshBooks_Element.html#method_sendRequest">FreshBooks_Element::_sendRequest()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	
+	<p class="notes" id="credit">
+		Documentation generated on Sat, 14 Mar 2009 18:57:46 +0100 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.1</a>
+	</p>
+	</div></body>
+</html>
