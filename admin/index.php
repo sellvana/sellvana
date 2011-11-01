@@ -1,5 +1,5 @@
 <?php
 
-require dirname(__DIR__).'/com/bootstrap.php';
+require dirname(__DIR__).'/FCom/FCom.php';
 
-FCom::i()->run('admin');
+FCom::i()->run('FCom_Admin');

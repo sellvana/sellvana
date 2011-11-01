@@ -1,5 +1,7 @@
 <?php
 
-require __DIR__.'/com/bootstrap.php';
+require __DIR__.'/FCom/FCom.php';
 
-FCom::i()->run('frontend');
+BConfig::i()->add(array('config_dir'=>'storage/config'));
+
+FCom::i()->run('FCom_Frontend');
