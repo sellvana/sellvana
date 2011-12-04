@@ -4,10 +4,11 @@ class FCom_Admin_DefaultTheme extends BClass
 {
     public static function bootstrap()
     {
-        BLayout::i()->theme('FCom_Admin_DefaultTheme', array(
-            'area' => 'FCom_Admin',
-            'callback' => array(static::i(), 'layout'),
-        ));
+        BLayout::i()
+            ->theme('FCom_Admin_DefaultTheme', array(
+                'area' => 'FCom_Admin',
+                'callback' => array(static::i(), 'layout'),
+            ));
     }
 
     public function layout()
@@ -23,12 +24,8 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('hook', 'main', 'views'=>array('breadcrumbs')),
                 ),
 
-                'home'=>array(
-                    array('view', 'root', 'do'=>array(
-                        array('setLayoutClass', 'col2-right-layout'),
-                    ), 'set'=>array(
-                        'body_class'=>'body-home',
-                    )),
+                '/'=>array(
+
                 ),
             ));
         ;

@@ -12,7 +12,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
         $cat = parent::load($id, $field);
         if ($cat) return $cat;
         if ($id==1) {
-            return $this->create(array(
+            return static::i()->create(array(
                 'id' => 1,
                 'id_path' => 1,
                 'sort_order' => 1,
@@ -219,16 +219,12 @@ class FCom_Core_Model_TreeAbstract extends BModel
             $class = get_class($this);
             $orm = $this->factory()->where('parent_id', $id);
             if ($children) $orm->where_not_in('id', array_keys($children));
-            foreach ($orm->find_many() as $c) {
+            if ($sort) $orm->order_by_asc($sort);
+            $rows = $orm->find_many();
+            foreach ($rows as $c) {
                 $c->cacheStore();
                 $children[$c->id] = $c;
             }
-        }
-        if ($sort) {
-            uasort($children, function($a, $b) use($sort) {
-                $l = $a->$sort; $r = $b->$sort;
-                return $l<$r ? -1 : ($l>$r ? 1 : 0);
-            });
         }
         return $children;
     }
@@ -244,16 +240,12 @@ class FCom_Core_Model_TreeAbstract extends BModel
         if (is_null($this->num_descendants) || sizeof($desc)!=$this->num_descendants) {
             $orm = $this->factory()->where_like('id_path', $path.'%');
             if ($desc) $orm->where_not_in('id', array_keys($desc));
-            foreach ($orm->find_many() as $c) {
+            if ($sort) $orm->order_by_asc($sort);
+            $rows = $orm->find_many();
+            foreach ($rows as $c) {
                 $c->cacheStore();
                 $desc[$c->id] = $c;
             }
-        }
-        if ($sort) {
-            uasort($desc, function($a, $b) use($sort) {
-                $l = $a->$sort; $r = $b->$sort;
-                return $l<$r ? -1 : ($l>$r ? 1 : 0);
-            });
         }
         return $desc;
     }
@@ -292,7 +284,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
 
     public function generateUrlKey()
     {
-        $this->set('url_key', DMain::getUrlKey($this->node_name));
+        $this->set('url_key', FCom_Catalog::getUrlKey($this->node_name));
         return $this;
     }
 

@@ -1,10 +1,10 @@
 <?php
 
-class FCom_Admin_Controller extends FCom_Admin_ControllerAbstract
+class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_index()
     {
-        BLayout::i()->layout('base')->layout('home');
+        BLayout::i()->layout('/');
         BResponse::i()->render();
     }
 

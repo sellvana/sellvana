@@ -1,12 +1,10 @@
-<div class="main col1-layout">
-    <?=$this->view('breadcrumbs')?>
     <div class="col-main">
         <div class="page-title category-title">
             <h1>Cart</h1>
         </div>
 <?
-$loggedIn = AUser::isLoggedIn();
-$cart = ACart::sessionCart()->calcTotals();
+$loggedIn = FCom_Customer_Model_User::i()->isLoggedIn();
+$cart = FCom_Checkout_Model_Cart::sessionCart()->calcTotals();
 $items = $cart->items();
 ?>
 <? if (!$items): ?>
@@ -15,9 +13,9 @@ $items = $cart->items();
 
 <? else: ?>
 <?
-AManuf::i()->cachePreloadFrom(AProduct::i()->cacheFetch(), 'manuf_id');
+FCom_Catalog_Model_Manuf::i()->cachePreloadFrom(FCom_Catalog_Model_Product::i()->cacheFetch(), 'manuf_id');
 ?>
-    <form name="cart" action="<?=BApp::baseUrl()?>/cart" method="post">
+    <form name="cart" action="<?=BApp::m('FCom_Checkout')->baseHref()?>/cart" method="post">
         <table class="product-list">
             <col width="30"/>
             <col width="60"/>
@@ -85,7 +83,6 @@ TEST
 <? endif ?>
 
     </div>
-</div>
 <script>
 $('.vendor-count').tooltip({effect:'slide'});
 </script>

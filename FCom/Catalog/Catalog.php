@@ -71,14 +71,14 @@ class FCom_Catalog extends BClass
     static public function frontend()
     {
         BFrontController::i()
-            ->route( 'GET /c/*category', 'FCom_Catalog_Controller.category')
-            ->route( 'GET /m/*manuf', 'FCom_Catalog_Controller.manuf')
-            ->route( 'GET /p/*product', 'FCom_Catalog_Controller.product')
-            ->route( 'GET /search', 'FCom_Catalog_Controller.search')
-            ->route( 'GET /compare', 'FCom_Catalog_Controller.compare')
+            ->route( 'GET /c/*category', 'FCom_Catalog_Controller_Frontend.category')
+            ->route( 'GET /m/*manuf', 'FCom_Catalog_Controller_Frontend.manuf')
+            ->route( 'GET /p/*product', 'FCom_Catalog_Controller_Frontend.product')
+            ->route( 'GET /search', 'FCom_Catalog_Controller_Frontend.search')
+            ->route( 'GET /compare', 'FCom_Catalog_Controller_Frontend.compare')
         ;
 
-        BLayout::i()->allViews('views_frontend');
+        BLayout::i()->allViews('views_frontend', 'catalog/');
     }
 
     static public function admin()
@@ -107,7 +107,7 @@ class FCom_Catalog extends BClass
     static public function url($type, $args)
     {
         if (is_string($args)) {
-            return BApp::m('FCom_Catalog')->baseUrl().'/'.$type.'/'.$args;
+            return BApp::m('FCom_Catalog')->baseHref().'/'.$type.'/'.$args;
         }
         return false;
     }
@@ -125,115 +125,3 @@ class FCom_Catalog extends BClass
     }
 }
 
-
-class FCom_Catalog_Controller extends BActionController
-{
-    public function action_category()
-    {
-        $layout = BLayout::i();
-        $category = ACategory::load(BRequest::i()->params('category'), 'url_path');
-        if (!$category) $this->forward('noroute');
-
-        $layout->view('category')->category = $category;
-        $layout->view('product/rows')->category = $category;
-
-        $crumbs = array('home');
-        foreach ($category->ascendants() as $c) if ($c->node_name) $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
-
-        DCatalogMain::lastNav(true);
-        $layout->view('main')->body_class = 'catalog-category-view';
-        $layout->view('body')->append('category');
-        BResponse::i()->render();
-    }
-
-    public function action_search()
-    {
-        $layout = BLayout::i();
-        $q = BRequest::i()->get('q');
-        $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
-        if (!$qs) {
-            BResponse::i()->redirect(BApp::baseUrl());
-        }
-        $and = array();
-        foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
-        $productsORM = AProduct::i()->factory()->where_complex(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
-
-        DCatalogMain::lastNav(true);
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-        $layout->view('search')->query = $q;
-        $layout->view('product/list')->productsORM = $productsORM;
-        $layout->view('main')->body_class = 'catalog-search';
-        $layout->view('body')->append('search');
-        BResponse::i()->render();
-    }
-
-    public function action_manuf()
-    {
-        BLayout::i()->view('body')->append('manuf');
-        BResponse::i()->render();
-    }
-
-    public function action_product()
-    {
-        $layout = BLayout::i();
-        $crumbs = array('home');
-        $r = explode('/', BRequest::i()->params('product'));
-        $p = array_pop($r);
-        $product = AProduct::i()->load($p, 'url_key');
-        if (!$product) {
-            $this->forward('noroute');
-            return $this;
-        }
-        BLayout::i()->view('product')->product = $product;
-        if ($r) {
-            $category = ACategory::load(join('/', $r), 'url_path');
-            if (!$category) {
-                $this->forward('noroute');
-                return $this;
-            }
-            $layout->view('product')->category = $category;
-            $layout->view('main')->canonical_url = $product->url();
-            foreach ($category->ascendants() as $c) if ($c->node_name) $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-            $crumbs[] = array('label'=>$category->node_name, 'href'=>$category->url());
-        }
-        $crumbs[] = array('label'=>$product->product_name, 'active'=>true);
-
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
-
-        $layout->view('main')->body_class = 'catalog-product-view';
-        $layout->view('body')->append('product');
-        BResponse::i()->render();
-    }
-
-    public function action_compare()
-    {
-        $layout = BLayout::i();
-        $cookie = BRequest::i()->cookie('dentevaCompare');
-        $xhr = BRequest::i()->xhr();
-        if (!empty($cookie)) $arr = BUtil::fromJson($cookie);
-        if (!empty($arr)) {
-            AProduct::i()->cachePreloadFrom($arr);
-            $products = AProduct::i()->cacheFetch();
-        }
-        if (empty($products)) {
-            if ($xhr) {
-                return;
-            } else {
-                BSession::i()->addMessage('No products to compare');
-                BResponse::i()->redirect(DCatalogMain::lastNav());
-            }
-        }
-        $layout->view('compare')->products = array_values($products);
-        if ($xhr) {
-            $layout->rootView('compare');
-        } else {
-            $layout->view('breadcrumbs')->crumbs = array('home',
-                array('label'=>'Compare '.sizeof($products).' products', 'active'=>true)
-            );
-            $layout->view('body')->append('compare');
-        }
-        BResponse::i()->render();
-    }
-}

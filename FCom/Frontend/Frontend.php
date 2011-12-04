@@ -13,41 +13,57 @@ class FCom_Frontend extends BClass
             //->view('head', array('view_class'=>'BViewHead'))
             ->allViews('views')
         ;
-
-        BPubSub::i()->on('BActionController::beforeDispatch', 'FCom_Frontend.onBeforeDispatch');
     }
 
-    public function onBeforeDispatch()
+    public function loadTheme()
     {
-        BLayout::i()->theme(BConfig::i()->get('FCom_Frontend/theme'));
+        BLayout::i()->theme(BConfig::i()->get('modules/FCom_Frontend/theme'));
     }
 }
 
-class FCom_Frontend_Controller extends BActionController
+class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
+{
+    public function layout($name)
+    {
+        $layout = BLayout::i();
+        $layout->theme(BConfig::i()->get('modules/FCom_Frontend/theme'));
+
+        foreach ((array)$name as $l) {
+            $layout->layout($l);
+        }
+        return $this;
+    }
+}
+
+class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
     {
         //FCom_Core::i()->writeDbConfig()->writeLocalConfig();
-        BLayout::i()->layout('base')->layout('home');
+        $this->layout('/');
         BResponse::i()->render();
     }
 }
 
 class FCom_Frontend_View_Root extends BView
 {
-    protected function _beforeRender()
-    {
-        $this->body_class = '';
-        $this->layout_class = '';
-        $this->show_left_col = '';
-        $this->show_right_col = '';
-        return true;
-    }
-
     public function setLayoutClass($layout)
     {
         $this->layout_class = $layout;
-        $this->show_left_col = $layout=='col2-left-layout' || $layout=='col3-layout';
-        $this->show_right_col = $layout=='col2-right-layout' || $layout=='col3-layout';
+        $this->show_left_col = $layout=='col2-layout-left' || $layout=='col3-layout';
+        $this->show_right_col = $layout=='col2-layout-right' || $layout=='col3-layout';
+        return $this;
+    }
+
+    public function addBodyClass($class)
+    {
+        $this->body_class = !$this->body_class ? (array)$class
+            : array_merge($this->body_class, (array)$class);
+        return $this;
+    }
+
+    public function getBodyClass()
+    {
+        return $this->body_class ? join(' ', $this->body_class) : '';
     }
 }

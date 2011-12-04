@@ -4,7 +4,10 @@ class FCom_Core extends BClass
 {
     static public function bootstrap()
     {
-        BApp::m()->autoload(dirname(dirname(__DIR__)));
+        $rootDir = dirname(dirname(__DIR__));
+        BApp::m()->autoload($rootDir.'/local');
+        BApp::m()->autoload($rootDir.'/market');
+        BApp::m()->autoload($rootDir);
 
         BLayout::i()
             ->view('head', array('view_class'=>'FCom_Core_View_Head'))
@@ -35,8 +38,9 @@ class FCom_Core extends BClass
     }
 }
 
-class FCom_Core_View_Head extends BView
+class FCom_Core_View_Head extends BViewHead
 {
+    /*
     public function _render()
     {
         $baseUrl = BConfig::i()->get('web/base_path');
@@ -45,4 +49,15 @@ class FCom_Core_View_Head extends BView
         $html .= '<script type="text/javascript">require.config({baseUrl: "'.$baseUrl.'"});</script>';
         return $html;
     }
+    */
+}
+
+class FCom_Core_Controller_Abstract extends BActionController
+{
+
+}
+
+class FCom_Core_Model_Abstract extends BModel
+{
+
 }

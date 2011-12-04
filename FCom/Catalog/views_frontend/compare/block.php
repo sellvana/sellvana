@@ -2,7 +2,7 @@
     <div class="block-title"><strong>Compare</strong>up to 4 items</div>
     <div class="block-content">
         <ul><li></li><li></li><li></li><li></li></ul>
-        <a href="<?=BApp::baseUrl()?>/compare" class="button" rel="#compare-overlay">Compare</a>
+        <a href="<?=BApp::m('FCom_Catalog')->baseHref()?>/compare" class="button" rel="#compare-overlay">Compare</a>
         <a href="#" class="reset-btn">Reset</a>
     </div>
 </div>

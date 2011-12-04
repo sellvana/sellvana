@@ -19,7 +19,7 @@ if ($this->crumbs) {
 if (!empty($crumbs)):
 
 foreach ($crumbs as $i=>&$c) {
-    if ($c=='home') $c = array('href'=>BApp::m('FCom_Frontend')->baseUrl(), 'label'=>'Home', 'li_class'=>'home');
+    if ($c=='home') $c = array('href'=>BApp::m('FCom_Frontend')->baseHref(), 'label'=>'Home', 'li_class'=>'home');
     if (!isset($c['title'])) $c['title'] = $c['label'];
 }
 unset($c);
