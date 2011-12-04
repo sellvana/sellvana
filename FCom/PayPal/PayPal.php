@@ -14,13 +14,13 @@ class FCom_PayPal extends BClass
     {
         if (($sUrl = BConfig::i()->get('secure_url'))) {
             $m = BApp::m();
-            $m->base_url = $sUrl.'/'.$m->url_prefix;
+            $m->base_href = $sUrl.'/'.$m->url_prefix;
         }
     }
 
     public function call($methodName, $nvpArr)
     {
-        $config = BConfig::i()->get('FCom_PayPal');
+        $config = BConfig::i()->get('modules/FCom_PayPal');
         $sandbox = $config['sandbox']['mode']=='on'
             || $config['sandbox']['mode']=='ip'
                 && in_array(BRequest::i()->ip(), explode(',', $config['sandbox']['ip']));
@@ -57,17 +57,17 @@ class FCom_PayPal extends BClass
         }
         $sData =& BSession::i()->dataToUpdate();
         $sData['checkout_error']['message'] = "[PAYPAL ERROR {$errorArr['code']}] {$errorArr['short_message']} - {$errorArr['long_message']}";
-        BResponse::i()->redirect(BApp::m('FCom_Checkout')->baseUrl());
+        BResponse::i()->redirect(BApp::m('FCom_Checkout')->baseHref());
     }
 }
 
 class FCom_PayPal_Controller extends BActionController
 {
-    public static function redirect()
+    public function action_redirect()
     {
-        $config = BConfig::i()->get('FCom_PayPal');
+        $config = BConfig::i()->get('modules/FCom_PayPal');
         $cart = FCom_Cart::i()->sessionCart();
-        $baseUrl = BApp::m('FCom_PayPal')->baseUrl();
+        $baseUrl = BApp::m('FCom_PayPal')->baseHref();
 
         Cart::save(array(
             'order_status' => 'paypal.started',
@@ -93,7 +93,7 @@ class FCom_PayPal_Controller extends BActionController
         BResponse::i()->redirect(self::$_webUrl.'webscr?cmd=_express-checkout&useraction=commit&token='.$resArr['TOKEN']);
     }
 
-    public static function complete()
+    public function action_complete()
     {
         $sData =& BSession::i()->dataToUpdate();
         $cart = FCom_Cart::i()->sessionCart();
@@ -159,7 +159,7 @@ class FCom_PayPal_Controller extends BActionController
         BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout_success");
     }
 
-    public static function cancel()
+    public function action_cancel()
     {
         BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout");
     }

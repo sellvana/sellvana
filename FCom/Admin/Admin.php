@@ -19,11 +19,11 @@ class FCom_Admin extends BClass
 
     public function onBeforeDispatch()
     {
-        BLayout::i()->theme(BConfig::i()->get('FCom_Admin/theme'));
+        BLayout::i()->theme(BConfig::i()->get('modules/FCom_Admin/theme'));
     }
 }
 
-class FCom_Admin_ControllerAbstract extends BActionController
+class FCom_Admin_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
@@ -39,18 +39,5 @@ class FCom_Admin_ControllerAbstract extends BActionController
 
 class FCom_Admin_View_Root extends BView
 {
-    protected function _beforeRender()
-    {
-        $this->body_class = '';
-        $this->layout_class = '';
-        $this->show_left_col = '';
-        $this->show_right_col = '';
-    }
 
-    public function setLayoutClass($layout)
-    {
-        $this->layout_class = $layout;
-        $this->show_left_col = $layout=='col2-left-layout' || $layout=='col3-layout';
-        $this->show_right_col = $layout=='col2-right-layout' || $layout=='col3-layout';
-    }
 }

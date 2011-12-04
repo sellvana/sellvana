@@ -3,7 +3,7 @@
 .wizard label { display:block; width:80px; float:left; }
 </style>
 <h1>Step 1</h1>
-<form class="wizard" method="post" action="<?=BApp::m()->baseUrl()?>/step1">
+<form class="wizard" method="post" action="<?=BApp::m()->baseHref()?>/step1">
     <fieldset>
         <h3>DB Connection</h3>
         <label for="host">Host:</label><input type="text" id="host" name="w[db][host]" value="<?=$this->q($w['db']['host'])?>"/><br/>

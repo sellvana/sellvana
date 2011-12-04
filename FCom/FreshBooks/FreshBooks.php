@@ -13,14 +13,14 @@ class FCom_FreshBooks extends BClass
         require_once __DIR__.'/lib/FreshBooks/Invoice.php';
         require_once __DIR__.'/lib/FreshBooks/Payment.php';
 
-        $config = BConfig::i()->get('FCom_FreshBooks/api');
+        $config = BConfig::i()->get('modules/FCom_FreshBooks/api');
         FreshBooks_HttpClient::init($config['url'], $config['key']);
     }
 
     public function createInvoiceFromOrder($args)
     {
         $order = $args['order'];
-        $config = BConfig::i()->get('FCom_FreshBooks');
+        $config = BConfig::i()->get('modules/FCom_FreshBooks');
         if (in_array($order->status, (array)$config['order']['status.collect'])) {
             $this->postInvoice($order, $config['email']['autosend'], $order->is('paid'));
             $order->set('status', $config['order']['status.set'])->save();
@@ -97,7 +97,7 @@ class FCom_FreshBooks extends BClass
             $payment->create();
         }
         if ($send) {
-            $config = BConfig::i()->get('FCom_FreshBooks/email');
+            $config = BConfig::i()->get('modules/FCom_FreshBooks/email');
             $invoice->subject = $config['subject'];
             $invoice->message = $config['message'];
 

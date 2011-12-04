@@ -1,5 +1,5 @@
 <?
-$navRoot = FCom_Nav::load(1);
+$navRoot = FCom_Core_Model_Nav::i()->load(1);
 $navRoot->descendants(); // cache preload
 ?>
 <div class="site-nav-2">
@@ -7,7 +7,7 @@ $navRoot->descendants(); // cache preload
         <li>
             <a href="#">Browse All Categories</a>
             <ul>
-<? foreach (ACategory::load(1)->children() as $c): ?>
+<? foreach (FCom_Catalog_Model_Category::i()->load(1)->children() as $c): ?>
                 <li class="level0 level-top">
                     <a href="<?=FCom_Catalog::url('c', $c->url_path)?>"><?=$this->q($c->node_name)?></a>
                 </li>

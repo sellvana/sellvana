@@ -3,13 +3,13 @@
     <head>
         <?php echo $this->hook('head') ?>
     </head>
-    <body class="<?php echo $this->body_class ?>">
+    <body class="<?php echo $this->getBodyClass() ?>">
         <div class="wrapper">
-            <div class="header">
-                <?php echo $this->hook('header') ?>
-            </div>
+        
+            <?php echo $this->hook('header') ?>
 
             <div class="main <?php echo $this->layout_class ?>">
+            	<?php echo $this->hook('breadcrumbs') ?>
 
 <?php if ($this->show_left_col): ?>
                 <div class="col-left sidebar">
@@ -28,9 +28,7 @@
 <?php endif ?>
             </div>
 
-            <div class="footer">
-                <?php echo $this->hook('footer') ?>
-            </div>
+            <?php echo $this->hook('footer') ?>
         </div>
     </body>
 </html>

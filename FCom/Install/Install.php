@@ -91,23 +91,23 @@ class FCom_Install_Controller_Post extends BActionController
     {
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
-            BResponse::i()->redirect(BApp::m()->baseUrl().'/?error=1');
+            BResponse::i()->redirect(BApp::m()->baseHref().'/?error=1');
         }
-        BResponse::i()->redirect(BApp::m()->baseUrl().'/step1');
+        BResponse::i()->redirect(BApp::m()->baseHref().'/step1');
     }
 
     public function action_step1()
     {
-        BResponse::i()->redirect(BApp::m()->baseUrl().'/step2');
+        BResponse::i()->redirect(BApp::m()->baseHref().'/step2');
     }
 
     public function action_step2()
     {
-        BResponse::i()->redirect(BApp::m()->baseUrl().'/step3');
+        BResponse::i()->redirect(BApp::m()->baseHref().'/step3');
     }
 
     public function action_step3()
     {
-        BResponse::i()->redirect(BApp::m()->baseUrl().'/success');
+        BResponse::i()->redirect(BApp::m()->baseHref().'/success');
     }
 }

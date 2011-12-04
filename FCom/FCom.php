@@ -45,6 +45,7 @@ class FCom extends BClass
 
             BDebug::logDir($rootDir.'/storage/log');
             BDebug::adminEmail($config->get('admin_email'));
+            #BDebug::mode('debug');
             BDebug::mode('debug');
 
             // DB configuration is separate to gitignore
@@ -57,7 +58,7 @@ class FCom extends BClass
             }
 
             // add area module
-            $config->add(array('bootstrap'=>array('modules'=>array($seedModule))));
+            $config->add(array('modules'=>array($seedModule=>array('run_level'=>BModule::REQUIRED))));
             self::$_area = $seedModule;
 
             // Initialize debugging mode and levels
@@ -155,6 +156,13 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
                 'depends' => array('FCom_Catalog'),
                 'url_prefix' => 'checkout',
+            ))
+            ->module('FCom_Newsletter', array(
+                'version' => '0.1.0',
+                'root_dir' => __DIR__.'/Newsletter',
+                'bootstrap' => array('file'=>'Newsletter.php', 'callback'=>'FCom_Newsletter::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'url_prefix' => 'newsletter',
             ))
             // paypal IPN
             ->module('FCom_PayPal', array(

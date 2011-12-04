@@ -24,7 +24,7 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function url($category=null)
     {
-        $url = BApp::baseUrl().'/p/';
+        $url = BApp::m('FCom_Catalog')->baseHref().'/p/';
         if ($category) {
             $url .= $category->url_path.'/';
         }

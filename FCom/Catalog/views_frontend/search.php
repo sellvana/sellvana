@@ -2,7 +2,7 @@
     <div class="breadcrumbs">
         <ul>
             <li class="home">
-                <a href="<?=BApp::m('fcom.frontend')->baseUrl()?>" title="Go to Home Page">Home</a>
+                <a href="<?=BApp::m('fcom.frontend')->baseHref()?>" title="Go to Home Page">Home</a>
             </li>
             <li>
                 <strong>Search: <?=$this->q($this->query)?></strong>

@@ -1,6 +1,6 @@
 <?
-$loggedIn = AUser::isLoggedIn();
-AManuf::i()->cachePreloadFrom($this->products, 'manuf_id');
+$loggedIn = Denteva_Model_User::i()->isLoggedIn();
+Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
 ?>
 <? foreach ($this->products as $p): ?>
 <tr id="tr-product-<?=$p->id?>">
