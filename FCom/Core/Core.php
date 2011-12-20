@@ -54,7 +54,16 @@ class FCom_Core_View_Head extends BViewHead
 
 class FCom_Core_Controller_Abstract extends BActionController
 {
-
+    public function layout($name)
+    {
+        $theme = BConfig::i()->get('modules/'.FCom::i()->area().'/theme');
+        $layout = BLayout::i();
+        $layout->theme($theme);
+        foreach ((array)$name as $l) {
+            $layout->layout($l);
+        }
+        return $this;
+    }
 }
 
 class FCom_Core_Model_Abstract extends BModel

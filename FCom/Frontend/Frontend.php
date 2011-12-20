@@ -23,16 +23,6 @@ class FCom_Frontend extends BClass
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
-    public function layout($name)
-    {
-        $layout = BLayout::i();
-        $layout->theme(BConfig::i()->get('modules/FCom_Frontend/theme'));
-
-        foreach ((array)$name as $l) {
-            $layout->layout($l);
-        }
-        return $this;
-    }
 }
 
 class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract

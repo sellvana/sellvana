@@ -14,10 +14,9 @@ class FCom_Admin_DefaultTheme extends BClass
     public function layout()
     {
         BLayout::i()
-            ->rootView('root')
-
             ->layout(array(
                 'base'=>array(
+                    array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('hook', 'header', 'views'=>array('header')),
                     array('hook', 'footer', 'views'=>array('footer')),

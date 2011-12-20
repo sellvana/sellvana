@@ -1,16 +1,19 @@
 <?php
 
-class FCom_Catalog_Controller_Admin extends FCom_Admin_ControllerAbstract
+class FCom_Catalog_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_categories()
     {
-        BResponse::i()->json(BuckyUI::i()->jqgridData(FCom_Catalog_Model_Category::i()->orm()));
+        $orm = FCom_Catalog_Model_Category::i()->orm();
+        $data = BuckyUI::i()->jqgridData($orm);
+        BResponse::i()->json($data);
     }
 
     public function action_products()
     {
-        BResponse::i()->json(FCom_Catalog_Model_Product::i()->orm()->paginate(null, array('as_array'=>true)));
-        //BResponse::i()->json(DAdminMain::jqgridData(AProduct::i()->orm()));
+        $orm = FCom_Catalog_Model_Product::i()->orm();
+        $data = $orm->paginate(null, array('as_array'=>true));
+        BResponse::i()->json($data);
     }
 
     public function action_category_tree_get()
@@ -62,7 +65,8 @@ class FCom_Catalog_Controller_Admin extends FCom_Admin_ControllerAbstract
             }
             $result = array('status'=>1);
 
-            BPubSub::i()->fire('category_tree_post.'.$r->post('operation').'.before', $r->post());
+            $eventName = 'category_tree_post.'.$r->post('operation');
+            BPubSub::i()->fire($eventName.'.before', $r->post());
 
             switch ($r->post('operation')) {
             case 'create_node':
@@ -90,12 +94,12 @@ class FCom_Catalog_Controller_Admin extends FCom_Admin_ControllerAbstract
                 break;
 
             default:
-                if (!BPubSub::i()->fire('category_tree_post.'.$r->post('operation'), $r->post())) {
+                if (!BPubSub::i()->fire($eventName, $r->post())) {
                     throw new BException('Not implemented');
                 }
             }
 
-            BPubSub::i()->fire('category_tree_post.'.$r->post('operation').'.after', $r->post());
+            BPubSub::i()->fire($eventName.'.after', $r->post());
         } catch (Exception $e) {
             $result = array('status'=>0, 'message'=>$e->getMessage());
         }

@@ -8,4 +8,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         BResponse::i()->render();
     }
 
+    public function action_blank()
+    {
+        BResponse::i()->render();
+    }
 }
