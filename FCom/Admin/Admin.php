@@ -6,10 +6,12 @@ class FCom_Admin extends BClass
     {
         BFrontController::i()
             ->route('GET /', 'FCom_Admin_Controller.index')
+            ->route('GET /blank', 'FCom_Admin_Controller.blank')
         ;
 
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
+            ->view('nav', array('view_class' => 'FCom_Admin_View_Nav'))
             //->view('head', array('view_class'=>'BViewHead'))
             ->allViews('views')
         ;
@@ -38,6 +40,11 @@ class FCom_Admin_Controller_Abstract extends BActionController
 }
 
 class FCom_Admin_View_Root extends BView
+{
+
+}
+
+class FCom_Admin_View_Nav extends BView
 {
 
 }

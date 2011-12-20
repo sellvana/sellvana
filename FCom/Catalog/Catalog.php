@@ -2,6 +2,42 @@
 
 class FCom_Catalog extends BClass
 {
+    static public function bootstrap()
+    {
+        BDb::migrate('FCom_Catalog_Migrate');
+
+        switch (FCom::area()) {
+            case 'FCom_Frontend': FCom_Catalog_Frontend::bootstrap(); break;
+            case 'FCom_Admin': FCom_Catalog_Admin::bootstrap(); break;
+        }
+    }
+
+    static public function getUrlKey($str)
+    {
+        return strtolower(trim(preg_replace('#[^0-9a-z]+#i', '-',
+            strtr($str, static::$_transliterateMap)), '-'));
+    }
+
+    static public function url($type, $args)
+    {
+        if (is_string($args)) {
+            return BApp::m('FCom_Catalog')->baseHref().'/'.$type.'/'.$args;
+        }
+        return false;
+    }
+
+    static public function lastNav($save=false)
+    {
+        $s = BSession::i();
+        $r = BRequest::i();
+        if ($save) {
+            $s->data('lastNav', array($r->rawPath(), $r->get()));
+        } else {
+            $d = $s->data('lastNav');
+            return BApp::baseUrl().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
+        }
+    }
+
     static protected $_transliterateMap = array(
         '&amp;' => 'and',   '@' => 'at',    '©' => 'c', '®' => 'r', 'À' => 'a',
         'Á' => 'a', 'Â' => 'a', 'Ä' => 'a', 'Å' => 'a', 'Æ' => 'ae','Ç' => 'c',
@@ -57,71 +93,5 @@ class FCom_Catalog extends BClass
         'נ' => 'n', 'ס' => 's', 'ע' => 'e', 'ף' => 'p', 'פ' => 'p', 'ץ' => 'C',
         'צ' => 'c', 'ק' => 'q', 'ר' => 'r', 'ש' => 'w', 'ת' => 't', '™' => 'tm',
     );
-
-    static public function bootstrap()
-    {
-        BDb::migrate('FCom_Catalog_Migrate');
-
-        switch (FCom::area()) {
-            case 'FCom_Frontend': self::frontend(); break;
-            case 'FCom_Admin': self::admin(); break;
-        }
-    }
-
-    static public function frontend()
-    {
-        BFrontController::i()
-            ->route( 'GET /c/*category', 'FCom_Catalog_Controller_Frontend.category')
-            ->route( 'GET /m/*manuf', 'FCom_Catalog_Controller_Frontend.manuf')
-            ->route( 'GET /p/*product', 'FCom_Catalog_Controller_Frontend.product')
-            ->route( 'GET /search', 'FCom_Catalog_Controller_Frontend.search')
-            ->route( 'GET /compare', 'FCom_Catalog_Controller_Frontend.compare')
-        ;
-
-        BLayout::i()->allViews('views_frontend', 'catalog/');
-    }
-
-    static public function admin()
-    {
-        BFrontController::i()
-            ->route('GET /api/products', 'AdminApi.products')
-            ->route('GET /api/category_tree', 'AdminApi.category_tree_get')
-            ->route('POST /api/category_tree', 'AdminApi.category_tree_post')
-        ;
-
-        BLayout::i()->allViews('views_admin');
-
-        BPubSub::i()
-            ->on('category_tree_post.associate.products', 'AProduct.onAssociateCategory')
-            ->on('category_tree_post.associate.category-aliases', 'CategoryAlias.onAssociateCategory')
-            ->on('category_tree_post.reorderAZ', 'ACategory.onReorderAZ')
-        ;
-    }
-
-    static public function getUrlKey($str)
-    {
-        return strtolower(trim(preg_replace('#[^0-9a-z]+#i', '-',
-            strtr($str, static::$_transliterateMap)), '-'));
-    }
-
-    static public function url($type, $args)
-    {
-        if (is_string($args)) {
-            return BApp::m('FCom_Catalog')->baseHref().'/'.$type.'/'.$args;
-        }
-        return false;
-    }
-
-    static public function lastNav($save=false)
-    {
-        $s = BSession::i();
-        $r = BRequest::i();
-        if ($save) {
-            $s->data('lastNav', array($r->rawPath(), $r->get()));
-        } else {
-            $d = $s->data('lastNav');
-            return BApp::baseUrl().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
-        }
-    }
 }
 
