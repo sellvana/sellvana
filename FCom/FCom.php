@@ -24,7 +24,7 @@ class FCom extends BClass
         return $dir;
     }
 
-    public function run($area)
+    public function run($area, $run=true)
     {
         try {
             $config = BConfig::i();
@@ -93,8 +93,10 @@ class FCom extends BClass
                 ->scan($rootDir.'/market/*')
                 ->scan($rootDir.'/local/*');
 
-            // Run application
-            BApp::i()->run();
+            if ($run) {
+                // Run application
+                BApp::i()->run();
+            }
 
         } catch (Exception $e) {
             BDebug::dumpLog();
