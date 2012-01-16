@@ -3,5 +3,4 @@
     <h1><?=$this->q($category->node_name)?></h1>
 </div>
 <?=$this->view('catalog/product/list')
-    ->set('category', $category)
-    ->set('productsORM', $category->productsORM()) ?>
+    ->set('category', $category) ?>

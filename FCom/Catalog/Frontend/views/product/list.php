@@ -1,13 +1,10 @@
-<?
-$data = $this->productsORM->paginate(null, array('ps'=>25));
-?>
-<? if (!$data['state']['c']): ?>
+<? if (!$this->products_data['state']['c']): ?>
 
     <p class="note-msg">There are no products matching the selection.</p>
 
 <? else: ?>
 
-    <?=$this->view('catalog/product/pager')->set('state', $data['state'])?>
+    <?=$this->view('catalog/product/pager')->set('state', $this->products_data['state'])?>
     <?=$this->view('catalog/compare/block')?>
     <table class="product-list">
         <col width="30"/>
@@ -16,7 +13,7 @@ $data = $this->productsORM->paginate(null, array('ps'=>25));
         <col width="180"/>
         <tbody>
             <?=$this->view('catalog/product/rows')
-                ->set('products', $data['rows'])
+                ->set('products', $this->products_data['rows'])
                 ->set('category', $this->category) ?>
         </tbody>
     </table>

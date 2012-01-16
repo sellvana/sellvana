@@ -5,11 +5,11 @@ class FCom_Checkout extends BClass
     static public function bootstrap()
     {
         BFrontController::i()
-            ->route( 'GET /cart', 'FCom_Checkout_Controller_Frontend.cart')
-            ->route('POST /cart', 'FCom_Checkout_Controller_Frontend.cart_post')
+            ->route( 'GET /cart', 'FCom_Checkout_Frontend_Controller.cart')
+            ->route('POST /cart', 'FCom_Checkout_Frontend_Controller.cart_post')
         ;
 
-        BLayout::i()->allViews('views_frontend', 'checkout/');
+        BLayout::i()->allViews('Frontend/views', 'checkout/');
     }
 }
 

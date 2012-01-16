@@ -12,7 +12,7 @@ class FCom_Admin extends BClass
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('nav', array('view_class' => 'FCom_Admin_View_Nav'))
-            //->view('head', array('view_class'=>'BViewHead'))
+            ->view('head', array('view_class'=>'BViewHead'))
             ->allViews('views')
         ;
 

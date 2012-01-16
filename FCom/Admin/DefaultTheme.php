@@ -18,9 +18,9 @@ class FCom_Admin_DefaultTheme extends BClass
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
-                    array('hook', 'header', 'views'=>array('header')),
-                    array('hook', 'footer', 'views'=>array('footer')),
-                    array('hook', 'main', 'views'=>array('breadcrumbs')),
+                    array('hook', 'main', 'views'=>array('header')),
+                    //array('hook', 'footer', 'views'=>array('footer')),
+                    //array('hook', 'main', 'views'=>array('breadcrumbs')),
                 ),
 
                 '/'=>array(
