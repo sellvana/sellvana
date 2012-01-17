@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Categories extends BActionController
+class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract
 {
 
     public function action_categories()
@@ -9,10 +9,10 @@ class FCom_Catalog_Admin_Controller_Categories extends BActionController
         $data = BuckyUI::i()->jqgridData($orm);
         BResponse::i()->json($data);
     }
+
     public function action_index()
     {
-        BLayout::i()->hookView('main', 'nav')->hookView('main', 'categories');
-        BResponse::i()->render();
+        $this->layout('/catalog/categories');
     }
 
     public function action_config()

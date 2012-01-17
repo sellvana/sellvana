@@ -18,13 +18,17 @@ class FCom_Admin_DefaultTheme extends BClass
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
-                    array('hook', 'main', 'views'=>array('header')),
-                    //array('hook', 'footer', 'views'=>array('footer')),
-                    //array('hook', 'main', 'views'=>array('breadcrumbs')),
+                    array('hook', 'header', 'views'=>array('nav')),
+                    array('view', 'head', 'do'=>array(
+                        array('js', '{FCom_Core}/js/lib/jquery.js', array()),
+                        array('js', '{FCom_Core}/js/lib/jquery-ui.js', array()),
+                        array('js', '{FCom_Admin}/js/app.js', array()),
+                    )),
                 ),
 
                 '/'=>array(
-
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('home')),
                 ),
             ));
         ;

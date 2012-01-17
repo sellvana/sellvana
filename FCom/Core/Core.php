@@ -54,6 +54,17 @@ class FCom_Core_View_Head extends BViewHead
 
 class FCom_Core_Controller_Abstract extends BActionController
 {
+    public function beforeDispatch()
+    {
+        BLayout::i()->view('root')->bodyClass = BRequest::i()->path(0, 1);
+        return parent::beforeDispatch();
+    }
+
+    public function afterDispatch()
+    {
+        BResponse::i()->render();
+    }
+
     public function layout($name)
     {
         $theme = BConfig::i()->get('modules/'.FCom::i()->area().'/theme');
