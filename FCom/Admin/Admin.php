@@ -11,8 +11,9 @@ class FCom_Admin extends BClass
 
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
+            ->view('head', array('view_class'=>'FCom_Admin_View_Head'))
             ->view('nav', array('view_class' => 'FCom_Admin_View_Nav'))
-            ->view('head', array('view_class'=>'BViewHead'))
+            ->view('grid', array('view_class'=>'BViewGrid'))
             ->allViews('views')
         ;
 
@@ -21,25 +22,20 @@ class FCom_Admin extends BClass
 
     public function onBeforeDispatch()
     {
-        BLayout::i()->theme(BConfig::i()->get('modules/FCom_Admin/theme'));
     }
 }
 
-class FCom_Admin_Controller_Abstract extends BActionController
+class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
-    public function beforeDispatch()
-    {
-        if (!parent::beforeDispatch()) return false;
-        return true;
-    }
 
-    public function afterDispatch()
-    {
-
-    }
 }
 
 class FCom_Admin_View_Root extends BView
+{
+
+}
+
+class FCom_Admin_View_Head extends BViewHead
 {
 
 }

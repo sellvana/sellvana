@@ -12,14 +12,15 @@ class FCom_Catalog_Admin extends BClass
 
         BFrontController::i()
             ->route('GET /products', 'FCom_Catalog_Admin_Controller_Products.index')
-            ->route('GET /api/products', 'FCom_Catalog_Admin_Controller_Products.grid')
+            ->route('GET /products/grid/config', 'FCom_Catalog_Admin_Controller_Products.grid_config')
+            ->route('GET /products/grid/data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
+            ->route('GET /categories', 'FCom_Catalog_Admin_Controller_Categories.index')
             ->route('GET /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_get')
             ->route('POST /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_post')
         ;
 
         BLayout::i()
             ->allViews('Admin/views', 'catalog')
-            ->view('grid', array('view_class'=>'BViewGrid'))
         ;
 
         BPubSub::i()
@@ -33,9 +34,21 @@ class FCom_Catalog_Admin extends BClass
     {
         BLayout::i()
             ->layout(array(
-                '/products'=>array(
+                '/catalog/products'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products')),
+                ),
+                '/catalog/products/view'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/products/view')),
+                ),
+                '/catalog/categories'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/categories')),
+                ),
+                '/catalog/categories/view'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/categories/view')),
                 ),
             ));
         ;
