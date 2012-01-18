@@ -54,8 +54,8 @@ class FCom_Catalog_Admin extends BClass
         ;
 
         $baseHref = BApp::m('FCom_Catalog')->baseHref();
-        BLayout::i()->view('nav')
-            ->add('catalog', array('label'=>'Catalog'))
+        BLayout::i()->view('root')
+            ->add('catalog', array('label'=>'Catalog', 'header'=>true))
             ->add('catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products'))
         ;
     }

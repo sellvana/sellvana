@@ -12,7 +12,6 @@ class FCom_Admin extends BClass
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('head', array('view_class'=>'FCom_Admin_View_Head'))
-            ->view('nav', array('view_class' => 'FCom_Admin_View_Nav'))
             ->view('grid', array('view_class'=>'BViewGrid'))
             ->allViews('views')
         ;
@@ -26,11 +25,6 @@ class FCom_Admin extends BClass
 }
 
 class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
-{
-
-}
-
-class FCom_Admin_View_Root extends BView
 {
 
 }

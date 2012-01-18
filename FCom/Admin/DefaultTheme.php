@@ -18,11 +18,11 @@ class FCom_Admin_DefaultTheme extends BClass
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
-                    array('hook', 'header', 'views'=>array('nav')),
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Core}/js/lib/jquery.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery-ui.js', array()),
                         array('js', '{FCom_Admin}/js/app.js', array()),
+                        array('css', '{FCom_Admin}/css/styles.css', array()),
                     )),
                 ),
 
@@ -32,7 +32,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 ),
             ));
         ;
-        BLayout::i()->view('nav')
+        BLayout::i()->view('root')
             ->add('home', array('label'=>'Home', 'href'=>BApp::m('FCom_Admin')->baseHref()));
     }
 }

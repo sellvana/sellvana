@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_View_Nav extends BView
+class FCom_Admin_View_Root extends BView
 {
     protected $_tree = array('ul' => array('id'=>'nav'));
 
@@ -18,9 +18,6 @@ class FCom_Admin_View_Nav extends BView
     public function tag($tag, $params=array())
     {
         $hmtl = '';
-if (!is_array($params)) {
-    var_dump($params); exit;
-}
         foreach ($params as $k=>$v) {
             $hmtl .= ' '.$k.'="'.htmlspecialchars($v).'"';
         }
@@ -42,7 +39,12 @@ if (!is_array($params)) {
                 $label = $this->tag('a', array('href'=>$node['href'])).$label.'</a>';
             }
             $children = $this->renderNodes($node);
-            $html .= $this->tag('li', !empty($root['li']) ? $root['li'] : array()) . $label . $children . '</li>';
+            if (!empty($node['header'])) {
+                $node['li']['class'] = 'nav-group';
+                $label = '<header>'.$label.'</header>';
+            }
+            $html .= $this->tag('li', !empty($node['li']) ? $node['li'] : array())
+                . $label . $children . '</li>';
         }
         $html .= '</ul>';
         return $html;
