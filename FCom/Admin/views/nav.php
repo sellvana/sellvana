@@ -3,11 +3,9 @@ $adminHref = BApp::m('Denteva_Admin')->baseHref();
 $mergeHref = BApp::m('Denteva_Merge')->baseHref();
 $catalogHref = BApp::m('FCom_Catalog')->baseHref();
 ?>
-<div style="background:#333">
-    <div class="f-right">
-    Login
-    </div>
-
+<div style="background:#333; float:left;">
+<?=$this->renderNodes() ?>
+<!--
     <ul class="clearer" id="nav">
         <li><a href="<?=$mergeHref?>">Merge</a><ul>
             <li><a href="<?=$mergeHref?>/"><span>Import</span></a></li>
@@ -39,4 +37,5 @@ $catalogHref = BApp::m('FCom_Catalog')->baseHref();
             <li><a href="#">Configuration</a></li>
         </ul></li>
     </ul>
+-->
 </div>

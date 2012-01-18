@@ -39,8 +39,3 @@ class FCom_Admin_View_Head extends BViewHead
 {
 
 }
-
-class FCom_Admin_View_Nav extends BView
-{
-
-}
