@@ -53,7 +53,8 @@ class FCom_Admin_View_Root extends BView
             }
             if (!empty($node['/'])) {
                 $node['li']['class'] .= ' nav-group';
-                $label = '<header>'.$label.'</header>';
+                $hdrParams = array('class'=>'nav-group-'.$k);
+                $label = $this->tag('header', $hdrParams).'<span>'.$label.'</span></header>';
             }
             $key = !empty($node['key']) ? $node['key'] : $k;
             if (isset($this->_curArr[$level]) && $this->_curArr[$level]===$key) {
