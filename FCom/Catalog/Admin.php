@@ -32,11 +32,19 @@ class FCom_Catalog_Admin extends BClass
 
     static public function layout()
     {
+        $baseHref = BApp::m('FCom_Catalog')->baseHref();
         BLayout::i()
             ->layout(array(
+                'base'=>array(
+                    array('view', 'root', 'do'=>array(
+                        array('navAdd', 'catalog', array('label'=>'Catalog')),
+                        array('navAdd', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
+                    )),
+                ),
                 '/catalog/products'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products')),
+                    array('view', 'root', 'do'=>array(array('navCur', 'catalog/products'))),
                 ),
                 '/catalog/products/view'=>array(
                     array('layout', 'base'),
@@ -51,12 +59,6 @@ class FCom_Catalog_Admin extends BClass
                     array('hook', 'main', 'views'=>array('catalog/categories/view')),
                 ),
             ));
-        ;
-
-        $baseHref = BApp::m('FCom_Catalog')->baseHref();
-        BLayout::i()->view('root')
-            ->add('catalog', array('label'=>'Catalog', 'header'=>true))
-            ->add('catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products'))
         ;
     }
 

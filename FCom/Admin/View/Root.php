@@ -3,8 +3,9 @@
 class FCom_Admin_View_Root extends BView
 {
     protected $_tree = array('ul' => array('id'=>'nav'));
+    protected $_current;
 
-    public function add($path, $node)
+    public function navAdd($path, $node)
     {
         $root =& $this->_tree;
         $pathArr = explode('/', $path);
@@ -15,19 +16,28 @@ class FCom_Admin_View_Root extends BView
         return $this;
     }
 
+    public function navCur($path)
+    {
+        $this->set('current_nav', $path);
+        return $this;
+    }
+
     public function tag($tag, $params=array())
     {
         $hmtl = '';
         foreach ($params as $k=>$v) {
-            $hmtl .= ' '.$k.'="'.htmlspecialchars($v).'"';
+            if (''!==$v && !is_null($v) && false!==$v) {
+                $hmtl .= ' '.$k.'="'.htmlspecialchars($v).'"';
+            }
         }
         return "<{$tag}{$hmtl}>";
     }
 
-    public function renderNodes($root=null)
+    public function renderNodes($root=null, $level=0)
     {
         if (is_null($root)) {
             $root = $this->_tree;
+            $this->_curArr = explode('/', $this->get('current_nav'));
         }
         if (empty($root['/'])) {
             return '';
@@ -38,11 +48,18 @@ class FCom_Admin_View_Root extends BView
             if (!empty($node['href'])) {
                 $label = $this->tag('a', array('href'=>$node['href'])).$label.'</a>';
             }
-            $children = $this->renderNodes($node);
-            if (!empty($node['header'])) {
-                $node['li']['class'] = 'nav-group';
+            if (!isset($node['li']['class'])) {
+                $node['li']['class'] = '';
+            }
+            if (!empty($node['/'])) {
+                $node['li']['class'] .= ' nav-group';
                 $label = '<header>'.$label.'</header>';
             }
+            $key = !empty($node['key']) ? $node['key'] : $k;
+            if (isset($this->_curArr[$level]) && $this->_curArr[$level]===$key) {
+                $node['li']['class'] .= ' active';
+            }
+            $children = $this->renderNodes($node, $level+1);
             $html .= $this->tag('li', !empty($node['li']) ? $node['li'] : array())
                 . $label . $children . '</li>';
         }
