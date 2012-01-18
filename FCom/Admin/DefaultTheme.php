@@ -32,5 +32,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 ),
             ));
         ;
+        BLayout::i()->view('nav')
+            ->add('home', array('label'=>'Home', 'href'=>BApp::m('FCom_Admin')->baseHref()));
     }
 }
