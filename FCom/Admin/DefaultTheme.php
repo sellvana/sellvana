@@ -33,6 +33,11 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('home')),
                 ),
+
+                '/login'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('login')),
+                ),
             ));
         ;
     }
