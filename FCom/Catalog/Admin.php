@@ -14,6 +14,7 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET /products/grid/config', 'FCom_Catalog_Admin_Controller_Products.grid_config')
             ->route('GET /products/grid/data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
+            ->route('GET /products/view/:id', 'FCom_Catalog_Admin_Controller_Products.view')
             ->route('GET /categories', 'FCom_Catalog_Admin_Controller_Categories.index')
             ->route('GET /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_get')
             ->route('POST /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_post')
@@ -39,6 +40,7 @@ class FCom_Catalog_Admin extends BClass
                     array('view', 'root', 'do'=>array(
                         array('navAdd', 'catalog', array('label'=>'Catalog')),
                         array('navAdd', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
+                        array('navAdd', 'catalog/products_view', array('label'=>'Product Edit', 'href'=>$baseHref.'/products/view/123')),
                     )),
                 ),
                 '/catalog/products'=>array(
