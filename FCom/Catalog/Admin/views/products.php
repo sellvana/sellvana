@@ -1,4 +1,7 @@
-<table id="grid"></table><div id="grid-pager"></div>
+	<header class="adm-page-title">
+		<span class="title">Products</span>
+	</header>
+	<table id="grid"></table><div id="grid-pager"></div>
 <script>
 //jqgrid('test', {parent:'products-grid', grid:{url:'<?=BApp::m('FCom_Catalog')->baseHref()?>/products/grid/data'}});
 var lastse13;
