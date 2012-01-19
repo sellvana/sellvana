@@ -3,11 +3,11 @@
  * Copyright:Denteva
  * Website:http://www.denteva.com
  */
- 
+
 /* =============================================================================
    Reset Boilerplate
    ========================================================================== */
-   
+
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display:block; }
 audio, canvas, video { display:inline-block; *display:inline; *zoom:1; }
 audio:not([controls]) { display:none; }
@@ -20,8 +20,8 @@ html, body {
 	margin:0;
 	padding:0;
 	}
-body, button, 
-input, select, 
+body, button,
+input, select,
 textarea 		{ font-family:sans-serif; color:#2f2f2f; }
 
 ::-moz-selection{ background:#a6b7d4; color:#fff; text-shadow:none; }
@@ -31,7 +31,7 @@ a 				{ color:#0640A9; text-decoration:none; }
 a:visited 		{ color:#0640A9; }
 a:hover 		{ color:#0640A9; text-decoration:none; }
 a:focus 		{ outline:thin dotted; }
-a:hover, 
+a:hover,
 a:active 		{ outline:0; }
 
 abbr[title] 	{ border-bottom:1px dotted; }
@@ -41,11 +41,11 @@ dfn 			{ font-style:italic; }
 hr 				{ display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
 ins 			{ background:#ff9; color:#000; text-decoration:none; }
 mark 			{ background:#ff0; color:#000; font-style:italic; font-weight:bold; }
-pre, code, 
+pre, code,
 kbd, samp 		{ font-family:monospace, monospace; _font-family:'courier new', monospace; font-size:1em; }
 pre 			{ white-space:pre; white-space:pre-wrap; word-wrap:break-word; }
 q 				{ quotes:none; }
-q:before, 
+q:before,
 q:after 		{ content:""; content:none; }
 small 			{ font-size:85%; }
 sub, sup 		{ font-size:75%; line-height:0; position:relative; vertical-align:baseline; }
@@ -53,7 +53,7 @@ sup 			{ top:-0.5em; }
 sub 			{ bottom:-0.25em; }
 ul, ol 			{ list-style:none; margin:0; padding:0; }
 dd 				{ margin:0 0 0 40px; }
-nav ul, 
+nav ul,
 nav ol 			{ list-style:none; list-style-image:none; margin:0; padding:0; }
 img 			{ border:0; -ms-interpolation-mode:bicubic; vertical-align:middle; }
 svg:not(:root) 	{ overflow:hidden; }
@@ -62,14 +62,14 @@ form 			{ margin:0; }
 fieldset 		{ border:0; margin:0; padding:0; }
 label 			{ cursor:pointer; }
 legend 			{ border:0; *margin-left:-7px; padding:0; }
-button, input, 
+button, input,
 select, textarea { font-size:100%; margin:0; vertical-align:baseline; *vertical-align:middle; }
 button, input 	{ line-height:normal; *overflow:visible; }
-table button, 
+table button,
 table input 	{ *overflow:auto; }
-button, 
-input[type="button"], 
-input[type="reset"], 
+button,
+input[type="button"],
+input[type="reset"],
 input[type="submit"] { cursor:pointer; -webkit-appearance:button; }
 input[type="checkbox"], input[type="radio"] { box-sizing:border-box; }
 input[type="search"] { -webkit-appearance:textfield; -moz-box-sizing:content-box; -webkit-box-sizing:content-box; box-sizing:content-box; }
@@ -87,15 +87,15 @@ td { vertical-align:top; }
    ========================================================================== */
 
 /* Forms - Lists */
-.msgs li { 
-	border:1px solid #e1d19d; 
+.msgs li {
+	border:1px solid #e1d19d;
 	border-radius:3px;
 	-moz-border-radius:3px;
 	-webkit-border-radius:3px;
-	margin-bottom:10px; 
-	padding:15px 15px 15px 42px; 
-	font-weight:bold; 
-	font-size:13px; 
+	margin-bottom:10px;
+	padding:15px 15px 15px 42px;
+	font-weight:bold;
+	font-size:13px;
 	}
 .msgs .success-msg { border-color:#658f26; background-position:10px -230px; background-color:#cff3a0; color:#355d0b; }
 .msgs .notice-msg { background-position:10px 10px; background-color:#fff4d0; color:#574628; }
@@ -125,7 +125,7 @@ input[type="text"].sz1, input[type="password"].sz1 {
 	padding:6px 5px;
 	font-size:17px;
 	}
-	
+
 /* Forms - Buttons */
 /* Buttons have st1, st2, sz1 */
 button.btn, input[type="submit"].btn {
@@ -179,19 +179,19 @@ button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 .adm-middle.collapsed-nav { padding-left:50px; }
 
 /* Header */
-.adm-topbar { 
-	border-bottom:1px solid #760700; 
+.adm-topbar {
+	border-bottom:1px solid #760700;
 	height:30px;
-	background:#c50f00; 
-	color:#fff; 
-	font-size:12px; 
-	text-shadow:0 -1px 0 #8a1810; 
+	background:#c50f00;
+	color:#fff;
+	font-size:12px;
+	text-shadow:0 -1px 0 #8a1810;
 	}
 .adm-topbar a { color:#fff;}
 .adm-topbar .app-logo { float:left; }
 .adm-topbar .sup-links { float:right; }
 .adm-topbar .sup-links li { float:left; }
-   
+
 /* Sidebar */
 .adm-nav-bg {
 	position:absolute;
@@ -202,23 +202,23 @@ button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 	background:#e9e9e9;
 	border-right:1px solid #acacac;
 	}
-.adm-nav { 
+.adm-nav {
 	position:absolute;
 	top:31px;
 	width:185px;
-	font:12px/1.2 'Lucida Grande', Arial, Helvetica, sans-serif; 
+	font:12px/1.2 'Lucida Grande', Arial, Helvetica, sans-serif;
 	text-shadow:0 1px 0 #fff;
 	z-index:0;
 	}
-.adm-nav a { 
+.adm-nav a {
 	display:block;
 	border-top:1px solid #fff;
 	border-bottom:1px solid #d4d4d4;
 	padding:5px 10px 5px 30px;
-	color:#444; 
+	color:#444;
 	}
 .adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
-.adm-nav li.nav-group > header { 
+.adm-nav li.nav-group > header {
 	border-bottom:1px solid #b6b6b6;
 	background-image:linear-gradient(bottom, rgb(218,218,218) 0%, rgb(235,235,235) 100%);
 	background-image:-o-linear-gradient(bottom, rgb(218,218,218) 0%, rgb(235,235,235) 100%);
@@ -232,7 +232,7 @@ button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 		color-stop(0, rgb(218,218,218)),
 		color-stop(1, rgb(235,235,235))
 	);
-	text-transform:uppercase; 
+	text-transform:uppercase;
 	}
 .adm-nav li.nav-group > header span { display:block; padding:4px 10px 4px 30px; font-weight:bold; }
 .adm-nav li.nav-group.active > header {}
@@ -262,7 +262,7 @@ button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 /* =============================================================================
    Per Page
    ========================================================================== */
-.adm-login-form { 
+.adm-login-form {
 	margin:45px auto;
 	width:510px;
 	}
@@ -306,12 +306,11 @@ button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
    ========================================================================== */
 .msgs li,
 .adm-nav li.nav-group > header span { background-image:url(../img/sprite.png); background-repeat:no-repeat; }
-   
-   
+
+
 /* =============================================================================
    Clearfix
    ========================================================================== */
 .topbar:after,
 .form-list li:after,
 .clearer:after { content:""; display:table; clear:both; }
-

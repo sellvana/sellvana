@@ -21,6 +21,10 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Core}/js/lib/jquery.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery-ui.js', array()),
+                        array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css', array()),
+                        array('css', '{FCom_Core}/js/lib/jqGrid/css/ui.jqgrid.css', array()),
+                        array('js', '{FCom_Core}/js/lib/jqGrid/js/i18n/grid.locale-en.js', array()),
+                        array('js', '{FCom_Core}/js/lib/jqGrid/js/jquery.jqGrid.min.js', array()),
                         array('js', '{FCom_Admin}/js/app.js', array()),
                         array('css', '{FCom_Admin}/css/styles.css', array()),
                     )),

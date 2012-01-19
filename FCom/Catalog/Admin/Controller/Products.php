@@ -46,7 +46,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function action_grid_data()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm();
-        $data = $orm->paginate(null, array('as_array'=>true));
+        BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::grid_data.orm', array('orm'=>$orm));
+        $data = $orm->jqGridData();
+        BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::grid_data.data', array('data'=>$data));
         BResponse::i()->json($data);
     }
 }
