@@ -1253,7 +1253,7 @@ console.log(a);
 $.extend($.jgrid.defaults, {
 });
 */
-/*
+
 function jqgrid(id, options) {
     var i, grid = $("#"+id), opt = {
         grid: {
@@ -1320,9 +1320,17 @@ function jqgrid(id, options) {
 
     return {autoresize:autoresize};
 }
-*/
+
+
 
 $(function(){
+    $(document).bind('ajaxSuccess', function(event, request, settings) {
+        if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
+            if (data.error=='login') {
+                location.href = window.appConfig.baseHref;
+            }
+        }
+    });
     /*$(" #nav ul ").css({display: "none"}); // Opera Fix
     $(" #nav li").hover(function(){
         $(this).find('ul:first').css({visibility: "visible",display: "none"}).show(400);

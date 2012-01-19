@@ -2,7 +2,7 @@
 
 class FCom_Admin_View_Root extends BView
 {
-    protected $_tree = array('ul' => array('id'=>'nav'));
+    protected $_tree = array();
     protected $_current;
 
     public function navAdd($path, $node)

@@ -3,9 +3,13 @@
 	<form method="post" action="<?=BApp::m('FCom_Admin')->baseHref()?>/login">
 	    <fieldset>
 	    	<header class="section-title">Log into Account</header>
+<?php if ($this->messages): ?>
     		<ul class="msgs">
-    			<li class="notice-msg">Something seriously went wrong...</li>
+<?php foreach ($this->messages as $m): ?>
+    			<li class="<?php echo $m['type']?>-msg"><?php echo $this->q($m['msg'])?></li>
+<?php endforeach ?>
     		</ul>
+<?php endif ?>
 	        <ul class="form-list">
 	        	<li class="label-l">
 	        		<label for="#">Email/Username</label>
