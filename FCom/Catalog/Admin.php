@@ -51,6 +51,7 @@ class FCom_Catalog_Admin extends BClass
                 '/catalog/products/view'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products/view')),
+                    array('view', 'root', 'do'=>array(array('navCur', 'catalog/products_view'))),
                 ),
                 '/catalog/categories'=>array(
                     array('layout', 'base'),
