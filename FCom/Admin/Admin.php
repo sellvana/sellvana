@@ -35,7 +35,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function action_unauthorized()
     {
-        $this->layout('/login');
+        if (BRequest::i()->xhr()) {
+            BResponse::i()->json(array('error'=>'login'));
+        } else {
+            $this->view('login')->messages = BSession::i()->messages('admin');
+            $this->layout('/login');
+        }
     }
 }
 

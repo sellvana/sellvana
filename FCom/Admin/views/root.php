@@ -2,6 +2,11 @@
 <html>
 <head>
     <?php echo $this->hook('head') ?>
+    <script>
+window.appConfig = {
+    baseHref: '<?php echo BApp::m('FCom_Admin')->baseHref() ?>'
+}
+    </script>
 </head>
 <body class="<?php echo $this->bodyClass ?>">
 	<div class="adm-wrapper">
@@ -19,13 +24,12 @@
 			</header>
 			    <section class="adm-nav-bg"></section>
 		        <nav class="adm-nav">
-				    <?=$this->renderNodes() ?>
+				    <?php echo $this->renderNodes() ?>
 			    </nav>
         <?php endif ?>
-        
+
 			<div class="adm-middle">
 				<?php echo $this->hook('main') ?>
-			    lalalalala
 			</div>
 	</div>
 </body>
