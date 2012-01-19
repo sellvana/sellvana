@@ -10,7 +10,7 @@ window.appConfig = {
 </head>
 <body class="<?php echo $this->bodyClass ?>">
 	<div class="adm-wrapper">
-        <?php if (FCom_Admin_Model_User::i()->isLoggedIn()): ?>
+<?php if (FCom_Admin_Model_User::i()->isLoggedIn()): ?>
 		<header class="adm-topbar">
 			<span class="adm-logo">Denteva Admin</span>
 			<nav class="sup-links">
@@ -26,10 +26,10 @@ window.appConfig = {
         <nav class="adm-nav">
 		    <?=$this->renderNodes() ?>
 	    </nav>
-        <?php endif ?>
-		<?php if (FCom_Admin_Model_User::i()->isLoggedIn()): ?><div class="adm-middle"><?php endif ?>
-			<?php echo $this->hook('main') ?>
-		<?php if (FCom_Admin_Model_User::i()->isLoggedIn()): ?></div><?php endif ?>
+        <div class="adm-middle"><?php echo $this->hook('main') ?></div>
+<?php else: ?>
+        <?php echo $this->hook('main') ?>
+<?php endif ?>
 	</div>
 </body>
 </html>
