@@ -113,11 +113,16 @@ var Admin = {
             return true;
         }
 
+        var plugins = ["themes","json_data","ui","crrm","cookies","dnd","search","types","hotkeys","contextmenu"];
+        if (opt.checkbox) {
+            plugins.push("checkbox");
+        }
+
         el.jstree({
             'core': {
                 animation:0
             },
-            "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","search","types","hotkeys","contextmenu"],
+            "plugins" : plugins,
             "json_data" : {
                 "ajax" : {"url" : opt.url, "data" : function (n) {
                     return {
@@ -156,7 +161,8 @@ var Admin = {
                     'refresh': {label:'Refresh', separator_before:true, action: function(n) { el.jstree('refresh', n); }}
                 }
             },
-            'cookies': { auto_save: false,save_opened: false,save_selected: false}
+            'cookies': { auto_save: false,save_opened: false,save_selected: false},
+            'checkbox': { real_checkboxes:true }
         })
         .bind("before.jstree", function (e, data) {
             if (data.func.match(/(create|remove|rename|move_node)/) && !checkLock()) {
