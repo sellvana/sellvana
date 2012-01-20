@@ -1,6 +1,110 @@
 <?php
     $p = $this->product;
 ?>
+<script>
+var editors = {};
+$(function() {
+    CKEDITOR.config.autoUpdateElement = true;
+});
+
+var url_get = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/view_tab/'.$p->id ?>';
+var url_post = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/edit/'.$p->id ?>';
+
+function loadTabs(data) {
+    for (var i in data.tabs) {
+        $('#tab-'+i).html(data.tabs[i]).data('loaded', true);
+        //var m = data.tabs[i].match(/<script[^>]>(.*?)<\/script>/i);
+        //for (var i=0; i<m.
+    }
+}
+
+$(function() {
+    var lis = $('.adm-tabs-left li');
+    var panes = $('.adm-tabs-content');
+    var curLi = $('.adm-tabs-left li[class=active]');
+    var curPane = $('.adm-tabs-content:not([hidden])');
+    $('a', lis).click(function(ev) {
+        curLi.removeClass('active');
+        curPane.attr('hidden', 'hidden');
+
+        var a = $(ev.currentTarget), li = a.parent('li');
+        if (curLi===li) {
+            return false;
+        }
+        var pane = $(a.attr('href'));
+        li.addClass('active');
+        pane.removeAttr('hidden');
+        curLi = li;
+        curPane = pane;
+        if (!pane.data('loaded')) {
+            var tabId = a.attr('href').replace(/^#tab-/,'');
+            $.getJSON(url_get+'?tabs='+tabId, function(data, status, req) {
+                loadTabs(data);
+            });
+        }
+        return false;
+    });
+});
+
+function wysiwygCreate(id) {
+    if (!editors[id]) {
+        editors[id] = CKEDITOR.replace(id);
+    }
+}
+
+function wysiwygDestroy(id) {
+    if (editors[id]) {
+        try {
+            editors[id].destroy();
+        } catch (e) {
+            editors[id].destroy();
+        }
+        editors[id] = null;
+    }
+}
+
+function tabClass(id, cls) {
+    var tab = $('.adm-tabs-left a[href=#tab-'+id+']').parent('li');
+    tab.removeClass('dirty error');
+    if (cls) tab.addClass(cls);
+}
+
+function tabAction(action, el) {
+    var pane = $(el).parents('.adm-tabs-content');
+    var tabId = pane.attr('id').replace(/^tab-/,'');
+    switch (action) {
+    case 'edit':
+        $.get(url_get+'?tabs='+tabId+'&mode=edit', function(data, status, req) {
+            loadTabs(data);
+            tabClass(tabId, 'dirty');
+        });
+        break;
+
+    case 'cancel':
+        $.get(url_get+'?tabs='+tabId+'&mode=view', function(data, status, req) {
+            loadTabs(data);
+            tabClass(tabId);
+        });
+        break;
+
+    case 'save':
+        $.post(url_post+'?tabs='+tabId+'&mode=view', function(data, status, req) {
+            loadTabs(data);
+            tabClass(tabId);
+        });
+        break;
+
+    case 'dirty':
+        $('.adm-tabs-left a[href=#'+tabId+']').addClass('changed');
+        break;
+
+    case 'clean':
+        $('.adm-tabs-left a[href=#'+tabId+']').removelass('changed');
+        break;
+    }
+    return false;
+}
+</script>
 <header class="adm-page-title">
 	<span class="title">View Product</span>
 </header>
@@ -16,92 +120,22 @@
 		<div class="adm-tabs-left-bg"></div>
 		<nav class="adm-tabs-left">
 			<ul>
-				<li class="active"><a href="#tab-general-info">General Info</a></li>
-				<li><a href="#tab-attributes">Attributes</a></li>
-				<li><a href="#tab-related-products">Related Products</a></li>
-				<li><a href="#tab-family-products">Family Products</a></li>
-				<li><a href="#tab-similar-products">Similar Products</a></li>
-				<li><a href="#tab-categories">Categories</a></li>
-				<li><a href="#tab-attachments">Attachments</a></li>
-				<li><a href="#tab-images">Images</a></li>
-				<li><a href="#tab-vendors">Vendors</a></li>
-				<li><a href="#tab-product-reviews">Product Reviews</a></li>
-				<li><a href="#tab-promotions">Promotions</a></li>
+<?php foreach ($this->tabs as $k=>$tab): ?>
+				<li <?php if ($k===$this->tab): ?>class="active"<?php endif ?>>
+                    <a href="#tab-<?php echo $this->q($k) ?>"><?php echo $this->q($tab['label']) ?></a>
+                </li>
+<?php endforeach ?>
 			</ul>
 		</nav>
         <div class="adm-tabs-container">
-            <section id="tab-general-info" class="adm-tabs-content">
-                <form method="#" action="#" class="adm-section-group">
-                    <fieldset>
-                        <button class="btn st2 sz2 btn-edit"><span>Edit</span></button>
-                        <ul class="form-list">
-                            <li>
-                                <h4 class="label">Short Description</h4>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vestibulum convallis varius. Donec et odio quis est blandit mattis.
-                            </li>
-                            <li>
-                                <h4 class="label">Long Description</h4>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vestibulum convallis varius. Donec et odio quis est blandit mattis. Aliquam ac nisl magna, sit amet vestibulum ipsum. Vestibulum ultrices justo sagittis ante interdum volutpat. Curabitur ullamcorper, neque pulvinar commodo gravida, augue tellus interdum nulla, a pulvinar leo nisi ac nisl. Nullam bibendum luctus sem, eget interdum leo blandit auctor. Integer ullamcorper tellus non justo ultrices tempor. Vivamus eu augue justo. Suspendisse ut neque nec neque ultrices aliquam dictum sed orci.
-                            </li>
-                            <li>
-                                <h4 class="label">Unit of Measures</h4>
-                            </li>
-                        </ul>
-                    </fieldset>
-                </form>
+<?php foreach ($this->tabs as $k=>$tab): ?>
+            <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
+                <?php if ($k!==$this->tab): ?>hidden<?php endif ?>
+                <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
+            >
+<?php if (empty($tab['async'])) echo $this->view($tab['view']) ?>
             </section>
-            <section id="tab-attributes" class="adm-tabs-content" hidden>
-                <form method="#" action="#" class="adm-section-group">
-                    <fieldset>
-                        <button class="btn st2 sz2 btn-edit"><span>Edit</span></button>
-                        <ul class="form-list">
-                            <li>
-                                <h4 class="label">Attribute 1</h4>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vestibulum convallis varius. Donec et odio quis est blandit mattis.
-                            </li>
-                            <li>
-                                <h4 class="label">Attribute 2</h4>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vestibulum convallis varius. Donec et odio quis est blandit mattis. Aliquam ac nisl magna, sit amet vestibulum ipsum. Vestibulum ultrices justo sagittis ante interdum volutpat. Curabitur ullamcorper, neque pulvinar commodo gravida, augue tellus interdum nulla, a pulvinar leo nisi ac nisl. Nullam bibendum luctus sem, eget interdum leo blandit auctor. Integer ullamcorper tellus non justo ultrices tempor. Vivamus eu augue justo. Suspendisse ut neque nec neque ultrices aliquam dictum sed orci.
-                            </li>
-                            <li>
-                                <h4 class="label">Attribute 3</h4>
-                            </li>
-                        </ul>
-                    </fieldset>
-                </form>
-            </section>
-            <section id="tab-related-products" class="adm-tabs-content" hidden
-                data-src="<?=BApp::m('FCom_Catalog')->baseHref().'/products/view/'.$p->id.'/tab/related-products'?>"></section>
+<?php endforeach ?>
         </div>
 	</div>
 </section>
-<script>
-(function() {
-    var lis = $('.adm-tabs-left li');
-    var panes = $('.adm-tabs-content');
-    var curLi = $('.adm-tabs-left li[class=active]');
-    var curPane = $('.adm-tabs-content:not([hidden])');
-    $('a', lis).click(function(ev) {
-        curLi.removeClass('active');
-        curPane.attr('hidden', 'hidden');
-
-        var a = $(ev.currentTarget), li = a.parent('li');
-        if (curLi===li) {
-            return false;
-        }
-        var pane = $(a.attr('href')), src = pane.data('src');
-        li.addClass('active');
-        pane.removeAttr('hidden');
-        curLi = li;
-        curPane = pane;
-        if (src && !pane.data('loaded')) {
-            pane.load(src, function(data, status, req) {
-                if (status=='success') {
-                    pane.data('loaded', true);
-                }
-            });
-        }
-        return false;
-    });
-})();
-</script>

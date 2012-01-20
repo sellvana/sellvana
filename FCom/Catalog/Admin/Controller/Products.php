@@ -10,7 +10,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'caption'       => 'Products',
                 'id'            => 'products',
                 'url'           => 'products/grid/data',
-                'editurl'       => 'products/grid/data',
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250,
@@ -30,6 +29,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->layout('/catalog/products');
     }
 
+    public function action_grid_data()
+    {
+        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*');
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Catalog_Admin_Controller_Products::grid_data');
+        BResponse::i()->json($data);
+    }
+
     public function action_view()
     {
         $id = BRequest::i()->params('id');
@@ -43,69 +49,74 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             BSession::i()->addMessage('Invalid product ID', 'error', 'admin');
             BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products');
         }
-        BLayout::i()->view('catalog/products/view')->product = $product;
         $this->layout('/catalog/products/view');
-    }
-
-    public function action_edit()
-    {
-        $id = BRequest::i()->params('id');
-        if (!$id) {
-            $id = BRequest::i()->get('id');
+        $layout = BLayout::i();
+        $view = $layout->view('catalog/products/view');
+        $curTab = BRequest::i()->request('tab');
+        foreach ($view->tabs as $k=>$tab) {
+            if (!$curTab) {
+                $curTab = $k;
+            }
+            $layout->view($tab['view'])->set('product', $product);
         }
-        if ($id) {
-            $product = FCom_Catalog_Model_Product::i()->load($id);
-        }
-        if (empty($product)) {
-            BSession::i()->addMessage('Invalid product ID', 'error', 'admin');
-            BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products');
-        }
-        BLayout::i()->view('catalog/products/edit')->product = $product;
-        $this->layout('/catalog/products/edit');
+        $view->set(array(
+            'product' => $product,
+            'tab' => $curTab,
+        ));
     }
 
     public function action_view_tab()
     {
         $r = BRequest::i();
-        echo $r->params('id').': '.$r->params('tab');
-        exit;
+        $outTabs = $r->request('tabs');
+        if ($outTabs && is_string($outTabs)) {
+            $outTabs = explode(',', $outTabs);
+        }
+        $id = $r->params('id');
+        if (!$id) {
+            $id = $r->request('id');
+        }
+        $mode = $r->request('mode');
+        if (!$mode) {
+            $mode = 'view';
+        }
+        $product = FCom_Catalog_Model_Product::i()->load($id);
+
+        $this->layout('catalog_product_view_tabs');
+
+        $out = array();
+        if ($outTabs) {
+            $layout = BLayout::i();
+            $tabs = $layout->view('catalog/products/view')->tabs;
+            foreach ($outTabs as $k) {
+                $view = $layout->view($tabs[$k]['view']);
+                if (!$view) {
+                    BDebug::error('MISSING VIEW: '.$tabs[$k]['view']);
+                    continue;
+                }
+                $out['tabs'][$k] = (string)$view->set(array(
+                    'mode' => $mode,
+                    'product' => $product,
+                ));
+            }
+        }
+        BResponse::i()->json($out);
     }
 
-    public function action_grid_config()
+    public function action_edit_post()
     {
-        BResponse::i()->json(array(
-            'url' => BApp::m('FCom_Catalog')->baseHref().'/products/grid/data',
-            'grid' => array(
-                //'forceFitColumns'=>true, // https://github.com/mleibman/SlickGrid/issues/223
-                'editable'=>true,
-                'autoEdit'=>false,
-                'asyncEditorLoading'=>true,
-                'enableAddRow'=>true,
-                'enableCellNavigation'=>true,
-                'enableColumnReorder'=>true
-            ),
-            'columns'=>array(
-                array('id'=>'id', 'name'=>'#', 'field'=>'id', 'width'=>60, 'sortable'=>true),
-                array('id'=>'product_name', 'name'=>'Name', 'field'=>'product_name', 'width'=>300, 'editor'=>'LongTextCellEditor', 'sortable'=>true),
-                array('id'=>'base_price', 'name'=>'Price', 'field'=>'base_price', 'width'=>80, 'editor'=>'TextCellEditor', 'sortable'=>true),
-                array('id'=>'manuf_sku', 'name'=>'Part #', 'field'=>'manuf_sku', 'width'=>100, 'sortable'=>true),
-                #array('id'=>'%', 'name'=>'%', 'field'=>'percent', 'formatter'=>'GraphicalPercentCompleteCellFormatter', 'editor'=>'PercentCompleteCellEditor'),
-                #array('id'=>'bool', 'name'=>'bool', 'field'=>'bool', 'formatter'=>'BoolCellFormatter', 'editor'=>'YesNoCheckboxCellEditor'),
-            ),
-            'sub'=>array('resize'=>'#details-pane/center'),
-            'pager'=>array('id'=>'#products-grid-pager'),
-            'columnpicker'=>true,
-            //'checkboxSelector'=>true,
-            //'reorder'=>true,
-            'dnd'=>true,
-            'undo'=>true,
-        ));
+        $r = BRequest::i();
+        $id = $r->params('id');
+        $data = $r->post();
+
+
+        //BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::edit_post', array('id'=>$id, 'data'=>$data));
+
+        if ($r->xhr()) {
+            $this->forward('view_tab');
+        } else {
+            BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products/view/'.$id);
+        }
     }
 
-    public function action_grid_data()
-    {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Catalog_Admin_Controller_Products::grid_data');
-        BResponse::i()->json($data);
-    }
 }
