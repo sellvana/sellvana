@@ -56,6 +56,10 @@ class FCom extends BClass
                 $config->add(array('web'=>array('base_path'=>$basePath)));
             }
 
+            if (!$config->get('web/base_store')) {
+                $config->add(array('web'=>array('base_store'=>$basePath)));
+            }
+
             BDebug::logDir($rootDir.'/storage/log');
             BDebug::adminEmail($config->get('admin_email'));
 

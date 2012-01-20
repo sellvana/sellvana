@@ -2,33 +2,33 @@
     $p = $this->product;
 ?>
 <header class="adm-page-title">
-	<span class="title">View Product</span>
+    <span class="title">Edit Product</span>
 </header>
 <section class="adm-content-box info-view-mode">
-	<section class="adm-product-summary adm-section-group">
-		<button class="btn st2 sz2 btn-edit"><span>Edit</span></button>
-		<a href="#" class="product-image"><img src="<?php echo $p->thumbUrl(118) ?>" width="118" height="118" alt=""/></a>
-		<h1><?php echo $this->q($p->product_name) ?></h1>
-		<span class="manuf-name attr-item"><?php echo $this->q($p->manuf()->vendor_name) ?></span>
-		<span class="manuf-sku attr-item"># <?php echo $this->q($p->manuf_sku) ?></span>
-	</section>
-	<div class="adm-content-inner">
-		<div class="adm-tabs-left-bg"></div>
-		<nav class="adm-tabs-left">
-			<ul>
-				<li class="active"><a href="#tab-general-info">General Info</a></li>
-				<li><a href="#tab-attributes">Attributes</a></li>
-				<li><a href="#tab-related-products">Related Products</a></li>
-				<li><a href="#tab-family-products">Family Products</a></li>
-				<li><a href="#tab-similar-products">Similar Products</a></li>
-				<li><a href="#tab-categories">Categories</a></li>
-				<li><a href="#tab-attachments">Attachments</a></li>
-				<li><a href="#tab-images">Images</a></li>
-				<li><a href="#tab-vendors">Vendors</a></li>
-				<li><a href="#tab-product-reviews">Product Reviews</a></li>
-				<li><a href="#tab-promotions">Promotions</a></li>
-			</ul>
-		</nav>
+    <section class="adm-product-summary adm-section-group">
+        <button class="btn st2 sz2 btn-edit"><span>Edit</span></button>
+        <a href="#" class="product-image"><img src="<?php echo $p->thumbUrl(118) ?>" width="118" height="118" alt=""/></a>
+        <h1><?php echo $this->q($p->product_name) ?></h1>
+        <span class="manuf-name attr-item"><?php echo $this->q($p->manuf()->vendor_name) ?></span>
+        <span class="manuf-sku attr-item"># <?php echo $this->q($p->manuf_sku) ?></span>
+    </section>
+    <div class="adm-content-inner">
+        <div class="adm-tabs-left-bg"></div>
+        <nav class="adm-tabs-left">
+            <ul>
+                <li class="active"><a href="#tab-general-info">General Info</a></li>
+                <li><a href="#tab-attributes">Attributes</a></li>
+                <li><a href="#tab-related-products">Related Products</a></li>
+                <li><a href="#tab-family-products">Family Products</a></li>
+                <li><a href="#tab-similar-products">Similar Products</a></li>
+                <li><a href="#tab-categories">Categories</a></li>
+                <li><a href="#tab-attachments">Attachments</a></li>
+                <li><a href="#tab-images">Images</a></li>
+                <li><a href="#tab-vendors">Vendors</a></li>
+                <li><a href="#tab-product-reviews">Product Reviews</a></li>
+                <li><a href="#tab-promotions">Promotions</a></li>
+            </ul>
+        </nav>
         <div class="adm-tabs-container">
             <section id="tab-general-info" class="adm-tabs-content">
                 <form method="#" action="#" class="adm-section-group">
@@ -73,7 +73,7 @@
             <section id="tab-related-products" class="adm-tabs-content" hidden
                 data-src="<?=BApp::m('FCom_Catalog')->baseHref().'/products/view/'.$p->id.'/tab/related-products'?>"></section>
         </div>
-	</div>
+    </div>
 </section>
 <script>
 (function() {

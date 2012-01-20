@@ -39,7 +39,7 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function thumbUrl($w, $h=null)
     {
-        return DMain::baseUrl().'/image_resize.php?f='.urlencode($this->imageUrl()).'&s='.$w.'x'.$h;
+        return FCom_Core::i()->resizeUrl().'?f='.urlencode($this->imageUrl()).'&s='.$w.'x'.$h;
     }
 
     public function beforeSave()

@@ -36,6 +36,15 @@ class FCom_Core extends BClass
         $config->writeFile($c['config_dir'].'/local1.php', $c);
         return;
     }
+
+    public function resizeUrl()
+    {
+        static $url;
+        if (!$url) {
+            $url = BConfig::i()->get('web/base_store').'/resize.php';
+        }
+        return $url;
+    }
 }
 
 class FCom_Core_View_Head extends BViewHead
