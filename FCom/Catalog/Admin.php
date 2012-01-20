@@ -15,6 +15,8 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /products/grid/config', 'FCom_Catalog_Admin_Controller_Products.grid_config')
             ->route('GET /products/grid/data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
             ->route('GET /products/view/:id', 'FCom_Catalog_Admin_Controller_Products.view')
+            ->route('GET /products/view/:id/tab/:tab', 'FCom_Catalog_Admin_Controller_Products.view_tab')
+            ->route('GET /products/edit/:id', 'FCom_Catalog_Admin_Controller_Products.edit')
             ->route('GET /categories', 'FCom_Catalog_Admin_Controller_Categories.index')
             ->route('GET /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_get')
             ->route('POST /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_post')
@@ -40,7 +42,8 @@ class FCom_Catalog_Admin extends BClass
                     array('view', 'root', 'do'=>array(
                         array('navAdd', 'catalog', array('label'=>'Catalog')),
                         array('navAdd', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
-                        array('navAdd', 'catalog/products_view', array('label'=>'Product Edit', 'href'=>$baseHref.'/products/view/123')),
+                        array('navAdd', 'catalog/products_view', array('label'=>'Product View', 'href'=>$baseHref.'/products/view/1')),
+                        array('navAdd', 'catalog/products_edit', array('label'=>'Product Edit', 'href'=>$baseHref.'/products/edit/1')),
                     )),
                 ),
                 '/catalog/products'=>array(
@@ -52,6 +55,11 @@ class FCom_Catalog_Admin extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products/view')),
                     array('view', 'root', 'do'=>array(array('navCur', 'catalog/products_view'))),
+                ),
+                '/catalog/products/edit'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/products/edit')),
+                    array('view', 'root', 'do'=>array(array('navCur', 'catalog/products_edit'))),
                 ),
                 '/catalog/categories'=>array(
                     array('layout', 'base'),

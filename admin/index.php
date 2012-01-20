@@ -1,10 +1,17 @@
 <?php
 
-require dirname(__DIR__).'/FCom/FCom.php';
+$rootDir = dirname(__DIR__);
+require $rootDir.'/FCom/FCom.php';
 
-BConfig::i()->add(array('modules'=>array(
-    'Denteva_Admin'=>array('run_level'=>BModule::REQUIRED),
-    'Denteva_Merge'=>array('run_level'=>BModule::REQUIRED),
-)));
+$r = BRequest::i();
+
+BConfig::i()->add(array(
+    'root_dir' => $rootDir,
+    'web' => array('base_store' => BRequest::i()->webRoot(1)),
+    'modules' => array(
+        'Denteva_Admin' => array('run_level'=>BModule::REQUIRED),
+        'Denteva_Merge' => array('run_level'=>BModule::REQUIRED),
+    )
+));
 
 FCom::i()->run('FCom_Admin');
