@@ -28,7 +28,6 @@ textarea 		{ font-family:sans-serif; color:#2f2f2f; }
 ::selection 	{ background:#a6b7d4; color:#fff; text-shadow:none; }
 
 a 				{ color:#0640a9; text-decoration:none; }
-a:visited 		{ color:#0640a9; }
 a:hover 		{ color:#0640a9; text-decoration:none; }
 a:focus 		{ outline:thin dotted; }
 a:hover,
@@ -80,7 +79,7 @@ button::-moz-focus-inner, input::-moz-focus-inner { border:0; padding:0; }
 textarea { overflow:auto; vertical-align:top; resize:vertical; }
 input:valid, textarea:valid {  }
 input:invalid, textarea:invalid { background-color:#f0dddd; }
-table { border-collapse:collapse; border-spacing:0; }
+table { /*border-collapse:collapse;*/ border-spacing:0; }
 td { vertical-align:top; }
 
 
@@ -140,14 +139,15 @@ button.btn, input[type="submit"].btn {
 	overflow:visible;
 }
 button.st1, input[type="submit"].st1 {
-	/* Key button in page */
-	border:none;
+	/* Key button in page ie:Save */
+	border:1px solid #33558f;
 	color:#fff;
 	background:-moz-linear-gradient(top,#7c94bf 0%,#32548e);
 	background:-webkit-gradient(linear, left top, left bottom, from(#7c94bf),to(#32548e));
 	text-shadow:0 -1px 0 #2c4779;
 	}
 button.st2, input[type="submit"].st2 {
+	/* Auxiliary button in page ie:Edit */
 	border:1px solid #adadad;
 	background-image:linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
 	background-image:-o-linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
@@ -163,6 +163,14 @@ button.st2, input[type="submit"].st2 {
 	);
 	color:#444;
 	text-shadow:0 1px 0 #fff;
+	}
+button.st3, input[type="submit"].st3 {
+	/* Cancel text button */
+	border:none;
+	background:none;
+	padding:0 4px !important;
+	color:#0640a9;
+	font-weight:normal;
 	}
 button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
@@ -192,6 +200,76 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	-webkit-box-shadow:0 1px 3px #777;
 	background-clip:content-box;
 	}
+
+/* jQuery UI Tables */
+.ui-widget { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
+.ui-jqgrid tr.jqgrow td { padding:5px; }
+.ui-widget-content { color:#444; }
+.ui-jqgrid tr.ui-row-ltr td { border-color:#ddd; }
+.ui-state-default, 
+.ui-widget-content .ui-state-default, 
+.ui-widget-header .ui-state-default {
+	border-color:#c0c0c0;
+	background-image: linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(224,224,224)),
+		color-stop(1, rgb(236,236,236))
+	);
+	color:#555;
+	font-weight:bold;
+	text-shadow:0 1px 0 #fff;
+	text-align:left;
+	}
+.ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column { padding:5px; text-align:left; }
+.ui-jqgrid .ui-jqgrid-htable th,
+.ui-jqgrid .ui-jqgrid-htable th div,
+.ui-jqgrid .ui-jqgrid-resize { height:auto !important; }
+.ui-jqgrid tr.jqgrow td { border-right:none !important; }
+.ui-priority-secondary, 
+.ui-widget-content .ui-priority-secondary, 
+.ui-widget-header .ui-priority-secondary { opacity:1; filter: Alpha(Opacity=100);}
+.ui-state-hover,
+.ui-widget-content .ui-state-hover, 
+.ui-widget-header .ui-state-hover, 
+.ui-state-focus, 
+.ui-widget-content .ui-state-focus, 
+.ui-widget-header .ui-state-focus { color:#444; }
+.ui-widget-content { 
+	border:none; 
+	box-shadow:0 1px 1px #777;
+	-moz-box-shadow:0 1px 1px #777;
+	-webkit-box-shadow:0 1px 1px #777;
+	background-clip:content-box;
+	}
+.ui-state-hover, 
+.ui-widget-content .ui-state-hover, 
+.ui-widget-header .ui-state-hover, 
+.ui-state-focus, 
+.ui-widget-content .ui-state-focus, 
+.ui-widget-header .ui-state-focus { border-color:#c8d2e2; background:#e9edf4; }
+.ui-state-hover a, 
+.ui-state-hover a:hover { color:#444; }
+.ui-jqgrid tr.jqgrow td,
+.ui-jqgrid .ui-paging-info { height:auto; }
+.ui-jqgrid .ui-jqgrid-pager { /*height:27px;*/ height:auto; }
+.ui-jqgrid .ui-pg-table td,
+.ui-jqgrid .ui-paging-info { font-size:.95em; font-weight:bold; }
+.ui-jqgrid .ui-paging-info { padding-right:5px; }
+.ui-jqgrid .ui-pg-table { padding-bottom:0; }
+.ui-jqgrid-pager { border:none !important; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+.ui-icon-triangle-1-s { background-position:-65px -16px; } /* Fixes sorting arrow alignment */
+.ui-state-highlight, 
+.ui-widget-content .ui-state-highlight, 
+.ui-widget-header .ui-state-highlight { background:#3b73cf; }
+.ui-widget-content .ui-state-highlight td,
+.ui-state-highlight a { color:#fff !important; }
 
 /* =============================================================================
    Global Structure

@@ -33,7 +33,7 @@ wysiwygDestroy('general-info-description');
     <form method="#" action="#" class="adm-section-group">
         <fieldset>
             <div class="btns-set">
-            	<button class="btn st2 sz2 btn-cancel" onclick="return tabAction('cancel', this);"><span>Cancel</span></button>
+            	<button class="btn st3 sz2 btn-cancel" onclick="return tabAction('cancel', this);"><span>Cancel</span></button>
             	<button class="btn st1 sz2 btn-save" onclick="return tabAction('save', this);"><span>Save</span></button>
             </div>
             <ul class="form-list">

@@ -5,6 +5,13 @@ Allow from all
 Deny from none
 </FilesMatch>
 
+Order allow,deny
+Order deny,allow 
+Deny from all 
+#Minu
+Allow from 24.21.137.218
+Allow from 76.109.119.82
+	
 AuthName "Denteva"
 AuthType Basic
 #AuthUserFile .htpasswd
