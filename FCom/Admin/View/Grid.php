@@ -63,8 +63,13 @@ class FCom_Admin_View_Grid extends BView
         foreach ($cfg as $k=>$opt) {
             $opt = BUtil::toJavaScript($opt);
             switch ($k) {
-                case 'grid': $html .= ".jqGrid({$opt})"; break;
-                case 'navGrid': $html .= ".jqGrid('navGrid', '#{$pagerId}', {$opt})"; break;
+                case 'grid':
+                    $html .= ".jqGrid({$opt})";
+                    break;
+                case 'navGrid':
+                case 'navButtonAdd':
+                    $html .= ".jqGrid('navGrid', '#{$pagerId}', {$opt})";
+                    break;
                 default: $html .= ".jqGrid('{$k}', {$opt})";
             }
         }
