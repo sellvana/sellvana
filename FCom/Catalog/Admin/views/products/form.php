@@ -123,7 +123,7 @@ function tabAction(action, el) {
 			<ul>
 <?php foreach ($this->tabs as $k=>$tab): ?>
 				<li <?php if ($k===$this->tab): ?>class="active"<?php endif ?>>
-                    <a href="#tab-<?php echo $this->q($k) ?>"><?php echo $this->q($tab['label']) ?></a>
+                    <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
                 </li>
 <?php endforeach ?>
 			</ul>
