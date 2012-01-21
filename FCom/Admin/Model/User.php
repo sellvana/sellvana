@@ -58,7 +58,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
-            static::$_sessionUser = BSession::i()->data('admin_user');
+            $data = BSession::i()->data('admin_user');
+            if (is_string($data)) {
+                static::$_sessionUser = $data ? unserialize($data) : false;
+            } else {
+                return false;
+            }
         }
         return static::$_sessionUser;
     }
@@ -82,7 +87,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             return false;
         }
 
-        BSession::i()->data('admin_user', $user);
+        BSession::i()->data('admin_user', serialize($user));
+        static::$_sessionUser = $user;
 
         if ($user->locale) {
             setlocale(LC_ALL, $user->locale);

@@ -5,6 +5,7 @@
 var editors = {};
 $(function() {
     CKEDITOR.config.autoUpdateElement = true;
+    CKEDITOR.config.toolbarStartupExpanded = false;
 });
 
 var url_get = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/view_tab/'.$p->id ?>';

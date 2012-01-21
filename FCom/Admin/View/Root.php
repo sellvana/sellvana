@@ -5,18 +5,28 @@ class FCom_Admin_View_Root extends BView
     protected $_tree = array();
     protected $_current;
 
-    public function navAdd($path, $node)
+    public function addNav($path, $node)
     {
         $root =& $this->_tree;
         $pathArr = explode('/', $path);
         foreach ($pathArr as $k) {
+            $parent = $root;
             $root =& $root['/'][$k];
+        }
+        if (empty($node['pos'])) {
+            $pos = 0;
+            if (!empty($parent['/'])) {
+                foreach ($parent['/'] as $k=>$n) {
+                    $pos = max($pos, $n['pos']);
+                }
+            }
+            $node['pos'] = $pos+10;
         }
         $root = $node;
         return $this;
     }
 
-    public function navCur($path)
+    public function setNav($path)
     {
         $this->set('current_nav', $path);
         return $this;
@@ -42,6 +52,11 @@ class FCom_Admin_View_Root extends BView
         if (empty($root['/'])) {
             return '';
         }
+
+        uasort($root['/'], function($a, $b) {
+            return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+        });
+
         $html = $this->tag('ul', !empty($root['ul']) ? $root['ul'] : array());
         foreach ($root['/'] as $k=>$node) {
             $label = !empty($node['label']) ? $node['label'] : $k;

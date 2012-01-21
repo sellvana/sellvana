@@ -1337,17 +1337,10 @@ $(function(){
             }
         }
     });
-    /*$(" #nav ul ").css({display: "none"}); // Opera Fix
-    $(" #nav li").hover(function(){
-        $(this).find('ul:first').css({visibility: "visible",display: "none"}).show(400);
-    }, function(){
-        $(this).find('ul:first').css({visibility: "hidden"});
+    $('.nav-group header').click(function(ev) {
+        $(ev.currentTarget).parent('li').find('ul').animate({
+            opacity:'toggle',
+            height:'toggle'
+        }, 100);
     });
-    $(window).resize(function() {
-        $('.ui-jqgrid-view').each(function() {
-            var g=$(this).parents('.ui-jqgrid'), p=g.parent();
-            g.setGridWidth(p.width()).setGridHeight(p.height()-50);
-        });
-    }).trigger('resize');
-    */
 })

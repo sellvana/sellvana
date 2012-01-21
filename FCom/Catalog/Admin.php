@@ -47,9 +47,15 @@ class FCom_Catalog_Admin extends BClass
             ->layout(array(
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
-                        array('navAdd', 'catalog', array('label'=>'Catalog')),
-                        array('navAdd', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
-                        array('navAdd', 'catalog/products_view', array('label'=>'Product View', 'href'=>$baseHref.'/products/view/1')),
+                        array('addNav', 'catalog', array('label'=>'Catalog', 'pos'=>100)),
+                        array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
+                        array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
+                        array('addNav', 'catalog/attribute_sets', array('label'=>'Attribute Sets', 'href'=>$baseHref.'/attribute_sets')),
+                        array('addNav', 'catalog/promotions', array('label'=>'Promotions', 'href'=>$baseHref.'/promotions')),
+                        array('addNav', 'catalog/product_families', array('label'=>'Product Families', 'href'=>$baseHref.'/product_families')),
+                        array('addNav', 'catalog/promotions', array('label'=>'Promotions', 'href'=>$baseHref.'/promotions')),
+
+                        array('addNav', 'catalog/product_reviews', array('label'=>'Product Reviews', 'href'=>$baseHref.'/product_reviews')),
                     )),
                 ),
                 'catalog_product_view_tabs'=>array(
@@ -70,16 +76,14 @@ class FCom_Catalog_Admin extends BClass
                 '/catalog/products'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products')),
-                    array('view', 'root', 'do'=>array(array('navCur', 'catalog/products'))),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
                 ),
                 '/catalog/products/view'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products/view')),
-                    array('view', 'root', 'do'=>array(array('navCur', 'catalog/products_view'))),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products_view'))),
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Core}/js/lib/ckeditor/ckeditor_source.js', array()),
-                        array('js', '{FCom_Core}/js/lib/jquery.cookie.js', array()),
-                        array('js', '{FCom_Core}/js/lib/jquery.hotkeys.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js', array()),
                         array('css', '{FCom_Core}/js/lib/themes/default/style.css', array()),
                     )),
@@ -88,10 +92,16 @@ class FCom_Catalog_Admin extends BClass
                 '/catalog/categories'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/categories')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/categories'))),
                 ),
                 '/catalog/categories/view'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/categories/view')),
+                ),
+                '/catalog/attribute_sets'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/attribute_sets')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/attribute_sets'))),
                 ),
             ));
         ;
