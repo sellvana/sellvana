@@ -18,7 +18,7 @@ window.appConfig = {
 			<span class="adm-logo">Denteva Admin</span>
 			<nav class="sup-links">
 				<ul>
-					<li class="sup-quicksearch"><a href="#"><span>Quicksearch</span></a>
+					<li class="sup-quicksearch"><a href="#"><span class="icon"></span><span class="title">Quicksearch</span></a>
 						<form action="#" method="post" class="sub-section">
 							<fieldset>
 								<ul class="form-list">
@@ -35,15 +35,15 @@ window.appConfig = {
 							</fieldset>
 						</form>
 					</li>
-					<li class="sup-shortcuts"><a href="#"><span>Shortcuts</span></a>
+					<li class="sup-shortcuts"><a href="#"><span class="icon"></span><span class="title">Shortcuts</span></a>
                         <ul class="sub-section">
                             <li><a href="">New Product</a></li>
                             <li><a href="">New Company</a></li>
                             <li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/logout">New User</a></li>
                         </ul>
                     </li>
-					<li class="sup-updates"><a href="#"><span>Updates &nbsp;<em class="count">10</em></span></a></li>
-					<li class="sup-account"><a href="#"><span><?php echo $this->q($user->fullname()) ?></span></a>
+					<li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a></li>
+					<li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						<ul class="sub-section">
 							<li><a href="">My Account</a></li>
 							<li><a href="">My Reports</a></li>
