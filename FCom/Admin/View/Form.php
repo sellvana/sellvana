@@ -1,12 +1,12 @@
 <?php
 
-class FCom_Catalog_Admin_View_ProductView extends BView
+class FCom_Admin_View_Form extends BView
 {
     public function addTab($id, $params)
     {
         $tabs = (array)$this->tabs;
         if (empty($params['view'])) {
-            $params['view'] = 'catalog/products/tab/'.$id;
+            $params['view'] = $this->tab_view_prefix.$id;
         }
         $tabs[$id] = $params;
         $this->tabs = $tabs;

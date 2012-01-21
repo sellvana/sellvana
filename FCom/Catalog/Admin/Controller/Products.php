@@ -7,14 +7,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $grid = BLayout::i()->view('jqgrid');
         $grid->config = array(
             'grid' => array(
-                'caption'       => 'Products',
                 'id'            => 'products',
                 'url'           => 'products/grid/data',
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250,
                         'formatter'=>'showlink', 'formatoptions'=>array(
-                            'baseLinkUrl' => BApp::m('FCom_Catalog')->baseHref().'/products/view/',
+                            'baseLinkUrl' => BApp::m('FCom_Catalog')->baseHref().'/products/form/',
                         )),
                     array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>100),
                     array('name'=>'manuf_vendor_name', 'label'=>'Mfr', 'index'=>'manuf_vendor_name', 'width'=>100),
@@ -22,8 +21,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ),
                 'sortname'      => 'p.id',
                 'sortorder'     => 'asc',
+                'multiselect'   => true,
             ),
             'navGrid' => array(),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>false),
         );
         BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::index', array('grid'=>$grid));
         $this->layout('/catalog/products');
@@ -36,7 +37,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         BResponse::i()->json($data);
     }
 
-    public function action_view()
+    public function action_form()
     {
         $id = BRequest::i()->params('id');
         if (!$id) {
@@ -49,15 +50,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             BSession::i()->addMessage('Invalid product ID', 'error', 'admin');
             BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products');
         }
-        $this->layout('/catalog/products/view');
+        $this->layout('/catalog/products/form');
         $layout = BLayout::i();
-        $view = $layout->view('catalog/products/view');
+        $view = $layout->view('catalog/products/form');
         $curTab = BRequest::i()->request('tab');
         foreach ($view->tabs as $k=>$tab) {
             if (!$curTab) {
                 $curTab = $k;
             }
-            $layout->view($tab['view'])->set('product', $product);
+            $tabView = $layout->view($tab['view']);
+            if ($tabView) {
+                $tabView->set('product', $product);
+            } else {
+                BDebug::warning('Invalid form tab view: '.$tab['view']);
+            }
         }
         $view->set(array(
             'product' => $product,
@@ -65,7 +71,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ));
     }
 
-    public function action_view_tab()
+    public function action_form_tab()
     {
         $r = BRequest::i();
         $outTabs = $r->request('tabs');
@@ -82,12 +88,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
         $product = FCom_Catalog_Model_Product::i()->load($id);
 
-        $this->layout('catalog_product_view_tabs');
+        $this->layout('catalog_product_form_tabs');
 
         $out = array();
         if ($outTabs) {
             $layout = BLayout::i();
-            $tabs = $layout->view('catalog/products/view')->tabs;
+            $tabs = $layout->view('catalog/products/form')->tabs;
             foreach ($outTabs as $k) {
                 $view = $layout->view($tabs[$k]['view']);
                 if (!$view) {
@@ -113,9 +119,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         //BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::edit_post', array('id'=>$id, 'data'=>$data));
 
         if ($r->xhr()) {
-            $this->forward('view_tab');
+            $this->forward('form_tab');
         } else {
-            BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products/view/'.$id);
+            BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products/form/'.$id);
         }
     }
 
