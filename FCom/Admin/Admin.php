@@ -4,6 +4,8 @@ class FCom_Admin extends BClass
 {
     static public function bootstrap()
     {
+        FCom_Admin_Model_User::i();
+
         BFrontController::i()
             ->route('GET /', 'FCom_Admin_Controller.index')
             ->route('GET /blank', 'FCom_Admin_Controller.blank')

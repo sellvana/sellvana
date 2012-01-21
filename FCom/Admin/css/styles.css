@@ -370,6 +370,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	}
 .adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
 .adm-nav li.nav-group > header {
+    cursor:pointer;
 	border-bottom:1px solid #b6b6b6;
 	background-image:linear-gradient(bottom, rgb(218,218,218) 0%, rgb(235,235,235) 100%);
 	background-image:-o-linear-gradient(bottom, rgb(218,218,218) 0%, rgb(235,235,235) 100%);

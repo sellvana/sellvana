@@ -11,7 +11,7 @@ jQuery.cookie = function (key, value, options) {
 
     // key and at least value given, set cookie...
     if (arguments.length > 1 && String(value) !== "[object Object]") {
-        options = jQuery.extend({}, options);
+        options = jQuery.extend({}, jQuery.cookie.options || {}, options);
 
         if (value === null || value === undefined) {
             options.expires = -1;
