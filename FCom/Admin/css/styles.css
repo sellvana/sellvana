@@ -418,7 +418,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 /* .adm-content-box
    		.adm-section-group */
 .adm-section-group { position:relative; }
-.adm-section-group .btn-edit {
+.adm-section-group .btns-set {
 	position:absolute;
 	top:10px;
 	right:10px;
@@ -427,7 +427,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	opacity:.40;
 	z-index:9;
 	}
-.adm-section-group:hover .btn-edit {
+.adm-section-group:hover .btns-set {
 	-moz-opacity:1;
 	filter:alpha(opacity=100);
 	opacity:1;
@@ -451,11 +451,12 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	color:#444;
 	line-height:1.2;
 	}
+.adm-tabs-left a:hover { border-top-color:#e7edf7; border-bottom-color:#c4ccda; background:#d8dfed; }
 .adm-tabs-left li:first-child a { border-top:none; }
 .adm-tabs-left li:last-child a { border-bottom:none; }
 .adm-tabs-left li.active a { margin-right:0; border-bottom-color:#c4ccda; background:#fff; }
 .adm-tabs-content { padding:13px 15px 25px 165px; }
-.adm-tabs-content .btn-edit { top:-18px; right:-5px; }
+.adm-tabs-content .btns-set { top:-18px; right:-5px; }
 
 /* =============================================================================
    Per Page
@@ -518,7 +519,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	z-index:99;
 	}
 .adm-product-summary .product-image { float:left; margin-left:-151px; }
-.adm-product-summary .product-image img { border:1px solid #bbb; }
+.adm-product-summary .product-image img { border:1px solid #bbb; background:#fff; padding:10px; }
 .adm-product-summary h1 { margin-top:5px; font-size:21px; }
 .adm-product-summary .attr-item { display:block; margin:3px 0; }
 

@@ -1,3 +1,6 @@
 [submodule "lib/minify"]
 	path = lib/minify
 	url = git://github.com/mrclay/minify.git
+[submodule "local/Denteva"]
+	path = local/Denteva
+	url = git@github.com:unirgy/denteva.git

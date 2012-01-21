@@ -111,8 +111,8 @@ function tabAction(action, el) {
 </header>
 <section class="adm-content-box info-view-mode">
 	<section class="adm-product-summary adm-section-group">
-		<button class="btn st2 sz2 btn-edit"><span>Edit</span></button>
-		<a href="#" class="product-image"><img src="<?php echo $p->thumbUrl(118) ?>" width="118" height="118" alt=""/></a>
+		<div class="btns-set"><button class="btn st2 sz2 btn-edit"><span>Edit</span></button></div>
+		<a href="#" class="product-image"><img src="<?php echo $p->thumbUrl(98) ?>" width="98" height="98" alt="<?php echo $this->q($p->product_name) ?>"/></a>
 		<h1><?php echo $this->q($p->product_name) ?></h1>
 		<span class="manuf-name attr-item"><?php echo $this->q($p->manuf()->vendor_name) ?></span>
 		<span class="manuf-sku attr-item"># <?php echo $this->q($p->manuf_sku) ?></span>
