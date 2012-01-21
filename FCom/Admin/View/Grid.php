@@ -22,7 +22,7 @@ class FCom_Admin_View_Grid extends BView
                 'viewrecords'   => true,
                 'shrinkToFit'   => true,
                 'autowidth'     => true,
-                'altRows'       => true,
+                //'altRows'       => true,
                 'width'         => '100%',
                 'height'        => '100%',
             ),
@@ -65,7 +65,7 @@ class FCom_Admin_View_Grid extends BView
             switch ($k) {
                 case 'grid': $html .= ".jqGrid({$opt})"; break;
                 case 'navGrid': $html .= ".jqGrid('navGrid', '#{$pagerId}', {$opt})"; break;
-                default: $hmtl .= ".jqGrid('{$k}', {$opt})";
+                default: $html .= ".jqGrid('{$k}', {$opt})";
             }
         }
         $html .= "</script>";
