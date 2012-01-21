@@ -8,7 +8,7 @@ $(function() {
     CKEDITOR.config.toolbarStartupExpanded = false;
 });
 
-var url_get = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/view_tab/'.$p->id ?>';
+var url_get = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/form_tab/'.$p->id ?>';
 var url_post = '<?php echo BApp::m('FCom_Catalog')->baseHref().'/products/edit/'.$p->id ?>';
 
 function loadTabs(data) {

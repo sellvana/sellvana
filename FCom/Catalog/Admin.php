@@ -14,8 +14,8 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET /products/grid/config', 'FCom_Catalog_Admin_Controller_Products.grid_config')
             ->route('GET /products/grid/data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
-            ->route('GET /products/view/:id', 'FCom_Catalog_Admin_Controller_Products.view')
-            ->route('GET /products/view_tab/:id', 'FCom_Catalog_Admin_Controller_Products.view_tab')
+            ->route('GET /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
+            ->route('GET /products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
             ->route('POST /products/edit/:id', 'FCom_Catalog_Admin_Controller_Products.edit_post')
 
             ->route('GET /products/edit/:id', 'FCom_Catalog_Admin_Controller_Products.edit')
@@ -27,7 +27,7 @@ class FCom_Catalog_Admin extends BClass
         ;
 
         BLayout::i()
-            ->view('catalog/products/view', array('view_class'=>'FCom_Catalog_Admin_View_ProductView'))
+            ->view('catalog/products/form', array('view_class'=>'FCom_Admin_View_Form'))
             ->allViews('Admin/views', 'catalog')
         ;
 
@@ -51,52 +51,54 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/attribute_sets', array('label'=>'Attribute Sets', 'href'=>$baseHref.'/attribute_sets')),
-                        array('addNav', 'catalog/promotions', array('label'=>'Promotions', 'href'=>$baseHref.'/promotions')),
                         array('addNav', 'catalog/product_families', array('label'=>'Product Families', 'href'=>$baseHref.'/product_families')),
-                        array('addNav', 'catalog/promotions', array('label'=>'Promotions', 'href'=>$baseHref.'/promotions')),
-
                         array('addNav', 'catalog/product_reviews', array('label'=>'Product Reviews', 'href'=>$baseHref.'/product_reviews')),
                     )),
                 ),
-                'catalog_product_view_tabs'=>array(
-                    array('view', 'catalog/products/view', 'do'=>array(
-                        array('addTab', 'general-info', array('label' => 'General Info')),
-                        array('addTab', 'attributes', array('label' => 'Attributes')),
-                        array('addTab', 'related-products', array('label' => 'Related Products')),
-                        array('addTab', 'family-products', array('label' => 'Family Products')),
-                        array('addTab', 'similar-products', array('label' => 'Similar Products')),
-                        array('addTab', 'categories', array('label' => 'Categories', 'async'=>true)),
-                        array('addTab', 'attachments', array('label' => 'Attachments')),
-                        array('addTab', 'images', array('label' => 'Images')),
-                        array('addTab', 'vendor-data', array('label' => 'Vendor Data')),
-                        array('addTab', 'product-reviews', array('label' => 'Product Reviews')),
-                        array('addTab', 'promotions', array('label' => 'Promotions')),
-                    )),
+                'catalog_product_form_tabs'=>array(
+                    array('view', 'catalog/products/form',
+                        'set'=>array(
+                            'tab_view_prefix' => 'catalog/products/tab/',
+                        ),
+                        'do'=>array(
+                            array('addTab', 'general-info', array('label' => 'General Info')),
+                            array('addTab', 'attributes', array('label' => 'Attributes')),
+                            array('addTab', 'related-products', array('label' => 'Related Products')),
+                            array('addTab', 'family-products', array('label' => 'Family Products')),
+                            array('addTab', 'similar-products', array('label' => 'Similar Products')),
+                            array('addTab', 'categories', array('label' => 'Categories', 'async'=>true)),
+                            array('addTab', 'attachments', array('label' => 'Attachments')),
+                            array('addTab', 'images', array('label' => 'Images')),
+                            array('addTab', 'vendor-data', array('label' => 'Vendor Data')),
+                            array('addTab', 'product-reviews', array('label' => 'Product Reviews')),
+                            array('addTab', 'promotions', array('label' => 'Promotions')),
+                        ),
+                    ),
                 ),
                 '/catalog/products'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/products')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
                 ),
-                '/catalog/products/view'=>array(
+                '/catalog/products/form'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/products/view')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products_view'))),
+                    array('hook', 'main', 'views'=>array('catalog/products/form')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Core}/js/lib/ckeditor/ckeditor_source.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js', array()),
                         array('css', '{FCom_Core}/js/lib/themes/default/style.css', array()),
                     )),
-                    array('layout', 'catalog_product_view_tabs'),
+                    array('layout', 'catalog_product_form_tabs'),
                 ),
                 '/catalog/categories'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/categories')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/categories'))),
                 ),
-                '/catalog/categories/view'=>array(
+                '/catalog/categories/form'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/categories/view')),
+                    array('hook', 'main', 'views'=>array('catalog/categories/form')),
                 ),
                 '/catalog/attribute_sets'=>array(
                     array('layout', 'base'),
