@@ -52,7 +52,7 @@ window.appConfig = {
 					</li>
 				</ul>
 			</nav>
-			<strong class="adm-group-title">Catalog</strong>
+			<strong class="adm-group-title"><?php echo $this->title ? $this->q($this->title) : '&nbsp;' ?></strong>
 		</header>
 	    <section class="adm-nav-bg"></section>
         <nav class="adm-nav">
