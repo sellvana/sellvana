@@ -5,7 +5,9 @@
 <?php if (!$this->mode || $this->mode==='view'): ?>
 
     <div class="adm-section-group">
-        <button class="btn st2 sz2 btn-edit" onclick="return tabAction('edit', this);"><span>Edit</span></button>
+        <div class="btns-set">
+        	<button class="btn st2 sz2 btn-edit" onclick="return tabAction('edit', this);"><span>Edit</span></button>
+       	</div>
         <ul class="form-list">
             <li>
                 <h4 class="label">Short Description</h4>
@@ -30,8 +32,10 @@ wysiwygDestroy('general-info-description');
 
     <form method="#" action="#" class="adm-section-group">
         <fieldset>
-            <button class="btn st2 sz2 btn-edit" onclick="return tabAction('cancel', this);"><span>Cancel</span></button>
-            <button class="btn st2 sz2 btn-edit" onclick="return tabAction('save', this);"><span>Save</span></button>
+            <div class="btns-set">
+            	<button class="btn st2 sz2 btn-cancel" onclick="return tabAction('cancel', this);"><span>Cancel</span></button>
+            	<button class="btn st1 sz2 btn-save" onclick="return tabAction('save', this);"><span>Save</span></button>
+            </div>
             <ul class="form-list">
                 <li>
                     <h4 class="label">Short Description</h4>
