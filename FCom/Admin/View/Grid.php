@@ -61,11 +61,26 @@ class FCom_Admin_View_Grid extends BView
         }
         $html .= "<script>jQuery('#grid-{$id}')";
         foreach ($cfg as $k=>$opt) {
+            if (is_numeric($k)) {
+                $k = array_shift($opt);
+            }
+            if (!empty($opt['_pager'])) {
+                $localPagerId = $opt['_pager'];
+                unset($opt['_pager']);
+            } else {
+                $localPagerId = $pagerId;
+            }
             $opt = BUtil::toJavaScript($opt);
             switch ($k) {
-                case 'grid': $html .= ".jqGrid({$opt})"; break;
-                case 'navGrid': $html .= ".jqGrid('navGrid', '#{$pagerId}', {$opt})"; break;
-                default: $html .= ".jqGrid('{$k}', {$opt})";
+                case 'grid':
+                    $html .= ".jqGrid({$opt})";
+                    break;
+                case 'navGrid':
+                case 'navButtonAdd':
+                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$opt})";
+                    break;
+                default:
+                    $html .= ".jqGrid('{$k}', {$opt})";
             }
         }
         $html .= "</script>";
