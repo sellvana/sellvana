@@ -270,7 +270,24 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .ui-widget-header .ui-state-highlight { background:#3b73cf; }
 .ui-widget-content .ui-state-highlight td,
 .ui-state-highlight a { color:#fff !important; }
+.ui-widget input, 
+.ui-widget select, 
+.ui-widget textarea, 
+.ui-widget button { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
 
+.ui-widget input[type="text"], .ui-widget input[type="password"] {
+	border-radius:3px;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border:1px solid #aaa;
+	box-shadow:inset 2px 2px 3px 0 #ddd;
+	-moz-box-shadow:inset 2px 2px 3px 0 #ddd;
+	-webkit-box-shadow:inset 2px 2px 3px 0 #ddd;
+	padding:4px 5px 3px !important;
+	color:#444;
+	}
+	
+	
 .fcom-form .dirty span {}
 .fcom-dirty-ball-blue {}
 

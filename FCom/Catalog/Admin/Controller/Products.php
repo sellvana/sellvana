@@ -25,9 +25,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ),
             'navGrid' => array(),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>false),
-            array('navButtonAdd',
-                'caption' => 'test',
-            ),
+            array('navButtonAdd', 'caption' => 'test1'),
+            array('navButtonAdd', 'caption' => 'test2'),
         );
         BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::index', array('grid'=>$grid));
         $this->layout('/catalog/products');
