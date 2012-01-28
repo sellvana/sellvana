@@ -7,9 +7,9 @@ class FCom_Core_Model_TreeAbstract extends BModel
     protected static $_cacheAuto = array('id', 'full_name', 'url_path');
     protected static $_cacheFlags = array('full_name'=>array('key_lower'));
 
-    public static function load($id, $field=null)
+    public static function load($id, $field=null, $cache=false)
     {
-        $cat = parent::load($id, $field);
+        $cat = parent::load($id, $field, $cache);
         if ($cat) return $cat;
         if ($id==1) {
             return static::i()->create(array(

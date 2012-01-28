@@ -21,12 +21,13 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 BSession::i()->addMessage('Invalid user name or password.', 'error', 'admin');
             }
         }
-        BResponse::i()->redirect(BApp::m('FCom_Admin')->baseHref());
+        $url = BSession::i()->data('login_orig_url');
+        BResponse::i()->redirect($url ? $url : BApp::url('FCom_Admin'));
     }
 
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::m('FCom_Admin')->baseHref());
+        BResponse::i()->redirect(BApp::url('FCom_Admin'));
     }
 }

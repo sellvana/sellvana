@@ -3,13 +3,7 @@
 	<form method="post" action="<?=BApp::m('FCom_Admin')->baseHref()?>/login">
 	    <fieldset>
 	    	<header class="section-title">Log into Account</header>
-<?php if ($this->messages): ?>
-    		<ul class="msgs">
-<?php foreach ($this->messages as $m): ?>
-    			<li class="<?php echo $m['type']?>-msg"><?php echo $this->q($m['msg'])?></li>
-<?php endforeach ?>
-    		</ul>
-<?php endif ?>
+            <?php echo $this->messagesHtml() ?>
 	        <ul class="form-list">
 	        	<li class="label-l">
 	        		<label for="#">Email/Username</label>
@@ -20,7 +14,7 @@
 	        		<input type="password" name="login[password]" class="sz1"/>
 	        	</li>
 	        </ul>
-	        <input class="btn st1 sz1 "type="submit" name="Login"/>
+	        <input class="btn st1 sz1" type="submit" name="Login"/>
 	        <a href="#">Recover your password</a>
 	    </fieldset>
 	</form>

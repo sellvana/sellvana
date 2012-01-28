@@ -12,6 +12,13 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_sessionUser;
 
+    protected $_fieldOptions = array(
+        'status' => array(
+            'A' => 'Active',
+            'I' => 'Inactive',
+        ),
+    );
+
     public static function statusOptions()
     {
         return array(
@@ -86,6 +93,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
+
+        $user->set('last_login', BDb::now())->save();
 
         BSession::i()->data('admin_user', serialize($user));
         static::$_sessionUser = $user;

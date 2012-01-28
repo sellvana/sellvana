@@ -4,12 +4,8 @@ class FCom_Core extends BClass
 {
     static public function bootstrap()
     {
-        $rootDir = dirname(dirname(__DIR__));
-        BApp::m()->autoload($rootDir.'/local');
-        BApp::m()->autoload($rootDir.'/market');
-        BApp::m()->autoload($rootDir);
-
         BLayout::i()
+            ->defaultViewClass('FCom_Core_View_Abstract')
             ->view('head', array('view_class'=>'FCom_Core_View_Head'))
         ;
     }
@@ -47,18 +43,25 @@ class FCom_Core extends BClass
     }
 }
 
-class FCom_Core_View_Head extends BViewHead
+class FCom_Core_View_Abstract extends BView
 {
-    /*
-    public function _render()
+    public function messagesHtml()
     {
-        $baseUrl = BConfig::i()->get('web/base_path');
-        $html = '<script type="text/javascript">var require = { deps: ["FCom/Core/js/lib/jquery"] }</script>';
-        $html .= '<script type="text/javascript" src="'.$baseUrl.'/FCom/Core/js/lib/require.js"></script>';
-        $html .= '<script type="text/javascript">require.config({baseUrl: "'.$baseUrl.'"});</script>';
+        $html = '';
+        if ($this->messages) {
+            $html .= '<ul class="msgs">';
+            foreach ($this->messages as $m) {
+                $html .= '<li class="'.$m['type'].'-msg">'.$this->q($m['msg']).'</li>';
+            }
+            $html .= '</ul>';
+        }
         return $html;
     }
-    */
+}
+
+class FCom_Core_View_Head extends BViewHead
+{
+
 }
 
 class FCom_Core_Controller_Abstract extends BActionController
@@ -82,6 +85,12 @@ class FCom_Core_Controller_Abstract extends BActionController
         foreach ((array)$name as $l) {
             $layout->layout($l);
         }
+        return $this;
+    }
+
+    public function messages($viewName, $namespace='frontend')
+    {
+        $this->view($viewName)->messages = BSession::i()->messages($namespace);
         return $this;
     }
 }

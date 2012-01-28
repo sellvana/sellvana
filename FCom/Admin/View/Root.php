@@ -3,7 +3,7 @@
 class FCom_Admin_View_Root extends BView
 {
     protected $_tree = array();
-    protected $_current;
+    protected $_curNav;
 
     public function addNav($path, $node)
     {
@@ -43,11 +43,11 @@ class FCom_Admin_View_Root extends BView
         return "<{$tag}{$hmtl}>";
     }
 
-    public function renderNodes($root=null, $level=0)
+    public function renderNodes($root=null, $path='')
     {
         if (is_null($root)) {
             $root = $this->_tree;
-            $this->_curArr = explode('/', $this->get('current_nav'));
+            $this->_curNav = $this->get('current_nav');
         }
         if (empty($root['/'])) {
             return '';
@@ -72,10 +72,11 @@ class FCom_Admin_View_Root extends BView
                 $label = $this->tag('header', $hdrParams).'<span class="icon"></span><span class="title">'.$label.'</span></header>';
             }
             $key = !empty($node['key']) ? $node['key'] : $k;
-            if (isset($this->_curArr[$level]) && $this->_curArr[$level]===$key) {
+            $nextPath = $path.($path?'/':'').$key;
+            if ($this->_curNav===$nextPath || strpos($this->_curNav, $nextPath.'/')===0) {
                 $node['li']['class'] .= ' active';
             }
-            $children = $this->renderNodes($node, $level+1);
+            $children = $this->renderNodes($node, $nextPath);
             $html .= $this->tag('li', !empty($node['li']) ? $node['li'] : array())
                 . $label . $children . '</li>';
         }
