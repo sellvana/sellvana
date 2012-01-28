@@ -1252,8 +1252,148 @@ console.log(a);
             "onRowsChanged":        onRowsChanged,
             "onPagingInfoChanged":  onPagingInfoChanged
         };
-    }
+    },
 
+    forms: {},
+    form: function(options) {
+        /* options = {
+            tabs:'.adm-tabs-left li',
+            panes:'.adm-tabs-content',
+            url_get: '.../form_tab/:id',
+            url_post: '.../edit/:id'
+        } */
+        var tabs, panes, curLi, curPane, editors = {};
+
+        function loadTabs(data) {
+            for (var i in data.tabs) {
+                $('#tab-'+i).html(data.tabs[i]).data('loaded', true);
+            }
+        }
+
+        function wysiwygCreate(id) {
+            if (!editors[id]) {
+                editors[id] = CKEDITOR.replace(id);
+            }
+        }
+
+        function wysiwygDestroy(id) {
+            if (editors[id]) {
+                try {
+                    editors[id].destroy();
+                } catch (e) {
+                    editors[id].destroy();
+                }
+                editors[id] = null;
+            }
+        }
+
+
+        function tabClass(id, cls) {
+            var tab = $('a[href=#tab-'+id+']', tabs).parent('li');
+            tab.removeClass('dirty error');
+            if (cls) tab.addClass(cls);
+        }
+
+        function tabAction(action, el) {
+            var pane = $(el).parents(options.panes);
+            var tabId = pane.attr('id').replace(/^tab-/,'');
+            switch (action) {
+            case 'edit':
+                $.get(options.url_get+'?tabs='+tabId+'&mode=edit', function(data, status, req) {
+                    loadTabs(data);
+                    tabClass(tabId, 'dirty');
+                });
+                break;
+
+            case 'cancel':
+                $.get(options.url_get+'?tabs='+tabId+'&mode=view', function(data, status, req) {
+                    loadTabs(data);
+                    tabClass(tabId);
+                });
+                break;
+
+            case 'save':
+                for (var i in editors) {
+                    editors[i].updateElement();
+                }
+                var postData = $(el).parents('fieldset').find('input,select,textarea').serializeArray();
+                $.post(options.url_post+'?tabs='+tabId+'&mode=view', postData, function(data, status, req) {
+                    loadTabs(data);
+                    tabClass(tabId);
+                });
+                break;
+
+            case 'dirty':
+                $('a[href=#'+tabId+']', tabs).addClass('changed');
+                break;
+
+            case 'clean':
+                $('a[href=#'+tabId+']', tabs).removelass('changed');
+                break;
+            }
+            return false;
+        }
+
+        function saveAll(el) {
+            return true;
+            //TODO
+            var form = $(el).parents('form');
+            var postData = form.serializeArray();
+            $.post(options.url_post+'?tabs=ALL&mode=view', postData, function(data, status, req) {
+                loadTabs(data);
+                for (var i in data.tabs) {
+                    tabClass(i);
+                }
+            });
+            return false;
+        }
+
+        function deleteForm(el) {
+            if (!confirm('Are you sure?')) return false;
+            var form = $(el).parents('form');
+            $('input[name=_delete]', form).val(1);
+            return true;
+        }
+
+        $(function() {
+            var tabs = $(options.tabs);
+            var panes = $(options.panes);
+            var curLi = $(options.tabs+'[class=active]');
+            var curPane = $(options.panes+':not([hidden])');
+
+            $('a', tabs).click(function(ev) {
+                curLi.removeClass('active');
+                curPane.attr('hidden', 'hidden');
+
+                var a = $(ev.currentTarget), li = a.parent('li');
+                if (curLi===li) {
+                    return false;
+                }
+                var pane = $(a.attr('href'));
+                li.addClass('active');
+                pane.removeAttr('hidden');
+                curLi = li;
+                curPane = pane;
+                if (!pane.data('loaded')) {
+                    var tabId = a.attr('href').replace(/^#tab-/,'');
+                    $.getJSON(options.url_get+'?tabs='+tabId, function(data, status, req) {
+                        loadTabs(data);
+                    });
+                }
+                return false;
+            });
+        });
+
+        return {
+            loadTabs:loadTabs,
+            wysiwygCreate:wysiwygCreate,
+            wysiwygDestroy:wysiwygDestroy,
+            tabClass:tabClass,
+            tabAction:tabAction,
+            saveAll:saveAll,
+            deleteForm:deleteForm
+        };
+    }
 }
 /*
 $.extend($.jgrid.defaults, {
@@ -1326,10 +1466,63 @@ function jqgrid(id, options) {
 
     return {autoresize:autoresize};
 }
+jqgrid.fmtHiddenInput = function (cellvalue, options, rowObject) {
+    console.log(cellvalue,options,rowObject);
+   // do something here
+   return cellvalue ? cellvalue : '';
+}
 
+$.widget('ui.fcom_autocomplete', {
+    _create: function() {
+        var self = this, input = this.element, field = $(this.options.field), value = field.val();
+        var cache = {}, lastXhr;
+        input.autocomplete({
+            minLength:2,
+            source: function(request, response) {
+                var term = request.term;
+                if (term in cache) {
+                    response(cache[term]);
+                    return;
+                }
+                lastXhr = $.getJSON(self.options.url, request, function(data, status, xhr) {
+                    cache[term] = data;
+                    if (xhr === lastXhr) {
+                        response(data);
+                    }
+                });
+            },
+            select: function( event, ui ) {
+                field.val(ui.item.id);
+            },
+            change: function( event, ui ) {
+                if ( !ui.item ) {
+                    $(this).val('');
+                    field.val('');
+                    return false;
+                }
+            }
+        });
+    },
 
+    destroy: function() {
+        this.input.remove();
+        this.button.remove();
+        this.element.show();
+        $.Widget.prototype.destroy.call( this );
+    }
+});
 
 $(function(){
+
+    $.jgrid.formatter.date.newformat = 'm/d/Y';
+
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.config.autoUpdateElement = true;
+        CKEDITOR.config.toolbarStartupExpanded = false;
+    }
+
+    //$('.datepicker').datepicker();
+
     $(document).bind('ajaxSuccess', function(event, request, settings) {
         if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
             if (data.error=='login') {

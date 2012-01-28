@@ -4,7 +4,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
-require realpath(__DIR__."/../lib/b/buckyball.php");
+require realpath(__DIR__."/../lib/buckyball/bucky/buckyball.php");
 
 class FCom extends BClass
 {
@@ -97,6 +97,14 @@ class FCom extends BClass
                 ->scan($rootDir.'/market/*')
                 ->scan($rootDir.'/local/*');
 
+            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
+            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+            BClassAutoload::i(true, array('root_dir'=>$rootDir));
+
+            if (BRequest::i()->csrf()) {
+                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+            }
+
             if ($run) {
                 // Run application
                 BApp::i()->run();
@@ -165,6 +173,14 @@ class FCom extends BClass
                 'root_dir' => 'Catalog',
                 'bootstrap' => array('file'=>'Catalog.php', 'callback'=>'FCom_Catalog::bootstrap'),
                 'depends' => array('FCom_Core'),
+            ))
+            // catalog views and controllers
+            ->module('FCom_CustomAttr', array(
+                'version' => '0.1.0',
+                'root_dir' => 'CustomAttr',
+                'bootstrap' => array('file'=>'CustomAttr.php', 'callback'=>'FCom_CustomAttr::bootstrap'),
+                'depends' => array('FCom_Catalog'),
+                'url_prefix' => 'customattr',
             ))
             // cart, checkout and customer account views and controllers
             ->module('FCom_Checkout', array(

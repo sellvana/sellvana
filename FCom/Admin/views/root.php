@@ -1,4 +1,5 @@
 <?php
+    $baseHref =
     $user = FCom_Admin_Model_User::sessionUser();
 ?>
 <!DOCTYPE html>
@@ -37,16 +38,16 @@ window.appConfig = {
 					</li>
 					<li class="sup-shortcuts"><a href="#"><span class="icon"></span><span class="title">Shortcuts</span></a>
                         <ul class="sub-section">
-                            <li><a href="">New Product</a></li>
-                            <li><a href="">New Company</a></li>
-                            <li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/logout">New User</a></li>
+                            <li><a href="<?php echo BApp::m('FCom_Catalog')->baseHref()?>/products/form/">New Product</a></li>
+                            <li><a href="<?php echo BApp::m('FCom_Catalog')->baseHref()?>/categories/form/">New Company</a></li>
+                            <li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/users/form/">New User</a></li>
                         </ul>
                     </li>
 					<li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a></li>
 					<li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						<ul class="sub-section">
-							<li><a href="">My Account</a></li>
-							<li><a href="">My Reports</a></li>
+							<li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/my_account">My Account</a></li>
+							<li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/reports">My Reports</a></li>
 							<li><a href="<?php echo BApp::m('FCom_Admin')->baseHref()?>/logout">Log Out</a></li>
 						</ul>
 					</li>

@@ -4,3 +4,6 @@
 [submodule "local/Denteva"]
 	path = local/Denteva
 	url = git@github.com:unirgy/denteva.git
+[submodule "lib/buckyball"]
+	path = lib/buckyball
+	url = git@github.com:unirgy/buckyball.git

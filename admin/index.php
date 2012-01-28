@@ -14,4 +14,6 @@ BConfig::i()->add(array(
     )
 ));
 
+BDebug::backtraceOn('MODULE UPDATE: FCom_Catalog');
+
 FCom::i()->run('FCom_Admin');
