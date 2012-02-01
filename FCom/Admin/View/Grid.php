@@ -28,6 +28,7 @@ class FCom_Admin_View_Grid extends BView
                 'width'         => '100%',
                 'height'        => '100%',
            ),
+           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true),
         );
     }
 
@@ -43,7 +44,7 @@ class FCom_Admin_View_Grid extends BView
                 if (empty($col['formatter'])) $col['formatter'] = 'select';
                 if (empty($col['stype'])) $col['stype'] = 'select';
                 $col['editoptions'] = array('value'=>$values);
-                $col['searchoptions'] = array('value'=>$values);
+                $col['searchoptions'] = array('value'=>':All;'.$values);
                 unset($col['options']);
             }
         }
@@ -68,47 +69,6 @@ class FCom_Admin_View_Grid extends BView
             BPubSub::i()->fire($method.'.data', array('data'=>$data));
         }
         return $data;
-    }
-
-    /** @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options */
-    public function _render()
-    {
-        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
-//echo "<pre>"; print_r($cfg); echo "</pre>";
-        $cfg = $this->processConfig($cfg);
-        $id = $cfg['grid']['id'];
-        $html = "<table id=\"{$id}\"></table>";
-        if (!empty($cfg['grid']['pager'])) {
-            $pagerId = true===$cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
-            $cfg['grid']['pager'] = $pagerId;
-            $html .= "<div id=\"{$pagerId}\"></div>";
-        }
-        $html .= "<script>jQuery('#{$id}')";
-        foreach ($cfg as $k=>$opt) {
-            if (is_numeric($k)) {
-                $k = array_shift($opt);
-            }
-            if (!empty($opt['_pager'])) {
-                $localPagerId = $opt['_pager'];
-                unset($opt['_pager']);
-            } else {
-                $localPagerId = $pagerId;
-            }
-            $opt = BUtil::toJavaScript($opt);
-            switch ($k) {
-                case 'grid':
-                    $html .= ".jqGrid({$opt})";
-                    break;
-                case 'navGrid':
-                case 'navButtonAdd':
-                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$opt})";
-                    break;
-                default:
-                    $html .= ".jqGrid('{$k}', {$opt})";
-            }
-        }
-        $html .= "</script>";
-        return $html;
     }
 
     public function processFilters($filter)
@@ -147,5 +107,47 @@ class FCom_Admin_View_Grid extends BView
             }
         }
         return $where;
+    }
+
+    /** @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options */
+    public function _render()
+    {
+        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
+//echo "<pre>"; print_r($cfg); echo "</pre>";
+        $cfg = $this->processConfig($cfg);
+        $id = $cfg['grid']['id'];
+        $html = "<table id=\"{$id}\"></table>";
+        if (!empty($cfg['grid']['pager'])) {
+            $pagerId = true===$cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
+            $cfg['grid']['pager'] = $pagerId;
+            $html .= "<div id=\"{$pagerId}\"></div>";
+        }
+        $html .= "<script>jQuery('#{$id}')";
+        foreach ($cfg as $k=>$opt) {
+            if (is_numeric($k)) {
+                $k = array_shift($opt);
+            }
+            if (!empty($opt['_pager'])) {
+                $localPagerId = $opt['_pager'];
+                unset($opt['_pager']);
+            } else {
+                $localPagerId = $pagerId;
+            }
+            $opt = BUtil::toJavaScript($opt);
+            switch ($k) {
+                case 'grid':
+                    $html .= ".jqGrid({$opt})";
+                    break;
+                case 'navGrid':
+                case 'inlineNav':
+                case 'navButtonAdd':
+                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$opt})";
+                    break;
+                default:
+                    $html .= ".jqGrid('{$k}', {$opt})";
+            }
+        }
+        $html .= "</script>";
+        return $html;
     }
 }

@@ -41,6 +41,15 @@ class FCom_Core extends BClass
         }
         return $url;
     }
+
+    public function dir($path, $autocreate=true, $mode=0777)
+    {
+        $dir = BConfig::i()->get('root_dir').'/'.$path;
+        if ($autocreate && !file_exists($dir)) {
+            mkdir($dir, $mode, true);
+        }
+        return $dir;
+    }
 }
 
 class FCom_Core_View_Abstract extends BView
