@@ -210,6 +210,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 
 /* jQuery UI Tables */
 .ui-widget { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
+.ui-jqgrid { margin:1px; }
 .ui-jqgrid tr.jqgrow td { padding:5px; }
 .ui-widget-content { color:#444; }
 .ui-jqgrid tr.ui-row-ltr td { border-color:#ddd; }
@@ -300,11 +301,18 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
     /*border-radius:8px;*/
     }
 
+.ui-jqgrid .ui-jqgrid-pager .ui-pg-div {
+    line-height:1.5em;
+    padding-right:5px;
+    }
+
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
     border: none;
     }
 
 .group-container .ui-jqgrid { margin:1px 1px 10px 1px; }
+
+.ui-icon { display:inline-block; cursor:pointer; }
 
 .ui-layout-pane { overflow:auto; }
 .ui-layout-resizer { opacity:0; }
