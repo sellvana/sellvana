@@ -61,7 +61,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
 
     public function action_form()
     {
-
         $id = BRequest::i()->params('id');
         if (!$id) {
             $id = BRequest::i()->get('id');
@@ -78,6 +77,19 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
         $this->layout('/users/form');
         $view = BLayout::i()->view('users/form');
         $this->initFormTabs($view, $model, $model->id ? 'view' : 'create');
+    }
+
+    public function action_form_tab()
+    {
+        $r = BRequest::i();
+        $id = $r->params('id');
+        if (!$id) {
+            $id = $r->request('id');
+        }
+        $model = FCom_Admin_Model_User::i()->load($id);
+        $this->layout('/users/form');
+        $view = BLayout::i()->view('users/form');
+        $this->outFormTabsJson($view, $model);
     }
 
     public function action_form_post()

@@ -10,6 +10,16 @@ class FCom extends BClass
 {
     static protected $_area;
 
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return FCom
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
     static public function area()
     {
         return self::$_area;
@@ -24,14 +34,17 @@ class FCom extends BClass
         return $dir;
     }
 
-    public function run($area, $run=true)
+    public function init($area)
     {
         try {
+            if (BRequest::i()->csrf()) {
+                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+            }
+
             $config = BConfig::i();
 
             // initialize start time and register error/exception handlers
-            BDebug::i();
-            BDebug::registerErrorHandlers();
+            BDebug::i()->registerErrorHandlers();
 
             BDebug::mode('debug');
             #BDebug::mode('development');
@@ -50,14 +63,18 @@ class FCom extends BClass
                 $config->add(array('config_dir'=>$configDir));
             }
 
-            $basePath = $config->get('web/base_path');
-            if (!$basePath) {
-                $basePath = BRequest::i()->webRoot();
-                $config->add(array('web'=>array('base_path'=>$basePath)));
+            $baseSrc = $config->get('web/base_src');
+            if (!$baseSrc) {
+                $baseSrc = BRequest::i()->webRoot();
+                $config->add(array('web'=>array('base_src'=>$baseSrc)));
             }
-
+            $baseHref = $config->get('web/base_href');
+            if (!$baseHref) {
+                $baseHref = BRequest::i()->webRoot();
+                $config->add(array('web'=>array('base_href'=>$baseHref)));
+            }
             if (!$config->get('web/base_store')) {
-                $config->add(array('web'=>array('base_store'=>$basePath)));
+                $config->add(array('web'=>array('base_store'=>$baseHref)));
             }
 
             BDebug::logDir($rootDir.'/storage/log');
@@ -101,15 +118,19 @@ class FCom extends BClass
             BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
             BClassAutoload::i(true, array('root_dir'=>$rootDir));
 
-            if (BRequest::i()->csrf()) {
-                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
-            }
+            return BApp::i();
 
-            if ($run) {
-                // Run application
-                BApp::i()->run();
-            }
+        } catch (Exception $e) {
+            BDebug::dumpLog();
+            BDebug::exceptionHandler($e);
+        }
+    }
 
+    public function run($area)
+    {
+        $this->init($area);
+        try {
+            BApp::i()->run();
         } catch (Exception $e) {
             BDebug::dumpLog();
             BDebug::exceptionHandler($e);
@@ -151,7 +172,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
-                'depends' => array('buckyball.ui', 'FCom_Core'),
+                'depends' => array('FCom_Core'),
             ))
             // Frontend collection of modules
             ->module('FCom_Admin_DefaultTheme', array(
@@ -165,7 +186,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Cron',
                 'bootstrap' => array('file'=>'Cron.php', 'callback'=>'FCom_Cron::bootstrap'),
-                'depends' => array('buckyball.ui', 'FCom_Core'),
+                'depends' => array('FCom_Core'),
             ))
             // catalog views and controllers
             ->module('FCom_Catalog', array(
