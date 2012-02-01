@@ -8,7 +8,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         STATUS_DELETED  = 'D'
     ;
 
-    protected static $_table = 'a_admin_user';
+    protected static $_table = 'fcom_admin_user';
 
     protected static $_sessionUser;
 

@@ -13,5 +13,32 @@ class FCom_Catalog_Frontend extends BClass
         ;
 
         BLayout::i()->allViews('Frontend/views', 'catalog/');
+
+        BPubSub::i()->on('BLayout::layout.load.after', 'FCom_Catalog_Frontend::layout');
+    }
+
+    static public function layout()
+    {
+        BLayout::i()->layout(array(
+            '/catalog/category'=>array(
+                array('layout', 'base'),
+            ),
+
+            '/catalog/product'=>array(
+                array('layout', 'base'),
+            ),
+
+            '/catalog/search'=>array(
+                array('layout', 'base'),
+            ),
+
+            '/catalog/compare'=>array(
+
+            ),
+
+            '/catalog/compare/ajax'=>array(
+
+            ),
+        ));
     }
 }

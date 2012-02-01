@@ -27,26 +27,6 @@ class FCom_Frontend_DefaultTheme extends BClass
                 '/'=>array(
                     array('layout', 'base'),
                 ),
-
-                '/catalog/category'=>array(
-                    array('layout', 'base'),
-                ),
-
-                '/catalog/product'=>array(
-                    array('layout', 'base'),
-                ),
-
-                '/catalog/search'=>array(
-                    array('layout', 'base'),
-                ),
-
-                '/catalog/compare'=>array(
-
-                ),
-
-                '/catalog/compare/ajax'=>array(
-
-                ),
             ));
         ;
     }
