@@ -1,6 +1,6 @@
 <?php debug_backtrace() || exit;
 
-#set_time_limit(2);
+set_time_limit(2);
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -56,13 +56,6 @@ class FCom extends BClass
             }
             BDebug::debug('ROOTDIR='.$rootDir);
 
-            // local configuration (db, enabled modules)
-            $configDir = $config->get('config_dir');
-            if (!$configDir) {
-                $configDir = $rootDir.'/storage/config';
-                $config->add(array('config_dir'=>$configDir));
-            }
-
             $baseSrc = $config->get('web/base_src');
             if (!$baseSrc) {
                 $baseSrc = BRequest::i()->webRoot();
@@ -80,6 +73,12 @@ class FCom extends BClass
             BDebug::logDir($rootDir.'/storage/log');
             BDebug::adminEmail($config->get('admin_email'));
 
+            // local configuration (db, enabled modules)
+            $configDir = $config->get('config_dir');
+            if (!$configDir) {
+                $configDir = $rootDir.'/storage/config';
+                $config->add(array('config_dir'=>$configDir));
+            }
             // DB configuration is separate to gitignore
             // used as indication that app is already installed and setup
             if (file_exists($configDir.'/db.php')) {
@@ -90,8 +89,12 @@ class FCom extends BClass
             }
 
             // add area module
-            $config->add(array('modules'=>array($area=>array('run_level'=>BModule::REQUIRED))));
             self::$_area = $area;
+            $reqModules = array($area=>array('run_level'=>BModule::REQUIRED));
+            if (($additionalModules = $config->get('modules/'.$area.'/modules'))) {
+                $reqModules = array_merge_recursive($reqModules, $additionalModules);
+            }
+            $config->add(array('modules'=>$reqModules));
 
             // Initialize debugging mode and levels
             if (($debugConfig = $config->get('debug'))) {
