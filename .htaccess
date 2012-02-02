@@ -6,8 +6,10 @@ Deny from none
 </FilesMatch>
 
 Order allow,deny
-Order deny,allow
-Deny from all
+Allow from all
+#Order deny,allow
+#Deny from all
+Allow from 64.85.162.30
 #Minu
 Allow from 24.21.137.218
 Allow from 76.109.119.82
