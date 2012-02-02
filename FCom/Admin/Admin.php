@@ -23,6 +23,9 @@ class FCom_Admin extends BClass
             ->route('GET /users/form_tab/:id', 'FCom_Admin_Controller_Users.form_tab')
             ->route('POST /users/form/:id', 'FCom_Admin_Controller_Users.form_post')
 
+            ->route('GET /media/grid/:do', 'FCom_Admin_Controller_Media.grid_get')
+            ->route('POST /media/grid/:do', 'FCom_Admin_Controller_Media.grid_post')
+
             ->route('GET /modules', 'FCom_Admin_Controller_Modules.index')
         ;
 
@@ -30,6 +33,8 @@ class FCom_Admin extends BClass
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('head', array('view_class'=>'FCom_Admin_View_Head'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))
+
+            ->view('media/grid', array('view_class'=>'FCom_Admin_View_MediaGrid'))
 
             ->view('users/form', array('view_class'=>'FCom_Admin_View_Form'))
 

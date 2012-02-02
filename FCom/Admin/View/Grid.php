@@ -124,6 +124,10 @@ class FCom_Admin_View_Grid extends BView
         }
         $html .= "<script>jQuery('#{$id}')";
         foreach ($cfg as $k=>$opt) {
+            if (is_string($opt)) {
+                $html .= $opt;
+                continue;
+            }
             if (is_numeric($k)) {
                 $k = array_shift($opt);
             }
@@ -133,18 +137,18 @@ class FCom_Admin_View_Grid extends BView
             } else {
                 $localPagerId = $pagerId;
             }
-            $opt = BUtil::toJavaScript($opt);
+            $optJS = BUtil::toJavaScript($opt);
             switch ($k) {
                 case 'grid':
-                    $html .= ".jqGrid({$opt})";
+                    $html .= ".jqGrid({$optJS})";
                     break;
                 case 'navGrid':
                 case 'inlineNav':
                 case 'navButtonAdd':
-                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$opt})";
+                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$optJS})";
                     break;
                 default:
-                    $html .= ".jqGrid('{$k}', {$opt})";
+                    $html .= ".jqGrid('{$k}', {$optJS})";
             }
         }
         $html .= "</script>";
