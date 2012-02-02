@@ -1,3 +1,155 @@
+
+var FCom_Admin = {};
+
+FCom_Admin.MediaLibrary = function(options) {
+    var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
+
+    $('#upload-btn', container).unbind('click').find('.ui-pg-div').css({overflow:'hidden'}).prepend($('<input type="file" name="upload[]" id="upload-input" value="Upload Media" multiple style="position:absolute; z-index:999; top:0; left:0; margin:-1px; padding:0; opacity:0">'));
+    $(container).append('<iframe id="upload-target" name="upload-target" src="" style="width:0;height:0;border:0"></iframe>');
+
+    $('#upload-input', container).change(function(ev) {
+        console.log(this.files);
+        var form = $(this).parents('form'), action = form.attr('action'), i, file;
+        for (i=0; i<this.files.length; i++) {
+            file = this.files[i];
+    console.log(file);
+            grid.jqGrid('addRowData', file.fileName, {file_name:file.fileName, file_size:file.fileSize, status:'...'});
+        }
+        form.attr('action', options.url+'/upload?grid='+grid.attr('id')+'&folder='+encodeURI(options.folder))
+            .attr('target', 'upload-target')
+            .attr('enctype', 'multipart/form-data')
+            .submit();
+        setTimeout(function() { form.attr('target', '').attr('enctype', '').attr('action', action); }, 100);
+    });
+
+    function fmtActions(val,opt,obj) {
+
+        var html = '', url = options.url+'/download?file='+encodeURI(obj.file_name)+'&folder='+encodeURI(options.folder);
+        if (!obj.status) {
+            html += '<span class=\"ui-icon ui-icon-pencil\" onclick=\"return '+options.js_var+'.editAttachment(event,this)\" title=\"Edit\"></span>'
+                +'<span class=\"ui-icon ui-icon-disk\" onclick=\"return '+options.js_var+'.editAttachmentSave(event,this)\" style=\"display:none\" title=\"Save\"></span>'
+                +'<span class=\"ui-icon ui-icon-cancel\" onclick=\"return '+options.js_var+'.editAttachmentCancel(event,this)\" style=\"display:none\" title=\"Cancel\"></span>'
+                +'<span class="ui-icon ui-icon-arrowthickstop-1-s" onclick="return '+options.js_var+'.downloadAttachment(event, \''+url+'\')" title="\Download\"></span>'
+                +'<span class="ui-icon ui-icon-arrowreturnthick-1-e" onclick="return '+options.js_var+'.downloadAttachment(event, \''+url+'&inline=1\', true)" title=\"Open\"></span>';
+        } else {
+            html = obj.status;
+        }
+        return html;
+    }
+
+    function addAttachments(target) {
+        var sel = grid.jqGrid('getGridParam', 'selarrrow'), i;
+        var target = $(target);
+        if (!sel.length) {
+            alert('Please select some attachments to add.');
+            return;
+        }
+        for (i=0; i<sel.length; i++) {
+            target.jqGrid('addRowData', sel[i], grid.jqGrid('getRowData', sel[i]));
+        }
+    }
+
+    function removeAttachments(target, inputName) {
+        var target = $(target), sel = target.jqGrid('getGridParam', 'selarrrow'), i;
+        if (!sel.length) {
+            alert('Please select some attachments to remove.');
+            return;
+        }
+        var targetContainer = target.parents('.ui-jqgrid').parent();
+        var attEl = $('input[name='+inputName+']', targetContainer);
+        var attData = attEl.val().split(',');
+        for (i=sel.length-1; i>=0; i--) {
+            attData.push(sel[i]);
+            target.jqGrid('delRowData', sel[i]);
+        }
+        attEl.val(attData.join(','));
+    }
+
+    function editAttachment(ev, el) {
+        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+        el.hide('fast'); $('.ui-icon-disk,.ui-icon-cancel', tr).show('fast');
+        ev.stopPropagation();
+        grid.jqGrid('editRow', rowid, {
+            keys:true,
+            oneditfunc:function() { options.oneditfunc(tr); },
+            successfunc:function(xhr) { /*console.log('successfunc');*/
+                editAttachmentRestore(tr);
+                return true;
+            },
+            errorfunc:function() { /*console.log('errorfunc');*/ el.show();  },
+            aftersavefunc:function() { /*console.log('aftersavefunc');*/ el.show(); },
+            afterrestorefunc:function() { /*console.log('afterrestorefunc');*/
+                editAttachmentRestore(tr);
+                return true;
+            }
+        });
+        return false;
+    }
+
+    function editAttachmentSave(ev, el) {
+        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+        ev.stopPropagation();
+        grid.jqGrid('saveRow', rowid);
+        editAttachmentRestore(tr);
+        return false;
+    }
+
+    function editAttachmentCancel(ev, el) {
+        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+        ev.stopPropagation();
+        grid.jqGrid('restoreRow', rowid);
+        editAttachmentRestore(tr);
+        return false;
+    }
+
+    function editAttachmentRestore(tr) {
+        $('.ui-icon-disk,.ui-icon-cancel', tr).hide('fast'); $('.ui-icon-pencil', tr).show('fast');
+    }
+
+
+    function downloadAttachment(ev, href, inline) {
+        ev.stopPropagation();
+        if (!inline) {
+            $('#upload-target', container)[0].contentWindow.location.href = href;
+        } else {
+            window.open(href);
+        }
+        return false;
+    }
+
+    function deleteAttachments() {
+        if (!confirm('Are you sure?')) {
+            return false;
+        }
+        var sel = grid.jqGrid('getGridParam', 'selarrrow'), i, postData = {'delete[]':[]};
+        if (!sel.length) {
+            alert('Please select some attachments to delete.');
+            return;
+        }
+        for (i=sel.length-1; i>=0; i--) {
+            grid.jqGrid('setRowData', sel[i], {status:'...'});
+            postData["delete[]"].push(grid.jqGrid('getRowData', sel[i]).file_name);
+        }
+        $.post(options.url+'/delete?grid='+grid.attr('id')+'&folder='+encodeURI(options.folder), postData, function(data, status, xhr) {
+            for (i=sel.length-1; i>=0; i--) {
+                grid.jqGrid('delRowData', sel[i]);
+            }
+        });
+    }
+
+    return {
+        fmtActions:fmtActions,
+        addAttachments:addAttachments,
+        removeAttachments:removeAttachments,
+        editAttachment:editAttachment,
+        editAttachmentSave:editAttachmentSave,
+        editAttachmentCancel:editAttachmentCancel,
+        editAttachmentRestore:editAttachmentRestore,
+        downloadAttachment:downloadAttachment,
+        deleteAttachments:deleteAttachments
+    };
+}
+
 var Admin = {
     load: function(collection, el) {
         el = $(el);
@@ -1511,6 +1663,8 @@ $.widget('ui.fcom_autocomplete', {
         $.Widget.prototype.destroy.call( this );
     }
 });
+
+
 
 $(function(){
 

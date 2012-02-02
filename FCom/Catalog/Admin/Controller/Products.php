@@ -121,4 +121,55 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
     }
 
+    public function action_attachments()
+    {
+        $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
+            ->where('folder', 'media/promo')
+            ->select(array('a.id', 'a.file_name', 'a.file_size'))
+
+            ->join('Denteva_Model_PromoAttachment', array('pa.file_id','=','a.id',), 'f')
+            ->where_null('pa.promo_id')
+            ->select(array('pa.manuf_vendor_id', 'pa.promo_status'))
+
+            ->left_outer_join('Denteva_Model_Vendor', array('v.id','=','pa.manuf_vendor_id'), 'v')
+            ->select(array('manuf_vendor_name'=>'v.vendor_name'))
+        ;
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'Denteva_Admin_Controller_Promo::action_attachments');
+        BResponse::i()->json($data);
+    }
+
+    public function action_attachments_download()
+    {
+        $r = BRequest::i();
+        $fileName = basename($r->get('file'));
+        //BResponse::i()->redirect(BConfig::i()->get('web/base_store').'/media/promo/'.$fileName);
+        $fullName = FCom_Core::i()->dir('media/promo').'/'.$fileName;
+        BResponse::i()->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
+    }
+
+    public function action_attachments_post()
+    {
+        $this->processAttachmentsGridPost(array(
+            'folder' => 'media/promo',
+            'on_upload' => function($att) {
+                Denteva_Model_PromoAttachment::i()->create(array(
+                    'file_id' => $att->id,
+                ))->save();
+            },
+            'on_edit' => function($att) {
+                $r = BRequest::i();
+                $m = Denteva_Model_Vendor::i()->load(array(
+                    'is_manuf' => 1,
+                    'vendor_name' => $r->post('manuf_vendor_name')
+                ));
+                Denteva_Model_PromoAttachment::i()
+                    ->load(array('promo_id'=>null, 'file_id'=>$att->id))
+                    ->set(array(
+                        'manuf_vendor_id' => $m ? $m->id : null,
+                        'promo_status' => $r->post('promo_status'),
+                    ))
+                    ->save();
+            },
+        ));
+    }
 }
