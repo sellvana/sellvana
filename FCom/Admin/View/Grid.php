@@ -23,6 +23,7 @@ class FCom_Admin_View_Grid extends BView
                 'gridview'      => true,
                 'viewrecords'   => true,
                 'shrinkToFit'   => true,
+                'forceFit'      => true,
                 'autowidth'     => true,
                 //'altRows'       => true,
                 'width'         => '100%',
@@ -122,10 +123,15 @@ class FCom_Admin_View_Grid extends BView
             $cfg['grid']['pager'] = $pagerId;
             $html .= "<div id=\"{$pagerId}\"></div>";
         }
-        $html .= "<script>jQuery('#{$id}')";
+        $extraJS = array();
+        $extraHTML = array();
+        $html .= "<script>head(function() { jQuery('#{$id}')";
         foreach ($cfg as $k=>$opt) {
-            if (is_string($opt)) {
-                $html .= $opt;
+            if ($k==='html') {
+                $extraHTML[] = $opt;
+                continue;
+            } elseif ($k==='js' || is_string($opt)) {
+                $extraJS[] = $opt;
                 continue;
             }
             if (is_numeric($k)) {
@@ -151,7 +157,7 @@ class FCom_Admin_View_Grid extends BView
                     $html .= ".jqGrid('{$k}', {$optJS})";
             }
         }
-        $html .= "</script>";
+        $html .= '; '.join("\n", $extraJS)." });</script>".join('', $extraHTML);
         return $html;
     }
 }

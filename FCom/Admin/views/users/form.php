@@ -3,12 +3,14 @@
     $baseHref = BApp::m('FCom_Admin')->baseHref();
 ?>
 <script>
-window.adminForm = Admin.form({
-    form:     '#users-form',
-    tabs:     '.adm-tabs-left li',
-    panes:    '.adm-tabs-content',
-    url_get:  '<?php echo $baseHref.'/users/form_tab/'.$m->id ?>',
-    url_post: '<?php echo $baseHref.'/users/form/'.$m->id ?>'
+head(function() {
+    window.adminForm = Admin.form({
+        form:     '#users-form',
+        tabs:     '.adm-tabs-left li',
+        panes:    '.adm-tabs-content',
+        url_get:  '<?php echo $baseHref.'/users/form_tab/'.$m->id ?>',
+        url_post: '<?php echo $baseHref.'/users/form/'.$m->id ?>'
+    });
 });
 </script>
 <form id="users-form" action="<?php echo $baseHref.'/users/form/'.$m->id ?>" method="post">
@@ -48,5 +50,5 @@ window.adminForm = Admin.form({
     </section>
 </form>
 <script>
-$("#users-form").validationEngine();
+head(function() { $("#users-form").validationEngine(); });
 </script>

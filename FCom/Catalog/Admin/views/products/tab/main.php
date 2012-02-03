@@ -24,7 +24,9 @@
     </div>
 
 <script>
-adminForm.wysiwygDestroy('general-info-description');
+head(function() {
+    adminForm.wysiwygDestroy('general-info-description');
+});
 </script>
 
 <?php elseif ($this->mode==='create' || $this->mode==='edit'): ?>
@@ -52,7 +54,9 @@ adminForm.wysiwygDestroy('general-info-description');
         </ul>
     </fieldset>
     <script>
+head(function() {
     adminForm.wysiwygCreate('general-info-description');
+});
     </script>
 
 <?php endif ?>

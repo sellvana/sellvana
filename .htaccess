@@ -20,6 +20,7 @@ Allow from 68.242.241.155
 Allow from 108.106.181.104
 Allow from 108.107.175.22
 Allow from 184.210.35.238
+Allow from 64.85.162.30
 
 AuthName "Denteva"
 AuthType Basic
