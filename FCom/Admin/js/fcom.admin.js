@@ -3,39 +3,8 @@ var FCom_Admin = {};
 
 FCom_Admin.MediaLibrary = function(options) {
     var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
-
-    $('#upload-btn', container).unbind('click').find('.ui-pg-div').css({overflow:'hidden'}).prepend($('<input type="file" name="upload[]" id="upload-input" value="Upload Media" multiple style="position:absolute; z-index:999; top:0; left:0; margin:-1px; padding:0; opacity:0">'));
-    $(container).append('<iframe id="upload-target" name="upload-target" src="" style="width:0;height:0;border:0"></iframe>');
-
-    $('#upload-input', container).change(function(ev) {
-        console.log(this.files);
-        var form = $(this).parents('form'), action = form.attr('action'), i, file;
-        for (i=0; i<this.files.length; i++) {
-            file = this.files[i];
-    console.log(file);
-            grid.jqGrid('addRowData', file.fileName, {file_name:file.fileName, file_size:file.fileSize, status:'...'});
-        }
-        form.attr('action', options.url+'/upload?grid='+grid.attr('id')+'&folder='+encodeURI(options.folder))
-            .attr('target', 'upload-target')
-            .attr('enctype', 'multipart/form-data')
-            .submit();
-        setTimeout(function() { form.attr('target', '').attr('enctype', '').attr('action', action); }, 100);
-    });
-
-    function fmtActions(val,opt,obj) {
-
-        var html = '', url = options.url+'/download?file='+encodeURI(obj.file_name)+'&folder='+encodeURI(options.folder);
-        if (!obj.status) {
-            html += '<span class=\"ui-icon ui-icon-pencil\" onclick=\"return '+options.js_var+'.editAttachment(event,this)\" title=\"Edit\"></span>'
-                +'<span class=\"ui-icon ui-icon-disk\" onclick=\"return '+options.js_var+'.editAttachmentSave(event,this)\" style=\"display:none\" title=\"Save\"></span>'
-                +'<span class=\"ui-icon ui-icon-cancel\" onclick=\"return '+options.js_var+'.editAttachmentCancel(event,this)\" style=\"display:none\" title=\"Cancel\"></span>'
-                +'<span class="ui-icon ui-icon-arrowthickstop-1-s" onclick="return '+options.js_var+'.downloadAttachment(event, \''+url+'\')" title="\Download\"></span>'
-                +'<span class="ui-icon ui-icon-arrowreturnthick-1-e" onclick="return '+options.js_var+'.downloadAttachment(event, \''+url+'&inline=1\', true)" title=\"Open\"></span>';
-        } else {
-            html = obj.status;
-        }
-        return html;
-    }
+    var addInput = options.add_input || 'input[name="_add_attachments"]';
+    var delInput = options.del_input || 'input[name="_del_attachments"]';
 
     function addAttachments(target) {
         var sel = grid.jqGrid('getGridParam', 'selarrrow'), i;
@@ -44,25 +13,33 @@ FCom_Admin.MediaLibrary = function(options) {
             alert('Please select some attachments to add.');
             return;
         }
-        for (i=0; i<sel.length; i++) {
-            target.jqGrid('addRowData', sel[i], grid.jqGrid('getRowData', sel[i]));
+        var existingIds = {}, targetData = target.jqGrid('getRowData');
+        for (i=0; i<targetData.length; i++) {
+            existingIds[targetData[i].id] = 1;
         }
+        for (i=0; i<sel.length; i++) {
+            if (!existingIds[sel[i]]) {
+                target.jqGrid('addRowData', sel[i], grid.jqGrid('getRowData', sel[i]));
+            }
+        }
+        target.trigger('reloadGrid');
     }
 
-    function removeAttachments(target, inputName) {
+    function removeAttachments(target) {
         var target = $(target), sel = target.jqGrid('getGridParam', 'selarrrow'), i;
         if (!sel.length) {
             alert('Please select some attachments to remove.');
             return;
         }
         var targetContainer = target.parents('.ui-jqgrid').parent();
-        var attEl = $('input[name='+inputName+']', targetContainer);
+        var attEl = $(delInput, targetContainer);
         var attData = attEl.val().split(',');
         for (i=sel.length-1; i>=0; i--) {
             attData.push(sel[i]);
             target.jqGrid('delRowData', sel[i]);
         }
         attEl.val(attData.join(','));
+        target.trigger('reloadGrid');
     }
 
     function editAttachment(ev, el) {
@@ -137,16 +114,142 @@ FCom_Admin.MediaLibrary = function(options) {
         });
     }
 
+    function initTargetGrid(target) {
+        target = $(target);
+        var toolbar = target.parents('.ui-jqgrid').find('.navtable');
+        toolbar.find('.ui-icon-plus').parents('.ui-pg-button').click(function(ev) { addAttachments(target) });
+        toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(function(ev) { removeAttachments(target) });
+    }
+
+    function fmtActions(val,opt,obj) {
+        var html = '', url = options.url+'/download?file='+encodeURI(obj.file_name)+'&folder='+encodeURI(options.folder);
+        if (!obj.status) {
+            html += '<span class=\"ui-icon ui-icon-pencil\" title=\"Edit\"></span>'
+                +'<span class=\"ui-icon ui-icon-disk\" style=\"display:none\" title=\"Save\"></span>'
+                +'<span class=\"ui-icon ui-icon-cancel\" style=\"display:none\" title=\"Cancel\"></span>'
+                +'<span class="ui-icon ui-icon-arrowthickstop-1-s" title="\Download\"></span>'
+                +'<span class="ui-icon ui-icon-arrowreturnthick-1-e" title=\"Open\"></span>';
+        } else {
+            html = obj.status;
+        }
+        return html;
+    }
+
+    $('.ui-icon-pencil', grid).live('click', function(ev) { return editAttachment(ev, this); });
+    $('.ui-icon-disk', grid).live('click', function(ev) { return editAttachmentSave(ev, this); });
+    $('.ui-icon-cancel', grid).live('click', function(ev) { return editAttachmentCancel(ev, this); });
+    $('.ui-icon-arrowthickstop-1-s', grid).live('click', function(ev) { return downloadAttachment(ev, url) });
+    $('.ui-icon-arrowreturnthick-1-e', grid).live('click', function(ev) { return downloadAttachment(ev, url+'&inline=1', true) });
+
+    var colModel = grid[0].p.colModel;
+    for (var i=0; i<colModel.length; i++) {
+        switch (colModel[i].name) {
+            case 'file_size':
+                colModel[i].formatter = function(val,opt,obj){ return Math.round(val/1024)+'k'; }
+                break;
+            case 'act':
+                colModel[i].formatter = fmtActions;
+                break;
+        }
+    }
+    //grid.trigger('reloadGrid');
+
+    $('#upload-btn', container).unbind('click').find('.ui-pg-div').css({overflow:'hidden'}).prepend($('<input type="file" name="upload[]" id="upload-input" value="Upload Media" multiple style="position:absolute; z-index:999; top:0; left:0; margin:-1px; padding:0; opacity:0">'));
+    $(container).append('<iframe id="upload-target" name="upload-target" src="" style="width:0;height:0;border:0"></iframe>');
+
+    $('#upload-input', container).change(function(ev) {
+        console.log(this.files);
+        var form = $(this).parents('form'), action = form.attr('action'), i, file;
+        for (i=0; i<this.files.length; i++) {
+            file = this.files[i];
+    console.log(file);
+            grid.jqGrid('addRowData', file.fileName, {file_name:file.fileName, file_size:file.fileSize, status:'...'});
+        }
+        form.attr('action', options.url+'/upload?grid='+grid.attr('id')+'&folder='+encodeURI(options.folder))
+            .attr('target', 'upload-target')
+            .attr('enctype', 'multipart/form-data')
+            .submit();
+        setTimeout(function() { form.attr('target', '').attr('enctype', '').attr('action', action); }, 100);
+    });
+    grid.parents('.ui-jqgrid').find('.navtable .ui-icon-trash').parents('.ui-pg-button').click(function(ev) { deleteAttachments(); });
+
     return {
         fmtActions:fmtActions,
-        addAttachments:addAttachments,
-        removeAttachments:removeAttachments,
-        editAttachment:editAttachment,
-        editAttachmentSave:editAttachmentSave,
-        editAttachmentCancel:editAttachmentCancel,
-        editAttachmentRestore:editAttachmentRestore,
-        downloadAttachment:downloadAttachment,
-        deleteAttachments:deleteAttachments
+        initTargetGrid:initTargetGrid
+    };
+}
+
+FCom_Admin.ProductLibrary = function(options) {
+    var source = $(options.grid);
+
+    function addProducts(target) {
+        target = $(target);
+        var sel = source.jqGrid('getGridParam', 'selarrrow'), data = [], i;
+        var targetData = target.jqGrid('getRowData'), existingIds = {};
+        for (i=0; i<targetData.length; i++) {
+            existingIds[targetData[i].id] = 1;
+        }
+        if (!sel.length) {
+            alert('Please select some products on the right to add.');
+            return;
+        }
+        updateProducts('add', target, sel);
+        for (i=0; i<sel.length; i++) {
+            if (!existingIds[sel[i]]) {
+                data.push(source.jqGrid('getRowData', sel[i]));
+            }
+        }
+        for (i=sel.length-1; i>=0; i--) {
+            source.jqGrid('setSelection', sel[i], false);
+        }
+        target.jqGrid('addRowData', 'id', data);
+        target.trigger('reloadGrid');
+    }
+
+    function removeProducts(target) {
+        target = $(target);
+        var sel = target.jqGrid('getGridParam', 'selarrrow'), i;
+        if (!sel.length) {
+            alert('Please select some products to remove.');
+            return;
+        }
+        updateProducts('remove', target, sel);
+        for (i=sel.length-1; i>=0; i--) {
+            target.jqGrid('delRowData', sel[i]);
+        }
+        target.trigger('reloadGrid');
+    }
+
+    function updateProducts(action, target, sel) {
+        target = $(target);
+        var container = target.parents('.ui-jqgrid').parent();
+        var groupId = target.attr('id').replace(/.*?([0-9-]+)$/, '\$1'), i, idx, prodId;
+        var addEl = $('.add-product-ids', container);
+        var delEl = $('.del-product-ids', container);
+        var fromEl = action==='add' ? delEl : addEl, toEl = action==='add' ? addEl : delEl;
+console.log(addEl, delEl);
+        var fromData = fromEl.val().split(','), toData = toEl.val().split(',');
+        for (i=0; i<sel.length; i++) {
+            prodId = /*groupId+':'+*/sel[i];
+            if ((idx = $.inArray(prodId, fromData))!=-1) {
+                fromData = fromData.splice(idx, 1);
+            } else if ($.inArray(prodId, toData)==-1) {
+                toData.push(prodId);
+            }
+        }
+        fromEl.val(fromData.join(','));
+        toEl.val(toData.join(','));
+    }
+
+    function initTargetGrid(target) {
+        target = $(target);
+        var toolbar = target.parents('.ui-jqgrid').find('.navtable');
+        toolbar.find('.ui-icon-plus').parents('.ui-pg-button').click(function(ev) { addProducts(target) });
+        toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(function(ev) { removeProducts(target) });
+    }
+
+    return {
+        initTargetGrid:initTargetGrid
     };
 }
 

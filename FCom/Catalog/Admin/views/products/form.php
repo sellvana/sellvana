@@ -4,12 +4,14 @@
 ?>
 
 <script>
-window.adminForm = Admin.form({
-    tabs:     '.adm-tabs-left li',
-    panes:    '.adm-tabs-content',
-    url_get:  '<?php echo $baseHref.'/products/form_tab/'.$p->id ?>',
-    url_post: '<?php echo $baseHref.'/products/form/'.$p->id ?>'
-});
+head(function() {
+    window.adminForm = Admin.form({
+        tabs:     '.adm-tabs-left li',
+        panes:    '.adm-tabs-content',
+        url_get:  '<?php echo $baseHref.'/products/form_tab/'.$p->id ?>',
+        url_post: '<?php echo $baseHref.'/products/form/'.$p->id ?>'
+    });
+})
 </script>
 
 <form action="<?php echo $baseHref.'/products/form/'.$p->id ?>" method="post">

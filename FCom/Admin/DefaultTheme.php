@@ -19,6 +19,8 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
+                        array('js', '{FCom_Core}/js/lib/head.min.js', array()),
+                        array('js', '{FCom_Core}/js/lib/json2.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery-ui.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery.cookie.js', array()),
@@ -45,7 +47,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 ),
                 'form'=>array(
                     array('view', 'head', 'do'=>array(
-                        array('js', '{FCom_Core}/js/lib/ckeditor/ckeditor_source.js', array()),
+                        array('js', '{FCom_Core}/js/lib/ckeditor/ckeditor.js', array()),
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js', array()),
                         array('css', '{FCom_Core}/js/lib/themes/default/style.css', array()),
 

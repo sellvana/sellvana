@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Controller_Media extends FCom_Admin_Controller_Abstract
+class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {
     protected $_allowedFolders = array();
 
@@ -17,6 +17,40 @@ class FCom_Admin_Controller_Media extends FCom_Admin_Controller_Abstract
             BDebug::error('Folder '.$folder.' is not allowed');
         }
         return $folder;
+    }
+
+    public function gridConfig($options=array())
+    {
+        $id = !empty($options['id']) ? $options['id'] : 'media_library';
+        $folder = $options['folder'];
+        $url = BApp::url('FCom_Admin', '/media/grid');
+        $config = array(
+            'grid' => array(
+                'id' => $id,
+                'caption' => 'Media Library',
+                'datatype' => 'json',
+                'url' => $url.'/data?folder='.urlencode($folder),
+                'editurl' => $url.'/edit?folder='.urlencode($folder),
+                'colModel' => array(
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400, 'editable'=>true),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>60, 'search'=>false),
+                    array('name'=>'act', 'label'=>'Actions', 'width'=>70, 'search'=>false, 'sortable'=>false, 'resizable'=>false),
+                ),
+                'multiselect' => true,
+                'multiselectWidth' => 30,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>true),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+            array('navButtonAdd', 'id'=>'upload-btn', 'caption' => 'Upload', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Library', 'cursor'=>'pointer'),
+            array('navButtonAdd', 'caption' => 'Delete', 'buttonicon'=>'ui-icon-trash', 'title' => 'Delete Attachments from Library', 'cursor'=>'pointer'),
+        );
+        if (!empty($options['config'])) {
+            $config = BUtil::arrayMerge($config, $options['config']);
+        }
+        BPubSub::i()->fire(__METHOD__, array('config'=>&$config));
+        BPubSub::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
+        return $config;
     }
 
     public function action_grid_get()
@@ -44,12 +78,12 @@ class FCom_Admin_Controller_Media extends FCom_Admin_Controller_Abstract
 
     public function action_grid_post()
     {
-        $this->processAttachmentsGridPost();
+        $this->processGridPost();
     }
 
     /**
     * $options = array(
-    *   'folder' => 'media/products/attachments',
+    *   'folder' => 'media/product/attachment',
     *   'subfolder' => null,
     *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
     *   'on_upload' => function() { },
@@ -70,7 +104,7 @@ class FCom_Admin_Controller_Media extends FCom_Admin_Controller_Abstract
     *
     * @param array $options
     */
-    public function processAttachmentsGridPost($options=array())
+    public function processGridPost($options=array())
     {
         $r = BRequest::i();
         $gridId = $r->get('grid');
@@ -88,6 +122,9 @@ class FCom_Admin_Controller_Media extends FCom_Admin_Controller_Abstract
             //ignore_user_abort(true);
             $uploads = $_FILES['upload'];
             foreach ($uploads['name'] as $i=>$fileName) {
+                if (!$fileName) {
+                    continue;
+                }
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir.'/'.$fileName)) {
                     $att = $attModel->load(array('folder'=>$folder, 'file_name'=>$fileName));
                     if (!$att) {

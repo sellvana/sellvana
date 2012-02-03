@@ -22,6 +22,9 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('hook', 'breadcrumbs', 'views'=>array('breadcrumbs')),
                     //array('hook', 'nav', 'views'=>array('nav')),
                     array('hook', 'footer', 'views'=>array('footer')),
+                    array('view', 'head', 'do'=>array(
+                        array('js', '{FCom_Core}/js/lib/head.min.js', array()),
+                    )),
                 ),
 
                 '/'=>array(
