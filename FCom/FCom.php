@@ -49,35 +49,40 @@ class FCom extends BClass
             BDebug::mode('debug');
             #BDebug::mode('development');
 
+            $localConfig = array();
+
+            $fcomRootDir = dirname(__DIR__);
+            $localConfig['fcom_root_dir'] = $fcomRootDir;
+
             $rootDir = $config->get('root_dir');
             if (!$rootDir) {
-                $rootDir = dirname(__DIR__);
-                $config->add(array('root_dir'=>$rootDir));
+                $localConfig['root_dir'] = $rootDir = $fcomRootDir;
             }
+
             BDebug::debug('ROOTDIR='.$rootDir);
 
             $baseSrc = $config->get('web/base_src');
             if (!$baseSrc) {
                 $baseSrc = BRequest::i()->webRoot();
-                $config->add(array('web'=>array('base_src'=>$baseSrc)));
+                $localConfig['web']['base_src'] = $baseSrc;
             }
             $baseHref = $config->get('web/base_href');
             if (!$baseHref) {
                 $baseHref = BRequest::i()->webRoot();
-                $config->add(array('web'=>array('base_href'=>$baseHref)));
+                $localConfig['web']['base_href'] = $baseHref;
             }
             if (!$config->get('web/base_store')) {
-                $config->add(array('web'=>array('base_store'=>$baseHref)));
+                $localConfig['web']['base_store'] = $baseHref;
             }
 
-            BDebug::logDir($rootDir.'/storage/log');
+            BDebug::logDir($fcomRootDir.'/storage/log');
             BDebug::adminEmail($config->get('admin_email'));
 
             // local configuration (db, enabled modules)
             $configDir = $config->get('config_dir');
             if (!$configDir) {
                 $configDir = $rootDir.'/storage/config';
-                $config->add(array('config_dir'=>$configDir));
+                $localConfig['config_dir'] = $configDir;
             }
             // DB configuration is separate to gitignore
             // used as indication that app is already installed and setup
@@ -94,7 +99,9 @@ class FCom extends BClass
             if (($additionalModules = $config->get('modules/'.$area.'/modules'))) {
                 $reqModules = array_merge_recursive($reqModules, $additionalModules);
             }
-            $config->add(array('modules'=>$reqModules));
+            $localConfig['modules'] = $reqModules;
+
+            $config->add($localConfig);
 
             // Initialize debugging mode and levels
             if (($debugConfig = $config->get('debug'))) {
@@ -113,13 +120,13 @@ class FCom extends BClass
             // Register modules
             $this->registerBundledModules();
             BModuleRegistry::i()
-                ->scan($rootDir.'/lib/b/plugins')
-                ->scan($rootDir.'/market/*')
-                ->scan($rootDir.'/local/*');
+                ->scan($fcomRootDir.'/lib/b/plugins')
+                ->scan($fcomRootDir.'/market/*')
+                ->scan($fcomRootDir.'/local/*');
 
-            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
-            BClassAutoload::i(true, array('root_dir'=>$rootDir));
+            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir.'/local'));
+            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir.'/market'));
+            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir));
 
             return BApp::i();
 
