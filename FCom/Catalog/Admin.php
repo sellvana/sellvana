@@ -35,6 +35,36 @@ class FCom_Catalog_Admin extends BClass
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
             ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin.onProductsEditPost')
+
+            /** @todo initialize these events only when needed */
+            ->on('FCom_Admin_View_MediaLibrary::gridConfig.media/product/attachment',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'A'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get.media/product/attachment.orm',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', array('type'=>'A'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/attachment.upload',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', array('type'=>'A'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/attachment.edit',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'A'))
+
+            ->on('FCom_Admin_View_MediaLibrary::gridConfig.media/product/image',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'I'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get.media/product/image.orm',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', array('type'=>'I'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/image.upload',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', array('type'=>'I'))
+
+            ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/image.edit',
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'I'))
+        ;
+
+        FCom_Admin_Controller_MediaLibrary::i()
+            ->allowFolder('media/product/image')
+            ->allowFolder('media/product/attachment')
         ;
     }
 
@@ -60,15 +90,13 @@ class FCom_Catalog_Admin extends BClass
                         'do'=>array(
                             array('addTab', 'main', array('label' => 'General Info')),
                             array('addTab', 'attributes', array('label' => 'Attributes')),
-                            array('addTab', 'related-products', array('label' => 'Related Products')),
-                            array('addTab', 'family-products', array('label' => 'Family Products')),
-                            array('addTab', 'similar-products', array('label' => 'Similar Products')),
+                            array('addTab', 'linked-products', array('label' => 'Linked Products', 'async'=>true)),
                             array('addTab', 'categories', array('label' => 'Categories', 'async'=>true)),
-                            array('addTab', 'attachments', array('label' => 'Attachments')),
-                            array('addTab', 'images', array('label' => 'Images')),
-                            array('addTab', 'vendor-data', array('label' => 'Vendor Data')),
-                            array('addTab', 'product-reviews', array('label' => 'Product Reviews')),
-                            array('addTab', 'promotions', array('label' => 'Promotions')),
+                            array('addTab', 'attachments', array('label' => 'Attachments', 'async'=>true)),
+                            array('addTab', 'images', array('label' => 'Images', 'async'=>true)),
+                            array('addTab', 'vendor-data', array('label' => 'Vendor Data', 'async'=>true)),
+                            array('addTab', 'product-reviews', array('label' => 'Product Reviews', 'async'=>true)),
+                            array('addTab', 'promotions', array('label' => 'Promotions', 'async'=>true)),
                         ),
                     ),
                 ),

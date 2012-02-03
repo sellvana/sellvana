@@ -23,6 +23,7 @@ class FCom_Admin_View_Grid extends BView
                 'gridview'      => true,
                 'viewrecords'   => true,
                 'shrinkToFit'   => true,
+                'forceFit'      => true,
                 'autowidth'     => true,
                 //'altRows'       => true,
                 'width'         => '100%',
@@ -122,8 +123,17 @@ class FCom_Admin_View_Grid extends BView
             $cfg['grid']['pager'] = $pagerId;
             $html .= "<div id=\"{$pagerId}\"></div>";
         }
-        $html .= "<script>jQuery('#{$id}')";
+        $extraJS = array();
+        $extraHTML = array();
+        $html .= "<script>head(function() { jQuery('#{$id}')";
         foreach ($cfg as $k=>$opt) {
+            if ($k==='html') {
+                $extraHTML[] = $opt;
+                continue;
+            } elseif ($k==='js' || is_string($opt)) {
+                $extraJS[] = $opt;
+                continue;
+            }
             if (is_numeric($k)) {
                 $k = array_shift($opt);
             }
@@ -133,21 +143,21 @@ class FCom_Admin_View_Grid extends BView
             } else {
                 $localPagerId = $pagerId;
             }
-            $opt = BUtil::toJavaScript($opt);
+            $optJS = BUtil::toJavaScript($opt);
             switch ($k) {
                 case 'grid':
-                    $html .= ".jqGrid({$opt})";
+                    $html .= ".jqGrid({$optJS})";
                     break;
                 case 'navGrid':
                 case 'inlineNav':
                 case 'navButtonAdd':
-                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$opt})";
+                    $html .= ".jqGrid('{$k}', '#{$localPagerId}', {$optJS})";
                     break;
                 default:
-                    $html .= ".jqGrid('{$k}', {$opt})";
+                    $html .= ".jqGrid('{$k}', {$optJS})";
             }
         }
-        $html .= "</script>";
+        $html .= '; '.join("\n", $extraJS)." });</script>".join('', $extraHTML);
         return $html;
     }
 }

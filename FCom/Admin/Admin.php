@@ -23,6 +23,9 @@ class FCom_Admin extends BClass
             ->route('GET /users/form_tab/:id', 'FCom_Admin_Controller_Users.form_tab')
             ->route('POST /users/form/:id', 'FCom_Admin_Controller_Users.form_post')
 
+            ->route('GET /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_get')
+            ->route('POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_post')
+
             ->route('GET /modules', 'FCom_Admin_Controller_Modules.index')
         ;
 

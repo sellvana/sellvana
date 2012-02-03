@@ -41,6 +41,67 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
+    public function productLibraryGridConfig($gridId='products')
+    {
+        $columns = $this->gridColumns();
+        unset($columns['product_name']['formatter'], $columns['product_name']['formatoptions']);
+        $columns['create_dt']['hidden'] = true;
+        $config = $this->gridConfig();
+        $config['grid']['autowidth'] = false;
+        $config['grid']['caption'] = 'All products';
+        $config['grid']['multiselect'] = true;
+        $config['grid']['height'] = '100%';
+        $config['grid']['colModel'] = array_values($columns);
+        $config['navGrid'] = array('add'=>false, 'edit'=>false, 'del'=>false);
+        return $config;
+    }
+
+    public function linkedProductGridConfig($model, $type)
+    {
+        switch ($type) {
+        case 'related':
+            $caption = 'Related Products';
+            break;
+        case 'similar':
+            $caption = 'Similar Products';
+            break;
+        case 'family':
+            $caption = 'Family Products <input type="text" name="family-name">';
+            break;
+        }
+        $data = array();//$orm->find_many();
+        $gridId = 'linked_products_'.$type;
+        $config = array(
+            'grid' => array(
+                'id'            => $gridId,
+                'data'          => $data,
+                'datatype'      => 'local',
+                'caption'       => $caption,
+                'colModel'      => array(
+                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
+                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
+                    array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
+                    array('name'=>'manuf_vendor_name', 'label'=>'Mfr', 'index'=>'manuf_vendor_name', 'width'=>120, 'hidden'=>true),
+                ),
+                'rowNum'        => 10,
+                'sortname'      => 'p.product_name',
+                'sortorder'     => 'asc',
+                'autowidth'     => false,
+                'multiselect'   => true,
+                'multiselectWidth' => 30,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
+            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
+            array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => "function() {
+                jQuery('#$gridId').jqGrid('columnChooser');
+            }"),
+            'html' => "<input type=\"hidden\" class=\"add-product-ids\" name=\"_add_product_ids[$type]\" value=\"\"/><input type=\"hidden\" class=\"del-product-ids\" name=\"_del_product_ids[$type]\" value=\"\"/>",
+        );
+
+        return $config;
+    }
+
     public function action_index()
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
@@ -121,4 +182,44 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
     }
 
+    public function onMediaGridConfig($args)
+    {
+        array_splice($args['config']['grid']['colModel'], -1, 0, array(
+            array('name'=>'manuf_vendor_name', 'label'=>'Manufacturer', 'width'=>150, 'index'=>'v.vendor_name', 'editable'=>true),
+        ));
+    }
+
+    public function onMediaGridGetORM($args)
+    {
+        $args['orm']->join('FCom_Catalog_Model_ProductMedia', array('pa.file_id','=','a.id',), 'pa')
+            ->where_null('pa.product_id')->where('media_type', $args['type'])
+            ->select(array('pa.manuf_vendor_id'))
+
+            ->left_outer_join('Denteva_Model_Vendor', array('v.id','=','pa.manuf_vendor_id'), 'v')
+            ->select(array('manuf_vendor_name'=>'v.vendor_name'));
+    }
+
+    public function onMediaGridUpload($args)
+    {
+        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $id = $args['model']->id;
+        if (!$hlp->load(array('product_id'=>null, 'file_id'=>$id))) {
+            $hlp->create(array('file_id' => $id, 'media_type'=>$args['type']))->save();
+        }
+    }
+
+    public function onMediaGridEdit($args)
+    {
+        $r = BRequest::i();
+        $m = Denteva_Model_Vendor::i()->load(array(
+            'is_manuf' => 1,
+            'vendor_name' => $r->post('manuf_vendor_name')
+        ));
+        FCom_Catalog_Model_ProductMedia::i()
+            ->load(array('product_id'=>null, 'file_id'=>$args['model']->id))
+            ->set(array(
+                'manuf_vendor_id' => $m ? $m->id : null,
+            ))
+            ->save();
+    }
 }
