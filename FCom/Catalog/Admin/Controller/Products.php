@@ -91,11 +91,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'multiselectWidth' => 30,
             ),
             'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
-            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
-            array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => "function() {
+            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
+            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
+            /*array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => "function() {
                 jQuery('#$gridId').jqGrid('columnChooser');
-            }"),
+            }"),*/
             'html' => "<input type=\"hidden\" class=\"add-product-ids\" name=\"_add_product_ids[$type]\" value=\"\"/><input type=\"hidden\" class=\"del-product-ids\" name=\"_del_product_ids[$type]\" value=\"\"/>",
         );
 

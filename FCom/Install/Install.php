@@ -32,7 +32,7 @@ class FCom_Install_Controller extends BActionController
     {
         if (!parent::beforeDispatch()) return false;
 
-        BLayout::i()->view('head')->css('css/styles.css', array());
+        BLayout::i()->view('head')->css('css/styles.css');
 
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w'])) {

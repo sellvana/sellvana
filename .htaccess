@@ -32,6 +32,12 @@ AuthUserFile /var/www/vhosts/dev.unirgy.com/b/denteva/user/.htpasswd
 
 Header unset ETag
 FileETag None
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 months"
+</IfModule>
+
 #Header unset If-Modified-Since
 #Header unset If-None-Match
 
