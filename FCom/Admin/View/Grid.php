@@ -22,20 +22,81 @@ class FCom_Admin_View_Grid extends BView
                 'pager'         => true,
                 'gridview'      => true,
                 'viewrecords'   => true,
-                'shrinkToFit'   => true,
-                'forceFit'      => true,
+                'shrinkToFit'   => false,
+                'forceFit'      => false,
                 'autowidth'     => true,
                 //'altRows'       => true,
                 'width'         => '100%',
                 'height'        => '100%',
+                'multiselectWidth' => 30,
            ),
            'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true),
         );
     }
 
+    public function processPersonalization($cfg)
+    {
+        if (!empty($cfg['custom']['personalize'])) {
+            $gridId = is_string($cfg['custom']['personalize'])
+                ? $cfg['custom']['personalize'] : $cfg['grid']['id'];
+            $pers = FCom_Admin_Model_User::i()->personalize();
+            if (!empty($pers['grid'][$gridId]['columns'])) {
+                $persCols = $pers['grid'][$gridId]['columns'];
+                $cfg['grid']['columns'] = BUtil::arrayMerge($cfg['grid']['columns'], $persCols);
+            }
+
+            $url = BApp::url('FCom_Admin', '/my_account/personalize');
+            $cfg['grid']['resizeStop'] = "function(newwidth, index) {
+                var cols = \$('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
+                \$.post('{$url}', {do:'grid.col.width', grid:'{$gridId}',
+                    col:cols[index].name, width:newwidth
+                });
+            }";
+            $cfg[] = array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns',
+                'onClickButton' => "function() {
+                    jQuery('#{$cfg['grid']['id']}').jqGrid('columnChooser', {
+                        done:function(perm) {
+                            console.log(perm, this.jqGrid('getGridParam', 'colModel'));
+                            if (perm) {
+                                this.jqGrid('remapColumns', perm, true);
+                                \$.post('{$url}', {do:'grid.col.order', grid:'{$gridId}',
+                                    cols:JSON.stringify(this.jqGrid('getGridParam', 'colModel'))
+                                });
+                            }
+                        }
+                    });
+                }");
+        }
+
+        if (!empty($cfg['grid']['columns'])) {
+            foreach ($cfg['grid']['columns'] as $colName=>$col) {
+                if (empty($col['name'])) {
+                    $col['name'] = $colName;
+                }
+                $cfg['grid']['colModel'][] = $col;
+            }
+            unset($cfg['grid']['columns']);
+        }
+
+        return $cfg;
+    }
+
     public function processConfig($cfg)
     {
+        $cfg = $this->processPersonalization($cfg);
+
+        $pos = 0;
         foreach ($cfg['grid']['colModel'] as &$col) {
+            if (!empty($col['position'])) {
+                $pos = $col['position'];
+            } else {
+                $col['position'] = ++$pos;
+            }
+            if (!empty($col['autocomplete'])) {
+                $cfg['js'][] = "\$('#gbox_{$cfg['grid']['id']} #gs_{$col['name']}').fcom_autocomplete({
+                    url:'{$col['autocomplete']}'
+                });";
+            }
             if (!empty($col['options'])) {
                 $valArr = array();
                 foreach ($col['options'] as $k=>$v) {
@@ -50,6 +111,12 @@ class FCom_Admin_View_Grid extends BView
             }
         }
         unset($col);
+        usort($cfg['grid']['colModel'], function($a, $b) {
+            $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
+        });
+        unset($cfg['custom']);
+
+#echo "<pre>"; print_r($cfg); echo "</pre>"; exit;
         return $cfg;
     }
 
@@ -128,10 +195,10 @@ class FCom_Admin_View_Grid extends BView
         $html .= "<script>head(function() { jQuery('#{$id}')";
         foreach ($cfg as $k=>$opt) {
             if ($k==='html') {
-                $extraHTML[] = $opt;
+                $extraHTML[] = join('', (array)$opt);
                 continue;
             } elseif ($k==='js' || is_string($opt)) {
-                $extraJS[] = $opt;
+                $extraJS[] = join('', (array)$opt);
                 continue;
             }
             if (is_numeric($k)) {

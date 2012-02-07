@@ -15,13 +15,14 @@ head(function() {
 </script>
 
 <form action="<?php echo $baseHref.'/products/form/'.$p->id ?>" method="post">
+    <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
 	    <span class="title"><?php echo $this->mode==='create' ? 'Create New' : 'View' ?> Product</span>
         <div style="float:right">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span>Save All</span></button>
         </div>
     </header>
-
+    <?php //echo $this->messagesHtml() ?>
     <section class="adm-content-box info-view-mode">
     <?php if ($this->mode!=='create'): ?>
 	    <section class="adm-product-summary adm-section-group">
