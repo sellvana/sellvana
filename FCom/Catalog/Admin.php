@@ -17,7 +17,12 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
             ->route('POST /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form_post')
 
-            ->route('GET /products/edit/:id', 'FCom_Catalog_Admin_Controller_Products.edit')
+            ->route('GET /families', 'FCom_Catalog_Admin_Controller_Families.index')
+            ->route('GET /families/grid_data', 'FCom_Catalog_Admin_Controller_Families.grid_data')
+            ->route('GET /families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form')
+            ->route('POST /families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form_post')
+            ->route('GET /families/autocomplete', 'FCom_Catalog_Admin_Controller_Families.autocomplete')
+            ->route('GET /families/product_data', 'FCom_Catalog_Admin_Controller_Families.product_data')
 
             ->route('GET /categories', 'FCom_Catalog_Admin_Controller_Categories.index')
             ->route('GET /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_get')
@@ -37,7 +42,7 @@ class FCom_Catalog_Admin extends BClass
             ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin.onProductsEditPost')
 
             /** @todo initialize these events only when needed */
-            ->on('FCom_Admin_View_MediaLibrary::gridConfig.media/product/attachment',
+            ->on('FCom_Admin_Controller_MediaLibrary::gridConfig.media/product/attachment',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'A'))
 
             ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get.media/product/attachment.orm',
@@ -49,7 +54,7 @@ class FCom_Catalog_Admin extends BClass
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/attachment.edit',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'A'))
 
-            ->on('FCom_Admin_View_MediaLibrary::gridConfig.media/product/image',
+            ->on('FCom_Admin_Controller_MediaLibrary::gridConfig.media/product/image',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'I'))
 
             ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get.media/product/image.orm',
@@ -78,7 +83,7 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog', array('label'=>'Catalog', 'pos'=>100)),
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
-                        array('addNav', 'catalog/product_families', array('label'=>'Product Families', 'href'=>$baseHref.'/product_families')),
+                        array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
                         array('addNav', 'catalog/product_reviews', array('label'=>'Product Reviews', 'href'=>$baseHref.'/product_reviews')),
                     )),
                 ),
@@ -120,6 +125,11 @@ class FCom_Catalog_Admin extends BClass
                 '/catalog/categories/form'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/categories/form')),
+                ),
+                '/catalog/families'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('catalog/families')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/families'))),
                 ),
             ));
         ;

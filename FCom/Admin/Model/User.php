@@ -19,6 +19,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ),
     );
 
+    protected $_persModel;
+    protected $_persData;
+
     public static function statusOptions()
     {
         return array(
@@ -129,5 +132,36 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function fullname()
     {
         return $this->firstname.' '.$this->lastname;
+    }
+
+    /**
+    * Personalize user preferences (grids, dashboard, etc)
+    * - grid
+    *   - {grid-name}
+    *     - colModel
+    *
+    * @param array|null $data
+    * @return FCom_Admin_Model_User|array
+    */
+    public function personalize($data=null)
+    {
+        if (!$this->orm) {
+            return $this->sessionUser()->personalize($data);
+        }
+        if (!$this->_persModel) {
+            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id, 'user_id');
+            if (!$this->_persModel) {
+                $this->_persModel = FCom_Admin_Model_Personalize::i()->create(array('user_id'=>$this->id));
+            }
+        }
+        if (!$this->_persData) {
+            $this->_persData = $this->_persModel->data_json ? BUtil::fromJson($this->_persModel->data_json) : array();
+        }
+        if (is_null($data)) {
+            return $this->_persData;
+        }
+        $this->_persData = BUtil::arrayMerge($this->_persData, $data);
+        $this->_persModel->set('data_json', BUtil::toJson($this->_persData))->save();
+        return $this;
     }
 }
