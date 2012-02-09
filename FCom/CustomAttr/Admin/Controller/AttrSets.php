@@ -2,38 +2,88 @@
 
 class FCom_CustomAttr_Admin_Controller_AttrSets extends FCom_Catalog_Admin_Controller_Products
 {
-    public function action_index()
+    public function attrSetsGridConfig()
     {
-        $grid = BLayout::i()->view('jqgrid');
-        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array(
-            'baseLinkUrl' => BApp::url('FCom_CustomAttr', '/attrsets/form/'),
-        ));
-        $grid->config = array(
+        $config = array(
             'grid' => array(
-                'id'            => 'attrsets',
-                'url'           => 'attrsets/grid_data',
-                'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'width'=>55, 'sorttype'=>'number'),
-                    array('name'=>'set_code', 'label'=>'Code', 'width'=>100) + $linkConf,
-                    array('name'=>'set_name', 'label'=>'Name', 'width'=>250) + $linkConf,
+                'id'      => 'attrsets',
+                'url'     => BApp::url('FCom_CustomAttr', '/attrsets/grid_data'),
+                'editurl' => BApp::url('FCom_CustomAttr', '/attrsets/grid_data'),
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
+                    'set_code' => array('label'=>'Code', 'width'=>100, 'editable'=>true),
+                    'set_name' => array('label'=>'Name', 'width'=>100, 'editable'=>true),
+                    'attr_codes' => array('labek' => 'Attributes', 'width'=>250),
                 ),
             ),
-            'navGrid' => array(),
+            'subGrid' => array(
+                'grid' => array(
+                    'datatype' => 'local',
+                    'data' => new BType('data'),
+                    'columns' => array(
+                        'attr_code' => array('name' => 'attr_code', 'label'=>'Attr.Code', 'width'=>100),
+                    ),
+                    'multiselect' => true,
+                ),
+                'custom' => array(
+                    'jsBefore' => "
+var data = [], attrs = jQuery('#attrsets').jqGrid('getRowData', row_id).attr_codes;
+var src = attrs ? attrs.split(',') : [], i;
+for (i=0; i<src.length; i++) data.push({attr_code:src[i]});
+                    ",
+                ),
+            ),
+            'navGrid' => array('search'=>false, 'refresh'=>false),
+            'inlineNav' => array(),
             #'searchGrid' => array('multipleSearch'=>true, 'multipleGroup'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
             array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => 'function() {
-                jQuery("#grid-attrsets").jqGrid("columnChooser");
+                jQuery("#attrsets").jqGrid("columnChooser");
             }'),
         );
-        BPubSub::i()->fire('FCom_CustomAttr_Admin_Controller_AttrSets::action_index', array('grid'=>$grid));
+        BPubSub::i()->fire(__METHOD__, array('config'=>&$config));
+        return $config;
+    }
+
+    public function attributesGridConfig()
+    {
+        $config = array(
+            'grid' => array(
+                'id' => 'attributes',
+                'url' => BApp::url('FCom_CustomAttr', '/attrsets/attr_grid_data'),
+                'columns' => array(
+                    'id' => array('label' => 'ID'),
+                    'attr_code' => array('label' => 'Code'),
+                    'attr_name' => array('label' => 'Name'),
+                    'frontend_label' => array('label' => 'Frontend Label'),
+                ),
+                'multiselect' => true,
+            ),
+        );
+        return $config;
+    }
+
+    public function action_index()
+    {
         $this->layout('/customattr/attrsets');
     }
 
     public function action_grid_data()
     {
         $orm = FCom_CustomAttr_Model_Set::i()->orm()->table_alias('s')->select('s.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_CustomAttr_Admin_Controller_AttrSets::action_grid_data');
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
+    }
+
+    public function action_grid_data_post()
+    {
+        $r = BRequest::i();
+        switch ($r->post('oper')) {
+        case 'add':
+            $result = array('id'=>2, 'set_code'=>$r->post('set_code'), 'set_name'=>$r->post('set_name'));
+            break;
+        }
+        BResponse::i()->json($result);
     }
 
     public function action_form()

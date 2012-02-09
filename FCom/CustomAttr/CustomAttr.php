@@ -18,6 +18,7 @@ class FCom_CustomAttr_Admin extends BClass
         BFrontController::i()
             ->route('GET /attrsets', 'FCom_CustomAttr_Admin_Controller_AttrSets.index')
             ->route('GET /attrsets/grid_data', 'FCom_CustomAttr_Admin_Controller_AttrSets.grid_data')
+            ->route('POST /attrsets/grid_data', 'FCom_CustomAttr_Admin_Controller_AttrSets.grid_data_post')
             ->route('GET /attrsets/form/:id', 'FCom_CustomAttr_Admin_Controller_AttrSets.form')
             ->route('GET /attrsets/form_tab/:id', 'FCom_CustomAttr_Admin_Controller_AttrSets.form_tab')
             ->route('POST /attrsets/form/:id', 'FCom_CustomAttr_Admin_Controller_AttrSets.form_post')
@@ -34,12 +35,11 @@ class FCom_CustomAttr_Admin extends BClass
 
     public static function layout()
     {
-        $baseHref = BApp::m('FCom_CustomAttr')->baseHref();
         BLayout::i()
             ->layout(array(
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
-                        array('addNav', 'catalog/attrsets', array('label'=>'Attribute Sets', 'href'=>$baseHref.'/attrsets')),
+                        array('addNav', 'catalog/attrsets', array('label'=>'Attribute Sets', 'href'=>BApp::url('FCom_CustomAttr', '/attrsets'))),
                     )),
                 ),
                 '/customattr/attrsets'=>array(
@@ -68,6 +68,11 @@ class FCom_CustomAttr_Frontend extends BClass
 class FCom_CustomAttr_Model_Set extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'a_attrset';
+}
+
+class FCom_CustomAttr_Model_Attribute extends FCom_Core_Model_Abstract
+{
+    protected static $_table = 'a_attribute';
 }
 
 class FCom_CustomAttr_Model_Product extends FCom_Core_Model_Abstract
