@@ -83,6 +83,7 @@ for (i=0; i<src.length; i++) data.push({attr_code:src[i]});
             $result = array('id'=>2, 'set_code'=>$r->post('set_code'), 'set_name'=>$r->post('set_name'));
             break;
         }
+        BResponse::i()->redirect(BApp::url('FCom_CustomAttr', '/attrsets/grid_data'));
         BResponse::i()->json($result);
     }
 

@@ -5,8 +5,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function gridColumns()
     {
         $columns = array(
-            'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
-            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250,
+            'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
+            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true,
                 'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::url('FCom_Catalog', '/products/form/'))),
             'manuf_sku'=>array('label'=>'Mfr Part #', 'index'=>'p.manuf_sku', 'width'=>100),
             'manuf_vendor_name'=>array('label'=>'Mfr', 'index'=>'v.vendor_name', 'width'=>150,
@@ -39,6 +39,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'navGrid' => array(),
             //'searchGrid' => array('multipleSearch'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+            //'setFrozenColumns'=>array(),
         );
         BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::gridConfig', array('config'=>&$config));
         return $config;
