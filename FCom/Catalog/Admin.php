@@ -13,6 +13,7 @@ class FCom_Catalog_Admin extends BClass
         BFrontController::i()
             ->route('GET /products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET /products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
+            ->route('GET /products/subgrid_data', 'FCom_Catalog_Admin_Controller_Products.subgrid_data')
             ->route('GET /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
             ->route('GET /products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
             ->route('POST /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form_post')
@@ -94,7 +95,7 @@ class FCom_Catalog_Admin extends BClass
                         ),
                         'do'=>array(
                             array('addTab', 'main', array('label' => 'General Info')),
-                            array('addTab', 'attributes', array('label' => 'Attributes')),
+                            array('addTab', 'fields', array('label' => 'Custom Fields')),
                             array('addTab', 'linked-products', array('label' => 'Linked Products', 'async'=>true)),
                             array('addTab', 'categories', array('label' => 'Categories', 'async'=>true)),
                             array('addTab', 'attachments', array('label' => 'Attachments', 'async'=>true)),

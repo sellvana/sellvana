@@ -30,18 +30,32 @@ class FCom_Admin_View_Grid extends BView
                 'height'        => '100%',
                 'multiselectWidth' => 30,
            ),
-           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true),
+           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
+                'search'=>array('multipleSearch'=>true, 'multipleGroup'=>true),
+           )),
         );
     }
 
     protected function _processPersonalization($cfg)
     {
+        if (!empty($cfg['custom']['columnChooser'])) {
+            $cfg[] = array('navButtonAdd',
+                'caption' => 'Columns',
+                'title' => 'Reorder Columns',
+                'onClickButton' => "function() { \$('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
+            );
+        }
         if (!empty($cfg['custom']['personalize'])) {
             $gridId = is_string($cfg['custom']['personalize'])
                 ? $cfg['custom']['personalize'] : $cfg['grid']['id'];
             $pers = FCom_Admin_Model_User::i()->personalize();
             if (!empty($pers['grid'][$gridId]['columns'])) {
                 $persCols = $pers['grid'][$gridId]['columns'];
+                foreach ($persCols as $k=>$c) {
+                    if (empty($cfg['grid']['columns'][$k])) {
+                        unset($persCols[$k]);
+                    }
+                }
                 $cfg['grid']['columns'] = BUtil::arrayMerge($cfg['grid']['columns'], $persCols);
             }
 
@@ -97,13 +111,19 @@ class FCom_Admin_View_Grid extends BView
             }
             $cfg['subGrid']['grid']['pager'] = new BType('pager_id');
             $cfg['subGrid']['isSubGrid'] = true;
-            $subGridView = static::i()->factory($cfg['grid']['id'].'_subgrid', array())->set('config', $cfg['subGrid']);
             $jsBefore = !empty($cfg['subGrid']['custom']['jsBefore']) ? (string)$cfg['subGrid']['custom']['jsBefore'] : '';
+            $jsAfter = '';
+            if (!empty($cfg['subGrid']['grid']['editurl'])) {
+                $jsAfter .= "subgrid.jqGrid('setGridParam', {editurl:subgrid.jqGrid('getGridParam', 'editurl')+row_id});";
+            }
+            $subGridView = static::i()->factory($cfg['grid']['id'].'_subgrid', array())->set('config', $cfg['subGrid']);
             $cfg['grid']['subGridRowExpanded'] = "function(subgrid_id, row_id) {
 var subgrid_table_id = subgrid_id+'_t', pager_id = 'p_'+subgrid_table_id;
 \$('#'+subgrid_id).html('<table id=\"'+subgrid_table_id+'\" class=\"scroll\"></table><div id=\"'+pager_id+'\" class=\"scroll\"></div>');
+var subgrid = \$('#'+subgrid_table_id);
 {$jsBefore}
 {$subGridView->render()}
+{$jsAfter}
             }";
             unset($cfg['subGrid']);
         }
@@ -145,7 +165,17 @@ var subgrid_table_id = subgrid_id+'_t', pager_id = 'p_'+subgrid_table_id;
             $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
         });
         unset($cfg['custom']);
-
+/*
+        foreach (array('add','edit','del') as $k) {
+            if (!empty($cfg['navGrid'][$k])) {
+                $cfg['navGrid']['prm'][$k] = array(
+                    'afterSubmit'=>"function(response, postdata) {
+console.log(response, postdata);
+return [true, 'Testing error'];
+                }");
+            }
+        }
+*/
 #echo "<pre>"; print_r($cfg); echo "</pre>"; exit;
         return $cfg;
     }

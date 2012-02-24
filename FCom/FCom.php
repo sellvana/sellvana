@@ -206,12 +206,12 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
             ))
             // catalog views and controllers
-            ->module('FCom_CustomAttr', array(
+            ->module('FCom_CustomField', array(
                 'version' => '0.1.0',
-                'root_dir' => 'CustomAttr',
-                'bootstrap' => array('file'=>'CustomAttr.php', 'callback'=>'FCom_CustomAttr::bootstrap'),
+                'root_dir' => 'CustomField',
+                'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
                 'depends' => array('FCom_Catalog'),
-                'url_prefix' => 'customattr',
+                'url_prefix' => 'customfield',
             ))
             // cart, checkout and customer account views and controllers
             ->module('FCom_Checkout', array(

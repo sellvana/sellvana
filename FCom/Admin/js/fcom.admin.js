@@ -1737,7 +1737,6 @@ $(function(){
     }
 
     //$('.datepicker').datepicker();
-
     $(document).bind('ajaxSuccess', function(event, request, settings) {
         if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
             if (data.error=='login') {
