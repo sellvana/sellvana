@@ -23,6 +23,8 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js'),
 
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/i18n/grid.locale-en.js'), // jqGrid translation
+                        array('js', '{FCom_Core}/js/lib/jqGrid/dist/jquery.jqGrid.min.js'), // jqGrid translation
+                        /*
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.base.js'), // jqGrid base
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.common.js'), // jqGrid common for editing
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.formedit.js'), // jqGrid Form editing
@@ -38,7 +40,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/JsonXml.js'), //xmljson utils
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.jqueryui.js'), //jQuery UI utils
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.filter.js'), // filter Plugin
-
+                        */
                         array('js', '{FCom_Core}/js/lib/jqGrid/plugins/jquery.tablednd.js'),
                         array('js', '{FCom_Core}/js/lib/jqGrid/plugins/jquery.contextmenu.js'),
                     )),

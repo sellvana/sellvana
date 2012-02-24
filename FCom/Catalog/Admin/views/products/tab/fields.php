@@ -28,6 +28,17 @@
             <button class="btn st1 sz2 btn-save" onclick="return adminForm.tabAction('save', this);"><span>Save</span></button>
         </div>
 <?php endif ?>
+
+        <table width="90%">
+            <tr>
+                <td width="50%">
+<?=$this->view('jqgrid')->set('config', FCom_CustomField_Admin_Controller_Products::i()->fieldsetsGridConfig()) ?>
+                </td>
+                <td width="50%">
+<?=$this->view('jqgrid')->set('config', FCom_CustomField_Admin_Controller_Products::i()->fieldsGridConfig()) ?>
+                </td>
+            </tr>
+        </table>
         <ul class="form-list">
             <li>
                 <h4 class="label">Attribute 1</h4>
