@@ -14,6 +14,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     'id' => array('label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
                     'set_code' => array('label'=>'Set Code', 'width'=>100, 'editable'=>true),
                     'set_name' => array('label'=>'Set Name', 'width'=>200, 'editable'=>true),
+                    'num_fields' => array('label' => 'Fields', 'width'=>30),
                 ),
             ),
             'subGrid' => array(
@@ -79,6 +80,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
 
     public function fieldsGridConfig()
     {
+        $fld = FCom_CustomField_Model_Field::i();
         $config = array(
             'grid' => array(
                 'id' => 'fields',
@@ -90,6 +92,11 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'field_code' => array('label'=>'Field Code', 'width'=>200, 'editable'=>true),
                     'field_name' => array('label'=>'Field Name', 'width'=>200, 'editable'=>true),
                     'frontend_label' => array('label'=>'Frontend Label', 'width'=>200, 'editable'=>true),
+                    'table_field_type' => array('label'=>'DB Type', 'width'=>80, 'editable'=>true,
+                        'options'=>$fld->fieldOptions('table_field_type')),
+                    'admin_input_type' => array('label'=>'Input Type', 'width'=>80, 'editable'=>true,
+                        'options'=>$fld->fieldOptions('admin_input_type')),
+                    'num_options' => array('label' => 'Options', 'width'=>30),
                 ),
                 'multiselect' => true,
             ),
@@ -104,7 +111,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'multiselect' => true,
                     'autowidth' => false,
                 ),
-                'navGrid'=>array('add'=>true, 'del'=>true, 'refresh'=>true, 'search'=>false,
+                'navGrid'=>array('add'=>true, 'edit'=>true, 'del'=>true, 'refresh'=>true, 'search'=>false,
                     'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
                 ),
             ),
@@ -123,7 +130,9 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
 
     public function action_grid_data()
     {
-        $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*');
+        $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
+            ->select('(select count(*) from '.FCom_CustomField_Model_SetField::table().' where set_id=s.id)', 'num_fields')
+        ;
         $data = $this->view('jqgrid')->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
     }
@@ -140,7 +149,9 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
 
     public function action_field_grid_data()
     {
-        $orm = FCom_CustomField_Model_Field::i()->orm('f')->select('f.*');
+        $orm = FCom_CustomField_Model_Field::i()->orm('f')->select('f.*')
+            ->select('(select count(*) from '.FCom_CustomField_Model_FieldOption::table().' where field_id=f.id)', 'num_options')
+        ;
         $data = $this->view('jqgrid')->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
     }

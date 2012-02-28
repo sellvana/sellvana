@@ -6,6 +6,12 @@ class FCom_Admin_View_Grid extends BView
     {
         $this->default_config = array(
             'grid' => array(
+                'prmNames' => array(
+                    'page' => 'p',
+                    'rows' => 'ps',
+                    'sort' => 's',
+                    'order' => 'sd',
+                ),
                 'datatype'  => 'json',
                 'jsonReader' =>  array(
                     'root' => 'rows',
@@ -40,8 +46,9 @@ class FCom_Admin_View_Grid extends BView
     {
         if (!empty($cfg['custom']['columnChooser'])) {
             $cfg[] = array('navButtonAdd',
-                'caption' => 'Columns',
-                'title' => 'Reorder Columns',
+                'caption' => '',
+                'title' => 'Customize Columns',
+                'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() { \$('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
             );
         }
@@ -66,7 +73,10 @@ class FCom_Admin_View_Grid extends BView
                     col:cols[index].name, width:newwidth
                 });
             }";
-            $cfg[] = array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns',
+            $cfg[] = array('navButtonAdd',
+                'caption' => '',
+                'title' => 'Customize Columns',
+                'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() {
                     jQuery('#{$cfg['grid']['id']}').jqGrid('columnChooser', {
                         done:function(perm) {
@@ -155,6 +165,7 @@ var subgrid = \$('#'+subgrid_table_id);
                 $values = join(';', $valArr);
                 if (empty($col['formatter'])) $col['formatter'] = 'select';
                 if (empty($col['stype'])) $col['stype'] = 'select';
+                if (empty($col['edittype'])) $col['edittype'] = 'select';
                 $col['editoptions'] = array('value'=>$values);
                 $col['searchoptions'] = array('value'=>':All;'.$values);
                 unset($col['options']);
@@ -165,6 +176,9 @@ var subgrid = \$('#'+subgrid_table_id);
             $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
         });
         unset($cfg['custom']);
+        if (!empty($cfg['navGrid']['edit'])) {
+            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { \$(this).jqGrid('editGridRow', rowid); }";
+        }
 /*
         foreach (array('add','edit','del') as $k) {
             if (!empty($cfg['navGrid'][$k])) {

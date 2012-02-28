@@ -139,14 +139,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function action_index()
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::action_index', array('grid'=>$grid));
+        BPubSub::i()->fire(__METHOD__, array('grid'=>$grid));
         $this->layout('/catalog/products');
     }
 
     public function action_grid_data()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Catalog_Admin_Controller_Products::action_grid_data');
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
     }
 
@@ -167,6 +167,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
         $this->layout('/catalog/products/form');
         $view = BLayout::i()->view('catalog/products/form');
+
         $this->initFormTabs($view, $product, $product->id ? 'view' : 'create');
     }
 

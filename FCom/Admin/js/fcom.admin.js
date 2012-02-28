@@ -1725,11 +1725,39 @@ $.widget('ui.fcom_autocomplete', {
     }
 });
 
+function partial(el, options) {
+    el = $(el);
+    if (!el.length) return;
+    var req = [], i, params = el.data('params'), scroll = $('.scrollable', el).scrollTop();
+    params = params || {};
+    options = options || {};
+    if (options.reset || !el.data('params')) el.data('params', {});
+    options.src = options.src || el.data('src');
+    if (options.params) {
+        for (i in options.params) {
+            params[i] = options.params[i];
+        }
+        el.data('params', params);
+    }
+    for (i in params) {
+        req.push(encodeURIComponent(i)+'='+encodeURIComponent(params[i]));
+    }
+    el.css({opacity:.5});
+    el.load(options.src+(options.src&&options.src.match(/\?/)?'&':'?')+req.join('&'), function(data) {
+        $('.scrollable', el).scrollTop(scroll);
+        el.css({opacity:1});
+        if (typeof options.complete!=='undefined') options.complete();
+    });
+}
 
+function partialParent(el, params) {
+    partial($(el).closest('.include'), params);
+}
 
 $(function(){
 
     $.jgrid.formatter.date.newformat = 'm/d/Y';
+    $.jgrid.edit.width = 500;
 
     if (typeof CKEDITOR !== 'undefined') {
         CKEDITOR.config.autoUpdateElement = true;

@@ -1,6 +1,7 @@
 <?php
     $p = $this->model;
     $baseHref = BApp::m('FCom_Catalog')->baseHref();
+    $tabs = $this->sortedTabs();
 ?>
 
 <script>
@@ -37,7 +38,7 @@ head(function() {
 		    <div class="adm-tabs-left-bg"></div>
 		    <nav class="adm-tabs-left">
 			    <ul>
-    <?php foreach ($this->tabs as $k=>$tab): ?>
+    <?php foreach ($tabs as $k=>$tab): ?>
 				    <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
                         <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
                     </li>
@@ -45,7 +46,7 @@ head(function() {
 			    </ul>
 		    </nav>
             <div class="adm-tabs-container">
-    <?php foreach ($this->tabs as $k=>$tab): ?>
+    <?php foreach ($tabs as $k=>$tab): ?>
                 <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
                     <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
                     <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
