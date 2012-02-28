@@ -1,6 +1,10 @@
 <?php
     $fieldSetsCtrl = FCom_CustomField_Admin_Controller_FieldSets::i();
 ?>
+<style>
+#pager-fieldsets .ui-pg-table,
+#pager-fields .ui-pg-table { table-layout:auto !important; }
+</style>
 <header class="adm-page-title">
     <span class="title">Field Sets</span>
 </header>
@@ -15,7 +19,7 @@
 <script>
 function updateFieldSet(subgrid) {
     var grid = subgrid.parent().closest('.ui-jqgrid-btable'), data = subgrid.jqGrid('getRowData');
-    var fields = [], id = subgrid.attr('id').match(/_([0-9])_/)[1];
+    var fields = [], id = subgrid.attr('id').match(/_([0-9]+)_/)[1];
     for (i=0; i<data.length; i++) {
         fields.push(data[i].id);
     }

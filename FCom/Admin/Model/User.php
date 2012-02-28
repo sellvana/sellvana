@@ -12,7 +12,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_sessionUser;
 
-    protected $_fieldOptions = array(
+    protected static $_fieldOptions = array(
         'status' => array(
             'A' => 'Active',
             'I' => 'Inactive',
