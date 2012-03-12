@@ -17,13 +17,20 @@ class FCom_Admin_DefaultTheme extends BClass
             ->layout(array(
                 'jqgrid'=>array(
                     array('view', 'head', 'do'=>array(
+                        array('css', '{FCom_Core}/js/lib/css/ui.jqgrid.css'),
+                        array('css', '{FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css'),
+                        array('js', '{FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js'),
+                        array('js', '{FCom_Core}/js/lib/jqGrid/i18n/grid.locale-en.js'), // jqGrid translation
+                        array('js', '{FCom_Core}/js/lib/jqGrid/jquery.jqGrid.min.js'),
+                        /*
                         array('css', '{FCom_Core}/js/lib/jqGrid/css/ui.jqgrid.css'),
 
                         array('css', '{FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css'),
                         array('js', '{FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js'),
 
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/i18n/grid.locale-en.js'), // jqGrid translation
-                        array('js', '{FCom_Core}/js/lib/jqGrid/dist/jquery.jqGrid.min.js'), // jqGrid translation
+                        array('js', '{FCom_Core}/js/lib/jqGrid/dist/jquery.jqGrid.min.js'),
+                        */
                         /*
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.base.js'), // jqGrid base
                         array('js', '{FCom_Core}/js/lib/jqGrid/js/grid.common.js'), // jqGrid common for editing
