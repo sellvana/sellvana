@@ -17,8 +17,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $r = BRequest::i()->post('login');
         if (!empty($r['username']) && !empty($r['password'])) {
-            $result = FCom_Admin_Model_User::i()->login($r['username'], $r['password']);
-            if (!$result) {
+            $user = FCom_Admin_Model_User::i()->authenticate($r['username'], $r['password']);
+            if ($user) {
+                $user->login();
+            } else {
                 BSession::i()->addMessage('Invalid user name or password.', 'error', 'admin');
             }
         }

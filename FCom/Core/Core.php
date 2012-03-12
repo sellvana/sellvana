@@ -12,25 +12,16 @@ class FCom_Core extends BClass
 
     public function writeDbConfig()
     {
-        $config = BConfig::i();
-        $c = $config->get();
-        $config->writeFile($c['config_dir'].'/db1.php', array('db'=>$c['db']));
+        BConfig::i()->writeFile('db.php', array('db'=>BConfig::i()->get('db', true)));
         return $this;
     }
 
     public function writeLocalConfig()
     {
-        $config = BConfig::i();
-        $c = $config->get();
-        // little clean up
-        unset($c['db'], $c['config_dir'], $c['bootstrap']['depends']);
-        foreach (array('Core', 'Admin', 'Frontend', 'Install', 'Cron') as $m) {
-            if (($i = array_search('FCom_'.$m, $c['bootstrap']['modules']))) {
-                unset($c['bootstrap']['modules'][$i]);
-            }
-        }
-        $config->writeFile($c['config_dir'].'/local1.php', $c);
-        return;
+        $c = BConfig::i()->get('', true);
+        unset($c['db']);
+        BConfig::i()->writeFile('local.php', $c);
+        return $this;
     }
 
     public function resizeUrl()
@@ -54,9 +45,12 @@ class FCom_Core extends BClass
 
 class FCom_Core_View_Abstract extends BView
 {
-    public function messagesHtml()
+    public function messagesHtml($namespace=null)
     {
         $html = '';
+        if (!is_null($namespace)) {
+            $this->messages = BSession::i()->messages($namespace);
+        }
         if ($this->messages) {
             $html .= '<ul class="msgs">';
             foreach ($this->messages as $m) {

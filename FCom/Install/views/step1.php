@@ -3,9 +3,10 @@
 .wizard label { display:block; width:80px; float:left; }
 </style>
 <h1>Step 1</h1>
-<form class="wizard" method="post" action="<?=BApp::m()->baseHref()?>/step1">
+<form class="wizard" method="post" action="<?=BApp::url('FCom_Install', '/install/step1')?>">
     <fieldset>
         <h3>DB Connection</h3>
+        <?php echo $this->messagesHtml() ?>
         <label for="host">Host:</label><input type="text" id="host" name="w[db][host]" value="<?=$this->q($w['db']['host'])?>"/><br/>
         <label for="dbname">DB name:</label><input type="text" id="dbname" name="w[db][dbname]" value="<?=$this->q($w['db']['dbname'])?>"/><br/>
         <label for="db-username">User name:</label><input type="text" id="db-username" name="w[db][username]" value="<?=$this->q($w['db']['username'])?>"/><br/>

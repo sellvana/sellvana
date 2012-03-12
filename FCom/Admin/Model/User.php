@@ -36,6 +36,15 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if ($this->password) {
+            $this->password_hash = BUtil::fullSaltedHash($this->password);
+        }
+        return true;
+    }
+
     public function getData()
     {
         $data = $this->as_array();
@@ -89,28 +98,35 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return static::sessionUser() ? true : false;
     }
 
-    static public function login($username, $password)
+    static public function authenticate($username, $password)
     {
-        /** @var Denteva_Model_User */
-        $user = static::i()->orm()->where_complex(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
+        /** @var FCom_Admin_Model_User */
+        $user = static::i()->orm()
+            ->where_complex(array('OR'=>array(
+                'username'=>$username,
+                'email'=>$username)))
+            ->find_one();
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
+        return $user;
+    }
 
-        $user->set('last_login', BDb::now())->save();
+    public function login()
+    {
+        $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('admin_user', serialize($user));
-        static::$_sessionUser = $user;
+        BSession::i()->data('admin_user', serialize($this));
+        static::$_sessionUser = $this;
 
-        if ($user->locale) {
-            setlocale(LC_ALL, $user->locale);
+        if ($this->locale) {
+            setlocale(LC_ALL, $this->locale);
         }
-        if ($user->timezone) {
-            date_default_timezone_set($user->timezone);
+        if ($this->timezone) {
+            date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$user));
-
-        return true;
+        BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$this));
+        return $this;
     }
 
     static public function logout()
