@@ -146,6 +146,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'datetime' => 'Date/Time',
             'decimal(12,4)' => 'Decimal',
             'int(11)' => 'Integer',
+            'tinyint(3)' => 'Tiny Int',
             'text' => 'Long Text',
             'varchar(255)' => 'Short Text',
         ),
@@ -153,6 +154,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'text' => 'Text Line',
             'textarea' => 'Text Area',
             'select' => 'Drop down',
+            'boolean' => 'Yes/No',
         ),
     );
 
