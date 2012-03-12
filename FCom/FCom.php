@@ -82,17 +82,26 @@ class FCom extends BClass
             $configDir = $config->get('config_dir');
             if (!$configDir) {
                 $configDir = $rootDir.'/storage/config';
-                $localConfig['config_dir'] = $configDir;
-            }
-            // DB configuration is separate to gitignore
-            // used as indication that app is already installed and setup
-            if (file_exists($configDir.'/db.php')) {
-                $config->add(include($configDir.'/db.php'));
-                $config->add(include($configDir.'/local.php'));
-            } else {
-                $area = 'FCom_Install';
+                $config->set('config_dir', $configDir);
             }
 
+            // DB configuration is separate to gitignore
+            // used as indication that app is already installed and setup
+            $configFileStatus = true;
+            if (file_exists($configDir.'/db.php')) {
+                $config->addFile('db.php', true);
+            } else {
+                $configFileStatus = false;
+            }
+            if (file_exists($configDir.'/local.php')) {
+                $config->addFile('local.php', true);
+            } else {
+                $configFileStatus = false;
+            }
+            if (!$configFileStatus || $config->get('install_status')!=='installed') {
+                $area = 'FCom_Install';
+            }
+#echo "<Pre>"; print_r($config->get()); exit;
             // add area module
             self::$_area = $area;
             $reqModules = array($area=>array('run_level'=>BModule::REQUIRED));
@@ -120,7 +129,7 @@ class FCom extends BClass
             // Register modules
             $this->registerBundledModules();
             BModuleRegistry::i()
-                ->scan($fcomRootDir.'/lib/b/plugins')
+                ->scan($fcomRootDir.'/lib/buckyball/plugins')
                 ->scan($fcomRootDir.'/market/*')
                 ->scan($fcomRootDir.'/local/*');
 
@@ -155,6 +164,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Core',
                 'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
+                'run_level' => BModule::REQUIRED,
             ))
             // Initial installation module
             ->module('FCom_Install', array(
@@ -168,7 +178,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Frontend',
                 'bootstrap' => array('file'=>'Frontend.php', 'callback'=>'FCom_Frontend::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Frontend_DefaultTheme'),
             ))
             // Frontend collection of modules
             ->module('FCom_Frontend_DefaultTheme', array(
@@ -182,7 +192,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Admin_DefaultTheme'),
             ))
             // Frontend collection of modules
             ->module('FCom_Admin_DefaultTheme', array(

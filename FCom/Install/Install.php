@@ -5,28 +5,19 @@ class FCom_Install extends BClass
     public static function bootstrap()
     {
         BFrontController::i()
-            ->route( 'GET /.action', 'FCom_Install_Controller')
-            ->route('POST /.action', 'FCom_Install_Controller_Post')
+            ->route( 'GET /', 'FCom_Install_Controller.index')
+            ->route( 'GET /install', 'FCom_Install_Controller.index')
+            ->route( 'GET /install/.action', 'FCom_Install_Controller')
+            ->route('POST /install/.action', 'FCom_Install_Controller_Post')
         ;
 
         BLayout::i()
             ->view('head', array('view_class'=>'BViewHead'))
             ->allViews('views')->rootView('root');
     }
-
-    public function modRewriteEnabled()
-    {
-        if (function_exists('apache_get_modules')) {
-            $modules = apache_get_modules();
-            $modRewrite = in_array('mod_rewrite', $modules);
-        } else {
-            $modRewrite =  getenv('HTTP_MOD_REWRITE')=='On' ? true : false;
-        }
-        return $modRewrite;
-    }
 }
 
-class FCom_Install_Controller extends BActionController
+class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
     public function beforeDispatch()
     {
@@ -38,7 +29,7 @@ class FCom_Install_Controller extends BActionController
         if (empty($sData['w'])) {
             $sData['w'] = array(
                 'db'=>array('host'=>'localhost', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>''),
-                'admin'=>array('username'=>'admin', 'password'=>''),
+                'admin'=>array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>''),
             );
         }
 
@@ -52,31 +43,30 @@ class FCom_Install_Controller extends BActionController
 
     public function action_index()
     {
+        $this->messages('index', 'install');
         BLayout::i()->hookView('main', 'index');
     }
 
     public function action_step1()
     {
+        $this->messages('step1', 'install');
         BLayout::i()->hookView('main', 'step1');
     }
 
     public function action_step2()
     {
+        $this->messages('step2', 'install');
         BLayout::i()->hookView('main', 'step2');
     }
 
     public function action_step3()
     {
+        $this->messages('step3', 'install');
         BLayout::i()->hookView('main', 'step3');
-    }
-
-    public function action_success()
-    {
-        BLayout::i()->hookView('main', 'success');
     }
 }
 
-class FCom_Install_Controller_Post extends BActionController
+class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
 {
     public function beforeDispatch()
     {
@@ -91,23 +81,50 @@ class FCom_Install_Controller_Post extends BActionController
     {
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
-            BResponse::i()->redirect(BApp::m()->baseHref().'/?error=1');
+            BResponse::i()->redirect(BApp::url('FCom_Install', '/?error=1'));
         }
-        BResponse::i()->redirect(BApp::m()->baseHref().'/step1');
+        $step = 1;
+        if (BConfig::i()->get('db')) {
+            $step = 2;
+            if (FCom_Admin_Model_User::i()->orm('u')->find_one()) {
+                $step = 3;
+            }
+        }
+        BResponse::i()->redirect(BApp::url('FCom_Install', '/install/step'.$step));
     }
 
     public function action_step1()
     {
-        BResponse::i()->redirect(BApp::m()->baseHref().'/step2');
+        $w = BRequest::i()->post('w');
+        BConfig::i()->add(array('db'=>$w['db']), true);
+        try {
+            BDb::connect();
+            FCom_Core::i()->writeDbConfig();
+            $url = BApp::url('FCom_Install', '/install/step2');
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $url = BApp::url('FCom_Install', '/install/step1');
+        }
+        BResponse::i()->redirect($url);
     }
 
     public function action_step2()
     {
-        BResponse::i()->redirect(BApp::m()->baseHref().'/step3');
+        $w = BRequest::i()->post('w');
+        try {
+            FCom_Admin_Model_User::i()->create($w['admin'])->save()->login();
+            $url = BApp::url('FCom_Install', '/install/step3');
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $url = BApp::url('FCom_Install', '/install/step2');
+        }
+        BResponse::i()->redirect($url);
     }
 
     public function action_step3()
     {
-        BResponse::i()->redirect(BApp::m()->baseHref().'/success');
+        BConfig::i()->add(array('install_status'=>'installed'), true);
+        FCom_Core::i()->writeLocalConfig();
+        BResponse::i()->redirect(BApp::url('FCom_Install'));
     }
 }

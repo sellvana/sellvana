@@ -1,16 +1,16 @@
 <?php
 
-class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
+class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 {
     public function gridConfig()
     {
         $baseHref = BApp::m('FCom_Admin')->baseHref();
-        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>$baseHref.'/modules/form/'));
+        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>$baseHref.'/users/form/'));
         $config = array(
             'grid' => array(
                 'id'            => 'users',
-                'url'           => $baseHref.'/modules/grid_data',
-                'editurl'       => $baseHref.'/modules/grid_data',
+                'url'           => $baseHref.'/settings/grid_data',
+                'editurl'       => $baseHref.'/settings/grid_data',
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'u.id', 'width'=>55),
                     array('name'=>'username', 'label'=>'User Name', 'width'=>100) + $linkConf,
@@ -31,14 +31,14 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                 jQuery("#grid-users").jqGrid("columnChooser");
             }'),
         );
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
+        BPubSub::i()->fire('FCom_Admin_Controller_Settings::gridConfig', array('config'=>&$config));
         return $config;
     }
 
     public function action_index()
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid'=>$grid));
-        $this->layout('/modules');
+        BPubSub::i()->fire('FCom_Admin_Controller_Settings::action_index', array('grid'=>$grid));
+        $this->layout('/settings');
     }
 }

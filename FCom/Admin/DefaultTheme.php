@@ -115,6 +115,12 @@ class FCom_Admin_DefaultTheme extends BClass
                     )),
                 ),
 
+                '/settings'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('settings')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'admin/settings'))),
+                ),
+
                 '/modules'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('modules')),
