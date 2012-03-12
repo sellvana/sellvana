@@ -70,7 +70,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         case 'related': case 'similar':
             $orm->join('FCom_Catalog_Model_ProductLink', array('pl.linked_product_id','=','p.id'), 'pl')
                 ->where('link_type', $type)
-                ->where('product_id', $model ? $model->id : 0);
+                ->where('pl.product_id', $model ? $model->id : 0);
 
             //TODO: flexibility for more types
             $caption = $type=='related' ? 'Related Products' : 'Similar Products';
@@ -83,8 +83,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ->select('f.id')->select('f.family_name')
                 ->find_one();
 
-            $orm->join('FCom_Catalog_Model_ProductFamily', array('pl.product_id','=','p.id'), 'pl')
-                ->where('family_id', $family ? $family->id : 0);
+            $orm->join('FCom_Catalog_Model_ProductFamily', array('pf.product_id','=','p.id'), 'pf')
+                ->where('pf.family_id', $family ? $family->id : 0);
 
             $vendorName = $model ? htmlspecialchars($model->manuf_vendor_name) : '';
             $vendorId = $model ? $model->manuf_vendor_id : '';

@@ -69,7 +69,7 @@ class FCom_Admin_View_Grid extends BView
             $url = BApp::url('FCom_Admin', '/my_account/personalize');
             $cfg['grid']['resizeStop'] = "function(newwidth, index) {
                 var cols = \$('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
-                \$.post('{$url}', {do:'grid.col.width', grid:'{$gridId}',
+                \$.post('{$url}', {'do':'grid.col.width', grid:'{$gridId}',
                     col:cols[index].name, width:newwidth
                 });
             }";
@@ -83,7 +83,7 @@ class FCom_Admin_View_Grid extends BView
                             console.log(perm, this.jqGrid('getGridParam', 'colModel'));
                             if (perm) {
                                 this.jqGrid('remapColumns', perm, true);
-                                \$.post('{$url}', {do:'grid.col.order', grid:'{$gridId}',
+                                \$.post('{$url}', {'do':'grid.col.order', grid:'{$gridId}',
                                     cols:JSON.stringify(this.jqGrid('getGridParam', 'colModel'))
                                 });
                             }

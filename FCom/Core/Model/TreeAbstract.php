@@ -212,13 +212,18 @@ class FCom_Core_Model_TreeAbstract extends BModel
     {
         $children = array();
         $id = $this->id;
-        foreach ($this->cacheFetch() as $c) {
+        $cache = $this->cacheFetch();
+        if (!$cache) {
+var_dump($cache);
+echo get_class($this); exit;
+        }
+        foreach ($cache as $c) {
             if ($c->parent_id==$id) $children[$c->id] = $c;
         }
         if (is_null($this->num_children) || sizeof($children)!=$this->num_children) {
             $class = get_class($this);
-            $orm = $this->factory()->where('parent_id', $id);
-            if ($children) $orm->where_not_in('id', array_keys($children));
+            $orm = $this->orm('t')->where('t.parent_id', $id);
+            if ($children) $orm->where_not_in('t.id', array_keys($children));
             if ($sort) $orm->order_by_asc($sort);
             $rows = $orm->find_many();
             foreach ($rows as $c) {
@@ -238,8 +243,8 @@ class FCom_Core_Model_TreeAbstract extends BModel
             if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;
         }
         if (is_null($this->num_descendants) || sizeof($desc)!=$this->num_descendants) {
-            $orm = $this->factory()->where_like('id_path', $path.'%');
-            if ($desc) $orm->where_not_in('id', array_keys($desc));
+            $orm = $this->orm('t')->where_like('t.id_path', $path.'%');
+            if ($desc) $orm->where_not_in('t.id', array_keys($desc));
             if ($sort) $orm->order_by_asc($sort);
             $rows = $orm->find_many();
             foreach ($rows as $c) {
