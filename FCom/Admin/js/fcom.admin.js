@@ -1754,6 +1754,10 @@ function partialParent(el, params) {
     partial($(el).closest('.include'), params);
 }
 
+function jqgridFmtNewWindow(val,opt,obj) {
+    return "<a href='javascript:window.open(\""+val+"\", \"vendor_website_url\", \"width=800,height=600\")'>"+val+"</a>";
+}
+
 $(function(){
 
     $.jgrid.formatter.date.newformat = 'm/d/Y';
