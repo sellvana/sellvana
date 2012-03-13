@@ -27,9 +27,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             ),
             'navGrid' => array(),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
-            array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => 'function() {
-                jQuery("#grid-users").jqGrid("columnChooser");
-            }'),
+            'custom' => array('personalize'=>true),
         );
         BPubSub::i()->fire('FCom_Admin_Controller_Settings::gridConfig', array('config'=>&$config));
         return $config;
