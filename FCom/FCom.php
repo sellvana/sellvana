@@ -217,6 +217,15 @@ class FCom extends BClass
                 'description' => "Cron scheduled tasks manager",
             ))
             // catalog views and controllers
+            ->module('FCom_Cms', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Cms',
+                'bootstrap' => array('file'=>'Cms.php', 'callback'=>'FCom_Cms::bootstrap'),
+                'depends' => array('FCom_Frontend', 'FCom_Admin'),
+                'description' => "CMS for custom pages and forms",
+                'url_prefix' => 'cms',
+            ))
+            // catalog views and controllers
             ->module('FCom_Catalog', array(
                 'version' => '0.1.0',
                 'root_dir' => 'Catalog',
