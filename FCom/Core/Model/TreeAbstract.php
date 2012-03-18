@@ -212,13 +212,10 @@ class FCom_Core_Model_TreeAbstract extends BModel
     {
         $children = array();
         $id = $this->id;
-        $cache = $this->cacheFetch();
-        if (!$cache) {
-var_dump($cache);
-echo get_class($this); exit;
-        }
-        foreach ($cache as $c) {
-            if ($c->parent_id==$id) $children[$c->id] = $c;
+        if (($cache = $this->cacheFetch())) {
+            foreach ($cache as $c) {
+                if ($c->parent_id==$id) $children[$c->id] = $c;
+            }
         }
         if (is_null($this->num_children) || sizeof($children)!=$this->num_children) {
             $class = get_class($this);
@@ -239,8 +236,10 @@ echo get_class($this); exit;
         $desc = array();
         $path = $this->id_path.'/';
 
-        foreach ($this->cacheFetch() as $c) {
-            if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;
+        if (($cache = $this->cacheFetch())) {
+            foreach ($cache as $c) {
+                if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;
+            }
         }
         if (is_null($this->num_descendants) || sizeof($desc)!=$this->num_descendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path.'%');
