@@ -225,6 +225,15 @@ class FCom extends BClass
                 'description' => "CMS for custom pages and forms",
                 'url_prefix' => 'cms',
             ))
+            // product reviews
+            ->module('FCom_ProductReviews', array(
+                'version' => '0.1.0',
+                'root_dir' => 'ProductReviews',
+                'bootstrap' => array('file'=>'ProductReviews.php', 'callback'=>'FCom_ProductReviews::bootstrap'),
+                'depends' => array('FCom_Catalog', 'FCom_Customer'),
+                'description' => "Product reviews by customers",
+                'url_prefix' => 'prodreviews',
+            ))
             // catalog views and controllers
             ->module('FCom_Catalog', array(
                 'version' => '0.1.0',
@@ -233,6 +242,15 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
                 'description' => "Categories and products management, admin and frontend",
                 'url_prefix' => 'catalog',
+            ))
+            // customer account and management
+            ->module('FCom_Customer', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Customer',
+                'bootstrap' => array('file'=>'Customer.php', 'callback'=>'FCom_Customer::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'description' => "Customer Accounts and Management",
+                'url_prefix' => 'customer',
             ))
             // catalog views and controllers
             ->module('FCom_CustomField', array(
