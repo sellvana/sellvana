@@ -221,7 +221,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Cms',
                 'bootstrap' => array('file'=>'Cms.php', 'callback'=>'FCom_Cms::bootstrap'),
-                'depends' => array('FCom_Frontend', 'FCom_Admin'),
+                'depends' => array('FCom_Core'),
                 'description' => "CMS for custom pages and forms",
                 'url_prefix' => 'cms',
             ))

@@ -5,8 +5,8 @@ class FCom_Cms extends BClass
     public static function bootstrap()
     {
         switch (FCom::area()) {
-            case 'FCom_Frontend': FCom_Cms_Frontend::bootstrap();
-            case 'FCom_Admin': FCom_Cms_Admin::bootstrap();
+            case 'FCom_Frontend': FCom_Cms_Frontend::bootstrap(); break;
+            case 'FCom_Admin': FCom_Cms_Admin::bootstrap(); break;
         }
     }
 }
@@ -29,7 +29,7 @@ class FCom_Cms_Frontend extends BClass
     public static function layout()
     {
         BLayout::i()->layout(array(
-            '/cms'=>aray(
+            '/cms'=>array(
 
             ),
         ));
@@ -67,21 +67,6 @@ class FCom_Cms_Admin extends BClass
     }
 }
 
-class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
-{
-    public function action_index()
-    {
-
-    }
-}
-
-class FCom_Cms_Admin_Controller extends FCom_Admin_Controller_Abstract
-{
-    public function action_index()
-    {
-
-    }
-}
 
 class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 {
