@@ -9,8 +9,13 @@ class FCom_Admin_View_Root extends BView
     {
         $root =& $this->_tree;
         $pathArr = explode('/', $path);
-        foreach ($pathArr as $k) {
+        $l = sizeof($pathArr)-1;
+        foreach ($pathArr as $i=>$k) {
             $parent = $root;
+            if ($i<$l && empty($root['/'][$k])) {
+                $part = join('/', array_slice($pathArr, 0, $i+1));
+                BDebug::warning('addNav('.$path.'): Invalid parent path: '.$part);
+            }
             $root =& $root['/'][$k];
         }
         if (empty($node['pos'])) {
