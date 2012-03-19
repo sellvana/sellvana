@@ -43,26 +43,7 @@ class FCom_Core extends BClass
     }
 }
 
-class FCom_Core_View_Abstract extends BView
-{
-    public function messagesHtml($namespace=null)
-    {
-        $html = '';
-        if (!is_null($namespace)) {
-            $this->messages = BSession::i()->messages($namespace);
-        }
-        if ($this->messages) {
-            $html .= '<ul class="msgs">';
-            foreach ($this->messages as $m) {
-                $html .= '<li class="'.$m['type'].'-msg">'.$this->q($m['msg']).'</li>';
-            }
-            $html .= '</ul>';
-        }
-        return $html;
-    }
-}
-
-class FCom_Core_View_Head extends BViewHead
+class FCom_Core_Model_Abstract extends BModel
 {
 
 }
@@ -98,7 +79,26 @@ class FCom_Core_Controller_Abstract extends BActionController
     }
 }
 
-class FCom_Core_Model_Abstract extends BModel
+class FCom_Core_View_Abstract extends BView
+{
+    public function messagesHtml($namespace=null)
+    {
+        $html = '';
+        if (!is_null($namespace)) {
+            $this->messages = BSession::i()->messages($namespace);
+        }
+        if ($this->messages) {
+            $html .= '<ul class="msgs">';
+            foreach ($this->messages as $m) {
+                $html .= '<li class="'.$m['type'].'-msg">'.$this->q($m['msg']).'</li>';
+            }
+            $html .= '</ul>';
+        }
+        return $html;
+    }
+}
+
+class FCom_Core_View_Head extends BViewHead
 {
 
 }
