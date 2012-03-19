@@ -1,7 +1,6 @@
 <?php
 $m = $this->model;
 $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
-$vAutocompleteUrl = BApp::url('Denteva_Admin', '/vendors/autocomplete');
 ?>
 <div id="attachments-layout">
     <div class="ui-layout-west">
@@ -30,8 +29,9 @@ $vAutocompleteUrl = BApp::url('Denteva_Admin', '/vendors/autocomplete');
     </div>
 </div>
 <script>
+var attachmentsLayout, attachmentsGrid;
 head(function() {
-    var attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+    attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,
         west__spacing_open:20,
@@ -44,14 +44,13 @@ head(function() {
         }
     });
 
-    var attachmentsGrid = new FCom_Admin.MediaLibrary({
+    attachmentsGrid = new FCom_Admin.MediaLibrary({
         grid:'#all_attachments',
         url:'<?=BApp::url('FCom_Admin', '/media/grid')?>',
-        folder:'media/product/attachment',
-        oneditfunc:function(tr) { $('input[name=manuf_vendor_name]', tr).fcom_autocomplete({url:'<?=$vAutocompleteUrl?>'}); }
+        folder:'media/product/attachment'
     });
-    $('#all_attachments #gs_manuf_vendor_name').fcom_autocomplete({url:'<?=$vAutocompleteUrl?>'});
 
     new FCom_Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
 })
 </script>
+<?php echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model)); ?>
