@@ -5,6 +5,12 @@ FCom_Admin.MediaLibrary = function(options) {
     var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
     var baseUrl = options.url+'/download?folder='+encodeURI(options.folder)+'&file=';
 
+    function setOptions(opt) {
+        for (i in opt) {
+            options[i] = opt[i];
+        }
+    }
+
     function editAttachment(ev) {
         var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
         el.hide('fast'); $('.ui-icon-disk,.ui-icon-cancel', tr).show('fast');
@@ -129,7 +135,7 @@ FCom_Admin.MediaLibrary = function(options) {
     });
     grid.parents('.ui-jqgrid').find('.navtable .ui-icon-trash').parents('.ui-pg-button').click(function(ev) { deleteAttachments(); });
 
-    return {};
+    return {setOptions:setOptions};
 }
 
 FCom_Admin.TargetGrid = function(options) {

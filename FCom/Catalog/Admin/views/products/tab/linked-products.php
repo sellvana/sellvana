@@ -1,7 +1,6 @@
 <?php
 $m = $this->model;
 $prodCtrl = FCom_Catalog_Admin_Controller_Products::i();
-$vUrl = BApp::url('Denteva_Admin', '/vendors/autocomplete?type=manuf');
 ?>
 <div id="linked-products-layout">
     <div class="ui-layout-west">
@@ -14,20 +13,6 @@ $vUrl = BApp::url('Denteva_Admin', '/vendors/autocomplete?type=manuf');
     <div class="ui-layout-center">
         <?=$this->view('jqgrid')->set('config', $prodCtrl->productLibraryGridConfig()) ?>
     </div>
-</div>
-
-<div id="dialog-family-new" title="Create new family">
-    <form method="post" action="#" onsubmit="return false"><fieldset>
-    <label for="family_name">Name</label> <input type="text" id="family_name" name="model[family_name]"/><br/>
-    <label for="manuf_vendor_name">Manufacturer</label> <input type="text" id="manuf_vendor_name" name="model[manuf_vendor_name]" value="<?=$this->q($m->manuf_vendor_name)?>"/>
-    <input type="hidden" id="manuf_vendor_id" name="model[manuf_vendor_id]" value="<?=$m->manuf_vendor_id?>"/>
-    </fieldset></form>
-</div>
-
-<div id="dialog-family-rename" title="Rename family">
-    <form method="post" action="#" onsubmit="return false"><fieldset>
-    <label for="family_name">Name</label> <input type="text" id="family_name" name="model[family_name]"/><br/>
-    </fieldset></form>
 </div>
 
 <script>
@@ -62,10 +47,6 @@ head(function() {
             });
         }
     });
-    $('#family-manuf-autocomplete').fcom_autocomplete({url:'<?=$vUrl?>', field:'#family-manuf-id'});
-    $('#dialog-family-new #manuf_vendor_name').fcom_autocomplete({url:'<?=$vUrl?>', field:'#dialog-family-new #manuf_vendor_id'});
-    $('#dialog-family-rename #manuf_vendor_name').fcom_autocomplete({url:'<?=$vUrl?>', field:'#dialog-family-rename #manuf_vendor_id'});
-
     $('#dialog-family-new').dialog({
         autoOpen:false, height:300, width:350, modal:true, buttons: {
             "Create Family": function() {
@@ -119,3 +100,4 @@ head(function() {
     });
 })
 </script>
+<?php echo $this->hook('catalog/products/tab/linked-products', array('model'=>$this->model)); ?>
