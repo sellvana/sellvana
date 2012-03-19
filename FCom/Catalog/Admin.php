@@ -85,7 +85,6 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
-                        array('addNav', 'catalog/product_reviews', array('label'=>'Product Reviews', 'href'=>$baseHref.'/product_reviews')),
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(

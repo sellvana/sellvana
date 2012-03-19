@@ -52,6 +52,12 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jqGrid/plugins/jquery.contextmenu.js'),
                     )),
                 ),
+                'jstree'=>array(
+                    array('view', 'head', 'do'=>array(
+                        array('css', '{FCom_Core}/js/lib/themes/default/style.css'),
+                        array('js', '{FCom_Core}/js/lib/jquery.jstree.js'),
+                    )),
+                ),
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
@@ -67,6 +73,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
                     )),
                     array('layout', 'jqgrid'),
+                    array('layout', 'jstree'),
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Admin}/js/fcom.admin.js'),
                         array('css', '{FCom_Admin}/css/fcom.admin.css'),
