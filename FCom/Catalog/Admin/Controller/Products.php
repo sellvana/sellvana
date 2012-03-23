@@ -18,11 +18,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function gridConfig()
     {
-        $baseUrl = BApp::url('FCom_Catalog', '/products/form/');
+        $baseUrl = BApp::url('FCom_Catalog', '/catalog/products/form/');
         $config = array(
             'grid' => array(
                 'id'            => 'products',
-                'url'           => BApp::url('FCom_Catalog', '/products/grid_data'),
+                'url'           => BApp::url('FCom_Catalog', '/catalog/products/grid_data'),
                 'columns'       => $this->gridColumns(),
                 'sortname'      => 'p.id',
                 'sortorder'     => 'asc',

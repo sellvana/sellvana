@@ -35,7 +35,7 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function imageUrl($full=false)
     {
-        $url = $full ? BApp::url('FCom_Catalog', 'base_src').'/' : '';
+        $url = $full ? BApp::src('FCom_Catalog').'/' : '';
         return $url.'media/'.($this->image_url ? $this->image_url : 'DC642702.jpg');
     }
 
