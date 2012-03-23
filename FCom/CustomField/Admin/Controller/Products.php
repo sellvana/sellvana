@@ -9,7 +9,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'id'      => 'product_fieldsets',
                 'hiddengrid' => true,
                 'caption' => 'Field Sets',
-                'url'     => BApp::url('FCom_CustomField', '/customfields/fieldsets/grid_data'),
+                'url'     => BApp::href('customfields/fieldsets/grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
                     'set_code' => array('label'=>'Set Code', 'width'=>100, 'editable'=>true),

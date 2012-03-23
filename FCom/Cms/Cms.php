@@ -70,10 +70,10 @@ class FCom_Cms_Admin extends BClass
             'base'=>array(
                 array('view', 'root', 'do'=>array(
                     array('addNav', 'cms', array('label'=>'CMS', 'pos'=>200)),
-                    array('addNav', 'cms/nav', array('label'=>'Navigation', 'href'=>BApp::url('FCom_Cms', '/cms/nav'))),
-                    array('addNav', 'cms/pages', array('label'=>'Pages', 'href'=>BApp::url('FCom_Cms', '/cms/pages'))),
-                    array('addNav', 'cms/blocks', array('label'=>'Blocks', 'href'=>BApp::url('FCom_Cms', '/cms/blocks'))),
-                    array('addNav', 'cms/forms', array('label'=>'Form Actions', 'href'=>BApp::url('FCom_Cms', '/cms/forms'))),
+                    array('addNav', 'cms/nav', array('label'=>'Navigation', 'href'=>BApp::href('cms/nav'))),
+                    array('addNav', 'cms/pages', array('label'=>'Pages', 'href'=>BApp::href('cms/pages'))),
+                    array('addNav', 'cms/blocks', array('label'=>'Blocks', 'href'=>BApp::href('cms/blocks'))),
+                    array('addNav', 'cms/forms', array('label'=>'Form Actions', 'href'=>BApp::href('cms/forms'))),
                 )),
             ),
             '/cms/nav'=>array(

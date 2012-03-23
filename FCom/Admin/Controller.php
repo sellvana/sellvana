@@ -25,13 +25,13 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             }
         }
         $url = BSession::i()->data('login_orig_url');
-        BResponse::i()->redirect($url ? $url : BApp::url('FCom_Admin'));
+        BResponse::i()->redirect($url ? $url : BApp::baseUrl());
     }
 
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::url('FCom_Admin'));
+        BResponse::i()->redirect(BApp::baseUrl());
     }
 
     public function action_my_account()

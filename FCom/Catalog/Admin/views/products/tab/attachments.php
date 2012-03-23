@@ -46,7 +46,7 @@ head(function() {
 
     attachmentsGrid = new FCom_Admin.MediaLibrary({
         grid:'#all_attachments',
-        url:'<?=BApp::url('FCom_Admin', '/media/grid')?>',
+        url:'<?=BApp::href('media/grid')?>',
         folder:'media/product/attachment'
     });
 

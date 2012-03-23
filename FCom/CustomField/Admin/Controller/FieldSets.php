@@ -8,8 +8,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             'grid' => array(
                 'id'      => 'fieldsets',
                 'caption' => 'Field Sets',
-                'url'     => BApp::url('FCom_CustomField', '/customfields/fieldsets/grid_data'),
-                'editurl' => BApp::url('FCom_CustomField', '/customfields/fieldsets/grid_data'),
+                'url'     => BApp::href('customfields/fieldsets/grid_data'),
+                'editurl' => BApp::href('customfields/fieldsets/grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
                     'set_code' => array('label'=>'Set Code', 'width'=>100, 'editable'=>true),
@@ -19,7 +19,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             ),
             'subGrid' => array(
                 'grid' => array(
-                    'url' => BApp::url('FCom_CustomField', '/customfields/fieldsets/set_field_grid_data?set_id='),
+                    'url' => BApp::href('customfields/fieldsets/set_field_grid_data?set_id='),
                     'columns' => array(
                         'id' => array('label'=>'ID', 'hidden'=>true, 'width'=>30),
                         'field_code' => array('label'=>'Field', 'width'=>200),
@@ -85,8 +85,8 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             'grid' => array(
                 'id' => 'fields',
                 'caption' => 'Fields',
-                'url' => BApp::url('FCom_CustomField', '/customfields/fieldsets/field_grid_data'),
-                'editurl' => BApp::url('FCom_CustomField', '/customfields/fieldsets/field_grid_data'),
+                'url' => BApp::href('customfields/fieldsets/field_grid_data'),
+                'editurl' => BApp::href('customfields/fieldsets/field_grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>30),
                     'field_code' => array('label'=>'Field Code', 'width'=>200, 'editable'=>true),
@@ -102,8 +102,8 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             ),
             'subGrid' => array(
                 'grid' => array(
-                    'url' => BApp::url('FCom_CustomField', '/customfields/fieldsets/field_option_grid_data?field_id='),
-                    'editurl' => BApp::url('FCom_CustomField', '/customfields/fieldsets/field_option_grid_data?field_id='),
+                    'url' => BApp::href('customfields/fieldsets/field_option_grid_data?field_id='),
+                    'editurl' => BApp::href('customfields/fieldsets/field_option_grid_data?field_id='),
                     'columns' => array(
                         'id' => array('label'=>'ID', 'width'=>30),
                         'label' => array('label'=>'Label', 'width'=>300, 'editable'=>true),
@@ -185,7 +185,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             $result = array('success'=>true);
             break;
         }
-        //BResponse::i()->redirect(BApp::url('FCom_CustomField', '/fieldsets/grid_data'));
+        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
         BResponse::i()->json($result);
     }
 
@@ -227,7 +227,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             $model = FCom_CustomField_Model_Set::i()->load($id);
             if (empty($model)) {
                 BSession::i()->addMessage('Invalid field set ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::url('FCom_CustomField', '/customfields/fieldsets'));
+                BResponse::i()->redirect(BApp::href('customfields/fieldsets'));
             }
         } else {
             $model = FCom_CustomField_Model_Set::i()->create();
@@ -276,7 +276,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::url('FCom_CustomField', '/customfields/customfield/form/'.$id));
+            BResponse::i()->redirect(BApp::href('customfields/customfield/form/'.$id));
         }
     }
 

@@ -57,7 +57,7 @@ class FCom_ProductReviews_Admin extends BClass
             'base'=>array(
                 array('view', 'root', 'do'=>array(
                     array('addNav', 'catalog/prodreviews', array('label'=>'Product Reviews',
-                        'href'=>BApp::url('FCom_ProductReviews', '/prodreviews'))),
+                        'href'=>BApp::href('prodreviews'))),
                 )),
             ),
         ));

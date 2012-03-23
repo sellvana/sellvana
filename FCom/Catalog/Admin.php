@@ -72,7 +72,7 @@ class FCom_Catalog_Admin extends BClass
 
     static public function layout()
     {
-        $baseHref = BApp::url('FCom_Catalog', '/catalog');
+        $baseHref = BApp::href('catalog');
         BLayout::i()
             ->layout(array(
                 'base'=>array(

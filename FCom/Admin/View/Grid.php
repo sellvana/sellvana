@@ -66,7 +66,7 @@ class FCom_Admin_View_Grid extends BView
                 $cfg['grid']['columns'] = BUtil::arrayMerge($cfg['grid']['columns'], $persCols);
             }
 
-            $url = BApp::url('FCom_Admin', '/my_account/personalize');
+            $url = BApp::href('/my_account/personalize');
             $cfg['grid']['resizeStop'] = "function(newwidth, index) {
                 var cols = \$('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
                 \$.post('{$url}', {'do':'grid.col.width', grid:'{$gridId}',
