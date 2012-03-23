@@ -31,11 +31,11 @@ head(function() {
     });
 
     $('#family-autocomplete').fcom_autocomplete({
-        url:'<?=BApp::url('FCom_Catalog', '/families/autocomplete')?>',
+        url:'<?=BApp::url('FCom_Catalog', '/catalog/families/autocomplete')?>',
         field:'#family-id',
         filter:'#family-manuf-id',
         select: function(event, ui) {
-            var url = '<?=BApp::url('FCom_Catalog', '/families/product_data')?>?family='+ui.item.id;
+            var url = '<?=BApp::url('FCom_Catalog', '/catalog/families/product_data')?>?family='+ui.item.id;
             $.get(url, function(data, status, xhr) {
                 var grid = $('#linked_products_family'), container = grid.parents('.ui-jqgrid');
                 container.find('input[name="grid[linked_products_family][add]"]').val('');
@@ -50,7 +50,7 @@ head(function() {
     $('#dialog-family-new').dialog({
         autoOpen:false, height:300, width:350, modal:true, buttons: {
             "Create Family": function() {
-                $.post('<?=BApp::url('FCom_Catalog', '/families/form/')?>',
+                $.post('<?=BApp::url('FCom_Catalog', '/catalog/families/form/')?>',
                     $('form', this).serialize(),
                     function(data, status, xhr) {
                         //$('#family-id').val(data.model.id);
@@ -72,7 +72,7 @@ head(function() {
                     alert('Please enter a valid name');
                     return;
                 }
-                $.post('<?=BApp::url('FCom_Catalog', '/families/form/')?>'+$('#family-id').val(),
+                $.post('<?=BApp::url('FCom_Catalog', '/catalog/families/form/')?>'+$('#family-id').val(),
                     $('form', this).serialize(),
                     function(data, status, xhr) {
                         $('#family-id').val(data.model.id);

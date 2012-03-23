@@ -223,7 +223,6 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'Cms.php', 'callback'=>'FCom_Cms::bootstrap'),
                 'depends' => array('FCom_Core'),
                 'description' => "CMS for custom pages and forms",
-                'url_prefix' => 'cms',
             ))
             // product reviews
             ->module('FCom_ProductReviews', array(
@@ -232,7 +231,6 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'ProductReviews.php', 'callback'=>'FCom_ProductReviews::bootstrap'),
                 'depends' => array('FCom_Catalog', 'FCom_Customer'),
                 'description' => "Product reviews by customers",
-                'url_prefix' => 'prodreviews',
             ))
             // catalog views and controllers
             ->module('FCom_Catalog', array(
@@ -241,7 +239,6 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'Catalog.php', 'callback'=>'FCom_Catalog::bootstrap'),
                 'depends' => array('FCom_Core'),
                 'description' => "Categories and products management, admin and frontend",
-                'url_prefix' => 'catalog',
             ))
             // customer account and management
             ->module('FCom_Customer', array(
@@ -250,7 +247,6 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'Customer.php', 'callback'=>'FCom_Customer::bootstrap'),
                 'depends' => array('FCom_Core'),
                 'description' => "Customer Accounts and Management",
-                'url_prefix' => 'customer',
             ))
             // catalog views and controllers
             ->module('FCom_CustomField', array(
@@ -258,7 +254,6 @@ class FCom extends BClass
                 'root_dir' => 'CustomField',
                 'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
                 'depends' => array('FCom_Catalog'),
-                'url_prefix' => 'customfield',
                 'description' => "Base custom fields implementation, currently for catalog only",
             ))
             // cart, checkout and customer account views and controllers
@@ -267,7 +262,6 @@ class FCom extends BClass
                 'root_dir' => 'Checkout',
                 'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
                 'depends' => array('FCom_Catalog'),
-                'url_prefix' => 'checkout',
                 'description' => "Base cart and checkout functionality",
             ))
             ->module('FCom_Newsletter', array(
@@ -275,7 +269,6 @@ class FCom extends BClass
                 'root_dir' => 'Newsletter',
                 'bootstrap' => array('file'=>'Newsletter.php', 'callback'=>'FCom_Newsletter::bootstrap'),
                 'depends' => array('FCom_Core'),
-                'url_prefix' => 'newsletter',
                 'description' => "Base subscription and mailing list management",
             ))
             // paypal IPN
@@ -284,7 +277,6 @@ class FCom extends BClass
                 'root_dir' => 'PayPal',
                 'bootstrap' => array('file'=>'PayPal.php', 'callback'=>'FCom_PayPal::bootstrap'),
                 'depends' => array('FCom_Core'),
-                'url_prefix' => 'paypal',
                 'description' => "PayPal&reg; standard payment method",
             ))
             // freshbook simple invoicing

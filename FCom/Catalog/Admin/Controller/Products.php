@@ -124,9 +124,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
             array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
-            /*array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => "function() {
-                jQuery('#$gridId').jqGrid('columnChooser');
-            }"),*/
         );
 
         BPubSub::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
@@ -182,7 +179,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->outFormTabsJson($view, $product);
     }
 
-    public function action_form_post()
+    public function action_form__POST()
     {
         $r = BRequest::i();
         $id = $r->params('id');
@@ -197,7 +194,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             if (!empty($data['model'])) {
                 $model->set($data['model']);
             }
-            BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::form_post', array('id'=>$id, 'data'=>$data, 'model'=>$model));
+            BPubSub::i()->fire(__METHOD__, array('id'=>$id, 'data'=>$data, 'model'=>$model));
             $model->save();
             if (!$id) {
                 $id = $model->id;
@@ -212,7 +209,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            $url = BApp::m('FCom_Catalog')->baseHref().'/products/form/'.$id;
+            $url = BApp::url('FCom_Catalog', '/catalog/products/form/'.$id);
             if ($r->post('tab')) {
                 $url .= '?tab='.urlencode($r->post('tab'));
             }
@@ -222,7 +219,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processLinkedProductsPost($model, $data)
     {
-
         $hlp = FCom_Catalog_Model_ProductLink::i();
         foreach (array('related', 'similar') as $type) {
             $typeName = 'linked_products_'.$type;
@@ -332,10 +328,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $args['orm']->join('FCom_Catalog_Model_ProductMedia', array('pa.file_id','=','a.id',), 'pa')
             ->where_null('pa.product_id')->where('media_type', $args['type'])
-            ->select(array('pa.manuf_vendor_id'))
-
-            ->left_outer_join('Denteva_Model_Vendor', array('v.id','=','pa.manuf_vendor_id'), 'v')
-            ->select(array('manuf_vendor_name'=>'v.vendor_name'));
+            ->select(array('pa.manuf_vendor_id'));
     }
 
     public function onMediaGridUpload($args)

@@ -15,7 +15,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_cart_post()
     {
-        $cartHref = BApp::m('FCom_Checkout')->baseHref().'/cart';
+        $cartHref = BApp::url('FCom_Checkout', '/checkout/cart');
         $post = BRequest::i()->post();
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
         if (BRequest::i()->xhr()) {

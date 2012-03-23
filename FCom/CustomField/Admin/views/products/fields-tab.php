@@ -42,8 +42,8 @@
                 </td>
             </tr>
         </table>
-        <div id="custom-fields-partial" data-src="<?=BApp::url('FCom_CustomField', '/products/fields_partial/'.$this->model->id)?>">
-            <?=$this->view('customfield/products/fields-partial')->set('model', $this->model)?>
+        <div id="custom-fields-partial" data-src="<?=BApp::url('FCom_CustomField', '/customfields/products/fields_partial/'.$this->model->id)?>">
+            <?=$this->view('customfields/products/fields-partial')->set('model', $this->model)?>
         </div>
     </fieldset>
 <script>

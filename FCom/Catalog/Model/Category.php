@@ -4,6 +4,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_category';
+    protected static $_cacheAuto = true;
 
     public function productsORM()
     {
@@ -19,7 +20,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function url()
     {
-        return BApp::m('FCom_Catalog')->baseHref().'/c/'.$this->url_path;
+        return BApp::url('FCom_Catalog', '/c/'.$this->url_path);
     }
 
     public function onReorderAZ($args)

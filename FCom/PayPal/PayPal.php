@@ -7,7 +7,7 @@ class FCom_PayPal extends BClass
 
     static public function bootstrap()
     {
-        BFrontController::i()->route('GET /.action', 'FCom_PayPal_Controller');
+        BFrontController::i()->route('GET /paypal/.action', 'FCom_PayPal_Controller');
     }
 
     public function __construct()

@@ -103,7 +103,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_compare()
     {
         $layout = BLayout::i();
-        $cookie = BRequest::i()->cookie('dentevaCompare');
+        $cookie = BRequest::i()->cookie('fulleronCompare');
         $xhr = BRequest::i()->xhr();
         if (!empty($cookie)) $arr = BUtil::fromJson($cookie);
         if (!empty($arr)) {

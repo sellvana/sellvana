@@ -25,7 +25,7 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function url($category=null)
     {
-        $url = BApp::m('FCom_Catalog')->baseHref().'/p/';
+        $url = BApp::url('FCom_Catalog', '/p/');
         if ($category) {
             $url .= $category->url_path.'/';
         }
@@ -35,7 +35,8 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function imageUrl($full=false)
     {
-        return ($full ? DMain::baseUrl().'/' : '').'media/'.($this->image_url ? $this->image_url : 'DC642702.jpg');
+        $url = $full ? BApp::url('FCom_Catalog', 'base_src').'/' : '';
+        return $url.'media/'.($this->image_url ? $this->image_url : 'DC642702.jpg');
     }
 
     public function thumbUrl($w, $h=null)

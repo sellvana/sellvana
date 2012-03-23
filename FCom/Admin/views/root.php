@@ -20,15 +20,16 @@ window.appConfig = {
 			    <span class="adm-logo">Denteva Admin</span>
 			    <nav class="sup-links">
 				    <ul>
+<?php if (!empty($this->_quickSearches)): ?>
 					    <li class="sup-quicksearch"><a href="#"><span class="icon"></span><span class="title">Quicksearch</span></a>
 						    <form action="#" method="post" class="sub-section">
 							    <fieldset>
 								    <ul class="form-list">
 									    <li>
 										    <select>
-											    <option value="#">Customers</option>
-											    <option value="#">Products</option>
-											    <option value="#">Orders</option>
+<?php foreach ($this->_quickSearches as $qs): ?>
+											    <option value="<?php echo $this->q($qs['href']) ?>"><?php echo $this->q($qs['label']) ?></option>
+<?php endforeach ?>
 										    </select>
 									    </li>
 									    <li><input type="text" name=""/></li>
@@ -37,19 +38,22 @@ window.appConfig = {
 							    </fieldset>
 						    </form>
 					    </li>
+<?php endif ?>
+<?php if (!empty($this->_shortcuts)): ?>
 					    <li class="sup-shortcuts"><a href="#"><span class="icon"></span><span class="title">Shortcuts</span></a>
                             <ul class="sub-section">
-                                <li><a href="<?php echo BApp::m('FCom_Catalog')->baseHref()?>/products/form/">New Product</a></li>
-                                <li><a href="<?php echo BApp::m('FCom_Catalog')->baseHref()?>/categories/form/">New Company</a></li>
-                                <li><a href="<?php echo $baseHref?>/users/form/">New User</a></li>
+<?php foreach ($this->_shortcuts as $sc): ?>
+                                <li><a href="<?php echo $this->q($sc['href']) ?>"><?php echo $this->q($sc['label']) ?></a></li>
+<?php endforeach ?>
                             </ul>
                         </li>
+<?php endif ?>
 					    <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a></li>
 					    <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						    <ul class="sub-section">
-							    <li><a href="<?php echo $baseHref ?>/my_account">My Account</a></li>
-							    <li><a href="<?php echo $baseHref ?>/reports">My Reports</a></li>
-							    <li><a href="<?php echo $baseHref ?>/logout">Log Out</a></li>
+							    <li><a href="<?php echo BApp::url('FCom_Admin', '/my_account')?>">My Account</a></li>
+							    <li><a href="<?php echo BApp::url('FCom_Admin', '/reports')?>">My Reports</a></li>
+							    <li><a href="<?php echo BApp::url('FCom_Admin', '/logout')?>">Log Out</a></li>
 						    </ul>
 					    </li>
 				    </ul>
@@ -60,7 +64,7 @@ window.appConfig = {
         <div class="ui-layout-west">
 	        <section class="adm-nav-bg"></section>
             <nav class="adm-nav">
-		        <?=$this->renderNodes() ?>
+		        <?php echo $this->renderNodes() ?>
 	        </nav>
         </div>
         <div class="adm-middle ui-layout-center"><?php echo $this->hook('main') ?></div>

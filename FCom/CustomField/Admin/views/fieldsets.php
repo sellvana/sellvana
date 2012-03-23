@@ -23,7 +23,7 @@ function updateFieldSet(subgrid) {
     for (i=0; i<data.length; i++) {
         fields.push(data[i].id);
     }
-    $.post('<?=BApp::url('FCom_CustomField', '/fieldsets/set_field_grid_data')?>',
+    $.post('<?=BApp::url('FCom_CustomField', '/customfields/fieldsets/set_field_grid_data')?>',
         {set_id:id, field_ids:fields.join(',')},
         function(data, status, xhr) {
             grid.jqGrid('setRowData', id, {field_codes:data.field_codes});

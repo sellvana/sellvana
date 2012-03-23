@@ -7,7 +7,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
         $grid = BLayout::i()->view('jqgrid')->set('config', array(
             'grid' => array(
                 'id' => 'product_families',
-                'url' => BApp::url('FCom_Catalog', '/families/grid_data'),
+                'url' => BApp::url('FCom_Catalog', '/catalog/families/grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>50),
                     'family_name' => array('label'=>'Family Name', 'width'=>250),
@@ -58,7 +58,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(BApp::url('FCom_Catalog', '/families/form/'.$model->id));
+        BResponse::i()->redirect(BApp::url('FCom_Catalog', '/catalog/families/form/'.$model->id));
     }
 
     public function action_autocomplete()
@@ -80,10 +80,9 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
             ->where('pf.family_id', BRequest::i()->get('family'))
 
             ->join('FCom_Catalog_Model_Product', array('p.id','=','pf.product_id'), 'p')
-            ->select(array('p.id', 'p.product_name', 'p.manuf_sku'))
+            ->select(array('p.id', 'p.product_name', 'p.manuf_sku'));
 
-            ->join('Denteva_Model_Vendor', array('v.id','=','p.manuf_vendor_id'), 'v')
-            ->select('v.vendor_name', 'manuf_vendor_name');
+        BPubSub::i()->fire(__METHOD__, array('orm'=>$orm));
 
         BResponse::i()->json(BDb::many_as_array($orm->find_many()));
     }

@@ -20,7 +20,7 @@ class FCom_Customer_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_Customer_Frontend_Controller.index')
+            ->route('GET /customers', 'FCom_Customer_Frontend_Controller.index')
         ;
 
         BLayout::i()->allViews('Frontend/views', 'customer');
@@ -45,7 +45,7 @@ class FCom_Customer_Admin extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_Customer_Admin_Controller.index')
+            ->route('GET /customers', 'FCom_Customer_Admin_Controller.index')
         ;
 
         BLayout::i()->allViews('Admin/views', 'customer');
@@ -58,7 +58,7 @@ class FCom_Customer_Admin extends BClass
                 array('view', 'root', 'do'=>array(
                     array('addNav', 'customers', array('label'=>'Customers', 'pos'=>300)),
                     array('addNav', 'customers/customer', array('label'=>'Customers',
-                        'href'=>BApp::url('FCom_Customer', '/customer'))),
+                        'href'=>BApp::url('FCom_Customer', '/customers/customer'))),
                 )),
             ),
         ));

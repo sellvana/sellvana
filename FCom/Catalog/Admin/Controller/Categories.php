@@ -2,81 +2,12 @@
 
 class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract
 {
-
-    public function action_categories()
-    {
-        $orm = FCom_Catalog_Model_Category::i()->orm();
-        $data = BuckyUI::i()->jqgridData($orm);
-        BResponse::i()->json($data);
-    }
-
     public function action_index()
     {
         $this->layout('/catalog/categories');
     }
 
-    public function action_config()
-    {
-        $config = array(
-            'products_grid' => array(
-                'url' => BApp::m('FCom_Catalog')->baseHref().'/products',
-                'grid' => array(
-                    //'forceFitColumns'=>true, // https://github.com/mleibman/SlickGrid/issues/223
-                    'editable'=>true,
-                    'autoEdit'=>false,
-                    'asyncEditorLoading'=>true,
-                    'enableAddRow'=>true,
-                    'enableCellNavigation'=>true,
-                    'enableColumnReorder'=>true
-                ),
-                'columns'=>array(
-                    array('id'=>'id', 'name'=>'#', 'field'=>'id', 'width'=>60, 'sortable'=>true),
-                    array('id'=>'product_name', 'name'=>'Name', 'field'=>'product_name', 'width'=>300, 'editor'=>'LongTextCellEditor', 'sortable'=>true),
-                    array('id'=>'base_price', 'name'=>'Price', 'field'=>'base_price', 'width'=>80, 'editor'=>'TextCellEditor', 'sortable'=>true),
-                    array('id'=>'manuf_sku', 'name'=>'Part #', 'field'=>'manuf_sku', 'width'=>100, 'sortable'=>true),
-                    #array('id'=>'%', 'name'=>'%', 'field'=>'percent', 'formatter'=>'GraphicalPercentCompleteCellFormatter', 'editor'=>'PercentCompleteCellEditor'),
-                    #array('id'=>'bool', 'name'=>'bool', 'field'=>'bool', 'formatter'=>'BoolCellFormatter', 'editor'=>'YesNoCheckboxCellEditor'),
-                ),
-                'sub'=>array('resize'=>'#details-pane/center'),
-                'pager'=>array('id'=>'#products-grid-pager'),
-                'columnpicker'=>true,
-                //'checkboxSelector'=>true,
-                //'reorder'=>true,
-                'dnd'=>true,
-                'undo'=>true,
-            ),
-            'aliases_grid' => array(
-                'url' => BApp::m('Denteva_Admin')->baseHref().'/categories/aliases',
-                'grid' => array(
-                    //'forceFitColumns'=>true, // https://github.com/mleibman/SlickGrid/issues/223
-                    'editable'=>true,
-                    'autoEdit'=>false,
-                    'asyncEditorLoading'=>true,
-                    'enableAddRow'=>true,
-                    'enableCellNavigation'=>true,
-                    'enableColumnReorder'=>true
-                ),
-                'columns'=>array(
-                    array('id'=>'vendor_code', 'name'=>'Vendor', 'field'=>'vendor_code', 'width'=>100, 'editor'=>'TextCellEditor', 'sortable'=>true),
-                    array('id'=>'alias_name', 'name'=>'Alias', 'field'=>'alias_name', 'width'=>300, 'editor'=>'TextCellEditor', 'sortable'=>true),
-                ),
-                'sub'=>array('resize'=>'#details-pane/center'),
-                'pager'=>array('id'=>'#aliases-grid-pager'),
-                'columnpicker'=>true,
-                'dnd'=>true,
-                'undo'=>true,
-            ),
-        );
-        BResponse::i()->json($config);
-    }
-
-    public function action_aliases()
-    {
-        BResponse::i()->json(Denteva_Merge_Model_CategoryAlias::i()->orm()->paginate(null, array('as_array'=>true)));
-    }
-
-
-    public function action_category_tree_get()
+    public function action_tree_data()
     {
         $r = BRequest::i();
         $result = null;
@@ -116,7 +47,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
         return $children;
     }
 
-    public function action_category_tree_post()
+    public function action_tree_data__POST()
     {
         $r = BRequest::i();
         try {
@@ -125,7 +56,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             }
             $result = array('status'=>1);
 
-            $eventName = 'category_tree_post.'.$r->post('operation');
+            $eventName = __METHOD__.'.'.$r->post('operation');
             BPubSub::i()->fire($eventName.'.before', $r->post());
 
             switch ($r->post('operation')) {

@@ -3,6 +3,7 @@
 class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cart';
+    protected static $_origClass = __CLASS__;
 
     protected static $_sessionCart;
 
@@ -41,7 +42,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function userLogin()
     {
-        $user = FCom_Checkout_Model_User::sessionUser();
+        $user = FCom_Customer_Model_User::sessionUser();
         $sessCartId = static::sessionCartId();
         if ($user->session_cart_id) {
             if ($sessCartId) {
@@ -192,62 +193,17 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         }
     }
 
-    public static function receiveProducts($request)
-    {
-        if ($request->target_id==0 || $request->target_id==-1) {
-            $description = $request->target_id==0 ? 'Unsaved Cart' : $request->target_description;
-            $request->target_description = Denteva_Model_Cart::i()->findNextAvailableValue('description', $description);
-            /** @var Denteva_Model_Cart */
-            $cart = FCom_Checkout_Model_Cart::i()->create(array(
-                'company_id' => Denteva_Model_Company::sessionCompanyId(),
-                'user_id' => Denteva_Model_User::sessionUserId(),
-                'description' => $request->target_description,
-            ))->save();
-            $request->target_id = $cart->id;
-            Denteva_Model_CartUser::i()->create(array(
-                'cart_id' => $cart->id, 'user_id' => Denteva_Model_User::sessionUserId(),
-                'can_admin'=>1, 'can_edit'=>1, 'can_share'=>1, 'can_order'=>1,
-            ))->save();
-            static::sessionCart($cart);
-            Denteva_Model_User::sessionUser()->set('session_cart_id', $cart->id)->save();
-        } elseif ($request->target_id==static::sessionCartId()) {
-            $cart = static::sessionCart();
-        } else {
-            $cart = static::load($request->target_id);
-        }
-        $options = array('no_calc_totals'=>true);
-        if (!empty($request->multirow_ids)) {
-            foreach ($request->multirow_ids as $id) {
-                $options['qty'] = !empty($request->qtys[$id]) ? $request->qtys[$id] : 1;
-                $cart->addProduct($id, $options);
-            }
-        } elseif (!empty($request->row_id)) {
-            $id = $request->row_id;
-            $options['qty'] = !empty($request->qtys[$id]) ? $request->qtys[$id] : 1;
-            $cart->addProduct($id, $options);
-        }
-        $cart->calcTotals()->save();
-    }
-
-    public static function afterSendProducts($request)
-    {
-        if (!empty($request->move)) {
-            $ids = !empty($request->multirow_ids) ? $request->multirow_ids : (array)$request->row_id;
-            Denteva_Model_CartItem::delete_many(array('cart_id'=>$request->source_id, 'product_id'=>$ids));
-        }
-    }
-
     public function addProduct($productId, $options=array())
     {
         $this->save();
         if (empty($options['qty']) || !is_numeric($options['qty'])) {
             $options['qty'] = 1;
         }
-        $item = Denteva_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
+        $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item) {
             $item->add('qty', $options['qty']);
         } else {
-            $item = Denteva_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId, 'qty'=>$options['qty']));
+            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId, 'qty'=>$options['qty']));
         }
         $item->save();
         if (empty($options['no_calc_totals'])) {
@@ -325,66 +281,6 @@ throw new Exception("Invalid cart_id: ".$cId);
             }
         }
         $this->calcTotals()->save();
-        return $this;
-    }
-
-    public function beforeSave()
-    {
-        if (!parent::beforeSave()) return false;
-        if (Denteva_Model_User::i()->isLoggedIn()) {
-            $this->set('company_id', Denteva_Model_Company::sessionCompanyId(), null);
-            $this->set('location_id', Denteva_Model_Location::sessionLocationId(), null);
-            $this->set('user_id', Denteva_Model_User::sessionUserId(), null);
-        } else {
-            $this->set('session_id', BSession::i()->sessionId(), null);
-        }
-        $this->set('description', 'Unsaved Cart', null);
-        if (!$this->sort_order) {
-            $this->set('sort_order', Denteva_Model_Cart::i()->factory()->select('(max(sort_order))', 'sort_order')->find_one()->sort_order+1);
-        }
-        return true;
-    }
-
-    public function afterSave()
-    {
-        parent::afterSave();
-        Denteva_Model_Cart::sessionCartId($this->id);
-        if (Denteva_Model_User::i()->isLoggedIn()) {
-            Denteva_Model_User::i()->sessionUser()->set('session_cart_id', $this->id, null);
-        }
-        return $this;
-    }
-
-    public function updateUsers($users, $deleted=null)
-    {
-        if ($deleted) {
-            $deleted = (array)$deleted;
-            if (empty($deleted[0])) {
-                $deleted = array_keys($deleted);
-            }
-            Denteva_Model_CartUser::delete_many(array('cart_id'=>$this->id, 'user_id'=>$deleted));
-        }
-        if ($users) {
-            $userIds = array();
-            foreach ($users as $i=>$u) {
-                $userIds[] = $u->user_id;
-            }
-            $oldUsers = Denteva_Model_CartUser::factory()
-                ->where_complex(array('cart_id'=>$this->id, 'user_id'=>$userIds))
-                ->find_many_assoc('user_id');
-            foreach ($users as $u) {
-                if (empty($u->user_id)) {
-                    continue;
-                }
-                $u->cart_id = $this->id;
-                unset($u->id);
-                if (empty($oldUsers[$u->user_id])) {
-                    $user = Denteva_Model_CartUser::create($u)->save();
-                } elseif ($oldUsers[$u->user_id]->as_array()!=$data) {
-                    $user = $oldUsers[$u->user_id]->set($u)->save();
-                }
-            }
-        }
         return $this;
     }
 

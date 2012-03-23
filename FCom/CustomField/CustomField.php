@@ -104,20 +104,20 @@ class FCom_CustomField_Admin extends BClass
     {
         $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets.';
         BFrontController::i()
-            ->route('GET /fieldsets', $ctrl.'index')
-            ->route('GET|POST /fieldsets/grid_data', $ctrl.'grid_data')
-            ->route('GET|POST /fieldsets/set_field_grid_data', $ctrl.'set_field_grid_data')
-            ->route('GET|POST /fieldsets/field_grid_data', $ctrl.'field_grid_data')
-            ->route('GET|POST /fieldsets/field_option_grid_data', $ctrl.'field_option_grid_data')
+            ->route('GET /customfields/fieldsets', $ctrl.'index')
+            ->route('GET|POST /customfields/fieldsets/grid_data', $ctrl.'grid_data')
+            ->route('GET|POST /customfields/fieldsets/set_field_grid_data', $ctrl.'set_field_grid_data')
+            ->route('GET|POST /customfields/fieldsets/field_grid_data', $ctrl.'field_grid_data')
+            ->route('GET|POST /customfields/fieldsets/field_option_grid_data', $ctrl.'field_option_grid_data')
 
-            ->route('GET|POST /fieldsets/form/:id', $ctrl.'form')
-            ->route('GET /fieldsets/form_tab/:id', $ctrl.'form_tab')
+            ->route('GET|POST /customfields/fieldsets/form/:id', $ctrl.'form')
+            ->route('GET /customfields/fieldsets/form_tab/:id', $ctrl.'form_tab')
 
-            ->route('GET /products/fields_partial/:id', 'FCom_CustomField_Admin_Controller_Products.fields_partial')
+            ->route('GET /customfields/products/fields_partial/:id', 'FCom_CustomField_Admin_Controller_Products.fields_partial')
         ;
 
         BLayout::i()
-            ->allViews('Admin/views', 'customfield')
+            ->allViews('Admin/views', 'customfields')
         ;
 
         BPubSub::i()
@@ -133,25 +133,25 @@ class FCom_CustomField_Admin extends BClass
             ->layout(array(
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
-                        array('addNav', 'catalog/fieldsets', array('label'=>'Field Sets', 'href'=>BApp::url('FCom_CustomField', '/fieldsets'))),
+                        array('addNav', 'catalog/fieldsets', array('label'=>'Field Sets', 'href'=>BApp::url('FCom_CustomField', '/customfields/fieldsets'))),
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
                     array('view', 'catalog/products/form',
                         'do'=>array(
-                            array('addTab', 'fields', array('label' => 'Custom Fields', 'pos'=>'15', 'view'=>'customfield/products/fields-tab')),
+                            array('addTab', 'fields', array('label' => 'Custom Fields', 'pos'=>'15', 'view'=>'customfields/products/fields-tab')),
                         ),
                     ),
                 ),
-                '/customfield/fieldsets'=>array(
+                '/customfields/fieldsets'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('customfield/fieldsets')),
+                    array('hook', 'main', 'views'=>array('customfields/fieldsets')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/fieldsets'))),
                 ),
-                '/customfield/fieldsets/form'=>array(
+                '/customfields/fieldsets/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('customfield/fieldsets/form')),
+                    array('hook', 'main', 'views'=>array('customfields/fieldsets/form')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/fieldsets'))),
                 ),
             ));

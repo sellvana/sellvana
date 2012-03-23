@@ -277,7 +277,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
         $sortOrder = 0;
         $parent = $this->parent();
         $siblings = $parent->children();
-        foreach (static::i()->_cache['id'] as $c) {
+        foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
             if ($c->sort_order && $c->parent_id==$this->parent_id) {
                 $sortOrder = max($sortOrder, $c->sort_order);
             }
