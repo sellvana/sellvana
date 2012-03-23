@@ -7,7 +7,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $columns = array(
             'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
             'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true,
-                'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::url('FCom_Catalog', '/products/form/'))),
+                'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::href('products/form/'))),
             'manuf_sku'=>array('label'=>'Mfr Part #', 'index'=>'p.manuf_sku', 'width'=>100),
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
@@ -18,11 +18,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function gridConfig()
     {
-        $baseUrl = BApp::url('FCom_Catalog', '/catalog/products/form/');
+        $baseUrl = BApp::href('catalog/products/form/');
         $config = array(
             'grid' => array(
                 'id'            => 'products',
-                'url'           => BApp::url('FCom_Catalog', '/catalog/products/grid_data'),
+                'url'           => BApp::href('catalog/products/grid_data'),
                 'columns'       => $this->gridColumns(),
                 'sortname'      => 'p.id',
                 'sortorder'     => 'asc',
@@ -209,7 +209,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            $url = BApp::url('FCom_Catalog', '/catalog/products/form/'.$id);
+            $url = BApp::href('catalog/products/form/'.$id);
             if ($r->post('tab')) {
                 $url .= '?tab='.urlencode($r->post('tab'));
             }

@@ -58,7 +58,7 @@ class FCom_Customer_Admin extends BClass
                 array('view', 'root', 'do'=>array(
                     array('addNav', 'customers', array('label'=>'Customers', 'pos'=>300)),
                     array('addNav', 'customers/customer', array('label'=>'Customers',
-                        'href'=>BApp::url('FCom_Customer', '/customers/customer'))),
+                        'href'=>BApp::href('customers/customer'))),
                 )),
             ),
         ));

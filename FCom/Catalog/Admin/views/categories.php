@@ -2,7 +2,7 @@
 <script>
 head(function() {
     Admin.tree('#categories', {
-        url:'<?=BApp::url('FCom_Catalog', '/catalog/categories/tree_data')?>',
+        url:'<?=BApp::href('catalog/categories/tree_data')?>',
     });
 })
 </script>

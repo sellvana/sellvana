@@ -79,12 +79,12 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('css', '{FCom_Admin}/css/fcom.admin.css'),
                     )),
                     array('view', 'root', 'do'=>array(
-                        array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::url('FCom_Admin'), 'pos'=>10)),
+                        array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
                         array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
-                        array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::url('FCom_Admin', '/users'))),
-                        array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::url('FCom_Admin', '/settings'))),
-                        array('addNav', 'admin/modules', array('label'=>'Modules', 'href'=>BApp::url('FCom_Admin', '/modules'))),
-                        array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::url('FCom_Admin', '/users/form/'))),
+                        array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
+                        array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
+                        array('addNav', 'admin/modules', array('label'=>'Modules', 'href'=>BApp::href('/modules'))),
+                        array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
                     )),
                 ),
                 'form'=>array(

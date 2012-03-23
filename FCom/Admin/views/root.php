@@ -1,5 +1,4 @@
 <?php
-    $baseHref = BApp::url('FCom_Admin');
     $user = FCom_Admin_Model_User::sessionUser();
 ?>
 <!DOCTYPE html>
@@ -8,7 +7,7 @@
     <?php echo $this->hook('head') ?>
     <script>
 window.appConfig = {
-    baseHref: '<?php echo $baseHref ?>'
+    baseHref: '<?php echo BApp::baseUrl(true) ?>'
 }
     </script>
 </head>
@@ -51,9 +50,9 @@ window.appConfig = {
 					    <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a></li>
 					    <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						    <ul class="sub-section">
-							    <li><a href="<?php echo BApp::url('FCom_Admin', '/my_account')?>">My Account</a></li>
-							    <li><a href="<?php echo BApp::url('FCom_Admin', '/reports')?>">My Reports</a></li>
-							    <li><a href="<?php echo BApp::url('FCom_Admin', '/logout')?>">Log Out</a></li>
+							    <li><a href="<?php echo BApp::href('/my_account')?>">My Account</a></li>
+							    <li><a href="<?php echo BApp::href('/reports')?>">My Reports</a></li>
+							    <li><a href="<?php echo BApp::href('/logout')?>">Log Out</a></li>
 						    </ul>
 					    </li>
 				    </ul>

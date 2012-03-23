@@ -3,7 +3,7 @@
 .wizard label { display:block; width:80px; float:left; }
 </style>
 <h1>Step 1</h1>
-<form class="wizard" method="post" action="<?=BApp::url('FCom_Install', '/install/step1')?>">
+<form class="wizard" method="post" action="<?=BApp::href('install/step1')?>">
     <fieldset>
         <h3>DB Connection</h3>
         <?php echo $this->messagesHtml() ?>

@@ -2,7 +2,7 @@
     <div class="breadcrumbs">
         <ul>
             <li class="home">
-                <a href="<?=BApp::url('FCom_Catalog')?>" title="Go to Home Page">Home</a>
+                <a href="<?=BApp::baseUrl()?>" title="Go to Home Page">Home</a>
             </li>
             <li>
                 <strong>Search: <?=$this->q($this->query)?></strong>
@@ -14,7 +14,7 @@
             <div class="block-title">
                 <strong><span>Newsletter</span></strong>
             </div>
-            <form action="<?php echo BApp::url('FCom_Newsletter', '/newsletter/subscriber/new/')?>" method="post" id="newsletter-validate-detail">
+            <form action="<?php echo BApp::href('newsletter/subscriber/form/')?>" method="post" id="newsletter-validate-detail">
                 <div class="block-content">
                     <label for="newsletter">Sign Up for Our Newsletter:</label>
                     <div class="input-box">

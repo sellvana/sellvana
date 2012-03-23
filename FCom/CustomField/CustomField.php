@@ -133,7 +133,7 @@ class FCom_CustomField_Admin extends BClass
             ->layout(array(
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
-                        array('addNav', 'catalog/fieldsets', array('label'=>'Field Sets', 'href'=>BApp::url('FCom_CustomField', '/customfields/fieldsets'))),
+                        array('addNav', 'catalog/fieldsets', array('label'=>'Field Sets', 'href'=>BApp::href('customfields/fieldsets'))),
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(

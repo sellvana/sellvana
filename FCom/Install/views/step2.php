@@ -1,6 +1,6 @@
 <?php $w = BSession::i()->data('w') ?>
 <h1>Step 2</h1>
-<form class="wizard" method="post" action="<?=BApp::url('FCom_Install', '/install/step2')?>">
+<form class="wizard" method="post" action="<?=BApp::href('install/step2')?>">
 
     <fieldset>
         <h3>Admin User</h3>

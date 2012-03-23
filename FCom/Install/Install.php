@@ -81,7 +81,7 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
     {
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
-            BResponse::i()->redirect(BApp::url('FCom_Install', '/?error=1'));
+            BResponse::i()->redirect(BApp::href('?error=1'));
         }
         $step = 1;
         if (BConfig::i()->get('db')) {
@@ -90,7 +90,7 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
                 $step = 3;
             }
         }
-        BResponse::i()->redirect(BApp::url('FCom_Install', '/install/step'.$step));
+        BResponse::i()->redirect(BApp::href('install/step'.$step));
     }
 
     public function action_step1()
@@ -100,10 +100,10 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
         try {
             BDb::connect();
             FCom_Core::i()->writeDbConfig();
-            $url = BApp::url('FCom_Install', '/install/step2');
+            $url = BApp::href('install/step2');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
-            $url = BApp::url('FCom_Install', '/install/step1');
+            $url = BApp::href('install/step1');
         }
         BResponse::i()->redirect($url);
     }
@@ -113,10 +113,10 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
         $w = BRequest::i()->post('w');
         try {
             FCom_Admin_Model_User::i()->create($w['admin'])->save()->login();
-            $url = BApp::url('FCom_Install', '/install/step3');
+            $url = BApp::href('install/step3');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
-            $url = BApp::url('FCom_Install', '/install/step2');
+            $url = BApp::href('install/step2');
         }
         BResponse::i()->redirect($url);
     }
@@ -125,6 +125,6 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
     {
         BConfig::i()->add(array('install_status'=>'installed'), true);
         FCom_Core::i()->writeLocalConfig();
-        BResponse::i()->redirect(BApp::url('FCom_Install'));
+        BResponse::i()->redirect(BApp::baseUrl());
     }
 }
