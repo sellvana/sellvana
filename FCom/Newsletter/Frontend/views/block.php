@@ -2,7 +2,7 @@
     <div class="block-title">
         <strong><span>Newsletter</span></strong>
     </div>
-    <form action="http://dev.unirgy.com/denteva/newsletter/subscriber/new/" method="post" id="newsletter-validate-detail">
+    <form action="<?php echo BApp::href('/newsletter/subscriber/new/')?>" method="post" id="newsletter-validate-detail">
         <div class="block-content">
             <label for="newsletter">Sign Up for Our Newsletter:</label>
             <div class="input-box">

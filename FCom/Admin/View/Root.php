@@ -4,6 +4,8 @@ class FCom_Admin_View_Root extends BView
 {
     protected $_tree = array();
     protected $_curNav;
+    protected $_quickSearches = array();
+    protected $_shortcuts = array();
 
     public function addNav($path, $node)
     {
@@ -34,6 +36,18 @@ class FCom_Admin_View_Root extends BView
     public function setNav($path)
     {
         $this->set('current_nav', $path);
+        return $this;
+    }
+
+    public function addQuickSearch($name, $config)
+    {
+        $this->_quickSearches[$name] = $config;
+        return $this;
+    }
+
+    public function addShortcut($name, $config)
+    {
+        $this->_shortcuts[$name] = $config;
         return $this;
     }
 

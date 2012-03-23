@@ -20,7 +20,7 @@ class FCom_ProductReviews_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_ProductReviews_Frontend_Controller.index')
+            ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
         ;
 
         BLayout::i()->allViews('Frontend/views', 'prodreviews');
@@ -45,7 +45,7 @@ class FCom_ProductReviews_Admin extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_ProductReviews_Admin_Controller.index')
+            ->route('GET /prodreviews', 'FCom_ProductReviews_Admin_Controller.index')
         ;
 
         BLayout::i()->allViews('Admin/views', 'prodreviews');

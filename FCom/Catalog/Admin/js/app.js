@@ -16,8 +16,8 @@ function setCookie(name, value, exdays) {
     document.cookie=name+'='+escape(value)+(exp?';expires='+exp:'')+';domain='+escape(c.domain)+';path='+escape(c.path);
 }
 
-function DentevaCompare(opt) {
-    var cookieName = opt.cookieName || 'dentevaCompare', cookie = getCookie(cookieName);
+function FulleronCompare(opt) {
+    var cookieName = opt.cookieName || 'fulleronCompare', cookie = getCookie(cookieName);
     var selected = cookie ? JSON.parse(cookie) : [], ul = $('ul', opt.thumbContainer);
     var added = {}; // to avoid duplicate notifications
 
@@ -148,7 +148,7 @@ function ManufIframe(opt) {
     return {expand:expand, collapse:collapse};
 }
 
-function DentevaCart(opt) {
+function FulleronCart(opt) {
     function add(id, qty) {
         $.post(opt.apiUrl, {action:'add', id:id, qty:qty||1}, function(data) {
             $.pnotify({pnotify_title:data.title, pnotify_text:'<div style="width:100%;overflow:auto">'+data.html+'</div>'});

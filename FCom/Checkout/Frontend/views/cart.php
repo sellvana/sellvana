@@ -11,7 +11,7 @@ $loggedIn = FCom_Customer_Model_User::i()->isLoggedIn();
 
 <? else: ?>
 
-    <form name="cart" action="<?=BApp::m('FCom_Checkout')->baseHref()?>/cart" method="post">
+    <form name="cart" action="<?=BApp::url('FCom_Checkout', '/checkout/cart')?>" method="post">
         <table class="product-list">
             <col width="30"/>
             <col width="60"/>

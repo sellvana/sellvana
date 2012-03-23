@@ -9,7 +9,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'id'      => 'product_fieldsets',
                 'hiddengrid' => true,
                 'caption' => 'Field Sets',
-                'url'     => BApp::url('FCom_CustomField', '/fieldsets/grid_data'),
+                'url'     => BApp::url('FCom_CustomField', '/customfields/fieldsets/grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
                     'set_code' => array('label'=>'Set Code', 'width'=>100, 'editable'=>true),
@@ -43,9 +43,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
 
-        $view = $this->view('customfield/products/fields-partial');
+        $view = $this->view('customfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields);
-        BLayout::i()->rootView('customfield/products/fields-partial');
+        BLayout::i()->rootView('customfields/products/fields-partial');
         BResponse::i()->render();
     }
 }

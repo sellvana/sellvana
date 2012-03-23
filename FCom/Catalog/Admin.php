@@ -5,29 +5,25 @@ class FCom_Catalog_Admin extends BClass
     static public function bootstrap()
     {
         $module = BApp::m();
-        $module->base_href = BApp::baseUrl().'/catalog';
         $module->base_src .= '/Admin';
 
         BDb::migrate('FCom_Catalog_Migrate');
 
         BFrontController::i()
-            ->route('GET /products', 'FCom_Catalog_Admin_Controller_Products.index')
-            ->route('GET /products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
-            ->route('GET /products/subgrid_data', 'FCom_Catalog_Admin_Controller_Products.subgrid_data')
-            ->route('GET /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
-            ->route('GET /products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
-            ->route('POST /products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form_post')
+            ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
+            ->route('GET /catalog/products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
+            ->route('GET /catalog/products/subgrid_data', 'FCom_Catalog_Admin_Controller_Products.subgrid_data')
+            ->route('GET|POST /catalog/products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
+            ->route('GET /catalog/products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
 
-            ->route('GET /families', 'FCom_Catalog_Admin_Controller_Families.index')
-            ->route('GET /families/grid_data', 'FCom_Catalog_Admin_Controller_Families.grid_data')
-            ->route('GET /families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form')
-            ->route('POST /families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form_post')
-            ->route('GET /families/autocomplete', 'FCom_Catalog_Admin_Controller_Families.autocomplete')
-            ->route('GET /families/product_data', 'FCom_Catalog_Admin_Controller_Families.product_data')
+            ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
+            ->route('GET /catalog/families/grid_data', 'FCom_Catalog_Admin_Controller_Families.grid_data')
+            ->route('GET|POST /catalog/families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form')
+            ->route('GET /catalog/families/autocomplete', 'FCom_Catalog_Admin_Controller_Families.autocomplete')
+            ->route('GET /catalog/families/product_data', 'FCom_Catalog_Admin_Controller_Families.product_data')
 
-            ->route('GET /categories', 'FCom_Catalog_Admin_Controller_Categories.index')
-            ->route('GET /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_get')
-            ->route('POST /api/category_tree', 'FCom_Catalog_Admin_Controller_Categories.category_tree_post')
+            ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
+            ->route('GET|POST /catalog/categories/tree_data', 'FCom_Catalog_Admin_Controller_Categories.tree_data')
         ;
 
         BLayout::i()
@@ -76,7 +72,7 @@ class FCom_Catalog_Admin extends BClass
 
     static public function layout()
     {
-        $baseHref = BApp::m('FCom_Catalog')->baseHref();
+        $baseHref = BApp::url('FCom_Catalog', '/catalog');
         BLayout::i()
             ->layout(array(
                 'base'=>array(
@@ -85,6 +81,8 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
+                        array('addQuickSearch', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
+                        array('addShortcut', 'catalog/products', array('label'=>'New Product', 'href'=>$baseHref.'/products/form/')),
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
