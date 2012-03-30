@@ -164,34 +164,9 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
         BResponse::i()->json($data);
     }
 
-    protected function _processPost($class, $defData=array())
-    {
-        $r = BRequest::i();
-        $id = $r->post('id');
-        $data = $defData + $r->post();
-        $model = $class::i();
-        unset($data['id'], $data['oper']);
-        switch ($r->post('oper')) {
-        case 'add':
-            $set = $model->create($data)->save();
-            $result = $set->as_array();
-            break;
-        case 'edit':
-            $set = $model->load($id)->set($data)->save();
-            $result = $set->as_array();
-            break;
-        case 'del':
-            $model->load($id)->delete();
-            $result = array('success'=>true);
-            break;
-        }
-        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
-        BResponse::i()->json($result);
-    }
-
     public function action_grid_data__POST()
     {
-        $this->_processPost('FCom_CustomField_Model_Set');
+        $this->_processGridDataPost('FCom_CustomField_Model_Set');
     }
 
     public function action_set_field_grid_data__POST()
@@ -209,12 +184,12 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
 
     public function action_field_grid_data__POST()
     {
-        $this->_processPost('FCom_CustomField_Model_Field');
+        $this->_processGridDataPost('FCom_CustomField_Model_Field');
     }
 
     public function action_field_option_grid_data__POST()
     {
-        $this->_processPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
+        $this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
     }
 
     public function action_form()

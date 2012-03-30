@@ -7,7 +7,7 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
         $this->layout('/cms/nav');
     }
 
-    public function action_tree()
+    public function action_tree_data()
     {
         $r = BRequest::i();
         $result = null;
@@ -41,13 +41,13 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
                 'state'=>$c->num_children?($depth?'open':'closed'):null,
                 'rel'=>$c->num_children?'parent':'leaf',
                 'position' => $c->sort_order,
-                'children'=>$depth && $c->num_children ? $this->_categoryChildren($c, $depth-1) : null,
+                'children'=>$depth && $c->num_children ? $this->_nodeChildren($c, $depth-1) : null,
             );
         }
         return $children;
     }
 
-    public function action_tree__POST()
+    public function action_tree_data__POST()
     {
         $r = BRequest::i();
         try {
@@ -95,5 +95,21 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
             $result = array('status'=>0, 'message'=>$e->getMessage());
         }
         BResponse::i()->json($result);
+    }
+
+    public function action_tree_form()
+    {
+        $this->layout('/cms/nav/tree_form');
+        $view = $this->view('cms/nav-tree-form');
+        if (!$model = FCom_Cms_Model_Page::i()->load(BRequest::i()->params('id'))) {
+            $model = FCom_Cms_Model_Page::i()->create();
+        }
+
+        $this->initFormTabs($view, $model);
+    }
+
+    public function action_tree_form__POST()
+    {
+
     }
 }

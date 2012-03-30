@@ -5,10 +5,10 @@ class FCom_Admin_View_Form extends BView
     public function addTab($id, $params)
     {
         $tabs = (array)$this->tabs;
-        if (empty($params['view'])) {
+        if (!isset($params['view'])) {
             $params['view'] = $this->tab_view_prefix.$id;
         }
-        if (empty($params['pos'])) {
+        if (!isset($params['pos'])) {
             $params['pos'] = null;
         }
         $tabs[$id] = $params;
