@@ -4,8 +4,8 @@
         <?php echo $this->hook('head') ?>
     </head>
     <body class="<?php echo $this->getBodyClass() ?>">
-        <div class="wrapper">
-        
+        <div class="wrapper page-container">
+
             <?php echo $this->hook('header') ?>
 
             <div class="main <?php echo $this->layout_class ?>">

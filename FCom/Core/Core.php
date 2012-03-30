@@ -63,7 +63,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 
     public function layout($name)
     {
-        $theme = BConfig::i()->get('modules/'.FCom::i()->area().'/theme');
+        $theme = BConfig::i()->get('modules/'.FCom::area().'/theme');
         $layout = BLayout::i();
         $layout->theme($theme);
         foreach ((array)$name as $l) {
