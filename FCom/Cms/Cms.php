@@ -20,7 +20,6 @@ class FCom_Cms_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_Cms_Frontend_Controller.index')
             ->route('GET /a/*page', 'FCom_Cms_Frontend_Controller.index')
         ;
 
