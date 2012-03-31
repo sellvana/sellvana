@@ -342,7 +342,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .adm-topbar {
 	position:relative;
 	border-bottom:1px solid #760700;
-	height:30px;
+	height:33px;
 	padding-right:20px;
 	background:#c50f00;
 	background-image: linear-gradient(bottom, rgb(186,9,0) 0%, rgb(197,16,0) 50%, rgb(206,14,0) 51%, rgb(223,15,0) 100%);
@@ -368,10 +368,10 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .adm-topbar a { color:#fff;}
 .adm-topbar .adm-logo {
 	float:left;
-	margin:4px 0 0 5px;
-	background:url(../img/logo_admin_st1.png) no-repeat;
+	margin:4px 0 10px 10px;
+	background:url(../img/logo_st1_sz2_white.png) no-repeat;
 	width:145px;
-	height:21px;
+	height:27px;
 	text-indent:-999em;
 	}
 .adm-topbar .adm-group-title {
@@ -638,7 +638,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .adm-login-form input[type="text"],
 .adm-login-form input[type="password"] { width:250px; }
 .adm-login-form .btn { margin-left:130px; }
-.adm-login-form .app-logo { width:145px; height:29px; background:url(../img/logo_sz1.png) no-repeat; text-indent:-999em; }
+.adm-login-form .app-logo { width:180px; height:40px; background:url(../img/logo_st1_black.png) no-repeat; text-indent:-999em; }
 .adm-login-form .msgs { margin:-13px 0 16px; }
 
 /* Product Edit/View */
