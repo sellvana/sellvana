@@ -4,6 +4,9 @@ class FCom_Frontend extends BClass
 {
     static public function bootstrap()
     {
+        if (BRequest::i()->https()) {
+            BResponse::i()->httpSTS();
+        }
         BFrontController::i()
             ->route('GET /', 'FCom_Frontend_Controller.index')
         ;
@@ -21,15 +24,18 @@ class FCom_Frontend extends BClass
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
+    public function messages($viewName, $namespace='frontend')
+    {
+        $this->view($viewName)->messages = BSession::i()->messages($namespace);
+        return $this;
+    }
 }
 
 class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
     {
-        //FCom_Core::i()->writeDbConfig()->writeLocalConfig();
         $this->layout('/');
-        BResponse::i()->render();
     }
 }
 

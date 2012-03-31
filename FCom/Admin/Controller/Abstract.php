@@ -46,14 +46,16 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             if ($curTab===$k) {
                 $tab['async'] = false;
             }
-            $tabView = $layout->view($tab['view']);
-            if ($tabView) {
-                $tabView->set(array(
-                    'model' => $model,
-                    'mode' => $mode,
-                ));
-            } else {
-                BDebug::error('MISSING VIEW: '.$tab['view']);
+            if (!empty($tab['view'])) {
+                $tabView = $layout->view($tab['view']);
+                if ($tabView) {
+                    $tabView->set(array(
+                        'model' => $model,
+                        'mode' => $mode,
+                    ));
+                } else {
+                    BDebug::error('MISSING VIEW: '.$tab['view']);
+                }
             }
         }
         unset($tab);
@@ -98,5 +100,30 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
         $out['messages'] = BSession::i()->messages('admin');
         BResponse::i()->json($out);
+    }
+
+    protected function _processGridDataPost($class, $defData=array())
+    {
+        $r = BRequest::i();
+        $id = $r->post('id');
+        $data = $defData + $r->post();
+        $model = $class::i();
+        unset($data['id'], $data['oper']);
+        switch ($r->post('oper')) {
+        case 'add':
+            $set = $model->create($data)->save();
+            $result = $set->as_array();
+            break;
+        case 'edit':
+            $set = $model->load($id)->set($data)->save();
+            $result = $set->as_array();
+            break;
+        case 'del':
+            $model->load($id)->delete();
+            $result = array('success'=>true);
+            break;
+        }
+        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
+        BResponse::i()->json($result);
     }
 }

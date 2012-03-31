@@ -20,7 +20,7 @@ class FCom_Cms_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /', 'FCom_Cms_Frontend_Controller.index')
+            ->route('GET /a/*page', 'FCom_Cms_Frontend_Controller.index')
         ;
 
         BLayout::i()->allViews('Frontend/views');
@@ -46,20 +46,24 @@ class FCom_Cms_Admin extends BClass
 
         BFrontController::i()
             ->route('GET /cms/nav', 'FCom_Cms_Admin_Controller_Nav.index')
-            ->route('GET|POST /cms/nav/tree', 'FCom_Cms_Admin_Controller_Nav.tree')
+            ->route('GET|POST /cms/nav/tree_data', 'FCom_Cms_Admin_Controller_Nav.tree_data')
+            ->route('GET|POST /cms/nav/tree_form/:id', 'FCom_Cms_Admin_Controller_Nav.tree_form')
 
             ->route('GET /cms/pages', 'FCom_Cms_Admin_Controller_Pages.index')
             ->route('GET|POST /cms/pages/grid_data', 'FCom_Cms_Admin_Controller_Pages.grid_data')
             ->route('GET|POST /cms/pages/form/:id', 'FCom_Cms_Admin_Controller_Pages.form')
 
-            ->route('GET|POST /cms/blocks', 'FCom_Cms_Admin_Controller_Blocks.index')
+            ->route('GET /cms/blocks', 'FCom_Cms_Admin_Controller_Blocks.index')
+            ->route('GET|POST /cms/blocks/grid_data', 'FCom_Cms_Admin_Controller_Blocks.grid_data')
             ->route('GET|POST /cms/blocks/form/:id', 'FCom_Cms_Admin_Controller_Blocks.form')
 
             ->route('GET|POST /cms/forms', 'FCom_Cms_Admin_Controller_Forms.index')
             ->route('GET|POST /cms/forms/form/:id', 'FCom_Cms_Admin_Controller_Forms.form')
         ;
 
-        BLayout::i()->allViews('Admin/views');
+        BLayout::i()->allViews('Admin/views')
+            ->view('cms/nav-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
+        ;
 
         BDb::migrate('FCom_Cms_Admin::migrate');
     }
@@ -73,13 +77,24 @@ class FCom_Cms_Admin extends BClass
                     array('addNav', 'cms/nav', array('label'=>'Navigation', 'href'=>BApp::href('cms/nav'))),
                     array('addNav', 'cms/pages', array('label'=>'Pages', 'href'=>BApp::href('cms/pages'))),
                     array('addNav', 'cms/blocks', array('label'=>'Blocks', 'href'=>BApp::href('cms/blocks'))),
-                    array('addNav', 'cms/forms', array('label'=>'Form Actions', 'href'=>BApp::href('cms/forms'))),
+                    #array('addNav', 'cms/forms', array('label'=>'Form Actions', 'href'=>BApp::href('cms/forms'))),
                 )),
             ),
             '/cms/nav'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('cms/nav')),
                 array('view', 'root', 'do'=>array(array('setNav', 'cms/nav'))),
+            ),
+            '/cms/nav/tree_form'=>array(
+                array('root', 'cms/nav-tree-form'),
+                array('view', 'cms/nav-tree-form',
+                    'set'=>array(
+                        'tab_view_prefix' => 'cms/nav-tree-form/',
+                    ),
+                    'do'=>array(
+                        array('addTab', 'main', array('label'=>'Navigation Node', 'pos'=>10, 'view'=>false)),
+                    ),
+                ),
             ),
             '/cms/pages'=>array(
                 array('layout', 'base'),
@@ -118,6 +133,11 @@ class FCom_Cms_Admin extends BClass
     {
         BDb::install('0.1.0', function() {
             $tNav = FCom_Cms_Model_Nav::table();
+            $tPage = FCom_Cms_Model_Page::table();
+            $tPageHistory = FCom_Cms_Model_PageHistory::table();
+            $tBlock = FCom_Cms_Model_Block::table();
+            $tBlockHistory = FCom_Cms_Model_BlockHistory::table();
+
             BDb::run("
 CREATE TABLE IF NOT EXISTS {$tNav} (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -132,9 +152,52 @@ CREATE TABLE IF NOT EXISTS {$tNav} (
   `num_children` int(10) unsigned DEFAULT NULL,
   `num_descendants` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE {$tPage} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `handle` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  `layout_update` text COLLATE utf8_unicode_ci,
+  `create_dt` datetime DEFAULT NULL,
+  `update_dt` datetime DEFAULT NULL,
+  `version` int(11) unsigned NOT NULL,
+  `meta_title` text COLLATE utf8_unicode_ci,
+  `meta_description` text COLLATE utf8_unicode_ci,
+  `meta_keywords` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE {$tPageHistory} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `page_id` int(10) unsigned NOT NULL,
+  `version` int(11) unsigned NOT NULL,
+  `user_id` int(11) unsigned not null,
+  `data` text COLLATE utf8_unicode_ci NOT NULL,
+  `comments` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE {$tBlock} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `content` text COLLATE utf8_unicode_ci,
+  `layout_update` text COLLATE utf8_unicode_ci,
+  `version` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE {$tBlockHistory} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `page_id` int(10) unsigned NOT NULL,
+  `version` int(11) unsigned NOT NULL,
+  `user_id` int(11) unsigned not null,
+  `data` text COLLATE utf8_unicode_ci NOT NULL,
+  `comments` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
             ");
         });
     }
@@ -152,11 +215,45 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cms_page';
     protected static $_origClass = __CLASS__;
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+
+        if (!$this->get('create_dt')) {
+            $this->set('create_dt', BDb::now());
+        }
+        $this->set('update_dt', BDb::now());
+        return true;
+    }
+}
+
+class FCom_Cms_Model_PageHistory extends FCom_Core_Model_Abstract
+{
+    protected static $_table = 'fcom_cms_page_history';
+    protected static $_origClass = __CLASS__;
 }
 
 class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cms_block';
+    protected static $_origClass = __CLASS__;
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+
+        if (!$this->get('create_dt')) {
+            $this->set('create_dt', BDb::now());
+        }
+        $this->set('update_dt', BDb::now());
+        return true;
+    }
+}
+
+class FCom_Cms_Model_BlockHistory extends FCom_Core_Model_Abstract
+{
+    protected static $_table = 'fcom_cms_block_history';
     protected static $_origClass = __CLASS__;
 }
 

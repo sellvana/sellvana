@@ -36,7 +36,6 @@ class FCom_Admin extends BClass
 
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
-            ->view('head', array('view_class'=>'FCom_Admin_View_Head'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))
 
             ->view('users/form', array('view_class'=>'FCom_Admin_View_Form'))
@@ -93,7 +92,3 @@ CREATE TABLE IF NOT EXISTS {$tPersonalize} (
     }
 }
 
-class FCom_Admin_View_Head extends BViewHead
-{
-
-}
