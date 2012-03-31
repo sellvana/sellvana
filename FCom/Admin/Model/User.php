@@ -12,12 +12,15 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_sessionUser;
 
-    protected $_fieldOptions = array(
+    protected static $_fieldOptions = array(
         'status' => array(
             'A' => 'Active',
             'I' => 'Inactive',
         ),
     );
+
+    protected $_persModel;
+    protected $_persData;
 
     public static function statusOptions()
     {
@@ -31,6 +34,15 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
         return $this;
+    }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if ($this->password) {
+            $this->password_hash = BUtil::fullSaltedHash($this->password);
+        }
+        return true;
     }
 
     public function getData()
@@ -86,28 +98,35 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return static::sessionUser() ? true : false;
     }
 
-    static public function login($username, $password)
+    static public function authenticate($username, $password)
     {
-        /** @var Denteva_Model_User */
-        $user = static::i()->orm()->where_complex(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
+        /** @var FCom_Admin_Model_User */
+        $user = static::i()->orm()
+            ->where_complex(array('OR'=>array(
+                'username'=>$username,
+                'email'=>$username)))
+            ->find_one();
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
+        return $user;
+    }
 
-        $user->set('last_login', BDb::now())->save();
+    public function login()
+    {
+        $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('admin_user', serialize($user));
-        static::$_sessionUser = $user;
+        BSession::i()->data('admin_user', serialize($this));
+        static::$_sessionUser = $this;
 
-        if ($user->locale) {
-            setlocale(LC_ALL, $user->locale);
+        if ($this->locale) {
+            setlocale(LC_ALL, $this->locale);
         }
-        if ($user->timezone) {
-            date_default_timezone_set($user->timezone);
+        if ($this->timezone) {
+            date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$user));
-
-        return true;
+        BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$this));
+        return $this;
     }
 
     static public function logout()
@@ -129,5 +148,36 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function fullname()
     {
         return $this->firstname.' '.$this->lastname;
+    }
+
+    /**
+    * Personalize user preferences (grids, dashboard, etc)
+    * - grid
+    *   - {grid-name}
+    *     - colModel
+    *
+    * @param array|null $data
+    * @return FCom_Admin_Model_User|array
+    */
+    public function personalize($data=null)
+    {
+        if (!$this->orm) {
+            return $this->sessionUser()->personalize($data);
+        }
+        if (!$this->_persModel) {
+            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id, 'user_id');
+            if (!$this->_persModel) {
+                $this->_persModel = FCom_Admin_Model_Personalize::i()->create(array('user_id'=>$this->id));
+            }
+        }
+        if (!$this->_persData) {
+            $this->_persData = $this->_persModel->data_json ? BUtil::fromJson($this->_persModel->data_json) : array();
+        }
+        if (is_null($data)) {
+            return $this->_persData;
+        }
+        $this->_persData = BUtil::arrayMerge($this->_persData, $data);
+        $this->_persModel->set('data_json', BUtil::toJson($this->_persData))->save();
+        return $this;
     }
 }

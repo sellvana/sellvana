@@ -2,6 +2,7 @@
 
 class FCom_Catalog_Model_Product extends BModel
 {
+    protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
 
     public static function stockStatusOptions($onlyAvailable=false)
@@ -24,7 +25,7 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function url($category=null)
     {
-        $url = BApp::m('FCom_Catalog')->baseHref().'/p/';
+        $url = BApp::href('p/');
         if ($category) {
             $url .= $category->url_path.'/';
         }
@@ -34,7 +35,8 @@ class FCom_Catalog_Model_Product extends BModel
 
     public function imageUrl($full=false)
     {
-        return ($full ? DMain::baseUrl().'/' : '').'media/'.($this->image_url ? $this->image_url : 'DC642702.jpg');
+        $url = $full ? BApp::src('FCom_Catalog').'/' : '';
+        return $url.'media/'.($this->image_url ? $this->image_url : 'DC642702.jpg');
     }
 
     public function thumbUrl($w, $h=null)

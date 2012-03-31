@@ -1,6 +1,8 @@
 <div id="categories"></div>
 <script>
-Admin.tree('#categories', {
-    url:'<?=BApp::m('Denteva_Merge')->baseHref()?>/api/category_tree'
-});
+head(function() {
+    Admin.tree('#categories', {
+        url:'<?=BApp::href('catalog/categories/tree_data')?>',
+    });
+})
 </script>

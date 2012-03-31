@@ -23,7 +23,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
         $folder = $options['folder'];
-        $url = BApp::url('FCom_Admin', '/media/grid');
+        $url = BApp::href('/media/grid');
         $config = array(
             'grid' => array(
                 'id' => $id,

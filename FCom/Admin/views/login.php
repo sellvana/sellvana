@@ -1,5 +1,5 @@
 <section class="adm-login-form">
-	<h3 class="app-logo">Denteva</h3>
+	<!--<h3 class="app-logo">Denteva</h3>-->
 	<form method="post" action="<?=BApp::m('FCom_Admin')->baseHref()?>/login">
 	    <fieldset>
 	    	<header class="section-title">Log into Account</header>
@@ -14,9 +14,9 @@
 	        		<input type="password" name="login[password]" class="sz1"/>
 	        	</li>
 	        </ul>
-	        <input class="btn st1 sz1" type="submit" name="Login"/>
+	        <input class="btn st1 sz1" type="submit" value="Login"/>
 	        <a href="#">Recover your password</a>
 	    </fieldset>
 	</form>
-	<p class="copyright">&copy; <?php echo date("Y")?> Denteva LLC. All rights reserved.</p>
+	<!--<p class="copyright">&copy; <?php echo date("Y")?> Denteva LLC. All rights reserved.</p>-->
 </section>

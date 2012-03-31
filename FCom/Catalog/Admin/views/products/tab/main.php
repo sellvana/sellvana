@@ -10,6 +10,10 @@
        	</div>
         <ul class="form-list">
             <li>
+                <h4 class="label">Product Name</h4>
+                <?php echo $this->q($m->product_name) ?>
+            </li>
+            <li>
                 <h4 class="label">Short Description</h4>
                 <?php echo $this->q($m->short_description) ?>
             </li>
@@ -40,6 +44,10 @@ head(function() {
 <?php endif ?>
         <ul class="form-list">
             <li>
+                <h4 class="label">Product Name</h4>
+                <input type="text" name="model[product_name]" value="<?php echo $this->q($m->product_name) ?>"/>
+            </li>
+            <li>
                 <h4 class="label">Short Description</h4>
                 <input type="text" name="model[short_description]" value="<?php echo $this->q($m->short_description) ?>"/>
             </li>
@@ -60,3 +68,5 @@ head(function() {
     </script>
 
 <?php endif ?>
+
+<?php echo $this->hook('catalog/products/tab/main', array('model'=>$this->model)); ?>

@@ -7,3 +7,6 @@
 [submodule "lib/buckyball"]
 	path = lib/buckyball
 	url = git@github.com:unirgy/buckyball.git
+[submodule "FCom/Core/js/lib/jqGrid"]
+	path = FCom/Core/js/lib/jqGrid
+	url = https://github.com/tonytomov/jqGrid.git

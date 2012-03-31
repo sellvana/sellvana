@@ -8,7 +8,7 @@ ul.compare li { display:block; float:left; width:240px; border-left:solid 1px #a
 <div class="main col1-layout">
     <? if (!$xhr) echo $this->view('breadcrumbs') ?>
     <div class="col-main">
-        <? if (!$xhr): ?><a href="<?=$this->q(DCatalogMain::lastNav())?>">&lt;&lt; Back to results</a><? endif ?>
+        <? if (!$xhr): ?><a href="<?=$this->q(FCom_Catalog::lastNav())?>">&lt;&lt; Back to results</a><? endif ?>
 
         <div class="page-title category-title">
             <h1>Compare <span class="compare-num-products"><?=sizeof($this->products)?></span> products</h1>
@@ -39,6 +39,6 @@ ul.compare li { display:block; float:left; width:240px; border-left:solid 1px #a
 </div>
 <? if (!$xhr): ?>
 <script>
-var compare = new DentevaCompare({emptyUrl:'<?=DCatalogMain::lastNav()?>'});
+var compare = new FulleronCompare({emptyUrl:'<?=FCom_Catalog::lastNav()?>'});
 </script>
 <? endif ?>
