@@ -235,12 +235,13 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	text-shadow:0 1px 0 #fff;
 	text-align:left;
 	}
-.ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column { padding:5px; text-align:left; }
+
+.ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column .ui-jqgrid-sortable { padding:5px; text-align:left; }
 .ui-jqgrid .ui-jqgrid-htable th,
 .ui-jqgrid .ui-jqgrid-htable th div,
 .ui-jqgrid .ui-jqgrid-resize { height:auto !important; }
 .ui-jqgrid tr.jqgrow td { border-right:none !important; }
-.ui-jqgrid .ui-jqgrid-resize-ltr { margin-right:-5px; }
+.ui-jqgrid .ui-jqgrid-resize-ltr { margin:0 -2px 0 0; line-height:22px; }
 .ui-priority-secondary,
 .ui-widget-content .ui-priority-secondary,
 .ui-widget-header .ui-priority-secondary { opacity:1; filter: Alpha(Opacity=100);}
@@ -250,6 +251,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .ui-state-focus,
 .ui-widget-content .ui-state-focus,
 .ui-widget-header .ui-state-focus { color:#444; }
+/*
 .ui-widget-content {
 	border:none;
 	box-shadow:0 1px 1px #777;
@@ -257,6 +259,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	-webkit-box-shadow:0 1px 1px #777;
 	background-clip:content-box;
 	}
+*/
 .ui-state-hover,
 .ui-widget-content .ui-state-hover,
 .ui-widget-header .ui-state-hover,
@@ -273,6 +276,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .ui-jqgrid .ui-paging-info { padding-right:5px; }
 .ui-jqgrid .ui-pg-table { padding-bottom:0; }
 .ui-jqgrid-pager { border:none !important; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+
 .ui-icon-triangle-1-s { background-position:-65px -16px; } /* Fixes sorting arrow alignment */
 .ui-state-highlight,
 .ui-widget-content .ui-state-highlight,
@@ -322,6 +326,11 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .fcom-dirty-ball-blue {}
 
 .ui-autocomplete-loading { background: white url('../img/autocomplete-loader.gif') right center no-repeat; }
+
+.ui-search-toolbar th div { text-align:left; }
+.ui-search-toolbar input[type="text"] {
+    border-radius:0; -moz-border-radius:0; -webkit-border-radius:0;
+    }
 
 /* =============================================================================
    Global Structure

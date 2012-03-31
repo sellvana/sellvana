@@ -1,8 +1,8 @@
 <?php
 
 return array(
-    'cookie' => array('domain'=>'localhost', 'path'=>'/fulleron', 'namespace'=>'fulleron'), //DB (def)
-    'bootstrap' => array('modules' => array('fcom.catalog')),
+    'cookie' => array('namespace'=>'fulleron'),
+    'bootstrap' => array('modules' => array('FCom_Catalog')),
     'encrypt' => array('key' => null),
     'debug' => array('ip' => array('127.0.0.1'=>'debug')), //DB (def)
     'web' => array('mod_rewrite'=>true, 'secure_url' => null), //

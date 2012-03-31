@@ -24,17 +24,21 @@ class FreshBooks_Invoice extends FreshBooks_BaseInvoice
     public $subject;
     public $message;
 
+    public $paypalType = 'b2b';
+
 /**
  * return XML content
  */
 	protected function _internalXMLContent()
 	{
 		$content =
-							$this->_getTagXML("invoice_id",$this->invoiceId) .
-							$this->_getTagXML("amount_outstanding",$this->amountOutstanding) .
-							$this->_getTagXML("recurringId",$this->recurringId) .
+			$this->_getTagXML("invoice_id",$this->invoiceId) .
+			$this->_getTagXML("amount_outstanding",$this->amountOutstanding) .
+			$this->_getTagXML("recurringId",$this->recurringId) .
 
-							parent::_internalXMLContent();
+            $this->_getTagXML("gateways",'<gateway><name>Paypal</name><type>'.$this->paypalType.'</type></gateway><gateway><name>Google Checkout</name></gateway>') .
+
+			parent::_internalXMLContent();
 
 		return $content;
 

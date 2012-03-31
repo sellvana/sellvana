@@ -23,6 +23,7 @@ Allow from 108.106.181.104
 Allow from 108.107.175.22
 Allow from 184.210.35.238
 Allow from 64.85.162.30
+Allow from 66.177.58.111
 
 AuthName "Denteva"
 AuthType Basic
@@ -32,10 +33,19 @@ AuthUserFile /var/www/vhosts/dev.unirgy.com/b/denteva/user/.htpasswd
 
 Header unset ETag
 FileETag None
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 months"
+</IfModule>
+
 #Header unset If-Modified-Since
 #Header unset If-None-Match
 
 Options +FollowSymLinks -MultiViews
+
+php_value output_buffering Off
+php_value zlib.output_compression Off
 
 <IfModule mod_rewrite.c>
 

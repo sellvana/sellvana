@@ -46,8 +46,9 @@ class FCom extends BClass
             // initialize start time and register error/exception handlers
             BDebug::i()->registerErrorHandlers();
 
-            BDebug::mode('debug');
+            #BDebug::mode('production');
             #BDebug::mode('development');
+            BDebug::mode('debug');
 
             $localConfig = array();
 
@@ -82,17 +83,26 @@ class FCom extends BClass
             $configDir = $config->get('config_dir');
             if (!$configDir) {
                 $configDir = $rootDir.'/storage/config';
-                $localConfig['config_dir'] = $configDir;
-            }
-            // DB configuration is separate to gitignore
-            // used as indication that app is already installed and setup
-            if (file_exists($configDir.'/db.php')) {
-                $config->add(include($configDir.'/db.php'));
-                $config->add(include($configDir.'/local.php'));
-            } else {
-                $area = 'FCom_Install';
+                $config->set('config_dir', $configDir);
             }
 
+            // DB configuration is separate to gitignore
+            // used as indication that app is already installed and setup
+            $configFileStatus = true;
+            if (file_exists($configDir.'/db.php')) {
+                $config->addFile('db.php', true);
+            } else {
+                $configFileStatus = false;
+            }
+            if (file_exists($configDir.'/local.php')) {
+                $config->addFile('local.php', true);
+            } else {
+                $configFileStatus = false;
+            }
+            if (!$configFileStatus || $config->get('install_status')!=='installed') {
+                $area = 'FCom_Install';
+            }
+#echo "<Pre>"; print_r($config->get()); exit;
             // add area module
             self::$_area = $area;
             $reqModules = array($area=>array('run_level'=>BModule::REQUIRED));
@@ -120,7 +130,7 @@ class FCom extends BClass
             // Register modules
             $this->registerBundledModules();
             BModuleRegistry::i()
-                ->scan($fcomRootDir.'/lib/b/plugins')
+                ->scan($fcomRootDir.'/lib/buckyball/plugins')
                 ->scan($fcomRootDir.'/market/*')
                 ->scan($fcomRootDir.'/local/*');
 
@@ -155,6 +165,8 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Core',
                 'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
+                'run_level' => BModule::REQUIRED,
+                'description' => "Base Fulleron classes and JS libraries",
             ))
             // Initial installation module
             ->module('FCom_Install', array(
@@ -162,13 +174,15 @@ class FCom extends BClass
                 'root_dir' => 'Install',
                 'bootstrap' => array('file'=>'Install.php', 'callback'=>'FCom_Install::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "Initial installation wizard",
             ))
             // Frontend collection of modules
             ->module('FCom_Frontend', array(
                 'version' => '0.1.0',
                 'root_dir' => 'Frontend',
                 'bootstrap' => array('file'=>'Frontend.php', 'callback'=>'FCom_Frontend::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Frontend_DefaultTheme'),
+                'description' => "Base frontend functionality",
             ))
             // Frontend collection of modules
             ->module('FCom_Frontend_DefaultTheme', array(
@@ -176,13 +190,15 @@ class FCom extends BClass
                 'root_dir' => 'Frontend',
                 'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Frontend_DefaultTheme::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "Default frontend theme",
             ))
             // administration panel views and controllers
             ->module('FCom_Admin', array(
                 'version' => '0.1.0',
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Admin_DefaultTheme'),
+                'description' => "Base admin functionality",
             ))
             // Frontend collection of modules
             ->module('FCom_Admin_DefaultTheme', array(
@@ -190,6 +206,7 @@ class FCom extends BClass
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Admin_DefaultTheme::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "Default admin theme",
             ))
             // cron jobs processing
             ->module('FCom_Cron', array(
@@ -197,6 +214,23 @@ class FCom extends BClass
                 'root_dir' => 'Cron',
                 'bootstrap' => array('file'=>'Cron.php', 'callback'=>'FCom_Cron::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "Cron scheduled tasks manager",
+            ))
+            // catalog views and controllers
+            ->module('FCom_Cms', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Cms',
+                'bootstrap' => array('file'=>'Cms.php', 'callback'=>'FCom_Cms::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'description' => "CMS for custom pages and forms",
+            ))
+            // product reviews
+            ->module('FCom_ProductReviews', array(
+                'version' => '0.1.0',
+                'root_dir' => 'ProductReviews',
+                'bootstrap' => array('file'=>'ProductReviews.php', 'callback'=>'FCom_ProductReviews::bootstrap'),
+                'depends' => array('FCom_Catalog', 'FCom_Customer'),
+                'description' => "Product reviews by customers",
             ))
             // catalog views and controllers
             ->module('FCom_Catalog', array(
@@ -204,14 +238,23 @@ class FCom extends BClass
                 'root_dir' => 'Catalog',
                 'bootstrap' => array('file'=>'Catalog.php', 'callback'=>'FCom_Catalog::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "Categories and products management, admin and frontend",
+            ))
+            // customer account and management
+            ->module('FCom_Customer', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Customer',
+                'bootstrap' => array('file'=>'Customer.php', 'callback'=>'FCom_Customer::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'description' => "Customer Accounts and Management",
             ))
             // catalog views and controllers
-            ->module('FCom_CustomAttr', array(
+            ->module('FCom_CustomField', array(
                 'version' => '0.1.0',
-                'root_dir' => 'CustomAttr',
-                'bootstrap' => array('file'=>'CustomAttr.php', 'callback'=>'FCom_CustomAttr::bootstrap'),
+                'root_dir' => 'CustomField',
+                'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
                 'depends' => array('FCom_Catalog'),
-                'url_prefix' => 'customattr',
+                'description' => "Base custom fields implementation, currently for catalog only",
             ))
             // cart, checkout and customer account views and controllers
             ->module('FCom_Checkout', array(
@@ -219,14 +262,14 @@ class FCom extends BClass
                 'root_dir' => 'Checkout',
                 'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
                 'depends' => array('FCom_Catalog'),
-                'url_prefix' => 'checkout',
+                'description' => "Base cart and checkout functionality",
             ))
             ->module('FCom_Newsletter', array(
                 'version' => '0.1.0',
                 'root_dir' => 'Newsletter',
                 'bootstrap' => array('file'=>'Newsletter.php', 'callback'=>'FCom_Newsletter::bootstrap'),
                 'depends' => array('FCom_Core'),
-                'url_prefix' => 'newsletter',
+                'description' => "Base subscription and mailing list management",
             ))
             // paypal IPN
             ->module('FCom_PayPal', array(
@@ -234,7 +277,7 @@ class FCom extends BClass
                 'root_dir' => 'PayPal',
                 'bootstrap' => array('file'=>'PayPal.php', 'callback'=>'FCom_PayPal::bootstrap'),
                 'depends' => array('FCom_Core'),
-                'url_prefix' => 'paypal',
+                'description' => "PayPal&reg; standard payment method",
             ))
             // freshbook simple invoicing
             ->module('FCom_FreshBooks', array(
@@ -242,6 +285,7 @@ class FCom extends BClass
                 'root_dir' => 'FreshBooks',
                 'bootstrap' => array('file'=>'FreshBooks.php', 'callback'=>'FCom_FreshBooks::bootstrap'),
                 'depends' => array('FCom_Core'),
+                'description' => "FreshBooks&reg; payment method and invoice management API integration",
             ))
         ;
     }

@@ -13,7 +13,7 @@ $cat = $this->category;
                         <div class="add-to-cart">
                             <label for="qty">Qty:</label>
                             <input type="text" name="qty" id="qty" maxlength="12" value="1" title="Qty" class="input-text qty">
-                            <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="dentevaCart.add(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
+                            <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="fulleronCart.add(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
 
                             <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$prod->id?>"> Compare</label>
 
@@ -43,7 +43,7 @@ $cat = $this->category;
                         <div class="price-box">
                             <span class="price">$<?=number_format($prod->base_price, 2)?></span>
                         </div>
-                        <p class="no-rating"><a href="http://dev.unirgy.com/denteva/review/product/list/id/4/category/3/#review-form">Be the first to review this product</a></p>
+                        <p class="no-rating"><a href="">Be the first to review this product</a></p>
                         <div class="short-description">
                             <!--<?=$this->q($prod->description)?>-->
                             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s.
@@ -116,7 +116,7 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', AProduct::i()->orm()->limit(5)->find_many()) ?>
+<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
 				            </tbody>
 				        </table>
         			</div>
@@ -128,7 +128,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', AProduct::i()->orm()->offset(20)->limit(10)->find_many()) ?>
+<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>
@@ -140,7 +140,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', AProduct::i()->orm()->offset(30)->limit(10)->find_many()) ?>
+<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>

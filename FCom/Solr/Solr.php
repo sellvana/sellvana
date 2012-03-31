@@ -31,8 +31,8 @@ class FCom_Solr extends BClass
         foreach ($products as $p) {
             $pIds[] = $p->id;
         }
-        $categories = Denteva_Model_ProductCategory::i()->orm()->table_alias('pc')
-            ->join(Denteva_Model_Category::table(), array('c.id','=','pc.category_id'), 'c')
+        $categories = FCom_Catalog_Model_ProductCategory::i()->orm()->table_alias('pc')
+            ->join(FCom_Catalog_Model_Category::table(), array('c.id','=','pc.category_id'), 'c')
             ->select('pc.product_id')->select('c.full_name')
             ->where_in('pc.product_id', $pIds)
             ->find_many();
@@ -50,7 +50,7 @@ class FCom_Solr extends BClass
             */
             $doc->id = $p->id;
             $doc->product_name = $p->product_name;
-            $doc->cat = $categories
+            ////$doc->cat = $categories
 
             $docs[] = $doc;
         }

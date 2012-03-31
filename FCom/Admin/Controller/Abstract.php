@@ -15,11 +15,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function action_unauthorized()
     {
-        $url = BRequest::i()->currentUrl();
-        BSession::i()->data('login_orig_url', $url);
-        if (BRequest::i()->xhr()) {
+        $r = BRequest::i();
+        if ($r->xhr()) {
+            BSession::i()->data('login_orig_url', $r->referrer());
             BResponse::i()->json(array('error'=>'login'));
         } else {
+            BSession::i()->data('login_orig_url', $r->currentUrl());
             $this->messages('login')->layout('/login');
             BResponse::i()->status(401, 'Not authorized');
         }
@@ -41,6 +42,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
             if (!$curTab) {
                 $curTab = $k;
+            }
+            if ($curTab===$k) {
+                $tab['async'] = false;
             }
             $tabView = $layout->view($tab['view']);
             if ($tabView) {

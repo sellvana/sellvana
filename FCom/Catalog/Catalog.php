@@ -21,7 +21,7 @@ class FCom_Catalog extends BClass
     static public function url($type, $args)
     {
         if (is_string($args)) {
-            return BApp::m('FCom_Catalog')->baseHref().'/'.$type.'/'.$args;
+            return BApp::href(''.$type.'/'.$args);
         }
         return false;
     }

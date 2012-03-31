@@ -3,47 +3,16 @@ var FCom_Admin = {};
 
 FCom_Admin.MediaLibrary = function(options) {
     var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
-    var addInput = options.add_input || 'input[name="_add_attachments"]';
-    var delInput = options.del_input || 'input[name="_del_attachments"]';
+    var baseUrl = options.url+'/download?folder='+encodeURI(options.folder)+'&file=';
 
-    function addAttachments(target) {
-        var sel = grid.jqGrid('getGridParam', 'selarrrow'), i;
-        var target = $(target);
-        if (!sel.length) {
-            alert('Please select some attachments to add.');
-            return;
+    function setOptions(opt) {
+        for (i in opt) {
+            options[i] = opt[i];
         }
-        var existingIds = {}, targetData = target.jqGrid('getRowData');
-        for (i=0; i<targetData.length; i++) {
-            existingIds[targetData[i].id] = 1;
-        }
-        for (i=0; i<sel.length; i++) {
-            if (!existingIds[sel[i]]) {
-                target.jqGrid('addRowData', sel[i], grid.jqGrid('getRowData', sel[i]));
-            }
-        }
-        target.trigger('reloadGrid');
     }
 
-    function removeAttachments(target) {
-        var target = $(target), sel = target.jqGrid('getGridParam', 'selarrrow'), i;
-        if (!sel.length) {
-            alert('Please select some attachments to remove.');
-            return;
-        }
-        var targetContainer = target.parents('.ui-jqgrid').parent();
-        var attEl = $(delInput, targetContainer);
-        var attData = attEl.val().split(',');
-        for (i=sel.length-1; i>=0; i--) {
-            attData.push(sel[i]);
-            target.jqGrid('delRowData', sel[i]);
-        }
-        attEl.val(attData.join(','));
-        target.trigger('reloadGrid');
-    }
-
-    function editAttachment(ev, el) {
-        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+    function editAttachment(ev) {
+        var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
         el.hide('fast'); $('.ui-icon-disk,.ui-icon-cancel', tr).show('fast');
         ev.stopPropagation();
         grid.jqGrid('editRow', rowid, {
@@ -63,16 +32,16 @@ FCom_Admin.MediaLibrary = function(options) {
         return false;
     }
 
-    function editAttachmentSave(ev, el) {
-        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+    function editAttachmentSave(ev) {
+        var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
         ev.stopPropagation();
         grid.jqGrid('saveRow', rowid);
         editAttachmentRestore(tr);
         return false;
     }
 
-    function editAttachmentCancel(ev, el) {
-        var el = $(el), tr = el.parents('tr'), rowid = tr.attr('id');
+    function editAttachmentCancel(ev) {
+        var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
         ev.stopPropagation();
         grid.jqGrid('restoreRow', rowid);
         editAttachmentRestore(tr);
@@ -83,13 +52,13 @@ FCom_Admin.MediaLibrary = function(options) {
         $('.ui-icon-disk,.ui-icon-cancel', tr).hide('fast'); $('.ui-icon-pencil', tr).show('fast');
     }
 
-
-    function downloadAttachment(ev, href, inline) {
+    function downloadAttachment(ev, inline) {
+        var href = baseUrl+$(ev.target).data('file');
         ev.stopPropagation();
         if (!inline) {
             $('#upload-target', container)[0].contentWindow.location.href = href;
         } else {
-            window.open(href);
+            window.open(href+'&inline=1');
         }
         return false;
     }
@@ -114,32 +83,25 @@ FCom_Admin.MediaLibrary = function(options) {
         });
     }
 
-    function initTargetGrid(target) {
-        target = $(target);
-        var toolbar = target.parents('.ui-jqgrid').find('.navtable');
-        toolbar.find('.ui-icon-plus').parents('.ui-pg-button').click(function(ev) { addAttachments(target) });
-        toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(function(ev) { removeAttachments(target) });
-    }
-
     function fmtActions(val,opt,obj) {
-        var html = '', url = options.url+'/download?file='+encodeURI(obj.file_name)+'&folder='+encodeURI(options.folder);
         if (!obj.status) {
-            html += '<span class=\"ui-icon ui-icon-pencil\" title=\"Edit\"></span>'
+            var file = $('<div/>').text(obj.file_name).html();
+            html = '<span class=\"ui-icon ui-icon-pencil\" title=\"Edit\"></span>'
                 +'<span class=\"ui-icon ui-icon-disk\" style=\"display:none\" title=\"Save\"></span>'
                 +'<span class=\"ui-icon ui-icon-cancel\" style=\"display:none\" title=\"Cancel\"></span>'
-                +'<span class="ui-icon ui-icon-arrowthickstop-1-s" title="\Download\"></span>'
-                +'<span class="ui-icon ui-icon-arrowreturnthick-1-e" title=\"Open\"></span>';
+                +'<span class="ui-icon ui-icon-arrowthickstop-1-s" title="\Download\" data-file=\"'+file+'\"></span>'
+                +'<span class="ui-icon ui-icon-arrowreturnthick-1-e" title=\"Open\" data-file=\"'+file+'\"></span>';
         } else {
             html = obj.status;
         }
         return html;
     }
 
-    $('.ui-icon-pencil', grid).live('click', function(ev) { return editAttachment(ev, this); });
-    $('.ui-icon-disk', grid).live('click', function(ev) { return editAttachmentSave(ev, this); });
-    $('.ui-icon-cancel', grid).live('click', function(ev) { return editAttachmentCancel(ev, this); });
-    $('.ui-icon-arrowthickstop-1-s', grid).live('click', function(ev) { return downloadAttachment(ev, url) });
-    $('.ui-icon-arrowreturnthick-1-e', grid).live('click', function(ev) { return downloadAttachment(ev, url+'&inline=1', true) });
+    $('.ui-icon-pencil', grid).live('click', function(ev) { return editAttachment(ev); });
+    $('.ui-icon-disk', grid).live('click', function(ev) { return editAttachmentSave(ev); });
+    $('.ui-icon-cancel', grid).live('click', function(ev) { return editAttachmentCancel(ev); });
+    $('.ui-icon-arrowthickstop-1-s', grid).live('click', function(ev) { return downloadAttachment(ev) });
+    $('.ui-icon-arrowreturnthick-1-e', grid).live('click', function(ev) { return downloadAttachment(ev, true) });
 
     var colModel = grid[0].p.colModel;
     for (var i=0; i<colModel.length; i++) {
@@ -173,27 +135,27 @@ FCom_Admin.MediaLibrary = function(options) {
     });
     grid.parents('.ui-jqgrid').find('.navtable .ui-icon-trash').parents('.ui-pg-button').click(function(ev) { deleteAttachments(); });
 
-    return {
-        fmtActions:fmtActions,
-        initTargetGrid:initTargetGrid
-    };
+    return {setOptions:setOptions};
 }
 
-FCom_Admin.ProductLibrary = function(options) {
-    var source = $(options.grid);
+FCom_Admin.TargetGrid = function(options) {
+    var source = $(options.source), target = $(options.target);
+    var id = options.id || target.attr('id');
+    var addInput = $('<input type="hidden" name="grid['+id+'][add]" value=""/>');
+    var delInput = $('<input type="hidden" name="grid['+id+'][del]" value=""/>');
+    target.parents('.ui-jqgrid').append(addInput, delInput);
 
-    function addProducts(target) {
-        target = $(target);
+    function addRows() {
         var sel = source.jqGrid('getGridParam', 'selarrrow'), data = [], i;
         var targetData = target.jqGrid('getRowData'), existingIds = {};
         for (i=0; i<targetData.length; i++) {
             existingIds[targetData[i].id] = 1;
         }
         if (!sel.length) {
-            alert('Please select some products on the right to add.');
+            alert('Please select some rows on the right to add.');
             return;
         }
-        updateProducts('add', target, sel);
+        updateProducts('add', sel);
         for (i=0; i<sel.length; i++) {
             if (!existingIds[sel[i]]) {
                 data.push(source.jqGrid('getRowData', sel[i]));
@@ -206,51 +168,42 @@ FCom_Admin.ProductLibrary = function(options) {
         target.trigger('reloadGrid');
     }
 
-    function removeProducts(target) {
-        target = $(target);
+    function removeRows() {
         var sel = target.jqGrid('getGridParam', 'selarrrow'), i;
         if (!sel.length) {
-            alert('Please select some products to remove.');
+            alert('Please select some rows to remove.');
             return;
         }
-        updateProducts('remove', target, sel);
+        updateProducts('remove', sel);
         for (i=sel.length-1; i>=0; i--) {
             target.jqGrid('delRowData', sel[i]);
         }
         target.trigger('reloadGrid');
     }
 
-    function updateProducts(action, target, sel) {
+    function updateProducts(action, sel) {
         target = $(target);
         var container = target.parents('.ui-jqgrid').parent();
         var groupId = target.attr('id').replace(/.*?([0-9-]+)$/, '\$1'), i, idx, prodId;
-        var addEl = $('.add-product-ids', container);
-        var delEl = $('.del-product-ids', container);
-        var fromEl = action==='add' ? delEl : addEl, toEl = action==='add' ? addEl : delEl;
-console.log(addEl, delEl);
+        var fromEl = action==='add' ? delInput : addInput,
+            toEl = action==='add' ? addInput : delInput;
         var fromData = fromEl.val().split(','), toData = toEl.val().split(',');
         for (i=0; i<sel.length; i++) {
-            prodId = /*groupId+':'+*/sel[i];
-            if ((idx = $.inArray(prodId, fromData))!=-1) {
+            if ((idx = $.inArray(sel[i], fromData))!=-1) {
                 fromData = fromData.splice(idx, 1);
-            } else if ($.inArray(prodId, toData)==-1) {
-                toData.push(prodId);
+            } else if ($.inArray(sel[i], toData)==-1) {
+                toData.push(sel[i]);
             }
         }
         fromEl.val(fromData.join(','));
         toEl.val(toData.join(','));
     }
 
-    function initTargetGrid(target) {
-        target = $(target);
-        var toolbar = target.parents('.ui-jqgrid').find('.navtable');
-        toolbar.find('.ui-icon-plus').parents('.ui-pg-button').click(function(ev) { addProducts(target) });
-        toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(function(ev) { removeProducts(target) });
-    }
+    var toolbar = target.parents('.ui-jqgrid').find('.navtable');
+    toolbar.find('.ui-icon-plus').parents('.ui-pg-button').click(addRows);
+    toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(removeRows);
 
-    return {
-        initTargetGrid:initTargetGrid
-    };
+    return {}
 }
 
 var Admin = {
@@ -1619,6 +1572,7 @@ console.log(a);
             $('a', tabs).click(function(ev) {
                 curLi.removeClass('active');
                 curPane.attr('hidden', 'hidden');
+                ev.stopPropagation();
 
                 var a = $(ev.currentTarget), li = a.parent('li');
                 if (curLi===li) {
@@ -1629,8 +1583,9 @@ console.log(a);
                 pane.removeAttr('hidden');
                 curLi = li;
                 curPane = pane;
+                var tabId = a.attr('href').replace(/^#tab-/,'');
+                pane.parents('form').find('#tab').val(tabId);
                 if (!pane.data('loaded')) {
-                    var tabId = a.attr('href').replace(/^#tab-/,'');
                     $.getJSON(options.url_get+'?tabs='+tabId, function(data, status, req) {
                         loadTabs(data);
                     });
@@ -1731,15 +1686,19 @@ $.widget('ui.fcom_autocomplete', {
     _create: function() {
         var self = this, input = this.element, field = $(this.options.field), value = field.val();
         var cache = {}, lastXhr;
-        input.autocomplete({
-            minLength:2,
+        var options = $.extend({
+            minLength:0,
             source: function(request, response) {
                 var term = request.term;
                 if (term in cache) {
                     response(cache[term]);
                     return;
                 }
-                lastXhr = $.getJSON(self.options.url, request, function(data, status, xhr) {
+                var url = self.options.url, query = $(self.options.filter).serialize();
+                if (query) {
+                    url += (url.match(/\?/) ? '&' : '?') + query;
+                }
+                lastXhr = $.getJSON(url, request, function(data, status, xhr) {
                     cache[term] = data;
                     if (xhr === lastXhr) {
                         response(data);
@@ -1748,15 +1707,20 @@ $.widget('ui.fcom_autocomplete', {
             },
             select: function( event, ui ) {
                 field.val(ui.item.id);
+                self.options.select && self.options.select(event, ui);
             },
             change: function( event, ui ) {
-                if ( !ui.item ) {
+                /*
+                if (self.options.exact && !ui.item ) {
                     $(this).val('');
                     field.val('');
                     return false;
                 }
+                */
+                self.options.change && self.options.change(event, ui);
             }
-        });
+        }, this.options.widget || {});
+        input.autocomplete(options).focus(function(ev) { if (!$(this).val()) { $(this).autocomplete('search', ''); } });
     },
 
     destroy: function() {
@@ -1767,11 +1731,43 @@ $.widget('ui.fcom_autocomplete', {
     }
 });
 
+function partial(el, options) {
+    el = $(el);
+    if (!el.length) return;
+    var req = [], i, params = el.data('params'), scroll = $('.scrollable', el).scrollTop();
+    params = params || {};
+    options = options || {};
+    if (options.reset || !el.data('params')) el.data('params', {});
+    options.src = options.src || el.data('src');
+    if (options.params) {
+        for (i in options.params) {
+            params[i] = options.params[i];
+        }
+        el.data('params', params);
+    }
+    for (i in params) {
+        req.push(encodeURIComponent(i)+'='+encodeURIComponent(params[i]));
+    }
+    el.css({opacity:.5});
+    el.load(options.src+(options.src&&options.src.match(/\?/)?'&':'?')+req.join('&'), function(data) {
+        $('.scrollable', el).scrollTop(scroll);
+        el.css({opacity:1});
+        if (typeof options.complete!=='undefined') options.complete();
+    });
+}
 
+function partialParent(el, params) {
+    partial($(el).closest('.include'), params);
+}
+
+function jqgridFmtNewWindow(val,opt,obj) {
+    return "<a href='javascript:window.open(\""+val+"\", \"vendor_website_url\", \"width=800,height=600\")'>"+val+"</a>";
+}
 
 $(function(){
 
     $.jgrid.formatter.date.newformat = 'm/d/Y';
+    $.jgrid.edit.width = 500;
 
     if (typeof CKEDITOR !== 'undefined') {
         CKEDITOR.config.autoUpdateElement = true;
@@ -1779,7 +1775,6 @@ $(function(){
     }
 
     //$('.datepicker').datepicker();
-
     $(document).bind('ajaxSuccess', function(event, request, settings) {
         if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
             if (data.error=='login') {
