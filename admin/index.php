@@ -1,6 +1,7 @@
 <?php
 
 $rootDir = dirname(__DIR__);
+require $rootDir.'/lib/buckyball/buckyball.php';
 require $rootDir.'/FCom/FCom.php';
 
 $webRoot = BRequest::i()->webRoot(1);

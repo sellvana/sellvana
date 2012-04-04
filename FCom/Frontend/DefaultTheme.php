@@ -25,7 +25,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         //array('css', '{FCom_Frontend}/css/base.css'),
                         array('less', '{FCom_Frontend}/css/base.less'),
                         array('less', '{FCom_Frontend}/css/skin_default.less'),
-                        array('css', '{FCom_Frontend}/css/boilerplate_post.css'),
+                        array('css', 'boilerplate_post', array('file'=>'{FCom_Frontend}/css/boilerplate_post.css')),
                         array('js_raw', 'js_init', array('content'=>"window.less={env:'development'}")),
                         array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.js'),

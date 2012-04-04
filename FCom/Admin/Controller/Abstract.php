@@ -26,6 +26,17 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
+    public function processFormTabs($view, $model, $mode='edit', $allowed=null)
+    {
+        $r = BRequest::i();
+        if ($r->xhr() && !is_null($r->get('tabs'))) {
+            $this->outFormTabsJson($view, $model, $mode);
+        } else {
+            $this->initFormTabs($view, $model, $mode, $allowed);
+        }
+        return $this;
+    }
+
     public function initFormTabs($view, $model, $mode='view', $allowed=null)
     {
         $r = BRequest::i();
