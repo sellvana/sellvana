@@ -39,7 +39,7 @@ class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     }
 }
 
-class FCom_Frontend_View_Root extends BView
+class FCom_Frontend_View_Root extends FCom_Core_View_Root
 {
     public function setLayoutClass($layout)
     {
@@ -49,15 +49,4 @@ class FCom_Frontend_View_Root extends BView
         return $this;
     }
 
-    public function addBodyClass($class)
-    {
-        $this->body_class = !$this->body_class ? (array)$class
-            : array_merge($this->body_class, (array)$class);
-        return $this;
-    }
-
-    public function getBodyClass()
-    {
-        return $this->body_class ? join(' ', $this->body_class) : '';
-    }
 }

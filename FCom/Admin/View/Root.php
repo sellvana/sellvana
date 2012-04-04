@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_View_Root extends BView
+class FCom_Admin_View_Root extends FCom_Core_View_Root
 {
     protected $_tree = array();
     protected $_curNav;

@@ -2,7 +2,7 @@
     $user = FCom_Admin_Model_User::sessionUser();
 ?>
 <!DOCTYPE html>
-<html>
+<html <?php echo $this->getHtmlAttributes() ?>>
 <head>
     <?php echo $this->hook('head') ?>
     <script>

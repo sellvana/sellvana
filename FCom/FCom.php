@@ -1,10 +1,9 @@
 <?php debug_backtrace() || exit;
 
+define('FULLERON_ROOT_DIR', dirname(__DIR__));
 set_time_limit(2);
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
-
-require realpath(__DIR__."/../lib/buckyball/bucky/buckyball.php");
 
 class FCom extends BClass
 {
@@ -27,11 +26,7 @@ class FCom extends BClass
 
     static public function rootDir()
     {
-        static $dir;
-        if (!$dir) {
-            $dir = dirname(__DIR__);
-        }
-        return $dir;
+        return FULLERON_ROOT_DIR;
     }
 
     public function init($area)
@@ -51,13 +46,11 @@ class FCom extends BClass
             BDebug::mode('debug');
 
             $localConfig = array();
-
-            $fcomRootDir = dirname(__DIR__);
-            $localConfig['fcom_root_dir'] = $fcomRootDir;
+            $localConfig['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
             $rootDir = $config->get('root_dir');
             if (!$rootDir) {
-                $localConfig['root_dir'] = $rootDir = $fcomRootDir;
+                $localConfig['root_dir'] = $rootDir = FULLERON_ROOT_DIR;
             }
 
             BDebug::debug('ROOTDIR='.$rootDir);
@@ -76,13 +69,19 @@ class FCom extends BClass
                 $localConfig['web']['base_store'] = $baseHref;
             }
 
-            BDebug::logDir($fcomRootDir.'/storage/log');
+            BDebug::logDir($rootDir.'/storage/log');
             BDebug::adminEmail($config->get('admin_email'));
+
+            $storageDir = $config->get('storage_dir');
+            if (!$storageDir) {
+                $storageDir = $rootDir.'/storage';
+                $config->set('storage_dir', $storageDir);
+            }
 
             // local configuration (db, enabled modules)
             $configDir = $config->get('config_dir');
             if (!$configDir) {
-                $configDir = $rootDir.'/storage/config';
+                $configDir = $storageDir.'/config';
                 $config->set('config_dir', $configDir);
             }
 
@@ -129,14 +128,16 @@ class FCom extends BClass
     #print_r(BDebug::mode());
             // Register modules
             $this->registerBundledModules();
+            if (defined('BUCKYBALL_ROOT_DIR')) { // if minified version used, load plugins manually
+                BModuleRegistry::i()->scan(BUCKYBALL_ROOT_DIR.'/plugins');
+            }
             BModuleRegistry::i()
-                ->scan($fcomRootDir.'/lib/buckyball/plugins')
-                ->scan($fcomRootDir.'/market/*')
-                ->scan($fcomRootDir.'/local/*');
+                ->scan(FULLERON_ROOT_DIR.'/market/*')
+                ->scan(FULLERON_ROOT_DIR.'/local/*');
 
-            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir.'/local'));
-            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir.'/market'));
-            BClassAutoload::i(true, array('root_dir'=>$fcomRootDir));
+            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
+            BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+            BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR));
 
             return BApp::i();
 
@@ -221,7 +222,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Cms',
                 'bootstrap' => array('file'=>'Cms.php', 'callback'=>'FCom_Cms::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'BPHPTAL'),
                 'description' => "CMS for custom pages and forms",
             ))
             // product reviews

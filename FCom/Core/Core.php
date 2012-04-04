@@ -98,6 +98,38 @@ class FCom_Core_View_Abstract extends BView
     }
 }
 
+class FCom_Core_View_Root extends FCom_Core_View_Abstract
+{
+    protected $_htmlAttr = array('lang'=>'en');
+
+    public function addBodyClass($class)
+    {
+        $this->body_class = !$this->body_class ? (array)$class
+            : array_merge($this->body_class, (array)$class);
+        return $this;
+    }
+
+    public function getBodyClass()
+    {
+        return $this->body_class ? join(' ', $this->body_class) : '';
+    }
+
+    public function getHtmlAttributes()
+    {
+        $xmlns = array();
+        foreach ($this->_htmlAttr as $a=>$v) {
+            $xmlns[] = $a.'="'.$this->q($v).'"';
+        }
+        return join(' ', $xmlns);
+    }
+
+    public function xmlns($ns, $href)
+    {
+        $this->_htmlAttr['xmlns:'.$ns] = $href;
+        return $this;
+    }
+}
+
 class FCom_Core_View_Head extends BViewHead
 {
 

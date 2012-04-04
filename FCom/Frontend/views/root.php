@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html <?php echo $this->getHtmlAttributes() ?>>
     <head>
         <?php echo $this->hook('head') ?>
     </head>
