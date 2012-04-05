@@ -1480,7 +1480,11 @@ console.log(a);
 
         function wysiwygCreate(id) {
             if (!editors[id]) {
-                editors[id] = CKEDITOR.replace(id);
+                editors[id] = true; // prevent double loading
+                $('#'+id).ckeditor(function() {
+                    this.dataProcessor.writer.indentationChars = '  ';
+                    editors[id] = this;
+                });
             }
         }
 
@@ -1765,15 +1769,14 @@ function jqgridFmtNewWindow(val,opt,obj) {
 }
 
 $(function(){
-
     $.jgrid.formatter.date.newformat = 'm/d/Y';
     $.jgrid.edit.width = 500;
 
     if (typeof CKEDITOR !== 'undefined') {
         CKEDITOR.config.autoUpdateElement = true;
         CKEDITOR.config.toolbarStartupExpanded = false;
+        CKEDITOR.config.startupMode = 'source';
     }
-
     //$('.datepicker').datepicker();
     $(document).bind('ajaxSuccess', function(event, request, settings) {
         if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
