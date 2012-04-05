@@ -18,7 +18,7 @@ class FCom_Core extends BClass
 
     public function writeLocalConfig()
     {
-        $c = BConfig::i()->get('', true);
+        $c = BConfig::i()->get(null, true);
         unset($c['db']);
         BConfig::i()->writeFile('local.php', $c);
         return $this;
