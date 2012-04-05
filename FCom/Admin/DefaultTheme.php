@@ -90,6 +90,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 'form'=>array(
                     array('view', 'head', 'do'=>array(
                         array('js', '{FCom_Core}/js/lib/ckeditor/ckeditor.js'),
+                        array('js', '{FCom_Core}/js/lib/ckeditor/adapters/jquery.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js'),
                         array('css', '{FCom_Core}/js/lib/themes/default/style.css'),
 
