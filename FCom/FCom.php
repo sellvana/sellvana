@@ -166,7 +166,6 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Core',
                 'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
-                'depends' => array('FCom_Admin'),
                 'run_level' => BModule::REQUIRED,
                 'description' => "Base Fulleron classes and JS libraries",
             ))
@@ -175,7 +174,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Install',
                 'bootstrap' => array('file'=>'Install.php', 'callback'=>'FCom_Install::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Admin'),
                 'description' => "Initial installation wizard",
             ))
             // Frontend collection of modules
