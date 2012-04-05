@@ -15,4 +15,21 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         $this->set('update_dt', BDb::now());
         return true;
     }
+
+    public function render()
+    {
+        $layout = BLayout::i();
+        $viewName = 'cms_block_'.$this->handle.'_'.strtotime($this->update_dt);
+        $layout->addView($viewName, array(
+            'renderer'    => 'BPHPTAL::renderer',
+            'source'      => $this->content,
+            'source_name' => $viewName,
+        ));
+        return $layout->view($viewName)->render();
+    }
+
+    public function __toString()
+    {
+        return $this->render();
+    }
 }
