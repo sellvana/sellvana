@@ -2,6 +2,8 @@
 
 class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'catalog/families';
+
     public function action_index()
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', array(

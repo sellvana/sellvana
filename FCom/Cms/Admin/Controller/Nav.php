@@ -2,6 +2,8 @@
 
 class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'cms/nav';
+
     public function action_index()
     {
         $this->layout('/cms/nav');

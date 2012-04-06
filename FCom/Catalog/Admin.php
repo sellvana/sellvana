@@ -68,6 +68,13 @@ class FCom_Catalog_Admin extends BClass
             ->allowFolder('media/product/image')
             ->allowFolder('media/product/attachment')
         ;
+
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'catalog' => 'Catalog',
+            'catalog/products' => 'Manage Products',
+            'catalog/categories' => 'Manage Categories',
+            'catalog/families' => 'Manage Families',
+        ));
     }
 
     static public function layout()

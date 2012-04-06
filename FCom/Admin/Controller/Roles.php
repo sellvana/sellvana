@@ -1,31 +1,23 @@
 <?php
 
-class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
+class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract
 {
-    protected $_permission = 'admin/users';
+    protected $_permission = 'admin/roles';
 
     public function gridConfig()
     {
         $baseHref = BApp::m('FCom_Admin')->baseHref();
-        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>$baseHref.'/users/form/'));
+        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>$baseHref.'/roles/form/'));
         $config = array(
             'grid' => array(
-                'id'            => 'users',
-                'url'           => $baseHref.'/users/grid_data',
-                'editurl'       => $baseHref.'/users/grid_data',
+                'id'            => 'roles',
+                'url'           => $baseHref.'/roles/grid_data',
+                'editurl'       => $baseHref.'/roles/grid_data',
                 'columns'       => array(
                     'id'          => array('label'=>'ID', 'index'=>'u.id', 'width'=>55),
-                    'username'    => array('label'=>'User Name', 'width'=>100) + $linkConf,
-                    'email'       => array('label'=>'Email', 'width'=>150) + $linkConf,
-                    'firstname'   => array('label'=>'First Name', 'width'=>150),
-                    'lastname'    => array('label'=>'First Name', 'width'=>150),
-                    'is_superadmin' => array('label'=>'Super?', 'width'=>100,
-                        'options'=>FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
-                    'status'      => array('label'=>'Status', 'width'=>100,
-                        'options'=>FCom_Admin_Model_User::i()->fieldOptions('status')),
-                    'last_login ' => array('label'=>'Last Login', 'formatter'=>'date', 'width'=>100),
+                    'role_name'   => array('label'=>'Role Name', 'width'=>100) + $linkConf,
                 ),
-                'sortname'      => 'u.id',
+                'sortname'      => 'r.id',
                 'sortorder'     => 'asc',
                 'multiselect'   => true,
             ),
@@ -41,12 +33,12 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
         BPubSub::i()->fire(__METHOD__, array('grid'=>$grid));
-        $this->layout('/users');
+        $this->layout('/roles');
     }
 
     public function action_grid_data()
     {
-        $orm = FCom_Admin_Model_User::i()->orm()->table_alias('u')->select('u.*');
+        $orm = FCom_Admin_Model_Role::i()->orm()->table_alias('r')->select('r.*');
         $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
     }
@@ -65,16 +57,16 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
     {
         $id = BRequest::i()->params('id', true);
         if ($id) {
-            $model = FCom_Admin_Model_User::i()->load($id);
+            $model = FCom_Admin_Model_Role::i()->load($id);
             if (empty($model)) {
-                BSession::i()->addMessage('Invalid user ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::href('users'));
+                BSession::i()->addMessage('Invalid role ID', 'error', 'admin');
+                BResponse::i()->redirect(BApp::href('roles'));
             }
         } else {
-            $model = FCom_Admin_Model_User::i()->create();
+            $model = FCom_Admin_Model_Role::i()->create();
         }
-        $this->layout('/users/form');
-        $view = BLayout::i()->view('users-form');
+        $this->layout('/roles/form');
+        $view = BLayout::i()->view('roles-form');
         $this->processFormTabs($view, $model, $model->id ? 'view' : 'create');
     }
 
@@ -83,31 +75,30 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
         $r = BRequest::i();
         $id = $r->params('id', true);
         $data = $r->post();
-
         try {
             if ($id) {
-                $model = FCom_Admin_Model_User::i()->load($id);
+                $model = FCom_Admin_Model_Role::i()->load($id);
             } else {
-                $model = FCom_Admin_Model_User::i()->create();
+                $model = FCom_Admin_Model_Role::i()->create();
             }
             BPubSub::i()->fire(__METHOD__, array('id'=>$id, 'data'=>$data, 'model'=>$model));
-            $model->set($data['model']);
-            unset($data['model']['password_hash']);
-            if (!empty($data['model']['password'])) {
-                $model->setPassword($data['model']['password']);
+            if (empty($data['model']['permissions'])) {
+                $data['model']['permissions'] = array();
             }
+            $model->set($data['model']);
             $model->save();
+
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
 
         if ($r->xhr()) {
-            $this->forward('form_tab', null, array('id'=>$id));
+            $this->forward('form', null, array('id'=>$id));
         } else {
             if (!$id) {
                 $id = $model->id;
             }
-            BResponse::i()->redirect(BApp::href('users/form/'.$id));
+            BResponse::i()->redirect(BApp::href('roles/form/'.$id));
         }
     }
 }

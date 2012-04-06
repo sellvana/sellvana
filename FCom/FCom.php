@@ -174,7 +174,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Install',
                 'bootstrap' => array('file'=>'Install.php', 'callback'=>'FCom_Install::bootstrap'),
-                'depends' => array('FCom_Core'),
+                'depends' => array('FCom_Core', 'FCom_Admin'),
                 'description' => "Initial installation wizard",
             ))
             // Frontend collection of modules
@@ -195,7 +195,7 @@ class FCom extends BClass
             ))
             // administration panel views and controllers
             ->module('FCom_Admin', array(
-                'version' => '0.1.0',
+                'version' => '0.1.1',
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
                 'depends' => array('FCom_Core', 'FCom_Admin_DefaultTheme'),
