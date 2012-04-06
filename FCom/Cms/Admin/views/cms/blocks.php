@@ -6,9 +6,10 @@
             'editurl' => BApp::href('cms/blocks/grid_data'),
             'columns' => array(
                 'id' => array('label'=>'ID'),
-                'handle' => array('label'=>'Handle', 'editable'=>true),
+                'handle' => array('label'=>'Handle', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
+                    'baseLinkUrl' => BApp::href('cms/blocks/form/'), 'idName' => 'id',
+                )),
                 'description' => array('label'=>'Description', 'editable'=>true),
-                'content' => array('label'=>'Content', 'hidden'=>true, 'editable'=>true, 'edittype'=>'textarea'),
                 'version' => array('label'=>'Version'),
                 'create_dt' => array('label'=>'Created', 'formatter'=>'date'),
                 'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),

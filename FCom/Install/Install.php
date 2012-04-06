@@ -112,7 +112,11 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
     {
         $w = BRequest::i()->post('w');
         try {
-            FCom_Admin_Model_User::i()->create($w['admin'])->save()->login();
+            FCom_Admin_Model_User::i()
+                ->create($w['admin'])
+                ->set('is_superadmin', 1)
+                ->save()
+                ->login();
             $url = BApp::href('install/step3');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');

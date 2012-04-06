@@ -17,10 +17,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             'A' => 'Active',
             'I' => 'Inactive',
         ),
+        'is_superadmin' => array(
+            '0' => 'No',
+            '1' => 'Yes',
+        ),
     );
 
     protected $_persModel;
     protected $_persData;
+
+    protected $_permissions;
 
     public static function statusOptions()
     {
@@ -179,5 +185,27 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $this->_persData = BUtil::arrayMerge($this->_persData, $data);
         $this->_persModel->set('data_json', BUtil::toJson($this->_persData))->save();
         return $this;
+    }
+
+    public function getPermission($paths)
+    {
+        if ($this->is_superadmin) {
+            return true;
+        }
+        if (!$this->role_id) {
+            return false;
+        }
+        if (!$this->permissions) {
+            $this->permissions = FCom_Admin_Model_Role::i()->load($this->role_id)->permissions;
+        }
+        if (is_string($paths)) {
+            $paths = explode(',', $paths);
+        }
+        foreach ($paths as $p) {
+            if (!empty($this->permissions[$p])) {
+                return true;
+            }
+        }
+        return false;
     }
 }
