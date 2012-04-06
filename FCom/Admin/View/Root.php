@@ -2,6 +2,8 @@
 
 class FCom_Admin_View_Root extends FCom_Core_View_Root
 {
+    protected static $_allPermissions;
+
     protected $_tree = array();
     protected $_curNav;
     protected $_quickSearches = array();
@@ -76,30 +78,48 @@ class FCom_Admin_View_Root extends FCom_Core_View_Root
             return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
         });
 
-        $html = $this->tag('ul', !empty($root['ul']) ? $root['ul'] : array());
+        if (!static::$_allPermissions) {
+            static::$_allPermissions = FCom_Admin_Model_Role::i()->getAllPermissions();
+        }
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+
+        $html = '';
         foreach ($root['/'] as $k=>$node) {
-            $label = !empty($node['label']) ? $node['label'] : $k;
-            if (!empty($node['href'])) {
-                $label = $this->tag('a', array('href'=>$node['href'])).$label.'</a>';
-            }
             if (!isset($node['li']['class'])) {
                 $node['li']['class'] = '';
             }
-            if (!empty($node['/'])) {
-                $node['li']['class'] .= ' nav-group';
-                $hdrParams = array('class'=>'nav-group-'.$k);
-                $label = $this->tag('header', $hdrParams).'<span class="icon"></span><span class="title">'.$label.'</span></header>';
-            }
+
             $key = !empty($node['key']) ? $node['key'] : $k;
             $nextPath = $path.($path?'/':'').$key;
             if ($this->_curNav===$nextPath || strpos($this->_curNav, $nextPath.'/')===0) {
                 $node['li']['class'] .= ' active';
             }
             $children = $this->renderNodes($node, $nextPath);
+
+            if (empty($node['permission']) && !empty(static::$_allPermissions[$nextPath])) {
+                $node['permission'] = $nextPath;
+            }
+            if (!empty($node['permission']) && !$children && !$user->getPermission($node['permission'])) {
+                continue;
+            }
+
+            $label = !empty($node['label']) ? $node['label'] : $k;
+            if (!empty($node['href'])) {
+                $label = $this->tag('a', array('href'=>$node['href'])).$label.'</a>';
+            }
+            if (!empty($node['/'])) {
+                $node['li']['class'] .= ' nav-group';
+                $hdrParams = array('class'=>'nav-group-'.$k);
+                $label = $this->tag('header', $hdrParams).'<span class="icon"></span><span class="title">'.$label.'</span></header>';
+            }
             $html .= $this->tag('li', !empty($node['li']) ? $node['li'] : array())
                 . $label . $children . '</li>';
         }
-        $html .= '</ul>';
-        return $html;
+
+        if ($html) {
+            return $this->tag('ul', !empty($root['ul']) ? $root['ul'] : array()).$html.'</ul>';
+        } else {
+            return '';
+        }
     }
 }

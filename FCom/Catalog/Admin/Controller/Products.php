@@ -2,6 +2,8 @@
 
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'catalog/products';
+
     public function gridColumns()
     {
         $columns = array(

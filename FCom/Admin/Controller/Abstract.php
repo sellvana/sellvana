@@ -2,18 +2,31 @@
 
 class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
+    protected $_permission;
+
     public function messages($viewName, $namespace='admin')
     {
         $this->view($viewName)->messages = BSession::i()->messages($namespace);
         return $this;
     }
 
-    public function authorize($args=array())
+    public function authenticate($args=array())
     {
         return FCom_Admin_Model_User::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
     }
 
-    public function action_unauthorized()
+    public function authorize($args=array())
+    {
+        if (!parent::authorize($args)) {
+            return false;
+        }
+        if (!empty($this->_permission)) {
+            return FCom_Admin_Model_User::i()->sessionUser()->getPermission($this->_permission);
+        }
+        return true;
+    }
+
+    public function action_unauthenticated()
     {
         $r = BRequest::i();
         if ($r->xhr()) {
@@ -22,7 +35,20 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         } else {
             BSession::i()->data('login_orig_url', $r->currentUrl());
             $this->messages('login')->layout('/login');
-            BResponse::i()->status(401, 'Not authorized');
+            BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
+        }
+    }
+
+    public function action_unauthorized()
+    {
+        $r = BRequest::i();
+        if ($r->xhr()) {
+            BSession::i()->data('login_orig_url', $r->referrer());
+            BResponse::i()->json(array('error'=>'denied'));
+        } else {
+            BSession::i()->data('login_orig_url', $r->currentUrl());
+            $this->layout('/denied');
+            BResponse::i()->status(403, 'Forbidden');
         }
     }
 

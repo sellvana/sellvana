@@ -2,6 +2,8 @@
 
 class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'catalog/categories';
+
     public function action_index()
     {
         $this->layout('/catalog/categories');
