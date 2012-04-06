@@ -118,6 +118,8 @@ CREATE TABLE IF NOT EXISTS {$tRole} (
   `role_name` VARCHAR(50) NOT NULL,
   `permissions_data` TEXT NOT NULL, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+UPDATE {$tUser} SET is_superadmin=1;
             ");
         });
     }
