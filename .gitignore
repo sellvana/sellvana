@@ -1,2 +1,3 @@
 storage/config/local.php
+storage/config/db.php
 lib/*

@@ -17,6 +17,7 @@ class FCom_Admin extends BClass
             ->route('GET /logout', 'FCom_Admin_Controller.logout')
 
             ->route('GET /my_account', 'FCom_Admin_Controller.my_account')
+            ->route('GET /reports', 'FCom_Admin_Controller.reports')
             ->route('POST /my_account/personalize', 'FCom_Admin_Controller.personalize')
 
             ->route('GET /users', 'FCom_Admin_Controller_Users.index')

@@ -40,6 +40,13 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $this->layout('/my_account');
     }
 
+    public function action_reports()
+    {
+        //TODO add code for reports
+        //BLayout::i()->view('my_account')->model = FCom_Admin_Model_User::i()->sessionUser();
+        $this->layout('/reports');
+    }
+
     public function action_personalize()
     {
         $r = BRequest::i()->request();

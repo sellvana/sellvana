@@ -114,6 +114,10 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('my_account')),
                 ),
+                '/reports'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('reports')),
+                ),
 
                 '/users'=>array(
                     array('layout', 'base'),
