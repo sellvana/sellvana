@@ -2,6 +2,8 @@
 
 class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'cms/pages';
+
     public function action_index()
     {
         $this->layout('/cms/pages');
@@ -22,10 +24,10 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract
     public function action_form()
     {
         $id = BRequest::i()->params('id', true);
-        $page = FCom_Cms_Model_Page::i()->load($id);
-        $view = $this->view('cms/pages-form')->set('model', $page);
+        $model = FCom_Cms_Model_Page::i()->load($id);
+        $view = $this->view('cms/pages-form')->set('model', $model);
         $this->layout('/cms/pages/form');
-        $this->processFormTabs($view, $page, 'edit');
+        $this->processFormTabs($view, $model, 'edit');
     }
 
     public function action_form__POST()
@@ -33,12 +35,12 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract
         try {
             $id = BRequest::i()->params('id', true);
             if ($id) {
-                $page = FCom_Cms_Model_Page::i()->load($id);
+                $model = FCom_Cms_Model_Page::i()->load($id);
             } else {
-                $page = FCom_Cms_Model_Page::i()->create();
+                $model = FCom_Cms_Model_Page::i()->create();
             }
-            $page->set(BRequest::i()->post('model'))->save();
-            $id = $page->id;
+            $model->set(BRequest::i()->post('model'))->save();
+            $id = $model->id;
             BSession::i()->addMessage('CMS Page Updated', 'success', 'admin');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');

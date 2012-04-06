@@ -8,6 +8,8 @@ class FCom_Admin extends BClass
             BResponse::i()->httpSTS();
         }
 
+        BDb::migrate('FCom_Admin::migrate');
+
         FCom_Admin_Model_User::i();
 
         BFrontController::i()
@@ -21,14 +23,15 @@ class FCom_Admin extends BClass
             ->route('POST /my_account/personalize', 'FCom_Admin_Controller.personalize')
 
             ->route('GET /users', 'FCom_Admin_Controller_Users.index')
-            ->route('GET /users/grid_data', 'FCom_Admin_Controller_Users.grid_data')
-            ->route('POST /users/grid_data', 'FCom_Admin_Controller_Users.grid_post')
-            ->route('GET /users/form/:id', 'FCom_Admin_Controller_Users.form')
-            ->route('GET /users/form_tab/:id', 'FCom_Admin_Controller_Users.form_tab')
-            ->route('POST /users/form/:id', 'FCom_Admin_Controller_Users.form_post')
+            ->route('GET|POST /users/grid_data', 'FCom_Admin_Controller_Users.grid_data')
+            ->route('GET|POST /users/form/:id', 'FCom_Admin_Controller_Users.form')
 
-            ->route('GET /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_get')
-            ->route('POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_post')
+            ->route('GET /roles', 'FCom_Admin_Controller_Roles.index')
+            ->route('GET|POST /roles/grid_data', 'FCom_Admin_Controller_Roles.grid_data')
+            ->route('GET|POST /roles/form/:id', 'FCom_Admin_Controller_Roles.form')
+            ->route('GET|POST /roles/form/:id/tree_data', 'FCom_Admin_Controller_Roles.tree_data')
+
+            ->route('GET|POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_data')
 
             ->route('GET /settings', 'FCom_Admin_Controller_Settings.index')
 
@@ -39,16 +42,23 @@ class FCom_Admin extends BClass
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))
 
-            ->view('users/form', array('view_class'=>'FCom_Admin_View_Form'))
+            ->view('users-form', array('view_class'=>'FCom_Admin_View_Form'))
+            ->view('roles-form', array('view_class'=>'FCom_Admin_View_Form'))
 
             ->allViews('views')
 
             ->defaultTheme('FCom_Admin_DefaultTheme')
         ;
 
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'admin/users' => 'Manage Users',
+            'admin/roles' => 'Manage Roles and Permissions',
+            'admin/settings' => 'Update Settings',
+            'admin/modules' => 'Manage Modules',
+        ));
+
         BPubSub::i()->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch');
 
-        BDb::migrate('FCom_Admin::migrate');
     }
 
     public function onBeforeDispatch()
@@ -88,6 +98,29 @@ CREATE TABLE IF NOT EXISTS {$tPersonalize} (
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_{$tPersonalize}_user` FOREIGN KEY (`user_id`) REFERENCES {$tUser} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            ");
+        });
+
+        BDb::upgrade('0.1.0', '0.1.1', function() {
+            $tUser = FCom_Admin_Model_User::table();
+            $tRole = FCom_Admin_Model_Role::table();
+            try {
+                BDb::run("
+ALTER TABLE {$tUser}
+    ADD COLUMN `is_superadmin` TINYINT DEFAULT 0 NOT NULL AFTER `username`
+    , ADD COLUMN `role_id` INT NULL AFTER `is_superadmin`
+;
+                ");
+            } catch (Exception $e) { }
+
+            BDb::run("
+CREATE TABLE IF NOT EXISTS {$tRole} (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `role_name` VARCHAR(50) NOT NULL,
+  `permissions_data` TEXT NOT NULL, PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+UPDATE {$tUser} SET is_superadmin=1;
             ");
         });
     }

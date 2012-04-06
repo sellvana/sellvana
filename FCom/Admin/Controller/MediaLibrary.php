@@ -53,7 +53,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         return $config;
     }
 
-    public function action_grid_get()
+    public function action_grid_data()
     {
         switch (BRequest::i()->params('do')) {
         case 'data':
@@ -76,7 +76,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
     }
 
-    public function action_grid_post()
+    public function action_grid_data__POST()
     {
         $this->processGridPost();
     }

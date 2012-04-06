@@ -2,6 +2,8 @@
 
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'admin/modules';
+
     public function gridConfig()
     {
         $modules = BModuleRegistry::i()->debug();

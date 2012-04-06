@@ -2,6 +2,8 @@
 
 class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'admin/settings';
+
     public function gridConfig()
     {
         $baseHref = BApp::m('FCom_Admin')->baseHref();

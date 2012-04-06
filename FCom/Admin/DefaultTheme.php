@@ -82,6 +82,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
                         array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
                         array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
+                        array('addNav', 'admin/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
                         array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
                         array('addNav', 'admin/modules', array('label'=>'Modules', 'href'=>BApp::href('/modules'))),
                         array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
@@ -103,6 +104,10 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('home')),
                     array('view', 'root', 'do'=>array(array('setNav', 'home'))),
+                ),
+                '/denied'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('denied')),
                 ),
 
                 '/login'=>array(
@@ -128,10 +133,26 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('layout', 'form'),
                     array('view', 'root', 'do'=>array(array('setNav', 'admin/users'))),
-                    array('hook', 'main', 'views'=>array('users/form')),
-                    array('view', 'users/form', 'set'=>array('tab_view_prefix'=>'users/tab-'), 'do'=>array(
+                    array('hook', 'main', 'views'=>array('users-form')),
+                    array('view', 'users-form', 'set'=>array('tab_view_prefix'=>'users-form/'), 'do'=>array(
                         array('addTab', 'main', array('label'=>'General Info')),
                         array('addTab', 'history', array('label'=>'History')),
+                    )),
+                ),
+
+                '/roles'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('roles')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'admin/roles'))),
+                ),
+                '/roles/form'=>array(
+                    array('layout', 'base'),
+                    array('layout', 'form'),
+                    array('view', 'root', 'do'=>array(array('setNav', 'admin/roles'))),
+                    array('hook', 'main', 'views'=>array('roles-form')),
+                    array('view', 'roles-form', 'set'=>array('tab_view_prefix'=>'roles-form/'), 'do'=>array(
+                        array('addTab', 'main', array('label'=>'Permissions')),
+                        array('addTab', 'users', array('label'=>'Users')),
                     )),
                 ),
 
