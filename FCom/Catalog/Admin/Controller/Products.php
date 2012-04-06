@@ -9,7 +9,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $columns = array(
             'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
             'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true,
-                'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::href('products/form/'))),
+                'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::href('catalog/products/form/'))),
             'manuf_sku'=>array('label'=>'Mfr Part #', 'index'=>'p.manuf_sku', 'width'=>100),
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
@@ -150,6 +150,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function action_form()
     {
         $id = BRequest::i()->params('id');
+
         if (!$id) {
             $id = BRequest::i()->get('id');
         }
@@ -157,7 +158,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $product = FCom_Catalog_Model_Product::i()->load($id);
             if (empty($product)) {
                 BSession::i()->addMessage('Invalid product ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/products');
+                BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/catalog/products');
             }
         } else {
             $product = FCom_Catalog_Model_Product::i()->create();

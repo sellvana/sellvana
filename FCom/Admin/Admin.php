@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS {$tPersonalize} (
         BDb::upgrade('0.1.0', '0.1.1', function() {
             $tUser = FCom_Admin_Model_User::table();
             $tRole = FCom_Admin_Model_Role::table();
+
             try {
                 BDb::run("
 ALTER TABLE {$tUser}
