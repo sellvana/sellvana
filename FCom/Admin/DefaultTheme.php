@@ -158,8 +158,14 @@ class FCom_Admin_DefaultTheme extends BClass
 
                 '/settings'=>array(
                     array('layout', 'base'),
+                    array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('settings')),
                     array('view', 'root', 'do'=>array(array('setNav', 'admin/settings'))),
+                    array('view', 'settings', 'set'=>array('tab_view_prefix'=>'settings/'), 'do'=>array(
+                        array('addTab', 'FCom_Core', array('label'=>'Fulleron Core', 'async'=>true)),
+                        array('addTab', 'FCom_Admin', array('label'=>'Fulleron Admin', 'async'=>true)),
+                        array('addTab', 'FCom_Frontend', array('label'=>'Fulleron Frontend', 'async'=>true)),
+                    )),
                 ),
 
                 '/modules'=>array(

@@ -5,8 +5,33 @@ class FCom_FreshBooks extends BClass
     static public function bootstrap()
     {
         BPubSub::i()->on('FCom_Sales_Model_Order::invoice', 'FCom_FreshBooks.createInvoiceFromOrder');
+
+        switch (FCom::area()) {
+            case 'FCom_Admin': FCom_FreshBooks_Admin::bootstrap();
+            case 'FCom_Frontend': FCom_FreshBooks_Frontend::bootstrap();
+        }
+    }
+}
+
+class FCom_FreshBooks_Admin extends BClass
+{
+    public static function bootstrap()
+    {
+        BLayout::i()->addAllViews('Admin/views');
+    }
+}
+
+class FCom_FreshBooks_Frontend extends BClass
+{
+    public static function bootstrap()
+    {
+
     }
 
+}
+
+class FCom_FreshBooks_Api extends BClass
+{
     public function __construct()
     {
         require_once __DIR__.'/lib/FreshBooks/Client.php';

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_View_Grid extends BView
+class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
 {
     public function __construct()
     {

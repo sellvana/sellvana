@@ -33,16 +33,17 @@ class FCom_Admin extends BClass
 
             ->route('GET|POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_data')
 
-            ->route('GET /settings', 'FCom_Admin_Controller_Settings.index')
+            ->route('GET|POST /settings', 'FCom_Admin_Controller_Settings.index')
 
             ->route('GET|POST /modules', 'FCom_Admin_Controller_Modules.index')
-            ->route('GET|POST /modules/grid_data', 'FCom_Admin_Controller_Modules.grid_data')
+            ->route('POST /modules/migrate', 'FCom_Admin_Controller_Modules.migrate')
         ;
 
         BLayout::i()
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))
 
+            ->view('settings', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('users-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('roles-form', array('view_class'=>'FCom_Admin_View_Form'))
 
@@ -58,12 +59,23 @@ class FCom_Admin extends BClass
             'admin/modules' => 'Manage Modules',
         ));
 
-        BPubSub::i()->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch');
+        BPubSub::i()
+            ->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
+            ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
+        ;
 
     }
 
     public function onBeforeDispatch()
     {
+    }
+
+    public function onSettingsPost($args)
+    {
+        $db =& $args['post']['config']['db'];
+        if (!empty($db['password']) && $db['password']==='*****') {
+            unset($db['password']);
+        }
     }
 
     public static function migrate()

@@ -114,6 +114,11 @@ class FCom_Cms_Admin extends BClass
                 array('hook', 'main', 'views'=>array('cms/forms-form')),
                 array('view', 'root', 'do'=>array(array('setNav', 'cms/forms'))),
             ),
+            '/settings'=>array(
+                array('view', 'settings', 'do'=>array(
+                    array('addTab', 'FCom_Cms', array('label'=>'CMS', 'async'=>true)),
+                )),
+            ),
         ));
     }
 

@@ -12,11 +12,11 @@ class FCom_Newsletter extends BClass
 
     public static function frontend()
     {
-        BLayout::i()->allViews('Frontend/views', 'newsletter/');
+        BLayout::i()->allViews('Frontend/views');
     }
 
     public static function admin()
     {
-        BLayout::i()->allViews('Admin/views', 'newsletter/');
+        BLayout::i()->allViews('Admin/views');
     }
 }
