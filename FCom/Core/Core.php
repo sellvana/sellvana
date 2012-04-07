@@ -81,12 +81,9 @@ class FCom_Core_Controller_Abstract extends BActionController
 
 class FCom_Core_View_Abstract extends BView
 {
-    public function messagesHtml($namespace=null)
+    public function messagesHtml()
     {
         $html = '';
-        if (!is_null($namespace)) {
-            $this->messages = BSession::i()->messages($namespace);
-        }
         if ($this->messages) {
             $html .= '<ul class="msgs">';
             foreach ($this->messages as $m) {

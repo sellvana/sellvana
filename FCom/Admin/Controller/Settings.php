@@ -4,41 +4,44 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'admin/settings';
 
-    public function gridConfig()
-    {
-        $baseHref = BApp::m('FCom_Admin')->baseHref();
-        $linkConf = array('formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>$baseHref.'/users/form/'));
-        $config = array(
-            'grid' => array(
-                'id'            => 'users',
-                'url'           => $baseHref.'/settings/grid_data',
-                'editurl'       => $baseHref.'/settings/grid_data',
-                'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'index'=>'u.id', 'width'=>55),
-                    array('name'=>'username', 'label'=>'User Name', 'width'=>100) + $linkConf,
-                    array('name'=>'email', 'label'=>'Email', 'width'=>150) + $linkConf,
-                    array('name'=>'firstname', 'label'=>'First Name', 'width'=>150),
-                    array('name'=>'lastname', 'label'=>'First Name', 'width'=>150),
-                    array('name'=>'status', 'label'=>'Status', 'width'=>100,
-                        'options'=>FCom_Admin_Model_User::i()->fieldOptions('status')),
-                    array('name'=>'last_login', 'label'=>'Last Login', 'formatter'=>'date', 'width'=>100),
-                ),
-                'sortname'      => 'u.id',
-                'sortorder'     => 'asc',
-                'multiselect'   => true,
-            ),
-            'navGrid' => array(),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
-            'custom' => array('personalize'=>true),
-        );
-        BPubSub::i()->fire('FCom_Admin_Controller_Settings::gridConfig', array('config'=>&$config));
-        return $config;
-    }
-
     public function action_index()
     {
-        $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire('FCom_Admin_Controller_Settings::action_index', array('grid'=>$grid));
-        $this->layout('/settings');
+        $view = $this->view('settings');
+        $tabViews = BLayout::i()->findViewsRegex('#^settings/#');
+        foreach ($tabViews as $tabViewName=>$tabView) {
+            $tabName = preg_replace('#^settings/#', '', $tabViewName);
+            $view->addTab($tabName, array('async'=>true, 'label'=>$tabName, 'view'=>$tabViewName));
+        }
+        $this->layout('/settings')->messages('settings')->processFormTabs($view, BConfig::i());
+    }
+
+    public function action_index__POST()
+    {
+        try {
+            $post = BRequest::i()->post();
+
+            BPubSub::i()->fire(__METHOD__, array('post'=>&$post));
+
+            BConfig::i()->add($post['config'], true);
+
+            if (!empty($post['config']['db'])) {
+                try {
+                    BDb::connect();
+                    FCom_Core::i()->writeDbConfig();
+                } catch (Exception $e) {
+                    BSession::i()->addMessage('Invalid DB configuration, not saved: '.$e->getMessage(), 'error', 'admin');
+                }
+            }
+
+            FCom_Core::i()->writeLocalConfig();
+
+            BSession::i()->addMessage('Settings updated', 'success', 'admin');
+
+        } catch (Exception $e) {
+
+            BDebug::logException($e);
+            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+        }
+        BResponse::i()->redirect(BApp::href('settings'));
     }
 }

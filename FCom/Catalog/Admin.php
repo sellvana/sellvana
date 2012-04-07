@@ -28,7 +28,7 @@ class FCom_Catalog_Admin extends BClass
 
         BLayout::i()
             ->view('catalog/products/form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->allViews('Admin/views', 'catalog')
+            ->allViews('Admin/views')
         ;
 
         BPubSub::i()
@@ -132,6 +132,11 @@ class FCom_Catalog_Admin extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('catalog/families')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/families'))),
+                ),
+                '/settings'=>array(
+                    array('view', 'settings', 'do'=>array(
+                        array('addTab', 'FCom_Catalog', array('label'=>'Catalog', 'async'=>true)),
+                    )),
                 ),
             ));
         ;

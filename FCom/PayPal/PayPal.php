@@ -2,13 +2,35 @@
 
 class FCom_PayPal extends BClass
 {
-    protected static $_apiVersion = '3.0';
-    protected static $_baseUrl;
+    static public function bootstrap()
+    {
+        switch (FCom::area()) {
+            case 'FCom_Admin': FCom_PayPal_Admin::bootstrap();
+            case 'FCom_Frontend': FCom_PayPal_Frontend::bootstrap();
+        }
+    }
+}
 
+class FCom_PayPal_Admin extends BClass
+{
+    static public function bootstrap()
+    {
+        BLayout::i()->addAllViews('Admin/views');
+    }
+}
+
+class FCom_PayPal_Frontend extends BClass
+{
     static public function bootstrap()
     {
         BFrontController::i()->route('GET /paypal/.action', 'FCom_PayPal_Controller');
     }
+}
+
+class FCom_PayPal_Api extends BClass
+{
+    protected static $_apiVersion = '3.0';
+    protected static $_baseUrl;
 
     public function __construct()
     {

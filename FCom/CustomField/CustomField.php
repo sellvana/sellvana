@@ -117,7 +117,7 @@ class FCom_CustomField_Admin extends BClass
         ;
 
         BLayout::i()
-            ->allViews('Admin/views', 'customfields')
+            ->allViews('Admin/views')
         ;
 
         BPubSub::i()
@@ -153,7 +153,12 @@ class FCom_CustomField_Admin extends BClass
                     array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('customfields/fieldsets/form')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/fieldsets'))),
-                ),
+                ),/*
+                '/settings'=>array(
+                    array('view', 'settings', 'do'=>array(
+                        array('addTab', 'FCom_CustomField', array('label'=>'Custom Fields', 'async'=>true)),
+                    )),
+                ),*/
             ));
     }
 

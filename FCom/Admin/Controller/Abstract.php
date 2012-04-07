@@ -56,7 +56,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
-    public function processFormTabs($view, $model, $mode='edit', $allowed=null)
+    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
     {
         $r = BRequest::i();
         if ($r->xhr() && !is_null($r->get('tabs'))) {
@@ -95,7 +95,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                         'mode' => $mode,
                     ));
                 } else {
-                    BDebug::error('MISSING VIEW: '.$tab['view']);
+                    BDebug::warning('MISSING VIEW: '.$tab['view']);
                 }
             }
         }

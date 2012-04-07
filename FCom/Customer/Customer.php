@@ -48,7 +48,7 @@ class FCom_Customer_Admin extends BClass
             ->route('GET /customers', 'FCom_Customer_Admin_Controller.index')
         ;
 
-        BLayout::i()->allViews('Admin/views', 'customer');
+        BLayout::i()->allViews('Admin/views');
     }
 
     public static function layout()
