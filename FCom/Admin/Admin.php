@@ -35,6 +35,7 @@ class FCom_Admin extends BClass
             ->route('GET /settings', 'FCom_Admin_Controller_Settings.index')
 
             ->route('GET /modules', 'FCom_Admin_Controller_Modules.index')
+            ->route('GET|POST /modules/grid_data', 'FCom_Admin_Controller_Modules.grid_data')
         ;
 
         BLayout::i()

@@ -21,7 +21,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             return false;
         }
         if (!empty($this->_permission)) {
-            return FCom_Admin_Model_User::i()->sessionUser()->getPermission($this->_permission);
+            $user = FCom_Admin_Model_User::i()->sessionUser();
+            if (!$user) {
+                return false;
+            }
+            return $user->getPermission($this->_permission);
         }
         return true;
     }
