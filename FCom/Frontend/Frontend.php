@@ -7,6 +7,7 @@ class FCom_Frontend extends BClass
         if (BRequest::i()->https()) {
             BResponse::i()->httpSTS();
         }
+
         BFrontController::i()
             ->route('GET /', 'FCom_Frontend_Controller.index')
         ;
@@ -19,6 +20,11 @@ class FCom_Frontend extends BClass
 
             ->defaultTheme('FCom_Frontend_DefaultTheme')
         ;
+
+        if (BDebug::is('RECOVERY,MIGRATION')) {
+            BLayout::i()->setRootView('under_construction');
+            BResponse::i()->render();
+        }
     }
 }
 
