@@ -9,7 +9,7 @@ class FCom_Checkout extends BClass
             ->route('POST /cart', 'FCom_Checkout_Frontend_Controller.cart_post')
         ;
 
-        BLayout::i()->allViews('Frontend/views', 'checkout/');
+        BLayout::i()->addAllViews('Frontend/views');
     }
 }
 

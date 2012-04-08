@@ -12,7 +12,7 @@ class FCom_ProductReviews_Frontend extends BClass
             ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
         ;
 
-        BLayout::i()->allViews('Frontend/views', 'prodreviews');
+        BLayout::i()->addAllViews('Frontend/views');
     }
 
     public static function layout()

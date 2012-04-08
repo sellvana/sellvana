@@ -28,7 +28,7 @@ class FCom_Cms_Admin extends BClass
             ->route('GET|POST /cms/forms/form/:id', 'FCom_Cms_Admin_Controller_Forms.form')
         ;
 
-        BLayout::i()->allViews('Admin/views')
+        BLayout::i()->addAllViews('Admin/views')
             ->view('cms/nav-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('cms/pages-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('cms/blocks-form', array('view_class'=>'FCom_Admin_View_Form'))

@@ -12,7 +12,7 @@ class FCom_Customer_Frontend extends BClass
             ->route('GET /customers', 'FCom_Customer_Frontend_Controller.index')
         ;
 
-        BLayout::i()->allViews('Frontend/views', 'customer');
+        BLayout::i()->addAllViews('Frontend/views');
     }
 
     public static function layout()

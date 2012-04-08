@@ -47,7 +47,7 @@ class FCom_Admin extends BClass
             ->view('users-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('roles-form', array('view_class'=>'FCom_Admin_View_Form'))
 
-            ->allViews('views')
+            ->addAllViews('views')
 
             ->defaultTheme('FCom_Admin_DefaultTheme')
         ;
