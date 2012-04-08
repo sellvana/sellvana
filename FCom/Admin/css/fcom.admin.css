@@ -311,7 +311,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
     }
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-    border: none;
+    /*border: none;*/
     }
 
 .group-container .ui-jqgrid { margin:1px 1px 10px 1px; }

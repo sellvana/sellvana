@@ -41,11 +41,51 @@ class FCom_Core extends BClass
         }
         return $dir;
     }
-}
 
-class FCom_Core_Model_Abstract extends BModel
-{
+    /**
+    * Run bootstrap depending on area
+    *
+    * @deprecated by declaring different bootstrap per area in manifest
+    * @param mixed $class
+    */
+    public static function bootstrapByArea($class)
+    {
+        switch (BApp::i()->get('area')) {
+            case 'FCom_Admin': $class .= '_Admin'; break;
+            case 'FCom_Frontend': $class .= '_Frontend'; break;
+        }
+        $class::bootstrap();
+    }
 
+    /**
+    * @deprecated
+    *
+    * @param mixed $str
+    */
+    static public function getUrlKey($str)
+    {
+        return BLocale::transliterate($str);
+    }
+
+    static public function url($type, $args)
+    {
+        if (is_string($args)) {
+            return BApp::href(''.$type.'/'.$args);
+        }
+        return false;
+    }
+
+    static public function lastNav($save=false)
+    {
+        $s = BSession::i();
+        $r = BRequest::i();
+        if ($save) {
+            $s->data('lastNav', array($r->rawPath(), $r->get()));
+        } else {
+            $d = $s->data('lastNav');
+            return BApp::baseUrl().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
+        }
+    }
 }
 
 class FCom_Core_Controller_Abstract extends BActionController
@@ -63,7 +103,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 
     public function layout($name)
     {
-        $theme = BConfig::i()->get('modules/'.FCom::area().'/theme');
+        $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
         $layout = BLayout::i();
         $layout->theme($theme);
         foreach ((array)$name as $l) {
@@ -77,6 +117,11 @@ class FCom_Core_Controller_Abstract extends BActionController
         $this->view($viewName)->messages = BSession::i()->messages($namespace);
         return $this;
     }
+}
+
+class FCom_Core_Model_Abstract extends BModel
+{
+
 }
 
 class FCom_Core_View_Abstract extends BView

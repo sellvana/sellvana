@@ -10,7 +10,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         $tabViews = BLayout::i()->findViewsRegex('#^settings/#');
         foreach ($tabViews as $tabViewName=>$tabView) {
             $tabName = preg_replace('#^settings/#', '', $tabViewName);
-            $view->addTab($tabName, array('async'=>true, 'label'=>$tabName, 'view'=>$tabViewName));
+            $view->addTab($tabName, array('async'=>true, 'label'=>str_replace('_', ' ', $tabName), 'view'=>$tabViewName));
         }
         $this->layout('/settings')->messages('settings')->processFormTabs($view, BConfig::i());
     }

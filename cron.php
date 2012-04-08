@@ -1,7 +1,9 @@
 <?php
 
-require __DIR__.'/FCom/FCom.php';
+require_once __DIR__.'/lib/buckyball/buckyball.php';
+require_once __DIR__.'/FCom/FCom.php';
 
-BConfig::i()->add(array('config_dir'=>'storage/config'));
-
+if (file_exists(__DIR__.'cron.local.php')) {
+    require_once __DIR__.'cron.local.php';
+}
 FCom::i()->run('FCom_Cron');

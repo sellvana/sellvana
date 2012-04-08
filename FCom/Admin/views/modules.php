@@ -14,7 +14,7 @@ tr.module-requested {}
 </style>
 <script>
 
-var runLevelColors = {'DISABLED':'#CCC', 'ONDEMAND':'#FFF', '':'#FFF', 'REQUESTED':'#CCF', 'REQUIRED':'#CFC'};
+var runLevelColors = {'DISABLED':'#CCC', 'ONDEMAND':'#FFF', '':'#FFF', 'REQUESTED':'#CFC', 'REQUIRED':'#FFC'};
 var bypassModules = {'FCom_Core':1,'FCom_Admin':1,'FCom_Frontend':1,'FCom_Install':1};
 var runStatusColors = {'IDLE':'', 'LOADED':'#CFC', 'ERROR':'#FCC'};
 
