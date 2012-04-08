@@ -23,7 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('breadcrumbs')->crumbs = $crumbs;
         $layout->view('catalog/product/list')->products_data = $productsData;
 
-        FCom_Catalog::lastNav(true);
+        FCom_Core::lastNav(true);
 
         $this->layout('/catalog/category');
         BResponse::i()->render();
@@ -48,7 +48,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Catalog::lastNav(true);
+        FCom_Core::lastNav(true);
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/product/list')->products_data = $productsData;
@@ -115,7 +115,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             } else {
                 BSession::i()->addMessage('No products to compare');
-                BResponse::i()->redirect(FCom_Catalog::lastNav());
+                BResponse::i()->redirect(FCom_Core::lastNav());
             }
         }
         $layout->view('catalog/compare')->products = array_values($products);

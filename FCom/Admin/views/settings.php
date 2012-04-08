@@ -3,14 +3,35 @@ $formUrl = BApp::href('settings');
 ?>
 <script>
 head(function() {
+    function onSortableStop(event, ui) {
+        var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
+console.log(ui.item[0].id);
+        var handle = ui.item;
+        if (type=='tabs') handle = handle.children('h3');
+        handle.triggerHandler('focusout');
+
+        return; //TODO: figure out whether to personalize settings items order
+
+        var url = '<?php echo BApp::href('my_account/personalize') ?>';
+
+        switch (type) {
+        case 'tabs':
+            var items = [];
+            ui.item.parent().children().each(function(idx, el) {
+                items.push(el.id.replace(/^settings-tab-/, ''));
+            });
+            //$.post(url, {'do':'settings.'+type+'.order', items:items});
+            break;
+
+        case 'sections':
+            var items = [];
+            break;
+        }
+    }
+
     function initTabs() {
-        $('.settings-container', this).accordion({
-            header: '> div > h3'
-        }).sortable({
-            axis: 'y',
-            handle: 'h3',
-            stop: function(event, ui) { ui.item.children('h3').triggerHandler('focusout') }
-        });
+        $('.settings-container', this).accordion({header: '> div > h3'})
+            .sortable({axis: 'y', handle: 'h3', stop: onSortableStop});
     }
     window.adminForm = Admin.form({
         form:     '#settings-form',
@@ -22,10 +43,7 @@ head(function() {
     });
     $('#settings-form').validationEngine();
     initTabs.apply($('#settings-form'));
-    $('.adm-tabs-left > ul').sortable({
-        axis: 'y',
-        stop: function(event, ui) { ui.item.triggerHandler('focusout') }
-    });
+    $('.adm-tabs-left > ul').sortable({axis: 'y', stop: onSortableStop});
 });
 </script>
 <form id="settings-form" action="<?php echo $formUrl ?>" method="post">
@@ -42,7 +60,7 @@ head(function() {
             <nav class="adm-tabs-left">
                 <ul>
     <?php foreach ($this->tabs as $k=>$tab): if (!empty($tab['disabled'])) continue; ?>
-                    <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
+                    <li id="settings-tab-<?php echo $this->q($k) ?>" <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
                         <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
                     </li>
     <?php endforeach ?>

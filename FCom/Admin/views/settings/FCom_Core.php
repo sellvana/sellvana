@@ -28,10 +28,11 @@
                         'DEVELOPMENT' => 'DEVELOPMENT',
                         'STAGING'     => 'STAGING',
                         'PRODUCTION'  => 'PRODUCTION',
-                        'MIGRATION'   => 'MIGRATION',
+                        //'MIGRATION'   => 'MIGRATION',
                         'RECOVERY'    => 'RECOVERY',
                     ), $c->get('debug/mode')) ?>
                 </select></td></tr>
+                <tr><td>Modules to run in RECOVERY mode</td><td><input type="text" name="config[modules][FCom_Core][recovery_modules]" value="<?php echo $this->q($c->get('modules/FCom_Core/recovery_modules'))?>"/></td></tr>
             </table>
         </div>
     </div>

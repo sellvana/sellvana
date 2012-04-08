@@ -12,12 +12,16 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $frontendLevels = $config->get('modules/FCom_Frontend/module_run_level');
         $modules = BModuleRegistry::i()->debug();
 
-        $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
-        $schemaModules = array();
-        foreach (BDb::getMigrationData() as $connection=>$migrationModules) {
-            foreach ($migrationModules as $modName=>$migrData) {
-                $schemaModules[$modName] = 1;
+        try {
+            $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
+            $schemaModules = array();
+            foreach (BDb::getMigrationData() as $connection=>$migrationModules) {
+                foreach ($migrationModules as $modName=>$migrData) {
+                    $schemaModules[$modName] = 1;
+                }
             }
+        } catch (Exception $e) {
+            BDebug::logException($e);
         }
 
         $data = array();

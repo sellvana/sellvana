@@ -1,5 +1,6 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
+    $loggedIn = FCom_Admin_Model_User::i()->isLoggedIn();
 ?>
 <!DOCTYPE html>
 <html <?php echo $this->getHtmlAttributes() ?>>
@@ -12,7 +13,7 @@ window.appConfig = {
     </script>
 </head>
 <body class="<?php echo $this->bodyClass ?>">
-<?php if (FCom_Admin_Model_User::i()->isLoggedIn()): ?>
+<?php if ($loggedIn): ?>
     <div id="root-layout" class="adm-wrapper">
         <div class="ui-layout-north">
 		    <header class="adm-topbar">
@@ -69,15 +70,18 @@ window.appConfig = {
         <div class="adm-middle ui-layout-center"><?php echo $this->hook('main') ?></div>
     </div>
 <script>
-/*
+
 head(function() {
+    //$('#root-layout > .ui-layout-west').width(180).height(1000).resizable({handles:'e'});
+    /*
     $('#root-layout').layout({
         north__spacingOpen:0,
         north__resizable:false,
         west__spacingOpen:0
     });
+    */
 });
-*/
+
 </script>
 <?php else: ?>
     <div id="root-layout" class="adm-wrapper">
