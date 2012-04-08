@@ -23,7 +23,7 @@ class FCom_CustomField_Admin extends BClass
         ;
 
         BLayout::i()
-            ->allViews('Admin/views')
+            ->addAllViews('Admin/views')
         ;
 
         BPubSub::i()

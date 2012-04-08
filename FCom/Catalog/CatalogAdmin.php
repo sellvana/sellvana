@@ -28,7 +28,7 @@ class FCom_Catalog_Admin extends BClass
 
         BLayout::i()
             ->view('catalog/products/form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->allViews('Admin/views')
+            ->addAllViews('Admin/views')
         ;
 
         BPubSub::i()

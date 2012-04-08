@@ -16,7 +16,7 @@ class FCom_Frontend extends BClass
             ->view('root', array('view_class'=>'FCom_Frontend_View_Root'))
             //->view('head', array('view_class'=>'BViewHead'))
 
-            ->allViews('views')
+            ->addAllViews('views')
 
             ->defaultTheme('FCom_Frontend_DefaultTheme')
         ;

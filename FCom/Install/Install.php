@@ -13,7 +13,7 @@ class FCom_Install extends BClass
 
         BLayout::i()
             ->view('head', array('view_class'=>'BViewHead'))
-            ->allViews('views')->rootView('root');
+            ->addAllViews('views')->rootView('root');
     }
 }
 
