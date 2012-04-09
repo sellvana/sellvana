@@ -422,7 +422,7 @@ class FCom extends BClass
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTankAdmin::bootstrap'),
                     ),
                     'FCom_Frontend' => array(
-                        'bootstrap' => array('file'=>'IndexTank.php', 'callback'=>'FCom_IndexTank::bootstrap'),
+                        'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTankFrontend::bootstrap'),
                     ),
                 ),
             ))
