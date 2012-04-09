@@ -22,17 +22,7 @@
         <h3><a href="#">System</a></h3>
         <div>
             <table>
-                <tr><td>Application Mode</td><td><select name="config[debug][mode]">
-                    <?php echo $this->optionsHtml(array(
-                        'DEBUG'       => 'DEBUG',
-                        'DEVELOPMENT' => 'DEVELOPMENT',
-                        'STAGING'     => 'STAGING',
-                        'PRODUCTION'  => 'PRODUCTION',
-                        //'MIGRATION'   => 'MIGRATION',
-                        'RECOVERY'    => 'RECOVERY',
-                    ), $c->get('debug/mode')) ?>
-                </select></td></tr>
-                <tr><td>Modules to run in RECOVERY mode</td><td><input type="text" name="config[modules][FCom_Core][recovery_modules]" value="<?php echo $this->q($c->get('modules/FCom_Core/recovery_modules'))?>"/></td></tr>
+
             </table>
         </div>
     </div>

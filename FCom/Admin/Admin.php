@@ -76,6 +76,15 @@ class FCom_Admin extends BClass
         if (!empty($db['password']) && $db['password']==='*****') {
             unset($db['password']);
         }
+
+        $ip = BRequest::i()->ip();
+        foreach (array('Frontend','Admin') as $area) {
+            if (!empty($args['post']['config']['modules']['FCom_'.$area]['mode_by_ip'])) {
+                $modes =& $args['post']['config']['modules']['FCom_'.$area]['mode_by_ip'];
+                $modes = str_replace('@', $ip, $modes);
+                unset($modes);
+            }
+        }
     }
 
     public static function migrate()
