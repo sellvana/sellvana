@@ -84,7 +84,7 @@ class FCom_IndexTank_Index_Product extends BClass
     public function search($query)
     {
         if (!empty($query)){
-            $queryString = self::FT_PRODUCT_NAME . ":($query)^10 ".self::FT_DESCRIPTION.":($query) ";
+            $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".self::FT_DESCRIPTION.":($query) ";
         } else {
             $queryString = "match:all";
         }
