@@ -17,7 +17,6 @@ class FCom_IndexTank_Admin extends BClass
 
     static public function layout()
     {
-
         BLayout::i()
             ->layout(array(
                 '/settings'=>array(
