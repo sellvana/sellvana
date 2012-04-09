@@ -18,11 +18,12 @@ class FCom_Cms_Admin extends BClass
             ->route('GET /cms/pages', 'FCom_Cms_Admin_Controller_Pages.index')
             ->route('GET|POST /cms/pages/grid_data', 'FCom_Cms_Admin_Controller_Pages.grid_data')
             ->route('GET|POST /cms/pages/form/:id', 'FCom_Cms_Admin_Controller_Pages.form')
-            ->route('GET|POST /cms/pages/history/grid_data', 'FCom_Cms_Admin_Controller_Pages.history_grid_data')
+            ->route('GET|POST /cms/pages/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Pages.history_grid_data')
 
             ->route('GET /cms/blocks', 'FCom_Cms_Admin_Controller_Blocks.index')
             ->route('GET|POST /cms/blocks/grid_data', 'FCom_Cms_Admin_Controller_Blocks.grid_data')
             ->route('GET|POST /cms/blocks/form/:id', 'FCom_Cms_Admin_Controller_Blocks.form')
+            ->route('GET|POST /cms/blocks/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Blocks.history_grid_data')
 
             ->route('GET|POST /cms/forms', 'FCom_Cms_Admin_Controller_Forms.index')
             ->route('GET|POST /cms/forms/form/:id', 'FCom_Cms_Admin_Controller_Forms.form')

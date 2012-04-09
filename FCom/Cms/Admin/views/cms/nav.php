@@ -1,3 +1,8 @@
+<header class="adm-page-title">
+    <span class="title">CMS Navigation</span>
+    <div class="btns-set">
+    </div>
+</header>
 <div id="cms-nav-layout">
     <div class="ui-layout-west">
         <div id="cms_nav"></div>

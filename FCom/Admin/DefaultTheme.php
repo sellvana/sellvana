@@ -84,7 +84,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
                         array('addNav', 'admin/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
                         array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
-                        array('addNav', 'admin/modules', array('label'=>'Modules', 'href'=>BApp::href('/modules'))),
+                        array('addNav', 'admin/modules', array('label'=>'Installed Modules', 'href'=>BApp::href('/modules'))),
                         array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
                     )),
                 ),

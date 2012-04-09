@@ -24,7 +24,12 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract
     public function action_form()
     {
         $id = BRequest::i()->params('id', true);
-        $model = FCom_Cms_Model_Page::i()->load($id);
+        if ($id && !($model = FCom_Cms_Model_Page::i()->load($id))) {
+            BDebug::error('Invalid Page ID: '.$id);
+        }
+        if (empty($model)) {
+            $model = FCom_Cms_Model_Page::i()->create();
+        }
         $view = $this->view('cms/pages-form')->set('model', $model);
         $this->layout('/cms/pages/form');
         $this->processFormTabs($view, $model, 'edit');
@@ -50,8 +55,14 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract
 
     public function action_history_grid_data()
     {
-        $orm = FCom_Cms_Model_PageHistory::i()->orm('ph')->select('ph.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+        $id = BRequest::i()->params('id', true);
+        if (!$id) {
+            $data = array();
+        } else {
+            $orm = FCom_Cms_Model_PageHistory::i()->orm('ph')->select('ph.*')
+                ->where('page_id', $id);
+            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+        }
         BResponse::i()->json($data);
     }
 
