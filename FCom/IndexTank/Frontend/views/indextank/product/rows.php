@@ -1,6 +1,6 @@
 <?
-$loggedIn = Denteva_Model_User::i()->isLoggedIn();
-Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
+//$loggedIn = Denteva_Model_User::i()->isLoggedIn();
+//Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
 ?>
 <? foreach ($this->products as $p): ?>
 <tr id="tr-product-<?=$p->id?>">
@@ -13,7 +13,7 @@ Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
     <td>
         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
         <span class="sku">Part #: <?=$this->q($p->manuf_sku)?></span>
-        <span class="manuf-name"><?=$this->q($p->manuf()->manuf_name)?></span>
+        <span class="manuf-name"><?=$this->q($p->manuf_name)?></span>
         <span class="rating">
             <span class="rating-out"><span class="rating-in" style="width:35px"></span></span>
             3.5 of 5 (<a href="#">16 reviews</a>)

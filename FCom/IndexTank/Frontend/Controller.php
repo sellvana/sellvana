@@ -14,6 +14,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
 
+
         //$and = array();
         //foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
         //$productsORM = FCom_Catalog_Model_Product::i()->factory()->where_complex(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
