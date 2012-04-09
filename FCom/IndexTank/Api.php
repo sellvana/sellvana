@@ -1,6 +1,6 @@
 <?php
 
-class FCom_IndexTank extends BClass
+class FCom_IndexTank_Api extends BClass
 {
     /**
     * Indextank Service instance
@@ -9,14 +9,15 @@ class FCom_IndexTank extends BClass
     */
     protected $_indextank;
 
-    protected $_api_url = '<API URL HERE>';
+    protected $_api_url = '';
 
-    static public function bootstrap()
+    public function __construct()
     {
-        BApp::m()->autoload('lib');
+        //BApp::m()->autoload('lib');
 
-        $config = BConfig::i()->get('modules/FCom_IndexTank/api');
-        $this->_api_url = $config['api_url'];
+        require_once __DIR__.'/lib/indextank.php';
+
+        $this->_api_url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
     }
 
     public function service()
