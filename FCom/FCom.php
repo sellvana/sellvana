@@ -420,9 +420,11 @@ class FCom extends BClass
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),
+                        //'depends' => array('FCom_Admin'),
                     ),
                     'FCom_Frontend' => array(
                         'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
+                        //'depends' => array('FCom_Frontend'),
                     ),
                 ),
             ))

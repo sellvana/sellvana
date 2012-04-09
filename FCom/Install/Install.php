@@ -100,6 +100,8 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
         try {
             BDb::connect();
             FCom_Core::i()->writeDbConfig();
+            BConfig::i()->set('db/implicit_migration', true, false, true);
+            FCom_Core::i()->writeLocalConfig();
             $url = BApp::href('install/step2');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
