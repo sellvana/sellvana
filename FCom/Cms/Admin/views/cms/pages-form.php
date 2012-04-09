@@ -7,15 +7,15 @@ head(function() {
     window.adminForm = Admin.form({
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
-        url_get:  '<?php echo BApp::href('cms/blocks/form/'.$p->id) ?>',
-        url_post: '<?php echo BApp::href('cms/blocks/form/'.$p->id) ?>'
+        url_get:  '<?php echo BApp::href('cms/pages/form/'.$p->id) ?>',
+        url_post: '<?php echo BApp::href('cms/pages/form/'.$p->id) ?>'
     });
 })
 </script>
-<form action="<?php echo BApp::href('cms/blocks/form/'.$p->id) ?>" method="post">
+<form action="<?php echo BApp::href('cms/pages/form/'.$p->id) ?>" method="post">
     <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
-        <span class="title"><?php echo $p->id ? 'Edit CMS Block: '.$this->q($p->handle) : 'Create New CMS Block' ?></span>
+        <span class="title"><?php echo $p->id ? 'Edit CMS Page: '.$this->q($p->handle) : 'Create New CMS Page' ?></span>
         <div style="float:right">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span><?php echo BLocale::_('Save')?></span></button>
         </div>

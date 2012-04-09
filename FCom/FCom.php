@@ -98,6 +98,13 @@ class FCom extends BClass
             $config->set('fs/config_dir', $configDir);
         }
 
+        // cache files
+        $logDir = $config->get('fs/cache_dir');
+        if (!$logDir) {
+            $logDir = $storageDir.'/cache';
+            $config->set('fs/cache_dir', $logDir);
+        }
+
         // log files
         $logDir = $config->get('fs/log_dir');
         if (!$logDir) {
@@ -141,16 +148,23 @@ class FCom extends BClass
         BDebug::logDir($config->get('fs/log_dir'));
         BDebug::adminEmail($config->get('admin_email'));
 
-        if (($debugConfig = $config->get('debug'))) {
-            if (!empty($debugConfig['ip']) && ($ip = BRequest::i()->ip()) && !empty($debugConfig['ip'][$ip])) {
-                BDebug::mode($debugConfig['ip'][$ip]);
-            } elseif (!empty($debugConfig['mode'])) {
-                BDebug::mode($debugConfig['mode']);
-            }
-            if (!empty($debugConfig['levels'])) {
-                foreach ($debugConfig['levels'] as $type=>$level) {
-                    BDebug::level($type, $level);
+        $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
+        if ($modeByIp) {
+            $ipModes = array();
+            foreach (explode("\n", $modeByIp) as $line) {
+                $a = explode(':', $line);
+                if (empty($a[1])) {
+                    $a = array('*', $a[0]);
                 }
+                $ipModes[trim($a[0])] = strtoupper(trim($a[1]));
+            }
+            $ip = BRequest::i()->ip();
+            if (PHP_SAPI==='cli' && !empty($ipModes['$'])) {
+                BDebug::mode($ipModes['$']);
+            } elseif (!empty($ipModes[$ip])) {
+                BDebug::mode($ipModes[$ip]);
+            } elseif (!empty($ipModes['*'])) {
+                BDebug::mode($ipModes['*']);
             }
         }
 #print_r(BDebug::mode());
