@@ -414,10 +414,17 @@ class FCom extends BClass
             // IndexTank integration
             ->addModule('FCom_IndexTank', array(
                 'version' => '0.1.0',
-                'root_dir' => 'PayPal',
+                'root_dir' => 'IndexTank',
                 'depends' => array('FCom_Core'),
                 'description' => "IndexTank API integration",
-                'bootstrap' => array('file'=>'IndexTank.php', 'callback'=>'FCom_IndexTank::bootstrap'),
+                'areas' => array(
+                    'FCom_Admin' => array(
+                        'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTankAdmin::bootstrap'),
+                    ),
+                    'FCom_Frontend' => array(
+                        'bootstrap' => array('file'=>'IndexTank.php', 'callback'=>'FCom_IndexTank::bootstrap'),
+                    ),
+                ),
             ))
         ;
     }
