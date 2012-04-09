@@ -7,6 +7,8 @@ error_reporting(E_ALL | E_STRICT);
 
 class FCom extends BClass
 {
+    protected $_modulesDirs = array();
+
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -25,6 +27,12 @@ class FCom extends BClass
     static public function rootDir()
     {
         return FULLERON_ROOT_DIR;
+    }
+
+    public function addModulesDir($dir)
+    {
+        $this->_modulesDirs[] = $dir;
+        return $this;
     }
 
     public function init($area)
@@ -90,6 +98,13 @@ class FCom extends BClass
             $config->set('fs/config_dir', $configDir);
         }
 
+        // log files
+        $logDir = $config->get('fs/log_dir');
+        if (!$logDir) {
+            $logDir = $storageDir.'/log';
+            $config->set('fs/log_dir', $logDir);
+        }
+
         // DB configuration is separate to gitignore
         // used as indication that app is already installed and setup
         $configFileStatus = true;
@@ -123,7 +138,7 @@ class FCom extends BClass
 
         $config = BConfig::i();
         // Initialize debugging mode and levels
-        BDebug::logDir($config->get('fs/storage_dir').'/log');
+        BDebug::logDir($config->get('fs/log_dir'));
         BDebug::adminEmail($config->get('admin_email'));
 
         if (($debugConfig = $config->get('debug'))) {
@@ -164,17 +179,21 @@ class FCom extends BClass
 
         $this->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
-        if (defined('BUCKYBALL_ROOT_DIR')) { // if minified version used, load plugins manually
-            BModuleRegistry::i()->scan(BUCKYBALL_ROOT_DIR.'/plugins');
+
+        if (defined('BUCKYBALL_ROOT_DIR')) {
+            $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
+            // if minified version used, need to load plugins manually
         }
-        BModuleRegistry::i()
-            ->scan(FULLERON_ROOT_DIR.'/market/*')
-            ->scan(FULLERON_ROOT_DIR.'/local/*');
+        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/market/*';
+        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/local/*';
+
+        foreach ($this->_modulesDirs as $dir) {
+            BModuleRegistry::i()->scan($dir);
+        }
 #BDebug::profile($d);
 
-        $rootDir = $config->get('fs/root_dir');
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/local'));
+        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/market'));
         BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR));
 
         return $this;
