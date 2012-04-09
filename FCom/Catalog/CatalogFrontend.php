@@ -14,7 +14,7 @@ class FCom_Catalog_Frontend extends BClass
 
         BLayout::i()->addAllViews('Frontend/views');
 
-        BPubSub::i()->on('BLayout::layout.load.after', 'FCom_Catalog_Frontend::layout');
+        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Catalog_Frontend::layout');
     }
 
     static public function layout()
