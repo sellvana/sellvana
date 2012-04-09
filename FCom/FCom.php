@@ -419,10 +419,10 @@ class FCom extends BClass
                 'description' => "IndexTank API integration",
                 'areas' => array(
                     'FCom_Admin' => array(
-                        'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTankAdmin::bootstrap'),
+                        'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),
                     ),
                     'FCom_Frontend' => array(
-                        'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTankFrontend::bootstrap'),
+                        'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
                     ),
                 ),
             ))

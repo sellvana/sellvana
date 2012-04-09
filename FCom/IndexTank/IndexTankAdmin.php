@@ -1,21 +1,25 @@
 <?php
 
-class FCom_IndexTankAdmin extends BClass
+class FCom_IndexTank_Admin extends BClass
 {
     static public function bootstrap()
     {
-        $module = BApp::m();
-        $module->base_src .= '/Admin';
+        BLayout::i()->addAllViews('Admin/views');
+        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout')
+                    ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave');
 
-        BFrontController::i()
-            ->route('GET|POST /indextank/settings', 'FCom_IndexTank_Admin_Controller_Settings.index')
-        ;
         BLayout::i()
-                ->addAllViews('Admin/views');
+            ->layout(array(
+                '/settings'=>array(
+                    array('view', 'settings', 'set'=>array('tab_view_prefix'=>'settings/'), 'do'=>array(
+                        array('addTab', 'FCom_IndexTank', array('label'=>'IndexDen API', 'async'=>true))
+                        )))
+            ));
+    }
 
-        BPubSub::i()
-            ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTankAdmin.onSettingsPost')
-            ->on('BLayout::theme.load.after', 'FCom_IndexTankAdmin::layout')
-        ;
+    static public function onProductAfterSave($args)
+    {
+        $product = $args['model'];
+        FCom_IndexTank_Index_Product::i()->add($product);
     }
 }

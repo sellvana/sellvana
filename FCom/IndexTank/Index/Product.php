@@ -1,12 +1,12 @@
 <?php
 
-class FCom_IndexTank_Model_Product extends BClass
+class FCom_IndexTank_Index_Product extends BClass
 {
     protected $_index_name = 'products';
     protected $_model;
 
     //main DOCID - unique for each records
-    const DOC_ID = 'doc_id';
+    const DOC_ID = 'docid';
 
     //text fields IndexDen
     const FT_PRODUCT_NAME = 'product_name';
@@ -67,9 +67,9 @@ class FCom_IndexTank_Model_Product extends BClass
     {
         if (empty($this->_model)){
             try {
-                $this->_model = FCom_IndexTank::i()->service()->create_index($this->_index_name);
+                $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
             } catch (Exception $e){
-                $this->_model = FCom_IndexTank::i()->service()->get_index($this->_index_name);
+                $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
             }
         }
         return $this->_model;
@@ -88,9 +88,11 @@ class FCom_IndexTank_Model_Product extends BClass
         } else {
             $queryString = "match:all";
         }
+        //print_r($this->_model);exit;
         try {
             $result = $this->model()->search($queryString);
         } catch(Exception $e) {
+
             throw $e;
         }
 
@@ -99,11 +101,13 @@ class FCom_IndexTank_Model_Product extends BClass
         }
 
         $products = array();
-        $product_model = FCom_Catalog_Model_Product::i();
+        //$product_model = FCom_Catalog_Model_Product::i();
         foreach ($result->results as $res){
-            $products[] = $product_model->load($res->{self::DOC_ID});
+            $products[] = $res->{self::DOC_ID};
         }
-        return $products;
+        $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_in("id", $products)
+                ->order_by_expr_desc("FIELD(id, ".implode(",", $products).")");
+        return $productsORM;
     }
 
     /**
@@ -133,8 +137,8 @@ class FCom_IndexTank_Model_Product extends BClass
         */
         $documents = array();
 
-        foreach($products as $product){
-            $categories = array(
+        foreach($products as $i => $product){
+/*            $categories = array(
                 self::CT_PRICE_RANGE    => $product->getPriceRangeText(),
                 self::CT_BRAND          => $product->getBrandName()
              );
@@ -154,11 +158,11 @@ class FCom_IndexTank_Model_Product extends BClass
                 $categories[self::CT_SELLER_PREFIX . $seller->name] = 'Yes';
             }
 
-
+*/
             //get all variables
             $variables = array(
-                self::VAR_PRICE         => $product->base_price,
-                self::VAR_RATING        => $product->rating()
+                self::VAR_PRICE         => $product->base_price/*,
+                self::VAR_RATING        => $product->rating()*/
             );
 
             //get all text fields
@@ -171,17 +175,16 @@ class FCom_IndexTank_Model_Product extends BClass
                 self::FT_MATCH          => "all"
             );
 
-            $documents[][self::DOC_ID] = $product->id();
+            $documents[$i][self::DOC_ID] = $product->id();
 
-            $documents[]['fields'] = $fields;
+            $documents[$i]['fields'] = $fields;
             if (!empty($categories)){
-                $documents[]['categories'] = $categories;
+                $documents[$i]['categories'] = $categories;
             }
             if (!empty($variables)){
-                $documents[]['variables'] = $variables;
+                $documents[$i]['variables'] = $variables;
             }
         }
-
         $this->model()->add_documents($documents);
     }
 

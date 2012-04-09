@@ -8,7 +8,7 @@
                 <tr>
                     <td>IndexDen API URL</td>
                     <td>
-                        <input type="text" name="config[modules][FCom_IndexTank][api_url]" value="<?php echo $this->q($c->get('modules/FCom_IndexTank/api_url'))?>"/>
+                        <input size="50" type="text" name="config[modules][FCom_IndexTank][api_url]" value="<?php echo $this->q($c->get('modules/FCom_IndexTank/api_url'))?>"/>
                     </td>
                 </tr>
             </table>
