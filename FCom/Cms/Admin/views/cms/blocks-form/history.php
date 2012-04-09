@@ -1,9 +1,11 @@
 <?php
+    $m = $this->model;
+
     echo $this->view('jqgrid')->set('config', array(
         'grid'=>array(
-            'id' => 'cms_pages_form_history',
-            'url' => BApp::href('cms/pages/history/grid_data'),
-            'editurl' => BApp::href('cms/pages/history/grid_data'),
+            'id' => 'cms_blocks_form_history',
+            'url' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
+            'editurl' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
             'columns' => array(
                 'id' => array('label'=>'ID', 'hidden'=>true),
                 'ts' => array('label'=>'TimeStamp', 'formatter'=>'date'),

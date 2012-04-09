@@ -20,7 +20,7 @@ $m = $this->model;
                     <fieldset>
                         <ul>
                             <li><label for="node_type">Node Type</label><select id="node_type" name="node[node_type]">
-                            <?php echo $this->optionsHtml(array('cms_page'=>'CMS Page', 'catalog_category'=>'Category')) ?>
+                            <?php echo $this->optionsHtml($this->node_types) ?>
                             </select></li>
                         </ul>
                     </fieldset>

@@ -57,7 +57,7 @@ class FCom_Catalog_Model_Product extends BModel
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->manuf_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $this->set('url_key', FCom_Core::i()->getUrlKey($key));
+        $this->set('url_key', BLocale::transliterate($key));
         return $this;
     }
 

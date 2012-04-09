@@ -103,6 +103,9 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
     {
         $this->layout('/cms/nav/tree_form');
         $view = $this->view('cms/nav-tree-form');
+        $nodeTypes = array('cms_page'=>'CMS Page');
+        BPubSub::i()->fire(__METHOD__, array('node_types'=>&$nodeTypes));
+        $view->node_types = $nodeTypes;
         if (!$model = FCom_Cms_Model_Page::i()->load(BRequest::i()->params('id'))) {
             $model = FCom_Cms_Model_Page::i()->create();
         }

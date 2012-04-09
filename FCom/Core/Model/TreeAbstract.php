@@ -77,12 +77,23 @@ class FCom_Core_Model_TreeAbstract extends BModel
     {
         if ($parentId!=$this->parent_id) {
             $p = $this->load($parentId);
-            $this->unregister()->set(array(
+            $this->unregister();
+            $this->set(array(
                 'parent_id' => $p->id,
                 'id_path' => $p->id_path.'/'.$this->id,
-                'full_name' => $p->full_name.static::$_separator.$this->node_name,
+                'full_name' => trim($p->full_name.static::$_separator.$this->node_name, static::$_separator),
                 'url_path' => null,
-            ))->register()->refreshDescendants(false, true);
+            ));
+            $this->register();
+
+            $this->refreshDescendants(false, true);
+            $this->cacheSaveDirty();
+            //TODO: improve performance, figure out why can't calculate correct nums
+            $this->cacheClear();
+            $root = $this->load(1);
+            $root->descendants();
+            $root->recalculateNumDescendants();
+            $this->cacheSaveDirty();
         }
         return $this;
     }
@@ -147,18 +158,15 @@ class FCom_Core_Model_TreeAbstract extends BModel
 
     public function recalculateNumDescendants($save=false)
     {
-        $this->num_children = null;
-        $this->num_descendants = null;
         $children = $this->children();
+        $this->num_children = 0;
+        $this->num_descendants = 0;
         if ($children) {
             foreach ($children as $c) {
                 $c->recalculateNumDescendants($save);
-                $this->num_children++;
-                $this->num_descendants += 1+$c->num_descendants;
+                $this->add('num_children', 1);
+                $this->add('num_descendants', 1+$c->get('num_descendants'));
             }
-        } else {
-            $this->num_children = 0;
-            $this->num_descendants = 0;
         }
         if ($save) $this->save();
         return $this;
@@ -167,18 +175,22 @@ class FCom_Core_Model_TreeAbstract extends BModel
     public function unregister($save=false)
     {
         $this->parent()->add('num_children', -1);
+        $numDesc = 1+$this->num_descendants;
         foreach ($this->ascendants() as $c) {
-            $c->add('num_descendants', -(1+$this->num_descendants));
+            $c->add('num_descendants', -$numDesc);
             if ($save) $c->save();
         }
+        $this->saveInstanceCache('parent', null);
+        if ($save) $this->save();
         return $this;
     }
 
     public function register($save=false)
     {
         $this->parent()->add('num_children');
+        $numDesc = 1+$this->num_descendants;
         foreach ($this->ascendants() as $c) {
-            $c->add('num_descendants', 1+$this->num_descendants);
+            $c->add('num_descendants', $numDesc);
             if ($save) $c->save();
         }
         return $this;
@@ -197,7 +209,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
     {
         if (!parent::beforeDelete()) return false;
         if (($d = $this->descendants())) {
-            ACategory::delete_many(array('id'=>array_keys($d)));
+            $this->delete_many(array('id'=>array_keys($d)));
         }
         $this->unregister(true);
         return true;
@@ -288,7 +300,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
 
     public function generateUrlKey()
     {
-        $this->set('url_key', FCom_Catalog::getUrlKey($this->node_name));
+        $this->set('url_key', BLocale::transliterate($this->node_name));
         return $this;
     }
 

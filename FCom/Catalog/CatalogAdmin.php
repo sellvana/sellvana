@@ -36,7 +36,7 @@ class FCom_Catalog_Admin extends BClass
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
-            ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin.onProductsEditPost')
+            ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin::onProductsEditPost')
 
             /** @todo initialize these events only when needed */
             ->on('FCom_Admin_Controller_MediaLibrary::gridConfig.media/product/attachment',
@@ -62,6 +62,8 @@ class FCom_Catalog_Admin extends BClass
 
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost.media/product/image.edit',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'I'))
+
+            ->on('FCom_Cms_Admin_Controller_Nav::action_tree_form', 'FCom_Catalog_Admin::onNavTreeForm')
         ;
 
         FCom_Admin_Controller_MediaLibrary::i()
@@ -75,6 +77,7 @@ class FCom_Catalog_Admin extends BClass
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
         ));
+
     }
 
     static public function layout()
@@ -142,8 +145,13 @@ class FCom_Catalog_Admin extends BClass
         ;
     }
 
-    public function onProductsEditPost($args)
+    public static function onProductsEditPost($args)
     {
 print_r($args); exit;
+    }
+
+    public static function onNavTreeForm($args)
+    {
+        $args['node_types']['category'] = 'Category';
     }
 }
