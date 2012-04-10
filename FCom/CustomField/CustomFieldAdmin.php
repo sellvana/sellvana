@@ -6,8 +6,6 @@ class FCom_CustomField_Admin extends BClass
     {
         FCom_CustomField::bootstrap();
 
-        BDb::migrate('FCom_CustomField_Migrate');
-
         $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets.';
         BFrontController::i()
             ->route('GET /customfields/fieldsets', $ctrl.'index')

@@ -126,7 +126,8 @@ class FCom extends BClass
             $configFileStatus = false;
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
-            $area = 'FCom_Install';
+            $area = 'FCom_Admin';
+            BDebug::mode('INSTALLATION');
         }
 #echo "<Pre>"; print_r($config->get()); exit;
         // add area module
@@ -175,7 +176,11 @@ class FCom extends BClass
     {
         $config = BConfig::i();
 
-        $runLevels = array(static::area() => 'REQUIRED');
+        if (BDebug::is('INSTALLATION')) {
+            $runLevels = array('FCom_Install' => 'REQUIRED');
+        } else {
+            $runLevels = array(static::area() => 'REQUIRED');
+        }
         if (BDebug::is('RECOVERY')) { // load manifests for RECOVERY mode
             $recoveryModules = BConfig::i()->get('modules/FCom_Core/recovery_modules');
             if ($recoveryModules) {
@@ -240,7 +245,7 @@ class FCom extends BClass
                 'version' => '0.1.0',
                 'root_dir' => 'Install',
                 'bootstrap' => array('file'=>'Install.php', 'callback'=>'FCom_Install::bootstrap'),
-                'depends' => array('FCom_Core', 'FCom_Admin'),
+                'depends' => array('FCom_Core'),
                 'description' => "Initial installation wizard",
             ))
             // Frontend collection of modules
@@ -265,6 +270,7 @@ class FCom extends BClass
                 'root_dir' => 'Admin',
                 'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
                 'depends' => array('FCom_Core', 'FCom_Admin_DefaultTheme'),
+                'migrate' => 'FCom_Admin_Migrate',
                 'description' => "Base admin functionality",
             ))
             // Frontend collection of modules
@@ -289,6 +295,7 @@ class FCom extends BClass
                 'root_dir' => 'Cms',
                 'depends' => array('FCom_Core', 'BPHPTAL'),
                 'description' => "CMS for custom pages and forms",
+                'migrate' => 'FCom_Cms_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CmsAdmin.php', 'callback'=>'FCom_Cms_Admin::bootstrap'),
@@ -319,6 +326,7 @@ class FCom extends BClass
                 'root_dir' => 'Catalog',
                 'depends' => array('FCom_Core'),
                 'description' => "Categories and products management, admin and frontend",
+                'migrate' => 'FCom_Catalog_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CatalogAdmin.php', 'callback'=>'FCom_Catalog_Admin::bootstrap'),
@@ -350,6 +358,7 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
                 'depends' => array('FCom_Catalog'),
                 'description' => "Base custom fields implementation, currently for catalog only",
+                'migrate' => 'FCom_CustomField_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CustomFieldAdmin.php', 'callback'=>'FCom_CustomField_Admin::bootstrap'),
@@ -420,9 +429,11 @@ class FCom extends BClass
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),
+                        //'depends' => array('FCom_Admin'),
                     ),
                     'FCom_Frontend' => array(
                         'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
+                        //'depends' => array('FCom_Frontend'),
                     ),
                 ),
             ))

@@ -15,7 +15,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         try {
             $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
             $schemaModules = array();
-            foreach (BDb::getMigrationData() as $connection=>$migrationModules) {
+            foreach (BMigrate::getMigrationData() as $connection=>$migrationModules) {
                 foreach ($migrationModules as $modName=>$migrData) {
                     $schemaModules[$modName] = 1;
                 }
@@ -130,7 +130,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
     public function action_migrate__POST()
     {
         try {
-            BDb::i()->runMigrationScripts();
+            BMigrate::i()->migrateModules();
             BSession::i()->addMessage('Migration complete', 'success', 'admin');
         } catch (Exception $e) {
             BDebug::logException($e);

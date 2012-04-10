@@ -171,11 +171,11 @@ class FCom_IndexTank_Index_Product extends BClass
         $documents = array();
 
         foreach($products as $i => $product){
-/*            $categories = array(
+           $categories = array(
                 self::CT_PRICE_RANGE    => $product->getPriceRangeText(),
                 self::CT_BRAND          => $product->getBrandName()
              );
-
+/*
             $product_categories = array(); //get all categories for product
             foreach ($product_categories as $cat) {
                 $categories[self::CT_CATEGORY_PREFIX . $cat->full_name] = $cat->node_name;
@@ -194,8 +194,8 @@ class FCom_IndexTank_Index_Product extends BClass
 */
             //get all variables
             $variables = array(
-                self::VAR_PRICE         => $product->base_price/*,
-                self::VAR_RATING        => $product->rating()*/
+                self::VAR_PRICE         => $product->base_price,
+                self::VAR_RATING        => $product->rating()
             );
 
             //get all text fields
