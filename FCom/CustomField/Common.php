@@ -1,14 +1,14 @@
 <?php
 
-class FCom_CustomField extends BClass
+class FCom_CustomField_Common extends BClass
 {
     protected $_types;
 
     public static function bootstrap()
     {
         BPubSub::i()
-            ->on('FCom_Catalog_Model_Product::find_one.orm', 'FCom_CustomField.productFindORM')
-            ->on('FCom_Catalog_Model_Product::find_many.orm', 'FCom_CustomField.productFindORM')
+            ->on('FCom_Catalog_Model_Product::find_one.orm', 'FCom_CustomField_Common.productFindORM')
+            ->on('FCom_Catalog_Model_Product::find_many.orm', 'FCom_CustomField_Common.productFindORM')
             // is there save on frontend?
             //->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField.productAfterSave')
         ;

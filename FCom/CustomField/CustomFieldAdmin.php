@@ -4,7 +4,7 @@ class FCom_CustomField_Admin extends BClass
 {
     public static function bootstrap()
     {
-        FCom_CustomField::bootstrap();
+        FCom_CustomField_Common::bootstrap();
 
         $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets.';
         BFrontController::i()
