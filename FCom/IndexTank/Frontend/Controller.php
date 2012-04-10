@@ -16,7 +16,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         if ($sc){
-            FCom_IndexTank_Index_Product::i()->order_by($sc);
+            FCom_IndexTank_Index_Product::i()->scoring_by($sc);
         }
 
         if ($f){
