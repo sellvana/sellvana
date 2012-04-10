@@ -12,6 +12,7 @@
     </td>
     <td>
         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
+        <span class="price">Price : <?=$this->q($p->base_price)?></span>
         <span class="sku">Part #: <?=$this->q($p->manuf_sku)?></span>
         <span class="manuf-name"><?=$this->q($p->manuf_name)?></span>
         <span class="rating">

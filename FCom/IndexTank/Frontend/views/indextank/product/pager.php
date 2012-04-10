@@ -3,13 +3,11 @@ $s = $this->state;
 $psOptions = array(25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
-    'product_name|asc' => 'Product Name (A-Z)',
-    'product_name|desc' => 'Product Name (Z-A)',
-    'manuf_sku|asc' => 'Manuf SKU (A-Z)',
-    'manuf_sku|desc' => 'Manuf SKU (Z-A)',
-    'base_price|asc' => 'Price (Lower first)',
-    'base_price|desc' => 'Price (Higher first)',
+    'relevance' => 'Relevance',
+    'base_price_asc' => 'Price (Lower first)',
+    'base_price_desc' => 'Price (Higher first)',
 );
+
 ?>
 <form id="product_list_pager" name="product_list_pager" method="get" action="">
 

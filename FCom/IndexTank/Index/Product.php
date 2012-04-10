@@ -57,6 +57,12 @@ class FCom_IndexTank_Index_Product extends BClass
     const VAR_PRICE         = 0;
     const VAR_RATING        = 1;
 
+    //scoring functions definition for IndexDen
+    protected $_functions  =  array ();
+
+
+    //currently selected function
+    protected $_scoring_function = 0;
 
     /**
      *
@@ -66,13 +72,39 @@ class FCom_IndexTank_Index_Product extends BClass
     public function model()
     {
         if (empty($this->_model)){
-            try {
-                $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
-            } catch (Exception $e){
-                $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
+            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
+
+            //run once to init index
+            //$this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
+
+
+            //scoring functions definition for IndexDen
+            $this->_functions  =  array (
+                'age'                   => array('number' => 0, 'definition' => '-age'         ),
+                'relevance'             => array('number' => 1, 'definition' => 'relevance'    ),
+                'base_price_asc'        => array('number' => 2, 'definition' => '-d[' . self::VAR_PRICE . ']'  ),
+                'base_price_desc'       => array('number' => 3, 'definition' => 'd[' . self::VAR_PRICE . ']'   )
+            );
+
+            //run once to init functions
+            /*
+            foreach($this->_functions as $func){
+                $this->_model->add_function($func['number'], $func['definition']);
             }
+             *
+             */
+
         }
         return $this->_model;
+    }
+
+    public function order_by($column)
+    {
+        $this->model();
+        if (empty($this->_functions[$column])){
+            throw new Exception('Scoring function does not exist: ' . $column);
+        }
+        $this->_scoring_function = $this->_functions[$column]['number'];
     }
 
     /**
@@ -81,16 +113,17 @@ class FCom_IndexTank_Index_Product extends BClass
      * @return array $products of FCom_Catalog_Model_Product objects
      * @throws Exception if query failed
      */
-    public function search($query)
+    public function search($query, $start=null, $len=null)
     {
         if (!empty($query)){
             $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".self::FT_DESCRIPTION.":($query) ";
         } else {
             $queryString = "match:all";
         }
-        //print_r($this->_model);exit;
+
         try {
-            $result = $this->model()->search($queryString);
+            //search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL)
+            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function);
         } catch(Exception $e) {
 
             throw $e;
@@ -106,7 +139,7 @@ class FCom_IndexTank_Index_Product extends BClass
             $products[] = $res->{self::DOC_ID};
         }
         $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_in("id", $products)
-                ->order_by_expr_desc("FIELD(id, ".implode(",", $products).")");
+                ->order_by_expr("FIELD(id, ".implode(",", $products).")");
         return $productsORM;
     }
 
