@@ -63,6 +63,7 @@ class FCom_IndexTank_Index_Product extends BClass
 
     //currently selected function
     protected $_scoring_function = 0;
+    protected $_filter_category = null;
 
     /**
      *
@@ -107,6 +108,15 @@ class FCom_IndexTank_Index_Product extends BClass
         $this->_scoring_function = $this->_functions[$column]['number'];
     }
 
+    public function filter_by($category, $value)
+    {
+        if ( !in_array($category, array(self::CT_PRICE_RANGE, self::CT_BRAND)) ){
+            throw new Exception('Filter does not exist: ' . $category);
+        }
+        $this->_filter_category[$category][] = $value;
+
+    }
+
     /**
      *
      * @param string $query
@@ -123,7 +133,7 @@ class FCom_IndexTank_Index_Product extends BClass
 
         try {
             //search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL)
-            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function);
+            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function, null, null, $this->_filter_category);
         } catch(Exception $e) {
 
             throw $e;

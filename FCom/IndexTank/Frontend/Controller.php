@@ -8,6 +8,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $sc = BRequest::i()->get('sc');
+        $f = BRequest::i()->get('f');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
         if (!$q) {
@@ -16,6 +17,12 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         if ($sc){
             FCom_IndexTank_Index_Product::i()->order_by($sc);
+        }
+
+        if ($f){
+            foreach($f as $key => $value) {
+                FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
+            }
         }
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
@@ -29,6 +36,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             $productsData = $this->paginate($productsORM, $r, array('ps' => 25));
         }
 
+        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = array('$0 to $99', '$100 to $299', '$300+');
         BApp::i()
             ->set('current_query', $q)
             ->set('products_data', $productsData);

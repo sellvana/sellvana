@@ -75,9 +75,9 @@ class FCom_Catalog_Model_Product extends BModel
         if ($this->base_price < 100){
             return "$0 to $99";
         } elseif ($this->base_price < 300) {
-            return "100 to 299";
+            return "$100 to $299";
         } else {
-            return "300+";
+            return "$300+";
         }
     }
 

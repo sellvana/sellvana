@@ -1,5 +1,7 @@
 <?php
 $s = $this->state;
+$price_ranges = $this->price_ranges;
+
 $psOptions = array(25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
@@ -38,6 +40,13 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
 <? endforeach ?>
     </select>
+    </div>
+    <br/><br/>
+    <div class="sort-by f-right">
+    <label>Filter by price:</label>
+<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] as $range): ?>
+        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>]" value="<?=$range?>" onclick="this.form.submit()">  <?=$range?> <br/>
+<? endforeach ?>
     </div>
 </div>
 
