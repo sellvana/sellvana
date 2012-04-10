@@ -4,7 +4,7 @@ class FCom_Catalog_Migrate extends BClass
 {
     public function run()
     {
-        BDb::install('0.1.0', array($this, 'install'));
+        BMigrate::install('0.1.0', array($this, 'install'));
     }
 
     public function install()

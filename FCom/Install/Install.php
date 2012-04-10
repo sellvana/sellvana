@@ -25,14 +25,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         BLayout::i()->view('head')->css('css/styles.css');
 
-        $sData =& BSession::i()->dataToUpdate();
-        if (empty($sData['w'])) {
-            $sData['w'] = array(
-                'db'=>array('host'=>'localhost', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>''),
-                'admin'=>array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>''),
-            );
-        }
-
         return true;
     }
 
@@ -49,12 +41,20 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step1()
     {
+        $sData =& BSession::i()->dataToUpdate();
+        if (empty($sData['w']['db'])) {
+            $sData['w']['db'] = array('host'=>'localhost', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
+        }
         $this->messages('step1', 'install');
         BLayout::i()->hookView('main', 'step1');
     }
 
     public function action_step2()
     {
+        $sData =& BSession::i()->dataToUpdate();
+        if (empty($sData['w']['admin'])) {
+            $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
+        }
         $this->messages('step2', 'install');
         BLayout::i()->hookView('main', 'step2');
     }
@@ -86,7 +86,9 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
         $step = 1;
         if (BConfig::i()->get('db')) {
             $step = 2;
-            if (FCom_Admin_Model_User::i()->orm('u')->find_one()) {
+            if (class_exists('FCom_Admin_Model_User')
+                && FCom_Admin_Model_User::i()->orm('u')->find_one()
+            ) {
                 $step = 3;
             }
         }
@@ -95,13 +97,11 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
 
     public function action_step1()
     {
-        $w = BRequest::i()->post('w');
-        BConfig::i()->add(array('db'=>$w['db']), true);
         try {
-            BDb::connect();
+            $w = BRequest::i()->post('w');
+            BConfig::i()->add(array('db'=>$w['db']), true);
+            BMigrate::i()->migrateModules('FCom_Admin');
             FCom_Core::i()->writeDbConfig();
-            BConfig::i()->set('db/implicit_migration', true, false, true);
-            FCom_Core::i()->writeLocalConfig();
             $url = BApp::href('install/step2');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
@@ -112,8 +112,8 @@ class FCom_Install_Controller_Post extends FCom_Core_Controller_Abstract
 
     public function action_step2()
     {
-        $w = BRequest::i()->post('w');
         try {
+            $w = BRequest::i()->post('w');
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
