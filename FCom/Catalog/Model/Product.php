@@ -69,5 +69,26 @@ class FCom_Catalog_Model_Product extends BModel
 
         }
     }
+
+    public function getPriceRangeText()
+    {
+        if ($this->base_price < 100){
+            return "$0 to $99";
+        } elseif ($this->base_price < 300) {
+            return "100 to 299";
+        } else {
+            return "300+";
+        }
+    }
+
+    public function getBrandName()
+    {
+        return (rand(0, 100) % 2 == 0) ? "Brand 1": "Brand 2";
+    }
+
+    public function rating()
+    {
+        return rand(0, 100);
+    }
 }
 
