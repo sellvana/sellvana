@@ -7,8 +7,6 @@ class FCom_Catalog_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        BDb::migrate('FCom_Catalog_Migrate');
-
         BFrontController::i()
             ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET /catalog/products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
