@@ -4,17 +4,13 @@ class FCom_IndexTank_Admin extends BClass
 {
     static public function bootstrap()
     {
-        require BUCKYBALL_ROOT_DIR . '/plugins/BphpQuery/BphpQuery.php';
-         BphpQuery::i()->debug = 2;
-         BphpQuery::i()->ready(function($args) {
-        $html = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
-        <script type="text/javascript">
-            function ajax_index_all_products() {
-                $.ajax({ type: "GET", url: "/admin/indextank/products/index"})
-                .done(function( msg ) { alert( msg ); });
-            }
-        </script>
-        ';
+        BphpQuery::i()->debug = 2;
+        BphpQuery::i()->ready(function($args) {
+            $html = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
+<script type="text/javascript">
+    function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
+        .done(function( msg ) { alert( msg ); }); }
+</script>';
             $args['doc']['header.adm-page-title div.btns-set']->append($html);
         });
 
