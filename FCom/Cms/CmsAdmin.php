@@ -55,6 +55,7 @@ class FCom_Cms_Admin extends BClass
             ),
             '/cms/nav'=>array(
                 array('layout', 'base'),
+                array('layout', 'form'),
                 array('hook', 'main', 'views'=>array('cms/nav')),
                 array('view', 'root', 'do'=>array(array('setNav', 'cms/nav'))),
             ),
@@ -65,7 +66,7 @@ class FCom_Cms_Admin extends BClass
                         'tab_view_prefix' => 'cms/nav-tree-form/',
                     ),
                     'do'=>array(
-                        array('addTab', 'main', array('label'=>'Navigation Node', 'pos'=>10, 'view'=>false)),
+                        array('addTab', 'main', array('label'=>'Navigation Node', 'pos'=>10)),
                     ),
                 ),
             ),

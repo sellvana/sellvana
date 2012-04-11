@@ -8,7 +8,7 @@ head(function() {
     window.adminForm = Admin.form({
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
-        url_get:  '<?php echo BApp::href('catalog/products/form_tab/'.$p->id) ?>',
+        url_get:  '<?php echo BApp::href('catalog/products/form/'.$p->id) ?>',
         url_post: '<?php echo BApp::href('catalog/products/form/'.$p->id) ?>'
     });
 })

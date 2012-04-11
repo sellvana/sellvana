@@ -2,6 +2,12 @@
 $tabs = $this->sortedTabs();
 $m = $this->model;
 ?>
+<section class="adm-product-summary adm-section-group">
+    <div style="float:right">
+        <button class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>
+    </div>
+    <h1><?php echo $this->q(str_replace('|', ' > ', $m->full_name)) ?></h1>
+</section>
 <section class="adm-content-box info-view-mode">
     <div class="adm-content-inner">
         <div class="adm-tabs-left-bg"></div>
@@ -15,17 +21,6 @@ $m = $this->model;
             </ul>
         </nav>
         <div class="adm-tabs-container">
-            <section id="tab-main" class="adm-tabs-content" data-loaded="true">
-                <form id="nav-tree-form" action="<?php echo BApp::href('cms/nav_tree_form/'.$m->id) ?>" method="post">
-                    <fieldset>
-                        <ul>
-                            <li><label for="node_type">Node Type</label><select id="node_type" name="node[node_type]">
-                            <?php echo $this->optionsHtml($this->node_types) ?>
-                            </select></li>
-                        </ul>
-                    </fieldset>
-                </form>
-            </section>
 <?php foreach ($tabs as $k=>$tab): if (!empty($tab['view'])): ?>
             <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
                 <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
@@ -37,13 +32,3 @@ $m = $this->model;
         </div>
     </div>
 </section>
-<script>
-head(function() {
-    window.adminForm = Admin.form({
-        tabs:     '.adm-tabs-left li',
-        panes:    '.adm-tabs-content',
-        url_get:  '<?php echo BApp::href('cms/nav_tree_form_tab/'.$m->id) ?>',
-        url_post: '<?php echo BApp::href('cms/nav_tree_form/'.$m->id) ?>'
-    });
-})
-</script>
