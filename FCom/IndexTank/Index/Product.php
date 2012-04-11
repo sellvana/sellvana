@@ -65,6 +65,8 @@ class FCom_IndexTank_Index_Product extends BClass
     protected $_scoring_function = 0;
     protected $_filter_category = null;
 
+    protected $_result = null;
+
 
     protected function _init()
     {
@@ -82,7 +84,7 @@ class FCom_IndexTank_Index_Product extends BClass
     {
         //init configuration
         $this->_init();
-        
+
         try {
             //create an index
             $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
@@ -150,6 +152,7 @@ class FCom_IndexTank_Index_Product extends BClass
         } catch(Exception $e) {
             throw $e;
         }
+        $this->_result = $result;
 
         if ($result->matches <= 0){
             return false;
@@ -163,6 +166,19 @@ class FCom_IndexTank_Index_Product extends BClass
         $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_in("id", $products)
                 ->order_by_expr("FIELD(id, ".implode(",", $products).")");
         return $productsORM;
+    }
+
+    public function getFacets()
+    {
+        if (!isset($this->_result->facets)){
+            return false;
+        }
+        $facets = get_object_vars($this->_result->facets);
+        $res = array();
+        foreach($facets as $k => $v){
+            $res[$k] = get_object_vars($v);
+        }
+        return $res;
     }
 
     /**

@@ -50,7 +50,8 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>][]"
                value="<?=$range?>" onclick="this.form.submit()"
                <?=(in_array($range, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]))?'checked':''?>
-               >  <?=$range?> <br/>
+               >  <?=$range?>
+                (<?=$s['facets'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE][$range]?>) <br/>
 <? endforeach ?>
     <br/>
     <label>Filter by brand:</label><br/>
@@ -58,7 +59,8 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_BRAND?>][]"
                value="<?=$range?>" onclick="this.form.submit()"
                <?=(in_array($range, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND]))?'checked':''?>
-               >  <?=$range?> <br/>
+               >  <?=$range?>
+        (<?=$s['facets'][FCom_IndexTank_Index_Product::CT_BRAND][$range]?>)<br/>
 <? endforeach ?>
     </div>
 </div>
