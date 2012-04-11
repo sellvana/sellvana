@@ -67,12 +67,10 @@ function fmtRunStatus(val,opt,row) {
 
 function fmtSchemaVersion(val,opt,row) {
     console.log(val,row);
-    if (val===null) {
-        return '';
-    } else if (val==row.version) {
-        return val;
+    if (row.migration_available && val!=row.version) {
+        return '<div style="padding:3px; color:000; background:#FCC">'+(val?val:'&nbsp;')+'</div>';
     } else {
-        return '<div style="padding:3px; color:000; background:#FCC">'+val+'</div>';
+        return val?val:'';
     }
 }
 </script>

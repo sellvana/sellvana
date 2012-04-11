@@ -48,7 +48,15 @@ window.appConfig = {
                             </ul>
                         </li>
 <?php endif ?>
-					    <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a></li>
+					    <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a>
+                            <ul class="sub-section" style="width:200px">
+                                <li><a href="#">Module update 1</a></li>
+                                <li><a href="#">Module update 2</a></li>
+                                <li><a href="#">Workflow update 1</a></li>
+                                <li><a href="#">Workflow update 2</a></li>
+                            </ul>
+
+                        </li>
 					    <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						    <ul class="sub-section">
 							    <li><a href="<?php echo BApp::href('/my_account')?>">My Account</a></li>

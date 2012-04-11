@@ -137,7 +137,8 @@ class FCom_Core_Model_TreeAbstract extends BModel
         if (!$this->id) $this->_new = true;
         if (!$this->sort_order) $this->generateSortOrder();
         if (!$this->url_key) $this->generateUrlKey();
-        if (!$this->url_path) $this->generateUrlPath();
+        if (!$this->url_path || $this->is_dirty('url_key')) $this->generateUrlPath();
+        if (!$this->full_name || $this->is_dirty('node_name')) $this->generateFullName();
 
         return true;
     }
@@ -311,6 +312,13 @@ class FCom_Core_Model_TreeAbstract extends BModel
             $urlKey = trim($this->parent()->url_path.'/'.$this->url_key, '/');
         }
         $this->set('url_path', $urlKey);
+        return $this;
+    }
+
+    public function generateFullName()
+    {
+        $fullName = $this->parent()->full_name.static::$_separator.$this->node_name;
+        $this->set('full_name', trim($fullName, '|'));
         return $this;
     }
 }

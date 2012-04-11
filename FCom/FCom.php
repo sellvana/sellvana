@@ -126,7 +126,7 @@ class FCom extends BClass
             $configFileStatus = false;
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
-            $area = 'FCom_Admin';
+            $area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
         }
 #echo "<Pre>"; print_r($config->get()); exit;
@@ -291,7 +291,7 @@ class FCom extends BClass
             ))
             // catalog views and controllers
             ->addModule('FCom_Cms', array(
-                'version' => '0.1.0',
+                'version' => '0.1.1',
                 'root_dir' => 'Cms',
                 'depends' => array('FCom_Core', 'BPHPTAL'),
                 'description' => "CMS for custom pages and forms",

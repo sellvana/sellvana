@@ -4,12 +4,17 @@ class FCom_Cms_Migrate extends BClass
 {
     public function run()
     {
-        BMigrate::install('0.1.0', function() {
-            $tNav = FCom_Cms_Model_Nav::table();
-            $tPage = FCom_Cms_Model_Page::table();
-            $tPageHistory = FCom_Cms_Model_PageHistory::table();
-            $tBlock = FCom_Cms_Model_Block::table();
-            $tBlockHistory = FCom_Cms_Model_BlockHistory::table();
+        BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+    }
+
+    public function install()
+    {
+        $tNav = FCom_Cms_Model_Nav::table();
+        $tPage = FCom_Cms_Model_Page::table();
+        $tPageHistory = FCom_Cms_Model_PageHistory::table();
+        $tBlock = FCom_Cms_Model_Block::table();
+        $tBlockHistory = FCom_Cms_Model_BlockHistory::table();
 
         BDb::run("
 CREATE TABLE IF NOT EXISTS {$tNav} (
@@ -75,7 +80,19 @@ CREATE TABLE {$tBlockHistory} (
   `ts` datetime not null,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-            ");
-        });
+        ");
+    }
+
+    public function upgrade_0_1_1()
+    {
+        $tNav = FCom_Cms_Model_Nav::table();
+
+        BDb::run("
+ALTER TABLE `fulleron`.`fcom_cms_nav`
+    ADD COLUMN `node_type` VARCHAR(20) NULL AFTER `num_descendants`
+    , ADD COLUMN `reference` VARCHAR(255) NULL AFTER `node_type`
+    , ADD COLUMN `contents` TEXT NULL AFTER `reference`
+    , ADD COLUMN `layout_update` TEXT NULL AFTER `contents`;
+        ");
     }
 }

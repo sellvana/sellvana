@@ -102,19 +102,34 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract
     public function action_tree_form()
     {
         $this->layout('/cms/nav/tree_form');
-        $view = $this->view('cms/nav-tree-form');
-        $nodeTypes = array('cms_page'=>'CMS Page');
+        $nodeTypes = array('content'=>'Text', 'cms_page'=>'CMS Page');
         BPubSub::i()->fire(__METHOD__, array('node_types'=>&$nodeTypes));
-        $view->node_types = $nodeTypes;
-        if (!$model = FCom_Cms_Model_Page::i()->load(BRequest::i()->params('id'))) {
-            $model = FCom_Cms_Model_Page::i()->create();
+        $this->view('cms/nav-tree-form/main')->node_types = $nodeTypes;
+        if ($id = BRequest::i()->params('id')) {
+            $id = preg_replace('#^[^0-9]+#', '', $id);
+            $model = FCom_Cms_Model_Nav::i()->load($id);
+        } else {
+            $model = FCom_Cms_Model_Nav::i()->create();
         }
-
-        $this->initFormTabs($view, $model);
+        $this->initFormTabs($this->view('cms/nav-tree-form'), $model);
     }
 
     public function action_tree_form__POST()
     {
+        try {
+            $id = BRequest::i()->params('id');
+            if (!$id || !($model = FCom_Cms_Model_Nav::i()->load($id))) {
+                throw new Exception('Invalid node ID');
+            }
+            $model->set(BRequest::i()->post('model'))
+                ->set(array('url_path'=>null, 'full_name'=>null));
+            $model->save();
+            $model->refreshDescendants(true, true);
 
+            $result = array('status'=>'success', 'message'=>'Node updated');
+        } catch (Exception $e) {
+            $result = array('status'=>'error', 'message'=>$e->getMessage());
+        }
+        BResponse::i()->json($result);
     }
 }
