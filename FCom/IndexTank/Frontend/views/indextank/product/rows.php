@@ -8,7 +8,7 @@
         <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$p->id?>"> Compare</label>
     </td>
     <td>
-        <img src="<?=$this->q($p->thumbUrl(85, 60))?>" width="85" height="60" class="product-img" alt="<?=$this->q($p->product_name)?>"/>
+        <img src="<?=$this->q($p->thumbUrl(85, 60))?>" width="85" height="60" class="product-img" alt="<?//=$this->q($p->product_name)?>"/>
     </td>
     <td>
         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
@@ -24,7 +24,8 @@
         <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
             <? if ($loggedIn):?><span class="availability in-stock">In Inventory</span><? endif ?>
             <span class="price-label">As low as</span>
-            <p><span class="price">$<?=number_format($p->base_price)?></span><span class="supplier">Darby Dental</span></p>
+            <p><span class="price">$<?=number_format($p->base_price)?></span>
+                <span class="supplier">Darby Dental</span></p>
             <div class="price-range">
                 <strong><a href="#" class="vendor-count">13 Vendors</a></strong>: $24-$49
             </div>

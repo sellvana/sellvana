@@ -426,6 +426,7 @@ class FCom extends BClass
                 'root_dir' => 'IndexTank',
                 'depends' => array('FCom_Core'),
                 'description' => "IndexTank API integration",
+                'migrate' => 'FCom_IndexTank_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),

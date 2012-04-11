@@ -90,5 +90,21 @@ class FCom_Catalog_Model_Product extends BModel
     {
         return rand(0, 100);
     }
+
+    public function categories($pId)
+    {
+        return FCom_Catalog_Model_CategoryProduct::i()->orm('cp')->where('cp.product_id', $pId)->find_many();
+    }
+
+    public function customFields($pId)
+    {
+        //todo: add get custom fields by product id $pId
+        //
+        // select * from fcom_field f inner join fcom_field_option fo on (f.id = fo.field_id)
+        // inner join fcom_product_custom pc on (pc.product_id = $p.id and pc._fieldset_ids = f.id)
+        // 
+        //return FCom_CustomField_Model_Field::i()->orm('f')->where('f.field_type', 'product')->find_many();
+        return false;
+    }
 }
 

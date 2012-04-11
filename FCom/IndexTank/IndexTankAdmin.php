@@ -4,8 +4,23 @@ class FCom_IndexTank_Admin extends BClass
 {
     static public function bootstrap()
     {
+        require BUCKYBALL_ROOT_DIR . '/plugins/BphpQuery/BphpQuery.php';
+         BphpQuery::i()->debug = 2;
+         BphpQuery::i()->ready(function($args) {
+        $html = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
+        <script type="text/javascript">
+            function ajax_index_all_products() {
+                $.ajax({ type: "GET", url: "/admin/indextank/products/index"})
+                .done(function( msg ) { alert( msg ); });
+            }
+        </script>
+        ';
+            $args['doc']['header.adm-page-title div.btns-set']->append($html);
+        });
+
+
         BFrontController::i()
-            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::products_index_all');
+            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll');
 
         BLayout::i()->addAllViews('Admin/views');
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout')
@@ -13,9 +28,10 @@ class FCom_IndexTank_Admin extends BClass
                     ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete');
     }
 
-    static public function products_index_all()
+
+    static public function productsIndexAll()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*');
+        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
         $limit = 1000;
         $offset = 0;
         $counter = 0;
@@ -51,6 +67,8 @@ class FCom_IndexTank_Admin extends BClass
                         array('addTab', 'FCom_IndexTank', array('label'=>'IndexDen API', 'async'=>true))
                         )))
             ));
+
+
     }
 
 }

@@ -19,9 +19,16 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             FCom_IndexTank_Index_Product::i()->scoring_by($sc);
         }
 
+        $filters_selected = array();
         if ($f){
-            foreach($f as $key => $value) {
-                FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
+            foreach($f as $key => $values) {
+                if (!is_array($values)){
+                    $values = array($values);
+                }
+                foreach ($values as $value){
+                    FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
+                }
+                $filters_selected[$key] = $values;
             }
         }
 
@@ -37,6 +44,10 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = array('$0 to $99', '$100 to $299', '$300+');
+        $productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $filters_selected[FCom_IndexTank_Index_Product::CT_PRICE_RANGE];
+
+        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_BRAND] = array('Brand 1', 'Brand 2', 'Brand 3');
+        $productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND] = $filters_selected[FCom_IndexTank_Index_Product::CT_BRAND];
         BApp::i()
             ->set('current_query', $q)
             ->set('products_data', $productsData);
