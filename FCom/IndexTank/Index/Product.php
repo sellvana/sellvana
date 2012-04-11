@@ -66,7 +66,7 @@ class FCom_IndexTank_Index_Product extends BClass
     protected $_filter_category = null;
 
 
-    public function _init()
+    protected function _init()
     {
         //scoring functions definition for IndexDen
         //todo: move them into configuration
@@ -78,11 +78,17 @@ class FCom_IndexTank_Index_Product extends BClass
         );
     }
 
-    public function _install()
+    public function install()
     {
+        //init configuration
         $this->_init();
-        //create an index
-        $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
+        
+        try {
+            //create an index
+            $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
+        } catch(Exception $e) {
+            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
+        }
 
         //run once to install scoring functions
         foreach($this->_functions as $func){
@@ -98,7 +104,9 @@ class FCom_IndexTank_Index_Product extends BClass
     public function model()
     {
         if (empty($this->_model)){
+            //init config
             $this->_init();
+            //init model
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
         return $this->_model;
@@ -235,23 +243,32 @@ class FCom_IndexTank_Index_Product extends BClass
         return $fields;
     }
 
+    /**
+     *
+     * @param FCom_Catalog_Model_Product $product
+     * @return array
+     */
     protected function _prepareCategories($product)
     {
         $categories = array(
                 self::CT_PRICE_RANGE    => $product->getPriceRangeText(),
                 self::CT_BRAND          => $product->getBrandName()
         );
-/*
-        $product_categories = $product->categories(); //get all categories for product
+
+        $product_categories = $product->categories($product->id()); //get all categories for product
+        if ($product_categories){
             foreach ($product_categories as $cat) {
                 $categories[self::CT_CATEGORY_PREFIX . $cat->full_name] = $cat->node_name;
             }
+        }
 
-        $product_custom_fields = $product->custom_fields(); //get all custom fields for product
+        $product_custom_fields = $product->customFields($product->id()); //get all custom fields for product
+        if ($product_custom_fields) {
             foreach ($product_custom_fields as $cf) {
                 $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_type. $cf->field_code .$cf->field_name] = $cf->label;
             }
-
+        }
+/*
         $product_sellers = $product->sellers(); //get all sellers for product
             foreach ($product_sellers as $seller) {
                 $categories[self::CT_SELLER_PREFIX . $seller->name] = 'Yes';
