@@ -12,7 +12,7 @@ class FCom_IndexTank_Admin extends BClass
         .done(function( msg ) { alert( msg ); }); }
 </script>';
             $args['doc']['header.adm-page-title div.btns-set']->append($html);
-        });
+        }, array('on_path'=>'/catalog/products'));
 
 
         BFrontController::i()
