@@ -1,7 +1,6 @@
 <?php
 $tabs = $this->sortedTabs();
 $m = $this->model;
-$formUrl = BApp::href('cms/nav/tree_form/'.$m->id);
 ?>
 <section class="adm-product-summary adm-section-group">
     <div style="float:right">

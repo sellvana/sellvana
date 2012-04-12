@@ -317,7 +317,8 @@ class FCom_Core_Model_TreeAbstract extends BModel
 
     public function generateFullName()
     {
-        $fullName = $this->parent()->full_name.static::$_separator.$this->node_name;
+        $parent = $this->parent();
+        $fullName = ($parent ? $parent->full_name : '').static::$_separator.$this->node_name;
         $this->set('full_name', trim($fullName, '|'));
         return $this;
     }
