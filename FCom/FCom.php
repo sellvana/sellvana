@@ -19,11 +19,17 @@ class FCom extends BClass
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
 
+    /**
+    * @deprecated
+    */
     static public function area()
     {
         return BApp::i()->get('area');
     }
 
+    /**
+    * @deprecated
+    */
     static public function rootDir()
     {
         return FULLERON_ROOT_DIR;
@@ -176,6 +182,10 @@ class FCom extends BClass
     {
         $config = BConfig::i();
 
+        if (BDebug::is('DISABLED')) {
+            BResponse::i()->status('404', 'Page not found', 'Page not found');
+            die;
+        }
         if (BDebug::is('INSTALLATION')) {
             $runLevels = array('FCom_Install' => 'REQUIRED');
         } else {
@@ -430,7 +440,7 @@ class FCom extends BClass
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),
-                        'depends' => array('BphpQuery'),
+                        'depends' => array('BGanon'),
                     ),
                     'FCom_Frontend' => array(
                         'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
