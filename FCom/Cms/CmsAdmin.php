@@ -4,10 +4,6 @@ class FCom_Cms_Admin extends BClass
 {
     public static function bootstrap()
     {
-        BPubSub::i()
-            ->on('BLayout::theme.load.after', 'FCom_Cms_Admin::layout')
-        ;
-
         BFrontController::i()
             ->route('GET /cms/nav', 'FCom_Cms_Admin_Controller_Nav.index')
             ->route('GET|POST /cms/nav/tree_data', 'FCom_Cms_Admin_Controller_Nav.tree_data')
@@ -28,6 +24,7 @@ class FCom_Cms_Admin extends BClass
         ;
 
         BLayout::i()->addAllViews('Admin/views')
+            ->afterTheme('FCom_Cms_Admin::layout')
             ->view('cms/nav-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('cms/pages-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->view('cms/blocks-form', array('view_class'=>'FCom_Admin_View_Form'))
@@ -67,6 +64,7 @@ class FCom_Cms_Admin extends BClass
                     ),
                     'do'=>array(
                         array('addTab', 'main', array('label'=>'Navigation Node', 'pos'=>10)),
+                        array('addTab', 'content', array('label'=>'Page Content', 'pos'=>20)),
                     ),
                 ),
             ),
