@@ -126,10 +126,15 @@ class FCom_IndexTank_Index_Product extends BClass
     public function filter_by($category, $value)
     {
         if ( !in_array($category, array(self::CT_PRICE_RANGE, self::CT_BRAND)) ){
-            throw new Exception('Filter does not exist: ' . $category);
+           // throw new Exception('Filter does not exist: ' . $category);
         }
         $this->_filter_category[$category][] = $value;
 
+    }
+
+    public function reset_filters()
+    {
+        $this->_filter_category = array();
     }
 
     /**
@@ -153,7 +158,7 @@ class FCom_IndexTank_Index_Product extends BClass
             throw $e;
         }
         $this->_result = $result;
-
+        //print_r( $this->_result);exit;
         if ($result->matches <= 0){
             return false;
         }
@@ -163,8 +168,8 @@ class FCom_IndexTank_Index_Product extends BClass
         foreach ($result->results as $res){
             $products[] = $res->{self::DOC_ID};
         }
-        $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_in("id", $products)
-                ->order_by_expr("FIELD(id, ".implode(",", $products).")");
+        $productsORM = FCom_Catalog_Model_Product::i()->orm('p')->where_in("p.id", $products)
+                ->order_by_expr("FIELD(p.id, ".implode(",", $products).")");
         return $productsORM;
     }
 
@@ -255,7 +260,7 @@ class FCom_IndexTank_Index_Product extends BClass
                 self::FT_PRODUCT_NAME   => $product->product_name,
                 self::FT_MANUF_SKU      => $product->manuf_sku,
                 self::FT_NOTES          => $product->notes,
-                self::FT_TIMESTAMP      => strtotime($product->updated_dt),
+                self::FT_TIMESTAMP      => strtotime($product->update_dt),
                 self::FT_MATCH          => "all"
         );
         return $fields;
@@ -268,8 +273,9 @@ class FCom_IndexTank_Index_Product extends BClass
      */
     protected function _prepareCategories($product)
     {
+
         $categories = array(
-                self::CT_PRICE_RANGE    => $product->getPriceRangeText(),
+                self::CT_PRICE_RANGE     => $product->getPriceRangeText(),
                 self::CT_BRAND          => $product->getBrandName()
         );
 
@@ -279,11 +285,12 @@ class FCom_IndexTank_Index_Product extends BClass
                 $categories[self::CT_CATEGORY_PREFIX . $cat->full_name] = $cat->node_name;
             }
         }
-        
-        $product_custom_fields = $product->customFields($product->id()); //get all custom fields for product
+
+        $product_custom_fields = $product->customFields($product); //get all custom fields for product
         if ($product_custom_fields) {
             foreach ($product_custom_fields as $cf) {
-                $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_type. $cf->field_code .$cf->field_name] = $cf->label;
+                //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code .'_'.$cf->field_name] = $cf->label;
+                $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code] = $cf->field_name;
             }
         }
 /*
