@@ -25,7 +25,12 @@ class FCom_IndexTank_Admin extends BClass
         BLayout::i()->addAllViews('Admin/views');
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout')
                     ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
-                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete');
+                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
+
+                    //now for categories
+                    ->on('FCom_Catalog_Model_Category::afterSave', 'FCom_IndexTank_Admin::onCategoryAfterSave')
+                    ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+            ;
     }
 
 
@@ -57,6 +62,28 @@ class FCom_IndexTank_Admin extends BClass
         $product = $args['model'];
         FCom_IndexTank_Index_Product::i()->delete($product);
     }
+
+    static public function onCategoryAfterSave($args)
+    {
+        $category = $args['model'];
+        $products = $category->products();
+        foreach($products as $product){
+            $categories = array(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX . $category->full_name => $category->node_name);
+            FCom_IndexTank_Index_Product::i()->update_categories($product, $categories);
+        }
+    }
+
+    static public function onCategoryBeforeDelete($args)
+    {
+        $category = $args['model'];
+        $products = $category->products();
+        foreach($products as $product){
+            $categories = array(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX . $category->full_name => "");
+            FCom_IndexTank_Index_Product::i()->update_categories($product, $categories);
+        }
+    }
+
+
 
     static public function layout()
     {
