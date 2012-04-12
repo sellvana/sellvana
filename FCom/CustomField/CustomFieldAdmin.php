@@ -22,10 +22,10 @@ class FCom_CustomField_Admin extends BClass
 
         BLayout::i()
             ->addAllViews('Admin/views')
+            ->afterTheme('FCom_CustomField_Admin::layout')
         ;
 
         BPubSub::i()
-            ->on('BLayout::theme.load.after', 'FCom_CustomField_Admin::layout')
             ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
             ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns');
         ;
@@ -41,7 +41,7 @@ class FCom_CustomField_Admin extends BClass
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
-                    array('view', 'catalog/products/form',
+                    array('view', 'catalog/products-form',
                         'do'=>array(
                             array('addTab', 'fields', array('label' => 'Custom Fields', 'pos'=>'15', 'view'=>'customfields/products/fields-tab')),
                         ),
