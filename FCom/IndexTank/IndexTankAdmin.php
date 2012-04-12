@@ -4,13 +4,15 @@ class FCom_IndexTank_Admin extends BClass
 {
     static public function bootstrap()
     {
-        BphpQuery::i()->ready(function($args) {
-            $html = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
+        BGanon::i()->ready(function($args) {
+            $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
 <script type="text/javascript">
     function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
         .done(function( msg ) { alert( msg ); }); }
 </script>';
-            $args['doc']['header.adm-page-title div.btns-set']->append($html);
+            if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
+                $el->setInnerText($insert.$el->getInnerText());
+            }
         }, array('on_path'=>'/catalog/products'));
 
         BFrontController::i()
