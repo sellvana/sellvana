@@ -220,9 +220,11 @@ class FCom_IndexTank_Index_Product extends BClass
         }
     }
 
-    public function update_categories($product)
+    public function update_categories($product, $categories=array())
     {
-        $categories = $this->_prepareCategories($product);
+        if (!$categories){
+            $categories = $this->_prepareCategories($product);
+        }
         $this->model()->update_categories($product->id(), $categories);
 
     }
@@ -277,7 +279,7 @@ class FCom_IndexTank_Index_Product extends BClass
                 $categories[self::CT_CATEGORY_PREFIX . $cat->full_name] = $cat->node_name;
             }
         }
-
+        
         $product_custom_fields = $product->customFields($product->id()); //get all custom fields for product
         if ($product_custom_fields) {
             foreach ($product_custom_fields as $cf) {
