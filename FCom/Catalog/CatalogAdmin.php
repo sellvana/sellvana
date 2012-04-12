@@ -8,29 +8,30 @@ class FCom_Catalog_Admin extends BClass
         $module->base_src .= '/Admin';
 
         BFrontController::i()
+            ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
+            ->route('GET|POST /catalog/categories/tree_data', 'FCom_Catalog_Admin_Controller_Categories.tree_data')
+            ->route('GET|POST /catalog/categories/tree_form/:id', 'FCom_Catalog_Admin_Controller_Categories.tree_form')
+
             ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET /catalog/products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
             ->route('GET /catalog/products/subgrid_data', 'FCom_Catalog_Admin_Controller_Products.subgrid_data')
             ->route('GET|POST /catalog/products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
-            ->route('GET /catalog/products/form_tab/:id', 'FCom_Catalog_Admin_Controller_Products.form_tab')
 
             ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
             ->route('GET /catalog/families/grid_data', 'FCom_Catalog_Admin_Controller_Families.grid_data')
             ->route('GET|POST /catalog/families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form')
             ->route('GET /catalog/families/autocomplete', 'FCom_Catalog_Admin_Controller_Families.autocomplete')
             ->route('GET /catalog/families/product_data', 'FCom_Catalog_Admin_Controller_Families.product_data')
-
-            ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
-            ->route('GET|POST /catalog/categories/tree_data', 'FCom_Catalog_Admin_Controller_Categories.tree_data')
         ;
 
         BLayout::i()
-            ->view('catalog/products/form', array('view_class'=>'FCom_Admin_View_Form'))
+            ->view('catalog/categories-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
+            ->view('catalog/products-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->addAllViews('Admin/views')
+            ->afterTheme('FCom_Catalog_Admin::layout')
         ;
 
         BPubSub::i()
-            ->on('BLayout::theme.load.after', 'FCom_Catalog_Admin::layout')
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
@@ -86,17 +87,17 @@ class FCom_Catalog_Admin extends BClass
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
                         array('addNav', 'catalog', array('label'=>'Catalog', 'pos'=>100)),
-                        array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
+                        array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
                         array('addQuickSearch', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addShortcut', 'catalog/products', array('label'=>'New Product', 'href'=>$baseHref.'/products/form/')),
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
-                    array('view', 'catalog/products/form',
+                    array('view', 'catalog/products-form',
                         'set'=>array(
-                            'tab_view_prefix' => 'catalog/products/tab/',
+                            'tab_view_prefix' => 'catalog/products-form/',
                         ),
                         'do'=>array(
                             array('addTab', 'main', array('label'=>'General Info', 'pos'=>10)),
@@ -115,19 +116,30 @@ class FCom_Catalog_Admin extends BClass
                 ),
                 '/catalog/products/form'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/products/form')),
+                    array('hook', 'main', 'views'=>array('catalog/products-form')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
                     array('layout', 'form'),
                     array('layout', 'catalog_product_form_tabs'),
                 ),
                 '/catalog/categories'=>array(
                     array('layout', 'base'),
+                    array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('catalog/categories')),
                     array('view', 'root', 'do'=>array(array('setNav', 'catalog/categories'))),
                 ),
-                '/catalog/categories/form'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/categories/form')),
+                '/catalog/categories/tree_form'=>array(
+                    array('root', 'catalog/categories-tree-form'),
+                    array('view', 'catalog/categories-tree-form',
+                        'set'=>array(
+                            'tab_view_prefix' => 'catalog/categories-tree-form/',
+                        ),
+                        'do'=>array(
+                            array('addTab', 'main', array('label'=>'Category', 'pos'=>10)),
+                            array('addTab', 'content', array('label'=>'Page Content', 'pos'=>20)),
+                            array('addTab', 'products', array('label'=>'Products', 'pos'=>30, 'async'=>true)),
+                            //array('addTab', 'main', array('label'=>'History', 'pos'=>100)),
+                        ),
+                    ),
                 ),
                 '/catalog/families'=>array(
                     array('layout', 'base'),

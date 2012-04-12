@@ -6,12 +6,5 @@
 
         <li><label for="main-node_name">URL Key</label>
             <input type="text" id="main-url_key" name="model[url_key]" value="<?php echo $this->q($m->url_key) ?>"></li>
-
-        <li><label for="main-node_type">Node Type</label><select id="main-node_type" name="model[node_type]">
-            <?php echo $this->optionsHtml($this->node_types, $m->node_type) ?></select></li>
-
-        <li><label for="main-reference">Reference</label>
-            <input type="text" id="main-reference" name="model[reference]" value="<?php echo $this->q($m->reference) ?>"/></li>
-
     </ul>
 </fieldset>

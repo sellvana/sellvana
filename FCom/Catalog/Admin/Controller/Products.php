@@ -149,11 +149,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function action_form()
     {
-        $id = BRequest::i()->params('id');
-
-        if (!$id) {
-            $id = BRequest::i()->get('id');
-        }
+        $id = BRequest::i()->params('id', true);
         if ($id) {
             $product = FCom_Catalog_Model_Product::i()->load($id);
             if (empty($product)) {
@@ -164,22 +160,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $product = FCom_Catalog_Model_Product::i()->create();
         }
         $this->layout('/catalog/products/form');
-        $view = BLayout::i()->view('catalog/products/form');
+        $view = BLayout::i()->view('catalog/products-form');
 
-        $this->initFormTabs($view, $product, $product->id ? 'view' : 'create');
-    }
-
-    public function action_form_tab()
-    {
-        $r = BRequest::i();
-        $id = $r->params('id');
-        if (!$id) {
-            $id = $r->request('id');
-        }
-        $product = FCom_Catalog_Model_Product::i()->load($id);
-        $this->layout('catalog_product_form_tabs');
-        $view = BLayout::i()->view('catalog/products/form');
-        $this->outFormTabsJson($view, $product);
+        $this->processFormTabs($view, $product, $product->id ? 'view' : 'create');
     }
 
     public function action_form__POST()

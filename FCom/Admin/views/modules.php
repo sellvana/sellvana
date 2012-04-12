@@ -13,7 +13,6 @@ tr.module-disabled td { background:#DDD; }
 tr.module-requested {}
 </style>
 <script>
-
 var runLevelColors = {'DISABLED':'#CCC', 'ONDEMAND':'#FFF', '':'#FFF', 'REQUESTED':'#CFC', 'REQUIRED':'#FFC'};
 var bypassModules = {'FCom_Core':1,'FCom_Admin':1,'FCom_Frontend':1,'FCom_Install':1};
 var runStatusColors = {'IDLE':'', 'LOADED':'#CFC', 'ERROR':'#FCC'};
@@ -28,7 +27,7 @@ function fmtRunLevel(area) {
             return [
                 runStatusColors[val] ? '<div style="padding:3px; color:#000; background:'+runLevelColors[val]+'">' : '<div>'
                 ,val,
-                ,'</div>'
+                ,'<'+'/div>'
             ].join('');
         }
         var options = opt.colModel.editoptions.value.split(';');
@@ -45,10 +44,10 @@ function fmtRunLevel(area) {
                 '<option value="', escape(a[0]), '"',
                 ' style="background:', runLevelColors[a[1]], '"',
                 (val==a[0] ? ' selected' : ''),
-                '>', escape(a[1]), '</option>'
+                '>', escape(a[1]), '<'+'/option>'
             ].join(''));
         }
-        html.push('</select>');
+        html.push('<'+'/select>');
         return html.join('');
     }
 }
@@ -61,14 +60,14 @@ function fmtRunStatus(val,opt,row) {
     return [
         runStatusColors[val] ? '<div style="padding:3px; color:#000; background:'+runStatusColors[val]+'">' : '<div>'
         ,val,
-        ,'</div>'
+        ,'<'+'/div>'
     ].join('');
 }
 
 function fmtSchemaVersion(val,opt,row) {
     console.log(val,row);
     if (row.migration_available && val!=row.version) {
-        return '<div style="padding:3px; color:000; background:#FCC">'+(val?val:'&nbsp;')+'</div>';
+        return '<div style="padding:3px; color:000; background:#FCC">'+(val?val:'&nbsp;')+'<'+'/div>';
     } else {
         return val?val:'';
     }
