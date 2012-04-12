@@ -77,7 +77,7 @@ class FCom_Catalog_Model_Product extends BModel
         } elseif ($this->base_price < 300) {
             return "$100 to $299";
         } else {
-            return "$300+";
+            return "$300 and above";
         }
     }
 
@@ -96,27 +96,9 @@ class FCom_Catalog_Model_Product extends BModel
         return FCom_Catalog_Model_CategoryProduct::i()->orm('cp')->where('cp.product_id', $pId)->find_many();
     }
 
-    public function customFields($pId)
+    public function customFields($product)
     {
-        $pf_list = FCom_CustomField_Model_ProductField::i()->orm('pf')->where("product_id", $pId)->find_many();
-        $result = array();
-        if(!$pf_list){
-            return array();
-        }
-
-        foreach($pf_list as $pf){
-            $result[$pf->product_id][] = $pf->productFields($pf);
-        }
-
-        return $result;
-
-        //todo: add get custom fields by product id $pId
-        //
-        // select * from fcom_field f inner join fcom_field_option fo on (f.id = fo.field_id)
-        // inner join fcom_product_custom pc on (pc.product_id = $p.id and pc._fieldset_ids = f.id)
-        //
-        //return FCom_CustomField_Model_Field::i()->orm('f')->where('f.field_type', 'product')->find_many();
-        return false;
+        return FCom_CustomField_Model_ProductField::i()->productFields($product);
     }
 }
 

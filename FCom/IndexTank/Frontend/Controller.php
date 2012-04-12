@@ -11,9 +11,12 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $f = BRequest::i()->get('f');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
+        /*
         if (!$q) {
             BResponse::i()->redirect(BApp::baseUrl());
         }
+         *
+         */
 
         if ($sc){
             FCom_IndexTank_Index_Product::i()->scoring_by($sc);
@@ -33,7 +36,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
-
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
         $productsData = array();
         if ( $productsORM ) {
@@ -43,6 +45,15 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
             $productsData = $this->paginate($productsORM, $r, array('ps' => 25));
         }
+
+        //unset some filters and get facets again
+        //$filters_unset = array(FCom_IndexTank_Index_Product::CT_PRICE_RANGE, FCom_IndexTank_Index_Product::CT_BRAND);
+        //foreach($filters_unset as $filter){
+//            FCom_IndexTank_Index_Product::i()->filter_unset($filter);
+//        }
+        //fire second request for smart facets
+//        FCom_IndexTank_Index_Product::i()->search($q);
+//        $facets = FCom_IndexTank_Index_Product::i()->getFacets();
 
         $productsData['state']['facets'] = $facets;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = array('$0 to $99', '$100 to $299', '$300+');
@@ -83,6 +94,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         );
 
         $cntOrm = clone $orm; // clone ORM to count
+
         $s['c'] = $cntOrm->count(); // total row count
         unset($cntOrm); // free mem
 

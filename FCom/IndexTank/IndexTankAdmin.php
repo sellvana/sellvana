@@ -41,8 +41,10 @@ class FCom_IndexTank_Admin extends BClass
             FCom_IndexTank_Index_Product::i()->add($products);
 
             $offset += $limit;
+            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
             $products = $orm->offset($offset)->limit($limit)->find_many();
         };
+
         echo $counter . ' products indexed';
     }
 
