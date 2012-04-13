@@ -25,8 +25,6 @@ class FCom_Catalog_Admin extends BClass
         ;
 
         BLayout::i()
-            ->view('catalog/categories-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->view('catalog/products-form', array('view_class'=>'FCom_Admin_View_Form'))
             ->addAllViews('Admin/views')
             ->afterTheme('FCom_Catalog_Admin::layout')
         ;
