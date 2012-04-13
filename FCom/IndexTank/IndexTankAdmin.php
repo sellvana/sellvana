@@ -67,8 +67,7 @@ class FCom_IndexTank_Admin extends BClass
         $category = $args['model'];
         $products = $category->products();
         foreach($products as $product){
-            $categories = array(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX . $category->full_name => $category->node_name);
-            FCom_IndexTank_Index_Product::i()->update_categories($product, $categories);
+            FCom_IndexTank_Index_Product::i()->update_categories($product);
         }
     }
 
@@ -77,11 +76,28 @@ class FCom_IndexTank_Admin extends BClass
         $category = $args['model'];
         $products = $category->products();
         foreach($products as $product){
-            $categories = array(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX . $category->full_name => "");
-            FCom_IndexTank_Index_Product::i()->update_categories($product, $categories);
+            FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
+        }
+    }
+/*
+    static public function onCustomFieldAfterSave($args)
+    {
+        $cf_model = $args['model'];
+        $products = $cf_model->products();
+        foreach($products as $product){
+            FCom_IndexTank_Index_Product::i()->update_categories($product);
         }
     }
 
+    static public function onCustomFieldBeforeDelete($args)
+    {
+        $category = $args['model'];
+        $products = $category->products();
+        foreach($products as $product){
+            FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
+        }
+    }
+*/
 
 
     static public function layout()
