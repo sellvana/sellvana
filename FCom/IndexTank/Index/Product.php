@@ -131,6 +131,11 @@ class FCom_IndexTank_Index_Product extends BClass
         $this->_filter_category[$category][] = $value;
 
     }
+    public function unfilter_by($category)
+    {
+        $this->_unfilter_category[] = $category;
+
+    }
 
     public function reset_filters()
     {
@@ -152,8 +157,12 @@ class FCom_IndexTank_Index_Product extends BClass
         }
 
         try {
-            //search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL)
-            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function, null, null, $this->_filter_category);
+            //search($query, $start = NULL, $len = NULL, $scoring_function = NULL,
+            //$snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
+            //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_unfilters = NULL )
+            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
+                    null, null, $this->_filter_category,
+                    null, null, null, implode(",", $this->_unfilter_category) );
         } catch(Exception $e) {
             throw $e;
         }
@@ -182,6 +191,11 @@ class FCom_IndexTank_Index_Product extends BClass
         $res = array();
         foreach($facets as $k => $v){
             $res[$k] = get_object_vars($v);
+        }
+        if (!empty($this->_result->facets_advanced)){
+            foreach($this->_result->facets_advanced as $k => $v){
+                $res[$k] = get_object_vars($v);
+            }
         }
         return $res;
     }
@@ -282,7 +296,7 @@ class FCom_IndexTank_Index_Product extends BClass
         $product_categories = $product->categories($product->id()); //get all categories for product
         if ($product_categories){
             foreach ($product_categories as $cat) {
-                $categories[self::CT_CATEGORY_PREFIX . $cat->full_name] = $cat->node_name;
+                $categories[self::CT_CATEGORY_PREFIX . $cat->id_path] = $cat->node_name;
             }
         }
 
@@ -290,7 +304,7 @@ class FCom_IndexTank_Index_Product extends BClass
         if ($product_custom_fields) {
             foreach ($product_custom_fields as $cf) {
                 //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code .'_'.$cf->field_name] = $cf->label;
-                $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code] = $cf->field_name;
+                $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name] = $product->{$cf->field_code};
             }
         }
 /*
