@@ -239,13 +239,22 @@ class FCom_IndexTank_Index_Product extends BClass
         }
     }
 
-    public function update_categories($product, $categories=array())
+    public function update_categories($product)
     {
-        if (!$categories){
-            $categories = $this->_prepareCategories($product);
-        }
+        $categories = $this->_prepareCategories($product);
         $this->model()->update_categories($product->id(), $categories);
+    }
 
+    public function delete_categories($product, $category)
+    {
+        $category = array(self::CT_CATEGORY_PREFIX . $category->id_path => "");
+        $this->model()->update_categories($product->id(), $category);
+    }
+
+    public function delete_custom_field($product, $cf)
+    {
+        $category = array(self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name => "");
+        $this->model()->update_categories($product->id(), $category);
     }
 
     public function update_variables($product)
