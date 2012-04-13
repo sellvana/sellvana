@@ -25,9 +25,6 @@ class FCom_Cms_Admin extends BClass
 
         BLayout::i()->addAllViews('Admin/views')
             ->afterTheme('FCom_Cms_Admin::layout')
-            ->view('cms/nav-tree-form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->view('cms/pages-form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->view('cms/blocks-form', array('view_class'=>'FCom_Admin_View_Form'))
         ;
 
         FCom_Admin_Model_Role::i()->createPermission(array(

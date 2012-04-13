@@ -38,12 +38,9 @@ class FCom_Admin extends BClass
         ;
 
         BLayout::i()
+            ->defaultViewClass('FCom_Admin_View_Abstract')
             ->view('root', array('view_class'=>'FCom_Admin_View_Root'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))
-
-            ->view('settings', array('view_class'=>'FCom_Admin_View_Form'))
-            ->view('users-form', array('view_class'=>'FCom_Admin_View_Form'))
-            ->view('roles-form', array('view_class'=>'FCom_Admin_View_Form'))
 
             ->addAllViews('views')
 
