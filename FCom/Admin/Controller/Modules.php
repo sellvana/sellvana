@@ -26,18 +26,19 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 
         $data = array();
         $migrate = false;
-        foreach ($modules as $mod) {
+        foreach ($modules as $modName=>$mod) {
             $r = (array)$mod;
             $deps = array();
             foreach ($r['depends'] as $dep) {
                 $deps[] = $dep['name'];
             }
             $r['depends'] = join(', ', $deps);
-            $r['run_level_core'] = !empty($coreLevels[$r['name']]) ? $coreLevels[$r['name']] : null;
-            $r['run_level_admin'] = !empty($adminLevels[$r['name']]) ? $adminLevels[$r['name']] : null;
-            $r['run_level_frontend'] = !empty($frontendLevels[$r['name']]) ? $frontendLevels[$r['name']] : null;
-            $r['schema_version'] = !empty($schemaVersions[$r['name']]) ? $schemaVersions[$r['name']]->schema_version : null;
-            $r['migration_available'] = !empty($schemaModules[$r['name']]) && $r['schema_version']!=$r['version'];
+            $r['required_by'] = join(', ', $mod->children_copy);
+            $r['run_level_core'] = !empty($coreLevels[$modName]) ? $coreLevels[$modName] : null;
+            $r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : null;
+            $r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : null;
+            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : null;
+            $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
             $data[] = $r;
         }
         return $data;
@@ -80,6 +81,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                     'run_level_admin' => array('label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Admin")'), 'width'=>120, 'hidden'=>true),
                     'run_level_frontend' => array('label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Frontend")'), 'width'=>120, 'hidden'=>true),
                     'depends'     => array('label' => 'Dependencies', 'width'=>250),
+                    'required_by' => array('label' => 'Required By', 'width'=>250),
                 ),
                 'rowNum'      => 200,
                 'sortname'    => 'name',

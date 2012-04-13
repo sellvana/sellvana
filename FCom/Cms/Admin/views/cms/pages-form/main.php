@@ -15,7 +15,7 @@
         </li>
         <li>
             <h4 class="label">Layout Update</h4>
-            <textarea id="main-content" name="model[layout_update]"><?php echo $this->q($m->layout_update) ?></textarea>
+            <textarea id="main-layout_update" name="model[layout_update]"><?php echo $this->q($m->layout_update) ?></textarea>
         </li>
         <li>
             <h4 class="label">Meta Title</h4>

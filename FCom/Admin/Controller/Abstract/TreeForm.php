@@ -1,6 +1,6 @@
 <?php
 
-abstract class FCom_Admin_Controller_TreeAbstract extends FCom_Admin_Controller_Abstract
+abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Controller_Abstract
 {
 //    protected $_origClass = __CLASS__;
 //    protected $_permission = 'cms/nav';
