@@ -33,10 +33,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 }
                 $filters_selected[$key] = $values;
             }
+            //unfilter price and brand to see all total found for each category price and brand
+            FCom_IndexTank_Index_Product::i()->unfilter_by(FCom_IndexTank_Index_Product::CT_PRICE_RANGE);
+            FCom_IndexTank_Index_Product::i()->unfilter_by(FCom_IndexTank_Index_Product::CT_BRAND);
         }
+
+        //$categories = FCom_Catalog_Model_Category::i()->orm('c')->where('parent_id', '1')->find_many();
+        //print_r($categories);exit;
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+
         $productsData = array();
         if ( $productsORM ) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
@@ -54,6 +61,27 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         //fire second request for smart facets
 //        FCom_IndexTank_Index_Product::i()->search($q);
 //        $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+
+        if($facets){
+            $category_data = array();
+            foreach($facets as $fname => $fvalues){
+                $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX);
+                if ($pos === false){
+                    continue;
+                }
+                $id_path = substr($fname, strlen(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX));
+                foreach($fvalues as $fvalue => $fcount) {
+                    $obj = new stdClass();
+                    $obj->name = $fvalue;
+                    $obj->count = $fcount;
+                    $category_data[$id_path] = $obj;
+                }
+            }
+            ksort($category_data);
+        }
+
+        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
+//        $productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $filters_selected[FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX];
 
         $productsData['state']['facets'] = $facets;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = array('$0 to $99', '$100 to $299', '$300+');

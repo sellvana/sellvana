@@ -62,6 +62,16 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
                >  <?=$range?>
         (<?=$s['facets'][FCom_IndexTank_Index_Product::CT_BRAND][$range]?>)<br/>
 <? endforeach ?>
+        <br/>
+    <label>Categories:</label><br/>
+<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] as $cat_name => $cat_obj): ?>
+    <?php for($i = 2; $i < strlen($cat_name); $i++) echo "+"; ?>
+        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX.$cat_name?>]"
+               value="<?=$cat_obj->name?>" onclick="this.form.submit()"
+               <?=(!empty($_GET['f'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX.$cat_name]))?'checked':''?>
+               >
+        <?=$cat_obj->name?> (<?=$cat_obj->count?>) <br/>
+<? endforeach ?>
     </div>
 </div>
 
