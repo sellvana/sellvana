@@ -35,6 +35,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                 'width'         => '100%',
                 'height'        => '100%',
                 'multiselectWidth' => 30,
+                'ignoreCase'    => true,
            ),
            'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
                 'search'=>array('multipleSearch'=>true, 'multipleGroup'=>true),
