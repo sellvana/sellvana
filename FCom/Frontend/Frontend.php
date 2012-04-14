@@ -19,11 +19,29 @@ class FCom_Frontend extends BClass
             ->addAllViews('views')
 
             ->defaultTheme('FCom_Frontend_DefaultTheme')
+            ->afterTheme('FCom_Frontend::layout')
         ;
 
         if (BDebug::is('RECOVERY,MIGRATION')) {
             BLayout::i()->setRootView('under_construction');
             BResponse::i()->render();
+        }
+    }
+
+    public static function layout($args)
+    {
+        if (($head = BLayout::i()->view('head'))) {
+            $config = BConfig::i()->get('modules/FCom_Frontend');
+            if (!empty($config['add_js'])) {
+                foreach (explode("\n", $config['add_js']) as $js) {
+                    $head->js($js);
+                }
+            }
+            if (!empty($config['add_css'])) {
+                foreach (explode("\n", $config['add_css']) as $js) {
+                    $head->css($css);
+                }
+            }
         }
     }
 }

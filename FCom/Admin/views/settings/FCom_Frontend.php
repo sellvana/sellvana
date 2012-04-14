@@ -10,5 +10,14 @@
             </table>
         </div>
     </div>
+    <div class="group">
+        <h3><a href="#">HTML</a></h3>
+        <div>
+            <table>
+                <tr><td>Additional JS</td><td><textarea name="config[modules][FCom_Frontend][add_js]" style="width:400px; height:100px"><?php echo $this->q($c->get('modules/FCom_Frontend/add_js')) ?></textarea></td></tr>
+                <tr><td>Additional CSS</td><td><textarea name="config[modules][FCom_Frontend][add_css]" style="width:400px; height:100px"><?php echo $this->q($c->get('modules/FCom_Frontend/add_css')) ?></textarea></td></tr>
+            </table>
+        </div>
+    </div>
 </div>
 </fieldset>
