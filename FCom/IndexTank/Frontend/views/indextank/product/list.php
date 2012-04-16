@@ -1,10 +1,10 @@
+<?=$this->view('indextank/product/pager')->set('state', $this->products_data['state'])?>
+
 <? if (!$this->products_data['state']['c']): ?>
 
     <p class="note-msg">There are no products matching the selection.</p>
 
 <? else: ?>
-
-    <?=$this->view('indextank/product/pager')->set('state', $this->products_data['state'])?>
 
     <table class="product-list">
         <col width="30"/>

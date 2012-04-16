@@ -64,6 +64,7 @@ class FCom_IndexTank_Index_Product extends BClass
     //currently selected function
     protected $_scoring_function = 0;
     protected $_filter_category = null;
+    protected $_filter_docvar = null;
 
     protected $_result = null;
 
@@ -129,8 +130,14 @@ class FCom_IndexTank_Index_Product extends BClass
            // throw new Exception('Filter does not exist: ' . $category);
         }
         $this->_filter_category[$category][] = $value;
-
     }
+
+    public function filter_range($var, $from, $to)
+    {
+        $this->_filter_docvar[$var][] = array($from, $to);
+    }
+
+
     public function unfilter_by($category)
     {
         $this->_unfilter_category[] = $category;
@@ -174,7 +181,7 @@ class FCom_IndexTank_Index_Product extends BClass
             //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_unfilters = NULL )
             $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
-                    null, null, null, implode(",", $this->_unfilter_category) );
+                    null, $this->_filter_docvar, null, implode(",", $this->_unfilter_category) );
         } catch(Exception $e) {
             throw $e;
         }

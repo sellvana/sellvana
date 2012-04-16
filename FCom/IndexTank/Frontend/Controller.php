@@ -9,7 +9,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $q = BRequest::i()->get('q');
         $sc = BRequest::i()->get('sc');
         $f = BRequest::i()->get('f');
-        $uf = BRequest::i()->get('uf');
+        $v = BRequest::i()->get('v');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
         /*
@@ -45,9 +45,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             FCom_IndexTank_Index_Product::i()->unfilter_by(FCom_IndexTank_Index_Product::CT_BRAND);
         }
 
-        if($uf){
-            foreach($uf as $uf_key => $uf_value){
-                //FCom_IndexTank_Index_Product::i()->unfilter_by($uf_key);
+        if($v){
+            foreach($v as $key => $values) {
+                if (!is_array($values)){
+                    $values = array($values);
+                }
+                $pos = strpos($key, 'price');
+                if($pos !== false){
+                    if ($values['from'] < $values['to']){
+                        FCom_IndexTank_Index_Product::i()->filter_range(FCom_IndexTank_Index_Product::VAR_PRICE, $values['from'], $values['to']);
+                    }
+                }
             }
         }
 
@@ -94,11 +102,13 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX);
                 if ($pos !== false){
                     $path = substr($fname, strlen(FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX));
+                    list($custom_name) = explode("_", $path);
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
-                        $cf_data[$path][] = $obj;
+                        $obj->path = $path;
+                        $cf_data[$custom_name][] = $obj;
                     }
                 }
                 $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_PRICE_RANGE);
@@ -127,6 +137,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             ksort($category_data);
         }
 
+        $productsData['state']['filter'] = $v;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] = $cf_data;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $price_data;
