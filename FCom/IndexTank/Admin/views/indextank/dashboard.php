@@ -1,11 +1,11 @@
 
 <table style="font-size: 14px;">
     <tr>
-        <td><?=$this->status['name']?> (created at <?=date("Y-m-d", strtotime($this->status['date']))?>)</td>
-        <td><?=$this->status['status']?></td>
+        <td>Index <?=$this->status['name']?> (created at <?=date("Y-m-d", strtotime($this->status['date']))?>)</td>
+        <td>Status: <?=$this->status['status']?></td>
     </tr>
     <tr>
-        <td><?=$this->status['size']?> documents</td>
+        <td>Size: <?=$this->status['size']?> documents</td>
         <td></td>
     </tr>
     <tr>
