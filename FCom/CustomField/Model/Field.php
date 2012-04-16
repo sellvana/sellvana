@@ -84,4 +84,10 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     {
         BDb::run("ALTER TABLE {$this->tableName()} DROP COLUMN {$this->field_code}");
     }
+
+    public function products($cfModel)
+    {
+        return FCom_Catalog_Model_Product::i()->orm('p')->where_not_null($cfModel->field_code)->find_many();
+    }
+
 }
