@@ -21,13 +21,10 @@ class FCom_Admin extends BClass
             ->route('POST /my_account/personalize', 'FCom_Admin_Controller.personalize')
 
             ->route('GET /users', 'FCom_Admin_Controller_Users.index')
-            ->route('GET|POST /users/grid_data', 'FCom_Admin_Controller_Users.grid_data')
-            ->route('GET|POST /users/form/:id', 'FCom_Admin_Controller_Users.form')
+            ->route('GET|POST /users/.action', 'FCom_Admin_Controller_Users')
 
             ->route('GET /roles', 'FCom_Admin_Controller_Roles.index')
-            ->route('GET|POST /roles/grid_data', 'FCom_Admin_Controller_Roles.grid_data')
-            ->route('GET|POST /roles/form/:id', 'FCom_Admin_Controller_Roles.form')
-            ->route('GET|POST /roles/form/:id/tree_data', 'FCom_Admin_Controller_Roles.tree_data')
+            ->route('GET|POST /roles/.action', 'FCom_Admin_Controller_Roles')
 
             ->route('GET|POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_data')
 

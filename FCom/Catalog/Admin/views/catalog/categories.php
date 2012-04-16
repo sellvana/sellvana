@@ -50,7 +50,7 @@ head(function() {
     });
 
     function loadForm(id) {
-        var url = '<?php echo $formUrl ?>'+id;
+        var url = '<?php echo $formUrl ?>?id='+id;
         $('#categories-form-container').load(url, function() {
             $('#categories-tree-form').attr('action', url);
             window.adminForm = Admin.form({

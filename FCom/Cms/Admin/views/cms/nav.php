@@ -50,7 +50,7 @@ head(function() {
     });
 
     function loadForm(id) {
-        var url = '<?php echo $formUrl ?>'+id;
+        var url = '<?php echo $formUrl ?>?id='+id;
         $('#nav-form-container').load(url, function() {
             $('#nav-tree-form').attr('action', url);
             window.adminForm = Admin.form({

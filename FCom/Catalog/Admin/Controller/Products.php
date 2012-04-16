@@ -195,7 +195,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            $url = BApp::href('catalog/products/form/'.$id);
+            $url = BApp::href('catalog/products/form/?id='.$id);
             if ($r->post('tab')) {
                 $url .= '?tab='.urlencode($r->post('tab'));
             }

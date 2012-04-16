@@ -38,7 +38,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
         try {
             $hlp = FCom_Catalog_Model_Family::i();
             $data = $r->post();
-            $id = $r->params('id');
+            $id = $r->params('id', true);
 
             if ($r->xhr()) {
                 $model = $hlp->load($data['model']['family_name'], 'family_name');
@@ -60,7 +60,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(BApp::href('catalog/families/form/'.$model->id));
+        BResponse::i()->redirect(BApp::href('catalog/families/form/?id='.$model->id));
     }
 
     public function action_autocomplete()

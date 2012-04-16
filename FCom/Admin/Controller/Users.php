@@ -107,7 +107,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract
             if (!$id) {
                 $id = $model->id;
             }
-            BResponse::i()->redirect(BApp::href('users/form/'.$id));
+            BResponse::i()->redirect(BApp::href('users/form/?id='.$id));
         }
     }
 }

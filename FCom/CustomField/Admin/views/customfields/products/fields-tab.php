@@ -42,7 +42,7 @@
                 </td>
             </tr>
         </table>
-        <div id="custom-fields-partial" data-src="<?=BApp::href('customfields/products/fields_partial/'.$this->model->id)?>">
+        <div id="custom-fields-partial" data-src="<?=BApp::href('customfields/products/fields_partial/?id='.$this->model->id)?>">
             <?=$this->view('customfields/products/fields-partial')->set('model', $this->model)?>
         </div>
     </fieldset>

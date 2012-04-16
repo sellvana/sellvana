@@ -17,6 +17,6 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $nav->render();
             return;
         }
-        $this->forward('noroute');
+        $this->forward(true);
     }
 }

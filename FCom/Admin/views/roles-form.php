@@ -1,6 +1,6 @@
 <?php
     $m = $this->model;
-    $baseHref = BApp::m('FCom_Admin')->baseHref();
+    $formUrl = BApp::href('roles/form/?id='.$m->id);
 ?>
 <script>
 head(function() {
@@ -8,12 +8,12 @@ head(function() {
         form:     '#roles-form',
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
-        url_get:  '<?php echo $baseHref.'/roles/form/'.$m->id ?>',
-        url_post: '<?php echo $baseHref.'/roles/form/'.$m->id ?>'
+        url_get:  '<?php echo $formUrl ?>',
+        url_post: '<?php echo $formUrl ?>'
     });
 });
 </script>
-<form id="users-form" action="<?php echo $baseHref.'/roles/form/'.$m->id ?>" method="post">
+<form id="users-form" action="<?php echo $formUrl ?>" method="post">
     <header class="adm-page-title">
         <span class="title" id="tab-title">
             <?php echo $this->mode==='create' ? 'Create New Role' : $this->q($m->role_name) ?>
