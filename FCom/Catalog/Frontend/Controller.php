@@ -62,6 +62,8 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_manuf()
     {
+        $this->forward(true);
+        return;
         BLayout::i()->layout('/catalog/manuf');
         BResponse::i()->render();
     }
@@ -72,7 +74,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $crumbs = array('home');
         $r = explode('/', BRequest::i()->params('product'));
         $p = array_pop($r);
-var_dump($p); exit;
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             $this->forward(true);

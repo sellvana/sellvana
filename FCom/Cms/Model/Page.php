@@ -5,12 +5,17 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_cms_page';
     protected static $_origClass = __CLASS__;
 
+    public function validate()
+    {
+        return true;
+    }
+
     public function render()
     {
         BLayout::i()
             ->addView('cms_page', array(
                 'renderer'    => 'BPHPTAL::renderer',
-                'source'      => $this->content,
+                'source'      => $this->content ? $this->content : ' ',
                 'source_name' => 'cms_page:'.$this->handle.':'.strtotime($this->update_dt),
             ))
             ->hookView('main', 'cms_page')
