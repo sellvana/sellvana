@@ -142,6 +142,18 @@ class FCom_IndexTank_Index_Product extends BClass
         $this->_filter_category = array();
     }
 
+    public function status()
+    {
+        $result = array (
+            'name'          => $this->_index_name,
+            'code'          => $this->model()->get_code(),
+            'status'        => $this->model()->get_status(),
+            'size'          => $this->model()->get_size(),
+            'date'          => $this->model()->get_creation_time()
+        );
+        return $result;
+    }
+
     /**
      *
      * @param string $query
@@ -166,6 +178,7 @@ class FCom_IndexTank_Index_Product extends BClass
         } catch(Exception $e) {
             throw $e;
         }
+
         $this->_result = $result;
         //print_r( $this->_result);exit;
         if ($result->matches <= 0){
@@ -197,6 +210,7 @@ class FCom_IndexTank_Index_Product extends BClass
                 $res[$k] = get_object_vars($v);
             }
         }
+
         return $res;
     }
 
@@ -253,7 +267,7 @@ class FCom_IndexTank_Index_Product extends BClass
 
     public function delete_custom_field($product, $cf)
     {
-        $category = array(self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name => "");
+        $category = array(self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code => "");
         $this->model()->update_categories($product->id(), $category);
     }
 
@@ -306,14 +320,21 @@ class FCom_IndexTank_Index_Product extends BClass
         if ($product_categories){
             foreach ($product_categories as $cat) {
                 $categories[self::CT_CATEGORY_PREFIX . $cat->id_path] = $cat->node_name;
+                //uncomment to remove all Categories
+               //$categories[self::CT_CATEGORY_PREFIX . $cat->id_path] = '';
             }
         }
 
         $product_custom_fields = $product->customFields($product); //get all custom fields for product
+
         if ($product_custom_fields) {
             foreach ($product_custom_fields as $cf) {
                 //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code .'_'.$cf->field_name] = $cf->label;
-                $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name] = $product->{$cf->field_code};
+                if (!is_null($product->{$cf->field_code})){
+                    $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code] = $product->{$cf->field_code};
+                    //uncomment to remove all CF
+                    //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code] = '';
+                }
             }
         }
 /*

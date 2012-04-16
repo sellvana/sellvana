@@ -102,5 +102,6 @@ class FCom_Catalog_Model_Product extends BModel
     {
         return FCom_CustomField_Model_ProductField::i()->productFields($product);
     }
+
 }
 

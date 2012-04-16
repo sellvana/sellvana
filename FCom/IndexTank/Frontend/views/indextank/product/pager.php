@@ -46,21 +46,21 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <br/><br/>
     <div class="sort-by f-left">
     <label>Filter by price:</label><br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] as $range): ?>
+<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] as $price): ?>
         <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>][]"
-               value="<?=$range?>" onclick="this.form.submit()"
-               <?=(in_array($range, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]))?'checked':''?>
-               >  <?=$range?>
-                (<?=$s['facets'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE][$range]?>) <br/>
+               value="<?=$price->name?>" onclick="this.form.submit()"
+               <?=(in_array($price->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]))?'checked':''?>
+               >  <?=$price->name?>
+                (<?=$price->count?>) <br/>
 <? endforeach ?>
     <br/>
     <label>Filter by brand:</label><br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_BRAND] as $range): ?>
+<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_BRAND] as $brand): ?>
         <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_BRAND?>][]"
-               value="<?=$range?>" onclick="this.form.submit()"
-               <?=(in_array($range, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND]))?'checked':''?>
-               >  <?=$range?>
-        (<?=$s['facets'][FCom_IndexTank_Index_Product::CT_BRAND][$range]?>)<br/>
+               value="<?=$brand->name?>" onclick="this.form.submit()"
+               <?=(in_array($brand->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND]))?'checked':''?>
+               >  <?=$brand->name?>
+        (<?=$brand->count?>)<br/>
 <? endforeach ?>
         <br/>
     <label>Categories:</label><br/>
@@ -71,6 +71,18 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
                <?=(!empty($_GET['f'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX.$cat_name]))?'checked':''?>
                >
         <?=$cat_obj->name?> (<?=$cat_obj->count?>) <br/>
+<? endforeach ?>
+
+         <br/>
+<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] as $cat_name => $cat_obj_list): ?>
+    <label><?=$cat_name?></label><br/>
+    <?php foreach($cat_obj_list as $cat_obj): ?>
+        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_name?>][]"
+               value="<?=$cat_obj->name?>" onclick="this.form.submit()"
+               <?=(in_array($cat_obj->name, $_GET['f'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_name]))?'checked':''?>
+               >
+        <?=$cat_obj->name?> (<?=$cat_obj->count?>) <br/>
+    <?php endforeach ?>
 <? endforeach ?>
     </div>
 </div>
