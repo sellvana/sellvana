@@ -1,6 +1,7 @@
 <?php
     $p = $this->model;
     $tabs = $this->sortedTabs();
+    $formUrl = BApp::href('catalog/products/form/?id='.$p->id)
 ?>
 
 <script>
@@ -8,13 +9,13 @@ head(function() {
     window.adminForm = Admin.form({
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
-        url_get:  '<?php echo BApp::href('catalog/products/form/'.$p->id) ?>',
-        url_post: '<?php echo BApp::href('catalog/products/form/'.$p->id) ?>'
+        url_get:  '<?php echo $formUrl ?>',
+        url_post: '<?php echo $formUrl ?>'
     });
 })
 </script>
 
-<form action="<?php echo BApp::href('catalog/products/form/'.$p->id) ?>" method="post">
+<form action="<?php echo $formUrl ?>" method="post">
     <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
 	    <span class="title"><?php echo $this->mode==='create' ? 'Create New' : 'View' ?> Product</span>

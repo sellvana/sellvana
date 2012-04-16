@@ -251,7 +251,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href('customfields/customfield/form/'.$id));
+            BResponse::i()->redirect(BApp::href('customfields/customfield/form/?id='.$id));
         }
     }
 

@@ -6,7 +6,10 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $layout = BLayout::i();
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
-        if (!$category) $this->forward('noroute');
+        if (!$category) {
+            $this->forward(true);
+            return $this;
+        }
 
         $productsORM = $category->productsORM();
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_category.products_orm', array('data'=>$productsORM));
@@ -69,9 +72,10 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $crumbs = array('home');
         $r = explode('/', BRequest::i()->params('product'));
         $p = array_pop($r);
+var_dump($p); exit;
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
-            $this->forward('noroute');
+            $this->forward(true);
             return $this;
         }
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
@@ -81,7 +85,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
             if (!$category) {
-                $this->forward('noroute');
+                $this->forward(true);
                 return $this;
             }
 

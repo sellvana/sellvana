@@ -1,6 +1,6 @@
 <?php
     $m = $this->model;
-    $baseHref = BApp::m('FCom_Admin')->baseHref();
+    $formUrl = $baseHref.'/users/form/?id='.$m->id;
 ?>
 <script>
 head(function() {
@@ -8,12 +8,12 @@ head(function() {
         form:     '#users-form',
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
-        url_get:  '<?php echo $baseHref.'/users/form_tab/'.$m->id ?>',
-        url_post: '<?php echo $baseHref.'/users/form/'.$m->id ?>'
+        url_get:  '<?php echo $formUrl ?>',
+        url_post: '<?php echo $formUrl ?>'
     });
 });
 </script>
-<form id="users-form" action="<?php echo $baseHref.'/users/form/'.$m->id ?>" method="post">
+<form id="users-form" action="<?php echo $formUrl ?>" method="post">
     <header class="adm-page-title">
         <span class="title" id="tab-title">
             <?php echo $this->mode==='create' ? 'Create New User' : $this->q($m->username.' - '.$m->email) ?>

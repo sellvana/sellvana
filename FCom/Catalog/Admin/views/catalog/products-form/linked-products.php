@@ -72,7 +72,7 @@ head(function() {
                     alert('Please enter a valid name');
                     return;
                 }
-                $.post('<?=BApp::href('catalog/families/form/')?>'+$('#family-id').val(),
+                $.post('<?=BApp::href('catalog/families/form/')?>?id='+$('#family-id').val(),
                     $('form', this).serialize(),
                     function(data, status, xhr) {
                         $('#family-id').val(data.model.id);

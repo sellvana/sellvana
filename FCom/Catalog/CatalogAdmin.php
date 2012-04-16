@@ -9,19 +9,13 @@ class FCom_Catalog_Admin extends BClass
 
         BFrontController::i()
             ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
-            ->route('GET|POST /catalog/categories/tree_data', 'FCom_Catalog_Admin_Controller_Categories.tree_data')
-            ->route('GET|POST /catalog/categories/tree_form/:id', 'FCom_Catalog_Admin_Controller_Categories.tree_form')
+            ->route('GET|POST /catalog/categories/.action', 'FCom_Catalog_Admin_Controller_Categories')
 
             ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
-            ->route('GET /catalog/products/grid_data', 'FCom_Catalog_Admin_Controller_Products.grid_data')
-            ->route('GET /catalog/products/subgrid_data', 'FCom_Catalog_Admin_Controller_Products.subgrid_data')
-            ->route('GET|POST /catalog/products/form/:id', 'FCom_Catalog_Admin_Controller_Products.form')
+            ->route('GET|POST /catalog/products/.action', 'FCom_Catalog_Admin_Controller_Products')
 
             ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
-            ->route('GET /catalog/families/grid_data', 'FCom_Catalog_Admin_Controller_Families.grid_data')
-            ->route('GET|POST /catalog/families/form/:id', 'FCom_Catalog_Admin_Controller_Families.form')
-            ->route('GET /catalog/families/autocomplete', 'FCom_Catalog_Admin_Controller_Families.autocomplete')
-            ->route('GET /catalog/families/product_data', 'FCom_Catalog_Admin_Controller_Families.product_data')
+            ->route('GET|POST /catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
         ;
 
         BLayout::i()

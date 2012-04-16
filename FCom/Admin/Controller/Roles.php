@@ -98,7 +98,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract
             if (!$id) {
                 $id = $model->id;
             }
-            BResponse::i()->redirect(BApp::href('roles/form/'.$id));
+            BResponse::i()->redirect(BApp::href('roles/form/?id='.$id));
         }
     }
 }

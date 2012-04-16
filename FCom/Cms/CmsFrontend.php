@@ -9,7 +9,7 @@ class FCom_Cms_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET /a/*page', 'FCom_Cms_Frontend_Controller.index')
+            ->route('GET /*page', 'FCom_Cms_Frontend_Controller.index')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');

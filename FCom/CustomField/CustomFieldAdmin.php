@@ -6,18 +6,12 @@ class FCom_CustomField_Admin extends BClass
     {
         FCom_CustomField_Common::bootstrap();
 
-        $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets.';
+        $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets';
         BFrontController::i()
-            ->route('GET /customfields/fieldsets', $ctrl.'index')
-            ->route('GET|POST /customfields/fieldsets/grid_data', $ctrl.'grid_data')
-            ->route('GET|POST /customfields/fieldsets/set_field_grid_data', $ctrl.'set_field_grid_data')
-            ->route('GET|POST /customfields/fieldsets/field_grid_data', $ctrl.'field_grid_data')
-            ->route('GET|POST /customfields/fieldsets/field_option_grid_data', $ctrl.'field_option_grid_data')
+            ->route('GET /customfields/fieldsets', $ctrl.'.index')
+            ->route('GET|POST /customfields/fieldsets/.action', $ctrl)
 
-            ->route('GET|POST /customfields/fieldsets/form/:id', $ctrl.'form')
-            ->route('GET /customfields/fieldsets/form_tab/:id', $ctrl.'form_tab')
-
-            ->route('GET /customfields/products/fields_partial/:id', 'FCom_CustomField_Admin_Controller_Products.fields_partial')
+            ->route('GET /customfields/products/.action', 'FCom_CustomField_Admin_Controller_Products')
         ;
 
         BLayout::i()
