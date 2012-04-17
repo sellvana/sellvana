@@ -14,6 +14,7 @@ class FCom_IndexTank_Index_Product extends BClass
     const FT_NOTES = 'notes';
     const FT_MANUF_SKU = 'manuf_sku';
     const FT_TIMESTAMP = 'timestamp';
+    const FT_CATEGORIES = 'categories';
     /**
      * Special text field which will contain word 'all'
      * It will be used when we will need to fetch all documents from the index
@@ -68,6 +69,8 @@ class FCom_IndexTank_Index_Product extends BClass
 
     protected $_result = null;
 
+    protected $_simple_query = false;
+
 
     protected function _init()
     {
@@ -99,6 +102,7 @@ class FCom_IndexTank_Index_Product extends BClass
         }
     }
 
+
     /**
      *
      * @return Indextank_Index
@@ -113,6 +117,11 @@ class FCom_IndexTank_Index_Product extends BClass
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
         return $this->_model;
+    }
+
+    public function isSimpleQuery()
+    {
+        return $this->_simple_query;
     }
 
     public function scoring_by($function)
@@ -161,6 +170,7 @@ class FCom_IndexTank_Index_Product extends BClass
         return $result;
     }
 
+
     /**
      *
      * @param string $query
@@ -170,7 +180,25 @@ class FCom_IndexTank_Index_Product extends BClass
     public function search($query, $start=null, $len=null)
     {
         if (!empty($query)){
-            $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".self::FT_DESCRIPTION.":($query) ";
+            $queryValue = $query;
+            if (strpos($query, " in ")) {
+                $categories_query = substr($query, strpos($query, " in ")+strlen(" in "));
+                $queryValue = substr($query, 0, strpos($query, " in "));
+
+                if(!empty($categories_query) && !empty($queryValue)){
+                    $queryString = self::FT_PRODUCT_NAME . ":($queryValue)^10 OR ".
+                            self::FT_DESCRIPTION.":($queryValue) AND ".
+                            self::FT_CATEGORIES.":($categories_query) ";
+                } else {
+                    $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".
+                            self::FT_DESCRIPTION.":($query) OR ".
+                            self::FT_CATEGORIES.":($query)";
+                }
+            } else {
+                $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".
+                            self::FT_DESCRIPTION.":($query) OR ".
+                            self::FT_CATEGORIES.":($query)";
+            }
         } else {
             $queryString = "match:all";
         }
@@ -182,6 +210,16 @@ class FCom_IndexTank_Index_Product extends BClass
             $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
                     null, $this->_filter_docvar, null, implode(",", $this->_unfilter_category) );
+
+            //try simple query
+            if ($result->matches <= 0){
+                $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ". self::FT_DESCRIPTION.":($query)";
+                $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
+                    null, null, $this->_filter_category,
+                    null, $this->_filter_docvar, null, implode(",", $this->_unfilter_category) );
+                $this->_simple_query = true;
+            }
+
         } catch(Exception $e) {
             throw $e;
         }
@@ -307,6 +345,18 @@ class FCom_IndexTank_Index_Product extends BClass
                 self::FT_TIMESTAMP      => strtotime($product->update_dt),
                 self::FT_MATCH          => "all"
         );
+        $product_categories = $product->categories($product->id()); //get all categories for product
+        if ($product_categories){
+            $categories = array();
+            foreach ($product_categories as $cat) {
+                $categories[] = $cat->node_name;
+            }
+            if($categories){
+                $fields[self::FT_CATEGORIES] = "/".implode("/", $categories);
+            }
+        }
+
+
         return $fields;
     }
 

@@ -61,6 +61,9 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <strong class="count"><?=$s['c']?> found.</strong>
     <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
     <input type="submit" value="Search">
+    
+    <label>Query mode: <?=$s['info']['query_mode']?></label>
+    <br/>
     <div class="pages">
     <label>Page:</label>
 

@@ -65,6 +65,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
 
+        $isQuerySimple = FCom_IndexTank_Index_Product::i()->isSimpleQuery();
+
         $productsData = array();
         if ( $productsORM ) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
@@ -137,6 +139,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             ksort($category_data);
         }
 
+        $productsData['state']['info']['query_mode'] = $isQuerySimple ? 'simple' : 'standard';
         $productsData['state']['filter'] = $v;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] = $cf_data;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
