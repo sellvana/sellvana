@@ -96,5 +96,12 @@ class FCom_Admin extends BClass
             }
         }
     }
+
+    public static function frontendHref($url='')
+    {
+        $r = BRequest::i();
+        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
+        return trim($href.'/'.ltrim($url, '/'), '/');
+    }
 }
 

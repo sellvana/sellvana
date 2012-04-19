@@ -44,6 +44,15 @@ class FCom_Frontend extends BClass
             }
         }
     }
+
+    public static function adminHref($url='')
+    {
+        $href = BConfig::i()->get('web/base_admin');
+        if (!$href) {
+            $href = BApp::baseUrl(true) . '/admin';
+        }
+        return trim($href.'/'.ltrim($url, '/'), '/');
+    }
 }
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
