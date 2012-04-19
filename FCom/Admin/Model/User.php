@@ -146,11 +146,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return BLocale::i()->tzOffset($this->tz);
     }
 
-    public function config()
-    {
-        return $this->relatedModel('Denteva_Model_Config', array('user_id'=>$this->id), true);
-    }
-
     public function fullname()
     {
         return $this->firstname.' '.$this->lastname;

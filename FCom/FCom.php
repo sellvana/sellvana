@@ -91,6 +91,12 @@ class FCom extends BClass
             $localConfig['web']['base_store'] = $baseHref;
         }
 
+        $mediaDir = $config->get('fs/media_dir');
+        if (!$storageDir) {
+            $storageDir = $rootDir.'/media';
+            $config->set('fs/media_dir', $storageDir);
+        }
+
         $storageDir = $config->get('fs/storage_dir');
         if (!$storageDir) {
             $storageDir = $rootDir.'/storage';
@@ -352,6 +358,7 @@ class FCom extends BClass
                 'root_dir' => 'Customer',
                 'depends' => array('FCom_Core'),
                 'description' => "Customer Accounts and Management",
+                'migrate' => 'FCom_Customer_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CustomerAdmin.php', 'callback'=>'FCom_Customer_Admin::bootstrap'),
