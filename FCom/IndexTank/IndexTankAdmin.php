@@ -107,6 +107,7 @@ class FCom_IndexTank_Admin extends BClass
         FCom_IndexTank_Index_Product::i()->delete($product);
     }
 
+
     /**
      * Catch event FCom_Catalog_Model_Category::afterSave
      * to update given category in products index
@@ -150,6 +151,32 @@ class FCom_IndexTank_Admin extends BClass
     }
 
     /**
+     *Update custom field name before save
+     * @param array $args
+     * @return void
+     */
+    static public function onCustomFieldBeforeSave($args)
+    {
+        $new_model = $args['model'];
+        if(!$new_model->id()){
+            return;
+        }
+        $orig_model = FCom_CustomField_Model_Field::i()->orm('cf')->load($new_model->id());
+        if (!$orig_model){
+            return;
+        }
+
+        $f = FCom_IndexTank_Model_ProductFields::i()->orm()
+                    ->where('field_name', FCom_IndexTank_Index_Product::i()->get_custom_field_name($orig_model))
+                    ->where('type', 'category')
+                    ->find_one();
+        if ($f){
+            $f->field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_name($new_model);
+            $f->save();
+        }
+    }
+
+    /**
      * Catch event FCom_CustomField_Model_Field::BeforeDelete
      * to delete given custom field from products index
      * @param array $args contain custom field model
@@ -160,6 +187,14 @@ class FCom_IndexTank_Admin extends BClass
         $products = $cf_model->products();
         foreach($products as $product){
             FCom_IndexTank_Index_Product::i()->delete_custom_field($product, $cf_model);
+        }
+
+        $f = FCom_IndexTank_Model_ProductFields::i()->orm()
+                    ->where('field_name', get_custom_field_name($cf_model))
+                    ->where('type', 'category')
+                    ->find_one();
+        if ($f){
+            $f->delete();
         }
     }
 

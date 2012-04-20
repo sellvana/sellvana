@@ -2,7 +2,8 @@
 <fieldset class="adm-section-group">
     <ul class="form-list">
         <li>
-            <h4 class="label">Field: <?php echo $this->q($m->field_name) ?></h4>
+            <h4 class="label">Field</h4>
+            <input type="text" name="model[field_name]" value="<?php echo $this->q($m->field_name) ?>"/>
         </li>
         <?php if ($m->type == 'fulltext'):?>
         <li>
