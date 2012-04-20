@@ -272,45 +272,30 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function search($query, $start=null, $len=null)
     {
         if (!empty($query)){
-            $queryValue = $query;
-            if (strpos($query, " in ")) {
-                $categories_query = substr($query, strpos($query, " in ")+strlen(" in "));
-                $queryValue = substr($query, 0, strpos($query, " in "));
-
-                if(!empty($categories_query) && !empty($queryValue)){
-                    $queryString = self::FT_PRODUCT_NAME . ":($queryValue)^10 OR ".
-                            self::FT_DESCRIPTION.":($queryValue) AND ".
-                            self::FT_CATEGORIES.":($categories_query) ";
-                } else {
-                    $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".
-                            self::FT_DESCRIPTION.":($query) OR ".
-                            self::FT_CATEGORIES.":($query)";
+            $product_fields = FCom_IndexTank_Model_ProductFields::i()->get_fulltext_list();
+            $query_string = '';
+            foreach($product_fields as $pfield){
+                $priority = '';
+                if($pfield->priority > 1){
+                    $priority = ' ^'.$pfield->priority;
                 }
-            } else {
-                $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ".
-                            self::FT_DESCRIPTION.":($query) OR ".
-                            self::FT_CATEGORIES.":($query)";
+                if(!empty($query_string)){
+                    $query_string .= " OR ";
+                }
+                $query_string .= " {$pfield->field_name}:{$query} " . $priority." ";
             }
+
         } else {
-            $queryString = "match:all";
+            $query_string = "match:all";
         }
 
         try {
             //search($query, $start = NULL, $len = NULL, $scoring_function = NULL,
             //$snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
             //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL )
-            $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
+            $result = $this->model()->search($query_string, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
                     null, $this->_filter_docvar, null, implode(",", $this->_rollup_category) );
-
-            //try simple query
-            if ($result->matches <= 0){
-                $queryString = self::FT_PRODUCT_NAME . ":($query)^10 OR ". self::FT_DESCRIPTION.":($query)";
-                $result = $this->model()->search($queryString, $start, $len, $this->_scoring_function,
-                    null, null, $this->_filter_category,
-                    null, $this->_filter_docvar, null, implode(",", $this->_rollup_category) );
-                $this->_simple_query = true;
-            }
 
         } catch(Exception $e) {
             throw $e;
@@ -486,6 +471,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->delete_documents($docids);
     }
 
+    public function get_custom_field_name($cf_model)
+    {
+        return self::CT_CUSTOM_FIELD_PREFIX . $cf_model->field_name.'_'.$cf_model->field_code;
+    }
+
     protected function _prepareFields($product)
     {
         //get all text fields
@@ -540,7 +530,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             foreach ($product_custom_fields as $cf) {
                 //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_code .'_'.$cf->field_name] = $cf->label;
                 if (!is_null($product->{$cf->field_code})){
-                    $categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code] = $product->{$cf->field_code};
+                    $categories[$this->get_custom_field_name($cf)] = $product->{$cf->field_code};
                     //uncomment to remove all CF
                     //$categories[self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code] = '';
                 }
