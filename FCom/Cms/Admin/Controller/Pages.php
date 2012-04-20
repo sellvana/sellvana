@@ -14,14 +14,13 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract_Gri
     {
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
-            'handle' => array('label'=>'Handle', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
-                'baseLinkUrl' => BApp::href('cms/pages/form/'), 'idName' => 'id',
-            )),
-            'title' => array('label'=>'Title', 'editable'=>true),
+            'handle' => array('label'=>'Handle'),
+            'title' => array('label'=>'Title'),
             'version' => array('label'=>'Version'),
             'create_dt' => array('label'=>'Created', 'formatter'=>'date'),
             'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),
         );
+        $config['custom']['dblClickHref'] = BApp::href('cms/pages/form?id=');
         return $config;
     }
 
