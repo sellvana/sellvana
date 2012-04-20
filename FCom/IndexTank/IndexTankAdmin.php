@@ -13,6 +13,9 @@ class FCom_IndexTank_Admin extends BClass
         self::_initButtonsOnProductsPage();
 
         BFrontController::i()
+            ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
+            ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
+
             ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
 
                 //api function
@@ -173,11 +176,28 @@ class FCom_IndexTank_Admin extends BClass
                     array('view', 'root', 'do'=>array(
                         array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
                         array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
+                        array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
                     ))),
                 '/indextank/dashboard'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/dashboard')),
                     array('view', 'root', 'do'=>array(array('setNav', 'indextank/dashboard'))),
+                ),
+                '/indextank/product_fields'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('indextank/product_fields')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_fields'))),
+                ),
+                '/indextank/product_fields/form'=>array(
+                    array('layout', 'base'),
+                    array('layout', 'form'),
+                    array('hook', 'main', 'views'=>array('indextank/product_fields-form')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_fields'))),
+                    array('view', 'indextank/product_fields-form', 'set'=>array(
+                        'tab_view_prefix' => 'indextank/product_fields-form/',
+                    ), 'do'=>array(
+                        array('addTab', 'main', array('label'=>'Product Field', 'pos'=>10))
+                    )),
                 ),
                 '/settings'=>array(
                     array('view', 'settings', 'do'=>array(
