@@ -2,6 +2,9 @@
 
 class FCom_IndexTank_Frontend extends BClass
 {
+    /**
+     * Bootstrap IndexTank routes, events and layout for Frontend part
+     */
     static public function bootstrap()
     {
         BFrontController::i()
@@ -13,6 +16,9 @@ class FCom_IndexTank_Frontend extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Frontend::layout');
     }
 
+    /**
+     * Itialized base layout, navigation links and page views scripts
+     */
     static public function layout()
     {
         BLayout::i()->layout(array(

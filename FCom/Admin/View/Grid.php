@@ -176,10 +176,12 @@ var subgrid = \$('#'+subgrid_table_id);
         usort($cfg['grid']['colModel'], function($a, $b) {
             $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
         });
-        unset($cfg['custom']);
-        if (!empty($cfg['navGrid']['edit'])) {
+        if (!empty($cfg['custom']['dblClickHref'])) {
+            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { location.href = '{$cfg['custom']['dblClickHref']}'+rowid; }";
+        } elseif (!empty($cfg['navGrid']['edit'])) {
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { \$(this).jqGrid('editGridRow', rowid); }";
         }
+        unset($cfg['custom']);
 /*
         foreach (array('add','edit','del') as $k) {
             if (!empty($cfg['navGrid'][$k])) {
