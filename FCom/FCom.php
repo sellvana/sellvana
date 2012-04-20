@@ -77,15 +77,13 @@ class FCom extends BClass
 
         BDebug::debug('ROOTDIR='.$rootDir);
 
-        $baseSrc = $config->get('web/base_src');
-        if (!$baseSrc) {
-            $baseSrc = BRequest::i()->webRoot();
-            $localConfig['web']['base_src'] = $baseSrc;
-        }
         $baseHref = $config->get('web/base_href');
         if (!$baseHref) {
             $baseHref = BRequest::i()->webRoot();
             $localConfig['web']['base_href'] = $baseHref;
+        }
+        if (!$config->get('web/base_src')) {
+            $localConfig['web']['base_src'] = $baseHref;
         }
         if (!$config->get('web/base_store')) {
             $localConfig['web']['base_store'] = $baseHref;

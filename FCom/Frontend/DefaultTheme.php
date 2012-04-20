@@ -19,6 +19,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
+                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', '/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),

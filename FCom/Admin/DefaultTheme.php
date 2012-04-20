@@ -62,6 +62,7 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
+                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', '/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('js', '{FCom_Core}/js/lib/json2.js'),
