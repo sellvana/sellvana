@@ -369,6 +369,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $limit_docs_per_query = 500;
         $counter = 0;
         $documents = array();
+        $products_structure = array();
         foreach($products as $i => $product){
             $categories     = $this->_prepareCategories($product);
             $variables      = $this->_prepareVariables($product);
@@ -385,12 +386,67 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
             //submit every N products to IndexDen - this protect from network overloading
             if ( 0 == $counter++ % $limit_docs_per_query ){
+                $this->get_structure($documents,$products_structure);
                 $this->model()->add_documents($documents);
                 $documents = array();
             }
         }
         if ($documents){
+            $this->get_structure($documents,$products_structure);
             $this->model()->add_documents($documents);
+        }
+        //update structure
+        foreach($products_structure['fields'] as $field_name){
+            $f = FCom_IndexTank_Model_ProductFields::i()->orm()
+                    ->where('field_name', $field_name)
+                    ->where('type', 'fulltext')
+                    ->find_one();
+            if ($f){
+                continue;
+            }
+            $f = FCom_IndexTank_Model_ProductFields::i()->orm()->create();
+            $f->field_name = $field_name;
+            $f->type = 'fulltext';
+            $f->save();
+        }
+
+        foreach($products_structure['categories'] as $field_name){
+            $f = FCom_IndexTank_Model_ProductFields::i()->orm()
+                    ->where('field_name', $field_name)
+                    ->where('type', 'category')
+                    ->find_one();
+            if ($f){
+                continue;
+            }
+            $f = FCom_IndexTank_Model_ProductFields::i()->orm()->create();
+            $f->field_name = $field_name;
+            $f->type = 'category';
+            $f->show = 'checkbox';
+            $f->filter = 'exclusive';
+            $f->save();
+        }
+    }
+
+    protected function get_structure($documents, &$products_structure)
+    {
+        if (empty($products_structure['fields'])){
+            $products_structure['fields'] = array();
+        }
+        if (empty($products_structure['categories'])){
+            $products_structure['categories'] = array();
+        }
+        foreach($documents as $doc){
+            $products_structure['fields'] = array_merge($products_structure['fields'], array_keys($doc['fields']));
+            if (!empty($doc['categories'])) {
+                $products_structure['categories'] = array_merge($products_structure['categories'], array_keys($doc['categories']));
+            }
+        }
+        $products_structure['fields'] = array_unique($products_structure['fields']);
+        $products_structure['categories'] = array_unique($products_structure['categories']);
+        foreach($products_structure['categories'] as $id => $cat){
+            if(false !== strpos($cat, self::CT_CATEGORY_PREFIX)){
+                unset($products_structure['categories'][$id]);
+            }
         }
     }
 
