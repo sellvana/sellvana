@@ -67,8 +67,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         try {
             $class = $this->_modelClassName;
             $id = BRequest::i()->params('id', true);
+            $post = BRequest::i()->post('model');
             $model = $id ? $class::i()->load($id) : $class::i()->create();
-            $model->set(BRequest::i()->post('model'))->save();
+            $model->set($post)->save();
             $id = $model->id;
             BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
         } catch (Exception $e) {
