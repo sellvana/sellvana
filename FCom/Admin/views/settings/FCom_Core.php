@@ -19,6 +19,14 @@
         </div>
     </div>
     <div class="group">
+        <h3><a href="#">Website</a></h3>
+        <div>
+            <table>
+                <tr><td>Store Name</td><td><input type="text" name="config[modules][FCom_Core][store_name]" value="<?php echo $this->q($c->get('modules/FCom_Core/store_name'))?>"/></td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="group">
         <h3><a href="#">System</a></h3>
         <div>
             <table>

@@ -29,6 +29,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('js_raw', 'js_init', array('content'=>"window.less={env:'development'}")),
                         array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
                         //array('js', '{FCom_Core}/js/core.js'),
                     )),

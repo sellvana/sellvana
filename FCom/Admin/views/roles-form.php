@@ -11,6 +11,7 @@ head(function() {
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>'
     });
+    $("#roles-form").validate();
 });
 </script>
 <form id="users-form" action="<?php echo $formUrl ?>" method="post">
@@ -48,6 +49,3 @@ head(function() {
         </div>
     </section>
 </form>
-<script>
-head(function() { $("#roles-form").validationEngine(); });
-</script>

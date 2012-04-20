@@ -19,5 +19,5 @@ if (file_exists(__DIR__.'index.local.php')) {
     require_once __DIR__.'index.local.php';
 }
 
-#BDebug::mode('RECOVERY');
+BDebug::mode('DEBUG');
 FCom::i()->run('FCom_Admin');

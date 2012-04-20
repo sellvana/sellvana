@@ -20,7 +20,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'columns' => array(
                     'id' => array('label'=>'ID', 'formatter'=>'showlink', 'formatoptions'=>array(
                         'baseLinkUrl' => BApp::href($this->_gridHref.'/form/'), 'idName' => 'id',
-                    )),
+                    ), 'width'=>50),
                 ),
             ),
             'custom'=>array('personalize'=>true),
