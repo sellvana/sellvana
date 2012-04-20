@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * IndexTank API factory class
+ */
 class FCom_IndexTank_Api extends BClass
 {
     /**
@@ -9,21 +12,24 @@ class FCom_IndexTank_Api extends BClass
     */
     protected $_indextank;
 
-    protected $_api_url = '';
-
+    /**
+     * Load IndexTank library
+     */
     public function __construct()
     {
         //BApp::m()->autoload('lib');
-
         require_once __DIR__.'/lib/indextank.php';
-
-        $this->_api_url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
     }
 
+    /**
+     * Initialization of IndexTank API service
+     * @return IndexTank_API object
+     */
     public function service()
     {
         if (empty($this->_indextank)) {
-            $this->_indextank = new Indextank_Api($this->_api_url);
+            $api_url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+            $this->_indextank = new Indextank_Api($api_url);
         }
         return $this->_indextank;
     }
