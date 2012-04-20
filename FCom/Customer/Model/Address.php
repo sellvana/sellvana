@@ -8,7 +8,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     public function install()
     {
         BDb::run("
-CREATE TABLE IF NOT EXISTS `".static::table()."` (
+CREATE TABLE IF NOT EXISTS ".static::table()." (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `customer_id` int(11) NOT NULL,
   `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,

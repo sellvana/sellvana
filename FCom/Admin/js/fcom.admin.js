@@ -595,7 +595,7 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
         }
 
         function saveAll(el) {
-            //return true;
+            return true;
             //TODO
             var form = $(el).closest('form');
             var postData = form.serializeArray();
@@ -627,6 +627,8 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
         }
 
         $(function() {
+            $.fn.validate && $(options.panes).closest('form').validate(options.validate || {});
+
             var tabs = $(options.tabs);
             var panes = $(options.panes);
             var curLi = $(options.tabs+'[class=active]');
@@ -651,7 +653,7 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
                 curLi = li;
                 curPane = pane;
                 var tabId = a.attr('href').replace(/^#tab-/,'');
-                pane.parents('form').find('#tab').val(tabId);
+                pane.closest('form').find('#tab').val(tabId);
                 if (!pane.data('loaded')) {
                     $.getJSON(options.url_get+'?tabs='+tabId, function(data, status, req) {
                         loadTabs(data);

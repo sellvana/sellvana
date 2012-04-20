@@ -4,6 +4,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer';
     protected static $_origClass = __CLASS__;
+
     protected static $_sessionUser;
 
     public function setPassword($password)
@@ -80,7 +81,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire('FCom_Customer_Model_Customer::login.after', array('user'=>$this));
+        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$this));
         return $this;
     }
 
@@ -93,7 +94,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function install()
     {
         BDb::run("
-CREATE TABLE IF NOT EXISTS `".static::table()."` (
+CREATE TABLE IF NOT EXISTS ".static::table()." (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `firstname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -104,6 +105,7 @@ CREATE TABLE IF NOT EXISTS `".static::table()."` (
   `create_dt` datetime NOT NULL,
   `update_dt` datetime NOT NULL,
   `last_login` datetime DEFAULT NULL,
+  `token` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");

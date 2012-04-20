@@ -5,7 +5,7 @@
         </header>
         <?php echo $this->messagesHtml() ?>
         <!--<div class="msg success-msg">Something went wrong</div>-->
-        <form action="<?php echo BApp::href('password_recovery')?>" method="post" id="recovery-form">
+        <form action="<?php echo BApp::href('customer/password/recover')?>" method="post" id="recovery-form">
             <fieldset class="form-group">
                 <ul>
                     <li class="form-row">
@@ -16,7 +16,7 @@
                     </li>
                 </ul>
                 <div class="form-buttons">
-                    <input type="submit" value="Send Reminder"/>
+                    <input type="submit" value="Send Recovery Instructions"/>
                 </div>
             </fieldset>
         </form>
