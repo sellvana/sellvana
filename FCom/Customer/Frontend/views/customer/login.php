@@ -23,7 +23,7 @@
 				</ul>
 				<div class="form-buttons">
 					<input type="submit" value="Login"/>
-					<a href="<?php echo BApp::href('password_recovery')?>">Retrieve your password</a>
+					<a href="<?php echo BApp::href('customer/password/recover')?>">Recover your password</a>
 				</div>
 			</fieldset>
 		</form>

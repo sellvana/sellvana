@@ -8,6 +8,18 @@ class FCom_Frontend extends BClass
             BResponse::i()->httpSTS();
         }
 
+        if (BApp::i()->get('area')==='FCom_Frontend') {
+            static::i()->bootstrapUI();
+        }
+
+        if (BDebug::is('RECOVERY,MIGRATION')) {
+            BLayout::i()->setRootView('under_construction');
+            BResponse::i()->render();
+        }
+    }
+
+    public function bootstrapUI()
+    {
         BFrontController::i()
             ->route('GET /', 'FCom_Frontend_Controller.index')
         ;
@@ -22,10 +34,7 @@ class FCom_Frontend extends BClass
             ->afterTheme('FCom_Frontend::layout')
         ;
 
-        if (BDebug::is('RECOVERY,MIGRATION')) {
-            BLayout::i()->setRootView('under_construction');
-            BResponse::i()->render();
-        }
+        return $this;
     }
 
     public static function layout($args)

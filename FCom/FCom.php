@@ -92,9 +92,9 @@ class FCom extends BClass
         }
 
         $mediaDir = $config->get('fs/media_dir');
-        if (!$storageDir) {
-            $storageDir = $rootDir.'/media';
-            $config->set('fs/media_dir', $storageDir);
+        if (!$mediaDir) {
+            $mediaDir = $rootDir.'/media';
+            $config->set('fs/media_dir', $mediaDir);
         }
 
         $storageDir = $config->get('fs/storage_dir');

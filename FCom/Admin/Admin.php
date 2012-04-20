@@ -10,6 +10,26 @@ class FCom_Admin extends BClass
 
         FCom_Admin_Model_User::i();
 
+        if (BApp::i()->get('area')==='FCom_Admin') {
+            static::i()->bootstrapUI();
+        }
+
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'admin/users' => 'Manage Users',
+            'admin/roles' => 'Manage Roles and Permissions',
+            'admin/settings' => 'Update Settings',
+            'admin/modules' => 'Manage Modules',
+        ));
+
+        BPubSub::i()
+            //->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
+            ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
+        ;
+
+    }
+
+    public function bootstrapUI()
+    {
         BFrontController::i()
             ->route('GET /', 'FCom_Admin_Controller.index')
             ->route('GET /blank', 'FCom_Admin_Controller.blank')
@@ -45,18 +65,7 @@ class FCom_Admin extends BClass
             ->afterTheme('FCom_Admin::layout')
         ;
 
-        FCom_Admin_Model_Role::i()->createPermission(array(
-            'admin/users' => 'Manage Users',
-            'admin/roles' => 'Manage Roles and Permissions',
-            'admin/settings' => 'Update Settings',
-            'admin/modules' => 'Manage Modules',
-        ));
-
-        BPubSub::i()
-            //->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
-            ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
-        ;
-
+        return $this;
     }
 
     public function onBeforeDispatch()
