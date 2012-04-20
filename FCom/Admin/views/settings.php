@@ -41,7 +41,7 @@ console.log(ui.item[0].id);
         url_post: '<?php echo $formUrl ?>',
         on_tab_load: initTabs
     });
-    $('#settings-form').validationEngine();
+    $('#settings-form').validate();
     initTabs.apply($('#settings-form'));
     $('.adm-tabs-left > ul').sortable({axis: 'y', stop: onSortableStop});
 });

@@ -33,6 +33,13 @@ class FCom_Core extends BClass
         return $url;
     }
 
+    public function thumbSrc($module, $path, $size)
+    {
+        $url = BApp::src($module, $path);
+        $path = str_replace(BApp::baseUrl(true), '', $url);
+        return $this->resizeUrl().'?f='.urlencode($path).'&s='.$size;
+    }
+
     public function dir($path, $autocreate=true, $mode=0777)
     {
         $dir = BConfig::i()->get('fs/root_dir').'/'.$path;

@@ -97,9 +97,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js'),
                         array('css', '{FCom_Core}/js/lib/themes/default/style.css'),
 
-                        array('js', '{FCom_Core}/js/lib/jquery.validationEngine-en.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.validationEngine.js'),
-                        array('css', '{FCom_Core}/js/lib/css/jquery.validationEngine.css'),
+                        array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
                     )),
                 ),
                 '/'=>array(

@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS {$tPersonalize} (
 ALTER TABLE {$tUser}
 ADD COLUMN `is_superadmin` TINYINT DEFAULT 0 NOT NULL AFTER `username`
 , ADD COLUMN `role_id` INT NULL AFTER `is_superadmin`
+, ADD COLUMN `token` varchar(20) DEFAULT NULL
 ;
             ");
         } catch (Exception $e) { }
