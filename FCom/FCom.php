@@ -372,6 +372,7 @@ class FCom extends BClass
                 'root_dir' => 'CustomField',
                 'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
                 'depends' => array('FCom_Catalog'),
+                'after' => array('FCom_Customer'),
                 'description' => "Base custom fields implementation, currently for catalog only",
                 'migrate' => 'FCom_CustomField_Migrate',
                 'areas' => array(
