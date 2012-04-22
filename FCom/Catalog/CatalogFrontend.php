@@ -12,9 +12,8 @@ class FCom_Catalog_Frontend extends BClass
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
         ;
 
-        BLayout::i()->addAllViews('Frontend/views');
-
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Catalog_Frontend::layout');
+        BLayout::i()->addAllViews('Frontend/views')
+            ->afterTheme('FCom_Catalog_Frontend::layout');
     }
 
     static public function layout()
