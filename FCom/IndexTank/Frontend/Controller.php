@@ -5,6 +5,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
     public function action_search()
     {
+
+
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $sc = BRequest::i()->get('sc');
@@ -24,6 +26,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $product_fields = FCom_IndexTank_Model_ProductFields::i()->get_list();
+        $inclusive_fields = FCom_IndexTank_Model_ProductFields::i()->get_inclusive_list();
 
         $filters_selected = array();
         $filters_invisible = array();
@@ -32,14 +35,10 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                $pos = strpos($key, FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX);
-                if ($pos !== false){
-                    foreach ($values as $value){
-                        if($product_fields[$key]->filter == 'inclusive'){
-                            FCom_IndexTank_Index_Product::i()->rollup_by($key, $value);
-                        }
-                    }
+                if( in_array($key, $inclusive_fields) ){
+                    FCom_IndexTank_Index_Product::i()->rollup_by($key);
                 }
+
                 foreach ($values as $value){
                     FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
                     $filters_invisible[$key][$value] = $value;
@@ -47,24 +46,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 $filters_selected[$key] = $values;
 
             }
-            //unfilter price and brand to see all total found for each category price and brand
-            if($product_fields[FCom_IndexTank_Index_Product::CT_PRICE_RANGE]->filter == 'inclusive'){
-                FCom_IndexTank_Index_Product::i()->rollup_by(FCom_IndexTank_Index_Product::CT_PRICE_RANGE);
-            }
-            if($product_fields[FCom_IndexTank_Index_Product::CT_BRAND]->filter == 'inclusive'){
-                FCom_IndexTank_Index_Product::i()->rollup_by(FCom_IndexTank_Index_Product::CT_BRAND);
-            }
         }
 
         if($v){
+            $variables_fields = FCom_IndexTank_Model_ProductFields::i()->get_varialbes_list();
             foreach($v as $key => $values) {
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                $pos = strpos($key, 'price');
-                if($pos !== false){
+                if( in_array($key, $variables_fields) ){
                     if ($values['from'] < $values['to']){
-                        FCom_IndexTank_Index_Product::i()->filter_range(FCom_IndexTank_Index_Product::VAR_PRICE, $values['from'], $values['to']);
+                        FCom_IndexTank_Index_Product::i()->filter_range($variables_fields[$key]->var_number, $values['from'], $values['to']);
                     }
                 }
             }
@@ -75,7 +67,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
-        $isQuerySimple = FCom_IndexTank_Index_Product::i()->isSimpleQuery();
 
         $productsData = array();
         if ( $productsORM ) {
@@ -95,33 +86,40 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 //        FCom_IndexTank_Index_Product::i()->search($q);
 //        $facets = FCom_IndexTank_Index_Product::i()->getFacets();
 
+        /*
+         * if( in_array($fname, $facets_fields) ){
+                    $id_path = substr($fname, strlen($facets_fields[$fname]->field_name));
+         */
         if($facets){
+            $facets_fields = FCom_IndexTank_Model_ProductFields::i()->get_facets_list();
+            $facets_data = array();
             $category_data = array();
             $cf_data = array();
             $price_data = array();
             $brand_data = array();
             foreach($facets as $fname => $fvalues){
-                $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX);
+                //hard coded ct_categories prefix
+                $pos = strpos($fname, 'ct_categories___');
                 if ($pos !== false){
-                    $id_path = substr($fname, strlen(FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX));
+                    $id_path = substr($fname, strlen('ct_categories___'));
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
-                        $category_data[$id_path] = $obj;
+                        $obj->path = '';
+                        $facets_data[$id_path] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }
                 }
-                $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX);
-                if ($pos !== false){
-                    $path = substr($fname, strlen(FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX));
-                    list($custom_name) = explode("_", $path);
+                if( in_array($fname, $facets_fields) ){
+                    $path = substr($fname, strlen($facets_fields[$fname]));
+                    list($custom_name) = explode("___", $path);
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
                         $obj->path = $path;
-                        $cf_data[$custom_name][] = $obj;
+                        $facets_data[$custom_name][] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }
                 }
@@ -154,7 +152,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData['state']['fields'] = $product_fields;
-        $productsData['state']['info']['query_mode'] = $isQuerySimple ? 'simple' : 'standard';
         $productsData['state']['filter'] = $v;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] = $cf_data;
         $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
