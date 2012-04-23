@@ -17,10 +17,11 @@ window.appConfig = {
     <div id="root-layout" class="adm-wrapper">
         <div class="ui-layout-north">
 		    <header class="adm-topbar">
-			    <span class="adm-logo">Denteva Admin</span>
 			    <nav class="adm-nav">
+		    		<a href="#" class="start">Navigation</a>
 		        	<?php echo $this->renderNodes() ?>
 	        	</nav>
+			    <span class="adm-logo">Fulleron Admin</span>
 			    <nav class="sup-links">
 				    <ul>
 <?php if (!empty($this->_quickSearches)): ?>
