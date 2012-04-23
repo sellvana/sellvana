@@ -18,6 +18,9 @@ window.appConfig = {
         <div class="ui-layout-north">
 		    <header class="adm-topbar">
 			    <span class="adm-logo">Denteva Admin</span>
+			    <nav class="adm-nav">
+		        	<?php echo $this->renderNodes() ?>
+	        	</nav>
 			    <nav class="sup-links">
 				    <ul>
 <?php if (!empty($this->_quickSearches)): ?>
@@ -68,12 +71,6 @@ window.appConfig = {
 			    </nav>
 			    <strong class="adm-group-title"><?php echo $this->title ? $this->q($this->title) : '&nbsp;' ?></strong>
 		    </header>
-        </div>
-        <div class="ui-layout-west">
-	        <section class="adm-nav-bg"></section>
-            <nav class="adm-nav">
-		        <?php echo $this->renderNodes() ?>
-	        </nav>
         </div>
         <div class="adm-middle ui-layout-center"><?php echo $this->hook('main') ?></div>
     </div>
