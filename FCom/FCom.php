@@ -303,6 +303,15 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
                 'description' => "Cron scheduled tasks manager",
             ))
+            // cron jobs processing
+            ->addModule('FCom_Geo', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Geo',
+                'migrate' => 'FCom_Geo::migrate',
+                'bootstrap' => array('file'=>'Geo.php', 'callback'=>'FCom_Geo::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'description' => "Geographic information about countries and states",
+            ))
             // catalog views and controllers
             ->addModule('FCom_Cms', array(
                 'version' => '0.1.1',

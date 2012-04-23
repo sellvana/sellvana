@@ -58,6 +58,13 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jquery.jstree.js'),
                     )),
                 ),
+                'mcdropdown'=>array(
+                    array('view', 'head', 'do'=>array(
+                        array('css', '{FCom_Core}/js/lib/css/jquery.mcdropdown.css'),
+                        array('js', '{FCom_Core}/js/lib/jquery.mcdropdown.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.bgiframe.js'),
+                    )),
+                ),
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
