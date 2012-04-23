@@ -177,7 +177,6 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 
 /* Section Titles */
 .adm-page-title {
-	margin:0 -19px 18px -19px;
 	padding:8px 18px;
 	border-bottom:1px solid #c4c4c4;
 	background:#e7e7e7;
@@ -344,8 +343,6 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	min-height:100%;
 	min-width:1000px;
 	}
-.adm-middle { padding:0 20px 20px 205px; }
-.adm-middle.collapsed-nav { padding-left:50px; }
 
 /* Header */
 .adm-topbar {
@@ -486,31 +483,20 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	}
 
 /* Sidebar */
-.adm-nav-bg {
-	position:absolute;
-	top:31px;
-	bottom:0;
-	z-index:-1;
-	width:185px;
-	background:#e9e9e9;
-	border-right:1px solid #acacac;
-	}
-.adm-nav {
-	position:absolute;
-	top:31px;
-	width:185px;
-	font:12px/1.2 'Lucida Grande', Arial, Helvetica, sans-serif;
-	text-shadow:0 1px 0 #fff;
-	z-index:0;
-	}
-.adm-nav a {
+.adm-nav { float:left; }
+.adm-nav ul li { display:inline-block }
+.adm-nav ul li a { display:block; }
+.adm-nav ul ul { display:none; }
+.adm-nav ul li:hover ul { display:block; }
+.adm-nav ul ul li { display:block; }
+.adm-nav ul ul li a {
 	display:block;
 	border-top:1px solid #fff;
 	border-bottom:1px solid #d4d4d4;
 	padding:5px 10px 5px 30px;
 	color:#444;
 	}
-.adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
+/*.adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
 .adm-nav li.nav-group > header {
 	position:relative;
     cursor:pointer;
@@ -556,7 +542,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .adm-nav .nav-group-denteva_accounts .icon { width:16px; height:8px; top:7px !important; background-position:-73px -39px; }
 .adm-nav .nav-group-merge .icon { width:15px; height:15px; background-position:-4px -36px; }
 .adm-nav .nav-group-admin .icon { width:16px; height:16px; background-position:-115px -36px; }
-
+*/
 
 /* Col Main */
 .adm-content-inner { position:relative; min-height:350px; }
@@ -700,5 +686,6 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .topbar:after,
 .form-list li:after,
 .adm-product-summary:after,
-.clearer:after { content:""; display:table; clear:both; }
+.clearer:after,
+.adm-topbar:after { content:""; display:table; clear:both; }
 

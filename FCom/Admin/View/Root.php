@@ -110,7 +110,7 @@ class FCom_Admin_View_Root extends FCom_Core_View_Root
             if (!empty($node['/'])) {
                 $node['li']['class'] .= ' nav-group';
                 $hdrParams = array('class'=>'nav-group-'.$k);
-                $label = $this->tag('header', $hdrParams).'<span class="icon"></span><span class="title">'.$label.'</span></header>';
+                $label = $this->tag('a', $hdrParams).'<span class="icon"></span><span class="title">'.$label.'</span></a>';
             }
             $html .= $this->tag('li', !empty($node['li']) ? $node['li'] : array())
                 . $label . $children . '</li>';
