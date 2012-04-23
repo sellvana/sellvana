@@ -14,7 +14,7 @@ audio:not([controls]) { display:none; }
 [hidden] { display:none; }
 
 html { font-size:100%; overflow-y:scroll; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
-body { margin:0; background:url(../img/body_bg.gif); color:#555; font:13px/1.35 'Helvetica Nue', Arial, Helvetica, sans-serif; }
+body { margin:0; background:url(../img/body_bg.gif); color:#555; font:13px/1.35 'Helvetica Neue', HelveticaNeue, Arial, Helvetica, sans-serif; }
 html, body {
 	height:100%;
 	margin:0;
@@ -385,7 +385,6 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	top:0;
 	left:185px;
 	padding:8px 0 8px 18px;
-	border-left:1px solid #8e0900;
 	font-size:13px;
 	line-height:1;
 	}
@@ -483,19 +482,37 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	}
 
 /* Sidebar */
-.adm-nav { float:left; }
-.adm-nav ul li { display:inline-block }
-.adm-nav ul li a { display:block; }
-.adm-nav ul ul { display:none; }
+.adm-nav { float:left; position:relative; }
+.adm-nav .start { float:left; width:31px; height:31px; background:#8a0700; text-indent:-999em; }
+.adm-nav:hover .start { background:#fafafa; }
+.adm-nav ul { 
+	display:none; 
+	position:absolute; 
+	top:31px; 
+	left:0;
+	width:165px; 
+	background:#fafafa; 
+	padding:5px 0; 
+	box-shadow:0 2px 2px #ccc;
+	-moz-box-shadow:0 2px 2px #ccc;
+	-webkit-box-shadow:0 2px 2px #ccc;
+	}
+.adm-nav:hover ul { display:block; }
+.adm-nav a:hover { color:#b00; }
+.adm-nav ul li { position:relative; cursor:pointer; }
+.adm-nav ul li a { 
+	display:block;
+	padding:4px 15px 4px 40px;
+	color:#444;
+	font-size:13px;
+	line-height:1.25em;
+	cursor:pointer;
+	text-shadow:none;
+	}
+.adm-nav:hover ul ul,
+.adm-nav ul ul { display:none; top:-10px; left:165px; }
 .adm-nav ul li:hover ul { display:block; }
 .adm-nav ul ul li { display:block; }
-.adm-nav ul ul li a {
-	display:block;
-	border-top:1px solid #fff;
-	border-bottom:1px solid #d4d4d4;
-	padding:5px 10px 5px 30px;
-	color:#444;
-	}
 /*.adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
 .adm-nav li.nav-group > header {
 	position:relative;
