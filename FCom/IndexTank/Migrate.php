@@ -72,6 +72,7 @@ class FCom_IndexTank_Migrate extends BClass
 
         }
 
+
         $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'custom_price_range')->find_one();
         if (!$doc){
             //add price range
