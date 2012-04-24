@@ -205,7 +205,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         } else {
             $query_string = "match:all";
         }
-
+//echo $query_string;exit;
         try {
             //search($query, $start = NULL, $len = NULL, $scoring_function = NULL,
             //$snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
@@ -416,7 +416,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $product_categories = $product->categories($product->id()); //get all categories for product
         if ($product_categories){
             foreach ($product_categories as $cat) {
-                $categories[$cat->id_path] = $cat->node_name;
+                $cat_path = str_replace("/","__",$cat->url_path);
+                $categories[$cat_path] = $cat->node_name;
             }
         }
         return $categories;
