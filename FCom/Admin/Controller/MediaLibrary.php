@@ -62,7 +62,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.file_name', 'a.file_size'))
             ;
-            $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Admin_Controller_Media::action_grid_get.'.$folder);
+            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__.'.'.$folder);
             BResponse::i()->json($data);
             break;
 
@@ -114,7 +114,6 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $attModel::i() : $attModel;
-
         switch($r->params('do')) {
         case 'upload':
             //set_time_limit(0);
@@ -147,7 +146,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $id = '';
                     $status = 'ERROR';
                 }
-                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', {id:'$id', act:'$status'})</script>";
+                $row = array('id'=>$id, 'act'=>$status, 'file_name'=>$fileName, 'file_size'=>$att->file_size);
+                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row).")</script>";
             }
             exit;
 

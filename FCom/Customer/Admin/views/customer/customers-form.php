@@ -1,7 +1,7 @@
 <?php
-$p = $this->model;
+$c = $this->model;
 $tabs = $this->sortedTabs();
-$formUrl = BApp::href('customers/form/?id='.$p->id);
+$formUrl = BApp::href('customers/form/?id='.$c->id);
 ?>
 <script>
 head(function() {
@@ -16,7 +16,7 @@ head(function() {
 <form action="<?php echo $formUrl ?>" method="post">
     <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
-        <span class="title"><?php echo $p->id ? 'Edit Customer: '.$this->q($p->handle) : 'Create New Customer' ?></span>
+        <span class="title"><?php echo $c->id ? 'Edit Customer: '.$this->q($c->handle) : 'Create New Customer' ?></span>
         <div style="float:right">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span><?php echo BLocale::_('Save')?></span></button>
         </div>
