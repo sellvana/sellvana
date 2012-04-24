@@ -72,19 +72,6 @@ class FCom_IndexTank_Migrate extends BClass
 
         }
 
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'ft_categories')->find_one();
-        if (!$doc){
-            //add price range
-            $data = array(
-                    'field_name'        => 'ft_categories',
-                    'field_nice_name'   => 'Full-text categories',
-                    'field_type'        => 'text',
-                    'search'            => 1,
-                    'source_type'       => 'function',
-                    'source_value'      => 'get_ft_categories'
-            );
-            FCom_IndexTank_Model_ProductFields::orm()->create($data)->save();
-        }
 
         $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'custom_price_range')->find_one();
         if (!$doc){
@@ -107,7 +94,7 @@ class FCom_IndexTank_Migrate extends BClass
                     'field_name'        => 'ct_categories___',
                     'field_nice_name'   => 'Categories',
                     'field_type'        => 'text',
-                    'search'            => 0,
+                    'search'            => 1,
                     'facets'            => 1,
                     'source_type'       => 'function',
                     'source_value'      => 'get_categories'

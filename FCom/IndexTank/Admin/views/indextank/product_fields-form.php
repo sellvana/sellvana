@@ -20,7 +20,7 @@ head(function() {
         <span class="title"><?php echo $p->id ? 'Edit Product Field: '.$this->q($p->field_name) : 'Create New Product Field' ?></span>
         <div style="float:right">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span><?php echo BLocale::_('Save')?></span></button>
-            <button class="st1 sz2 btn" onclick="adminForm.deleteAll()"><span><?php echo BLocale::_('Delete - now working yet')?></span></button>
+            <button class="st1 sz2 btn" onclick="javascript:history.back()"><span><?php echo BLocale::_('Cancel')?></span></button>
         </div>
     </header>
 

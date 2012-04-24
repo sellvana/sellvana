@@ -5,8 +5,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
     public function action_search()
     {
-
-
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $sc = BRequest::i()->get('sc');
@@ -27,7 +25,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $product_fields = FCom_IndexTank_Model_ProductFields::i()->get_list();
         $inclusive_fields = FCom_IndexTank_Model_ProductFields::i()->get_inclusive_list();
-
         $filters_selected = array();
         $filters_invisible = array();
         if ($f){
@@ -35,7 +32,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                if( in_array($key, $inclusive_fields) ){
+                if( isset($inclusive_fields[$key]) ){
                     FCom_IndexTank_Index_Product::i()->rollup_by($key);
                 }
 
@@ -67,7 +64,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
-
         $productsData = array();
         if ( $productsORM ) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
@@ -94,26 +90,57 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             $facets_fields = FCom_IndexTank_Model_ProductFields::i()->get_facets_list();
             $facets_data = array();
             $category_data = array();
-            $cf_data = array();
-            $price_data = array();
-            $brand_data = array();
+            //$cf_data = array();
+            //$other_data = array();
+            //$brand_data = array();
+
+            //get categories
             foreach($facets as $fname => $fvalues){
                 //hard coded ct_categories prefix
                 $pos = strpos($fname, 'ct_categories___');
                 if ($pos !== false){
-                    $id_path = substr($fname, strlen('ct_categories___'));
+                    $path = substr($fname, strlen('ct_categories___'));
+                    $level = count(explode("__", $path))-1;
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
-                        $obj->path = '';
-                        $facets_data[$id_path] = $obj;
+                        $obj->key = $fname;
+                        $obj->level = $level;
+                        $category_data['Categories'][$path] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }
+                    continue;
                 }
+                //get other fields
+                if( isset($facets_fields[$fname]) ){
+                    foreach($fvalues as $fvalue => $fcount) {
+                            $obj = new stdClass();
+                            $obj->name = $fvalue;
+                            $obj->count = $fcount;
+                            $obj->key = $fname;
+                            $facets_data[$facets_fields[$fname]->field_nice_name][] = $obj;
+                            unset($filters_invisible[$fname][$fvalue]);
+                    }
+                }
+            }
+
+            ksort($facets_data);
+            ksort($category_data['Categories']);
+            //put categories first
+            $facets_data = (array)$category_data + (array)$facets_data;
+
+/*
+                print_r($facets);exit;
                 if( in_array($fname, $facets_fields) ){
-                    $path = substr($fname, strlen($facets_fields[$fname]));
-                    list($custom_name) = explode("___", $path);
+                    if(false !== strpos($fname, "___")){
+                        $path = substr($fname, strlen($facets_fields[$fname]));
+                        list($custom_name) = explode("___", $path);
+                    } else {
+                        $custom_name = $fname;
+                        $path = '';
+                    }
+
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
@@ -123,6 +150,9 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                         unset($filters_invisible[$fname][$fvalue]);
                     }
                 }
+ *
+ */
+                /*
                 $pos = strpos($fname, FCom_IndexTank_Index_Product::CT_PRICE_RANGE);
                 if ($pos !== false){
                     foreach($fvalues as $fvalue => $fcount) {
@@ -144,26 +174,34 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                         unset($filters_invisible[$fname][$fvalue]);
                     }
                 }
-            }
-            ksort($brand_data);
-            ksort($price_data);
-            ksort($cf_data);
-            ksort($category_data);
+                 *
+                 */
+            //}
+            //print_r($facets_data);
+            //ksort($brand_data);
+           // ksort($other_data);
+            //ksort($cf_data);
+            //ksort($category_data);
         }
+        //print_r($facets_data);exit;
 
         $productsData['state']['fields'] = $product_fields;
-        $productsData['state']['filter'] = $v;
-        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] = $cf_data;
-        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
-        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $price_data;
-        $productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_BRAND] = $brand_data;
-//        $productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $filters_selected[FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX];
-
         $productsData['state']['facets'] = $facets;
-        //$productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $filters_selected[FCom_IndexTank_Index_Product::CT_PRICE_RANGE];
-        //$productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND] = $filters_selected[FCom_IndexTank_Index_Product::CT_BRAND];
         $productsData['state']['filter_selected'] = $filters_selected;
         $productsData['state']['filter_invisible'] = $filters_invisible;
+        $productsData['state']['available_facets'] = $facets_data;
+        $productsData['state']['filter'] = $v;
+
+        //$productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] = $cf_data;
+        //$productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $category_data;
+        //$productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $price_data;
+        //$productsData['state']['filter'][FCom_IndexTank_Index_Product::CT_BRAND] = $brand_data;
+//        $productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] = $filters_selected[FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX];
+
+
+        //$productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] = $filters_selected[FCom_IndexTank_Index_Product::CT_PRICE_RANGE];
+        //$productsData['state']['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND] = $filters_selected[FCom_IndexTank_Index_Product::CT_BRAND];
+
 
         BApp::i()
             ->set('current_query', $q)
