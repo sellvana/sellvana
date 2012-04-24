@@ -252,6 +252,7 @@ class FCom extends BClass
                 'root_dir' => 'Core',
                 'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
                 'run_level' => BModule::REQUIRED,
+                'migrate' => 'FCom_Core_Migrate',
                 'description' => "Base Fulleron classes and JS libraries",
             ))
             // Initial installation module

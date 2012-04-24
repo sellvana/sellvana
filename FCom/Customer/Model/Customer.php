@@ -110,4 +110,44 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
     }
+
+    public static function import($row)
+    {
+        $data = array();
+        foreach ($row as $k=>$v) {
+            list($table, $field) = explode('.', $k);
+            $data[$table][$field] = $v;
+        }
+
+        BPubSub::i()->fire(__METHOD__.'.before', array('data'=>&$data));
+
+        if (empty($data['customer']['email'])) {
+            return false;
+        }
+        $cust = static::i()->load($data['customer']['email'], 'email');
+        if (!$cust) {
+            $cust = static::i()->create();
+        }
+        $cust->set($data['customer'])->save();
+
+        if ($cust->default_billing_id) {
+            $addr = FCom_Customer_Model_Address::i()->load($cust->default_billing_id);
+        }
+        if (empty($addr)) {
+            $addr = FCom_Customer_Model_Address::i()->create(array('customer_id' => $cust->id));
+        }
+        $addr->set($data['address'])->save();
+
+        if (!$cust->default_billing_id) {
+            $cust->set('default_billing_id', $addr->id);
+        }
+        if (!$cust->default_shipping_id) {
+            $cust->set('default_shipping_id', $addr->id);
+        }
+        $cust->save();
+
+        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>&$data));
+
+        return $cust;
+    }
 }

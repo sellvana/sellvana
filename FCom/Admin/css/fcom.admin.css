@@ -483,16 +483,16 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 
 /* Sidebar */
 .adm-nav { float:left; position:relative; }
-.adm-nav .start { float:left; width:31px; height:31px; background:#8a0700; text-indent:-999em; }
-.adm-nav:hover .start { background:#fafafa; }
-.adm-nav ul { 
-	display:none; 
-	position:absolute; 
-	top:31px; 
+.adm-nav .start { float:left; /*width:31px; */; width:165px; height:31px; /*background:#8a0700; */text-indent:-999em; }
+.adm-nav:hover .start { /*background:#fafafa; */background:#8a0700; }
+.adm-nav ul {
+	display:none;
+	position:absolute;
+	top:31px;
 	left:0;
-	width:165px; 
-	background:#fafafa; 
-	padding:5px 0; 
+	width:165px;
+	background:#fafafa;
+	padding:5px 0;
 	box-shadow:0 2px 2px #ccc;
 	-moz-box-shadow:0 2px 2px #ccc;
 	-webkit-box-shadow:0 2px 2px #ccc;
@@ -500,7 +500,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 .adm-nav:hover ul { display:block; }
 .adm-nav a:hover { color:#b00; }
 .adm-nav ul li { position:relative; cursor:pointer; }
-.adm-nav ul li a { 
+.adm-nav ul li a {
 	display:block;
 	padding:4px 15px 4px 40px;
 	color:#444;
@@ -510,7 +510,7 @@ button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
 	text-shadow:none;
 	}
 .adm-nav:hover ul ul,
-.adm-nav ul ul { display:none; top:-10px; left:165px; }
+.adm-nav ul ul { display:none; top:-5px; left:165px; }
 .adm-nav ul li:hover ul { display:block; }
 .adm-nav ul ul li { display:block; }
 /*.adm-nav a:hover { border-top-color:#e3e3e3; background:#e3e3e3;}
