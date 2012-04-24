@@ -332,7 +332,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->delete_documents($docids);
     }
 
-    protected function _processFields($fields_list, $product)
+    protected function _processFields($fields_list, $product, $type='')
     {
         $result = array();
         foreach($fields_list as $field){
@@ -342,7 +342,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $result[$field->field_name] = $value;
                     break;
                 case 'function':
-                    $values_list = $this->{$field->source_value}($product);
+                    $values_list = $this->{$field->source_value}($product, $type);
                     if($values_list){
                         if(is_array($values_list)){
                             foreach ($values_list as $search_name => $search_value) {
@@ -362,7 +362,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     protected function _prepareFields($product)
     {
         $fields_list = FCom_IndexTank_Model_ProductFields::i()->get_search_list();
-        $searches = $this->_processFields($fields_list, $product);
+        $searches = $this->_processFields($fields_list, $product, 'search');
         //add two special fields
         $searches['timestamp'] = strtotime($product->update_dt);
         $searches['match'] = "all";
@@ -410,7 +410,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return '';
     }
 
-    protected function get_categories($product)
+    protected function get_categories($product, $type='')
     {
         $categories = array();
         $product_categories = $product->categories($product->id()); //get all categories for product
@@ -420,10 +420,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $categories[$cat_path] = $cat->node_name;
             }
         }
+        if ('search' == $type){
+            return "/".implode("/", $categories);
+        }
         return $categories;
     }
 
-    protected function price_range_large($product)
+    protected function price_range_large($product, $type='')
     {
         if ($product->base_price < 100) {
             return '$0 to $99';
