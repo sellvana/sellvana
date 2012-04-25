@@ -16,7 +16,7 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
             ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
 
-            ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
+        //    ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
 
                 //api function
             ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
@@ -210,14 +210,14 @@ class FCom_IndexTank_Admin extends BClass
                 'base'=>array(
                     array('view', 'root', 'do'=>array(
                         array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
-                        array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
+//                        array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
                         array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
                     ))),
-                '/indextank/dashboard'=>array(
+       /*         '/indextank/dashboard'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/dashboard')),
                     array('view', 'root', 'do'=>array(array('setNav', 'indextank/dashboard'))),
-                ),
+                ),*/
                 '/indextank/product_fields'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/product_fields')),
