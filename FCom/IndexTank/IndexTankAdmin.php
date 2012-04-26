@@ -16,6 +16,9 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
             ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
 
+             ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
+            ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
+
         //    ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
 
                 //api function
@@ -212,6 +215,7 @@ class FCom_IndexTank_Admin extends BClass
                         array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
 //                        array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
                         array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
+                        array('addNav', 'indextank/product_functions', array('label'=>'Product functions', 'href'=>BApp::href('indextank/product_functions'))),
                     ))),
        /*         '/indextank/dashboard'=>array(
                     array('layout', 'base'),
@@ -231,7 +235,24 @@ class FCom_IndexTank_Admin extends BClass
                     array('view', 'indextank/product_fields-form', 'set'=>array(
                         'tab_view_prefix' => 'indextank/product_fields-form/',
                     ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Field', 'pos'=>10))
+                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10)),
+                        array('addTab', 'display', array('label'=>'Display options', 'pos'=>15))
+                    )),
+                ),
+                '/indextank/product_functions'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('indextank/product_functions')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_functions'))),
+                ),
+                '/indextank/product_functions/form'=>array(
+                    array('layout', 'base'),
+                    array('layout', 'form'),
+                    array('hook', 'main', 'views'=>array('indextank/product_functions-form')),
+                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_functions'))),
+                    array('view', 'indextank/product_functions-form', 'set'=>array(
+                        'tab_view_prefix' => 'indextank/product_functions-form/',
+                    ), 'do'=>array(
+                        array('addTab', 'main', array('label'=>'Product Functions', 'pos'=>10))
                     )),
                 ),
                 '/settings'=>array(

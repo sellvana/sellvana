@@ -84,11 +84,6 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         } catch(Exception $e) {
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
-
-        //run once to install scoring functions
-        foreach($this->_functions as $func){
-            $this->_model->add_function($func['number'], $func['definition']);
-        }
     }
 
 
@@ -280,7 +275,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $categories     = $this->_prepareCategories($product);
             $variables      = $this->_prepareVariables($product);
             $fields         = $this->_prepareFields($product);
-            
+
             $documents[$i]['docid'] = $product->id();
             $documents[$i]['fields'] = $fields;
             if (!empty($categories)){
@@ -323,6 +318,25 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $variables = $this->_prepareVariables($product);
         $this->model()->update_variables($product->id(), $variables);
+    }
+
+    public function update_functions()
+    {
+        $functions = FCom_IndexTank_Model_ProductFunctions::i()->get_list();
+        if(!$functions){
+            return;
+        }
+        foreach($functions as $func){
+            $this->update_function($func->number, $func->definition);
+        }
+    }
+    public function update_function($number, $definition)
+    {
+        if('' === $definition){
+            return $this->model()->delete_function($number);
+        } else {
+            return $this->model()->add_function($number, $definition);
+        }
     }
 
     public function delete($products)

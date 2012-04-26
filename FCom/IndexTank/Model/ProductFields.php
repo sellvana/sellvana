@@ -39,7 +39,7 @@ class FCom_IndexTank_Model_ProductFields extends FCom_Core_Model_Abstract
     public function get_varialbes_list()
     {
         $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()
-                ->where('sorting', 1)->find_many();
+                ->where('scoring', 1)->find_many();
         $result = array();
         foreach($product_fields as $p){
             $result[$p->field_name] = $p;
