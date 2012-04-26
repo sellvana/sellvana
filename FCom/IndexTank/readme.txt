@@ -51,3 +51,43 @@ You need to create function like this:
 miles(query.var[0], query.var[1], doc.var[0], doc.var[1])
 
 Read more about functions here: http://www.indexden.com/documentation/function-definition
+
+How to add new functions
+For instance you want to sorts documents rating.
+* Add new product index field 'rating', check it as scoring variable and set variable number i.e. '3'. Select the source for the field (field should have some value).
+* Click button 'Index All Products' to add new variable to the index. 
+* Add new function 'ranking' with definition: doc.var[3] (3 is variable number)
+* Add new sort option to frontend view: open IndexTank/FrontEnd/views/indextank/product/pager.php and add new option 'rating' => 'Sort by rating' to the $sortOptions array.
+* Now you are ready to sort by rating!
+
+* In the same way you could filter by rating.
+* Open pager.php again and add two new controls with names v[rating][from] and v[rating][to]. Example:
+Filter by rating: from <input type=text name="v[rating][from]">  to <input type=text name="v[rating][to]">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
