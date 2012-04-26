@@ -28,6 +28,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         );
     }
 
+    public function gridOrmConfig($orm)
+    {
+    }
+
     public function action_index()
     {
         $this->view('jqgrid')->config = $this->gridConfig();
@@ -38,6 +42,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $class = $this->_modelClassName;
         $orm = $class::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+        $this->gridOrmConfig($orm);
         $data = FCom_Admin_View_Grid::i()->processORM($orm, get_class($this).'::action_grid_data');
         BResponse::i()->json($data);
     }

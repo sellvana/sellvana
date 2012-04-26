@@ -28,8 +28,36 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
   `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `create_dt` datetime NOT NULL,
   `update_dt` datetime NOT NULL,
+  `lat` decimal(15,10) DEFAULT NULL,
+  `lng` decimal(15,10) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
+    }
+
+    public static function import($data, $cust)
+    {
+        if ($cust->default_billing_id) {
+            $addr = static::load($cust->default_billing_id);
+            //$addr = Model::factory('FCom_Customer_Model_Address')->find_one($cust->default_billing_id);
+        }
+        if (empty($addr)) {
+            $addr = static::create(array('customer_id' => $cust->id));
+        }
+        if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
+            $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
+        }
+        $addr->set($data['address']);
+        $addr->save();
+
+        if (!$cust->default_billing_id) {
+            $cust->set('default_billing_id', $addr->id);
+        }
+        if (!$cust->default_shipping_id) {
+            $cust->set('default_shipping_id', $addr->id);
+        }
+        $cust->save();
+
+        return $addr;
     }
 }
