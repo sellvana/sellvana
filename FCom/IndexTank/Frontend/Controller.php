@@ -125,7 +125,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 }
             }
 
-            ksort($facets_data);
             ksort($category_data['Categories']);
             //put categories first
             $facets_data = (array)$category_data + (array)$facets_data;

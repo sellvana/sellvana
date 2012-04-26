@@ -1,7 +1,7 @@
 <header class="adm-page-title">
-    <span class="title">Product Fields</span>
+    <span class="title">Product Functions</span>
     <div class="btns-set">
-        <button class="st1 sz2 btn" onclick="location.href='<?php echo BApp::href('indextank/product_fields/form/')?>'"><span>New Product Field</span></button>
+        <button class="st1 sz2 btn" onclick="location.href='<?php echo BApp::href('indextank/product_functions/form/')?>'"><span>New Function</span></button>
         <button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
         <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
     </div>

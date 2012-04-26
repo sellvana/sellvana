@@ -84,11 +84,6 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         } catch(Exception $e) {
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
-
-        //run once to install scoring functions
-        foreach($this->_functions as $func){
-            $this->_model->add_function($func['number'], $func['definition']);
-        }
     }
 
 
@@ -189,8 +184,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function search($query, $start=null, $len=null)
     {
         if (!empty($query)){
+
             $product_fields = FCom_IndexTank_Model_ProductFields::i()->get_search_list();
             $query_string = '';
+
             foreach($product_fields as $pfield){
                 $priority = '';
                 if($pfield->priority > 1){
@@ -198,8 +195,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 }
                 if(!empty($query_string)){
                     $query_string .= " OR ";
+                } else {
+                    $query_string = $query . " OR ";
                 }
-                $query_string .= " {$pfield->field_name}:{$query} " . $priority." ";
+
+                $query_string .= " {$pfield->field_name}:$query" . $priority." ";
             }
 
         } else {
@@ -209,10 +209,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         try {
             //search($query, $start = NULL, $len = NULL, $scoring_function = NULL,
             //$snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
-            //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL )
+            //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL, $match_any_field = NULL )
             $result = $this->model()->search($query_string, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
-                    null, $this->_filter_docvar, null, implode(",", $this->_rollup_category) );
+                    null, $this->_filter_docvar, null, implode(",", $this->_rollup_category), true );
 
         } catch(Exception $e) {
             throw $e;
@@ -318,6 +318,25 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $variables = $this->_prepareVariables($product);
         $this->model()->update_variables($product->id(), $variables);
+    }
+
+    public function update_functions()
+    {
+        $functions = FCom_IndexTank_Model_ProductFunctions::i()->get_list();
+        if(!$functions){
+            return;
+        }
+        foreach($functions as $func){
+            $this->update_function($func->number, $func->definition);
+        }
+    }
+    public function update_function($number, $definition)
+    {
+        if('' === $definition){
+            return $this->model()->delete_function($number);
+        } else {
+            return $this->model()->add_function($number, $definition);
+        }
     }
 
     public function delete($products)
@@ -426,6 +445,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $categories;
     }
 
+    protected function get_brands($product, $type='')
+    {
+        return (rand(0, 100) % 2 == 0) ? "Brand 1": "Brand 2";
+    }
+
     protected function price_range_large($product, $type='')
     {
         if ($product->base_price < 100) {
@@ -451,6 +475,17 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
 
 
+    }
+
+    protected function price_range_smart($product, $type='')
+    {
+        $p = $product->base_price;
+        $p2_u = ceil($p/10)*10;
+        $p2_d = floor($p/10)*10;
+        if($p2_u == $p2_d){
+            $p2_u += 10;
+        }
+        return '$'.$p2_d.' to $'.$p2_u;
     }
 
 

@@ -327,9 +327,12 @@ class Indextank_Index {
      *     Scoring function 2 must return a value between 2 and 6 OR 7 and 11 OR greater than 15 for documents matching this query.
      *
      */
-    public function search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL) {
+    public function search($query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL,
+            $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL,
+            $function_filters = NULL, $category_rollup = NULL, $match_any_field = NULL ) {
 
-        $params = $this->as_search_param( $query, $start, $len, $scoring_function, $snippet_fields, $fetch_fields, $category_filters, $variables, $docvar_filters, $function_filters, $category_rollup);
+        $params = $this->as_search_param( $query, $start, $len, $scoring_function, $snippet_fields,
+                $fetch_fields, $category_filters, $variables, $docvar_filters, $function_filters, $category_rollup, $match_any_field);
 
         try {
             $res = $this->api->api_call('GET', $this->search_url(), $params);
@@ -376,7 +379,9 @@ class Indextank_Index {
 
 
 
-    private function as_search_param( $query, $start = NULL, $len = NULL, $scoring_function = NULL, $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL, $variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL) {
+    private function as_search_param( $query, $start = NULL, $len = NULL, $scoring_function = NULL,
+            $snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
+            $variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL, $match_any_field = NULL ) {
 
         $params = array("q" => $query);
         if ($start != NULL) {
@@ -399,6 +404,9 @@ class Indextank_Index {
         }
         if ($category_rollup != NULL) {
             $params["category_rollup"] = $category_rollup;
+        }
+        if ($match_any_field != NULL) {
+            $params["match_any_field"] = $match_any_field;
         }
         if ($variables) {
             foreach ($variables as $k => $v)
