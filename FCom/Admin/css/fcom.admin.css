@@ -132,9 +132,9 @@ input[type="text"].sz1, input[type="password"].sz1 {
 button.btn, input[type="submit"].btn {
 	display:inline-block;
 	height:auto;
-	border-radius:16px;
-	-moz-border-radius:16px;
-	-webkit-border-radius:16px;
+	border-radius:4px;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
 	font:bold 14px/1 'Helvetica Nue', Arial, Helvetica, sans-serif;
 	overflow:visible;
 }
@@ -173,18 +173,18 @@ button.st3, input[type="submit"].st3 {
 	font-weight:normal;
 	}
 button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
-button.sz2, input[type="submit"].sz2 { padding:4px 15px; font-size:12px; }
+button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 
 /* Section Titles */
 .adm-page-title {
 	padding:8px 18px;
-	border-bottom:1px solid #c4c4c4;
-	background:#e7e7e7;
+	background:#f6f6f6;
 	text-align:left;
     position:relative;
 	}
 .adm-page-title .title {
-	font:18px/1.15 'Helvetica Nue', Arial, Helvetica, sans-serif;
+	font-size:20px;
+	line-height:1.15em;
 	text-shadow:0 1px 0 #fff;
 	}
 .adm-page-title .btns-set {
