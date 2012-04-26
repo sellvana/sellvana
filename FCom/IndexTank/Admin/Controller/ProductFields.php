@@ -12,6 +12,9 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function gridConfig()
     {
+        $status = FCom_IndexTank_Index_Product::i()->status();
+        BLayout::i()->view('indextank/product_fields')->set('status', $status);
+
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
             'field_nice_name' => array('label'=>'Name', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
@@ -19,7 +22,8 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             )),
             'search' => array('label'=>'Search'),
             'facets' => array('label'=>'Facets'),
-            'sorting' => array('label'=>'Sorting'),
+            'scoring' => array('label'=>'Scoring'),
+            'var_number' => array('label'=>'Scoring variable #'),
             'priority' => array('label'=>'Priority'),
             'show' => array('label'=>'Display as'),
             'filter' => array('label'=>'Filter type'),
@@ -27,18 +31,5 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         return $config;
     }
 
-    public function action_form__POST() {
-        $id = BRequest::i()->params('id', true);
-        $model = BRequest::i()->post('model');
-
-        if($id){
-
-        } else {
-            //BSession::i()->addMessage('Id not found', 'error', 'admin');
-            //BResponse::i()->redirect(BApp::href('indextank/product_fields/form/?id='.$id));
-        }
-
-        parent::action_form__POST();
-    }
 
 }
