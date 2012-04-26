@@ -111,43 +111,44 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
         ");
     }
 
-    public static function import($row)
+    public static function import($data)
     {
-        $data = array();
-        foreach ($row as $k=>$v) {
-            list($table, $field) = explode('.', $k);
-            $data[$table][$field] = $v;
-        }
-
         BPubSub::i()->fire(__METHOD__.'.before', array('data'=>&$data));
 
-        if (empty($data['customer']['email'])) {
-            return false;
+        if (!empty($data['customer']['id'])) {
+            $cust = static::load($data['customer']['id']);
         }
-        $cust = static::i()->load($data['customer']['email'], 'email');
+        if (empty($cust)) {
+            if (empty($data['customer']['email'])) {
+                $result = array('status'=>'error', 'message'=>'Missing email address');
+                return $result;
+            }
+            $cust = static::load($data['customer']['email'], 'email');
+        }
+        $result['status'] = '';
         if (!$cust) {
-            $cust = static::i()->create();
+            $cust = static::create();
+            $result['status'] = 'created';
         }
-        $cust->set($data['customer'])->save();
+        $result['model'] = $cust;
+        $cust->set($data['customer']);
+        if ($cust->is_dirty()) {
+            if (!$result['status']) $result['status'] = 'updated';
+            $cust->save();
+        }
 
-        if ($cust->default_billing_id) {
-            $addr = FCom_Customer_Model_Address::i()->load($cust->default_billing_id);
-        }
-        if (empty($addr)) {
-            $addr = FCom_Customer_Model_Address::i()->create(array('customer_id' => $cust->id));
-        }
-        $addr->set($data['address'])->save();
+        $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
-        if (!$cust->default_billing_id) {
-            $cust->set('default_billing_id', $addr->id);
-        }
-        if (!$cust->default_shipping_id) {
-            $cust->set('default_shipping_id', $addr->id);
-        }
-        $cust->save();
+        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
 
-        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>&$data));
+        return $result;
+    }
 
-        return $cust;
+    public function defaultBilling()
+    {
+        if ($this->default_billing_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing);
+        }
+        return $this->default_billing;
     }
 }

@@ -27,7 +27,7 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function action_start()
     {
-        FCom_Customer_Import::i()->run(BRequest::i()->post('config'));
+        FCom_Customer_Import::i()->run();
         exit;
     }
 
@@ -39,9 +39,6 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function action_status()
     {
-        $view = BLayout::i()->view('customer/import/status')->set(array(
-            'config' => FCom_Customer_Import::i()->config(),
-        ));
-        BResponse::i()->set($view->render());
+        BResponse::i()->set(BLayout::i()->view('customer/import/status')->render());
     }
 }

@@ -69,9 +69,7 @@ head(function() {
     });
 
     $('#step3-start').live('click', function(ev) {
-        $.post('<?=BApp::href('customers/import/start')?>', $('#import-columns-form').serialize(), function(data, status, xhr) {
-            $('#import-status').load('<?=BApp::href('customers/import/status')?>');
-        });
+        $('#import-status').load('<?=BApp::href('customers/import/status')?>?start=true');
     });
 
     $('#step3-stop').live('click', function(ev) {

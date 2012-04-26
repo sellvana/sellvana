@@ -63,7 +63,7 @@ class FCom_Customer_Import extends BClass
         $fieldPatterns = $this->getFieldData();
         foreach ($row as $i=>$v) {
             foreach ($fieldPatterns as $f=>$fd) {
-                if (preg_match("#{$fd['pattern']}#i", $v)) {
+                if (!empty($fd['pattern']) && preg_match("#{$fd['pattern']}#i", $v)) {
                     $info['columns'][$i] = $f;
                     break;
                 }
@@ -103,37 +103,82 @@ class FCom_Customer_Import extends BClass
 
     public function run()
     {
+        #BSession::i()->close();
         session_write_close();
         ignore_user_abort(true);
         set_time_limit(0);
         ob_implicit_flush();
+        //gc_enable();
+        BDb::connect();
+
+        $timer = microtime(true);
 
         $model = FCom_Customer_Model_Customer::i();
         $config = $this->config();
         $filename = $this->getImportDir().'/'.$config['filename'];
-        $totalRows = sizeof(file($filename));
-        $rowsDone = 0;
-        $this->config(array('status'=>'running', 'total_rows'=>$totalRows), true);
+        $status = array(
+            'start_time' => time(),
+            'status' => 'running',
+            'rows_total' => sizeof(file($filename)),
+            'rows_processed' => 0,
+            'rows_skipped' => 0,
+            'rows_warning' => 0,
+            'rows_error' => 0,
+            'rows_nochange' => 0,
+            'rows_created' => 0,
+            'rows_updated' => 0,
+            'memory_usage' => memory_get_usage(),
+            'run_time' => 0,
+        );
+        $this->config($status, true);
         $fp = fopen($filename, 'r');
         if (!empty($config['skip_first'])) {
             for ($i=0; $i<$config['skip_first']; $i++) {
                 fgets($fp);
+                $status['rows_skipped']++;
             }
         }
         while (($r = fgetcsv($fp, 4096, $config['delim']))) {
             $row = array_combine($config['columns'], $r);
-            $cust = $model->import($row);
+            foreach ($config['defaults'] as $k=>$v) {
+                if (!is_null($v) && $v!=='' && (!isset($row[$k]) || $row[$k]==='')) {
+                    $row[$k] = $v;
+                }
+            }
 
-            if (++$rowsDone % 50 === 0) {
+            $data = array();
+            foreach ($row as $k=>$v) {
+                $f = explode('.', $k);
+                if (empty($f[0]) || empty($f[1])) {
+                    continue;
+                }
+                $data[$f[0]][$f[1]] = $v;
+            }
+
+            $result = $model->import($data);
+            //$result = array('status'=>'skipped');
+            if (isset($status['rows_'.$result['status']])) {
+                $status['rows_'.$result['status']]++;
+            }
+
+            if (++$status['rows_processed'] % 50 === 0) {
+                //gc_collect_cycles();
                 $update = $this->config();
-                if (!$update || $update['status']!=='running') {
+                if (!$update || $update['status']!=='running' || $update['start_time']!==$status['start_time']) {
                     return false;
                 }
-                $this->config(array('rows_done'=>$rowsDone), true);
+                $status['memory_usage'] = memory_get_usage();
+                $status['run_time'] = microtime(true)-$timer;
+                $this->config($status, true);
             }
         }
         fclose($fp);
-        $this->config(array('status'=>'done'), true);
+
+        $status['memory_usage'] = memory_get_usage();
+        $status['run_time'] = microtime(true)-$timer;
+        $status['status'] = 'done';
+        $this->config($status, true);
+
         return true;
     }
 }
