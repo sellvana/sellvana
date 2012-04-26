@@ -7,13 +7,18 @@ class FCom_Customer_Admin extends BClass
         BFrontController::i()
             ->route('GET /customers', 'FCom_Customer_Admin_Controller_Customers.index')
             ->route('GET|POST /customers/.action', 'FCom_Customer_Admin_Controller_Customers')
+            ->route('GET|POST /customers/import/.action', 'FCom_Customer_Admin_Controller_CustomersImport')
         ;
 
         BLayout::i()->addAllViews('Admin/views')->afterTheme('FCom_Customer_Admin::layout');
 
         FCom_Admin_Model_Role::i()->createPermission(array(
             'customers' => 'Customers',
+            'customers/manage' => 'Manage',
+            'customers/import' => 'Import',
         ));
+
+        FCom_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
     }
 
     public static function layout()
@@ -24,6 +29,8 @@ class FCom_Customer_Admin extends BClass
                     array('addNav', 'customer', array('label'=>'Customers', 'pos'=>300)),
                     array('addNav', 'customer/customers', array('label'=>'Customers',
                         'href'=>BApp::href('customers'))),
+                    array('addNav', 'customer/import', array('label'=>'Import Customers',
+                        'href'=>BApp::href('customers/import/index'))),
                 )),
             ),
 
@@ -43,6 +50,12 @@ class FCom_Customer_Admin extends BClass
                     array('addTab', 'main', array('label'=>'Customer Info', 'pos'=>10)),
                     array('addTab', 'addresses', array('label'=>'Addresses', 'async'=>true, 'pos'=>20)),
                 )),
+            ),
+            '/customers/import'=>array(
+                array('layout', 'base'),
+                array('layout', 'form'),
+                array('hook', 'main', 'views'=>array('customer/import')),
+                array('view', 'root', 'do'=>array(array('setNav', 'customer/import'))),
             ),
         ));
     }

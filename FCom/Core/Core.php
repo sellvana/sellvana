@@ -133,12 +133,16 @@ class FCom_Core_Model_Abstract extends BModel
 
 class FCom_Core_View_Abstract extends BView
 {
-    public function messagesHtml()
+    public function messagesHtml($namespace=null)
     {
+        $messages = $this->messages;
+        if (!$messages && $namespace) {
+            $messages = BSession::i()->messages($namespace);
+        }
         $html = '';
-        if ($this->messages) {
+        if ($messages) {
             $html .= '<ul class="msgs">';
-            foreach ($this->messages as $m) {
+            foreach ($messages as $m) {
                 $html .= '<li class="'.$m['type'].'-msg">'.$this->q($m['msg']).'</li>';
             }
             $html .= '</ul>';

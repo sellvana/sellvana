@@ -1,7 +1,7 @@
 <?php
-$c = $this->model;
+$p = $this->model;
 $tabs = $this->sortedTabs();
-$formUrl = BApp::href('customers/form/?id='.$c->id);
+$formUrl = BApp::href('indextank/product_functions/form/?id='.$p->id);
 ?>
 <script>
 head(function() {
@@ -13,12 +13,14 @@ head(function() {
     });
 })
 </script>
+<?php //echo $this->messagesHtml() ?>
 <form action="<?php echo $formUrl ?>" method="post">
     <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
-        <span class="title"><?php echo $c->id ? 'Edit Customer: '.$this->q($c->handle) : 'Create New Customer' ?></span>
+        <span class="title"><?php echo $p->id ? 'Edit Product Field: '.$this->q($p->field_name) : 'Create New Product Field' ?></span>
         <div style="float:right">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span><?php echo BLocale::_('Save')?></span></button>
+            <button class="st1 sz2 btn" onclick="javascript:history.back()"><span><?php echo BLocale::_('Cancel')?></span></button>
         </div>
     </header>
 

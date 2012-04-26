@@ -110,4 +110,45 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
     }
+
+    public static function import($data)
+    {
+        BPubSub::i()->fire(__METHOD__.'.before', array('data'=>&$data));
+
+        if (!empty($data['customer']['id'])) {
+            $cust = static::load($data['customer']['id']);
+        }
+        if (empty($cust)) {
+            if (empty($data['customer']['email'])) {
+                $result = array('status'=>'error', 'message'=>'Missing email address');
+                return $result;
+            }
+            $cust = static::load($data['customer']['email'], 'email');
+        }
+        $result['status'] = '';
+        if (!$cust) {
+            $cust = static::create();
+            $result['status'] = 'created';
+        }
+        $result['model'] = $cust;
+        $cust->set($data['customer']);
+        if ($cust->is_dirty()) {
+            if (!$result['status']) $result['status'] = 'updated';
+            $cust->save();
+        }
+
+        $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
+
+        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
+
+        return $result;
+    }
+
+    public function defaultBilling()
+    {
+        if ($this->default_billing_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing);
+        }
+        return $this->default_billing;
+    }
 }

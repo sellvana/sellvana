@@ -18,10 +18,12 @@ window.appConfig = {
         <div class="ui-layout-north">
 		    <header class="adm-topbar">
 			    <nav class="adm-nav">
-		    		<a href="#" class="start">Navigation</a>
+		    		<a href="#" class="start">
+                        <span class="adm-logo">Fulleron Admin</span>
+                    </a>
 		        	<?php echo $this->renderNodes() ?>
 	        	</nav>
-			    <span class="adm-logo">Fulleron Admin</span>
+
 			    <nav class="sup-links">
 				    <ul>
 <?php if (!empty($this->_quickSearches)): ?>

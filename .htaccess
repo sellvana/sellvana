@@ -25,12 +25,6 @@ Allow from 184.210.35.238
 Allow from 64.85.162.30
 Allow from 66.177.58.111
 
-AuthName "Denteva"
-AuthType Basic
-#AuthUserFile .htpasswd
-AuthUserFile /var/www/vhosts/dev.unirgy.com/b/denteva/user/.htpasswd
-#Require valid-user
-
 Header unset ETag
 FileETag None
 

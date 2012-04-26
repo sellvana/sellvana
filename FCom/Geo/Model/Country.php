@@ -15,6 +15,15 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
         return static::$_optionsCache;
     }
 
+    public static function getIsoByName($name)
+    {
+        static $countries;
+        if (!$countries) {
+            $countries = array_flip(static::options());
+        }
+        return !empty($countries[$name]) ? $countries[$name] : null;
+    }
+
     public function install()
     {
         BDb::run("
