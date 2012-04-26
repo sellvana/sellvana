@@ -2,7 +2,7 @@
 
 class FCom_IndexTank_Model_ProductFields extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'from_indextank_product_fields';
+    protected static $_table = 'fcom_indextank_product_fields';
 
     public function get_list()
     {
@@ -14,15 +14,48 @@ class FCom_IndexTank_Model_ProductFields extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function get_fulltext_list()
+    public function get_facets_list()
     {
-        $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()->where('type', 'fulltext')
-                ->where_not_in('field_name', array('timestamp', 'match'))
-                ->find_many();
+        $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()
+                ->where('facets', 1)->find_many();
         $result = array();
         foreach($product_fields as $p){
             $result[$p->field_name] = $p;
         }
         return $result;
     }
+
+    public function get_search_list()
+    {
+        $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()
+                ->where('search', 1)->find_many();
+        $result = array();
+        foreach($product_fields as $p){
+            $result[$p->field_name] = $p;
+        }
+        return $result;
+    }
+
+    public function get_varialbes_list()
+    {
+        $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()
+                ->where('scoring', 1)->find_many();
+        $result = array();
+        foreach($product_fields as $p){
+            $result[$p->field_name] = $p;
+        }
+        return $result;
+    }
+
+    public function get_inclusive_list()
+    {
+        $product_fields = FCom_IndexTank_Model_ProductFields::i()->orm()
+                ->where('filter', 'inclusive')->find_many();
+        $result = array();
+        foreach($product_fields as $p){
+            $result[$p->field_name] = $p;
+        }
+        return $result;
+    }
+
 }

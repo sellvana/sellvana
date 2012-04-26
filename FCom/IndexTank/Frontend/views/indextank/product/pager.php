@@ -20,7 +20,7 @@ var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 			  $.ajax( {
 			    url: remoteSource,
 			    dataType: "jsonp",
-			    data: { query: request.term },
+			    data: { query: request.term, field: 'description' },
 			    success: function( data ) { responseCallback( data.suggestions ); }
 			  } );
 			};
@@ -44,7 +44,8 @@ var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 
 <?php
 $s = $this->state;
-$price_ranges = $this->price_ranges;
+
+//$price_ranges = $this->price_ranges;
 
 $psOptions = array(25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
@@ -55,7 +56,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 );
 
 ?>
-<form id="product_list_pager" name="product_list_pager" method="get" action="">
+<form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
 
 <div class="pager">
     <strong class="count"><?=$s['c']?> found.</strong>
@@ -92,119 +93,48 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     </div>
         <br/><br/>
 
-
-    <label>Categories:</label><br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX] as $cat_name => $cat_obj): ?>
-    <?php for($i = 2; $i < strlen($cat_name); $i++) echo "+"; ?>
-        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX.$cat_name?>]"
-               value="<?=$cat_obj->name?>" onclick="this.form.submit()"
-               <?=(!empty($_GET['f'][FCom_IndexTank_Index_Product::CT_CATEGORY_PREFIX.$cat_name]))?'checked':''?>
-               >
-        <?=$cat_obj->name?> (<?=$cat_obj->count?>) <br/>
-<? endforeach ?>
-    <br/>
-
-
-    <div class="sort-by f-left">
-    <label>Filter by price:</label><br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] as $id => $price): ?>
-    <?php if ($s['fields'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]->show == 'checkbox'):?>
-        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>][]"
-               value="<?=$price->name?>" onclick="this.form.submit()"
-               <?=(in_array($price->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]))?'checked':''?>
-               >  <?=$price->name?> (<?=$price->count?>) <br/>
-    <?php else: ?>
-            <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>][]" id="price_<?=$id?>"
-               value="<?=$price->name?>" style="display:none;"
-               <?=(in_array($price->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE]))?'checked':''?>
-               />
-           <? if( in_array($price->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE])):?>
-           <a onclick="$('#price_<?=$id?>').attr('checked', '');$('#product_list_pager').submit();" href="javascript:void(0);" style="color:grey;"><?=$price->name?> (<?=$price->count?>)</a>
-           <?php else:?>
-           <a onclick="$('#price_<?=$id?>').attr('checked', 'checked');$('#product_list_pager').submit();" href="javascript:void(0);"><?=$price->name?> (<?=$price->count?>)</a>
-           <?php endif; ?>
-           <br/>
-    <?php endif; ?>
-<? endforeach ?>
-<?php if (!empty($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE])):?>
-           <? foreach ($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_PRICE_RANGE] as $filter_name): ?>
-           <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_PRICE_RANGE?>][]"
-               value="<?=$filter_name?>" style="display:none;" checked="checked" />
-           <?php endforeach; ?>
-<?php endif; ?>
-
+<?php foreach($s['available_facets'] as $label => $data):?>
+        <label><?=$label?>:</label><br/>
+        <? foreach ($data as $id => $obj): ?>
+            <?php if ($s['fields'][$obj->key]->show == 'checkbox'):?>
+                <input type="checkbox" name="f[<?=$obj->key?>][]"
+                    value="<?=$obj->name?>" onclick="this.form.submit()"
+                    <?=(in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> >
+                <?=$obj->name?> (<?=$obj->count?>) <br/>
+            <?php else: ?>
+                    <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>_<?=$id?>"
+                    value="<?=$obj->name?>" style="display:none;"
+                    <?=(in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
+                    <?php if(!empty($obj->level)):?>
+                    <span style="margin:<?=$obj->level*10?>px;"></span>
+                    <?php endif; ?>
+                <? if( in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                <a onclick="$('#<?=$obj->key?>_<?=$id?>').attr('checked', false);$('#product_list_pager').submit();"
+                   href="javascript:void(0);" style="color:grey;"><?=$obj->name?> (<?=$obj->count?>)</a>
+                <?php else:?>
+                <a onclick="$('#<?=$obj->key?>_<?=$id?>').attr('checked', true);$('#product_list_pager').submit();"
+                   href="javascript:void(0);"><?=$obj->name?> (<?=$obj->count?>)</a>
+                <?php endif; ?>
                 <br/>
+            <?php endif; ?>
+        <? endforeach ?>
+                <br/>
+<?php endforeach; ?>
 
-                <label>Price range</label><br/>
-From: <input type="text" size="5" name="v[price][from]" id="v_price_from" value="<?=$s['filter']['price']['from']?>">
-    to <input type="text" size="5" name="v[price][to]" id="v_price_to" value="<?=$s['filter']['price']['to']?>">
-    <br/><br/>
-
-
-    <label>Filter by brand:</label><br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_BRAND] as $id => $brand): ?>
-    <?php if ($s['fields'][FCom_IndexTank_Index_Product::CT_BRAND]->show == 'checkbox'):?>
-        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_BRAND?>][]"
-               value="<?=$brand->name?>" onclick="this.form.submit()"
-               <?=(in_array($brand->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND]))?'checked':''?>
-               >  <?=$brand->name?>
-        (<?=$brand->count?>)<br/>
-    <?php else: ?>
-            <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_BRAND?>][]" id="brand_<?=$id?>"
-               value="<?=$brand->name?>" style="display:none;"
-               <?=(in_array($brand->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND]))?'checked':''?>
-               />
-           <? if( in_array($brand->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_BRAND])):?>
-           <a onclick="$('#brand_<?=$id?>').attr('checked', '');$('#product_list_pager').submit();"
-              href="javascript:void(0);" style="color:grey;"><?=$brand->name?> (<?=$brand->count?>)</a>
-           <?php else:?>
-           <a onclick="$('#brand_<?=$id?>').attr('checked', 'checked');$('#product_list_pager').submit();"
-              href="javascript:void(0);"><?=$brand->name?> (<?=$brand->count?>)</a>
+<?php if (!empty($s['filter_invisible'])):?>
+    <? foreach ($s['filter_invisible'] as $filter_key => $filter_name): ?>
+           <?php if (!empty($filter_name)):?>
+                <?php foreach($filter_name as $fname):?>
+                <input type="checkbox" name="f[<?=$filter_key?>][]"
+                    value="<?=$fname?>" style="display:none;" checked="checked" />
+                <?php endforeach; ?>
            <?php endif; ?>
-           <br/>
-    <?php endif; ?>
-<? endforeach ?>
-<?php if (!empty($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_BRAND])):?>
-           <? foreach ($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_BRAND] as $filter_name): ?>
-           <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_BRAND?>][]"
-               value="<?=$filter_name?>" style="display:none;" checked="checked" />
-           <?php endforeach; ?>
+    <?php endforeach; ?>
 <?php endif; ?>
 
 
-         <br/>
-<? foreach ($s['filter'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX] as $cat_name => $cat_obj_list): ?>
-    <label><?=$cat_name?></label><br/>
-    <?php foreach($cat_obj_list as $id => $cat_obj): ?>
-        <?php if ($s['fields'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path]->show == 'checkbox'):?>
-        <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path?>][]"
-               value="<?=$cat_obj->name?>" onclick="this.form.submit()"
-               <?=(in_array($cat_obj->name, $_GET['f'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path]))?'checked':''?>
-               >
-            <?=$cat_obj->name?> (<?=$cat_obj->count?>) <br/>
-        <?php else: ?>
-            <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path?>][]" id="cf_<?=$cat_obj->path?>_<?=$id?>"
-               value="<?=$cat_obj->name?>" style="display:none;"
-               <?=(in_array($cat_obj->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path]))?'checked':''?>
-               />
-           <? if( in_array($cat_obj->name, $s['filter_selected'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path])):?>
-           <a onclick="$('#cf_<?=$cat_obj->path?>_<?=$id?>').attr('checked', '');$('#product_list_pager').submit();"
-              href="javascript:void(0);" style="color:grey;"><?=$cat_obj->name?> (<?=$cat_obj->count?>)</a>
-           <?php else:?>
-           <a onclick="$('#cf_<?=$cat_obj->path?>_<?=$id?>').attr('checked', 'checked');$('#product_list_pager').submit();"
-              href="javascript:void(0);"><?=$cat_obj->name?> (<?=$cat_obj->count?>)</a>
-           <?php endif; ?>
-           <br/>
-    <?php endif; ?>
-    <?php endforeach ?>
-           <?php if (!empty($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path])):?>
-                    <? foreach ($s['filter_invisible'][FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path] as $filter_name): ?>
-                    <input type="checkbox" name="f[<?=FCom_IndexTank_Index_Product::CT_CUSTOM_FIELD_PREFIX.$cat_obj->path?>][]"
-                        value="<?=$filter_name?>" style="display:none;" checked="checked" />
-                    <?php endforeach; ?>
-            <?php endif; ?>
-<? endforeach ?>
-    </div>
+
+
 </div>
 
 </form>

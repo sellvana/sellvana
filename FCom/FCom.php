@@ -246,12 +246,13 @@ class FCom extends BClass
     public function registerBundledModules()
     {
         BModuleRegistry::i()
-            // Core logic, abstract classes, all models
+            // Core logic, abstract classes
             ->addModule('FCom_Core', array(
                 'version' => '0.1.0',
                 'root_dir' => 'Core',
                 'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
                 'run_level' => BModule::REQUIRED,
+                'migrate' => 'FCom_Core_Migrate',
                 'description' => "Base Fulleron classes and JS libraries",
             ))
             // Initial installation module
@@ -261,6 +262,14 @@ class FCom extends BClass
                 'bootstrap' => array('file'=>'Install.php', 'callback'=>'FCom_Install::bootstrap'),
                 'depends' => array('FCom_Core'),
                 'description' => "Initial installation wizard",
+            ))
+            // API area
+            ->addModule('FCom_Api', array(
+                'version' => '0.1.0',
+                'root_dir' => 'Api',
+                'bootstrap' => array('file'=>'Api.php', 'callback'=>'FCom_Api::bootstrap'),
+                'depends' => array('FCom_Core'),
+                'description' => "API area",
             ))
             // Frontend collection of modules
             ->addModule('FCom_Frontend', array(
@@ -367,6 +376,9 @@ class FCom extends BClass
                 'description' => "Customer Accounts and Management",
                 'migrate' => 'FCom_Customer_Migrate',
                 'areas' => array(
+                    'FCom_Api' => array(
+                        'bootstrap' => array('file'=>'Api.php', 'callback'=>'FCom_Customer_Api::bootstrap'),
+                    ),
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CustomerAdmin.php', 'callback'=>'FCom_Customer_Admin::bootstrap'),
                     ),
