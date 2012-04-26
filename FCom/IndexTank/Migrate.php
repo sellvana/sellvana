@@ -9,7 +9,7 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function install()
     {
-        //Install IndexTank product index and functions
+        //create product index
         FCom_IndexTank_Index_Product::i()->install();
 
         //create table
@@ -22,7 +22,7 @@ class FCom_IndexTank_Migrate extends BClass
             `field_type`    varchar(255) not null default '',
             `search` tinyint(1) not null default 0,
             `facets` tinyint(1) not null default 0,
-            `sorting` tinyint(1) not null default 0,
+            `scoring` tinyint(1) not null default 0,
             `var_number` tinyint(3) not null default -1,
             `priority` int(11) unsigned NOT NULL DEFAULT '1',
             `show` enum('','link','checkbox') NOT NULL DEFAULT '',
@@ -33,6 +33,30 @@ class FCom_IndexTank_Migrate extends BClass
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunctions::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$pFunctionsTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `name` VARCHAR( 1024 ) NOT NULL,
+            `number` INT( 11 ) UNSIGNED NOT NULL ,
+            `definition` VARCHAR( 1024 ) NOT NULL
+            ) ENGINE = InnoDB;
+            ");
+        //predefined functions
+        $functions  =  array (
+                'age'                   => array('number' => 0, 'definition' => '-age'         ),
+                'relevance'             => array('number' => 1, 'definition' => 'relevance'    ),
+                'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
+                'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
+        );
+        //insert predefined functions
+        foreach($functions as $func_name => $func){
+            BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
+            //add functions to index
+            FCom_IndexTank_Index_Product::i()->update_function($func['number'], $func['definition']);
+        }
+
+        //setup basic index schema
         $this->installProductSchema();
     }
 
@@ -61,7 +85,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $data['search'] = 1;
             } else if ( in_array($type, array('decimal', 'timestamp')) ) {
                 if("base_price" == $f->Field){
-                    $data['sorting'] = 1;
+                    $data['scoring'] = 1;
                     $data['var_number'] = 0;
                 }
             } else {
@@ -87,7 +111,7 @@ class FCom_IndexTank_Migrate extends BClass
             FCom_IndexTank_Model_ProductFields::orm()->create($data)->save();
         }
 
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'ct_categories')->find_one();
+        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'ct_categories___')->find_one();
         if (!$doc){
             //add categories
             $data = array(

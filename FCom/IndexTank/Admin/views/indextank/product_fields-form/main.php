@@ -14,6 +14,7 @@
         <li>
             <h4 class="label">Label</h4>
             <input type="text" name="model[field_nice_name]" value="<?php echo $this->q($m->field_nice_name) ?>"/>
+            (only for facets)
         </li>
         <?php endif; ?>
 
@@ -27,12 +28,26 @@
             <input type="hidden" name="model[facets]" value="0" checked />
             <input type="checkbox" name="model[facets]" value="1" <?= $m->facets ?'checked' : '' ?>/>
         </li>
+        <li>
+            <h4 class="label">Scoring variable</h4>
+            <input type="hidden" name="model[scoring]" value="0" checked />
+            <input type="checkbox" name="model[scoring]" value="1" <?= $m->scoring ?'checked' : '' ?>/>
+            (Scoring accept only float or integer type of variables. Text fields couldn't be used as scoring variable without transformation.)
+        </li>
 
         <?php if ($m->search || !$m->id()):?>
         <li>
             <h4 class="label">Priority</h4>
             <input type="text" size="3" id="main-content" name="model[priority]" value="<?php echo $this->q($m->priority) ?>">
             (Default 1)
+        </li>
+        <?php endif; ?>
+
+        <?php if ($m->scoring || !$m->id()):?>
+        <li>
+            <h4 class="label">Variable number</h4>
+            <input type="text" size="3" name="model[var_number]" value="<?php echo $m->var_number ?>"/>
+            (Start from 0)
         </li>
         <?php endif; ?>
 
