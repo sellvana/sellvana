@@ -130,7 +130,7 @@ class FCom_IndexTank_Migrate extends BClass
         $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
         if ($fields){
             foreach($fields as $f){
-                $field_name = 'cf_'.$f->field_type.'___'.$f->field_code;
+                $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($f);
                 $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', $field_name)->find_one();
                 if ($doc){
                     continue;
