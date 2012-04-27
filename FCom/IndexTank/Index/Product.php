@@ -302,15 +302,26 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->update_categories($product->id(), $categories);
     }
 
+    public function get_category_key($category)
+    {
+        return str_replace("/","__",$category->url_path);
+    }
+
+    public function get_custom_field_key($cf_model)
+    {
+        return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
+    }
+
     public function delete_categories($product, $category)
     {
-        $category = array(self::CT_CATEGORY_PREFIX . $category->id_path => "");
+
+        $category = array($this->get_category_key($category) => "");
         $this->model()->update_categories($product->id(), $category);
     }
 
-    public function delete_custom_field($product, $cf)
+    public function delete_custom_field($product, $cf_model)
     {
-        $category = array(self::CT_CUSTOM_FIELD_PREFIX . $cf->field_name.'_'.$cf->field_code => "");
+        $category = array($this->get_custom_field_key($cf_model) => "");
         $this->model()->update_categories($product->id(), $category);
     }
 
