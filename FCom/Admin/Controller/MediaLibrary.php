@@ -35,7 +35,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400, 'editable'=>true),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>60, 'search'=>false),
-                    array('name'=>'act', 'label'=>'Actions', 'width'=>70, 'search'=>false, 'sortable'=>false, 'resizable'=>false),
+                    array('name'=>'act', 'label'=>'Actions', 'width'=>80, 'search'=>false, 'sortable'=>false, 'resizable'=>false),
                 ),
                 'multiselect' => true,
                 'multiselectWidth' => 30,

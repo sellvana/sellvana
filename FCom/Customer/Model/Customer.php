@@ -16,6 +16,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
@@ -150,5 +152,10 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
             $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing);
         }
         return $this->default_billing;
+    }
+
+    public function addresses()
+    {
+        return FCom_Customer_Model_Address::i()->orm('a')->where('customer_id', $this->id)->find_many();
     }
 }

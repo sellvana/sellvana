@@ -5,6 +5,28 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
 
+    public function as_html()
+    {
+        return '<div class="adr">'
+            .'<div class="street-address">'.$this->street1.'</div>'
+            .($this->street2 ? '<div class="extended-address">'.$this->street2.'</div>' : '')
+            .($this->street3 ? '<div class="extended-address">'.$this->street3.'</div>' : '')
+            .'<span class="locality">'.$this->city.'</span>,'
+            .'<span class="region">'.$this->region.'</span>'
+            .'<span class="postal-code">'.$this->postcode.'</span>'
+            .'<div class="country-name">'.$this->country.'</div>'
+            .'</div>';
+
+    }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        return true;
+    }
+
     public function install()
     {
         BDb::run("

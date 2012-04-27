@@ -12,6 +12,7 @@
     'folder' => 'storage/import/customers',
     'config' => array(
         'grid' => array(
+            'multiselect'=>false,
             'autowidth'=>false,
             'width'=>600,
             'height'=>200,
@@ -47,7 +48,7 @@ head(function() {
     });
 
     $('#step1-next').click(function(ev) {
-        var sel = $('#import_files').jqGrid('getGridParam', 'selarrrow');
+        var sel = importsGrid.getSelectedRows();
         if (!sel.length) {
             alert('Please select one file');
             return;
