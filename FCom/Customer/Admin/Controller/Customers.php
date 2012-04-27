@@ -22,6 +22,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'region' => array('label'=>'Region', 'index'=>'a.region'),
             'postcode' => array('label'=>'Zip', 'index'=>'a.postcode'),
             'country' => array('label'=>'Country', 'index'=>'a.country'),
+            'create_dt' => array('label'=>'Created'),
+            'update_dt' => array('label'=>'Updated'),
         );
         $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         return $config;

@@ -63,11 +63,22 @@ FCom_Admin.MediaLibrary = function(options) {
         return false;
     }
 
+    function getSelectedRows()
+    {
+        if (grid.jqGrid('getGridParam', 'multiselect')) {
+            return grid.jqGrid('getGridParam', 'selarrrow');
+        } else {
+            var sel = grid.jqGrid('getGridParam', 'selrow');
+console.log(sel);
+            return sel===null ? [] : [sel];
+        }
+    }
+
     function deleteAttachments() {
         if (!confirm('Are you sure?')) {
             return false;
         }
-        var sel = grid.jqGrid('getGridParam', 'selarrrow'), i, postData = {'delete[]':[]};
+        var sel = getSelectedRows(), i, postData = {'delete[]':[]};
         if (!sel.length) {
             alert('Please select some attachments to delete.');
             return;
@@ -135,7 +146,10 @@ FCom_Admin.MediaLibrary = function(options) {
     });
     grid.parents('.ui-jqgrid').find('.navtable .ui-icon-trash').parents('.ui-pg-button').click(function(ev) { deleteAttachments(); });
 
-    return {setOptions:setOptions};
+    return {
+        setOptions:setOptions,
+        getSelectedRows:getSelectedRows
+    };
 }
 
 FCom_Admin.TargetGrid = function(options) {

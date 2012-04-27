@@ -60,11 +60,14 @@ class FCom_Customer_Import extends BClass
         // save first row data
         $info['first_row'] = $row;
         // find likely column names
-        $fieldPatterns = $this->getFieldData();
+        $fields = $this->getFieldData();
         foreach ($row as $i=>$v) {
-            foreach ($fieldPatterns as $f=>$fd) {
-                if (!empty($fd['pattern']) && preg_match("#{$fd['pattern']}#i", $v)) {
+            foreach ($fields as $f=>$fd) {
+                if (!empty($fd['pattern']) && empty($fd['used'])
+                    && preg_match("#{$fd['pattern']}#i", $v)
+                ) {
                     $info['columns'][$i] = $f;
+                    $fields[$f]['used'] = true;
                     break;
                 }
             }

@@ -327,6 +327,7 @@ class FCom extends BClass
                 'root_dir' => 'Cms',
                 'depends' => array('FCom_Core', 'BPHPTAL'),
                 'description' => "CMS for custom pages and forms",
+                'bootstrap' => array('file'=>'CmsFrontend.php', 'callback'=>'FCom_Cms_Frontend::bootstrap'),
                 'migrate' => 'FCom_Cms_Migrate',
                 'areas' => array(
                     'FCom_Admin' => array(
@@ -343,6 +344,7 @@ class FCom extends BClass
                 'root_dir' => 'ProductReviews',
                 'depends' => array('FCom_Catalog', 'FCom_Customer'),
                 'description' => "Product reviews by customers",
+                'bootstrap' => array('file'=>'ProductReviewsFrontend.php', 'callback'=>'FCom_ProductReviews_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'ProductReviewsAdmin.php', 'callback'=>'FCom_ProductReviews_Admin::bootstrap'),
@@ -359,6 +361,7 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
                 'description' => "Categories and products management, admin and frontend",
                 'migrate' => 'FCom_Catalog_Migrate',
+                'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CatalogAdmin.php', 'callback'=>'FCom_Catalog_Admin::bootstrap'),
@@ -375,6 +378,7 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
                 'description' => "Customer Accounts and Management",
                 'migrate' => 'FCom_Customer_Migrate',
+                'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Api' => array(
                         'bootstrap' => array('file'=>'Api.php', 'callback'=>'FCom_Customer_Api::bootstrap'),
@@ -396,6 +400,7 @@ class FCom extends BClass
                 'after' => array('FCom_Customer'),
                 'description' => "Base custom fields implementation, currently for catalog only",
                 'migrate' => 'FCom_CustomField_Migrate',
+                'bootstrap' => array('file'=>'CustomFieldFrontend.php', 'callback'=>'FCom_CustomField_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'CustomFieldAdmin.php', 'callback'=>'FCom_CustomField_Admin::bootstrap'),
@@ -418,6 +423,7 @@ class FCom extends BClass
                 'root_dir' => 'Newsletter',
                 'depends' => array('FCom_Core'),
                 'description' => "Base subscription and mailing list management",
+                'bootstrap' => array('file'=>'NewsletterFrontend.php', 'callback'=>'FCom_Newsletter_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'NewsletterAdmin.php', 'callback'=>'FCom_Newsletter_Admin::bootstrap'),
@@ -433,6 +439,7 @@ class FCom extends BClass
                 'root_dir' => 'PayPal',
                 'depends' => array('FCom_Core'),
                 'description' => "PayPal&reg; standard payment method",
+                'bootstrap' => array('file'=>'PayPalFrontend.php', 'callback'=>'FCom_PayPal_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'PayPalAdmin.php', 'callback'=>'FCom_PayPal_Admin::bootstrap'),
@@ -448,6 +455,7 @@ class FCom extends BClass
                 'root_dir' => 'FreshBooks',
                 'depends' => array('FCom_Core'),
                 'description' => "FreshBooks&reg; payment method and invoice management API integration",
+                'bootstrap' => array('file'=>'FreshBooksFrontend.php', 'callback'=>'FCom_FreshBooks_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'FreshBooksAdmin.php', 'callback'=>'FCom_FreshBooks_Admin::bootstrap'),
@@ -464,6 +472,7 @@ class FCom extends BClass
                 'depends' => array('FCom_Core'),
                 'description' => "IndexTank API integration",
                 'migrate' => 'FCom_IndexTank_Migrate',
+                'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
                 'areas' => array(
                     'FCom_Admin' => array(
                         'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),

@@ -15,6 +15,40 @@ class FCom_Admin_DefaultTheme extends BClass
     {
         BLayout::i()
             ->layout(array(
+                'base'=>array(
+                    array('root', 'root'),
+                    array('hook', 'head', 'views'=>array('head')),
+                    array('view', 'head', 'do'=>array(
+                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
+                        array('icon', '/favicon.ico'),
+                        array('js', '{FCom_Core}/js/lib/head.min.js'),
+                        array('js', '{FCom_Core}/js/lib/json2.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
+                        array('js', '{FCom_Core}/js/lib/angular.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.hotkeys.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.layout-latest.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
+                        array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
+                        array('css', '{FCom_Core}/js/lib/css/jquery.pnotify.default.css'),
+                    )),
+                    array('layout', 'jqgrid'),
+                    array('layout', 'jstree'),
+                    array('view', 'head', 'do'=>array(
+                        array('js', '{FCom_Admin}/js/fcom.admin.js'),
+                        array('css', '{FCom_Admin}/css/fcom.admin.css'),
+                    )),
+                    array('view', 'root', 'do'=>array(
+                        array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
+                        array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
+                        array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
+                        array('addNav', 'admin/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
+                        array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
+                        array('addNav', 'admin/modules', array('label'=>'Installed Modules', 'href'=>BApp::href('/modules'))),
+                        array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
+                    )),
+                ),
                 'jqgrid'=>array(
                     array('view', 'head', 'do'=>array(
                         array('css', '{FCom_Core}/js/lib/jqGrid/ui.jqgrid.css'),
@@ -63,39 +97,6 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('css', '{FCom_Core}/js/lib/css/jquery.mcdropdown.css'),
                         array('js', '{FCom_Core}/js/lib/jquery.mcdropdown.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.bgiframe.js'),
-                    )),
-                ),
-                'base'=>array(
-                    array('root', 'root'),
-                    array('hook', 'head', 'views'=>array('head')),
-                    array('view', 'head', 'do'=>array(
-                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
-                        array('icon', '/favicon.ico'),
-                        array('js', '{FCom_Core}/js/lib/head.min.js'),
-                        array('js', '{FCom_Core}/js/lib/json2.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery-ui.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.hotkeys.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.layout-latest.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
-                        array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
-                        array('css', '{FCom_Core}/js/lib/css/jquery.pnotify.default.css'),
-                    )),
-                    array('layout', 'jqgrid'),
-                    array('layout', 'jstree'),
-                    array('view', 'head', 'do'=>array(
-                        array('js', '{FCom_Admin}/js/fcom.admin.js'),
-                        array('css', '{FCom_Admin}/css/fcom.admin.css'),
-                    )),
-                    array('view', 'root', 'do'=>array(
-                        array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
-                        array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
-                        array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
-                        array('addNav', 'admin/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
-                        array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
-                        array('addNav', 'admin/modules', array('label'=>'Installed Modules', 'href'=>BApp::href('/modules'))),
-                        array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
                     )),
                 ),
                 'form'=>array(
