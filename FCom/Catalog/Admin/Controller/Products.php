@@ -35,7 +35,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     location.href = '{$baseUrl}'+rowid;
                 }",
             ),
-            'custom'=>array('personalize'=>true),
+            'custom'=>array('personalize'=>true, 'autoresize'=>true),
             'navGrid' => array(),
             //'searchGrid' => array('multipleSearch'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
