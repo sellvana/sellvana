@@ -90,7 +90,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 
             ),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
-            'custom' => array('personalize'=>true),
+            'custom' => array('personalize'=>true, 'autoresize'=>true),
         );
         BPubSub::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
         return $config;
