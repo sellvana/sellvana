@@ -65,6 +65,7 @@ window.appConfig = {
                         </li>
 					    <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
 						    <ul class="sub-section">
+                                <li><img src="<?=BUtil::gravatar($user->email)?>" style="margin:3px 13px"/></li>
 							    <li><a href="<?php echo BApp::href('/my_account')?>">My Account</a></li>
 							    <li><a href="<?php echo BApp::href('/reports')?>">My Reports</a></li>
 							    <li><a href="<?php echo BApp::href('/logout')?>">Log Out</a></li>
@@ -75,19 +76,23 @@ window.appConfig = {
 			    <strong class="adm-group-title"><?php echo $this->title ? $this->q($this->title) : '&nbsp;' ?></strong>
 		    </header>
         </div>
-        <div class="adm-middle ui-layout-center"><?php echo $this->hook('main') ?></div>
+        <div class="adm-middle ui-layout-center" id="main-container"><?php echo $this->hook('main') ?></div>
     </div>
 <script>
 
 head(function() {
     //$('#root-layout > .ui-layout-west').width(180).height(1000).resizable({handles:'e'});
-    /*
-    $('#root-layout').layout({
+/*
+    var rootLayout = $('#root-layout').layout({
         north__spacingOpen:0,
         north__resizable:false,
         west__spacingOpen:0
     });
-    */
+
+    $('#root-layout > .ui-layout-north')
+        .mouseover(function() { rootLayout.allowOverflow(this); })
+        .mouseout(function() { rootLayout.resetOverflow(this); });
+*/
 });
 
 </script>

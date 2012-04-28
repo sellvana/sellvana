@@ -181,6 +181,13 @@ var subgrid = \$('#'+subgrid_table_id);
         } elseif (!empty($cfg['navGrid']['edit'])) {
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { \$(this).jqGrid('editGridRow', rowid); }";
         }
+        if (!empty($cfg['custom']['autoresize'])) {
+            $cfg[] = "
+$(window).resize(function() {
+    var top = $('#{$cfg['grid']['id']}').offset().top, pager = $('#pager-{$cfg['grid']['id']}').height();
+    $('#{$cfg['grid']['id']}').jqGrid('setGridWidth', $(this).width()).jqGrid('setGridHeight', $(window).height()-top-pager);
+}); $('html').css({overflow:'hidden'}); $(window).trigger('resize');";
+        }
         unset($cfg['custom']);
 /*
         foreach (array('add','edit','del') as $k) {

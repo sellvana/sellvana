@@ -14,7 +14,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         return array(
             'grid'=>array(
-                'id' => 'sample_grid_id',
+                'id' => 'grid',
                 'url' => BApp::href($this->_gridHref.'/grid_data'),
                 'editurl' => BApp::href($this->_gridHref.'/grid_data'),
                 'columns' => array(
@@ -23,7 +23,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     ), 'width'=>50),
                 ),
             ),
-            'custom'=>array('personalize'=>true),
+            'custom'=>array('personalize'=>true, 'autoresize'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
         );
     }
