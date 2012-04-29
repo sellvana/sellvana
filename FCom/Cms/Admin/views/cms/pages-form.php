@@ -6,7 +6,7 @@ $formUrl = BApp::href('cms/pages/form/?id='.$p->id);
 <script>
 head(function() {
     window.adminForm = Admin.form({
-        tabs:     '.adm-tabs-left li',
+        tabs:     '.adm-tabs li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>'
@@ -23,27 +23,24 @@ head(function() {
     </header>
 
     <section class="adm-content-box info-view-mode">
-        <div class="adm-content-inner">
-            <div class="adm-tabs-left-bg"></div>
-            <nav class="adm-tabs-left">
-                <ul>
-    <?php foreach ($tabs as $k=>$tab): ?>
-                    <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
-                        <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
-                    </li>
-    <?php endforeach ?>
-                </ul>
-            </nav>
-            <div class="adm-tabs-container">
-    <?php foreach ($tabs as $k=>$tab): ?>
-                <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
-                    <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
-                    <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
-                >
-    <?php if (empty($tab['async'])) echo $this->view($tab['view']) ?>
-                </section>
-    <?php endforeach ?>
-            </div>
+        <nav class="adm-tabs">
+            <ul>
+<?php foreach ($tabs as $k=>$tab): ?>
+                <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
+                    <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
+                </li>
+<?php endforeach ?>
+            </ul>
+        </nav>
+        <div class="adm-tabs-container">
+<?php foreach ($tabs as $k=>$tab): ?>
+            <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
+                <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
+                <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
+            >
+<?php if (empty($tab['async'])) echo $this->view($tab['view']) ?>
+            </section>
+<?php endforeach ?>
         </div>
     </section>
 </form>
