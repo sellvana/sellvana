@@ -9,6 +9,8 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function install()
     {
+        return false; //TODO skip if no configuration
+
         //create product index
         FCom_IndexTank_Index_Product::i()->install();
 
