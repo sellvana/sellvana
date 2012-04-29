@@ -324,9 +324,9 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .ui-search-toolbar th div { text-align:left; }
 .ui-search-toolbar input[type="text"] { border-radius:0; -moz-border-radius:0; -webkit-border-radius:0; }
 .ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr, .ui-corner-left, .ui-corner-tl { border-radius:0; -moz-border-radius:0; -webkit-border-radius:0; -khtml-border-radius:0; }
-.ui-jqgrid-labels .ui-th-column { 
-	border-right:1px solid #657FAC; 
-	border-left:0; 
+.ui-jqgrid-labels .ui-th-column {
+	border-right:1px solid #657FAC;
+	border-left:0;
 	background-image: linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
 	background-image: -o-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
 	background-image: -moz-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
@@ -629,6 +629,8 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 
 .adm-form-subtable { border:solid 1px #AAA; border-radius:3px }
 .adm-form-subtable td { padding:5px; }
+
+.ui-jqdialog td.first { padding-left:20px; border-left:dotted 1px #CCC; }
 
 /* =============================================================================
    Per Page
