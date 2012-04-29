@@ -22,11 +22,55 @@ function CustomerAddressCtrl($scope) {
 
 }
 </script>
-
-<img src="<?=BUtil::gravatar($m->email)?>"/>
-<?=$this->q($m->firstname)?> <?=$this->q($m->lastname)?>
-
-<div ng-controller="CustomerAddressesCtrl">
+<header class="adm-main-header">Customer Info</header>
+<div class="col-customer-info">
+	<fieldset>
+		<h3 class="form-group-title">Personal Information</h3>
+		<ul class="form-list">
+			<li class="label-l">
+				<label for="#">First Name</label>
+				<input type="text"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Last Name</label>
+				<input type="text"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Email</label>
+				<input type="text"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Daytime Phone</label>
+				<input type="text"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Work Phone</label>
+				<input type="text"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Status</label>
+				<select name="">
+					<option value="#">Active</option>
+				</select>
+			</li>
+		</ul>
+	</fieldset>
+	<fieldset>
+		<h3 class="form-group-title">Password Reset</h3>
+		<ul class="form-list">
+			<li class="label-l">
+				<label for="#">New Password</label>
+				<input type="password"/>
+			</li>
+			<li class="label-l">
+				<label for="#">Confirm Password</label>
+				<input type="password"/>
+			</li>
+		</ul>
+	</fieldset>
+</div>
+<div class="col-customer-address" ng-controller="CustomerAddressesCtrl">
+		<h3 class="form-group-title">Addresses</h3>
     <div ng-repeat="a in addresses">
         <a href ng-click="delAddress(a)">[X]</a>
         <label><input type="checkbox" ng-model="a.edit_mode"/> Edit</label>
