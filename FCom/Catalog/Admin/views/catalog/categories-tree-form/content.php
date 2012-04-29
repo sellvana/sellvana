@@ -1,10 +1,10 @@
 <?php $m = $this->model ?>
 <fieldset>
-    <ul>
-        <li><label for="main-content">Content</label>
+    <ul class="form-list">
+        <li class="label-top"><label for="main-content">Content</label>
             <textarea id="main-content" name="model[content]"><?php echo $this->q($m->content) ?></textarea></li>
 
-        <li><label for="main-layout_update">Layout Update</label>
+        <li class="label-top"><label for="main-layout_update">Layout Update</label>
             <textarea id="main-layout_update" name="model[layout_update]" style="width:90%; height:100px"><?php echo $this->q($m->layout_update) ?></textarea></li>
 
     </ul>

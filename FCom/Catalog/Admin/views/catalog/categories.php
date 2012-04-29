@@ -1,12 +1,13 @@
 <?php $formUrl = BApp::href('catalog/categories/tree_form/') ?>
 <header class="adm-page-title">
-    <span class="title">CMS Navigation</span>
+    <span class="title">Categories</span>
     <div class="btns-set">
     </div>
 </header>
-<div id="categories-layout">
-    <div class="ui-layout-west">
+<div id="categories-layout" class="adm-content-box">
+    <div class="ui-layout-west adm-sidebar">
         <div class="ui-widget-header">
+        	Categories
             <input type="checkbox" id="categories-tree-lock"/>
             <input type="checkbox" id="categories-expand-collapse"/>
         </div>
@@ -14,7 +15,7 @@
     </div>
 
 <form id="categories-tree-form" action="<?php echo $formUrl ?>" method="post">
-    <div class="ui-layout-center" id="categories-form-container">
+    <div class="ui-layout-center adm-main" id="categories-form-container">
     </div>
 </form>
 </div>
@@ -37,7 +38,7 @@ head(function() {
     var cmsNavLayout = $('#categories-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,
-        west__spacing_open:20,
+        west__spacing_open:1,
         west__closable:false,
         triggerEventsOnLoad: true,
         onresize:function(pane, $Pane, paneState) {
@@ -54,7 +55,7 @@ head(function() {
         $('#categories-form-container').load(url, function() {
             $('#categories-tree-form').attr('action', url);
             window.adminForm = Admin.form({
-                tabs:     '.adm-tabs-left li',
+                tabs:     '.adm-tabs li',
                 panes:    '.adm-tabs-content',
                 url_get:  url,
                 url_post: url

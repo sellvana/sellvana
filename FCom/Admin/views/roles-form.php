@@ -6,7 +6,7 @@
 head(function() {
     window.adminForm = Admin.form({
         form:     '#roles-form',
-        tabs:     '.adm-tabs-left li',
+        tabs:     '.adm-tabs-sidebar li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>'
@@ -25,9 +25,8 @@ head(function() {
         </div>
     </header>
     <section class="adm-content-box info-view-mode">
-        <div class="adm-content-inner">
-            <div class="adm-tabs-left-bg"></div>
-            <nav class="adm-tabs-left">
+    	<aside class="adm-sidebar">
+            <nav class="adm-tabs-sidebar">
                 <ul>
     <?php foreach ($this->tabs as $k=>$tab): if (!empty($tab['disabled'])) continue; ?>
                     <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
@@ -36,6 +35,8 @@ head(function() {
     <?php endforeach ?>
                 </ul>
             </nav>
+		</aside>
+        <div class="adm-main">
             <div class="adm-tabs-container">
     <?php foreach ($this->tabs as $k=>$tab): ?>
                 <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
@@ -46,6 +47,6 @@ head(function() {
                 </section>
     <?php endforeach ?>
             </div>
-        </div>
+    	</div>
     </section>
 </form>

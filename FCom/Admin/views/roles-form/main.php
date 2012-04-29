@@ -2,6 +2,7 @@
     $m = $this->model;
     $hlp = FCom_Admin_Model_Role::i();
 ?>
+<header class="adm-main-header">Permissions</header>
 <fieldset class="adm-section-group">
     <ul class="form-list">
         <li>

@@ -6,7 +6,7 @@ $formUrl = BApp::href('customers/form/?id='.$c->id);
 <script>
 head(function() {
     window.adminForm = Admin.form({
-        tabs:     '.adm-tabs-left li',
+        tabs:     '.adm-tabs-sidebar li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>'
@@ -16,16 +16,16 @@ head(function() {
 <form action="<?php echo $formUrl ?>" method="post">
     <input type="hidden" id="tab" name="tab" value="<?=$this->cur_tab?>"/>
     <header class="adm-page-title">
-        <span class="title"><?php echo $c->id ? 'Edit Customer: '.$this->q($c->handle) : 'Create New Customer' ?></span>
-        <div style="float:right">
+        <span class="title"><?php echo $c->id ? 'Edit Customer: '.$this->q($c->firstname.' '.$c->lastname) : 'Create New Customer' ?></span>
+        <div class="btns-set">
             <button class="st1 sz2 btn" onclick="adminForm.saveAll()"><span><?php echo BLocale::_('Save')?></span></button>
         </div>
     </header>
 
     <section class="adm-content-box info-view-mode">
-        <div class="adm-content-inner">
-            <div class="adm-tabs-left-bg"></div>
-            <nav class="adm-tabs-left">
+    	<aside class="form-img-sidebar">
+			<img src="<?=BUtil::gravatar($c->email)?>"/>
+            <nav class="adm-tabs-sidebar">
                 <ul>
     <?php foreach ($tabs as $k=>$tab): ?>
                     <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
@@ -34,6 +34,8 @@ head(function() {
     <?php endforeach ?>
                 </ul>
             </nav>
+    	</aside>
+    	<div class="adm-main">
             <div class="adm-tabs-container">
     <?php foreach ($tabs as $k=>$tab): ?>
                 <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
@@ -44,6 +46,6 @@ head(function() {
                 </section>
     <?php endforeach ?>
             </div>
-        </div>
+		</div>
     </section>
 </form>
