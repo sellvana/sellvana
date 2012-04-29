@@ -6,7 +6,7 @@ $formUrl = BApp::href('cms/blocks/form/?id='.$m->id)
 <script>
 head(function() {
     window.adminForm = Admin.form({
-        tabs:     '.adm-tabs-left li',
+        tabs:     '.adm-tabs li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>'
@@ -23,9 +23,7 @@ head(function() {
     </header>
 
     <section class="adm-content-box info-view-mode">
-        <div class="adm-content-inner">
-            <div class="adm-tabs-left-bg"></div>
-            <nav class="adm-tabs-left">
+            <nav class="adm-tabs">
                 <ul>
     <?php foreach ($tabs as $k=>$tab): ?>
                     <li <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
@@ -44,6 +42,5 @@ head(function() {
                 </section>
     <?php endforeach ?>
             </div>
-        </div>
     </section>
 </form>

@@ -35,7 +35,7 @@ console.log(ui.item[0].id);
     }
     window.adminForm = Admin.form({
         form:     '#settings-form',
-        tabs:     '.adm-tabs-left li',
+        tabs:     '.adm-tabs-sidebar li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',
         url_post: '<?php echo $formUrl ?>',
@@ -55,27 +55,28 @@ console.log(ui.item[0].id);
     </header>
     <?php echo $this->messagesHtml() ?>
     <section class="adm-content-box info-view-mode">
-        <div class="adm-content-inner">
-            <div class="adm-tabs-left-bg"></div>
-            <nav class="adm-tabs-left">
-                <ul>
-    <?php foreach ($this->tabs as $k=>$tab): if (!empty($tab['disabled'])) continue; ?>
-                    <li id="settings-tab-<?php echo $this->q($k) ?>" <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
-                        <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
-                    </li>
-    <?php endforeach ?>
-                </ul>
-            </nav>
-            <div class="adm-tabs-container">
-    <?php foreach ($this->tabs as $k=>$tab): ?>
-                <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
-                    <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
-                    <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
-                >
-    <?php if (empty($tab['async'])) echo $this->view($tab['view']) ?>
-                </section>
-    <?php endforeach ?>
-            </div>
+    	<aside class="form-img-sidebar">
+	        <nav class="adm-tabs-sidebar">
+	            <ul>
+	<?php foreach ($this->tabs as $k=>$tab): if (!empty($tab['disabled'])) continue; ?>
+	                <li id="settings-tab-<?php echo $this->q($k) ?>" <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
+	                    <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
+	                </li>
+	<?php endforeach ?>
+	            </ul>
+	        </nav>
+	    </aside>
+	    <div class="adm-main">
+	        <div class="adm-tabs-container">
+	<?php foreach ($this->tabs as $k=>$tab): ?>
+	            <section id="tab-<?php echo $this->q($k) ?>" class="adm-tabs-content"
+	                <?php if ($k!==$this->cur_tab): ?>hidden<?php endif ?>
+	                <?php if (empty($tab['async'])): ?>data-loaded="true"<?php endif ?>
+	            >
+	<?php if (empty($tab['async'])) echo $this->view($tab['view']) ?>
+	            </section>
+	<?php endforeach ?>
+	        </div>
         </div>
     </section>
 </form>

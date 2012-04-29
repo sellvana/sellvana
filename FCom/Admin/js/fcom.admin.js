@@ -235,12 +235,16 @@ var Admin = {
     ,checkboxButton: function(id, opt) {
         var el = $(id);
         var cur = opt[opt.def ? 'on' : 'off'];
-        el.after('<label for="'+id.replace(/^#/,'')+'">'+(opt.text ? $(cur.label).html() : '')+'</label>');
+        var label = $('<label for="'+id.replace(/^#/,'')+'">'+(opt.text ? $(cur.label).html() : '')+'</label>');
+        el.css({display:'none'}).after(label);
+        label.css({display:'inline-block'}).addClass('icon-btn ui-icon-'+cur.icon);
         el.attr('checked', opt.def ? true : false)
-            .button({text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})
+            /*.button({text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})*/
             .click(function(ev) {
+                label.removeClass('ui-icon-'+cur.icon);
                 cur = opt[this.checked ? 'on' : 'off'];
-                el.button('option', {text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})
+                label.addClass('ui-icon-'+cur.icon);
+                //el.button('option', {text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})
                 if (opt.click) opt.click.bind(this)(ev);
             });
         return el;
@@ -571,16 +575,19 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
         function tabAction(action, el) {
             var pane = $(el).parents(options.panes);
             var tabId = pane.attr('id').replace(/^tab-/,'');
+            var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
+            var url_post = options.url_get+(options.url_post.match(/\?/) ? '&' : '?');
+console.log(url_get, url_post);
             switch (action) {
             case 'edit':
-                $.get(options.url_get+'?tabs='+tabId+'&mode=edit', function(data, status, req) {
+                $.get(url_get+'tabs='+tabId+'&mode=edit', function(data, status, req) {
                     loadTabs(data);
                     tabClass(tabId, 'dirty');
                 });
                 break;
 
             case 'cancel':
-                $.get(options.url_get+'?tabs='+tabId+'&mode=view', function(data, status, req) {
+                $.get(url_get+'tabs='+tabId+'&mode=view', function(data, status, req) {
                     loadTabs(data);
                     tabClass(tabId);
                 });
@@ -591,7 +598,7 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
                     editors[i].updateElement();
                 }
                 var postData = $(el).parents('fieldset').find('input,select,textarea').serializeArray();
-                $.post(options.url_post+'?tabs='+tabId+'&mode=view', postData, function(data, status, req) {
+                $.post(url_post+'tabs='+tabId+'&mode=view', postData, function(data, status, req) {
                     loadTabs(data);
                     tabClass(tabId);
                 });
@@ -613,7 +620,8 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
             //TODO
             var form = $(el).closest('form');
             var postData = form.serializeArray();
-            $.post(options.url_post+'?tabs=ALL&mode=view', postData, function(data, status, req) {
+            var url_post = options.url_get+(options.url_post.match(/\?/) ? '&' : '?');
+            $.post(url_post+'tabs=ALL&mode=view', postData, function(data, status, req) {
                 $.pnotify({
                     pnotify_title: data.message || 'The form has been saved',
                     pnotify_type: data.status=='error' ? 'error' : null,
@@ -669,6 +677,7 @@ console.log(dd, $(dd.drag).parents('.grid-container'));
                 var tabId = a.attr('href').replace(/^#tab-/,'');
                 pane.closest('form').find('#tab').val(tabId);
                 if (!pane.data('loaded')) {
+
                     $.getJSON(options.url_get+'?tabs='+tabId, function(data, status, req) {
                         loadTabs(data);
                     });

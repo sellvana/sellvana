@@ -5,8 +5,9 @@
     </div>
 </header>
 <div id="cms-nav-layout">
-    <div class="ui-layout-west">
+    <div class="ui-layout-west adm-sidebar">
         <div class="ui-widget-header">
+        	Pages
             <input type="checkbox" id="nav-tree-lock"/>
             <input type="checkbox" id="nav-expand-collapse"/>
         </div>
@@ -37,7 +38,7 @@ head(function() {
     var cmsNavLayout = $('#cms-nav-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,
-        west__spacing_open:20,
+        west__spacing_open:0,
         west__closable:false,
         triggerEventsOnLoad: true,
         onresize:function(pane, $Pane, paneState) {
@@ -54,7 +55,7 @@ head(function() {
         $('#nav-form-container').load(url, function() {
             $('#nav-tree-form').attr('action', url);
             window.adminForm = Admin.form({
-                tabs:     '.adm-tabs-left li',
+                tabs:     '.adm-tabs li',
                 panes:    '.adm-tabs-content',
                 url_get:  url,
                 url_post: url
