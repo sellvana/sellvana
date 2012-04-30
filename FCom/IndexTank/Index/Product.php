@@ -57,35 +57,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     /**
      * Load defined scoring functions
      */
-    protected function _init()
+    protected function _init_functions()
     {
         //scoring functions definition for IndexDen
         //todo: move them into configuration
-        $this->_functions  =  array (
-                'age'                   => array('number' => 0, 'definition' => '-age'         ),
-                'relevance'             => array('number' => 1, 'definition' => 'relevance'    ),
-                'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
-                'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
-        );
-    }
-
-    /**
-     * Run by migration script.
-     * Create index name 'products' and install scoring functions.
-     */
-    public function install()
-    {
-        //init configuration
-        $this->_init();
-
-        try {
-            //create an index
-            $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
-        } catch(Exception $e) {
-            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
+        $func_list  =  FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        foreach ($func_list as $func) {
+            $this->_functions[$func->name] = $func;
         }
     }
-
 
     /**
      *
@@ -96,7 +76,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         if (empty($this->_model)){
             //init config
-            $this->_init();
+            $this->_init_functions();
             //init model
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
@@ -114,7 +94,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         if (empty($this->_functions[$function])){
             throw new Exception('Scoring function does not exist: ' . $function);
         }
-        $this->_scoring_function = $this->_functions[$function]['number'];
+        $this->_scoring_function = $this->_functions[$function]->number;
     }
 
     /**
@@ -314,7 +294,6 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function delete_categories($product, $category)
     {
-
         $category = array($this->get_category_key($category) => "");
         $this->model()->update_categories($product->id(), $category);
     }
@@ -421,11 +400,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         foreach($fields_list as $field){
             switch($field->source_type){
                 case 'product':
+                    //get value of product object
                     $value = $product->{$field->source_value};
                     $result[$field->field_name] = $value;
                     break;
                 case 'function':
-                    $values_list = $this->{$field->source_value}($product, $type);
+                    //call function
+                    $values_list = $this->_field_{$field->source_value}($product, $type);
+                    //process results
                     if($values_list){
                         if(is_array($values_list)){
                             foreach ($values_list as $search_name => $search_value) {
@@ -478,22 +460,33 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $variables;
     }
 
-    protected function get_ft_categories($product)
+    /**
+     * Run by migration script.
+     * Create index name 'products' and install scoring functions.
+     */
+    public function install()
     {
-        $product_categories = $product->categories($product->id()); //get all categories for product
-        if ($product_categories){
-            $categories = array();
-            foreach ($product_categories as $cat) {
-                $categories[] = $cat->node_name;
-            }
-            if($categories){
-                return "/".implode("/", $categories);
-            }
+        try {
+            //create an index
+            $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
+        } catch(Exception $e) {
+            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_index_name);
         }
-        return '';
     }
 
-    protected function get_categories($product, $type='')
+
+    /*************** Field init functions *******************
+     * Start field functions with _field_ prefix
+     * Example:
+     * For field with source_type 'function' and source_value 'get_label'
+     * create following function
+     * private function _field_get_label()
+     * {
+     *      return 'Text label';
+     * }
+     */
+
+    protected function _field_get_categories($product, $type='')
     {
         $categories = array();
         $product_categories = $product->categories($product->id()); //get all categories for product
@@ -509,12 +502,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $categories;
     }
 
-    protected function get_brands($product, $type='')
+    protected function _field_get_brands($product, $type='')
     {
         return (rand(0, 100) % 2 == 0) ? "Brand 1": "Brand 2";
     }
 
-    protected function price_range_large($product, $type='')
+    protected function _field_price_range_large($product, $type='')
     {
         if ($product->base_price < 100) {
             return '$0 to $99';
@@ -541,7 +534,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     }
 
-    protected function price_range_smart($product, $type='')
+    protected function _field_price_range_smart($product, $type='')
     {
         $p = $product->base_price;
         $p2_u = ceil($p/10)*10;
