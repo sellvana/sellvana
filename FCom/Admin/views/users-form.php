@@ -1,10 +1,10 @@
 <?php
     $m = $this->model;
-    $formUrl = $baseHref.'/users/form/?id='.$m->id;
+    $formUrl = BApp::href('users/form/?id='.$m->id);
 ?>
 <script>
 head(function() {
-    window.adminForm = Admin.form({
+    window.adminForm = FCom.Admin.form({
         form:     '#users-form',
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
@@ -21,7 +21,7 @@ head(function() {
             <?php if ($m->status): ?><sup>(<?php echo $this->q($m->fieldOptions('status', $m->status)) ?>)</sup><?php endif ?>
         </span>
         <div class="btns-set">
-            <button type="button" class="st2 sz2 btn" onclick="location.href='<?php echo $baseHref.'/users'?>'" type="button"><span>Back to list</span></button>
+            <button type="button" class="st2 sz2 btn" onclick="location.href='<?php echo BApp::href('users')?>'" type="button"><span>Back to list</span></button>
             <button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save All</span></button>
         </div>
     </header>

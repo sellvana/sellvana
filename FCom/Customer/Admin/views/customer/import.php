@@ -41,7 +41,7 @@
 head(function() {
     $('#import-accordion').accordion({});
 
-    importsGrid = new FCom_Admin.MediaLibrary({
+    importsGrid = new FCom.Admin.MediaLibrary({
         grid:'#import_files',
         url:'<?=BApp::href('media/grid')?>',
         folder:'storage/import/customers'

@@ -5,7 +5,7 @@ $formUrl = BApp::href('indextank/product_fields/form/?id='.$p->id);
 ?>
 <script>
 head(function() {
-    window.adminForm = Admin.form({
+    window.adminForm = FCom.Admin.form({
         tabs:     '.adm-tabs-left li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',

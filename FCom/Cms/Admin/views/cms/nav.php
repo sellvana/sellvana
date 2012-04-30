@@ -4,7 +4,7 @@
     <div class="btns-set">
     </div>
 </header>
-<div id="cms-nav-layout">
+<div id="cms-nav-layout" class="adm-content-box">
     <div class="ui-layout-west adm-sidebar">
         <div class="ui-widget-header">
         	Pages
@@ -15,20 +15,20 @@
     </div>
 
 <form id="nav-tree-form" action="<?php echo $formUrl ?>" method="post">
-    <div class="ui-layout-center" id="nav-form-container">
+    <div class="ui-layout-center adm-main" id="nav-form-container">
     </div>
 </form>
 </div>
 <script>
 head(function() {
-    Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
-    Admin.checkboxButton('#nav-expand-collapse', {
+    FCom.Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
+    FCom.Admin.checkboxButton('#nav-expand-collapse', {
         off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
         click:function(ev) { $('#cms_nav').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }
         //TODO: fetch ancestors only for root node
     });
 
-    Admin.tree('#cms_nav', {
+    FCom.Admin.tree('#cms_nav', {
         url:'<?=BApp::href('cms/nav/tree_data')?>'
         , on_dblclick: function (n) { loadForm(n.attr('id')); }
         , on_select: function (n) { loadForm(n.attr('id')); }
@@ -38,7 +38,7 @@ head(function() {
     var cmsNavLayout = $('#cms-nav-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,
-        west__spacing_open:0,
+        west__spacing_open:1,
         west__closable:false,
         triggerEventsOnLoad: true,
         onresize:function(pane, $Pane, paneState) {
@@ -54,7 +54,7 @@ head(function() {
         var url = '<?php echo $formUrl ?>?id='+id;
         $('#nav-form-container').load(url, function() {
             $('#nav-tree-form').attr('action', url);
-            window.adminForm = Admin.form({
+            window.adminForm = FCom.Admin.form({
                 tabs:     '.adm-tabs li',
                 panes:    '.adm-tabs-content',
                 url_get:  url,
