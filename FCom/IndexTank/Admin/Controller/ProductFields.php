@@ -4,7 +4,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'indextank/product_fields';
-    protected $_modelClass = 'FCom_IndexTank_Model_ProductFields';
+    protected $_modelClass = 'FCom_IndexTank_Model_ProductField';
     protected $_mainTableAlias = 'pf';
 
     public function gridConfig()

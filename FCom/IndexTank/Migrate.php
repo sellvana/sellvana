@@ -15,7 +15,7 @@ class FCom_IndexTank_Migrate extends BClass
         FCom_IndexTank_Index_Product::i()->install();
 
         //create table
-        $pFieldsTable = FCom_IndexTank_Model_ProductFields::table();
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
         BDb::run( "
             CREATE TABLE IF NOT EXISTS {$pFieldsTable} (
             `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -35,7 +35,7 @@ class FCom_IndexTank_Migrate extends BClass
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunctions::table();
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$pFunctionsTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -67,7 +67,7 @@ class FCom_IndexTank_Migrate extends BClass
         $pTable = FCom_Catalog_Model_Product::table();
         $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
         foreach($fields as $f){
-            $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', $f->Field)->find_one();
+            $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
             if($doc){
                 continue;
             }
@@ -94,12 +94,12 @@ class FCom_IndexTank_Migrate extends BClass
                 continue;
             }
 
-            FCom_IndexTank_Model_ProductFields::orm()->create($data)->save();
+            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
 
         }
 
 
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'custom_price_range')->find_one();
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'custom_price_range')->find_one();
         if (!$doc){
             //add price range
             $data = array(
@@ -110,10 +110,10 @@ class FCom_IndexTank_Migrate extends BClass
                     'source_type'       => 'function',
                     'source_value'      => 'price_range_large'
             );
-            FCom_IndexTank_Model_ProductFields::orm()->create($data)->save();
+            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
         }
 
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', 'ct_categories___')->find_one();
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'ct_categories___')->find_one();
         if (!$doc){
             //add categories
             $data = array(
@@ -125,7 +125,7 @@ class FCom_IndexTank_Migrate extends BClass
                     'source_type'       => 'function',
                     'source_value'      => 'get_categories'
             );
-            FCom_IndexTank_Model_ProductFields::orm()->create($data)->save();
+            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
         }
 
         //add custom fields
@@ -133,11 +133,11 @@ class FCom_IndexTank_Migrate extends BClass
         if ($fields){
             foreach($fields as $f){
                 $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($f);
-                $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', $field_name)->find_one();
+                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
                 if ($doc){
                     continue;
                 }
-                $doc = FCom_IndexTank_Model_ProductFields::orm()->create();
+                $doc = FCom_IndexTank_Model_ProductField::orm()->create();
 
                 $matches = array();
                 preg_match("#(\w+)#", $f->table_field_type, $matches);

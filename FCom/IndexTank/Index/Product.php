@@ -185,7 +185,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         if (!empty($query)){
 
-            $product_fields = FCom_IndexTank_Model_ProductFields::i()->get_search_list();
+            $product_fields = FCom_IndexTank_Model_ProductField::i()->get_search_list();
             $query_string = '';
 
             foreach($product_fields as $pfield){
@@ -333,7 +333,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function update_functions()
     {
-        $functions = FCom_IndexTank_Model_ProductFunctions::i()->get_list();
+        $functions = FCom_IndexTank_Model_ProductFunction::i()->get_list();
         if(!$functions){
             return;
         }
@@ -371,7 +371,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 return strnatcmp($a->name, $b->name);
             };
 
-            $facets_fields = FCom_IndexTank_Model_ProductFields::i()->get_facets_list();
+            $facets_fields = FCom_IndexTank_Model_ProductField::i()->get_facets_list();
             $category_data = array();
 
             //get categories
@@ -444,7 +444,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareFields($product)
     {
-        $fields_list = FCom_IndexTank_Model_ProductFields::i()->get_search_list();
+        $fields_list = FCom_IndexTank_Model_ProductField::i()->get_search_list();
         $searches = $this->_processFields($fields_list, $product, 'search');
         //add two special fields
         $searches['timestamp'] = strtotime($product->update_dt);
@@ -460,7 +460,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     protected function _prepareCategories($product)
     {
-        $fields_list = FCom_IndexTank_Model_ProductFields::i()->get_facets_list();
+        $fields_list = FCom_IndexTank_Model_ProductField::i()->get_facets_list();
         $categories = $this->_processFields($fields_list, $product);
         return $categories;
 
@@ -468,7 +468,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareVariables($product)
     {
-        $fields_list = FCom_IndexTank_Model_ProductFields::i()->get_varialbes_list();
+        $fields_list = FCom_IndexTank_Model_ProductField::i()->get_varialbes_list();
         $variables_list = $this->_processFields($fields_list, $product);
 
         $variables = array();
