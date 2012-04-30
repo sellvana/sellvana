@@ -19,7 +19,7 @@ class FCom_ProductReviews_Admin extends BClass
     {
         BLayout::i()->layout(array(
             'base'=>array(
-                array('view', 'root', 'do'=>array(
+                array('view', 'admin/header', 'do'=>array(
                     array('addNav', 'catalog/prodreviews', array('label'=>'Product Reviews',
                         'href'=>BApp::href('prodreviews'))),
                 )),

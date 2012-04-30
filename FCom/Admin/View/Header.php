@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_View_Root extends FCom_Core_View_Root
+class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 {
     protected static $_allPermissions;
 
@@ -55,13 +55,13 @@ class FCom_Admin_View_Root extends FCom_Core_View_Root
 
     public function tag($tag, $params=array())
     {
-        $hmtl = '';
+        $html = '';
         foreach ($params as $k=>$v) {
             if (''!==$v && !is_null($v) && false!==$v) {
-                $hmtl .= ' '.$k.'="'.htmlspecialchars($v).'"';
+                $html .= ' '.$k.'="'.htmlspecialchars($v).'"';
             }
         }
-        return "<{$tag}{$hmtl}>";
+        return "<{$tag}{$html}>";
     }
 
     public function renderNodes($root=null, $path='')

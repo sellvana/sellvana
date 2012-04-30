@@ -10,7 +10,11 @@ class FCom_IndexTank_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        self::_initButtonsOnProductsPage();
+        BGanon::i()->ready('FCom_IndexTank_Admin::initIndexButtons', array('on_path'=>array(
+            '/catalog/products',
+            '/indextank/product_fields',
+            '/indextank/product_functions',
+        )));
 
         BFrontController::i()
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
@@ -233,7 +237,7 @@ class FCom_IndexTank_Admin extends BClass
         BLayout::i()
             ->layout(array(
                 'base'=>array(
-                    array('view', 'root', 'do'=>array(
+                    array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
 //                        array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
                         array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
@@ -242,19 +246,19 @@ class FCom_IndexTank_Admin extends BClass
        /*         '/indextank/dashboard'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/dashboard')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/dashboard'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/dashboard'))),
                 ),*/
                 '/indextank/product_fields'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/product_fields')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_fields'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_fields'))),
                 ),
                 '/indextank/product_fields/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('indextank/product_fields-form')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_fields'))),
-                    array('view', 'indextank/product_fields-form', 'set'=>array(
+                    array('hook', 'main', 'views'=>array('admin/form')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_fields'))),
+                    array('view', 'admin/form', 'set'=>array(
                         'tab_view_prefix' => 'indextank/product_fields-form/',
                     ), 'do'=>array(
                         array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10)),
@@ -264,14 +268,14 @@ class FCom_IndexTank_Admin extends BClass
                 '/indextank/product_functions'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/product_functions')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_functions'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_functions'))),
                 ),
                 '/indextank/product_functions/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('indextank/product_functions-form')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'indextank/product_functions'))),
-                    array('view', 'indextank/product_functions-form', 'set'=>array(
+                    array('hook', 'main', 'views'=>array('admin/form')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_functions'))),
+                    array('view', 'admin/form', 'set'=>array(
                         'tab_view_prefix' => 'indextank/product_functions-form/',
                     ), 'do'=>array(
                         array('addTab', 'main', array('label'=>'Product Functions', 'pos'=>10))
@@ -283,25 +287,21 @@ class FCom_IndexTank_Admin extends BClass
                     )))
 
             ));
-
-
     }
 
-    static protected function _initButtonsOnProductsPage()
+    public static function initIndexButtons($args)
     {
-        BGanon::i()->ready(function($args) {
-            $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
-                <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
+        $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
+            <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
-    function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
-        .done(function( msg ) { alert( msg ); }); }
-    function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href('indextank/products/index').'"})
-        .done(function( msg ) { alert( msg ); }); }
+function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
+    .done(function( msg ) { alert( msg ); }); }
+function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href('indextank/products/index').'"})
+    .done(function( msg ) { alert( msg ); }); }
 </script>
 ';
-            if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
-                $el->setInnerText($insert.$el->getInnerText());
-            }
-        }, array('on_path'=>'/catalog/products'));
+        if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
+            $el->setInnerText($insert.$el->getInnerText());
+        }
     }
 }

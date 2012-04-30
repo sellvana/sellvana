@@ -2,12 +2,11 @@
 
 class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'customers/manage';
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'customers';
-    protected $_gridLayoutName = '/customers';
-    protected $_formLayoutName = '/customers/form';
-    protected $_formViewName = 'customer/customers-form';
-    protected $_modelClassName = 'FCom_Customer_Model_Customer';
+    protected $_modelClass = 'FCom_Customer_Model_Customer';
+    protected $_gridTitle = 'Customers';
+    protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
 
     public function gridConfig()
@@ -34,5 +33,15 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $orm->left_outer_join('FCom_Customer_Model_Address', array('a.id','=','c.default_billing_id'), 'a')
             ->select(array('a.street1', 'a.city', 'a.region', 'a.postcode', 'a.country'))
         ;
+    }
+
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'sidebar_img' => BUtil::gravatar($m->email),
+            'title' => $m->id ? 'Edit Customer: '.$m->firstname.' '.$m->lastname : 'Create New Customer',
+        ));
     }
 }

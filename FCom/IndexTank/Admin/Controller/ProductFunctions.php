@@ -2,12 +2,9 @@
 
 class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Controller_Abstract_GridForm
 {
-    //protected $_permission = 'cms/pages';
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'indextank/product_functions';
-    protected $_gridLayoutName = '/indextank/product_functions';
-    protected $_formLayoutName = '/indextank/product_functions/form';
-    protected $_formViewName = 'indextank/product_functions-form';
-    protected $_modelClassName = 'FCom_IndexTank_Model_ProductFunctions';
+    protected $_modelClass = 'FCom_IndexTank_Model_ProductFunctions';
     protected $_mainTableAlias = 'pf';
 
     public function gridConfig()
@@ -35,8 +32,15 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             FCom_IndexTank_Index_Product::i()->update_function($post['number'], $post['definition']);
         }
 
-
         parent::action_form__POST();
     }
 
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'title' => $m->id ? 'Edit Product Function: '.$m->name: 'Create New Product Function',
+        ));
+    }
 }

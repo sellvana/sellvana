@@ -2,13 +2,11 @@
 
 class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'cms/pages';
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'cms/pages';
-    protected $_gridLayoutName = '/cms/pages';
-    protected $_formLayoutName = '/cms/pages/form';
-    protected $_formViewName = 'cms/pages-form';
-    protected $_modelClassName = 'FCom_Cms_Model_Page';
-    protected $_mainTableAlias = 'p';
+    protected $_modelClass = 'FCom_Cms_Model_Page';
+    protected $_gridTitle = 'CMS Pages';
+    protected $_recordName = 'CMS Page';
 
     public function gridConfig()
     {
@@ -20,8 +18,16 @@ class FCom_Cms_Admin_Controller_Pages extends FCom_Admin_Controller_Abstract_Gri
             'create_dt' => array('label'=>'Created', 'formatter'=>'date'),
             'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),
         );
-        $config['custom']['dblClickHref'] = BApp::href('cms/pages/form?id=');
         return $config;
+    }
+
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'title' => $m->id ? 'Edit CMS Page: '.$m->title : 'Create New CMS Page',
+        ));
     }
 
     public function action_history_grid_data()

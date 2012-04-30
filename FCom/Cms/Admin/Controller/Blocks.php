@@ -2,13 +2,11 @@
 
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'cms/blocks';
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'cms/blocks';
-    protected $_gridLayoutName = '/cms/blocks';
-    protected $_formLayoutName = '/cms/blocks/form';
-    protected $_formViewName = 'cms/blocks-form';
-    protected $_modelClassName = 'FCom_Cms_Model_Block';
-    protected $_mainTableAlias = 'b';
+    protected $_modelClass = 'FCom_Cms_Model_Block';
+    protected $_gridTitle = 'CMS Block';
+    protected $_recordName = 'CMS Block';
 
     public function gridConfig()
     {
@@ -23,6 +21,15 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),
         );
         return $config;
+    }
+
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'title' => $m->id ? 'Edit CMS Block: '.$m->handle : 'Create New CMS Block',
+        ));
     }
 
     public function action_history_grid_data()

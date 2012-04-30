@@ -2,12 +2,9 @@
 
 class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controller_Abstract_GridForm
 {
-    //protected $_permission = 'cms/pages';
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'indextank/product_fields';
-    protected $_gridLayoutName = '/indextank/product_fields';
-    protected $_formLayoutName = '/indextank/product_fields/form';
-    protected $_formViewName = 'indextank/product_fields-form';
-    protected $_modelClassName = 'FCom_IndexTank_Model_ProductFields';
+    protected $_modelClass = 'FCom_IndexTank_Model_ProductFields';
     protected $_mainTableAlias = 'pf';
 
     public function gridConfig()
@@ -31,5 +28,12 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         return $config;
     }
 
-
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'title' => $m->id ? 'Edit Product Field: '.$m->field_nice_name : 'Create New Product Field',
+        ));
+    }
 }

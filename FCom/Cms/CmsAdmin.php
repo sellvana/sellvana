@@ -36,7 +36,7 @@ class FCom_Cms_Admin extends BClass
     {
         BLayout::i()->layout(array(
             'base'=>array(
-                array('view', 'root', 'do'=>array(
+                array('view', 'admin/header', 'do'=>array(
                     array('addNav', 'cms', array('label'=>'CMS', 'pos'=>200)),
                     array('addNav', 'cms/nav', array('label'=>'Navigation', 'href'=>BApp::href('cms/nav'))),
                     array('addNav', 'cms/pages', array('label'=>'Pages', 'href'=>BApp::href('cms/pages'))),
@@ -48,7 +48,7 @@ class FCom_Cms_Admin extends BClass
                 array('layout', 'base'),
                 array('layout', 'form'),
                 array('hook', 'main', 'views'=>array('cms/nav')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/nav'))),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/nav'))),
             ),
             '/cms/nav/tree_form'=>array(
                 array('root', 'cms/nav-tree-form'),
@@ -64,15 +64,15 @@ class FCom_Cms_Admin extends BClass
             ),
             '/cms/pages'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('cms/pages')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/pages'))),
+                array('hook', 'main', 'views'=>array('admin/grid')),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/pages'))),
             ),
             '/cms/pages/form'=>array(
                 array('layout', 'base'),
                 array('layout', 'form'),
-                array('hook', 'main', 'views'=>array('cms/pages-form')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/pages'))),
-                array('view', 'cms/pages-form', 'set'=>array(
+                array('hook', 'main', 'views'=>array('admin/form')),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/pages'))),
+                array('view', 'admin/form', 'set'=>array(
                     'tab_view_prefix' => 'cms/pages-form/',
                 ), 'do'=>array(
                     array('addTab', 'main', array('label'=>'CMS Page', 'pos'=>10)),
@@ -81,15 +81,15 @@ class FCom_Cms_Admin extends BClass
             ),
             '/cms/blocks'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('cms/blocks')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/blocks'))),
+                array('hook', 'main', 'views'=>array('admin/grid')),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/blocks'))),
             ),
             '/cms/blocks/form'=>array(
                 array('layout', 'base'),
                 array('layout', 'form'),
-                array('hook', 'main', 'views'=>array('cms/blocks-form')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/blocks'))),
-                array('view', 'cms/blocks-form', 'set'=>array(
+                array('hook', 'main', 'views'=>array('admin/form')),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/blocks'))),
+                array('view', 'admin/form', 'set'=>array(
                     'tab_view_prefix' => 'cms/blocks-form/',
                 ), 'do'=>array(
                     array('addTab', 'main', array('label'=>'CMS Block', 'pos'=>10)),
@@ -99,12 +99,12 @@ class FCom_Cms_Admin extends BClass
             '/cms/forms'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('cms/forms')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/forms'))),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/forms'))),
             ),
             '/cms/forms/form'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('cms/forms-form')),
-                array('view', 'root', 'do'=>array(array('setNav', 'cms/forms'))),
+                array('view', 'admin/header', 'do'=>array(array('setNav', 'cms/forms'))),
             ),
             '/settings'=>array(
                 array('view', 'settings', 'do'=>array(
