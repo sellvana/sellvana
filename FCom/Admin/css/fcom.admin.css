@@ -391,10 +391,12 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-topbar .adm-logo {
 	float:left;
 	margin:4px 0 0 5px;
-	background:url(../img/logo_admin_st1.png) no-repeat;
-	width:145px;
 	height:21px;
-	text-indent:-999em;
+	padding:3px 10px;
+	font-size:14px;
+	font-weight:bold;
+	line-height:1em;
+	text-transform:uppercase;
 	}
 .adm-topbar .adm-group-title {
 	position:absolute;
@@ -498,7 +500,7 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 	}
 
 .adm-nav { float:left; position:relative; }
-.adm-nav .start { float:left; /*width:31px; */; width:165px; height:31px; /*background:#8a0700; */text-indent:-999em; }
+.adm-nav .start { float:left; /*width:31px; ; width:165px;*/ height:31px; /*background:#8a0700; text-indent:-999em;*/ }
 .adm-nav:hover .start { /*background:#fafafa; */background:#8a0700; }
 .adm-nav ul {
 	display:none;
