@@ -53,6 +53,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     protected $_result = null;
 
 
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return FCom_IndexTank_Index_Product
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
 
     /**
      * Load defined scoring functions
