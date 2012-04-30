@@ -22,6 +22,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                         'baseLinkUrl' => BApp::href($this->_gridHref.'/form/'), 'idName' => 'id',
                     ), 'width'=>50),
                 ),
+                'toppager' => true,
             ),
             'custom'=>array('personalize'=>true, 'autoresize'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),

@@ -1,7 +1,7 @@
 <?php debug_backtrace() || exit;
 
 define('FULLERON_ROOT_DIR', dirname(__DIR__));
-set_time_limit(2);
+//set_time_limit(2);
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -373,7 +373,7 @@ class FCom extends BClass
             ))
             // customer account and management
             ->addModule('FCom_Customer', array(
-                'version' => '0.1.0',
+                'version' => '0.1.1',
                 'root_dir' => 'Customer',
                 'depends' => array('FCom_Core'),
                 'description' => "Customer Accounts and Management",
