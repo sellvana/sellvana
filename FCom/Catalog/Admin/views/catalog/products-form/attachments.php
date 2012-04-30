@@ -44,13 +44,13 @@ head(function() {
         }
     });
 
-    attachmentsGrid = new FCom_Admin.MediaLibrary({
+    attachmentsGrid = new FCom.Admin.MediaLibrary({
         grid:'#all_attachments',
         url:'<?=BApp::href('media/grid')?>',
         folder:'media/product/attachment'
     });
 
-    new FCom_Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
+    new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
 })
 </script>
 <?php echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model)); ?>

@@ -5,7 +5,7 @@ $formUrl = BApp::href('cms/blocks/form/?id='.$m->id)
 ?>
 <script>
 head(function() {
-    window.adminForm = Admin.form({
+    window.adminForm = FCom.Admin.form({
         tabs:     '.adm-tabs li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',

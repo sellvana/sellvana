@@ -44,13 +44,13 @@ head(function() {
         }
     });
 
-    allImagesGrid = new FCom_Admin.MediaLibrary({
+    allImagesGrid = new FCom.Admin.MediaLibrary({
         grid:'#all_images',
         url:'<?=BApp::href('media/grid')?>',
         folder:'media/product/image',
     });;
 
-    new FCom_Admin.TargetGrid({source:'#all_images', target:'#product_images'});
+    new FCom.Admin.TargetGrid({source:'#all_images', target:'#product_images'});
 
 })
 </script>

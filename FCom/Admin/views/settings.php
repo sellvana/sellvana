@@ -31,9 +31,9 @@ console.log(ui.item[0].id);
 
     function initTabs() {
         $('.settings-container', this).accordion({header: '> div > h3'})
-            .sortable({axis: 'y', handle: 'h3', stop: onSortableStop});
+            .sortable({axis: 'y', handle: 'h3', stop: onSortableStop, distance:5});
     }
-    window.adminForm = Admin.form({
+    window.adminForm = FCom.Admin.form({
         form:     '#settings-form',
         tabs:     '.adm-tabs-sidebar li',
         panes:    '.adm-tabs-content',
@@ -43,7 +43,7 @@ console.log(ui.item[0].id);
     });
     $('#settings-form').validate();
     initTabs.apply($('#settings-form'));
-    $('.adm-tabs-left > ul').sortable({axis: 'y', stop: onSortableStop});
+    $('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
 });
 </script>
 <form id="settings-form" action="<?php echo $formUrl ?>" method="post">

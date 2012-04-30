@@ -6,7 +6,7 @@
 
 <script>
 head(function() {
-    window.adminForm = Admin.form({
+    window.adminForm = FCom.Admin.form({
         tabs:     '.adm-tabs-sidebar li',
         panes:    '.adm-tabs-content',
         url_get:  '<?php echo $formUrl ?>',

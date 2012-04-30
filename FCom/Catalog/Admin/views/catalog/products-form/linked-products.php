@@ -96,7 +96,7 @@ head(function() {
     });
 
     $('#linked-products-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
-        new FCom_Admin.TargetGrid({source:'#products', target:el});
+        new FCom.Admin.TargetGrid({source:'#products', target:el});
     });
 })
 </script>

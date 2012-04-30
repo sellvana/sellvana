@@ -21,14 +21,14 @@
 </div>
 <script>
 head(function() {
-    Admin.checkboxButton('#categories-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
-    Admin.checkboxButton('#categories-expand-collapse', {
+    FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
+    FCom.Admin.checkboxButton('#categories-expand-collapse', {
         off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
         click:function(ev) { $('#categories').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }
         //TODO: fetch ancestors only for root node
     });
 
-    Admin.tree('#categories', {
+    FCom.Admin.tree('#categories', {
         url:'<?=BApp::href('catalog/categories/tree_data')?>'
         , on_dblclick: function (n) { loadForm(n.attr('id')); }
         , on_select: function (n) { loadForm(n.attr('id')); }
@@ -54,7 +54,7 @@ head(function() {
         var url = '<?php echo $formUrl ?>?id='+id;
         $('#categories-form-container').load(url, function() {
             $('#categories-tree-form').attr('action', url);
-            window.adminForm = Admin.form({
+            window.adminForm = FCom.Admin.form({
                 tabs:     '.adm-tabs li',
                 panes:    '.adm-tabs-content',
                 url_get:  url,

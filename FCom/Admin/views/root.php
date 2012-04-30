@@ -13,9 +13,9 @@ window.appConfig = {
     </script>
 </head>
 <body class="<?php echo $this->bodyClass ?>">
-<div style="position:fixed; top:10px; left:50%; background:#fff1b7; border:1px solid #ebc27b; border-bottom-color:#deb060; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; z-index:99999; padding:5px 15px; line-height:1.3em; box-shadow:0 2px 3px #ddd;">
-	Something happened here!
-</div>
+    <div id="top-message" style="position:fixed; top:10px; left:50%; background:#fff1b7; border:1px solid #ebc27b; border-bottom-color:#deb060; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; z-index:99999; padding:5px 15px; line-height:1.3em; box-shadow:0 2px 3px #ddd; display:none">
+	    Something happened here!
+    </div>
 <?php if ($loggedIn): ?>
     <div id="root-layout" class="ui-layout-center adm-wrapper">
         <div class="ui-layout-north">
