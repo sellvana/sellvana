@@ -2,7 +2,7 @@
 
 class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_indextank_product_functions';
+    protected static $_table = 'fcom_indextank_product_function';
 
     public function get_list()
     {
