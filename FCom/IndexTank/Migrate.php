@@ -52,7 +52,12 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
         );
         //insert predefined functions
+        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
         foreach($functions as $func_name => $func){
+            //add new function only if function not exists yet
+            if(!empty($functions_list[$func['number']])){
+                continue;
+            }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
             //add functions to index
             FCom_IndexTank_Index_Product::i()->update_function($func['number'], $func['definition']);
