@@ -10,4 +10,14 @@ class FCom_IndexTank_Model_IndexHelper extends FCom_Core_Model_Abstract
         $products = FCom_Catalog_Model_Product::i()->orm()->where_gt("update_dt", $helper->checkpoint)->find_many();
         return $products;
     }
+
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return FCom_IndexTank_Model_IndexHelper
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
 }
