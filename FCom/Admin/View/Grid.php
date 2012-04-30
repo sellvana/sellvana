@@ -50,7 +50,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                 'caption' => '',
                 'title' => 'Customize Columns',
                 'buttonicon' => 'ui-icon-calculator',
-                'onClickButton' => "function() { \$('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
+                'onClickButton' => "function() { $('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
             );
         }
         if (!empty($cfg['custom']['personalize'])) {
@@ -69,8 +69,8 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
 
             $url = BApp::href('/my_account/personalize');
             $cfg['grid']['resizeStop'] = "function(newwidth, index) {
-                var cols = \$('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
-                \$.post('{$url}', {'do':'grid.col.width', grid:'{$gridId}',
+                var cols = $('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
+                $.post('{$url}', {'do':'grid.col.width', grid:'{$gridId}',
                     col:cols[index].name, width:newwidth
                 });
             }";
@@ -84,7 +84,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                             console.log(perm, this.jqGrid('getGridParam', 'colModel'));
                             if (perm) {
                                 this.jqGrid('remapColumns', perm, true);
-                                \$.post('{$url}', {'do':'grid.col.order', grid:'{$gridId}',
+                                $.post('{$url}', {'do':'grid.col.order', grid:'{$gridId}',
                                     cols:JSON.stringify(this.jqGrid('getGridParam', 'colModel'))
                                 });
                             }
@@ -130,8 +130,8 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
             $subGridView = static::i()->factory($cfg['grid']['id'].'_subgrid', array())->set('config', $cfg['subGrid']);
             $cfg['grid']['subGridRowExpanded'] = "function(subgrid_id, row_id) {
 var subgrid_table_id = subgrid_id+'_t', pager_id = 'p_'+subgrid_table_id;
-\$('#'+subgrid_id).html('<table id=\"'+subgrid_table_id+'\" class=\"scroll\"></table><div id=\"'+pager_id+'\" class=\"scroll\"></div>');
-var subgrid = \$('#'+subgrid_table_id);
+$('#'+subgrid_id).html('<table id=\"'+subgrid_table_id+'\" class=\"scroll\"></table><div id=\"'+pager_id+'\" class=\"scroll\"></div>');
+var subgrid = $('#'+subgrid_table_id);
 {$jsBefore}
 {$subGridView->render()}
 {$jsAfter}
@@ -154,7 +154,7 @@ var subgrid = \$('#'+subgrid_table_id);
                 $col['position'] = ++$pos;
             }
             if (!empty($col['autocomplete'])) {
-                $cfg['js'][] = "\$('#gbox_{$cfg['grid']['id']} #gs_{$col['name']}').fcom_autocomplete({
+                $cfg['js'][] = "$('#gbox_{$cfg['grid']['id']} #gs_{$col['name']}').fcom_autocomplete({
                     url:'{$col['autocomplete']}'
                 });";
             }
@@ -179,14 +179,16 @@ var subgrid = \$('#'+subgrid_table_id);
         if (!empty($cfg['custom']['dblClickHref'])) {
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { location.href = '{$cfg['custom']['dblClickHref']}'+rowid; }";
         } elseif (!empty($cfg['navGrid']['edit'])) {
-            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { \$(this).jqGrid('editGridRow', rowid); }";
+            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { $(this).jqGrid('editGridRow', rowid); }";
         }
         if (!empty($cfg['custom']['autoresize'])) {
-            $cfg[] = "
+            $cfg[] = "$('html').css({overflow:'hidden'});
 $(window).resize(function() {
     var top = $('#{$cfg['grid']['id']}').offset().top, pager = $('#pager-{$cfg['grid']['id']}').height();
-    $('#{$cfg['grid']['id']}').jqGrid('setGridWidth', $(this).width()).jqGrid('setGridHeight', $(window).height()-top-pager);
-}); $('html').css({overflow:'hidden'}); $(window).trigger('resize');";
+    $('#{$cfg['grid']['id']}').jqGrid('setGridWidth', $(this).width()).jqGrid('setGridHeight', $(this).height()-top-pager);
+});
+$(window).trigger('resize');
+";
         }
         unset($cfg['custom']);
 /*

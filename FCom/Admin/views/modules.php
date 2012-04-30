@@ -43,7 +43,7 @@ function fmtRunLevel(area) {
             html.push([
                 '<option value="', escape(a[0]), '"',
                 ' style="background:', runLevelColors[a[1]], '"',
-                (val==a[0] ? ' selected' : ''),
+                (val==a[0] ? ' selected="selected"' : ''),
                 '>', escape(a[1]), '<'+'/option>'
             ].join(''));
         }
@@ -65,7 +65,6 @@ function fmtRunStatus(val,opt,row) {
 }
 
 function fmtSchemaVersion(val,opt,row) {
-    console.log(val,row);
     if (row.migration_available && val!=row.version) {
         return '<div style="padding:3px; color:000; background:#FCC">'+(val?val:'&nbsp;')+'<'+'/div>';
     } else {

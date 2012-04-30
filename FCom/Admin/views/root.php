@@ -3,7 +3,7 @@
     $loggedIn = FCom_Admin_Model_User::i()->isLoggedIn();
 ?>
 <!DOCTYPE html>
-<html ng-app <?php echo $this->getHtmlAttributes() ?>>
+<html <?php echo $this->getHtmlAttributes() ?>>
 <head>
     <?php echo $this->hook('head') ?>
     <script>
