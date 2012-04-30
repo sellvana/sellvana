@@ -16,6 +16,7 @@ class FCom_Catalog_Admin extends BClass
 
             ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
             ->route('GET|POST /catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
+
         ;
 
         BLayout::i()
@@ -77,7 +78,7 @@ class FCom_Catalog_Admin extends BClass
         BLayout::i()
             ->layout(array(
                 'base'=>array(
-                    array('view', 'root', 'do'=>array(
+                    array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'catalog', array('label'=>'Catalog', 'pos'=>100)),
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
@@ -87,7 +88,7 @@ class FCom_Catalog_Admin extends BClass
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
-                    array('view', 'catalog/products-form',
+                    array('view', 'admin/form',
                         'set'=>array(
                             'tab_view_prefix' => 'catalog/products-form/',
                         ),
@@ -103,13 +104,13 @@ class FCom_Catalog_Admin extends BClass
                 ),
                 '/catalog/products'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/products')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
+                    array('hook', 'main', 'views'=>array('admin/grid')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/products'))),
                 ),
                 '/catalog/products/form'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/products-form')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/products'))),
+                    array('hook', 'main', 'views'=>array('admin/form')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/products'))),
                     array('layout', 'form'),
                     array('layout', 'catalog_product_form_tabs'),
                 ),
@@ -117,7 +118,7 @@ class FCom_Catalog_Admin extends BClass
                     array('layout', 'base'),
                     array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('catalog/categories')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/categories'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/categories'))),
                 ),
                 '/catalog/categories/tree_form'=>array(
                     array('root', 'catalog/categories-tree-form'),
@@ -133,11 +134,13 @@ class FCom_Catalog_Admin extends BClass
                         ),
                     ),
                 ),
+
                 '/catalog/families'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/families')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'catalog/families'))),
+                    array('hook', 'main', 'views'=>array('admin/grid')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/families'))),
                 ),
+
                 '/settings'=>array(
                     array('view', 'settings', 'do'=>array(
                         array('addTab', 'FCom_Catalog', array('label'=>'Catalog', 'async'=>true)),

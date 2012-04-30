@@ -1,15 +1,18 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
+class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'catalog/products';
+    protected static $_origClass = __CLASS__;
+    protected $_modelClass = 'FCom_Catalog_Model_Product';
+    protected $_gridHref = 'catalog/products';
+    protected $_gridTitle = 'Products';
+    protected $_recordName = 'Product';
 
     public function gridColumns()
     {
         $columns = array(
             'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
-            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true,
-                'formatter'=>'showlink', 'formatoptions'=>array('baseLinkUrl'=>BApp::href('catalog/products/form/'))),
+            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true),
             'manuf_sku'=>array('label'=>'Mfr Part #', 'index'=>'p.manuf_sku', 'width'=>100),
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
@@ -20,29 +23,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function gridConfig()
     {
-        $baseUrl = BApp::href('catalog/products/form/');
-        $config = array(
-            'grid' => array(
-                'id'            => 'products',
-                'url'           => BApp::href('catalog/products/grid_data'),
-                'columns'       => $this->gridColumns(),
-                'sortname'      => 'p.id',
-                'sortorder'     => 'asc',
-                'multiselect'   => true,
-                'multiselectWidth' => 30,
-                //'afterInsertRow' => 'function(id,data,el) { console.log(id,data,el); }',
-                'ondblClickRow' => "function(rowid) {
-                    location.href = '{$baseUrl}'+rowid;
-                }",
-            ),
-            'custom'=>array('personalize'=>true, 'autoresize'=>true),
-            'navGrid' => array(),
-            //'searchGrid' => array('multipleSearch'=>true),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
-            //'setFrozenColumns'=>array(),
-        );
-        BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::gridConfig', array('config'=>&$config));
+        $config = parent::gridConfig();
+        $config['grid']['id'] = 'products';
+        $config['grid']['columns'] = $this->gridColumns();
         return $config;
+    }
+
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $m = $args['model'];
+        $args['view']->set(array(
+            'sidebar_img' => $m->thumbUrl(98),
+            'title' => $m->id ? 'Edit Product: '.$m->product_name : 'Create New Product',
+        ));
     }
 
     public function productLibraryGridConfig($gridId='products')
@@ -133,74 +127,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
-    public function action_index()
+    public function formPostAfter($args)
     {
-        $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire(__METHOD__, array('grid'=>$grid));
-        $this->layout('/catalog/products');
-    }
-
-    public function action_grid_data()
-    {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
-        BResponse::i()->json($data);
-    }
-
-    public function action_form()
-    {
-        $id = BRequest::i()->params('id', true);
-        if ($id) {
-            $product = FCom_Catalog_Model_Product::i()->load($id);
-            if (empty($product)) {
-                BSession::i()->addMessage('Invalid product ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::m('FCom_Catalog')->baseHref().'/catalog/products');
-            }
-        } else {
-            $product = FCom_Catalog_Model_Product::i()->create();
-        }
-        $this->layout('/catalog/products/form');
-        $view = BLayout::i()->view('catalog/products-form');
-
-        $this->processFormTabs($view, $product, $product->id ? 'view' : 'create');
-    }
-
-    public function action_form__POST()
-    {
-        $r = BRequest::i();
-        $id = $r->params('id');
-        $data = $r->post();
-
-        try {
-            if ($id) {
-                $model = FCom_Catalog_Model_Product::i()->load($id);
-            } else {
-                $model = FCom_Catalog_Model_Product::i()->create();
-            }
-            if (!empty($data['model'])) {
-                $model->set($data['model']);
-            }
-            BPubSub::i()->fire(__METHOD__, array('id'=>$id, 'data'=>$data, 'model'=>$model));
-            $model->save();
-            if (!$id) {
-                $id = $model->id;
-            }
-            $this->processLinkedProductsPost($model, $data);
-            $this->processMediaPost($model, $data);
-            $this->processFamilyProductsPost($model, $data);
-        } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
-        }
-
-        if ($r->xhr()) {
-            $this->forward('form_tab', null, array('id'=>$id));
-        } else {
-            $url = BApp::href('catalog/products/form/?id='.$id);
-            if ($r->post('tab')) {
-                $url .= '?tab='.urlencode($r->post('tab'));
-            }
-            BResponse::i()->redirect($url);
-        }
+        parent::formPostAfter($args);
+        extract($args);
+        $this->processLinkedProductsPost($model, $data);
+        $this->processMediaPost($model, $data);
+        $this->processFamilyProductsPost($model, $data);
     }
 
     public function processLinkedProductsPost($model, $data)

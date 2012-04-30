@@ -39,7 +39,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Admin}/js/fcom.admin.js'),
                         array('css', '{FCom_Admin}/css/fcom.admin.css'),
                     )),
-                    array('view', 'root', 'do'=>array(
+                    array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
                         array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
                         array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
@@ -112,7 +112,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 '/'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('home')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'home'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'home'))),
                 ),
                 '/denied'=>array(
                     array('layout', 'base'),
@@ -135,15 +135,15 @@ class FCom_Admin_DefaultTheme extends BClass
 
                 '/users'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('users')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/users'))),
+                    array('hook', 'main', 'views'=>array('admin/grid')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/users'))),
                 ),
                 '/users/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/users'))),
-                    array('hook', 'main', 'views'=>array('users-form')),
-                    array('view', 'users-form', 'set'=>array('tab_view_prefix'=>'users-form/'), 'do'=>array(
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/users'))),
+                    array('hook', 'main', 'views'=>array('admin/form')),
+                    array('view', 'admin/form', 'set'=>array('tab_view_prefix'=>'users-form/'), 'do'=>array(
                         array('addTab', 'main', array('label'=>'General Info')),
                         array('addTab', 'history', array('label'=>'History')),
                     )),
@@ -151,15 +151,15 @@ class FCom_Admin_DefaultTheme extends BClass
 
                 '/roles'=>array(
                     array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('roles')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/roles'))),
+                    array('hook', 'main', 'views'=>array('admin/grid')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/roles'))),
                 ),
                 '/roles/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/roles'))),
-                    array('hook', 'main', 'views'=>array('roles-form')),
-                    array('view', 'roles-form', 'set'=>array('tab_view_prefix'=>'roles-form/'), 'do'=>array(
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/roles'))),
+                    array('hook', 'main', 'views'=>array('admin/form')),
+                    array('view', 'admin/form', 'set'=>array('tab_view_prefix'=>'roles-form/'), 'do'=>array(
                         array('addTab', 'main', array('label'=>'Permissions')),
                         array('addTab', 'users', array('label'=>'Users')),
                     )),
@@ -169,7 +169,7 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('settings')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/settings'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/settings'))),
                     array('view', 'settings', 'set'=>array('tab_view_prefix'=>'settings/'), 'do'=>array(
                         array('addTab', 'FCom_Core', array('label'=>'Fulleron Core', 'async'=>true)),
                         array('addTab', 'FCom_Admin', array('label'=>'Fulleron Admin', 'async'=>true)),
@@ -180,7 +180,7 @@ class FCom_Admin_DefaultTheme extends BClass
                 '/modules'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('modules')),
-                    array('view', 'root', 'do'=>array(array('setNav', 'admin/modules'))),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'admin/modules'))),
                 ),
             ));
         ;

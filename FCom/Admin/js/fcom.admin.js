@@ -88,7 +88,8 @@ console.log(sel);
             grid.jqGrid('setRowData', sel[i], {status:'...'});
             postData["delete[]"].push(grid.jqGrid('getRowData', sel[i]).file_name);
         }
-        $.post(options.url+'/delete?grid='+grid.attr('id')+'&folder='+encodeURIComponent(options.folder), postData, function(data, status, xhr) {
+        var url = options.url+'/delete?grid='+grid.attr('id')+'&folder='+encodeURIComponent(options.folder);
+        $.post(url, postData, function(data, status, xhr) {
             for (i=sel.length-1; i>=0; i--) {
                 grid.jqGrid('delRowData', sel[i]);
             }
@@ -679,8 +680,8 @@ console.log(url_get, url_post);
             var tabId = a.attr('href').replace(/^#tab-/,'');
             pane.closest('form').find('#tab').val(tabId);
             if (!pane.data('loaded')) {
-
-                $.getJSON(options.url_get+'?tabs='+tabId, function(data, status, req) {
+                var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
+                $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
                     loadTabs(data);
                 });
             }

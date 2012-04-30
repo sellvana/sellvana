@@ -7,7 +7,8 @@ class FCom_Catalog_Frontend extends BClass
         BFrontController::i()
             ->route( 'GET /*category', 'FCom_Catalog_Frontend_Controller.category')
             ->route( 'GET /*manuf', 'FCom_Catalog_Frontend_Controller.manuf')
-            ->route( 'GET /*product', 'FCom_Catalog_Frontend_Controller.product')
+            ->route( 'GET /:product', 'FCom_Catalog_Frontend_Controller.product')
+            ->route( 'GET /*category/:product', 'FCom_Catalog_Frontend_Controller.product')
             ->route( 'GET /catalog/search', 'FCom_Catalog_Frontend_Controller.search')
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
         ;

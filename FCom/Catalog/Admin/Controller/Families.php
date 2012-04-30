@@ -1,35 +1,20 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstract
+class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'catalog/families';
+    protected static $_origClass = __CLASS__;
+    protected $_modelClass = 'FCom_Catalog_Model_Family';
+    protected $_gridHref = 'catalog/families';
+    protected $_gridTitle = 'Product Families';
+    protected $_recordName = 'Family';
 
-    public function action_index()
+    public function gridConfig()
     {
-        $grid = BLayout::i()->view('jqgrid')->set('config', array(
-            'grid' => array(
-                'id' => 'product_families',
-                'url' => BApp::href('catalog/families/grid_data'),
-                'columns' => array(
-                    'id' => array('label'=>'ID', 'width'=>50),
-                    'family_name' => array('label'=>'Family Name', 'width'=>250),
-                ),
-            ),
-        ));
-        BPubSub::i()->fire(__METHOD__, array('grid'=>$grid));
-        $this->layout('/catalog/families');
-    }
-
-    public function action_grid_data()
-    {
-        $orm = FCom_Catalog_Model_Family::i()->orm()->table_alias('f')->select('f.*');
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
-        BResponse::i()->json($data);
-    }
-
-    public function action_form()
-    {
-        $this->layout('/catalog/families/form');
+        $config = parent::gridConfig();
+        $config['grid']['columns'] += array(
+            'family_name' => array('label'=>'Family Name', 'width'=>250),
+        );
+        return $config;
     }
 
     public function action_form_post()
