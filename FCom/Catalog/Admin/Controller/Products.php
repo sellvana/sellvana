@@ -17,7 +17,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
         );
-        BPubSub::i()->fire('FCom_Catalog_Admin_Controller_Products::gridColumns', array('columns'=>&$columns));
+        BPubSub::i()->fire(__METHOD__, array('columns'=>&$columns));
         return $columns;
     }
 
