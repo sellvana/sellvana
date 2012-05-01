@@ -42,10 +42,29 @@ class FCom_IndexTank_Admin extends BClass
                     //for custom fields
                     ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
                     ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                    //for API init
+                    ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
             ;
     }
 
+    static public function onSaveAdminSettings($post)
+    {
+        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])){
+            return false;
+        }
+        $api_url = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
 
+        BConfig::i()->set('modules/FCom_IndexTank/api_url', $api_url);
+
+        //create product index
+        FCom_IndexTank_Index_Product::i()->install();
+
+        //insert predefined functions
+        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        foreach($functions_list as $func){
+            FCom_IndexTank_Index_Product::i()->update_function($func->number, $func->definition);
+        }
+    }
 
     /**
      * Delete all indexed products
@@ -291,6 +310,11 @@ class FCom_IndexTank_Admin extends BClass
 
     public static function initIndexButtons($args)
     {
+        try {
+            FCom_IndexTank_Index_Product::i()->status();
+        } catch (Exception $e){
+            return false;
+        }
         $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">

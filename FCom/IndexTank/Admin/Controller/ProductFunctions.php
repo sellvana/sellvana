@@ -9,8 +9,12 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
     public function gridConfig()
     {
-        $status = FCom_IndexTank_Index_Product::i()->status();
-        BLayout::i()->view('indextank/product_functions')->set('status', $status);
+        try {
+            $status = FCom_IndexTank_Index_Product::i()->status();
+            BLayout::i()->view('indextank/product_functions')->set('status', $status);
+        } catch (Exception $e){
+            BLayout::i()->view('indextank/product_functions')->set('status', false);
+        }
 
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
