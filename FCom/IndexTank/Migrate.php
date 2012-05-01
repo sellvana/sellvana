@@ -11,15 +11,12 @@ class FCom_IndexTank_Migrate extends BClass
     {
         return false; //TODO skip if no configuration
 
-        //create product index
-        FCom_IndexTank_Index_Product::i()->install();
-
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
             CREATE TABLE {$pIndexHelperTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `index` VARCHAR( 255 ) NOT NULL ,
-            `checkpoint` TIMESTAMP 
+            `checkpoint` TIMESTAMP
             ) ENGINE = InnoDB;
          ");
         BDb::run("insert into {$pIndexHelperTable}(`index`, checkpoint) values('products', null");
@@ -45,6 +42,10 @@ class FCom_IndexTank_Migrate extends BClass
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
+        //add initial data
+        $this->installProductSchema();
+
+        //create table
         $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$pFunctionsTable} (
@@ -61,20 +62,15 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
         );
-        //insert predefined functions
         $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        //add initial functions
         foreach($functions as $func_name => $func){
             //add new function only if function not exists yet
             if(!empty($functions_list[$func['number']])){
                 continue;
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
-            //add functions to index
-            FCom_IndexTank_Index_Product::i()->update_function($func['number'], $func['definition']);
         }
-
-        //setup basic index schema
-        $this->installProductSchema();
     }
 
     public function installProductSchema()

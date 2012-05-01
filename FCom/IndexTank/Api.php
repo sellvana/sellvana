@@ -10,7 +10,7 @@ class FCom_IndexTank_Api extends BClass
     *
     * @var Indextank_API
     */
-    protected $_indextank;
+    protected $_indextank = null;
 
     /**
      * Load IndexTank library
