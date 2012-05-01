@@ -35,7 +35,7 @@ class FCom_CustomField_Admin extends BClass
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
-                    array('view', 'catalog/products-form',
+                    array('view', 'admin/form',
                         'do'=>array(
                             array('addTab', 'fields', array('label' => 'Custom Fields', 'pos'=>'15', 'view'=>'customfields/products/fields-tab')),
                         ),
