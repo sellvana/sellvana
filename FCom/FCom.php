@@ -235,10 +235,6 @@ class FCom extends BClass
     public function run($area)
     {
         $this->init($area);
-        if('Tests' == $area){
-            BModuleRegistry::i()->bootstrap();
-            return;
-        }
         try {
             BApp::i()->run();
         } catch (Exception $e) {
