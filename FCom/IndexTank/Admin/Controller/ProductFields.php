@@ -36,4 +36,5 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             'title' => $m->id ? 'Edit Product Field: '.$m->field_nice_name : 'Create New Product Field',
         ));
     }
+
 }

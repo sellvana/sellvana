@@ -20,7 +20,7 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
             ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
 
-             ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
+            ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
         //    ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
