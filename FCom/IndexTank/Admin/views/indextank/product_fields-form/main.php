@@ -51,28 +51,6 @@
         </li>
         <?php endif; ?>
 
-        <?php if ($m->facets || !$m->id()):?>
-        <li>
-            <h3>Display settings</h3>
-            <hr/>
-        </li>
-        <li>
-            <h4 class="label">Display as</h4>
-            <select name="model[show]">
-                <option <?=('checkbox' == $m->show)?'selected':''?> value="checkbox">Checkbox</option>
-                <option <?=('link' == $m->show || '' == $m->show)?'selected':''?> value="link">Link</option>
-            </select>
-        </li>
-
-        <li>
-            <h4 class="label">Filter type</h4>
-            <select name="model[filter]">
-                <option <?=('exclusive' == $m->filter)?'selected':''?> value="exclusive">Exclusive</option>
-                <option <?=('inclusive' == $m->filter || '' == $m->filter)?'selected':''?> value="inclusive">Inclusive</option>
-            </select>
-        </li>
-        <?php endif; ?>
-
         <li>
             <h3>Additional fields (advanced)</h3>
             <hr/>
