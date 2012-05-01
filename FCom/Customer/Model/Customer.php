@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
     public function defaultBilling()
     {
         if ($this->default_billing_id && !$this->default_billing) {
-            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing);
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
         }
         return $this->default_billing;
     }
