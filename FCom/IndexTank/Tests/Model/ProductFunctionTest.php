@@ -1,5 +1,5 @@
 <?php
-class FCom_IndexTank_Model_Tests_ProductFunctionTest extends PHPUnit_Framework_TestCase
+class FCom_IndexTank_Tests_Model_ProductFunctionTest extends PHPUnit_Framework_TestCase
 {
     public function testListArray()
     {
