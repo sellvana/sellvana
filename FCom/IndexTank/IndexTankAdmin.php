@@ -20,7 +20,7 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
             ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
 
-             ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
+            ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
         //    ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
@@ -42,10 +42,29 @@ class FCom_IndexTank_Admin extends BClass
                     //for custom fields
                     ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
                     ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                    //for API init
+                    ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
             ;
     }
 
+    static public function onSaveAdminSettings($post)
+    {
+        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])){
+            return false;
+        }
+        $api_url = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
 
+        BConfig::i()->set('modules/FCom_IndexTank/api_url', $api_url);
+
+        //create product index
+        FCom_IndexTank_Index_Product::i()->install();
+
+        //insert predefined functions
+        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        foreach($functions_list as $func){
+            FCom_IndexTank_Index_Product::i()->update_function($func->number, $func->definition);
+        }
+    }
 
     /**
      * Delete all indexed products
@@ -154,9 +173,9 @@ class FCom_IndexTank_Admin extends BClass
 
         //add custom field to the IndexTank product field table if not exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', $field_name)->find_one();
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
         if (!$doc){
-            $doc = FCom_IndexTank_Model_ProductFields::orm()->create();
+            $doc = FCom_IndexTank_Model_ProductField::orm()->create();
             $matches = array();
             preg_match("#(\w+)#", $cf_model->table_field_type, $matches);
             $type = $matches[1];
@@ -196,7 +215,7 @@ class FCom_IndexTank_Admin extends BClass
             return;
         }
 
-        $f = FCom_IndexTank_Model_ProductFields::i()->orm()
+        $f = FCom_IndexTank_Model_ProductField::i()->orm()
                     ->where('field_name', FCom_IndexTank_Index_Product::i()->get_custom_field_key($orig_model))
                     ->where('type', 'category')
                     ->find_one();
@@ -221,7 +240,7 @@ class FCom_IndexTank_Admin extends BClass
 
         //delete custom field from the IndexTank product field table if exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
-        $doc = FCom_IndexTank_Model_ProductFields::orm()->where('field_name', $field_name)->find_one();
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
         if ($doc){
             $doc->delete();
         }
@@ -291,6 +310,11 @@ class FCom_IndexTank_Admin extends BClass
 
     public static function initIndexButtons($args)
     {
+        try {
+            FCom_IndexTank_Index_Product::i()->status();
+        } catch (Exception $e){
+            return false;
+        }
         $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">

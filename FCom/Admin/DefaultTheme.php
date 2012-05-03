@@ -26,6 +26,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
                         array('js', '{FCom_Core}/js/lib/angular.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.ba-hashchange.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.hotkeys.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.layout-latest.js'),

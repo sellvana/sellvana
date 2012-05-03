@@ -4,13 +4,18 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'indextank/product_fields';
-    protected $_modelClass = 'FCom_IndexTank_Model_ProductFields';
+    protected $_modelClass = 'FCom_IndexTank_Model_ProductField';
     protected $_mainTableAlias = 'pf';
 
     public function gridConfig()
     {
-        $status = FCom_IndexTank_Index_Product::i()->status();
-        BLayout::i()->view('indextank/product_fields')->set('status', $status);
+        try {
+            $status = FCom_IndexTank_Index_Product::i()->status();
+            BLayout::i()->view('indextank/product_fields')->set('status', $status);
+        } catch (Exception $e){
+            BLayout::i()->view('indextank/product_fields')->set('status', false);
+        }
+
 
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
@@ -36,4 +41,5 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             'title' => $m->id ? 'Edit Product Field: '.$m->field_nice_name : 'Create New Product Field',
         ));
     }
+
 }
