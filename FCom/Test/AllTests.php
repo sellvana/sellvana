@@ -15,26 +15,13 @@ class FCom_Test_AllTests {
     {
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
-        $path = realpath(dirname(__FILE__) . '/..') . '/*/Tests/*AllTests.php';
+        $modules = BModuleRegistry::i()->debug();
 
-        $moduleSuitePaths = glob($path);
-        //print_r($moduleSuitePaths);exit;
-        foreach ($moduleSuitePaths as $suitePath) {
-            require_once $suitePath;
-            // Separate out the component parts of the AllTests code file.
-            $class_name = self::get_class_from_path($suitePath);
-            $suite->addTest(call_user_func(array($class_name, 'suite')));
+        foreach ($modules as $module) {
+            if(!empty($module->tests) && class_exists($module->tests)){
+                $suite->addTest(call_user_func(array($module->tests, 'suite')));
+            }
         }
         return $suite;
     }
-
-  public static function get_class_from_path($filename)
-  {
-      $path = realpath(dirname(__FILE__) . '/..');
-
-      $newpath = substr($filename, strlen($path));
-      $class_name = 'FCom'.str_replace("/", "_", $newpath);
-      $class_name = str_replace(".php", "", $class_name);
-      return $class_name;
-  }
 }

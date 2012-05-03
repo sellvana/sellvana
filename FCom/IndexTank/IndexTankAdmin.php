@@ -45,7 +45,7 @@ class FCom_IndexTank_Admin extends BClass
                     //for API init
                     ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
             ;
-            FCom_IndexTank_Admin_Controller::bootstrap();
+        FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
@@ -332,6 +332,7 @@ class FCom_IndexTank_Admin extends BClass
         } catch (Exception $e){
             return false;
         }
+        
         $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
@@ -344,5 +345,6 @@ function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href
         if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
             $el->setInnerText($insert.$el->getInnerText());
         }
+
     }
 }
