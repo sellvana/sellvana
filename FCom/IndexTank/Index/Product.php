@@ -285,6 +285,33 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    public function updateTextField($products, $field, $field_value)
+    {
+        if (!is_array($products))
+        {
+            $products = array($products);
+        }
+
+        $limit_docs_per_query = 500;
+        $counter = 0;
+        $documents = array();
+        foreach($products as $i => $product){
+            $fields[$field] = $field_value;
+            $documents[$i]['docid'] = $product->id();
+            $documents[$i]['fields'] = $fields;
+
+            //submit every N products to IndexDen - this protect from network overloading
+            if ( 0 == $counter++ % $limit_docs_per_query ){
+                $this->model()->add_documents($documents);
+                $documents = array();
+            }
+        }
+
+        if ($documents){
+            $this->model()->add_documents($documents);
+        }
+    }
+
     public function update_categories($product)
     {
         $categories = $this->_prepareCategories($product);
@@ -415,7 +442,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     break;
                 case 'function':
                     //call function
-                    $values_list = $this->_field_{$field->source_value}($product, $type);
+                    $values_list = $this->{"_field_".$field->source_value}($product, $type);
                     //process results
                     if($values_list){
                         if(is_array($values_list)){
