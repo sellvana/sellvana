@@ -85,7 +85,7 @@ class Indextank_Api
             $args = json_encode($params);
 
         }
-
+        
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_CUSTOMREQUEST, $method); // Tell curl to use HTTP method of choice
         curl_setopt($session, CURLOPT_POSTFIELDS, $args); // Tell curl that this is the body of the POST

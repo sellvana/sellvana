@@ -45,6 +45,7 @@ class FCom_IndexTank_Admin extends BClass
                     //for API init
                     ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
             ;
+            FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
@@ -109,6 +110,22 @@ class FCom_IndexTank_Admin extends BClass
         };
 
         echo $counter . ' products indexed';
+    }
+    static public function productIndexDropField($field)
+    {
+        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
+        $limit = 1000;
+        $offset = 0;
+        $counter = 0;
+        $products = $orm->offset($offset)->limit($limit)->find_many();
+        while($products) {
+            $counter += count($products);
+            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field, '');
+
+            $offset += $limit;
+            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
+            $products = $orm->offset($offset)->limit($limit)->find_many();
+        };
     }
 
     /**

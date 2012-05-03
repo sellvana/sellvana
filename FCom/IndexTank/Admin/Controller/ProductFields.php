@@ -42,4 +42,22 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         ));
     }
 
+    public function action_form__POST()
+    {
+        $r = BRequest::i();
+        $class = $this->_modelClass;
+        $id = $r->params('id', true);
+        $model = $id ? $class::i()->load($id) : $class::i()->create();
+        if ($model){
+            //clear index for the field
+            FCom_IndexTank_Admin::productIndexDropField($model->field_name);
+        }
+        //remove field from database
+        parent::action_form__POST();
+    }
+
+    static public function onGridViewBefore($args)
+    {
+    }
+
 }
