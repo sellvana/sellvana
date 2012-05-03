@@ -1,10 +1,10 @@
 <?php
 
 require_once __DIR__.'/lib/buckyball/buckyball.php';
-require_once __DIR__.'/FCom/FCom.php';
+require_once __DIR__.'/FCom/Core/Core.php';
 
 if (file_exists(__DIR__.'index.local.php')) {
     require_once __DIR__.'index.local.php';
 }
 
-FCom::i()->run('FCom_Frontend');
+FCom_Core::i()->run('FCom_Frontend');

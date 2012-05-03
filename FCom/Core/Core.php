@@ -1,7 +1,226 @@
 <?php
 
+if (!defined('FULLERON_ROOT_DIR')) {
+    define('FULLERON_ROOT_DIR', dirname(dirname(__DIR__)));
+    //set_time_limit(2);
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL | E_STRICT);
+}
+
 class FCom_Core extends BClass
 {
+    protected $_modulesDirs = array();
+
+    public function init($area)
+    {
+        try {
+            if (BRequest::i()->csrf()) {
+                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+            }
+
+            // initialize start time and register error/exception handlers
+            BDebug::i()->registerErrorHandlers();
+
+            $this->initConfig($area);
+            $this->initDebug();
+            $this->initModules();
+
+            return BApp::i();
+
+        } catch (Exception $e) {
+            BDebug::dumpLog();
+            BDebug::exceptionHandler($e);
+        }
+    }
+
+    public function run($area)
+    {
+        $this->init($area);
+        try {
+            BApp::i()->run();
+        } catch (Exception $e) {
+            BDebug::dumpLog();
+            BDebug::exceptionHandler($e);
+        }
+    }
+
+    public function initConfig($area)
+    {
+        $config = BConfig::i();
+
+        $localConfig = array();
+        $localConfig['fcom_root_dir'] = FULLERON_ROOT_DIR;
+
+        $rootDir = $config->get('fs/root_dir');
+        if (!$rootDir) {
+            $localConfig['fs']['root_dir'] = $rootDir = FULLERON_ROOT_DIR;
+        }
+
+        BDebug::debug('ROOTDIR='.$rootDir);
+
+        $baseHref = $config->get('web/base_href');
+        if (!$baseHref) {
+            $baseHref = BRequest::i()->webRoot();
+            $localConfig['web']['base_href'] = $baseHref;
+        }
+        if (!$config->get('web/base_src')) {
+            $localConfig['web']['base_src'] = $baseHref;
+        }
+        if (!$config->get('web/base_store')) {
+            $localConfig['web']['base_store'] = $baseHref;
+        }
+
+        $mediaDir = $config->get('fs/media_dir');
+        if (!$mediaDir) {
+            $mediaDir = $rootDir.'/media';
+            $config->set('fs/media_dir', $mediaDir);
+        }
+
+        $storageDir = $config->get('fs/storage_dir');
+        if (!$storageDir) {
+            $storageDir = $rootDir.'/storage';
+            $config->set('fs/storage_dir', $storageDir);
+        }
+
+        // local configuration (db, enabled modules)
+        $configDir = $config->get('fs/config_dir');
+        if (!$configDir) {
+            $configDir = $storageDir.'/config';
+            $config->set('fs/config_dir', $configDir);
+        }
+
+        // cache files
+        $logDir = $config->get('fs/cache_dir');
+        if (!$logDir) {
+            $logDir = $storageDir.'/cache';
+            $config->set('fs/cache_dir', $logDir);
+        }
+
+        // log files
+        $logDir = $config->get('fs/log_dir');
+        if (!$logDir) {
+            $logDir = $storageDir.'/log';
+            $config->set('fs/log_dir', $logDir);
+        }
+
+        // DB configuration is separate to gitignore
+        // used as indication that app is already installed and setup
+        $configFileStatus = true;
+        if (file_exists($configDir.'/db.php')) {
+            $config->addFile('db.php', true);
+        } else {
+            $configFileStatus = false;
+        }
+        if (file_exists($configDir.'/local.php')) {
+            $config->addFile('local.php', true);
+        } else {
+            $configFileStatus = false;
+        }
+        if (!$configFileStatus || $config->get('install_status')!=='installed') {
+            $area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
+            BDebug::mode('INSTALLATION');
+        }
+#echo "<Pre>"; print_r($config->get()); exit;
+        // add area module
+        BApp::i()->set('area', $area, true);
+
+        $config->add($localConfig);
+
+        return $this;
+    }
+
+    public function initDebug()
+    {
+        #BDebug::mode('production');
+        #BDebug::mode('development');
+        #BDebug::mode('debug');
+
+        $config = BConfig::i();
+        // Initialize debugging mode and levels
+        BDebug::logDir($config->get('fs/log_dir'));
+        BDebug::adminEmail($config->get('admin_email'));
+
+        $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
+        if ($modeByIp) {
+            $ipModes = array();
+            foreach (explode("\n", $modeByIp) as $line) {
+                $a = explode(':', $line);
+                if (empty($a[1])) {
+                    $a = array('*', $a[0]);
+                }
+                $ipModes[trim($a[0])] = strtoupper(trim($a[1]));
+            }
+            $ip = BRequest::i()->ip();
+            if (PHP_SAPI==='cli' && !empty($ipModes['$'])) {
+                BDebug::mode($ipModes['$']);
+            } elseif (!empty($ipModes[$ip])) {
+                BDebug::mode($ipModes[$ip]);
+            } elseif (!empty($ipModes['*'])) {
+                BDebug::mode($ipModes['*']);
+            }
+        }
+#print_r(BDebug::mode());
+        return $this;
+    }
+
+    public function initModules()
+    {
+        $config = BConfig::i();
+        $area = BApp::i()->get('area');
+
+        if (BDebug::is('DISABLED')) {
+            BResponse::i()->status('404', 'Page not found', 'Page not found');
+            die;
+        }
+        if (BDebug::is('INSTALLATION')) {
+            $runLevels = array('FCom_Install' => 'REQUIRED');
+        } else {
+            $runLevels = array($area => 'REQUIRED');
+        }
+        if (BDebug::is('RECOVERY')) { // load manifests for RECOVERY mode
+            $recoveryModules = BConfig::i()->get('modules/FCom_Core/recovery_modules');
+            if ($recoveryModules) {
+                $moduleNames = preg_split('#\s*(,|\n)\s*#', $recoveryModules);
+                foreach ($moduleNames as $modName) {
+                    $runLevels[$modName] = 'REQUESTED';
+                }
+            }
+        } else { // load all manifests
+            $runLevels += (array)$config->get('request/module_run_level') +
+                (array)$config->get('modules/'.$area.'/module_run_level') +
+                (array)$config->get('modules/FCom_Core/module_run_level');
+        }
+        $config->add(array('request'=>array('module_run_level'=>$runLevels)));
+
+        //FCom::i()->registerBundledModules();
+#$d = BDebug::debug('SCANNING MANIFESTS');
+
+        if (defined('BUCKYBALL_ROOT_DIR')) {
+            $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
+            // if minified version used, need to load plugins manually
+        }
+        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/FCom';
+        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/market/*';
+        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/local/*';
+
+        foreach ($this->_modulesDirs as $dir) {
+            BModuleRegistry::i()->scan($dir);
+        }
+#BDebug::profile($d);
+
+        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/local'));
+        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/market'));
+        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR));
+
+        return $this;
+    }
+
+    public function addModulesDir($dir)
+    {
+        $this->_modulesDirs[] = $dir;
+        return $this;
+    }
+
     static public function bootstrap()
     {
         BLayout::i()
@@ -112,7 +331,7 @@ class FCom_Core_Controller_Abstract extends BActionController
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
         $layout = BLayout::i();
-        $layout->theme($theme);
+        $layout->applyTheme($theme);
         foreach ((array)$name as $l) {
             $layout->layout($l);
         }

@@ -2,7 +2,7 @@
 
 class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 {
-    protected $_permission = 'admin/settings';
+    protected $_permission = 'system/settings';
 
     public function action_index()
     {

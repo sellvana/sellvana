@@ -5,7 +5,7 @@ class FCom_Frontend_DefaultTheme extends BClass
     public static function bootstrap()
     {
         BLayout::i()
-            ->theme('FCom_Frontend_DefaultTheme', array(
+            ->addTheme('FCom_Frontend_DefaultTheme', array(
                 'area' => 'FCom_Frontend',
                 'callback' => array(static::i(), 'layout'),
             ));

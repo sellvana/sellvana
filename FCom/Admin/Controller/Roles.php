@@ -3,7 +3,7 @@
 class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
-    protected $_permission = 'admin/roles';
+    protected $_permission = 'system/roles';
     protected $_modelClass = 'FCom_Admin_Model_Role';
     protected $_gridHref = 'roles';
     protected $_gridTitle = 'Roles and Permissions';

@@ -2,7 +2,7 @@
 
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 {
-    protected $_permission = 'admin/modules';
+    protected $_permission = 'system/modules';
 
     public function getModulesData()
     {
