@@ -190,6 +190,22 @@ $(window).resize(function() {
 $(window).trigger('resize');
 ";
         }
+        if (!empty($cfg['custom']['hashState'])) {
+            $cfg['grid']['serializeGridData'] = "function(data) {
+    if (!$(this).data('ignore_hash')) {
+        var hash = window.location.hash;
+        if (hash) data = {hash:hash.replace(/^#/, '')};
+        $(this).data('ignore_hash', true);
+    }
+    return data;
+}";
+            $cfg['grid']['loadComplete'] = "function(data) {
+    window.location.hash = data.hash;
+    if (data.reloadGrid) {
+        $(this).jqGrid('triggerToolbar');
+    }
+}";
+        }
         unset($cfg['custom']);
 /*
         foreach (array('add','edit','del') as $k) {
@@ -335,17 +351,28 @@ return [true, 'Testing error'];
 
     public function processORM($orm, $method=null)
     {
-        if (($filter = BRequest::i()->request('filters'))) {
-            $where = $this->_processFilters(BUtil::fromJson($filter));
-#print_r($where);
+        $r = BRequest::i()->request();
+        if (!empty($r['hash'])) {
+            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+        } elseif (!empty($r['filters'])) {
+            $r['filters'] = BUtil::fromJson($r['filters']);
+        }
+#print_r($r); exit;
+        //$r = array_replace_recursive($hash, $r);
+#print_r($r); exit;
+        if (!empty($r['filters'])) {
+            $where = $this->_processFilters($r['filters']);
             $orm->where_complex($where);
         }
         if (!is_null($method)) {
             //BPubSub::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
             BPubSub::i()->fire($method.'.orm', array('orm'=>$orm));
         }
-        $data = $orm->jqGridData();
+        $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
+        $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
+        $data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
+        $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
             BPubSub::i()->fire($method.'.data', array('data'=>$data));
         }
