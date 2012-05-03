@@ -226,6 +226,7 @@
             'depends' => array('FCom_Core'),
             'description' => "IndexTank API integration",
             'migrate' => 'FCom_IndexTank_Migrate',
+            'tests' => "FCom_IndexTank_Tests_AllTests",
             'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
@@ -235,6 +236,19 @@
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
                     //'depends' => array('FCom_Frontend'),
+                ),
+            ),
+        ),
+        // PHPUnit Tests integration
+        'FCom_Test' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Test',
+            'depends' => array('FCom_Core'),
+            'description' => "PHPUnit tests integration",
+            'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap')
                 ),
             ),
         ),
