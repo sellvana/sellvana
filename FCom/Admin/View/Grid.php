@@ -43,6 +43,36 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
         );
     }
 
+    protected function _processState($cfg)
+    {
+        $state = BSession::i()->get('grid_state');
+        if (!empty($state[$cfg['grid']['id']])) {
+            $r = $state[$cfg['grid']['id']];
+
+            if (!empty($r['p'])) $cfg['grid']['page'] = $r['p'];
+            if (!empty($r['ps'])) $cfg['grid']['rowNum'] = $r['ps'];
+            if (!empty($r['s'])) $cfg['grid']['sortname'] = $r['s'];
+            if (!empty($r['sd'])) $cfg['grid']['sortorder'] = $r['sd'];
+            if (!empty($r['filters'])) {
+                $f = $r['filters'];
+                $cfg['grid']['postData'] = array('_search'=>true, 'filters'=>BUtil::toJson($f));
+                if (!empty($f['groupOp']) && $f['groupOp']==='AND' && !empty($f['rules'])) {
+                    $cfg['grid']['search'] = true;
+                    foreach ($f['rules'] as $rule) {
+                        $idx = $rule['field'];
+                        foreach ($cfg['grid']['columns'] as $colId=>&$col) {
+                            if ($colId===$idx || !empty($col['index']) && $col['index']===$idx) {
+                                $col['searchoptions']['defaultValue'] = $rule['data'];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $cfg;
+    }
+
     protected function _processPersonalization($cfg)
     {
         if (!empty($cfg['custom']['columnChooser'])) {
@@ -109,6 +139,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
     protected function _processSubGridConfig($cfg)
     {
         if (!empty($cfg['subGrid']) && is_array($cfg['subGrid'])) {
+            $cfg['grid']['gridview'] = false;
             $cfg['grid']['subGrid'] = true;
             $cfg['grid']['subGridOptions'] = array(
                 'plusicon' => 'ui-icon-triangle-1-e',
@@ -143,6 +174,7 @@ var subgrid = $('#'+subgrid_table_id);
 
     protected function _processConfig($cfg)
     {
+        $cfg = $this->_processState($cfg);
         $cfg = $this->_processPersonalization($cfg);
         $cfg = $this->_processSubGridConfig($cfg);
 
@@ -190,6 +222,7 @@ $(window).resize(function() {
 $(window).trigger('resize');
 ";
         }
+        /*
         if (!empty($cfg['custom']['hashState'])) {
             $cfg['grid']['serializeGridData'] = "function(data) {
     if (!$(this).data('ignore_hash')) {
@@ -206,6 +239,7 @@ $(window).trigger('resize');
     }
 }";
         }
+        */
         unset($cfg['custom']);
 /*
         foreach (array('add','edit','del') as $k) {
@@ -349,13 +383,17 @@ return [true, 'Testing error'];
         return $where;
     }
 
-    public function processORM($orm, $method=null)
+    public function processORM($orm, $method=null, $stateKey=null)
     {
         $r = BRequest::i()->request();
         if (!empty($r['hash'])) {
             $r = (array)BUtil::fromJson(base64_decode($r['hash']));
         } elseif (!empty($r['filters'])) {
             $r['filters'] = BUtil::fromJson($r['filters']);
+        }
+        if ($stateKey) {
+            $sess =& BSession::i()->dataToUpdate();
+            $sess['grid_state'][$stateKey] = $r;
         }
 #print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
@@ -371,7 +409,7 @@ return [true, 'Testing error'];
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        $data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
+        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
             BPubSub::i()->fire($method.'.data', array('data'=>$data));

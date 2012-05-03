@@ -37,7 +37,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $formUrl = BApp::href($this->_formHref);
         $config = array(
             'grid'=>array(
-                'id' => 'grid',
+                'id' => static::$_origClass,
                 'url' => $gridDataUrl,
                 'editurl' => $gridDataUrl,
                 'columns' => array(
@@ -79,10 +79,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
-        $class = $this->_modelClass;
-        $orm = $class::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+        $modelClass = $this->_modelClass;
+        $orm = $modelClass::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
         $this->gridOrmConfig($orm);
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, get_class($this).'::action_grid_data');
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, static::$_origClass.'::action_grid_data', static::$_origClass);
         BResponse::i()->json($data);
     }
 
