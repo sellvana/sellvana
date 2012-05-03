@@ -47,7 +47,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 ),
                 'toppager' => true,
             ),
-            'custom'=>array('personalize'=>true, 'autoresize'=>true, 'dblClickHref'=>$formUrl.'?id='),
+            'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'dblClickHref'=>$formUrl.'?id='),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
         );
         BPubSub::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
@@ -114,7 +114,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'form_id' => BLocale::transliterate($this->_formLayoutName),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => array(
-                'cancel' => '<button type="button" class="st2 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
+                'back' => '<button type="button" class="st2 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
+                'delete' => '<button type="submit" class="st3 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>',
                 'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
             ),
         ));
@@ -127,13 +128,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         try {
             $class = $this->_modelClass;
             $id = $r->params('id', true);
-            $data = $r->post('model');
             $model = $id ? $class::i()->load($id) : $class::i()->create();
-            $args = array('id'=>$id, 'data'=>&$data, 'model'=>$model);
+            $data = $r->post('model');
+            $args = array('id'=>$id, 'data'=>&$data, 'do'=>$r->post('do'), 'model'=>$model);
             $this->formPostBefore($args);
-            $model->set($data)->save();
+            if ($r->post('do')==='DELETE') {
+                $model->delete();
+                BSession::i()->addMessage('The record has been deleted', 'success', 'admin');
+            } else {
+                $model->set($data)->save();
+                BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+            }
             $this->formPostAfter($args);
-            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
         } catch (Exception $e) {
             $this->formPostError($args);
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
