@@ -1,6 +1,5 @@
 <?php
-
-require_once __DIR__ . '/Initialize.php';
+require_once '../../tests/index.php';
 
 /**
 * All Fulleron Tests
@@ -10,13 +9,13 @@ require_once __DIR__ . '/Initialize.php';
 * Individual module suites can be run directly with the phpunit command.
 *
 */
-class FCom_Tests_AllTests {
+class FCom_Test_AllTests {
 
     public static function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
-        $path = realpath(dirname(__FILE__) . '/..') . '/*/tests/*AllTests.php';
+        $path = realpath(dirname(__FILE__) . '/..') . '/*/Tests/*AllTests.php';
 
         $moduleSuitePaths = glob($path);
         //print_r($moduleSuitePaths);exit;
