@@ -3,7 +3,7 @@
 class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
-    protected $_permission = 'admin/users';
+    protected $_permission = 'system/users';
     protected $_modelClass = 'FCom_Admin_Model_User';
     protected $_gridHref = 'users';
     protected $_gridTitle = 'Admin Users';

@@ -15,10 +15,10 @@ class FCom_Admin extends BClass
         }
 
         FCom_Admin_Model_Role::i()->createPermission(array(
-            'admin/users' => 'Manage Users',
-            'admin/roles' => 'Manage Roles and Permissions',
-            'admin/settings' => 'Update Settings',
-            'admin/modules' => 'Manage Modules',
+            'system/users' => 'Manage Users',
+            'system/roles' => 'Manage Roles and Permissions',
+            'system/settings' => 'Update Settings',
+            'system/modules' => 'Manage Modules',
         ));
 
         BPubSub::i()

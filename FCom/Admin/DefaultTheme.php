@@ -5,7 +5,7 @@ class FCom_Admin_DefaultTheme extends BClass
     public static function bootstrap()
     {
         BLayout::i()
-            ->theme('FCom_Admin_DefaultTheme', array(
+            ->addTheme('FCom_Admin_DefaultTheme', array(
                 'area' => 'FCom_Admin',
                 'callback' => array(static::i(), 'layout'),
             ));
@@ -42,12 +42,12 @@ class FCom_Admin_DefaultTheme extends BClass
                     )),
                     array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'home', array('label'=>'Home', 'href'=>BApp::baseUrl(), 'pos'=>10)),
-                        array('addNav', 'admin', array('label'=>'Admin', 'pos'=>900)),
-                        array('addNav', 'admin/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
-                        array('addNav', 'admin/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
-                        array('addNav', 'admin/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
-                        array('addNav', 'admin/modules', array('label'=>'Installed Modules', 'href'=>BApp::href('/modules'))),
-                        array('addShortcut', 'admin/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
+                        array('addNav', 'system', array('label'=>'System', 'pos'=>900)),
+                        array('addNav', 'system/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
+                        array('addNav', 'system/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),
+                        array('addNav', 'system/settings', array('label'=>'Settings', 'href'=>BApp::href('/settings'))),
+                        array('addNav', 'system/modules', array('label'=>'Installed Modules', 'href'=>BApp::href('/modules'))),
+                        array('addShortcut', 'system/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
                     )),
                 ),
                 'jqgrid'=>array(

@@ -2,7 +2,7 @@
 
 $rootDir = dirname(__DIR__);
 require_once $rootDir.'/lib/buckyball/buckyball.php';
-require_once $rootDir.'/FCom/FCom.php';
+require_once $rootDir.'/FCom/Core/Core.php';
 
 $webRoot = BRequest::i()->webRoot(1);
 BConfig::i()->add(array(
@@ -20,4 +20,4 @@ if (file_exists(__DIR__.'index.local.php')) {
 }
 
 BDebug::mode('DEBUG');
-FCom::i()->run('FCom_Admin');
+FCom_Core::i()->run('FCom_Admin');
