@@ -47,7 +47,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 ),
                 'toppager' => true,
             ),
-            'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'dblClickHref'=>$formUrl.'?id='),
+            'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id='),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
         );
         BPubSub::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
@@ -79,11 +79,21 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
-        $modelClass = $this->_modelClass;
-        $orm = $modelClass::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+        $mc = $this->_modelClass;
+        $orm = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
         $this->gridOrmConfig($orm);
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, static::$_origClass.'::action_grid_data', static::$_origClass);
-        BResponse::i()->json($data);
+
+        $export = BRequest::i()->request('export');
+
+        $oc = static::$_origClass;
+
+        $grid = FCom_Admin_View_Grid::i();
+        if ($export) {
+            $grid->set('config', $this->gridConfig())->export($orm, $oc);
+        } else {
+            $data = $grid->processORM($orm, $oc.'::action_grid_data', $oc);
+            BResponse::i()->json($data);
+        }
     }
 
     public function action_grid_data__POST()
