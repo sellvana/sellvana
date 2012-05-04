@@ -16,14 +16,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'id' => array('index'=>'c.id'),
             'firstname' => array('label'=>'First Name', 'index'=>'c.firstname'),
             'lastname' => array('label'=>'Last Name', 'index'=>'c.lastname'),
-            'email' => array('label'=>'Email'),
+            'email' => array('label'=>'Email', 'index'=>'c.email'),
             'street1' => array('label'=>'Address', 'index'=>'a.street1'),
             'city' => array('label'=>'City', 'index'=>'a.city'),
             'region' => array('label'=>'Region', 'index'=>'a.region'),
             'postcode' => array('label'=>'Zip', 'index'=>'a.postcode'),
             'country' => array('label'=>'Country', 'index'=>'a.country'),
-            'create_dt' => array('label'=>'Created'),
-            'update_dt' => array('label'=>'Updated'),
+            'create_dt' => array('label'=>'Created', 'index'=>'c.create_dt', 'formatter'=>'date'),
+            'update_dt' => array('label'=>'Updated', 'index'=>'c.update_dt', 'formatter'=>'date'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         return $config;
