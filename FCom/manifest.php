@@ -67,6 +67,19 @@
             'description' => "Cron scheduled tasks manager",
         ),
         // cron jobs processing
+        'FCom_Market' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Market',
+            'bootstrap' => array('file'=>'Market.php', 'callback'=>'FCom_Market::bootstrap'),
+            'depends' => array('FCom_Core'),
+            'description' => "Cron scheduled tasks manager",
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'MarketAdmin.php', 'callback'=>'FCom_Market_Admin::bootstrap'),
+                ),
+            ),
+        ),
+        // cron jobs processing
         'FCom_Geo' => array(
             'version' => '0.1.0',
             'root_dir' => 'Geo',
