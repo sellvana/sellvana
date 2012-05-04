@@ -191,16 +191,11 @@ var subgrid = $('#'+subgrid_table_id);
                 });";
             }
             if (!empty($col['options'])) {
-                $valArr = array();
-                foreach ($col['options'] as $k=>$v) {
-                    $valArr[] = $k.':'.$v;
-                }
-                $values = join(';', $valArr);
                 if (empty($col['formatter'])) $col['formatter'] = 'select';
                 if (empty($col['stype'])) $col['stype'] = 'select';
                 if (empty($col['edittype'])) $col['edittype'] = 'select';
-                $col['editoptions'] = array('value'=>$values);
-                $col['searchoptions'] = array('value'=>':All;'.$values);
+                $col['editoptions'] = array('value'=>$col['options']);
+                $col['searchoptions'] = array('value'=>array(''=>'All')+$col['options']);
                 unset($col['options']);
             }
         }
@@ -221,6 +216,20 @@ $(window).resize(function() {
 });
 $(window).trigger('resize');
 ";
+        }
+        if (!empty($cfg['custom']['export'])) {
+            if (!empty($cfg['grid']['export_url'])) {
+                $exportUrl =  $cfg['grid']['export_url'];
+            } else {
+                $exportUrl = BUtil::setUrlQuery($cfg['grid']['url'], array('export'=>'csv'));
+            }
+            $cfg[] = array('navButtonAdd',
+                'caption' => '',
+                'title' => 'Export to CSV',
+                'buttonicon' => 'ui-icon-copy',
+                'onClickButton' => "function() {
+                    $('body').append('<iframe src=\"{$exportUrl}\" display=\"none\"></iframe');
+                }");
         }
         /*
         if (!empty($cfg['custom']['hashState'])) {
@@ -383,7 +392,7 @@ return [true, 'Testing error'];
         return $where;
     }
 
-    public function processORM($orm, $method=null, $stateKey=null)
+    public function processORM($orm, $method=null, $stateKey=null, $forceRequest=array())
     {
         $r = BRequest::i()->request();
         if (!empty($r['hash'])) {
@@ -394,6 +403,9 @@ return [true, 'Testing error'];
         if ($stateKey) {
             $sess =& BSession::i()->dataToUpdate();
             $sess['grid_state'][$stateKey] = $r;
+        }
+        if ($forceRequest) {
+            $r = array_replace_recursive($r, $forceRequest);
         }
 #print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
@@ -415,5 +427,56 @@ return [true, 'Testing error'];
             BPubSub::i()->fire($method.'.data', array('data'=>$data));
         }
         return $data;
+    }
+
+    public function export($orm, $class=null)
+    {
+        if ($class) {
+            BPubSub::i()->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
+        }
+        $r = BRequest::i()->request();
+        if (!empty($r['filters'])) {
+            $r['filters'] = BUtil::fromJson($r['filters']);
+        }
+        $state = (array)BSession::i()->get('grid_state');
+        if ($class && !empty($state[$class])) {
+            $r = array_replace_recursive($state[$class], $r);
+        }
+        if (!empty($r['filters'])) {
+            $where = $this->_processFilters($r['filters']);
+            $orm->where_complex($where);
+        }
+        if (!empty($r['s'])) {
+            $orm->{'order_by_'.$r['sd']}($r['s']);
+        }
+
+        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
+        $cfg = $this->_processConfig($cfg);
+        $columns = $cfg['grid']['colModel'];
+        $headers = array();
+        foreach ($columns as $col) {
+            if (!empty($col['hidden'])) continue;
+            $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
+        }
+        $dir = BConfig::i()->get('fs/storage_dir').'/export';
+        BUtil::ensureDir($dir);
+        $filename = $dir.'/'.$cfg['grid']['id'].'.csv';
+        $fp = fopen($filename, 'w');
+        fputcsv($fp, $headers);
+        $orm->iterate(function($row) use($columns, $fp) {
+            $data = array();
+            foreach ($columns as $col) {
+                if (!empty($col['hidden'])) continue;
+                $k = $col['name'];
+                $val = !empty($row->$k) ? $row->$k : '';
+                if (!empty($col['editoptions']['value'][$val])) {
+                    $val = $col['editoptions']['value'][$val];
+                }
+                $data[] = $val;
+            }
+            fputcsv($fp, $data);
+        });
+        fclose($fp);
+        BResponse::i()->sendFile($filename);
     }
 }
