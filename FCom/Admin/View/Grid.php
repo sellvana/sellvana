@@ -185,17 +185,36 @@ var subgrid = $('#'+subgrid_table_id);
             } else {
                 $col['position'] = ++$pos;
             }
-            if (!empty($col['autocomplete'])) {
-                $cfg['js'][] = "$('#gbox_{$cfg['grid']['id']} #gs_{$col['name']}').fcom_autocomplete({
-                    url:'{$col['autocomplete']}'
-                });";
+            if (!empty($col['autocomplete']) && !isset($col['searchoptions']['dataInit'])) {
+                $col['searchoptions']['dataInit'] = "function(el) { $(el).fcom_autocomplete({url:'{$col['autocomplete']}'}); }";
+            }
+
+            if (!empty($col['formatter'])) {
+                switch ($col['formatter']) {
+                case 'date':
+                    //$col['editoptions'] = array();
+                    $col['editrules']['date'] = true;
+                    if (!isset($col['searchoptions']['sopt'])) $col['searchoptions']['sopt'] = array('eq','ne','lt','le','gt','ge');
+                    if (!isset($col['searchoptions']['dataInit'])) $col['searchoptions']['dataInit'] = "function(el) {
+$(el).datepicker({dateFormat:'yy-mm-dd'});
+                    }";
+                    if (!isset($col['formatoptions']['srcformat'])) $col['formatoptions']['srcformat'] = 'Y-m-d H:i:s';
+                    if (!isset($col['formatoptions']['newformat'])) $col['formatoptions']['newformat'] = 'm/d/Y';
+                    break;
+                }
             }
             if (!empty($col['options'])) {
-                if (empty($col['formatter'])) $col['formatter'] = 'select';
-                if (empty($col['stype'])) $col['stype'] = 'select';
-                if (empty($col['edittype'])) $col['edittype'] = 'select';
-                $col['editoptions'] = array('value'=>$col['options']);
-                $col['searchoptions'] = array('value'=>array(''=>'All')+$col['options']);
+                $optArr = array();
+                foreach ($col['options'] as $k=>$v) {
+                    $optArr[] = $k.':'.$v;
+                }
+                $options = join(';', $optArr);
+                if (!isset($col['formatter'])) $col['formatter'] = 'select';
+                if (!isset($col['stype'])) $col['stype'] = 'select';
+                if (!isset($col['edittype'])) $col['edittype'] = 'select';
+                if (!isset($col['editoptions']['value'])) $col['editoptions']['value'] = $options;
+                if (!isset($col['searchoptions']['value'])) $col['searchoptions']['value'] = ':All;'.$options;
+                if (!isset($col['searchoptions']['defaultValue'])) $col['searchoptions']['defaultValue'] = '';
                 unset($col['options']);
             }
         }
@@ -457,6 +476,14 @@ return [true, 'Testing error'];
         foreach ($columns as $col) {
             if (!empty($col['hidden'])) continue;
             $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
+            if (!empty($col['editoptions']['value']) && is_string($col['editoptions']['value'])) {
+                $options = explode(';', $col['editoptions']['value']);
+                $col['editoptions']['value'] = array();
+                foreach ($options as $o) {
+                    list($k, $v) = explode(':', $o);
+                    $col['editoptions']['value'][$k] = $v;
+                }
+            }
         }
         $dir = BConfig::i()->get('fs/storage_dir').'/export';
         BUtil::ensureDir($dir);
