@@ -1,5 +1,4 @@
 <?php
-require_once '../../tests/index.php';
 
 /**
 * All Fulleron Tests
@@ -13,13 +12,17 @@ class FCom_Test_AllTests {
 
     public static function suite()
     {
+        $sapi_type = php_sapi_name();
+        if (substr($sapi_type, 0, 3) == 'cgi' || substr($sapi_type, 0, 3) == 'cli' ) {
+            require_once realpath(dirname(__FILE__).'/../..') . '/tests/index.php';
+        }
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
         $modules = BModuleRegistry::i()->debug();
 
         foreach ($modules as $module) {
             if(!empty($module->tests) && class_exists($module->tests)){
-                $suite->addTest(call_user_func(array($module->tests, 'suite')));
+                $suite->addTestSuite(call_user_func(array($module->tests, 'suite')));
             }
         }
         return $suite;
