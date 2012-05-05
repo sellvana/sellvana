@@ -48,6 +48,7 @@ class FCom_Core extends BClass
     {
         $config = BConfig::i();
 
+        // $localConfig used to override saved config with settings from entry point
         $localConfig = array();
         $localConfig['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
@@ -60,7 +61,7 @@ class FCom_Core extends BClass
 
         $baseHref = $config->get('web/base_href');
         if (!$baseHref) {
-            $baseHref = BRequest::i()->webRoot();
+            $baseHref = BRequest::i()->baseUrl();
             $localConfig['web']['base_href'] = $baseHref;
         }
         if (!$config->get('web/base_src')) {
@@ -90,10 +91,10 @@ class FCom_Core extends BClass
         }
 
         // cache files
-        $logDir = $config->get('fs/cache_dir');
-        if (!$logDir) {
-            $logDir = $storageDir.'/cache';
-            $config->set('fs/cache_dir', $logDir);
+        $cacheDir = $config->get('fs/cache_dir');
+        if (!$cacheDir) {
+            $cacheDir = $storageDir.'/cache';
+            $config->set('fs/cache_dir', $cacheDir);
         }
 
         // log files
