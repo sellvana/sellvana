@@ -49,4 +49,24 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
                 'handle,description,content')),
         ))->save();
     }
+
+    public static function install()
+    {
+        $tBlock = static::table();
+        BDb::run("
+
+CREATE TABLE IF NOT EXISTS {$tBlock} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `content` text COLLATE utf8_unicode_ci,
+  `layout_update` text COLLATE utf8_unicode_ci,
+  `version` int(11) NOT NULL,
+  `create_dt` datetime DEFAULT NULL,
+  `update_dt` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+        ");
+    }
 }

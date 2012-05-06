@@ -10,7 +10,7 @@ class FCom_Cron_Model_Task extends FCom_Core_Model_Abstract
         BDb::run("
 CREATE TABLE IF NOT EXISTS ".static::table()." (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `handle` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `cron_expr` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `last_start_dt` datetime DEFAULT NULL,
   `last_finish_dt` datetime DEFAULT NULL,

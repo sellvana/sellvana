@@ -62,10 +62,12 @@
         'FCom_Cron' => array(
             'version' => '0.1.0',
             'root_dir' => 'Cron',
-            'bootstrap' => array('file'=>'Cron.php', 'callback'=>'FCom_Cron::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Cron scheduled tasks manager",
             'areas' => array(
+                'FCom_Cron' => array(
+                    'bootstrap' => array('file'=>'Cron.php', 'callback'=>'FCom_Cron::bootstrap'),
+                ),
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'CronAdmin.php', 'callback'=>'FCom_Cron_Admin::bootstrap'),
                 ),
@@ -133,7 +135,7 @@
             'depends' => array('FCom_Core'),
             'description' => "Categories and products management, admin and frontend",
             'migrate' => 'FCom_Catalog_Migrate',
-            'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
+            //'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'CatalogAdmin.php', 'callback'=>'FCom_Catalog_Admin::bootstrap'),
