@@ -118,7 +118,7 @@ class FCom_Core extends BClass
             $configFileStatus = false;
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
-            $area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
+            //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
         }
 #echo "<Pre>"; print_r($config->get()); exit;

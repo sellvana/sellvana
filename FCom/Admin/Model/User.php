@@ -210,7 +210,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $tUser = static::table();
         $tRole = FCom_Admin_Model_Role::table();
         BDb::run("
-CREATE TABLE IF NOT EXISTS {$t} (
+CREATE TABLE IF NOT EXISTS {$tUser} (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `superior_id` int(10) unsigned DEFAULT NULL,
   `username` varchar(255) NOT NULL,
