@@ -13,6 +13,12 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         exit;
     }
 
+    public function action_noroute()
+    {
+        $this->layout('404');
+        BResponse::i()->status(404);
+    }
+
     public function action_login_post()
     {
         try {
