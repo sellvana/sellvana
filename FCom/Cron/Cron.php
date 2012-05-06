@@ -2,11 +2,7 @@
 
 class FCom_Cron extends BClass
 {
-    protected $_dt;
-
     protected $_tasks = array();
-
-    protected $_dbTasks;
 
     static public function bootstrap()
     {
@@ -163,7 +159,7 @@ class FCom_Cron extends BClass
 
         // multiple parts
         $multipart = explode(',', $pattern);
-        if ($multipart) {
+        if (sizeof($multipart)>1) {
             foreach ($multipart as $p) {
                 if ($this->matchPatternValue($p, $val)) return true;
             }
