@@ -50,6 +50,10 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('addShortcut', 'system/users', array('label'=>'New User', 'href'=>BApp::href('/users/form/'))),
                     )),
                 ),
+                '404'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('404')),
+                ),
                 'jqgrid'=>array(
                     array('view', 'head', 'do'=>array(
                         array('css', '{FCom_Core}/js/lib/jqGrid/ui.jqgrid.css'),

@@ -346,6 +346,11 @@ class FCom_Core_Controller_Abstract extends BActionController
         $this->view($viewName)->messages = BSession::i()->messages($namespace);
         return $this;
     }
+
+    public function action_noroute()
+    {
+        $this->layout('404');
+    }
 }
 
 class FCom_Core_Model_Abstract extends BModel

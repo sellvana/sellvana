@@ -40,6 +40,11 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('hook', 'footer', 'views'=>array('footer')),
                 ),
 
+                '404'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('404')),
+                ),
+
                 '/'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('home')),
