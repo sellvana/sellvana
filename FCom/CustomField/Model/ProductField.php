@@ -2,6 +2,7 @@
 
 class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 {
+    protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product_custom';
 
     public function productFields($p, $r=array())
@@ -51,5 +52,22 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
             return false;
         }
         return true;
+    }
+
+    public static function install()
+    {
+        $tProdField = static::table();
+        $tProd = FCom_Catalog_Model_Product::table();
+        BDb::run("
+CREATE TABLE IF NOT EXISTS {$tProdField} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `product_id` int(10) unsigned NOT NULL,
+  `_fieldset_ids` text,
+  `_add_field_ids` text,
+  `_hide_field_ids` text,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_{$tProdField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProd} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 }

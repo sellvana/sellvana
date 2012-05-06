@@ -10,7 +10,10 @@ class FCom_Cron extends BClass
 
     static public function bootstrap()
     {
-
+        BFrontController::i()
+            ->route('GET /', 'FCom_Cron_Controller.all_tasks')
+            ->route('GET /*handle', 'FCom_Cron_Controller.one_task')
+        ;
     }
 
     public function task($expr, $callback, $args=array())
@@ -32,41 +35,62 @@ class FCom_Cron extends BClass
         }
         if (empty($args['handle'])) {
             $args['handle'] = $args['module_name'];
+            if (is_string($callback)) {
+                $args['handle'] .= '/'.$callback;
+            } elseif (is_array($callback)) {
+                $args['handle'] .= '/'
+                    .(is_string($callback[0]) ? $callback[0] : get_class($callback[0]))
+                    .'::'.$callback[1];
+            }
         }
         if (!empty($this->_tasks[$args['handle']])) {
-            BDebug::notice('Task re-declared: '.$args['handle']);
+            BDebug::warning('Task re-declared: '.$args['handle']);
         }
         $this->_tasks[$args['handle']] = $args;
         return $this;
     }
 
-    public function dispatch($time=null)
+    public function run($handles=null, $force=false)
     {
+        // get associated array of task handles, if specified
+        if (is_string($handles)) {
+            $handles = $handles!=='' ? array_flip(explode(',', $handles)) : null;
+        } elseif (!is_null($handles) && !is_array($handles)) {
+            throw new Exception('Invalid argument: '.print_r($handles, 1));
+        }
+        // fetch configuration
         $c = BConfig::i()->get('modules/FCom_Cron');
         $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins'] : 5;
         $timeoutSecs = !empty($c['timeout_mins']) ? $c['timeout_mins']*60 : 3600;
-        // try to get numeric time to save on performance for each task
-        if (is_null($time)) {
-            $time = time();
-        } elseif (!is_numeric($time)) {
-            $time = strtotime($time);
-        }
         // get running or previously ran tasks
         $dbTasks = FCom_Cron_Model_Task::i()->orm('t')->find_many_assoc('handle');
         // cleanup stale running tasks
-        $timeout = time()-$timeoutSecs;
-        foreach ($dbTasks as $task) {
-            if ($task->status==='running' && strtotime($task->last_run_dt)<$timeout) {
+        $time = strtotime(BDb::now());
+        $timeout = $time-$timeoutSecs;
+        foreach ($dbTasks as $h=>$task) {
+            $task->last_start_time = strtotime($task->last_start_dt);
+            if ($task->status==='running' && $task->last_start_time<$timeout) {
                 $task->set('status', 'timeout')->save();
             }
+
         }
+        $thresholdTime = $time-58;
         // try leeway minutes backwards for missed cron runs and mark matching tasks as pending
         for ($i=0; $i<$leewayMins; $i++) {
             // parse time into components
             $date = getdate($time-$i*60);
             foreach ($this->_tasks as $h=>$task) {
+                // skip task if not one of the specified handles
+                if (!is_null($handles) && !isset($handles[$h])) {
+                    continue;
+                }
                 // skip pending and already running tasks
                 if (!empty($dbTasks[$h]) && in_array($dbTasks[$h]->status, array('pending', 'running'))) {
+                    continue;
+                }
+                // skip tasks that started within last minute if not specified $force flag
+                if (!$force && !empty($dbTasks[$h]) && $dbTasks[$h]->last_start_time>$thresholdTime) {
+#echo $dbTasks[$h]->last_start_time.', '.$thresholdTime.', '.date('Y-m-d H:i:s', $dbTasks[$h]->last_start_time).', '.date('Y-m-d H:i:s', $thresholdTime).'<hr>';
                     continue;
                 }
                 // skip not matching tasks
@@ -87,22 +111,33 @@ class FCom_Cron extends BClass
         // running tasks loop is split from marking as pending to decouple run dependencies between different tasks
         // 1. ensure match leeway time period even if previous task takes long time
         // 2. if previous task crashes, other tasks still will be ran on the next cron
-        foreach ($dbTasks as $dbTask) {
-            if ($dbTask->status==='pending') {
-                $dbTask->set(array(
-                    'status'=>'running',
-                    'last_start_dt'=>BDb::now(),
-                    'last_finish_dt'=>null,
-                ))->save();
-                $task = $this->_tasks[$dbTask->handle];
-                try {
-                    call_user_func($task['callback'], $task);
-                    $dbTask->set(array('status'=>'success'));
-                } catch (Exception $e) {
-                    $dbTask->set(array('status'=>'error', 'last_error_msg'=>$e->getMessage()));
-                }
-                $dbTask->set(array('last_finish_dt', BDb::now()))->save();
+        foreach ($dbTasks as $h=>$dbTask) {
+            // skip task if not one of the specified handles
+            if (!is_null($handles) && !isset($handles[$h])) {
+                continue;
             }
+            // skip not pending tasks
+            if ($dbTask->status!=='pending') {
+                continue;
+            }
+            // mark task as running
+            $dbTask->set(array(
+                'status'=>'running',
+                'last_start_dt'=>BDb::now(),
+                'last_finish_dt'=>null,
+            ))->save();
+            $task = $this->_tasks[$dbTask->handle];
+            try {
+                // run task callback
+                call_user_func($task['callback'], $task);
+                // if everything ok, mark task as success
+                $dbTask->set(array('status'=>'success'));
+            } catch (Exception $e) {
+                // on exception mark as error
+                $dbTask->set(array('status'=>'error', 'last_error_msg'=>$e->getMessage()));
+            }
+            // set finishing time and save task
+            $dbTask->set(array('last_finish_dt'=>BDb::now()))->save();
         }
         return $this;
     }
@@ -186,5 +221,24 @@ class FCom_Cron extends BClass
             if (isset($convert[$val])) return $convert[$val];
         }
         return false;
+    }
+}
+
+class FCom_Cron_Controller extends FCom_Core_Controller_Abstract
+{
+    public function action_all_tasks()
+    {
+        FCom_Cron::i()->run(null, BRequest::i()->get('force'));
+    }
+
+    public function action_one_task()
+    {
+        FCom_Cron::i()->run(BRequest::i()->param('handle'), BRequest::i()->get('force'));
+    }
+
+    public function afterDispatch()
+    {
+        BDebug::dumpLog();
+        exit;
     }
 }

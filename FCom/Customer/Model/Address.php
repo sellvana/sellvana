@@ -33,10 +33,12 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     public function install()
     {
+        $tCustomer = FCom_Customer_Model_Customer::table();
+        $tAddress = static::table();
         BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
+CREATE TABLE IF NOT EXISTS {$tAddress} (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `customer_id` int(11) NOT NULL,
+  `customer_id` int(11) unsigned NOT NULL,
   `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -56,7 +58,8 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
   `update_dt` datetime NOT NULL,
   `lat` decimal(15,10) DEFAULT NULL,
   `lng` decimal(15,10) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
     }

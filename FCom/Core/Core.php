@@ -319,7 +319,9 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
-        BLayout::i()->view('root')->bodyClass = BRequest::i()->path(0, 1);
+        if (($root = BLayout::i()->view('root'))) {
+            $root->bodyClass = BRequest::i()->path(0, 1);
+        }
         return parent::beforeDispatch();
     }
 

@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `{$catProdTable}` (
   `sort_order` INT(10) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `product_id` (`product_id`,`category_id`),
-  KEY `NewIndex1` (`category_id`,`product_id`),
-  KEY `NewIndex2` (`category_id`,`sort_order`),
+  KEY `category_id__product_id` (`category_id`,`product_id`),
+  KEY `category_id__sort_order` (`category_id`,`sort_order`),
   CONSTRAINT `FK_{$catProdTable}_category` FOREIGN KEY (`category_id`) REFERENCES `{$categoryTable}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_{$catProdTable}_product` FOREIGN KEY (`product_id`) REFERENCES `{$productTable}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
