@@ -65,6 +65,11 @@
             'bootstrap' => array('file'=>'Cron.php', 'callback'=>'FCom_Cron::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Cron scheduled tasks manager",
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'CronAdmin.php', 'callback'=>'FCom_Cron_Admin::bootstrap'),
+                ),
+            ),
         ),
         // cron jobs processing
         'FCom_Market' => array(
