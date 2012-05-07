@@ -118,7 +118,7 @@ class FCom_Core extends BClass
             $configFileStatus = false;
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
-            $area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
+            //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
         }
 #echo "<Pre>"; print_r($config->get()); exit;
@@ -350,6 +350,35 @@ class FCom_Core_Controller_Abstract extends BActionController
     public function action_noroute()
     {
         $this->layout('404');
+    }
+
+    public function viewProxy($viewPrefix)
+    {
+        $viewPrefix = trim($viewPrefix, '/').'/';
+        $page = BRequest::i()->params('view');
+        if (!$page || !($view = $this->view($viewPrefix.$page))) {
+            $this->forward(true);
+            return;
+        }
+        $this->layout('base');
+        BLayout::i()->applyLayout($viewPrefix.$page);
+        $view->render();
+        $metaData = $view->param('meta_data');
+        if ($metaData && ($head = $this->view('head'))) {
+            foreach ($metaData as $k=>$v) {
+                $k = strtolower($k);
+                switch ($k) {
+                case 'title':
+                    $head->addTitle($v); break;
+                case 'meta_title': case 'meta_description': case 'meta_keywords':
+                    $head->meta(str_replace('meta_','',$k), $v); break;
+                }
+            }
+        }
+        if (($root = BLayout::i()->view('root'))) {
+            $root->addBodyClass('page-'.$page);
+        }
+        BLayout::i()->hookView('main', $viewPrefix.$page);
     }
 }
 

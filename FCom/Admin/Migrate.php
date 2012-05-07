@@ -10,6 +10,7 @@ class FCom_Admin_Migrate extends BClass
 
     public function install()
     {
+        FCom_Admin_Model_Role::i()->install();
         FCom_Admin_Model_User::i()->install();
         FCom_Admin_Model_Personalize::i()->install();
     }
