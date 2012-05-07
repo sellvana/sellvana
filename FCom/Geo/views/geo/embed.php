@@ -1,6 +1,6 @@
 <script>
 head(function(){
-    var geoCountries = <?php echo BUtil::toJson(FCom_Geo_Model_Country::options()) ?>;
+    var geoCountries = <?php echo BUtil::toJson(FCom_Geo_Model_Country::options($this->countries)) ?>;
     var geoRegions = <?php echo BUtil::toJson(FCom_Geo_Model_Region::allOptions()) ?>;
 
     $.fn.geoCountryRegion = function(opt) {

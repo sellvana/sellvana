@@ -7,12 +7,17 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
 
     protected static $_optionsCache = array();
 
-    public static function options()
+    public static function options($limit=null)
     {
-        if (!static::$_optionsCache) {
-            static::$_optionsCache = static::orm('c')->find_many_assoc('iso', 'name');
+        $key = $limit ? $limit : '-';
+        if (empty(static::$_optionsCache[$key])) {
+            $orm = static::orm('c');
+            if ($limit) {
+                $orm->where_in('iso', explode(',', $limit));
+            }
+            static::$_optionsCache[$key] = $orm->find_many_assoc('iso', 'name');
         }
-        return static::$_optionsCache;
+        return static::$_optionsCache[$key];
     }
 
     public static function getIsoByName($name)
