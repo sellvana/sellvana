@@ -351,6 +351,35 @@ class FCom_Core_Controller_Abstract extends BActionController
     {
         $this->layout('404');
     }
+
+    public function viewProxy($viewPrefix)
+    {
+        $viewPrefix = trim($viewPrefix, '/').'/';
+        $page = BRequest::i()->params('view');
+        if (!$page || !($view = $this->view($viewPrefix.$page))) {
+            $this->forward(true);
+            return;
+        }
+        $this->layout('base');
+        BLayout::i()->applyLayout($viewPrefix.$page);
+        $view->render();
+        $metaData = $view->param('meta_data');
+        if ($metaData && ($head = $this->view('head'))) {
+            foreach ($metaData as $k=>$v) {
+                $k = strtolower($k);
+                switch ($k) {
+                case 'title':
+                    $head->addTitle($v); break;
+                case 'meta_title': case 'meta_description': case 'meta_keywords':
+                    $head->meta(str_replace('meta_','',$k), $v); break;
+                }
+            }
+        }
+        if (($root = BLayout::i()->view('root'))) {
+            $root->addBodyClass('page-'.$page);
+        }
+        BLayout::i()->hookView('main', $viewPrefix.$page);
+    }
 }
 
 class FCom_Core_Model_Abstract extends BModel

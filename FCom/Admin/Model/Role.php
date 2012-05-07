@@ -89,7 +89,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     public function getPermissionIds()
     {
         $perms = array();
-        foreach ($this->permissions as $p=>$_) {
+        foreach ((array)$this->permissions as $p=>$_) {
             $perms['perm_'.str_replace('/', '__', $p)] = $_;
         }
         return $perms;
