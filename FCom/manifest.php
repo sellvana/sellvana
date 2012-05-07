@@ -90,7 +90,7 @@
         'FCom_Geo' => array(
             'version' => '0.1.0',
             'root_dir' => 'Geo',
-            'migrate' => 'FCom_Geo::migrate',
+            'migrate' => array('file'=>'Geo.php', 'callback'=>'FCom_Geo::migrate'),
             'bootstrap' => array('file'=>'Geo.php', 'callback'=>'FCom_Geo::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Geographic information about countries and states",

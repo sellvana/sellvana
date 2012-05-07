@@ -25,7 +25,10 @@ head(function() {
 
     var $main = $('.adm-content-box'), $win = $(window), $doc = $(document);
     if ($main.length) {
-        $win.resize(function() { $main.height(Math.max($doc.height(), $win.height())-$main.offset().top); }).trigger('resize');
+        $win.resize(function() {
+            var h = $win.height(); //Math.max($doc.height(), $win.height());
+            $main.height(h-$main.offset().top);
+        }).trigger('resize');
     }
 
     //$('#root-layout > .ui-layout-west').width(180).height(1000).resizable({handles:'e'});
