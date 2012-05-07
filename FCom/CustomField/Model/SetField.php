@@ -8,6 +8,7 @@ class FCom_CustomField_Model_SetField extends FCom_Core_Model_Abstract
     public static function install()
     {
         $tSet = FCom_CustomField_Model_Set::table();
+        $tField = FCom_CustomField_Model_Field::table();
         $tSetField = static::table();
         BDb::run("
 CREATE TABLE IF NOT EXISTS {$tSetField} (

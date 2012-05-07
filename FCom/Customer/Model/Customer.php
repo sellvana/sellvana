@@ -110,9 +110,7 @@ CREATE TABLE IF NOT EXISTS {$tCustomer} (
   `update_dt` datetime NOT NULL,
   `last_login` datetime DEFAULT NULL,
   `token` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK_{$tCustomer}_billing` FOREIGN KEY (`default_billing_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_{$tCustomer}_shipping` FOREIGN KEY (`default_shipping_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
     }
