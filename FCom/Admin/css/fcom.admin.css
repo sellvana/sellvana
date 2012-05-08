@@ -174,7 +174,7 @@ button.st3, input[type="submit"].st3 {
 	color:#0640a9;
 	font-weight:normal;
 	}
-button.st4, input[type="submit"].st1 {
+button.st4, input[type="submit"].st4 {
     /* Key button in page example:Save */
     box-shadow: inset 0 1px 0 #FF704D;
     -moz-box-shadow: inset 0 1px 0 #FF704D;
