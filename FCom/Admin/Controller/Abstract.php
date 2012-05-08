@@ -2,6 +2,7 @@
 
 class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
+    protected static $_origClass;
     protected $_permission;
 
     public function messages($viewName, $namespace='admin')
@@ -150,6 +151,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $data = $defData + $r->post();
         $model = $class::i();
         unset($data['id'], $data['oper']);
+
+        $args = array('data'=>&$data, 'model'=>&$model);
+        $this->gridPostBefore(array('data'=>&$data, 'model'=>&$model));
+
         switch ($r->post('oper')) {
         case 'add':
             $set = $model->create($data)->save();
@@ -164,7 +169,20 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             $result = array('success'=>true);
             break;
         }
+
+        $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));
+
         //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
         BResponse::i()->json($result);
+    }
+
+    public function gridPostBefore($args)
+    {
+        BPubSub::i()->fire(static::$_origClass.'::gridPostBefore', $args);
+    }
+
+    public function gridPostAfter($args)
+    {
+        BPubSub::i()->fire(static::$_origClass.'::gridPostAfter', $args);
     }
 }

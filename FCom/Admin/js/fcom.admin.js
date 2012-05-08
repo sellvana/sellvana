@@ -885,3 +885,47 @@ $(function(){
         }, 100);
     });
 })
+
+$.fn.resizeWithWindow = function(options) {
+    var settings = $.extend({ x:false, y:true, dX:null, dX:null, initBy:null, jqGrid:null }, options || {});
+    var $win = $(window), $el = this, isGrid = settings.jqGrid || $el.hasClass('ui-jqgrid-btable');
+
+    function resize() {
+        if (settings.initBy) {
+            var w = $by.outerWidth()-padX, h = $by.outerHeight()-padY;
+        } else {
+            var c = $el.offset(), w = $win.width()-dX-(c.left-coords.left), h = $win.height()-dY-(c.top-coords.top);
+        }
+        if (isGrid) {
+            if (settings.x) $el.jqGrid('setGridWidth', w);
+            if (settings.y) $el.jqGrid('setGridHeight', h);
+        } else {
+            if (settings.x) $el.width(w);
+            if (settings.y) $el.height(h);
+        }
+    }
+
+    if (settings.initBy) {
+        var $by = $(settings.initBy), parents = $el.parents(), padX = 0, padY = 0, isParent = false;
+        for (var i=0, ii=parents.length; i<ii; i++) {
+            var $p = $(parents[i]);
+            if (settings.x) padX += $p.outerWidth(true)-$p.width();
+            if (settings.y) padY += $p.outerHeight(true)-$p.height();
+            if (parents[i]===$by[0]) {
+                isParent = true;
+                break;
+            }
+        }
+        if (isParent) {
+            if (settings.x) $el.width($by.outerWidth()-padX);
+            if (settings.y) $el.height($by.outerHeight()-padY);
+        }
+    } else {
+        var dX = settings.dX!==null ? settings.dX : $win.width()-$el.width(),
+            dY = settings.dY!==null ? settings.dY : $win.height()-$el.height(),
+            coords = $el.offset();
+    }
+
+    resize();
+    $win.resize(resize);
+}
