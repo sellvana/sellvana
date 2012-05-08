@@ -52,6 +52,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['grid']['columns'] = $columns;
         $config['navGrid'] = array('add'=>false, 'edit'=>false, 'del'=>false);
         $config['custom']['personalize'] = 'products';
+        //$config['custom']['autoresize'] = '#linked-products-layout';
         return $config;
     }
 

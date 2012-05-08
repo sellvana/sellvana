@@ -29,6 +29,7 @@ head(function() {
             });
         }
     });
+    $('#linked-products-layout').resizeWithWindow();
 
     $('#family-autocomplete').fcom_autocomplete({
         url:'<?=BApp::href('catalog/families/autocomplete')?>',

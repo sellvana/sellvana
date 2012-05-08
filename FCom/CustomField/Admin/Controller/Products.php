@@ -40,6 +40,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         $id = BRequest::i()->params('id');
         $p = FCom_Catalog_Model_Product::i()->load($id);
+        if (!$p) {
+            $p = FCom_Catalog_Model_Product::i()->create();
+        }
 
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
 

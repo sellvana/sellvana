@@ -3,7 +3,6 @@
 abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Controller_Abstract
 {
     // Required parameters
-    protected static $_origClass = __CLASS__;
     protected $_modelClass;# = 'Model_Class_Name';
     protected $_gridHref;# = 'feature';
 
@@ -25,7 +24,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
-        if (is_null($this->_formLayoutName)) $this->_formLayoutName = '/'.$this->_formHref;
+        if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
         if (is_null($this->_gridViewName))   $this->_formViewName = 'admin/grid';
         if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
         if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
@@ -52,10 +51,6 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         );
         BPubSub::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
         return $config;
-    }
-
-    public function gridOrmConfig($orm)
-    {
     }
 
     public function action_index()
@@ -96,6 +91,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
     }
 
+    public function gridOrmConfig($orm)
+    {
+        BPubSub::i()->fire(static::$_origClass.'::gridOrmConfig', array('orm'=>&$orm));
+    }
+
     public function action_grid_data__POST()
     {
         $this->_processGridDataPost($this->_modelClass);
@@ -125,7 +125,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => array(
                 'back' => '<button type="button" class="st2 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
-                'delete' => '<button type="submit" class="st3 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>',
+                'delete' => '<button type="submit" class="st4 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>',
                 'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
             ),
         ));
@@ -140,7 +140,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $id = $r->params('id', true);
             $model = $id ? $class::i()->load($id) : $class::i()->create();
             $data = $r->post('model');
-            $args = array('id'=>$id, 'data'=>&$data, 'do'=>$r->post('do'), 'model'=>$model);
+            $args = array('id'=>$id, 'do'=>$r->post('do'), 'data'=>&$data, 'model'=>&$model);
             $this->formPostBefore($args);
             if ($r->post('do')==='DELETE') {
                 $model->delete();

@@ -56,7 +56,7 @@ class FCom_Admin extends BClass
         ;
 
         BLayout::i()
-            ->defaultViewClass('FCom_Admin_View_Abstract')
+            ->defaultViewClass('FCom_Admin_View_Default')
             ->view('root', array('view_class'=>'FCom_Core_View_Root'))
             ->view('admin/header', array('view_class'=>'FCom_Admin_View_Header'))
             ->view('jqgrid', array('view_class'=>'FCom_Admin_View_Grid'))

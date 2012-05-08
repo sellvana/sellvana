@@ -45,6 +45,9 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
 
     protected function _processState($cfg)
     {
+        if (empty($cfg['grid']['id'])) {
+            return $cfg;
+        }
         $state = BSession::i()->get('grid_state');
         if (!empty($state[$cfg['grid']['id']])) {
             $r = $state[$cfg['grid']['id']];
@@ -228,13 +231,14 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { $(this).jqGrid('editGridRow', rowid); }";
         }
         if (!empty($cfg['custom']['autoresize'])) {
-            $cfg[] = "$('html').css({overflow:'hidden'});
-$(window).resize(function() {
-    var top = $('#{$cfg['grid']['id']}').offset().top, pager = $('#pager-{$cfg['grid']['id']}').height();
-    $('#{$cfg['grid']['id']}').jqGrid('setGridWidth', $(this).width()).jqGrid('setGridHeight', $(this).height()-top-pager);
-});
-$(window).trigger('resize');
-";
+            if ($cfg['custom']['autoresize']===true) {
+                $cfg[] = "$('html').css({overflow:'hidden'});
+var top = $('#{$cfg['grid']['id']}').offset().top, pager = $('#pager-{$cfg['grid']['id']}').height();
+$('#{$cfg['grid']['id']}').resizeWithWindow({x:true, dX:0, dY:top+pager});";
+            } else {
+                $cfg[] = "
+$('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'".addslashes($cfg['custom']['autoresize'])."', jqGrid:true});";
+            }
         }
         if (!empty($cfg['custom']['export'])) {
             if (!empty($cfg['grid']['export_url'])) {
