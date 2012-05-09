@@ -163,17 +163,24 @@ class BDb
     /**
     * Shortcut to run multiple queries from migrate scripts
     *
+    * It doesn't make sense to run multiple queries in the same call and use $params
+    *
     * @param string $sql
     * @param array $params
+    * @param array $options
+    *   - echo - echo all queries as they run
     */
-    public static function run($sql, $params=null)
+    public static function run($sql, $params=null, $options=array())
     {
         $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
         $results = array();
-        foreach ($queries as $query){
+        foreach ($queries as $i=>$query){
            if (strlen(trim($query)) > 0) {
                 #try {
                     BDebug::debug('DB.RUN: '.$query);
+                    if (!empty($options['echo'])) {
+                        echo '<hr><pre>'.$query.'<pre>';
+                    }
                     if (is_null($params)) {
                         $results[] = BORM::get_db()->exec($query);
                     } else {
