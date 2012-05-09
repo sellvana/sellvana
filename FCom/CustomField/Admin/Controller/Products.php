@@ -45,9 +45,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
+        foreach($fields as $field){
+            $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
+                    ->where("field_id", $field->id)->find_many();
+        }
 
         $view = $this->view('customfields/products/fields-partial');
-        $view->set('model', $p)->set('fields', $fields);
+        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
         BLayout::i()->rootView('customfields/products/fields-partial');
         BResponse::i()->render();
     }
