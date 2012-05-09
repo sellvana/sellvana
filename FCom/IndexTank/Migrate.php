@@ -74,6 +74,15 @@ class FCom_IndexTank_Migrate extends BClass
     public function installProductSchema()
     {
         $pTable = FCom_Catalog_Model_Product::table();
+        //check if table exists
+        try {
+            $check_table = FCom_Catalog_Model_Product::orm()->raw_query("show tables like '{$pTable}'", null)->find_one();
+            if (!$check_table){
+                return false;
+            }
+        } catch (Exception $e){
+            return false;
+        }
         $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
         foreach($fields as $f){
             $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
