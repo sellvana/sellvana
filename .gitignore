@@ -2,3 +2,4 @@ storage/config/local.php
 storage/config/db.php
 storage/log/
 lib/*
+local/*

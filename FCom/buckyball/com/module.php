@@ -626,7 +626,8 @@ class BModule extends BClass
             static::$_env['base_href'] = static::$_env['web_root'];
         }
         foreach (static::$_manifestCache as &$m) {
-            $m['base_src'] = static::$_env['base_src'].str_replace(static::$_env['root_dir'], '', $m['root_dir']);
+			//    $m['base_src'] = static::$_env['base_src'].str_replace(static::$_env['root_dir'], '', $m['root_dir']);
+			$m['base_src'] = rtrim(static::$_env['base_src'], '/').str_replace(static::$_env['root_dir'], '', $m['root_dir']);
         }
         unset($m);
     }
@@ -895,7 +896,6 @@ class BMigrate extends BClass
                 }
                 $modules[$m->module_name]['schema_version'] = $m->schema_version;
             }
-
             // run required migration scripts
             foreach ($modules as $modName=>$mod) {
                 if (empty($mod['code_version'])) {
