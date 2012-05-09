@@ -1,0 +1,24 @@
+{
+    "modules": {
+        "BGanon": {
+            "root_dir": "BGanon",
+            "bootstrap": {"file":"BGanon.php", "callback":"BGanon::bootstrap"},
+            "version": "0.5.0"
+        },
+        "BPHPTAL": {
+            "root_dir": "BPHPTAL",
+            "bootstrap": {"file":"BPHPTAL.php", "callback":"BPHPTAL::bootstrap"},
+            "version": "1.2.2-0"
+        },
+        "BUI": {
+            "root_dir": "BUI",
+            "bootstrap": {"file":"BUI.php", "callback":"BUI::bootstrap"},
+            "version": "0.0.1"
+        },
+        "BFireLogger": {
+            "root_dir": "BFireLogger",
+            "bootstrap": {"file":"BFireLogger.php", "callback":"BFireLogger::bootstrap"},
+            "version": "1.0.0"
+        }
+    }
+}
