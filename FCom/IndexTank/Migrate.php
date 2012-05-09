@@ -9,17 +9,15 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function install()
     {
-        return false; //TODO skip if no configuration
-
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
-            CREATE TABLE {$pIndexHelperTable} (
+            CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `index` VARCHAR( 255 ) NOT NULL ,
             `checkpoint` TIMESTAMP
             ) ENGINE = InnoDB;
          ");
-        BDb::run("insert into {$pIndexHelperTable}(`index`, checkpoint) values('products', null");
+        BDb::run("insert into {$pIndexHelperTable} (`index`, checkpoint) values('products', null)");
 
         //create table
         $pFieldsTable = FCom_IndexTank_Model_ProductField::table();

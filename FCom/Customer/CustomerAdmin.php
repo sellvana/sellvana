@@ -13,6 +13,9 @@ class FCom_Customer_Admin extends BClass
         BLayout::i()->addAllViews('Admin/views')->afterTheme('FCom_Customer_Admin::layout');
 
         FCom_Admin_Model_Role::i()->createPermission(array(
+            'api/customers' => 'Customers',
+            'api/customers/view' => 'View',
+            'api/customers/update' => 'Update',
             'customers' => 'Customers',
             'customers/manage' => 'Manage',
             'customers/import' => 'Import',
