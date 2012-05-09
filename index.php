@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__.'/lib/buckyball/buckyball.php';
 require_once __DIR__.'/FCom/Core/Core.php';
 
 if (file_exists(__DIR__.'index.local.php')) {

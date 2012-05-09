@@ -2,9 +2,10 @@
 
 if (!defined('FULLERON_ROOT_DIR')) {
     define('FULLERON_ROOT_DIR', dirname(dirname(__DIR__)));
-    //set_time_limit(2);
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL | E_STRICT);
+}
+
+if (!defined('BUCKYBALL_ROOT_DIR')) {
+    require_once FULLERON_ROOT_DIR.'/FCom/buckyball/buckyball.php';
 }
 
 class FCom_Core extends BClass
