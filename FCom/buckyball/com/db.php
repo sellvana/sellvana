@@ -176,7 +176,7 @@ class BDb
         $results = array();
         foreach ($queries as $i=>$query){
            if (strlen(trim($query)) > 0) {
-                #try {
+                try {
                     BDebug::debug('DB.RUN: '.$query);
                     if (!empty($options['echo'])) {
                         echo '<hr><pre>'.$query.'<pre>';
@@ -186,9 +186,12 @@ class BDb
                     } else {
                         $results[] = BORM::get_db()->prepare($query)->execute($params);
                     }
-                #} catch (Exception $e) {
-                #    var_dump($e); exit;
-                #}
+                } catch (Exception $e) {
+                    echo "<hr>{$e->getMessage()}: <pre>{$query}</pre>";
+                    if (empty($options['soft_error'])) {
+                        throw $e;
+                    }
+                }
            }
         }
         return $results;

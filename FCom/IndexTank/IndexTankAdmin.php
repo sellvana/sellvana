@@ -332,7 +332,7 @@ class FCom_IndexTank_Admin extends BClass
         } catch (Exception $e){
             return false;
         }
-        
+
         $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
