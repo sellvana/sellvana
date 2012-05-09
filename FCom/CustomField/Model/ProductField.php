@@ -51,6 +51,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if (!$this->id && ($exists = static::i()->load($this->product_id, 'product_id'))) {
             return false;
         }
+        
         return true;
     }
 

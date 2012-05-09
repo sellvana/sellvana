@@ -10,6 +10,7 @@ class FCom_IndexTank_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
+
         BGanon::i()->ready('FCom_IndexTank_Admin::initIndexButtons', array('on_path'=>array(
             '/catalog/products',
             '/indextank/product_fields',
