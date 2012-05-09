@@ -201,18 +201,20 @@ class FCom_Core extends BClass
             $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
             // if minified version used, need to load plugins manually
         }
-        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/FCom';
-        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/market/*';
-        $this->_modulesDirs[] = FULLERON_ROOT_DIR.'/local/*';
+        // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
+        $rootDir = $config->get('fs/root_dir');
+        $this->_modulesDirs[] = $rootDir.'/FCom';
+        $this->_modulesDirs[] = $rootDir.'/market/*';
+        $this->_modulesDirs[] = $rootDir.'/local/*';
 
         foreach ($this->_modulesDirs as $dir) {
             BModuleRegistry::i()->scan($dir);
         }
 #BDebug::profile($d);
 
-        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/local'));
-        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR.'/market'));
-        BClassAutoload::i(true, array('root_dir'=>FULLERON_ROOT_DIR));
+        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
+        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+        BClassAutoload::i(true, array('root_dir'=>$rootDir));
 
         return $this;
     }

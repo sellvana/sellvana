@@ -146,8 +146,8 @@ class BModuleRegistry extends BClass
             return $this;
         }
         foreach ($manifests as $file) {
-            $ext = pathinfo($file, PATHINFO_EXTENSION);
-            switch ($ext) {
+            $info = pathinfo($file);
+            switch ($info['extension']) {
                 case 'php':
                     $manifest = include($file);
                     break;
@@ -589,7 +589,7 @@ class BModule extends BClass
         //TODO: eliminate need for manifest file
         $file = $this->manifest_file;
         if (empty(static::$_manifestCache[$file])) {
-            static::$_manifestCache[$file] = array('root_dir' => str_replace('\\', '/', dirname(realpath($file))));
+            static::$_manifestCache[$file] = array('root_dir' => str_replace('\\', '/', dirname($file)));
         }
         return static::$_manifestCache[$file];
     }
@@ -614,6 +614,7 @@ class BModule extends BClass
         } else {
             static::$_env['root_dir'] = str_replace('\\', '/', $r->scriptDir());
         }
+
         if (($baseSrc = $c->get('web/base_src'))) {
             static::$_env['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_env['http_host'].$baseSrc;
         } else {
