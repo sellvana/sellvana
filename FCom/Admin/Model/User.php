@@ -49,6 +49,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
+        if (!$this->role_id) {
+            $this->role_id = null;
+        }
+
         return true;
     }
 

@@ -40,9 +40,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     {
         parent::formPostBefore($args);
 
-        unset($data['model']['password_hash']);
-        if (!empty($data['model']['password'])) {
-            $model->setPassword($data['model']['password']);
+        unset($args['data']['model']['password_hash']);
+        if (!empty($args['data']['model']['password'])) {
+            $args['model']->setPassword($args['data']['model']['password']);
         }
     }
 }
