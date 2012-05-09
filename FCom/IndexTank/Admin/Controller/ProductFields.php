@@ -56,19 +56,4 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         parent::action_form__POST();
     }
 
-    static public function onGridViewBefore($args)
-    {
-  /*      $args['view']->actions += array(
-    '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
-            <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
-<script type="text/javascript">
-function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
-    .done(function( msg ) { alert( msg ); }); }
-function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href('indextank/products/index').'"})
-    .done(function( msg ) { alert( msg ); }); }
-</script>',
-  );
-  */
-    }
-
 }
