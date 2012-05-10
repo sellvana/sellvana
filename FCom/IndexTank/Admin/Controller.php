@@ -4,9 +4,20 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
     static public function bootstrap()
     {
         BPubSub::i()->on('FCom_IndexTank_Admin_Controller_ProductFields::gridViewBefore',
-                'FCom_IndexTank_Admin_Controller::onGridViewBefore');
+                'FCom_IndexTank_Admin_Controller::initButtons');
+        BPubSub::i()->on('FCom_IndexTank_Admin_Controller_ProductFunctions::gridViewBefore',
+                'FCom_IndexTank_Admin_Controller::initButtons');
     }
-    static public function onGridViewBefore($args)
+    static public function initButtons()
+    {
+        BGanon::i()->ready('FCom_IndexTank_Admin_Controller::initIndexButtons', array('on_path'=>array(
+            '/catalog/products',
+            '/indextank/product_fields',
+            '/indextank/product_functions',
+        )));
+    }
+
+    public static function initIndexButtons($args)
     {
         try {
             FCom_IndexTank_Index_Product::i()->status();
@@ -23,13 +34,9 @@ function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href
     .done(function( msg ) { alert( msg ); }); }
 </script>
 ';
-
-       $args['view']->set(array('actions' => array('new' => ($insert . $args['view']->actions['new']))));
-        /*
         if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
             $el->setInnerText($insert.$el->getInnerText());
         }
-        */
 
     }
 }
