@@ -36,14 +36,34 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    public function formViewBefore()
+    {
+        $id = BRequest::i()->params('id', true);
+        $p = FCom_Catalog_Model_Product::i()->load($id);
+
+        if (!$p) {
+            return;//$p = FCom_Catalog_Model_Product::i()->create();
+        }
+
+        $fields_options = array();
+        $fields = FCom_CustomField_Model_ProductField::i()->productFields($p);
+        foreach($fields as $field){
+            $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
+                    ->where("field_id", $field->id)->find_many();
+        }
+        $view = $this->view('customfields/products/fields-partial');
+        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
+    }
+
     public function action_fields_partial()
     {
-        $id = BRequest::i()->params('id');
+        $id = BRequest::i()->params('id', true);
         $p = FCom_Catalog_Model_Product::i()->load($id);
         if (!$p) {
             $p = FCom_Catalog_Model_Product::i()->create();
         }
 
+        $fields_options = array();
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
         foreach($fields as $field){
             $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()

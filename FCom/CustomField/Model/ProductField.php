@@ -11,7 +11,8 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if ($p->_fieldset_ids || !empty($r['add_fieldset_ids'])) {
             $addSetIds = BUtil::arrayCleanInt($p->_fieldset_ids);
             if (!empty($r['add_fieldset_ids'])) {
-                $addSetIds += BUtil::arrayCleanInt($r['add_fieldset_ids']);
+                //$addSetIds += BUtil::arrayCleanInt($r['add_fieldset_ids']);
+                $addSetIds = array_merge($addSetIds, BUtil::arrayCleanInt($r['add_fieldset_ids']));
             }
             $where['OR'][] = "f.id IN (SELECT field_id FROM ".FCom_CustomField_Model_SetField::table()
                 ." WHERE set_id IN (".join(',', $addSetIds)."))";
@@ -21,8 +22,10 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if ($p->_add_field_ids || !empty($r['add_field_ids'])) {
             $addFieldIds = BUtil::arrayCleanInt($p->_add_field_ids);
             if (!empty($r['add_field_ids'])) {
-                $addFieldIds += BUtil::arrayCleanInt($r['add_field_ids']);
+                //$addFieldIds += BUtil::arrayCleanInt($r['add_field_ids']);
+                $addFieldIds = array_merge($addFieldIds, BUtil::arrayCleanInt($r['add_field_ids']));
             }
+
             $where['OR'][] = "f.id IN (".join(',', $addFieldIds).")";
             $p->_add_field_ids = join(',', array_unique($addFieldIds));
         }
@@ -30,7 +33,8 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if ($p->_hide_field_ids || !empty($r['hide_field_ids'])) {
             $hideFieldIds = BUtil::arrayCleanInt($p->_hide_field_ids);
             if (!empty($r['hide_field_ids'])) {
-                $hideFieldIds += BUtil::arrayCleanInt($r['hide_field_ids']);
+                //$hideFieldIds += BUtil::arrayCleanInt($r['hide_field_ids']);
+                $hideFieldIds = array_merge($hideFieldIds, BUtil::arrayCleanInt($r['hide_field_ids']));
             }
             $where[] = "f.id NOT IN (".join(',', $hideFieldIds).")";
             $p->_hide_field_ids = join(',', array_unique($hideFieldIds));
@@ -51,7 +55,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if (!$this->id && ($exists = static::i()->load($this->product_id, 'product_id'))) {
             return false;
         }
-        
+
         return true;
     }
 

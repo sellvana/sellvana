@@ -21,7 +21,9 @@ class FCom_CustomField_Admin extends BClass
 
         BPubSub::i()
             ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
-            ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns');
+            ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns')
+                //
+            ->on('FCom_Catalog_Admin_Controller_Products::formViewBefore', 'FCom_CustomField_Admin_Controller_Products.formViewBefore');
         ;
     }
 
