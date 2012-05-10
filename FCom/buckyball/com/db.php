@@ -379,7 +379,6 @@ class BDb
     public static function ddlClearCache()
     {
         static::$_tables = array();
-        return $this;
     }
 
     /**

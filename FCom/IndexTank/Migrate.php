@@ -17,6 +17,7 @@ class FCom_IndexTank_Migrate extends BClass
             `checkpoint` TIMESTAMP
             ) ENGINE = InnoDB;
          ");
+        BDb::i()->ddlClearCache();
         BDb::run("insert into {$pIndexHelperTable} (`index`, checkpoint) values('products', null)");
 
         //create table
@@ -39,6 +40,7 @@ class FCom_IndexTank_Migrate extends BClass
             PRIMARY KEY (`id`)
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+        BDb::i()->ddlClearCache();
 
         //add initial data
         $this->installProductSchema();
@@ -53,6 +55,8 @@ class FCom_IndexTank_Migrate extends BClass
             `definition` VARCHAR( 1024 ) NOT NULL
             ) ENGINE = InnoDB;
             ");
+        BDb::i()->ddlClearCache();
+        
         //predefined functions
         $functions  =  array (
                 'age'                   => array('number' => 0, 'definition' => '-age'         ),
