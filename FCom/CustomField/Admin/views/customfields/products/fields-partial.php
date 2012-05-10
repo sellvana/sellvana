@@ -10,7 +10,7 @@ $m = $this->model;
         <?php if($field->admin_input_type == 'select'):?>
             <select name="model[<?= $field->field_code ?>]">
                 <?php foreach($this->fields_options[$field->id] as $field_option):?>
-                    <option value="<?=$field_option->label?>"><?=$field_option->label?></option>
+                    <option value="<?=$field_option->label?>" <?= ($field_option->label == $m->{$field->field_code})?'selected':''?> ><?=$field_option->label?></option>
                 <?php endforeach; ?>
             </select>
         <?php elseif($field->admin_input_type == 'text'):?>
