@@ -14,6 +14,9 @@
         <h3><a href="#">HTML</a></h3>
         <div>
             <table>
+                <tr><td>Theme</td><td><select name="config[modules][FCom_Admin][theme]">
+<?php echo $this->optionsHtml(BLayout::i()->getThemes('FCom_Admin', true), $c->get('modules/FCom_Admin/theme')) ?>
+                </select></td></tr>
                 <tr><td>Additional JS</td><td><textarea name="config[modules][FCom_Admin][add_js]" style="width:400px; height:100px"><?php echo $this->q($c->get('modules/FCom_Admin/add_js')) ?></textarea></td></tr>
                 <tr><td>Additional CSS</td><td><textarea name="config[modules][FCom_Admin][add_css]" style="width:400px; height:100px"><?php echo $this->q($c->get('modules/FCom_Admin/add_css')) ?></textarea></td></tr>
             </table>

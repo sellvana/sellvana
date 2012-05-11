@@ -55,6 +55,8 @@ class FCom_Admin extends BClass
             ->route('POST /modules/migrate', 'FCom_Admin_Controller_Modules.migrate')
         ;
 
+        $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');
+
         BLayout::i()
             ->defaultViewClass('FCom_Admin_View_Default')
             ->view('root', array('view_class'=>'FCom_Core_View_Root'))
@@ -63,7 +65,7 @@ class FCom_Admin extends BClass
 
             ->addAllViews('views')
 
-            ->defaultTheme('FCom_Admin_DefaultTheme')
+            ->defaultTheme($defaultTheme ? $defaultTheme : 'FCom_Admin_DefaultTheme')
             ->afterTheme('FCom_Admin::layout')
         ;
 

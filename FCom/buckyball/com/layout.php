@@ -421,6 +421,11 @@ class BLayout extends BClass
             BDebug::error('Layout recursion detected: '.$d['name']);
             return;
         }
+        static $layoutsApplied = array();
+        if (!empty($layoutsApplied[$d['name']]) && empty($d['repeat'])) {
+            return;
+        }
+        $layoutsApplied[$d['name']] = 1;
         $this->applyLayout($d['name']);
     }
 
@@ -496,13 +501,26 @@ class BLayout extends BClass
     public function addTheme($themeName, $params)
     {
         BDebug::debug('THEME.ADD '.$themeName);
-        $area = BApp::i()->get('area');
-        if (!empty($params['area']) && !in_array($area, (array)$params['area'])) {
-            BDebug::debug('Theme '.$themeName.' can not be used in '.$area);
-            return $this;
-        }
         $this->_themes[$themeName] = $params;
         return $this;
+    }
+
+    public function getThemes($area=null, $asOptions=false)
+    {
+        if (is_null($area)) {
+            return $this->_themes;
+        }
+        $themes = array();
+        foreach ($this->_themes as $name=>$theme) {
+            if (!empty($theme['area']) && $theme['area']===$area) {
+                if ($asOptions) {
+                    $themes[$name] = !empty($theme['description']) ? $theme['description'] : $name;
+                } else {
+                    $themes[$name] = $theme;
+                }
+            }
+        }
+        return $themes;
     }
 
     public function applyTheme($themeName=null)
@@ -523,9 +541,14 @@ class BLayout extends BClass
             BDebug::error('Invalid theme name: '.$themeName);
             return $this;
         }
+        $area = BApp::i()->get('area');
+        if (!empty($params['area']) && !in_array($area, (array)$params['area'])) {
+            BDebug::debug('Theme '.$themeName.' can not be used in '.$area);
+            return $this;
+        }
         BDebug::debug('THEME.LOAD '.$themeName);
         BPubSub::i()->fire('BLayout::theme.load.before', array('theme_name'=>$themeName));
-        call_user_func($this->_themes[$themeName]['callback']);
+        BUtil::call($this->_themes[$themeName]['callback']);
         BPubSub::i()->fire('BLayout::theme.load.after', array('theme_name'=>$themeName));
         return $this;
     }

@@ -356,7 +356,7 @@ FCom.Admin.tree = function(el, opt) {
             "ajax" : {"url" : opt.url, "data" : function (n) {
                 return {
                     "operation" : "get_children",
-                    "id" : n.attr ? n.attr("id").replace("node_","") : 1,
+                    "id" : n.attr ? n.attr("id").replace("node_","") : 'NULL',
                     'expanded': expanded ? 1 : '',
                     'refresh': n!=-1 ? 1 : ''
                 };

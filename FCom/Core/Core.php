@@ -51,11 +51,12 @@ class FCom_Core extends BClass
 
         // $localConfig used to override saved config with settings from entry point
         $localConfig = array();
-        $localConfig['fcom_root_dir'] = FULLERON_ROOT_DIR;
+        $localConfig['fs']['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
         $rootDir = $config->get('fs/root_dir');
         if (!$rootDir) {
-            $localConfig['fs']['root_dir'] = $rootDir = FULLERON_ROOT_DIR;
+            // not FULLERON_ROOT_DIR, but actual called entry point dir
+            $localConfig['fs']['root_dir'] = $rootDir = BRequest::i()->scriptDir();
         }
 
         BDebug::debug('ROOTDIR='.$rootDir);

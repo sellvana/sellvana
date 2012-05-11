@@ -21,8 +21,10 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $result = null;
         switch ($r->get('operation')) {
         case 'get_children':
-            $node = $class::i()->load($r->get('id'));
-            if ($r->get('id')==1 && !$r->get('refresh')) {
+            if ($r->get('id')=='NULL') {
+                $result = $this->_nodeChildren(null, 1);
+                /*
+                $rootNodes = $class::i()->orm()->where_null('parent_id')->find_many();
                 $result = array(
                     'data' => $node->node_name?$node->node_name:'ROOT',
                     'attr' => array('id'=>$node->id),
@@ -30,7 +32,9 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     'rel' => 'root',
                     'children' => $this->_nodeChildren($node, $r->get('expanded')=='true'?10:0),
                 );
+                */
             } else {
+                $node = $class::i()->load($r->get('id'));
                 $node->descendants();
                 $result = $this->_nodeChildren($node, 100);
             }
@@ -41,15 +45,17 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
     protected function _nodeChildren($node, $depth=0)
     {
+        $class = $this->_navModelClass;
+        $nodeChildren = $node ? $node->children() : $class::i()->orm()->where_null('parent_id')->find_many();
         $children = array();
-        foreach ($node->children() as $c) {
+        foreach ($nodeChildren as $c) {
             $children[] = array(
-                'data'=>$c->node_name,
-                'attr'=>array('id'=>$c->id),
-                'state'=>$c->num_children?($depth?'open':'closed'):null,
-                'rel'=>$c->num_children?'parent':'leaf',
+                'data'     => $c->node_name ? $c->node_name : 'ROOT',
+                'attr'     => array('id'=>$c->id),
+                'state'    => $c->num_children ? ($depth ? 'open' : 'closed') : null,
+                'rel'      => $node ? 'root' : ($c->num_children ? 'parent' : 'leaf'),
                 'position' => $c->sort_order,
-                'children'=>$depth && $c->num_children ? $this->_nodeChildren($c, $depth-1) : null,
+                'children' => $depth && $c->num_children ? $this->_nodeChildren($c, $depth-1) : null,
             );
         }
         return $children;
