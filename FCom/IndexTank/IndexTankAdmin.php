@@ -194,7 +194,7 @@ class FCom_IndexTank_Admin extends BClass
             $doc->field_name        = $field_name;
             $doc->field_nice_name   = $cf_model->frontend_label;
             $doc->field_type        = $type;
-            $doc->facets            = 1;
+            $doc->facets            = 0;
             $doc->search            = 0;
             $doc->source_type       = 'product';
             $doc->source_value      = $cf_model->field_code;
@@ -319,5 +319,5 @@ class FCom_IndexTank_Admin extends BClass
             ));
     }
 
-    
+
 }
