@@ -781,7 +781,7 @@ class BClassRegistry extends BClass
             return $this->_methodOverrideCache[$cacheKey];
         }
         if (!empty($this->_methods[$method][$static][$type]['extends'])) {
-            $parents = array_flip(class_parents($class));
+            $parents = class_parents($class);
             foreach ($this->_methods[$method][$static][$type]['extends'] as $c=>$v) {
                 if (isset($parents[$c])) {
                     $this->_methodOverrideCache[$cacheKey] = $v;
@@ -790,7 +790,7 @@ class BClassRegistry extends BClass
             }
         }
         if (!empty($this->_methods[$method][$static][$type]['implements'])) {
-            $implements = array_flip(class_implements($class));
+            $implements = class_implements($class);
             foreach ($this->_methods[$method][$static][$type]['implements'] as $i) {
                 if (isset($implements[$p])) {
                     $this->_methodOverrideCache[$cacheKey] = $v;
@@ -1564,7 +1564,7 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
     */
     public function close()
     {
-        if (!$this->_dirty) {
+        if (!$this->_dirty || !empty($_SESSION)) {
             return;
         }
 BDebug::debug(__METHOD__.': '.spl_object_hash($this));

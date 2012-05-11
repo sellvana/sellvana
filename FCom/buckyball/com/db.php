@@ -665,7 +665,7 @@ class BORM extends ORMWrapper
     protected static function _log_query($query, $parameters)
     {
         $result = parent::_log_query($query, $parameters);
-        static::$_last_profile = BDebug::debug('DB.RUN: '.static::$_last_query);
+        static::$_last_profile = BDebug::debug('DB.RUN: '.(static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED'));
         return $result;
     }
 

@@ -880,6 +880,23 @@ class BUtil
         return 'http://www.gravatar.com/avatar/'.md5(strtolower($email))
             .($params ? '?'.http_build_query($params) : '');
     }
+
+    public static function call($callback, $args=array(), $array=false)
+    {
+        if (is_string($callback)) {
+            if (($c = explode('.', $callback))) {
+                list($class, $method) = $c;
+            } elseif (($c = explode('->', $callback))) {
+                list($class, $method) = $c;
+            }
+            $callback = array($class::i(), $method);
+        }
+        if ($array) {
+            return call_user_func_array($callback, $args);
+        } else {
+            return call_user_func($callback, $args);
+        }
+    }
 }
 
 /**
