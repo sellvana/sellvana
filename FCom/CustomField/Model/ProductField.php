@@ -36,7 +36,13 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
                 //$hideFieldIds += BUtil::arrayCleanInt($r['hide_field_ids']);
                 $hideFieldIds = array_merge($hideFieldIds, BUtil::arrayCleanInt($r['hide_field_ids']));
             }
-            $where[] = "f.id NOT IN (".join(',', $hideFieldIds).")";
+            if (!empty($r['add_field_ids'])){
+                $addFieldIdsUnset = BUtil::arrayCleanInt($p->_add_field_ids);
+                $hideFieldIds = array_diff($hideFieldIds, $addFieldIdsUnset);
+            }
+            if (!empty($hideFieldIds)){
+                $where[] = "f.id NOT IN (".join(',', $hideFieldIds).")";
+            }
             $p->_hide_field_ids = join(',', array_unique($hideFieldIds));
         }
 
@@ -56,8 +62,47 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
             return false;
         }
 
+        //clear add fields ids
+        if(!empty($this->_hide_field_ids)){
+            $hide_fields = explode(",",$this->_hide_field_ids);
+            if (!empty($this->_add_field_ids)){
+                $add_fields = explode(",",$this->_add_field_ids);
+                foreach($add_fields as $id => $af){
+                    if(in_array($af, $hide_fields)){
+                        unset($add_fields[$id]);
+                    }
+                }
+                $this->_add_field_ids = implode(",", $add_fields);
+            }
+        }
+
         return true;
     }
+
+    public function removeField($p, $hide_field)
+    {
+        if (!empty($p->_add_field_ids)){
+            $add_fields = explode(",",$p->_add_field_ids);
+            foreach($add_fields as $id => $af){
+                if($af == $hide_field){
+                    unset($add_fields[$id]);
+                }
+            }
+            $p->_add_field_ids = implode(",", $add_fields);
+        }
+        $field = FCom_CustomField_Model_Field::i()->load($hide_field);
+        $p->{$field->field_code} = '';
+        if(!empty($p->_hide_field_ids)){
+            $p->_hide_field_ids .= ','.$hide_field;
+        } else {
+            $p->_hide_field_ids = $hide_field;
+        }
+        $p->save();
+    }
+
+
+
+
 
     public static function install()
     {
