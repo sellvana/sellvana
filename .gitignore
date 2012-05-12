@@ -3,3 +3,5 @@ storage/config/db.php
 storage/log/
 lib/*
 local/*
+vendor/*
+user/*

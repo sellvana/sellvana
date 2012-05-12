@@ -133,7 +133,7 @@ class BRequest extends BClass
     */
     public static function docRoot()
     {
-        return !empty($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : null;
+        return !empty($_SERVER['DOCUMENT_ROOT']) ? str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']) : null;
     }
 
     /**
@@ -143,7 +143,7 @@ class BRequest extends BClass
     */
     public static function scriptName()
     {
-        return !empty($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : null;
+        return !empty($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : null;
     }
 
     /**
@@ -153,7 +153,7 @@ class BRequest extends BClass
     */
     public static function scriptFilename()
     {
-        return !empty($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : null;
+        return !empty($_SERVER['SCRIPT_FILENAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']) : null;
     }
 
     /**
@@ -179,7 +179,7 @@ class BRequest extends BClass
         if (empty($_SERVER['SCRIPT_NAME'])) {
             return null;
         }
-        $root = dirname($_SERVER['SCRIPT_NAME']);
+        $root = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
         if ($parentDepth) {
             $arr = explode('/', $root);
             $len = sizeof($arr)-$parentDepth;

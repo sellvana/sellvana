@@ -55,6 +55,18 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
     }
 
+    public function action_field_remove()
+    {
+        $id = BRequest::i()->params('id', true);
+        $p = FCom_Catalog_Model_Product::i()->load($id);
+        if(!$p){
+            return;
+        }
+        $hide_field = BRequest::i()->params('hide_field', true);
+
+        FCom_CustomField_Model_ProductField::i()->removeField($p, $hide_field);
+    }
+
     public function action_fields_partial()
     {
         $id = BRequest::i()->params('id', true);
