@@ -728,6 +728,23 @@ class BORM extends ORMWrapper
         return parent::select($column, $alias);
     }
 
+    protected $_use_index = array();
+
+    public function use_index($index, $type='USE', $table='_')
+    {
+        $this->_use_index[$table] = compact('index', 'type');
+        return $this;
+    }
+
+    protected function _build_select_start() {
+        $fragment = parent::_build_select_start();
+        if (!empty($this->_use_index['_'])) {
+            $idx = $this->_use_index['_'];
+            $fragment .= ' '.$idx['type'].' INDEX ('.$idx['index'].') ';
+        }
+        return $fragment;
+    }
+
     /**
     * Return select sql statement built from the ORM object
     *
