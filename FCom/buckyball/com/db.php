@@ -157,7 +157,7 @@ class BDb
     */
     public static function now()
     {
-        return gmstrftime('%F %T');
+        return gmstrftime('%Y-%m-%d %H:%M:%S');
     }
 
     /**
