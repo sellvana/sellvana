@@ -9,16 +9,18 @@
         <li>
             <h4 class="label">Display as</h4>
             <select name="model[show]">
+                <option <?=('' == $m->show)?'selected':''?> value="">---</option>
                 <option <?=('checkbox' == $m->show)?'selected':''?> value="checkbox">Checkbox</option>
-                <option <?=('link' == $m->show || '' == $m->show)?'selected':''?> value="link">Link</option>
+                <option <?=('link' == $m->show)?'selected':''?> value="link">Link</option>
             </select>
         </li>
 
         <li>
             <h4 class="label">Filter type</h4>
             <select name="model[filter]">
+                <option <?=('' == $m->filter)?'selected':''?> value="">---</option>
                 <option <?=('exclusive' == $m->filter)?'selected':''?> value="exclusive">Exclusive</option>
-                <option <?=('inclusive' == $m->filter || '' == $m->filter)?'selected':''?> value="inclusive">Inclusive</option>
+                <option <?=('inclusive' == $m->filter)?'selected':''?> value="inclusive">Inclusive</option>
             </select>
         </li>
         <?php else:?>

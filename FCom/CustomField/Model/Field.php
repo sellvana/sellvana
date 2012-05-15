@@ -72,11 +72,10 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     public function afterSave()
     {
         $fTable = $this->tableName();
-        file_put_contents("/tmp/debug", $fTable."\n", FILE_APPEND);
         $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
         $fType = preg_replace('#([^0-9a-z\(\),])#', '', $this->table_field_type);
         $field = BDb::ddlFieldInfo($fTable, $this->field_code);
-        if (!$field) {
+        if (!$field && empty($this->_oldTableFieldCode)) {
             BDb::run("ALTER TABLE {$fTable} ADD COLUMN {$fCode} {$fType}");
         } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode) {
             BDb::run("ALTER TABLE {$fTable} CHANGE COLUMN {$this->_oldTableFieldCode} {$fCode} {$fType}");
@@ -86,7 +85,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             $this->field_code = $fCode;
             $this->save();
         }
-        
+
         parent::afterSave();
     }
 
