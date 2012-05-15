@@ -280,6 +280,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $documents = array();
             }
         }
+
         if ($documents){
             $this->model()->add_documents($documents);
         }
@@ -325,7 +326,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function get_custom_field_key($cf_model)
     {
-        return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
+        //return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
+        return 'cf_'.$cf_model->id;
     }
 
     public function delete_categories($product, $category)
