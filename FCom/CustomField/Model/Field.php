@@ -58,6 +58,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
 
     public function afterLoad()
     {
+        parent::afterLoad();
         $this->_oldTableFieldCode = $this->field_code;
     }
 
@@ -71,6 +72,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     public function afterSave()
     {
         $fTable = $this->tableName();
+        file_put_contents("/tmp/debug", $fTable."\n", FILE_APPEND);
         $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
         $fType = preg_replace('#([^0-9a-z\(\),])#', '', $this->table_field_type);
         $field = BDb::ddlFieldInfo($fTable, $this->field_code);
@@ -79,15 +81,18 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode) {
             BDb::run("ALTER TABLE {$fTable} CHANGE COLUMN {$this->_oldTableFieldCode} {$fCode} {$fType}");
         }
-        //fix field code to allow value
+        //fix field code name
         if($this->field_code != $fCode){
             $this->field_code = $fCode;
             $this->save();
         }
+        
+        parent::afterSave();
     }
 
     public function afterDelete()
     {
+        parent::afterDelete();
         BDb::run("ALTER TABLE {$this->tableName()} DROP COLUMN {$this->field_code}");
     }
 

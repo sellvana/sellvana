@@ -130,6 +130,7 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductAfterSave($args)
     {
         $product = $args['model'];
+        //file_put_contents("/tmp/debug", $product->product_name."\n", FILE_APPEND);
         FCom_IndexTank_Index_Product::i()->add($product);
     }
 
@@ -181,9 +182,9 @@ class FCom_IndexTank_Admin extends BClass
     static public function onCustomFieldAfterSave($args)
     {
         $cf_model = $args['model'];
-
         //add custom field to the IndexTank product field table if not exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
+        //file_put_contents("/tmp/debug", $field_name, FILE_APPEND);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
         if (!$doc){
             $doc = FCom_IndexTank_Model_ProductField::orm()->create();
@@ -211,32 +212,6 @@ class FCom_IndexTank_Admin extends BClass
     }
 
     /**
-     *Update custom field name before save
-     * @param array $args
-     * @return void
-     */
-    static public function onCustomFieldBeforeSave($args)
-    {
-        $new_model = $args['model'];
-        if(!$new_model->id()){
-            return;
-        }
-        $orig_model = FCom_CustomField_Model_Field::i()->orm('cf')->load($new_model->id());
-        if (!$orig_model){
-            return;
-        }
-
-        $f = FCom_IndexTank_Model_ProductField::i()->orm()
-                    ->where('field_name', FCom_IndexTank_Index_Product::i()->get_custom_field_key($orig_model))
-                    ->where('type', 'category')
-                    ->find_one();
-        if ($f){
-            $f->field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($new_model);
-            $f->save();
-        }
-    }
-
-    /**
      * Catch event FCom_CustomField_Model_Field::BeforeDelete
      * to delete given custom field from products index
      * @param array $args contain custom field model
@@ -248,7 +223,7 @@ class FCom_IndexTank_Admin extends BClass
         foreach($products as $product){
             FCom_IndexTank_Index_Product::i()->delete_custom_field($product, $cf_model);
         }
-
+        //file_put_contents("/tmp/debug", print_r($products,1), FILE_APPEND);
         //delete custom field from the IndexTank product field table if exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
