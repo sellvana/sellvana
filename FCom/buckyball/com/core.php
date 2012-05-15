@@ -510,6 +510,7 @@ class BConfig extends BClass
         if (!BUtil::isPathAbsolute($filename)) {
             $filename = BConfig::i()->get('fs/config_dir').'/'.$filename;
         }
+        BUtil::ensureDir(dirname($filename));
         // Write contents
         if (!file_put_contents($filename, $contents, LOCK_EX)) {
             BDebug::error('Error writing configuration file: '.$filename);
