@@ -7,6 +7,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_gridHref = 'catalog/products';
     protected $_gridTitle = 'Products';
     protected $_recordName = 'Product';
+    protected $_mainTableAlias = 'p';
 
     public function gridColumns()
     {
@@ -27,6 +28,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['grid']['id'] = 'products';
         $config['grid']['columns'] = $this->gridColumns();
         return $config;
+    }
+
+    public function gridOrmConfig($orm)
+    {
+        $orm->use_index('primary');
     }
 
     public function formViewBefore($args)
