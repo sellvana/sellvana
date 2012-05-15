@@ -130,7 +130,6 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductAfterSave($args)
     {
         $product = $args['model'];
-        //file_put_contents("/tmp/debug", $product->product_name."\n", FILE_APPEND);
         FCom_IndexTank_Index_Product::i()->add($product);
     }
 
@@ -184,7 +183,6 @@ class FCom_IndexTank_Admin extends BClass
         $cf_model = $args['model'];
         //add custom field to the IndexTank product field table if not exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
-        //file_put_contents("/tmp/debug", $field_name, FILE_APPEND);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
         if (!$doc){
             $doc = FCom_IndexTank_Model_ProductField::orm()->create();
@@ -201,9 +199,10 @@ class FCom_IndexTank_Admin extends BClass
             $doc->source_value      = $cf_model->field_code;
 
             $doc->save();
+        } elseif('product' == $doc->source_type && $doc->source_value != $cf_model->field_code) {
+            $doc->source_value      = $cf_model->field_code;
+            $doc->save();
         }
-
-
 
         $products = $cf_model->products();
         foreach($products as $product){
@@ -219,17 +218,22 @@ class FCom_IndexTank_Admin extends BClass
     static public function onCustomFieldBeforeDelete($args)
     {
         $cf_model = $args['model'];
-        $products = $cf_model->products();
-        foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->delete_custom_field($product, $cf_model);
-        }
-        //file_put_contents("/tmp/debug", print_r($products,1), FILE_APPEND);
-        //delete custom field from the IndexTank product field table if exists yet
         $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
-        if ($doc){
-            $doc->delete();
+        if (!$doc){
+            return;
         }
+        if($doc->search){
+            self::productIndexDropField($field_name);
+        }
+        if($doc->facets){
+            $products = $cf_model->products();
+            foreach($products as $product){
+                FCom_IndexTank_Index_Product::i()->delete_category($product, $field_name);
+            }
+        }
+        $doc->delete();
+
     }
 
 
