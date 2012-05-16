@@ -68,7 +68,7 @@ class FCom_Catalog_Model_Product extends BModel
     public function categories($pId)
     {
         return FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
-                ->join('fcom_category', array('cp.category_id','=','c.id'), 'c')
+                ->join('FCom_Catalog_Model_Category', array('cp.category_id','=','c.id'), 'c')
                 ->where('cp.product_id', $pId)->find_many();
     }
 
