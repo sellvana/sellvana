@@ -7,8 +7,8 @@ class FCom_Cron extends BClass
     static public function bootstrap()
     {
         BFrontController::i()
-            ->route('GET /', 'FCom_Cron_Controller.all_tasks')
-            ->route('GET /*handle', 'FCom_Cron_Controller.one_task')
+            ->route('GET /', 'FCom_Cron_Controller.run')
+            ->route('GET /*task', 'FCom_Cron_Controller.run')
         ;
     }
 
@@ -56,8 +56,10 @@ class FCom_Cron extends BClass
         }
         // fetch configuration
         $c = BConfig::i()->get('modules/FCom_Cron');
-        $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins'] : 5;
+        $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins']*1 : 5;
         $timeoutSecs = !empty($c['timeout_mins']) ? $c['timeout_mins']*60 : 3600;
+        $waitSecs = !empty($c['wait_secs']) ? $c['wait_secs']*1 : 30;
+#print_r(compact('leewayMins','timeoutSecs','waitSecs'));
         // get running or previously ran tasks
         $dbTasks = FCom_Cron_Model_Task::i()->orm('t')->find_many_assoc('handle');
         // cleanup stale running tasks
@@ -65,12 +67,11 @@ class FCom_Cron extends BClass
         $timeout = $time-$timeoutSecs;
         foreach ($dbTasks as $h=>$task) {
             $task->last_start_time = strtotime($task->last_start_dt);
-            if ($task->status==='running' && $task->last_start_time<$timeout) {
+            if ($task->status==='running' && $task->last_start_time < $timeout) {
                 $task->set('status', 'timeout')->save();
             }
-
         }
-        $thresholdTime = $time-58;
+        $thresholdTime = $time-$waitSecs;
         // try leeway minutes backwards for missed cron runs and mark matching tasks as pending
         for ($i=0; $i<$leewayMins; $i++) {
             // parse time into components
@@ -85,7 +86,7 @@ class FCom_Cron extends BClass
                     continue;
                 }
                 // skip tasks that started within last minute if not specified $force flag
-                if (!$force && !empty($dbTasks[$h]) && $dbTasks[$h]->last_start_time>$thresholdTime) {
+                if (!$force && !empty($dbTasks[$h]) && $dbTasks[$h]->last_start_time > $thresholdTime) {
 #echo $dbTasks[$h]->last_start_time.', '.$thresholdTime.', '.date('Y-m-d H:i:s', $dbTasks[$h]->last_start_time).', '.date('Y-m-d H:i:s', $thresholdTime).'<hr>';
                     continue;
                 }
@@ -222,18 +223,18 @@ class FCom_Cron extends BClass
 
 class FCom_Cron_Controller extends FCom_Core_Controller_Abstract
 {
-    public function action_all_tasks()
+    public function action_run()
     {
-        FCom_Cron::i()->run(null, BRequest::i()->get('force'));
-    }
-
-    public function action_one_task()
-    {
-        FCom_Cron::i()->run(BRequest::i()->param('handle'), BRequest::i()->get('force'));
-    }
-
-    public function afterDispatch()
-    {
+        $r = BRequest::i();
+        if ($r->request('wait')) {
+            BConfig::i()->set('modules/FCom_Cron/wait_secs', (int)$r->request('wait'));
+        }
+        if ($r->request('debug')) {
+            BDebug::level(BDebug::OUTPUT, $r->request('debug'));
+        }
+        $task = $r->param('task', true);
+        $force = $r->request('force');
+        FCom_Cron::i()->run($task, $force);
         BDebug::dumpLog();
         exit;
     }
