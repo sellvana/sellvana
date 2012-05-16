@@ -45,6 +45,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ));
     }
 
+    public function linked_categories_data()
+    {
+        $result = array('check_3', 'check_2','check_5','check_7');
+        return BUtil::toJson($result);
+    }
+
     public function productLibraryGridConfig($gridId='products')
     {
         $columns = $this->gridColumns();

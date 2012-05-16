@@ -349,7 +349,8 @@ FCom.Admin.tree = function(el, opt) {
 
     el.jstree({
         'core': {
-            animation:0
+            animation:0,
+            'initially_open': opt.initially_open
         },
         "plugins" : plugins,
         "json_data" : {
@@ -391,7 +392,7 @@ FCom.Admin.tree = function(el, opt) {
             }
         },
         'cookies': { auto_save: false,save_opened: false,save_selected: false},
-        'checkbox': { real_checkboxes:true }
+        'checkbox': opt.checkbox/*{ real_checkboxes:true }*/,
     })
     .bind("before.jstree", function (e, data) {
         if (data.func.match(/(create|remove|rename|move_node)/) && !checkLock()) {
