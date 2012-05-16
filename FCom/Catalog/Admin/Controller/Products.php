@@ -45,9 +45,17 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ));
     }
 
-    public function linked_categories_data()
+    public function linked_categories_data($model)
     {
-        $result = array('check_3', 'check_2','check_5','check_7');
+        $cp = FCom_Catalog_Model_CategoryProduct::i();
+        $categories = $cp->orm()->where('product_id', $model->id())->find_many();
+        if(!$categories){
+            return;
+        }
+        $result = array();
+        foreach($categories as $c){
+            $result[] = 'check_'.$c->category_id;
+        }
         return BUtil::toJson($result);
     }
 
@@ -157,17 +165,21 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         foreach($post as $key => $value){
             $matches = array();
             if(preg_match("#check_(\d+)#", $key, $matches)){
-                $categoreis[] = intval($matches[1]);
+                $categoreis[intval($matches[1])] = $value;
             }
         }
         if (!empty($categoreis)){
             $cat_product = FCom_Catalog_Model_CategoryProduct::i();
             $category_model = FCom_Catalog_Model_Category::i();
-            foreach($categoreis as $cat_id){
+
+            foreach($categoreis as $cat_id => $value){
                 $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
                 if(0 == $value && $product){
                     $product->delete();
                 }elseif(false == $product){
+                    $data=array('product_id' => $model->id(), 'category_id'=>$cat_id);
+                    FCom_Catalog_Model_CategoryProduct::create($data)->save();
+                    /*
                     $category = $category_model->load($cat_id);
                     if(!$category){
                         continue;
@@ -180,6 +192,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             FCom_Catalog_Model_CategoryProduct::create($data)->save();
                         }
                     }
+                     *
+                     */
                 }
             }
         }
