@@ -37,6 +37,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
                 $hideFieldIds = array_merge($hideFieldIds, BUtil::arrayCleanInt($r['hide_field_ids']));
             }
             if (!empty($r['add_field_ids'])){
+                //don't hide hidden fileds which user wants to add even
                 $addFieldIdsUnset = BUtil::arrayCleanInt($p->_add_field_ids);
                 $hideFieldIds = array_diff($hideFieldIds, $addFieldIdsUnset);
             }

@@ -5,3 +5,4 @@ lib/*
 local/*
 vendor/*
 user/*
+index.local.php

@@ -138,11 +138,46 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         parent::formPostAfter($args);
         extract($args);
+        $this->processCategoriesPost($model);
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
         $this->processFamilyProductsPost($model, $data);
     }
 
+    public function processCategoriesPost($model)
+    {
+        $post = BRequest::i()->post();
+        $categoreis = array();
+        foreach($post as $key => $value){
+            $matches = array();
+            if(preg_match("#check_(\d+)#", $key, $matches)){
+                $categoreis[] = intval($matches[1]);
+            }
+        }
+        if (!empty($categoreis)){
+            $cat_product = FCom_Catalog_Model_CategoryProduct::i();
+            $category_model = FCom_Catalog_Model_Category::i();
+            foreach($categoreis as $cat_id){
+                $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
+                if(0 == $value && $product){
+                    $product->delete();
+                }elseif(false == $product){
+                    $category = $category_model->load($cat_id);
+                    if(!$category){
+                        continue;
+                    }
+                    $category_ids = explode("/",$category->id_path);
+                    foreach($category_ids as $c_id) {
+                        $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $c_id)->find_one();
+                        if(false == $product){
+                            $data=array('product_id' => $model->id(), 'category_id'=>$c_id);
+                            FCom_Catalog_Model_CategoryProduct::create($data)->save();
+                        }
+                    }
+                }
+            }
+        }
+    }
     public function processLinkedProductsPost($model, $data)
     {
         $hlp = FCom_Catalog_Model_ProductLink::i();
