@@ -1,32 +1,5 @@
-<FilesMatch "(attachments)">
-Satisfy Any
-Order allow,deny
-Allow from all
-Deny from none
-</FilesMatch>
-
-Order allow,deny
-Allow from all
-#Order deny,allow
-#Deny from all
-Allow from 64.85.162.30
-#Minu
-Allow from 24.21.137.218
-Allow from 76.109.119.82
-Allow from 166.248.137.201
-Allow from 178.85.253.152
-Allow from 75.95.12.4
-Allow from 108.106.63.150
-Allow from 108.107.60.160
-Allow from 68.242.241.155
-Allow from 108.106.181.104
-Allow from 108.107.175.22
-Allow from 184.210.35.238
-Allow from 64.85.162.30
-Allow from 66.177.58.111
-
-Header unset ETag
-FileETag None
+#Header unset ETag
+#FileETag None
 
 <IfModule mod_expires.c>
     ExpiresActive On
@@ -38,8 +11,8 @@ FileETag None
 
 Options +FollowSymLinks -MultiViews
 
-php_value output_buffering Off
-php_value zlib.output_compression Off
+#php_value output_buffering Off
+#php_value zlib.output_compression Off
 
 <IfModule mod_rewrite.c>
 
