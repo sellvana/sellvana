@@ -280,6 +280,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $documents = array();
             }
         }
+
         if ($documents){
             $this->model()->add_documents($documents);
         }
@@ -325,18 +326,28 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function get_custom_field_key($cf_model)
     {
-        return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
+        //return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
+        return 'cf_'.$cf_model->id;
     }
 
+    /**
+     *
+     * @param FCom_Catalog_Model_Product $product
+     * @param FCom_Catalog_Model_Category $category
+     */
     public function delete_categories($product, $category)
     {
-        $category = array($this->get_category_key($category) => "");
-        $this->model()->update_categories($product->id(), $category);
+        $this->delete_category($product, $this->get_category_key($category));
     }
 
-    public function delete_custom_field($product, $cf_model)
+    /**
+     *
+     * @param FCom_Catalog_Model_Product $product
+     * @param string $category_field in IndexDen
+     */
+    public function delete_category($product, $category_field)
     {
-        $category = array($this->get_custom_field_key($cf_model) => "");
+        $category = array($category_field => "");
         $this->model()->update_categories($product->id(), $category);
     }
 
