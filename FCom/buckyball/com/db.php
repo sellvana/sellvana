@@ -1619,6 +1619,16 @@ class BModel extends Model
     }
 
     /**
+    * Return dirty fields for debugging
+    *
+    * @return array
+    */
+    public function dirty_fields()
+    {
+        return $this->orm->dirty_fields();
+    }
+
+    /**
      * Check whether the given field has changed since the object was created or saved
      */
     public function is_dirty($property=null) {
