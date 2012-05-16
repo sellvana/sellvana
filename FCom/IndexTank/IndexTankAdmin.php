@@ -33,6 +33,8 @@ class FCom_IndexTank_Admin extends BClass
                     //for categories
                     ->on('FCom_Catalog_Model_Category::afterSave', 'FCom_IndexTank_Admin::onCategoryAfterSave')
                     ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+                    ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
+                    ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
                     //for custom fields
                     ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
                     ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
@@ -159,6 +161,14 @@ class FCom_IndexTank_Admin extends BClass
         }
     }
 
+    static public function onCategoryProductAfterSave($args)
+    {
+        $cp = $args['model'];
+        $product = FCom_Catalog_Model_Product::i()->load($cp->product_id);
+        FCom_IndexTank_Index_Product::i()->update_categories($product);
+    }
+
+
     /**
      * Catch event FCom_Catalog_Model_Category::BeforeDelete
      * to delete given category from products index
@@ -171,6 +181,14 @@ class FCom_IndexTank_Admin extends BClass
         foreach($products as $product){
             FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
         }
+    }
+
+    static public function onCategoryProductBeforeDelete($args)
+    {
+        $cp = $args['model'];
+        $product = FCom_Catalog_Model_Product::i()->load($cp->product_id);
+        $category = FCom_Catalog_Model_Category::i()->load($cp->category_id);
+        FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
     }
 
     /**

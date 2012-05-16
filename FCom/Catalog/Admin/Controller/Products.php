@@ -50,7 +50,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $cp = FCom_Catalog_Model_CategoryProduct::i();
         $categories = $cp->orm()->where('product_id', $model->id())->find_many();
         if(!$categories){
-            return;
+            return BUtil::toJson(array());
         }
         $result = array();
         foreach($categories as $c){

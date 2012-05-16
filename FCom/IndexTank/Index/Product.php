@@ -321,7 +321,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function get_category_key($category)
     {
-        return str_replace("/","__",$category->url_path);
+        return 'ct_categories___'.str_replace("/","__",$category->url_path);
     }
 
     public function get_custom_field_key($cf_model)
@@ -458,7 +458,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     if($values_list){
                         if(is_array($values_list)){
                             foreach ($values_list as $search_name => $search_value) {
-                                $result[$field->field_name . $search_name] = $search_value;
+                                $result[$search_name] = $search_value;
                             }
                         }  else {
                             $result[$field->field_name] = $values_list;
@@ -539,7 +539,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $product_categories = $product->categories($product->id()); //get all categories for product
         if ($product_categories){
             foreach ($product_categories as $cat) {
-                $cat_path = str_replace("/","__",$cat->url_path);
+                $cat_path = $this->get_category_key($cat);//str_replace("/","__",$cat->url_path);
                 $categories[$cat_path] = $cat->node_name;
             }
         }
