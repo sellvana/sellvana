@@ -22,6 +22,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', '/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
+                        array('js', '{FCom_Core}/js/lib/html5shiv.min.js', array('if'=>'lt IE 9')),
                         array('js', '{FCom_Core}/js/lib/json2.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),

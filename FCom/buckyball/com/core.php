@@ -1416,6 +1416,9 @@ class BSession extends BClass
             return $this;
         }
         $config = BConfig::i()->get('cookie');
+        if (!empty($config['session_disable'])) {
+            return $this;
+        }
         session_set_cookie_params(
             !empty($config['timeout']) ? $config['timeout'] : 3600,
             !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot(),

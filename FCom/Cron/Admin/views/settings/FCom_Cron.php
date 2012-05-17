@@ -15,6 +15,7 @@
             <table>
                 <tr><td>Leeway Minutes</td><td><input type="text" name="config[modules][FCom_Cron][leeway_mins]" value="<?php echo $this->q($c->get('modules/FCom_Cron/leeway_mins'))?>"/></td></tr>
                 <tr><td>Timeout Minutes</td><td><input type="text" name="config[modules][FCom_Cron][timeout_mins]" value="<?php echo $this->q($c->get('modules/FCom_Cron/timeout_mins'))?>"/></td></tr>
+                <tr><td>Wait Seconds</td><td><input type="text" name="config[modules][FCom_Cron][wait_secs]" value="<?php echo $this->q($c->get('modules/FCom_Cron/wait_secs'))?>"/></td></tr>
             </table>
         </div>
     </div>
