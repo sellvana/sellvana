@@ -22,6 +22,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', '/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
+                        array('js', '{FCom_Core}/js/lib/html5shiv.min.js', array('if'=>'lt IE 9')),
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),
                         //array('css', '{FCom_Frontend}/css/base.css'),
                         array('less', '{FCom_Frontend}/css/base.less'),
