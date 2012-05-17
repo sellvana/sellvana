@@ -26,8 +26,9 @@ class FCom_IndexTank_Admin extends BClass
 
         BLayout::i()->addAllViews('Admin/views');
 
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout')
-                    ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
+        if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
+            BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
                     ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories
@@ -41,6 +42,7 @@ class FCom_IndexTank_Admin extends BClass
                     //for API init
                     ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
             ;
+        }
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
