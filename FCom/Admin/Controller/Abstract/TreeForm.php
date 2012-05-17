@@ -99,6 +99,13 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 $node->delete();
                 break;
 
+           /* case 'check_node': case 'uncheck_node':
+                $product_id = $r->get('id');
+                if(!$product_id){
+                    break;
+                }
+
+                break;*/
             default:
                 if (!BPubSub::i()->fire($eventName, $r->post())) {
                     throw new BException('Not implemented');

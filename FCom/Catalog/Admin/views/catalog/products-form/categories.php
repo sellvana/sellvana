@@ -7,7 +7,7 @@ $prodCtrl = FCom_Catalog_Admin_Controller_Products::i();
 head(function() {
 
     FCom.Admin.tree('#categories', {
-        url:'<?=BApp::href('catalog/categories/tree_data')?>',
+        url:'<?=BApp::href('catalog/categories/tree_data?id='.$this->model->id())?>',
         checkbox: {
             override_ui:true,
             checked_parent_open:true,

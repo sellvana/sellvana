@@ -488,6 +488,44 @@ FCom.Admin.tree = function(el, opt) {
     .bind("select.jstree", function(ev, node) {
         if (typeof opt.on_select !== 'undefined') opt.on_select(node);
     })
+/*    .bind("check_node.jstree", function (e, data) {
+        data.rslt.obj.each(function () {
+            $.ajax({
+                async : false,
+                type: 'POST',
+                url: opt.url,
+                data : {
+                    "operation" : "check_node",
+                    "id" : this.id.replace("node_","")
+                },
+                success : function (r) {
+                    if(!r.status) {
+                        alert(r.message);
+                        data.inst.refresh();
+                    }
+                }
+            });
+        });
+    })
+    .bind("uncheck_node.jstree", function (e, data) {
+        data.rslt.obj.each(function () {
+            $.ajax({
+                async : false,
+                type: 'POST',
+                url: opt.url,
+                data : {
+                    "operation" : "uncheck_node",
+                    "id" : this.id.replace("node_","")
+                },
+                success : function (r) {
+                    if(!r.status) {
+                        alert(r.message);
+                        data.inst.refresh();
+                    }
+                }
+            });
+        });
+    })*/
     ;
 
     $('a', el).live('drop', function(e,dd) {
