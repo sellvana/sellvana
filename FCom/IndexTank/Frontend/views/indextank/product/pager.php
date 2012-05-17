@@ -95,24 +95,24 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 <?php foreach($s['available_facets'] as $label => $data):?>
         <label><?=$label?>:</label><br/>
-        <? foreach ($data as $id => $obj): ?>
+        <? foreach ($data as $obj): ?>
             <?php if ($s['fields'][$obj->key]->show == 'checkbox'):?>
                 <input type="checkbox" name="f[<?=$obj->key?>][]"
                     value="<?=$obj->name?>" onclick="this.form.submit()"
                     <?=(in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> >
                 <?=$obj->name?> (<?=$obj->count?>) <br/>
             <?php else: ?>
-                    <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>_<?=$id?>"
+                    <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>"
                     value="<?=$obj->name?>" style="display:none;"
                     <?=(in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
                     <?php if(!empty($obj->level)):?>
                     <span style="margin:<?=$obj->level*10?>px;"></span>
                     <?php endif; ?>
                 <? if( in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                <a onclick="$('#<?=$obj->key?>_<?=$id?>').attr('checked', false);$('#product_list_pager').submit();"
+                <a onclick="$('#<?=$obj->key?>').attr('checked', false);$('#product_list_pager').submit();"
                    href="javascript:void(0);" style="color:grey;"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php else:?>
-                <a onclick="$('#<?=$obj->key?>_<?=$id?>').attr('checked', true);$('#product_list_pager').submit();"
+                <a onclick="$('#<?=$obj->key?>').attr('checked', true);$('#product_list_pager').submit();"
                    href="javascript:void(0);"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php endif; ?>
                 <br/>

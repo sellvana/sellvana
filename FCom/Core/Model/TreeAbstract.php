@@ -204,6 +204,8 @@ class FCom_Core_Model_TreeAbstract extends BModel
             $this->_new = null;
         }
         $this->cacheStore();
+
+        parent::afterSave();
     }
 
     public function beforeDelete()

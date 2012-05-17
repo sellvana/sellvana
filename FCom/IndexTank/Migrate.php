@@ -56,7 +56,7 @@ class FCom_IndexTank_Migrate extends BClass
             ) ENGINE = InnoDB;
             ");
         BDb::i()->ddlClearCache();
-        
+
         //predefined functions
         $functions  =  array (
                 'age'                   => array('number' => 0, 'definition' => '-age'         ),
@@ -135,11 +135,11 @@ class FCom_IndexTank_Migrate extends BClass
             FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
         }
 
-        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'ct_categories___')->find_one();
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'ct_categories')->find_one();
         if (!$doc){
             //add categories
             $data = array(
-                    'field_name'        => 'ct_categories___',
+                    'field_name'        => 'ct_categories',
                     'field_nice_name'   => 'Categories',
                     'field_type'        => 'text',
                     'search'            => 1,
