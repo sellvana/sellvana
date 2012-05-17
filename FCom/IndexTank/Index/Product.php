@@ -321,13 +321,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function get_category_key($category)
     {
-        return 'ct_categories___'.str_replace("/","__",$category->url_path);
+        //return 'ct_categories___'.str_replace("/","__",$category->url_path);
+        return 'ct_'.$category->id();
     }
 
     public function get_custom_field_key($cf_model)
     {
         //return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
-        return 'cf_'.$cf_model->id;
+        return 'cf_'.$cf_model->id();
     }
 
     /**
@@ -403,17 +404,18 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //get categories
             foreach($facets as $fname => $fvalues){
                 //hard coded ct_categories prefix
-                $pos = strpos($fname, 'ct_categories___');
+                $pos = strpos($fname, 'ct_');
                 if ($pos !== false){
-                    $path = substr($fname, strlen('ct_categories___'));
-                    $level = count(explode("__", $path))-1;
+                    $cat_id = substr($fname, strlen('ct_'));
+                    $category = FCom_Catalog_Model_Category::i()->load($cat_id);
+                    $level = count(explode("/", $category->id_path))-1;
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
-                        $obj->key = $fname;
+                        $obj->key = $this->get_category_key($category);
                         $obj->level = $level;
-                        $category_data['Categories'][$path] = $obj;
+                        $category_data['Categories'][$category->id_path] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }
                     continue;
