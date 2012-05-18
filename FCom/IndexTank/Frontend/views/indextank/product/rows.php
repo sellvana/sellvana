@@ -21,7 +21,7 @@
         </span>
     </td>
     <td class="actions last a-left">
-        <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
+        <div class="price-box <?=(!empty($loggedIn))?'logged-in':'logged-out'?>">
             <? if ($loggedIn):?><span class="availability in-stock">In Inventory</span><? endif ?>
             <span class="price-label">As low as</span>
             <p><span class="price">$<?=number_format($p->base_price)?></span>
