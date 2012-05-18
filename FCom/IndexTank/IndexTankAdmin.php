@@ -93,6 +93,7 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function productsIndexAll()
     {
+        set_time_limit(0);
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
         $limit = 1000;
         $offset = 0;
