@@ -64,6 +64,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         }
 
         //clear add fields ids
+        /*
         if(!empty($this->_hide_field_ids)){
             $hide_fields = explode(",",$this->_hide_field_ids);
             if (!empty($this->_add_field_ids)){
@@ -76,27 +77,34 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
                 $this->_add_field_ids = implode(",", $add_fields);
             }
         }
+         *
+         */
 
         return true;
     }
 
     public function removeField($p, $hide_field)
     {
+        $field = FCom_CustomField_Model_Field::i()->load($hide_field);
+        $p->{$field->field_code} = '';
+
+        $field_unset = false;
         if (!empty($p->_add_field_ids)){
             $add_fields = explode(",",$p->_add_field_ids);
             foreach($add_fields as $id => $af){
                 if($af == $hide_field){
+                    $field_unset = true;
                     unset($add_fields[$id]);
                 }
             }
             $p->_add_field_ids = implode(",", $add_fields);
         }
-        $field = FCom_CustomField_Model_Field::i()->load($hide_field);
-        $p->{$field->field_code} = '';
-        if(!empty($p->_hide_field_ids)){
-            $p->_hide_field_ids .= ','.$hide_field;
-        } else {
-            $p->_hide_field_ids = $hide_field;
+        if(false == $field_unset){
+            if(!empty($p->_hide_field_ids)){
+                $p->_hide_field_ids .= ','.$hide_field;
+            } else {
+                $p->_hide_field_ids = $hide_field;
+            }
         }
         $p->save();
     }
