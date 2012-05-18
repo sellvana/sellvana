@@ -1080,7 +1080,7 @@ exit;
             'rs' => !empty($r['rs']) ? $r['rs'] : null,
             'rc' => !empty($r['rc']) ? $r['rc'] : null,
             'q'  => !empty($r['q'])  ? $r['q'] : null,
-            'c'  => !empty($r['c'])  ? $r['c'] : null,
+            'c'  => !empty($d['c'])  ? $d['c'] : null, //total found
         );
 #print_r($r); print_r($d); print_r($s); exit;
         $s['sc'] = $s['s'].'|'.$s['sd']; // sort combined for state
