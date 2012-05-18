@@ -78,11 +78,11 @@ $m = $this->model;
                 $('#cf_hide_fields_ids').val(field_id);
             }
         }
-        
+
         $.ajax({
             url: "/admin/customfields/products/field_remove?id=<?=$m->id?>&hide_field="+field_id
         }).done(function() {
-            $('#cf_field_'+field_id).hide();
+            $('#cf_field_'+field_id).remove();
         });
     }
 </script>

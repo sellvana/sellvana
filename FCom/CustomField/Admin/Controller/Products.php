@@ -63,6 +63,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             return;
         }
         $hide_field = BRequest::i()->params('hide_field', true);
+        if(!$hide_field){
+            return;
+        }
 
         FCom_CustomField_Model_ProductField::i()->removeField($p, $hide_field);
     }
