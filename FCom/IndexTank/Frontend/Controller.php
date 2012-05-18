@@ -73,9 +73,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             //$productsData = $productsORM->paginate(null, array('ps'=>25));
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_data', array('data'=>&$productsData));
 
-            //$productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
+            $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
         }
-        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
 
         $facets_data = FCom_IndexTank_Index_Product::i()->prepareFacets($facets, $filters_invisible);
 
