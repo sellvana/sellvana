@@ -203,9 +203,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //search($query, $start = NULL, $len = NULL, $scoring_function = NULL,
             //$snippet_fields = NULL, $fetch_fields = NULL, $category_filters = NULL,
             //$variables = NULL, $docvar_filters = NULL, $function_filters = NULL, $category_rollup = NULL, $match_any_field = NULL )
+            $category_rollup = null;
+            if($this->_rollup_category){
+                $category_rollup = implode(",", $this->_rollup_category);
+            }
             $result = $this->model()->search($query_string, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
-                    null, $this->_filter_docvar, null, implode(",", $this->_rollup_category), true );
+                    null, $this->_filter_docvar, null, $category_rollup, true );
 
         } catch(Exception $e) {
             throw $e;
