@@ -12,6 +12,12 @@
                         <input type="button" onclick="location.href='http://indexden.com/pricing'" value="Get one" />
                     </td>
                 </tr>
+                <tr>
+                    <td>Index name</td>
+                    <td>
+                        <input size="50" type="text" name="config[modules][FCom_IndexTank][index_name]" value="<?php echo $this->q($c->get('modules/FCom_IndexTank/index_name'))?>"/>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
