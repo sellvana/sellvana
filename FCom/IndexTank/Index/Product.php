@@ -218,7 +218,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->_result = $result;
         //print_r( $this->_result);exit;
         if (!$result || $result->matches <= 0){
-            return false;
+            return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id',array(-1));
         }
 
         $products = array();
