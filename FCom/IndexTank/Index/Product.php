@@ -444,7 +444,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 usort($values, $cmp);
             }
 
-            ksort($category_data['Categories']);
+            if (!empty($category_data['Categories'])){
+                ksort($category_data['Categories']);
+            }
             //put categories first
             $facets_data = (array)$category_data + (array)$facets_data;
         }
