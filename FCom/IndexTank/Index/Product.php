@@ -84,6 +84,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function model()
     {
         if (empty($this->_model)){
+            //init index name
+            if(false != ($index_name = BConfig::i()->get('modules/FCom_IndexTank/index_name'))){
+                $this->_index_name = $index_name;
+            }
             //init config
             $this->_init_functions();
             //init model
@@ -515,6 +519,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     public function install()
     {
+        //init index name
+        if(false != ($index_name = BConfig::i()->get('modules/FCom_IndexTank/index_name'))){
+            $this->_index_name = $index_name;
+        }
+
         try {
             //create an index
             $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
