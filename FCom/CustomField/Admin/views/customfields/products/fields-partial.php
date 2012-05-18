@@ -2,7 +2,7 @@
 $m = $this->model;
 ?>
 <input type="text" name="model[_fieldset_ids]" value="<?=$m->_fieldset_ids?>"/>
-<input type="text" name="model[_add_field_ids]" value="<?=$m->_add_field_ids?>"/>
+<input type="text" name="model[_add_field_ids]" value="<?=$m->_add_field_ids?>" id="cf_add_fields_ids"/>
 <input type="text" name="model[_hide_field_ids]" value="<?=$m->_hide_field_ids?>" id="cf_hide_fields_ids"/>
 <?php if(!empty($this->fields)):?>
     <?php foreach($this->fields as $field):?>
@@ -56,14 +56,29 @@ $m = $this->model;
 <script type="text/javascript">
     function cf_field_remove(field_id)
     {
-        var curval = $('#cf_hide_fields_ids').val();
-        if(curval){
-            $('#cf_hide_fields_ids').val(curval + ',' + field_id);
-        } else {
-            $('#cf_hide_fields_ids').val(field_id);
+        var addfields = $('#cf_add_fields_ids').val();
+        var addfield_ar=addfields.split(",");
+        for(fid in addfield_ar){
+            if(addfield_ar[fid] == field_id){
+                addfield_ar.splice(fid,1);
+            }
+        }
+        var addfields_new = addfield_ar.join(",");
+        var replaced = false;
+        if(addfields_new != addfields){
+            replaced = true;
+            $('#cf_add_fields_ids').val(addfields_new);
         }
 
-
+        if(false == replaced){
+            var hidefields = $('#cf_hide_fields_ids').val();
+            if(hidefields){
+                $('#cf_hide_fields_ids').val(hidefields + ',' + field_id);
+            } else {
+                $('#cf_hide_fields_ids').val(field_id);
+            }
+        }
+        
         $.ajax({
             url: "/admin/customfields/products/field_remove?id=<?=$m->id?>&hide_field="+field_id
         }).done(function() {
