@@ -44,7 +44,7 @@ var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 
 <?php
 $s = $this->state;
-
+if(empty($s['p'])) $s['p'] = 0;
 //$price_ranges = $this->price_ranges;
 
 $psOptions = array(25, 50, 100, 500, 30000);
