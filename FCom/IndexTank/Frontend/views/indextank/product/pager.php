@@ -104,11 +104,11 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
             <?php else: ?>
                     <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>"
                     value="<?=$obj->name?>" style="display:none;"
-                    <?=(in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
+                    <?=(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
                     <?php if(!empty($obj->level)):?>
                     <span style="margin:<?=$obj->level*10?>px;"></span>
                     <?php endif; ?>
-                <? if( in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                <? if(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
                 <a onclick="$('#<?=$obj->key?>').attr('checked', false);$('#product_list_pager').submit();"
                    href="javascript:void(0);" style="color:grey;"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php else:?>
