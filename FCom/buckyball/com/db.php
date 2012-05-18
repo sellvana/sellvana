@@ -1085,9 +1085,11 @@ exit;
         $s['sc'] = $s['s'].'|'.$s['sd']; // sort combined for state
 
         #$s['c'] = 600000;
-        $cntOrm = clone $this; // clone ORM to count
-        $s['c'] = $cntOrm->count(); // total row count
-        unset($cntOrm); // free mem
+        if (empty($s['c'])){
+            $cntOrm = clone $this; // clone ORM to count
+            $s['c'] = $cntOrm->count(); // total row count
+            unset($cntOrm); // free mem
+        }
 
         $s['mp'] = ceil($s['c']/$s['ps']); // max page
         if (($s['p']-1)*$s['ps']>$s['c']) $s['p'] = $s['mp']; // limit to max page
