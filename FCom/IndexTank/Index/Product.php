@@ -231,6 +231,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $productsORM;
     }
 
+    public function total_found()
+    {
+        return !empty($this->_result) ? $this->_result->matches : 0;
+    }
+
     /**
      * Return facets with merged rollups
      * @return array

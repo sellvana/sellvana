@@ -76,6 +76,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             //$productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
         }
         $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
+        //update total cound
+        $productsData['state']['s'] = FCom_IndexTank_Index_Product::i()->total_found();
 
         $facets_data = FCom_IndexTank_Index_Product::i()->prepareFacets($facets, $filters_invisible);
 
