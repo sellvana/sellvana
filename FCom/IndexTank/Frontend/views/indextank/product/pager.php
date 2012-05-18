@@ -59,11 +59,10 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
 
 <div class="pager">
-    <strong class="count"><?=$s['c']?> found.</strong>
+    <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
     <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
     <input type="submit" value="Search">
 
-    <label>Query mode: <?=$s['info']['query_mode']?></label>
     <br/>
     <div class="pages">
     <label>Page:</label>
@@ -77,6 +76,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <input type="text" name="p" value="<?=$s['p']?>"/> of <?=$s['mp']?>
     <? if ($s['p']<$s['mp']): ?><a href="#" class="arrow-right" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']+1?>); $(this).parents('form').submit()">&gt;</a><? endif ?>
 	</div>
+
 	<div class="rows f-right">
     <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
 <? foreach ($psOptions as $i): ?>
