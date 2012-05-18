@@ -1,5 +1,5 @@
 <?
-//$loggedIn = Denteva_Model_User::i()->isLoggedIn();
+$loggedIn = Denteva_Model_User::i()->isLoggedIn();
 //Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
 ?>
 <? foreach ($this->products as $p): ?>
