@@ -188,7 +188,7 @@ class BDb
                     }
                 } catch (Exception $e) {
                     echo "<hr>{$e->getMessage()}: <pre>{$query}</pre>";
-                    if (empty($options['soft_error'])) {
+                    if (empty($options['try'])) {
                         throw $e;
                     }
                 }
