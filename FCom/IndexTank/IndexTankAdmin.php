@@ -65,6 +65,19 @@ class FCom_IndexTank_Admin extends BClass
         }
     }
 
+    static public function startProductsIndexAll()
+    {
+        $script = dirname(__DIR__)."/Cron/index_all.php";
+        $exclusive = dirname(__DIR__). "/../../exclusive.php";
+        $command = "nohup php {$exclusive} indextank_index_all php {$script} &";
+        system($command);
+    }
+
+    static public function startProductsDeleteAll()
+    {
+        self::productsDeleteAll();
+    }
+
     /**
      * Delete all indexed products
      */
