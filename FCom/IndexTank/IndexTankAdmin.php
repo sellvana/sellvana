@@ -113,7 +113,7 @@ class FCom_IndexTank_Admin extends BClass
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
         while($products) {
             $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->add($products);
+            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
 
             $offset += $batch_size;
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
