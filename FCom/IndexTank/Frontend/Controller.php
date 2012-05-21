@@ -10,6 +10,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $sc = BRequest::i()->get('sc');
         $f = BRequest::i()->get('f');
         $v = BRequest::i()->get('v');
+        $page = BRequest::i()->get('p');
+        $result_per_page = BRequest::i()->get('ps');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
         /*
@@ -65,7 +67,15 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             }
         }
 
-        $productsORM = FCom_IndexTank_Index_Product::i()->search($q);
+        if (empty($result_per_page)){
+            $result_per_page = 25;
+        }
+        if(empty($page)){
+            $page = 1;
+        }
+        $start = ($page - 1) * $result_per_page;
+
+        $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $result_per_page);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
         $productsData = array();
         if ( $productsORM ) {

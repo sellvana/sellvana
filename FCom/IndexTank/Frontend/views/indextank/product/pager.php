@@ -47,7 +47,7 @@ $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 //$price_ranges = $this->price_ranges;
 
-$psOptions = array(25, 50, 100, 500, 30000);
+$psOptions = array(2, 25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
