@@ -67,10 +67,23 @@ class FCom_IndexTank_Admin extends BClass
 
     static public function startProductsIndexAll()
     {
-        $script = dirname(__DIR__)."/Cron/index_all.php";
-        $exclusive = dirname(__DIR__). "/../../exclusive.php";
-        $command = "nohup php {$exclusive} indextank_index_all php {$script} &";
-        system($command);
+        $expr = "";
+        FCom_Cron::i()->task($expr, $callback);
+        echo 'Indexing scheduled';
+        /*
+        $indextank = dirname(__FILE__)."/../../storage/indextank/";
+        if(!file_exists($indextank)){
+            mkdir($indextank);
+        }
+        $outputfile = dirname(__FILE__)."/../../storage/indextank/index_all.log";
+        $pidfile = dirname(__FILE__)."/../../storage/indextank/index_all.pid";
+        $script = dirname(__FILE__)."/Cron/index_all.php";
+        $exclusive = dirname(__FILE__). "/../../exclusive.php";
+        $command = "php {$exclusive} indextank_index_all php {$script} &";
+        exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $command, $outputfile, $pidfile));
+         *
+         */
+
     }
 
     static public function startProductsDeleteAll()
@@ -118,6 +131,7 @@ class FCom_IndexTank_Admin extends BClass
             $offset += $batch_size;
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
             $products = $orm->offset($offset)->limit($batch_size)->find_many();
+            unset($orm);
             if($debug){
                 echo "Indexed: $counter\n";
             }
