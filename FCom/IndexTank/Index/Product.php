@@ -226,6 +226,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         foreach ($result->results as $res){
             $products[] = $res->docid;
         }
+        if(!$products){
+            return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id',array(-1));
+        }
         $productsORM = FCom_Catalog_Model_Product::i()->orm('p')->where_in("p.id", $products)
                 ->order_by_expr("FIELD(p.id, ".implode(",", $products).")");
         return $productsORM;
