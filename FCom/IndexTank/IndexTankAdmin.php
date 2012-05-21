@@ -91,21 +91,20 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Index all products
      */
-    static public function productsIndexAll($debug=false)
+    static public function productsIndexAll($debug=false, $batch_size=1000)
     {
         set_time_limit(0);
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
         $offset = 0;
         $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
+        $products = $orm->offset($offset)->limit($batch_size)->find_many();
         while($products) {
             $counter += count($products);
             FCom_IndexTank_Index_Product::i()->add($products);
 
-            $offset += $limit;
+            $offset += $batch_size;
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
+            $products = $orm->offset($offset)->limit($batch_size)->find_many();
             if($debug){
                 echo "Indexed: $counter\n";
             }
