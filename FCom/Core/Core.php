@@ -314,7 +314,7 @@ class FCom_Core extends BClass
             $s->data('lastNav', array($r->rawPath(), $r->get()));
         } else {
             $d = $s->data('lastNav');
-            return BApp::baseUrl().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
+            return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
     }
 }
