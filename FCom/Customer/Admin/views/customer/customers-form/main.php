@@ -83,7 +83,7 @@
     <div class="col-customer-address" ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none">
         <h3 class="form-group-title">Addresses</h3>
         <div ng-repeat="a in addresses">
-            <a href ng-click="delAddress(a)">[X]</a>
+            <a href ng-click="delAddress(a)" class="btn-remove">[X]</a>
             <label><input type="checkbox" ng-model="a.edit_mode"/> Edit</label>
             <div class="adr">
                 <div class="street-address">
@@ -116,18 +116,16 @@
                     <span ng-hide="a.edit_mode" ng-bind="countries[a.country]"></span>
                 </div>
                 <div class="phone">
-                    Tel:
                     <input type="text" ng-show="a.edit_mode" ng-model="a.phone" placeholder="Phone"/>
                     <span ng-hide="a.edit_mode" ng-bind="a.phone"></span>
                 </div>
                 <div class="fax">
-                    Fax:
                     <input type="text" ng-show="a.edit_mode" ng-model="a.fax" placeholder="Fax"/>
                     <span ng-hide="a.edit_mode" ng-bind="a.fax"></span>
                 </div>
             </div>
         </div>
-        <a href ng-click="addAddress()">Add</a>
+        <a href ng-click="addAddress()" class="add-link">+ Add Another </a>
         <input type="hidden" name="address[data_json]" value="{{addresses}}"/>
         <input type="hidden" name="address[del_json]" value="{{del_ids}}"/>
     </div>
