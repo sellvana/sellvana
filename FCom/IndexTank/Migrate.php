@@ -134,7 +134,7 @@ class FCom_IndexTank_Migrate extends BClass
     public function installCron()
     {
         $expr = "*/5 * * * *";
-        $callback = Fcom_IndexTank_Cron_Index::index_all();
+        $callback = "Fcom_IndexTank_Cron_Index::index_all()";
         FCom_Cron::i()->task($expr, $callback);
     }
 
