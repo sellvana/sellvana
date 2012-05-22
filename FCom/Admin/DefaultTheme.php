@@ -42,7 +42,7 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('css', '{FCom_Admin}/css/fcom.admin.css'),
                     )),
                     array('view', 'admin/header', 'do'=>array(
-                        array('addNav', 'home', array('label'=>'Dashboard', 'href'=>BApp::baseUrl(), 'pos'=>10)),
+                        array('addNav', 'home', array('label'=>'Dashboard', 'href'=>BApp::href(), 'pos'=>10)),
                         array('addNav', 'system', array('label'=>'System', 'pos'=>900)),
                         array('addNav', 'system/users', array('label'=>'Users', 'href'=>BApp::href('/users'))),
                         array('addNav', 'system/roles', array('label'=>'Roles & Permissions', 'href'=>BApp::href('/roles'))),

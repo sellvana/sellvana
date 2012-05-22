@@ -36,13 +36,13 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
+        BResponse::i()->redirect(!empty($url) ? $url : BApp::href());
     }
 
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::baseUrl());
+        BResponse::i()->redirect(BApp::href());
     }
 
     public function action_my_account()
