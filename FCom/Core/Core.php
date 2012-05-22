@@ -63,7 +63,7 @@ class FCom_Core extends BClass
 
         $baseHref = $config->get('web/base_href');
         if (!$baseHref) {
-            $baseHref = BRequest::i()->baseUrl();
+            $baseHref = BRequest::i()->webRoot();
             $localConfig['web']['base_href'] = $baseHref;
         }
         if (!$config->get('web/base_src')) {
