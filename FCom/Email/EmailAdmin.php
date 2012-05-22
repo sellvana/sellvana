@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Newsletter_Admin extends BClass
+class FCom_Email_Admin extends BClass
 {
     public static function bootstrap()
     {

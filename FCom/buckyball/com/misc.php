@@ -823,7 +823,7 @@ class BUtil
         if (!empty($parsed['query'])) {
             foreach (explode('&', $parsed['query']) as $q) {
                 $a = explode('=', $q);
-                $query[$a[0]] = $a[1];
+                $query[$a[0]] = urldecode($a[1]);
             }
         }
         $query = array_merge($query, $params);

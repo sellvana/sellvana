@@ -993,16 +993,14 @@ class BView extends BClass
     */
     public function email($p=array())
     {
-        static $availHeaders = array('to','from','cc','bcc','reply-to','return-path');
+        static $availHeaders = array('to','from','cc','bcc','reply-to','return-path','content-type');
 
         if (is_string($p)) {
             $p = array('to'=>$p);
         }
-
         $body = $this->render($p, true);
         $headers = array();
         $params = array();
-
         if (($metaData = $this->param('meta_data'))) {
             foreach ($metaData as $k=>$v) {
                 $lh = strtolower($k);
