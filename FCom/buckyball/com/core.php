@@ -232,24 +232,39 @@ class BApp extends BClass
     /**
     * Shortcut for base URL to use in views and controllers
     *
+    * @param $full whether the URL should include schema and host
+    * @param $method
+    *   1 : use config for full url
+    *   2 : use entry point for full url
     * @return string
     */
-    public static function baseUrl($full=true)
+    public static function baseUrl($full=true, $method=1)
     {
         static $baseUrl = array();
         $full = (int)$full;
-        if (empty($baseUrl[$full])) {
+        $key = $full.'|'.$method;
+        if (empty($baseUrl[$key])) {
             /** @var BRequest */
             $r = BRequest::i();
-            if ($full) {
-                $url = BConfig::i()->get('web/base_href');
-                if (!$url) $url = $r->baseUrl();
-            } else {
-                $url = $r->webRoot();
+            $c = BConfig::i();
+            switch ($method) {
+                case 1:
+                    $url = $c->get('web/base_href');
+                    if (!$url) $url = $r->webRoot();
+                    break;
+                case 2:
+                    $url = $r->scriptName();
+                    if ($r->modRewriteEnabled() && !$c->get('web/show_script_name')) {
+                        $url = dirname($url);
+                    }
+                    break;
             }
-            $baseUrl[$full] = rtrim($url, '/').'/';
+            if ($full) {
+                $url = $r->scheme().'://'.$r->httpHost().$url;
+            }
+            $baseUrl[$key] = rtrim($url, '/').'/';
         }
-        return $baseUrl[$full];
+        return $baseUrl[$key];
     }
 
     /**
@@ -271,9 +286,9 @@ class BApp extends BClass
         return $m->$method() . $url;
     }
 
-    public static function href($url='', $full=true)
+    public static function href($url='', $full=true, $method=2)
     {
-        return BApp::baseUrl($full) . BFrontController::processHref($url);
+        return BApp::baseUrl($full, $method) . BFrontController::processHref($url);
     }
 
     /**

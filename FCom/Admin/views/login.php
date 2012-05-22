@@ -1,6 +1,6 @@
 <section class="adm-login-form">
 	<!--<h3 class="app-logo">Denteva</h3>-->
-	<form method="post" action="<?=BApp::m('FCom_Admin')->baseHref()?>/login">
+	<form method="post" action="<?=BApp::href('login')?>">
 	    <fieldset>
 	    	<header class="section-title">Log into Account</header>
             <?php echo $this->messagesHtml() ?>
