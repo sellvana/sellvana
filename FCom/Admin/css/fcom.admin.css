@@ -114,6 +114,7 @@ td { vertical-align:top; }
 .form-list label { font-weight:bold; font-size:14px; line-height:1.2; }
 .form-list li.label-l label { float:left; width:120px; margin-top:5px; }
 .form-list li.label-top label { display:block; margin-bottom:2px; }
+.form-list label.error { float:none; display:block; margin-top:2px; color:#d30e00; font-size:.95em; }
 
 /* Forms - Inputs */
 /* Inputs have sz1 */
@@ -754,17 +755,21 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-login-form .section-title {
 	margin:-30px -30px 30px -30px;
 	border-bottom:1px solid #bbb;
+	border-radius:5px 5px 0 0;
+	-moz-border-radius:5px 5px 0 0;
+	-webkit-border-radius:5px 5px 0 0;
 	background:#eee;
 	padding:12px 20px;
 	font-size:20px;
 	font-weight:bold;
 	text-shadow:0 1px 0 #fff;
 	}
+.adm-login-form .form-list { margin-bottom:10px; }
 .adm-login-form li.label-l label { width:130px; font-size:15px; }
 .adm-login-form input[type="text"],
 .adm-login-form input[type="password"] { width:250px; }
 .adm-login-form .btn { margin-left:130px; }
-.adm-login-form .app-logo { width:145px; height:29px; background:url(../img/logo_sz1.png) no-repeat; text-indent:-999em; }
+.adm-login-form .app-logo { width:265px; height:55px; margin-bottom:10px; background:url(../img/logo_blk.png) no-repeat; text-indent:-999em; }
 .adm-login-form .msgs { margin:-13px 0 16px; }
 
 /* Product Edit/View */
