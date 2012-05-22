@@ -79,30 +79,9 @@ class FCom_IndexTank_Admin extends BClass
      * Mark all product for re-index
      */
     static public function productsIndexAll()
-    {
+    {        
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
         echo 'Products re-indexing scheduled';
-    }
-
-    /**
-     * Todo: rework this function
-     * @param type $field
-     */
-    static public function productIndexDropField($field)
-    {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
-        while($products) {
-            $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field, '');
-
-            $offset += $limit;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
-        };
     }
 
     /**
