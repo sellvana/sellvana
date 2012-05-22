@@ -9,8 +9,7 @@ BConfig::i()->add(array(
         'root_dir' => $rootDir,
     ),
     'web' => array(
-        'base_store' => $webRoot,
-        'base_src' => $webRoot,
+        'base_href' => $webRoot,
     ),
 ));
 
