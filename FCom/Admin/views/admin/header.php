@@ -5,7 +5,7 @@
     <header class="adm-topbar">
         <nav class="adm-nav">
             <a href="#" class="start">
-                <span class="adm-logo">Fulleron Admin</span>
+                <span class="adm-logo">XPMDA Admin</span>
             </a>
             <?php echo $this->renderNodes() ?>
         </nav>

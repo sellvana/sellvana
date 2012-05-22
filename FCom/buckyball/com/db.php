@@ -1096,7 +1096,9 @@ exit;
         if (($s['p']-1)*$s['ps']>$s['c']) $s['p'] = $s['mp']; // limit to max page
         if ($s['s']) $this->{'order_by_'.$s['sd']}($s['s']); // sort rows if requested
         $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p']-1)*$s['ps']); // start from requested row or page
-        $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
+        if(empty($d['donotlimit'])){
+            $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
+        }
         $rows = $this->find_many(); // result data
         $s['rc'] = $rows ? sizeof($rows) : 0; // returned row count
         if (!empty($d['as_array'])) {

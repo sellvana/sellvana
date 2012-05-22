@@ -1,1 +1,3 @@
-HOME test
+<div class="home-icon">
+	Welcome.
+</div>
