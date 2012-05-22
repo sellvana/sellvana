@@ -252,7 +252,7 @@ class FCom_Core extends BClass
     {
         static $url;
         if (!$url) {
-            $url = BConfig::i()->get('web/base_store').'/resize.php';
+            $url = BApp::href('resize.php', 1, 1);
         }
         return $url;
     }
