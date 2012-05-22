@@ -23,6 +23,7 @@ html, body {
 button,
 input, select,
 textarea 		{ font-family:sans-serif; color:#2f2f2f; }
+textarea { width:250px; height:100px; }
 
 ::-moz-selection{ background:#a6b7d4; color:#fff; text-shadow:none; }
 ::selection 	{ background:#a6b7d4; color:#fff; text-shadow:none; }
@@ -144,24 +145,34 @@ button.st1, input[type="submit"].st1 {
 	-webkit-box-shadow: inset 0 1px 0 #a0b5db;
 	border:1px solid #33558f;
 	color:#fff;
-	background:-moz-linear-gradient(top,#7c94bf 0%,#32548e);
-	background:-webkit-gradient(linear, left top, left bottom, from(#7c94bf),to(#4b70b0));
+	background:#5678b3;
+	background-image: -o-linear-gradient(bottom, #7C94BF 100%, #4B70B0 0%);
+	background-image: -moz-linear-gradient(bottom, #7C94BF 100%, #4B70B0 0%);
+	background-image: -webkit-linear-gradient(bottom, #7C94BF 100%, #4B70B0 0%);
+	background-image: -ms-linear-gradient(bottom, #7C94BF 100%, #4B70B0 0%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(1, #7C94BF),
+		color-stop(0, #4B70B0)
+	);
 	text-shadow:0 -1px 0 #2c4779;
 	}
 button.st2, input[type="submit"].st2 {
 	/* Auxiliary button in page example:Edit */
 	border:1px solid #adadad;
-	background-image:linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
-	background-image:-o-linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
-	background-image:-moz-linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
-	background-image:-webkit-linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
-	background-image:-ms-linear-gradient(bottom, rgb(216,216,216) 0%, rgb(240,240,242) 100%);
-	background-image:-webkit-gradient(
+	background:#d8d8d8;
+	background-image: -o-linear-gradient(bottom, #f0f0f2 100%, #d8d8d8 0%);
+	background-image: -moz-linear-gradient(bottom, #f0f0f2 100%, #d8d8d8 0%);
+	background-image: -webkit-linear-gradient(bottom, #f0f0f2 100%, #d8d8d8 0%);
+	background-image: -ms-linear-gradient(bottom, #f0f0f2 100%, #d8d8d8 0%);
+	background-image: -webkit-gradient(
 		linear,
 		left bottom,
 		left top,
-		color-stop(0, rgb(216,216,216)),
-		color-stop(1, rgb(240,240,242))
+		color-stop(1, #f0f0f2),
+		color-stop(0, #d8d8d8)
 	);
 	color:#444;
 	text-shadow:0 1px 0 #fff;
@@ -181,9 +192,19 @@ button.st4, input[type="submit"].st4 {
     -webkit-box-shadow: inset 0 1px 0 #FF704D;
     border:1px solid #800000;
     color:#fff;
-    background:-moz-linear-gradient(top,#DD6600 0%,#CC3300);
-    background:-webkit-gradient(linear, left top, left bottom, from(#DD6600),to(#CC3300));
-    text-shadow:0 -1px 0 #660033;
+	background:#dd6600;
+	background-image: -o-linear-gradient(bottom, #dd6600 100%, #cc3300 0%);
+	background-image: -moz-linear-gradient(bottom, #dd6600 100%, #cc3300 0%);
+	background-image: -webkit-linear-gradient(bottom, #dd6600 100%, #cc3300 0%);
+	background-image: -ms-linear-gradient(bottom, #dd6600 100%, #cc3300 0%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(1, #dd6600),
+		color-stop(0, #cc3300)
+	);
+    text-shadow:0 -1px 0 #603;
     }
 button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
 button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
@@ -333,17 +354,17 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .ui-jqgrid-labels .ui-th-column {
 	border-right:1px solid #657FAC;
 	border-left:0;
-	background-image: linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
-	background-image: -o-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
-	background-image: -moz-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
-	background-image: -webkit-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
-	background-image: -ms-linear-gradient(bottom, rgb(111,139,188) 0%, rgb(147,169,208) 100%);
+	background:#6f8bbc;
+	background-image: -o-linear-gradient(bottom, #93a9d0 100%, #6f8bbc 0%);
+	background-image: -moz-linear-gradient(bottom, #93a9d0 100%, #6f8bbc 0%);
+	background-image: -webkit-linear-gradient(bottom, #93a9d0 100%, #6f8bbc 0%);
+	background-image: -ms-linear-gradient(bottom, #93a9d0 100%, #6f8bbc 0%);
 	background-image: -webkit-gradient(
 		linear,
 		left bottom,
 		left top,
-		color-stop(0, rgb(111,139,188)),
-		color-stop(1, rgb(147,169,208))
+		color-stop(1, #93a9d0),
+		color-stop(0, #6f8bbc)
 	);
 	color:#fff;
 	text-shadow:0 -1px 0 #4f6fa7;
@@ -543,7 +564,8 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-nav ul ul li { display:block;  }
 
 /* Sidebar */
-.adm-sidebar { position:absolute; top:0; bottom:0; left:0; width:131px; /*border-right:1px solid #a3b5c9;*/ background:#e7edf4; }
+.adm-sidebar { position:absolute; top:0; bottom:0; left:0; width:131px; background:#e7edf4; }
+.info-view-mode .adm-sidebar { border-right:1px solid #a3b5cc; }
 .adm-sidebar .ui-widget-header {
 	border:none;
 	border-bottom:1px solid #a3b5c9;
@@ -570,9 +592,10 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 	line-height:1.2em;
 	}
 .adm-sidebar .ui-widget-header label.icon-btn {
+	float:right;
 	width:19px;
 	height:19px;
-	margin-top:-13px;
+	margin:-3px -7px 0 0;
 	padding:0;
 	}
 .adm-sidebar .ui-widget-header .ui-button-text-icon-primary .ui-button-text { display:none; }
@@ -688,10 +711,10 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 		color-stop(1, rgb(224,224,224))
 	);
 }
-.adm-tabs li.active a { background:#fff; color:#444; text-shadow:none; }
+.adm-tabs li.active a { background:#f3f3f3; color:#444; text-shadow:none; }
 
 .adm-tabs-sidebar a { display:block; border-bottom:1px solid #d7e1ec; padding:5px 13px; color:#505e71; line-height:1.3em; }
-.adm-tabs-sidebar li.active a { margin:0 -1px 1px 0; border:none; box-shadow:0 2px 0 #dce4ed; background:#fff; color:#444; }
+.adm-tabs-sidebar li.active a { margin:0 -1px 1px 0; border:none; box-shadow:0 2px 0 #dce4ed; background:#f3f3f3; color:#444; }
 .form-img-sidebar .adm-tabs-sidebar { margin:15px -15px; }
 
 
@@ -749,7 +772,40 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 /* Customer */
 .col-customer-info { float:left; width:330px; }
 .col-customer-address { margin-left:355px; }
-.col-customer-address .ng-scope { float:left; width:350px; background:#f7f7f7; padding:13px; margin:8px; }
+.col-customer-address .ng-scope { 
+	float:left; 
+	width:350px; 
+	background:#fff; 
+	padding:13px; 
+	margin:0 15px 15px 0;
+	box-shadow:0 2px 3px #ddd;
+	-moz-box-shadow:0 2px 3px #ddd;
+	-webkit-box-shadow:0 2px 3px #ddd;
+	}
+.col-customer-address .ng-scope .adr input[type="text"] { width:280px; margin:3px 0; }
+.col-customer-address .ng-scope .adr .locality input[type="text"] { width:100px; }
+.col-customer-address .ng-scope .adr .region input[type="text"] { width:40px; }
+.col-customer-address .ng-scope .adr .postal-code input[type="text"] { width:100px; }
+.col-customer-address .ng-scope .adr .country-name select { width:290px; margin:3px 0; }
+.col-customer-address .btn-remove { 
+	float:right; 
+	width:17px; 
+	height:17px; 
+	margin:-6px -6px 0 0; 
+	background-position:-78px -59px; 
+	text-indent:-999em; 
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+	filter: alpha(opacity=80);
+	-moz-opacity: 0.8;
+	-khtml-opacity: 0.8;
+	opacity: 0.8;
+	}
+.col-customer-address .add-link { float:left; border:1px solid #ccc; border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px; width:140px; background:#eee; padding:15px 0; color:#666; font-size:16px; text-align:center; line-height:1em; }
+
+body { background:#f4f4f4; }
+.home-icon { background:url(../img/admin_home_icon.png) no-repeat; width:200px; margin:250px auto 50px; padding-top:200px; color:#bbb; font-weight:bold; font-size:20px; text-shadow:0 1px 0 #fff; text-align:center; }
+.lt-ie9 .adm-nav ul { border:1px solid #bbb; border-bottom-width:2px; }
+
 
 /* =============================================================================
    Typography
@@ -763,7 +819,8 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .msgs li,
 .adm-nav li.nav-group > header .icon,
 .adm-topbar .sup-links a .icon,
-.adm-tabs-left .icon { background-image:url(../img/sprite.png); background-repeat:no-repeat; }
+.adm-tabs-left .icon,
+.col-customer-address .btn-remove { background-image:url(../img/sprite.png); background-repeat:no-repeat; }
 
 
 /* =============================================================================
@@ -776,3 +833,10 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-topbar:after,
 .adm-tabs:after { content:""; display:table; clear:both; }
 
+.topbar,
+.form-list li,
+.adm-product-summary,
+.clearer,
+.adm-topbar,
+.adm-tabs,
+.adm-content-box { zoom:1; }
