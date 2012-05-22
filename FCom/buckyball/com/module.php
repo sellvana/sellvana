@@ -682,14 +682,24 @@ class BModule extends BClass
     *
     * @return string
     */
-    public function baseSrc()
+    public function baseSrc($full=true)
     {
-        return $this->base_src;
+        $src = $this->base_src;
+        if ($full) {
+            $r = BRequest::i();
+            $src = $r->scheme().'://'.$r->httpHost().$src;
+        }
+        return $src;
     }
 
-    public function baseHref()
+    public function baseHref($full=true)
     {
-        return $this->base_href;
+        $href = $this->base_src;
+        if ($full) {
+            $r = BRequest::i();
+            $href = $r->scheme().'://'.$r->httpHost().$href;
+        }
+        return $href;
     }
 
     public function runLevel($level=null, $updateConfig=false)
