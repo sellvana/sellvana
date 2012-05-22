@@ -192,18 +192,19 @@
             'depends' => array('FCom_Catalog'),
             'description' => "Base cart and checkout functionality",
         ),
-        'FCom_Newsletter' => array(
+        'FCom_Email' => array(
             'version' => '0.1.0',
-            'root_dir' => 'Newsletter',
+            'root_dir' => 'Email',
             'depends' => array('FCom_Core'),
-            'description' => "Base subscription and mailing list management",
-            'bootstrap' => array('file'=>'NewsletterFrontend.php', 'callback'=>'FCom_Newsletter_Frontend::bootstrap'),
+            'description' => "Base email subscription and mailing list management",
+            'bootstrap' => array('file'=>'EmailFrontend.php', 'callback'=>'FCom_Email_Frontend::bootstrap'),
+            'migrate' => 'FCom_Email_Migrate',
             'areas' => array(
                 'FCom_Admin' => array(
-                    'bootstrap' => array('file'=>'NewsletterAdmin.php', 'callback'=>'FCom_Newsletter_Admin::bootstrap'),
+                    'bootstrap' => array('file'=>'EmailAdmin.php', 'callback'=>'FCom_Email_Admin::bootstrap'),
                 ),
                 'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'NewsletterFrontend.php', 'callback'=>'FCom_Newsletter_Frontend::bootstrap'),
+                    'bootstrap' => array('file'=>'EmailFrontend.php', 'callback'=>'FCom_Email_Frontend::bootstrap'),
                 ),
             ),
         ),
