@@ -114,7 +114,7 @@ class FCom_Admin extends BClass
     {
         $r = BRequest::i();
         $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
-        return trim($href.'/'.ltrim($url, '/'), '/');
+        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
     }
 }
 
