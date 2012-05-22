@@ -65,80 +65,29 @@ class FCom_IndexTank_Admin extends BClass
         }
     }
 
-    static public function startProductsIndexAll()
-    {
-        $expr = "";
-        FCom_Cron::i()->task($expr, $callback);
-        echo 'Indexing scheduled';
-        /*
-        $indextank = dirname(__FILE__)."/../../storage/indextank/";
-        if(!file_exists($indextank)){
-            mkdir($indextank);
-        }
-        $outputfile = dirname(__FILE__)."/../../storage/indextank/index_all.log";
-        $pidfile = dirname(__FILE__)."/../../storage/indextank/index_all.pid";
-        $script = dirname(__FILE__)."/Cron/index_all.php";
-        $exclusive = dirname(__FILE__). "/../../exclusive.php";
-        $command = "php {$exclusive} indextank_index_all php {$script} &";
-        exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $command, $outputfile, $pidfile));
-         *
-         */
-
-    }
-
-    static public function startProductsDeleteAll()
-    {
-        self::productsDeleteAll();
-    }
-
     /**
      * Delete all indexed products
      */
     static public function productsDeleteAll()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
-        while($products) {
-            $counter += count($products);
-
-            FCom_IndexTank_Index_Product::i()->delete($products);
-
-            $offset += $limit;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
-        };
-
-        echo $counter . ' products deleted';
+        FCom_IndexTank_Index_Product::i()->drop_index();
+        FCom_IndexTank_Index_Product::i()->create_index();
+        echo 'Index recreated';
     }
 
     /**
-     * Index all products
+     * Mark all product for re-index
      */
-    static public function productsIndexAll($debug=false, $batch_size=500)
+    static public function productsIndexAll()
     {
-        set_time_limit(0);
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($batch_size)->find_many();
-        while($products) {
-            $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
-
-            $offset += $batch_size;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($batch_size)->find_many();
-            unset($orm);
-            if($debug){
-                echo "Indexed: $counter\n";
-            }
-        };
-
-        echo $counter . ' products indexed';
+        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
+        echo 'Products re-indexing scheduled';
     }
+
+    /**
+     * Todo: rework this function
+     * @param type $field
+     */
     static public function productIndexDropField($field)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');

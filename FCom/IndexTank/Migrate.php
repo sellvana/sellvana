@@ -7,8 +7,61 @@ class FCom_IndexTank_Migrate extends BClass
         BMigrate::install('0.1.0', array($this, 'install'));
     }
 
+    public function uninstall()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed; ");
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed_at; ");
+
+        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
+        BDb::run( " DROP TABLE {$pIndexHelperTable}; ");
+
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " DROP TABLE {$pFieldsTable}; ");
+
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " DROP TABLE {$pFunctionsTable}; ");
+
+        //install cron
+        $this->uninstallCron();
+    }
+
+    public function upgrade_0_1_1()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+
+        //install cron
+        $this->installCron();
+    }
+
     public function install()
     {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
             CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
@@ -73,6 +126,21 @@ class FCom_IndexTank_Migrate extends BClass
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
         }
+
+        //install cron
+        $this->installCron();
+    }
+
+    public function installCron()
+    {
+        $expr = "*/5 * * * *";
+        $callback = Fcom_IndexTank_Cron_Index::index_all();
+        FCom_Cron::i()->task($expr, $callback);
+    }
+
+    public function uninstallCron()
+    {
+
     }
 
     public function installProductSchema()
@@ -89,6 +157,9 @@ class FCom_IndexTank_Migrate extends BClass
         }
         $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
         foreach($fields as $f){
+            if ($f->Field == "indextank_indexed" || $f->Field == "indextank_indexed_at"){
+                continue;
+            }
             $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
             if($doc){
                 continue;
