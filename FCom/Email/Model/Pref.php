@@ -2,6 +2,7 @@
 
 class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
 {
+    protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_email_pref';
 
     public static function unsubAll($email)
@@ -17,7 +18,7 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
             $params = array('unsub_all'=>'true');
         }
         $params += array('email'=>$email, 'token'=>static::getToken($email));
-        return BUtil::setUrlQuery(BApp::href('email/pref'), $params);
+        return BUtil::setUrlQuery(BApp::href('email/pref', true, 1), $params);
     }
 
     public static function getToken($email, $salt=null)
