@@ -24,6 +24,10 @@ button,
 input, select,
 textarea 		{ font-family:sans-serif; color:#2f2f2f; }
 textarea { width:250px; height:100px; }
+input[type='text'],
+input[type='url'],
+input[type='password'] { width:280px; }
+
 
 ::-moz-selection{ background:#a6b7d4; color:#fff; text-shadow:none; }
 ::selection 	{ background:#a6b7d4; color:#fff; text-shadow:none; }
