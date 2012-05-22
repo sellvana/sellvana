@@ -32,7 +32,7 @@ class FCom_IndexTank_Admin extends BClass
                     ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories
-                    ->on('FCom_Catalog_Model_Category::afterSave', 'FCom_IndexTank_Admin::onCategoryAfterSave')
+                    ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
                     ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
                     ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
                     ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
@@ -129,17 +129,21 @@ class FCom_IndexTank_Admin extends BClass
 
 
     /**
-     * Catch event FCom_Catalog_Model_Category::afterSave
-     * to update given category in products index
-     * @param array $args contain category model
+     *Catch move category
+     * @param type $args
      */
-    static public function onCategoryAfterSave($args)
+
+    static public function onCategoryMove($args)
     {
         $category = $args['model'];
         $products = $category->products();
+        $product_ids = array();
         foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->update_categories($product);
+            $product_ids[] = $product->id();
         }
+        FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $product_ids).")");
     }
 
     static public function onCategoryProductAfterSave($args)
@@ -159,9 +163,13 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
+        $product_ids = array();
         foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
+            $product_ids[] = $product->id();
         }
+        FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $product_ids).")");
     }
 
     static public function onCategoryProductBeforeDelete($args)
@@ -222,11 +230,14 @@ class FCom_IndexTank_Admin extends BClass
         if (!$doc){
             return;
         }
+        $products = $cf_model->products();
+        if (!$products){
+            return;
+        }
         if($doc->search){
-            self::productIndexDropField($field_name);
+            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field_name, '');
         }
         if($doc->facets){
-            $products = $cf_model->products();
             foreach($products as $product){
                 FCom_IndexTank_Index_Product::i()->delete_category($product, $field_name);
             }
