@@ -545,6 +545,22 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    public function drop_index()
+    {
+        if(false != ($index_name = BConfig::i()->get('modules/FCom_IndexTank/index_name'))){
+            $this->_index_name = $index_name;
+        }
+        $this->model()->delete_index();
+    }
+
+    public function create_index()
+    {
+        if(false != ($index_name = BConfig::i()->get('modules/FCom_IndexTank/index_name'))){
+            $this->_index_name = $index_name;
+        }
+        FCom_IndexTank_Api::i()->service()->create_index($this->_index_name);
+    }
+
 
     /*************** Field init functions *******************
      * Start field functions with _field_ prefix
