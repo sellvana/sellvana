@@ -226,6 +226,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         foreach ($result->results as $res){
             $products[] = $res->docid;
         }
+        if(!$products){
+            return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id',array(-1));
+        }
         $productsORM = FCom_Catalog_Model_Product::i()->orm('p')->where_in("p.id", $products)
                 ->order_by_expr("FIELD(p.id, ".implode(",", $products).")");
         return $productsORM;
@@ -263,14 +266,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * Collect all data (text fields, categoreis, variables) for $product and add it to the index
      * @param array $products of FCom_Catalog_Model_Product objects
      */
-    public function add($products)
+    public function add($products, $limit_docs_per_query = 500)
     {
         if (!is_array($products))
         {
             $products = array($products);
         }
 
-        $limit_docs_per_query = 500;
         $counter = 0;
         $documents = array();
         foreach($products as $i => $product){

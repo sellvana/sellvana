@@ -65,6 +65,32 @@ class FCom_IndexTank_Admin extends BClass
         }
     }
 
+    static public function startProductsIndexAll()
+    {
+        $expr = "";
+        FCom_Cron::i()->task($expr, $callback);
+        echo 'Indexing scheduled';
+        /*
+        $indextank = dirname(__FILE__)."/../../storage/indextank/";
+        if(!file_exists($indextank)){
+            mkdir($indextank);
+        }
+        $outputfile = dirname(__FILE__)."/../../storage/indextank/index_all.log";
+        $pidfile = dirname(__FILE__)."/../../storage/indextank/index_all.pid";
+        $script = dirname(__FILE__)."/Cron/index_all.php";
+        $exclusive = dirname(__FILE__). "/../../exclusive.php";
+        $command = "php {$exclusive} indextank_index_all php {$script} &";
+        exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $command, $outputfile, $pidfile));
+         *
+         */
+
+    }
+
+    static public function startProductsDeleteAll()
+    {
+        self::productsDeleteAll();
+    }
+
     /**
      * Delete all indexed products
      */
@@ -91,21 +117,24 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Index all products
      */
-    static public function productsIndexAll()
+    static public function productsIndexAll($debug=false, $batch_size=500)
     {
         set_time_limit(0);
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
         $offset = 0;
         $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
+        $products = $orm->offset($offset)->limit($batch_size)->find_many();
         while($products) {
             $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->add($products);
+            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
 
-            $offset += $limit;
+            $offset += $batch_size;
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
+            $products = $orm->offset($offset)->limit($batch_size)->find_many();
+            unset($orm);
+            if($debug){
+                echo "Indexed: $counter\n";
+            }
         };
 
         echo $counter . ' products indexed';

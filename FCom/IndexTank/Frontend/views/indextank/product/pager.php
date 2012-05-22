@@ -47,7 +47,7 @@ $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 //$price_ranges = $this->price_ranges;
 
-$psOptions = array(25, 50, 100, 500, 30000);
+$psOptions = array(2, 25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
@@ -56,9 +56,10 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 );
 
 ?>
-<form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
+
 
 <div class="pager">
+    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
     <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
     <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
     <input type="submit" value="Search">
@@ -73,7 +74,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <option value="<?=$i?>" <?=$s['p']==$i?'selected':''?>><?=$i?></option>
 <? endfor ?>
     </select>-->
-    <input type="text" name="p" value="<?=$s['p']?>"/> of <?=$s['mp']?>
+    <input type="text" id="p" name="p" value="<?=$s['p']?>"/> of <?=$s['mp']?>
     <? if ($s['p']<$s['mp']): ?><a href="#" class="arrow-right" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']+1?>); $(this).parents('form').submit()">&gt;</a><? endif ?>
 	</div>
 
