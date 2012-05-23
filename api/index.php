@@ -13,8 +13,8 @@ BConfig::i()->add(array(
     ),
 ));
 
-if (file_exists(__DIR__.'index.local.php')) {
-    require_once __DIR__.'index.local.php';
+if (file_exists(__DIR__.'/index.local.php')) {
+    require_once __DIR__.'/index.local.php';
 }
 
 BDebug::mode('DEBUG');
