@@ -19,7 +19,7 @@
         ),
     ),
 ))) ?>
-            <button type="button" class="btw st1 sz1" id="step1-next">Select file and go to next step</button>
+            <br/><button type="button" class="btn st1 sz2" id="step1-next">Select file and go to next step</button>
         </form>
     </div>
     <h3><a href="#">Step 2: Configure columns and other options</a></h3>

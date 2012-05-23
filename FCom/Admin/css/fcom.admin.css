@@ -86,6 +86,7 @@ input:valid, textarea:valid {  }
 input:invalid, textarea:invalid { background-color:#f0dddd; }
 table { /*border-collapse:collapse;*/ border-spacing:0; }
 td { vertical-align:top; }
+th, td { text-align:left; }
 
 
 /* =============================================================================
@@ -235,6 +236,32 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
     }
 .info-view-mode .label { display:block; margin:1em 0 .3em; font-size:15px; }
 
+/* Table */
+.data-table { border:1px solid #ccc; }
+.data-table th {
+	border-color:#c0c0c0;
+	background:#e0e0e0;
+	background-image: linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -o-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -moz-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -webkit-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -ms-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #e0e0e0),
+		color-stop(1, #ececec)
+	);
+	padding:5px 8px;
+	color:#555;
+	font-weight:bold;
+	text-shadow:0 1px 0 #fff;
+	text-align:left;
+	}
+.data-table td { padding:5px 8px; }
+
+
 /* jQuery UI Tables */
 .ui-widget { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
 .ui-jqgrid { border:none; }
@@ -245,17 +272,18 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .ui-widget-content .ui-state-default,
 .ui-widget-header .ui-state-default {
 	border-color:#c0c0c0;
-	background-image: linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
-	background-image: -o-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
-	background-image: -moz-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
-	background-image: -webkit-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
-	background-image: -ms-linear-gradient(bottom, rgb(224,224,224) 0%, rgb(236,236,236) 100%);
+	background:#e0e0e0;
+	background-image: linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -o-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -moz-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -webkit-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
+	background-image: -ms-linear-gradient(bottom, #e0e0e0 0%, #ececec 100%);
 	background-image: -webkit-gradient(
 		linear,
 		left bottom,
 		left top,
-		color-stop(0, rgb(224,224,224)),
-		color-stop(1, rgb(236,236,236))
+		color-stop(0, #e0e0e0),
+		color-stop(1, #ececec)
 	);
 	color:#555;
 	font-weight:bold;
@@ -317,9 +345,6 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .ui-widget button { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
 
 .ui-widget input[type="text"], .ui-widget input[type="password"] {
-	border-radius:3px;
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
 	border:1px solid #aaa;
 	box-shadow:inset 2px 2px 3px 0 #ddd;
 	-moz-box-shadow:inset 2px 2px 3px 0 #ddd;
