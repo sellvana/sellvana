@@ -22,8 +22,6 @@ class FCom_IndexTank_Migrate extends BClass
         $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
         BDb::run( " DROP TABLE {$pFunctionsTable}; ");
 
-        //install cron
-        $this->uninstallCron();
     }
 
     public function upgrade_0_1_1()
@@ -42,8 +40,6 @@ class FCom_IndexTank_Migrate extends BClass
             ) ENGINE = InnoDB;
          ");
 
-        //install cron
-        $this->installCron();
     }
 
     public function install()
@@ -126,20 +122,6 @@ class FCom_IndexTank_Migrate extends BClass
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
         }
-
-        //install cron
-        $this->installCron();
-    }
-
-    public function installCron()
-    {
-        $expr = "*/5 * * * *";
-        $callback = "Fcom_IndexTank_Cron_Index::index_all()";
-        FCom_Cron::i()->task($expr, $callback);
-    }
-
-    public function uninstallCron()
-    {
 
     }
 
