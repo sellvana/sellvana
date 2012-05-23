@@ -6,6 +6,7 @@ class FCom_IndexTank_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function uninstall()
@@ -23,6 +24,12 @@ class FCom_IndexTank_Migrate extends BClass
         $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
         BDb::run( " DROP TABLE {$pFunctionsTable}; ");
 
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " ALTER TABLE {$pFieldsTable} DROP `show`; ");
     }
 
     public function upgrade_0_1_1()
@@ -83,7 +90,6 @@ class FCom_IndexTank_Migrate extends BClass
             `scoring` tinyint(1) not null default 0,
             `var_number` tinyint(3) not null default -1,
             `priority` int(11) unsigned NOT NULL DEFAULT '1',
-            `show` enum('','link','checkbox') NOT NULL DEFAULT '',
             `filter` enum('','inclusive','exclusive') NOT NULL DEFAULT '',
             `source_type` varchar(255) NOT NULL,
             `source_value` varchar(255) NOT NULL,

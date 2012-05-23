@@ -79,7 +79,7 @@ class FCom_IndexTank_Admin extends BClass
      * Mark all product for re-index
      */
     static public function productsIndexAll()
-    {        
+    {
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
         echo 'Products re-indexing scheduled';
     }
@@ -259,8 +259,7 @@ class FCom_IndexTank_Admin extends BClass
                     array('view', 'admin/form', 'set'=>array(
                         'tab_view_prefix' => 'indextank/product_fields-form/',
                     ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10)),
-                        array('addTab', 'display', array('label'=>'Display options', 'pos'=>15))
+                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10))
                     )),
                 ),
                 '/indextank/product_functions'=>array(
