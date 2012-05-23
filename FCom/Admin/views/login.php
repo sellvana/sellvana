@@ -15,8 +15,10 @@
 	        		<input type="password" name="login[password]" class="sz1"/>
 	        	</li>
 	        </ul>
-	        <input class="btn st1 sz1" type="submit" value="Login"/>
-	        <a href="<?=BApp::href('password/recover')?>">Recover your password</a>
+            <div class="btns-set">
+	        	<input class="btn st1 sz1" type="submit" value="Login"/>
+	        	<p><a href="<?=BApp::href('password/recover')?>">Recover your password</a></p>
+	        </div>
 	    </fieldset>
 	</form>
 	<p class="copyright">&copy; <?php echo date("Y")?> <?=$this->q($storeName)?>. All rights reserved.</p>

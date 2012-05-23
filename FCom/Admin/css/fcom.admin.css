@@ -794,10 +794,10 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 	text-shadow:0 1px 0 #fff;
 	}
 .adm-login-form .form-list { margin-bottom:10px; }
-.adm-login-form li.label-l label { width:130px; font-size:15px; }
+.adm-login-form li.label-l label { width:145px; font-size:15px; text-align:right; margin-right:10px; }
 .adm-login-form input[type="text"],
 .adm-login-form input[type="password"] { width:250px; }
-.adm-login-form .btn { margin-left:130px; }
+.adm-login-form .btns-set { margin-left:155px; }
 .adm-login-form .app-logo { margin-bottom:10px; }
 .adm-login-form .msgs { margin:-13px 0 16px; }
 

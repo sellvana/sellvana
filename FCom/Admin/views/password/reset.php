@@ -11,12 +11,14 @@
                     <input type="password" name="password" class="sz1 required"/>
                 </li>
                 <li class="label-l">
-                    <label for="#">Confirm</label>
+                    <label for="#">Confirm Password</label>
                     <input type="password" name="password_confirm" class="sz1 required"/>
                 </li>
             </ul>
-            <input type="hidden" name="token" value="<?=$this->q(BRequest::i()->request('token'))?>"/>
-            <input class="btn st1 sz1" type="submit" value="Reset Password"/>
+            <div class="btns-set">
+            	<input type="hidden" name="token" value="<?=$this->q(BRequest::i()->request('token'))?>"/>
+            	<input class="btn st1 sz1" type="submit" value="Reset Password"/>
+	        </div>
         </fieldset>
     </form>
     <p class="copyright">&copy; <?php echo date("Y")?> <?=$this->q($storeName)?>. All rights reserved.</p>
