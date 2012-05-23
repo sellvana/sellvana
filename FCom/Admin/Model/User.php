@@ -247,6 +247,7 @@ CREATE TABLE IF NOT EXISTS {$tUser} (
   `create_dt` datetime NOT NULL,
   `update_dt` datetime DEFAULT NULL,
   `token` varchar(20) DEFAULT NULL,
+  `token_dt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNQ_email` (`email`),
   UNIQUE KEY `UNQ_username` (`username`),

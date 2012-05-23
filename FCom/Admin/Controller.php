@@ -79,9 +79,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $password = BRequest::i()->post('password');
         if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
             $user->resetPassword($password);
-            BSession::i()->addMessage('Password has been reset', 'success', 'dealer');
+            BSession::i()->addMessage('Password has been reset', 'success', 'admin');
         } else {
-            BSession::i()->addMessage('Invalid form data', 'error', 'dealer');
+            BSession::i()->addMessage('Invalid form data', 'error', 'admin');
         }
         BResponse::i()->redirect(BApp::href());
     }
