@@ -32,7 +32,7 @@ class FCom_IndexTank_Admin extends BClass
                     ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories
-                    ->on('FCom_Catalog_Model_Category::afterSave', 'FCom_IndexTank_Admin::onCategoryAfterSave')
+                    ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
                     ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
                     ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
                     ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
@@ -65,95 +65,23 @@ class FCom_IndexTank_Admin extends BClass
         }
     }
 
-    static public function startProductsIndexAll()
-    {
-        $expr = "";
-        FCom_Cron::i()->task($expr, $callback);
-        echo 'Indexing scheduled';
-        /*
-        $indextank = dirname(__FILE__)."/../../storage/indextank/";
-        if(!file_exists($indextank)){
-            mkdir($indextank);
-        }
-        $outputfile = dirname(__FILE__)."/../../storage/indextank/index_all.log";
-        $pidfile = dirname(__FILE__)."/../../storage/indextank/index_all.pid";
-        $script = dirname(__FILE__)."/Cron/index_all.php";
-        $exclusive = dirname(__FILE__). "/../../exclusive.php";
-        $command = "php {$exclusive} indextank_index_all php {$script} &";
-        exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $command, $outputfile, $pidfile));
-         *
-         */
-
-    }
-
-    static public function startProductsDeleteAll()
-    {
-        self::productsDeleteAll();
-    }
-
     /**
      * Delete all indexed products
      */
     static public function productsDeleteAll()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
-        while($products) {
-            $counter += count($products);
-
-            FCom_IndexTank_Index_Product::i()->delete($products);
-
-            $offset += $limit;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
-        };
-
-        echo $counter . ' products deleted';
+        FCom_IndexTank_Index_Product::i()->drop_index();
+        FCom_IndexTank_Index_Product::i()->create_index();
+        echo 'Index recreated';
     }
 
     /**
-     * Index all products
+     * Mark all product for re-index
      */
-    static public function productsIndexAll($debug=false, $batch_size=500)
+    static public function productsIndexAll()
     {
-        set_time_limit(0);
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($batch_size)->find_many();
-        while($products) {
-            $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
-
-            $offset += $batch_size;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($batch_size)->find_many();
-            unset($orm);
-            if($debug){
-                echo "Indexed: $counter\n";
-            }
-        };
-
-        echo $counter . ' products indexed';
-    }
-    static public function productIndexDropField($field)
-    {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-        $limit = 1000;
-        $offset = 0;
-        $counter = 0;
-        $products = $orm->offset($offset)->limit($limit)->find_many();
-        while($products) {
-            $counter += count($products);
-            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field, '');
-
-            $offset += $limit;
-            $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*');
-            $products = $orm->offset($offset)->limit($limit)->find_many();
-        };
+        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
+        echo 'Products re-indexing scheduled';
     }
 
     /**
@@ -180,17 +108,21 @@ class FCom_IndexTank_Admin extends BClass
 
 
     /**
-     * Catch event FCom_Catalog_Model_Category::afterSave
-     * to update given category in products index
-     * @param array $args contain category model
+     *Catch move category
+     * @param type $args
      */
-    static public function onCategoryAfterSave($args)
+
+    static public function onCategoryMove($args)
     {
         $category = $args['model'];
         $products = $category->products();
+        $product_ids = array();
         foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->update_categories($product);
+            $product_ids[] = $product->id();
         }
+        FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $product_ids).")");
     }
 
     static public function onCategoryProductAfterSave($args)
@@ -210,9 +142,13 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
+        $product_ids = array();
         foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
+            $product_ids[] = $product->id();
         }
+        FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $product_ids).")");
     }
 
     static public function onCategoryProductBeforeDelete($args)
@@ -273,11 +209,14 @@ class FCom_IndexTank_Admin extends BClass
         if (!$doc){
             return;
         }
+        $products = $cf_model->products();
+        if (!$products){
+            return;
+        }
         if($doc->search){
-            self::productIndexDropField($field_name);
+            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field_name, '');
         }
         if($doc->facets){
-            $products = $cf_model->products();
             foreach($products as $product){
                 FCom_IndexTank_Index_Product::i()->delete_category($product, $field_name);
             }
@@ -320,8 +259,7 @@ class FCom_IndexTank_Admin extends BClass
                     array('view', 'admin/form', 'set'=>array(
                         'tab_view_prefix' => 'indextank/product_fields-form/',
                     ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10)),
-                        array('addTab', 'display', array('label'=>'Display options', 'pos'=>15))
+                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10))
                     )),
                 ),
                 '/indextank/product_functions'=>array(

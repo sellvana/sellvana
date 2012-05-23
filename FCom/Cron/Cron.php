@@ -124,6 +124,7 @@ class FCom_Cron extends BClass
                 'last_finish_dt'=>null,
             ))->save();
             $task = $this->_tasks[$dbTask->handle];
+
             try {
                 // run task callback
                 call_user_func($task['callback'], $task);
