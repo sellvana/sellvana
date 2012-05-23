@@ -22,9 +22,10 @@ class FCom_IndexTank_Cron extends BClass
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
         $batch_size = 2000;
         $offset = 0;
-        $counter = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
-        $counter += count($products);
+        if(!$products){
+            return;
+        }
         $product_ids = array();
         foreach($products as $p){
             $product_ids[] = $p->id();
@@ -46,9 +47,10 @@ class FCom_IndexTank_Cron extends BClass
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
         $batch_size = 2000;
         $offset = 0;
-        $counter = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
-        $counter += count($products);
+        if(!$products){
+            return;
+        }
         $product_ids = array();
         foreach($products as $p){
             $product_ids[] = $p->id();
