@@ -303,6 +303,7 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .ui-jqgrid .ui-paging-info { padding-right:5px; }
 .ui-jqgrid .ui-pg-table { padding-bottom:0; }
 .ui-jqgrid-pager { border:none !important; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+.ui-pg-input { width:3em !important; }
 
 .ui-icon-triangle-1-s { background-position:-65px -16px; } /* Fixes sorting arrow alignment */
 .ui-state-highlight,
