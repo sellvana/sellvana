@@ -20,7 +20,7 @@ class FCom_IndexTank_Cron extends BClass
     protected function index_all_in_indexing()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
-        $batch_size = 2000;
+        $batch_size = 1000;
         $offset = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
         if(!$products){
@@ -45,7 +45,7 @@ class FCom_IndexTank_Cron extends BClass
     protected function index_all_not_indexed()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
-        $batch_size = 2000;
+        $batch_size = 1000;
         $offset = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
         if(!$products){
