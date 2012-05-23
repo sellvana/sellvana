@@ -2,6 +2,14 @@
 
 class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
+    public function authenticate($args=array())
+    {
+        if (in_array($this->_action, array('login', 'password_recover', 'password_reset'))) {
+            return true;
+        }
+        return parent::authenticate($args);
+    }
+
     public function action_index()
     {
         $this->layout('/');
@@ -19,7 +27,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         BResponse::i()->status(404);
     }
 
-    public function action_login_post()
+    public function action_login__POST()
     {
         try {
             $r = BRequest::i()->post('login');
@@ -36,13 +44,52 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
+        BResponse::i()->redirect(!empty($url) ? $url : BApp::href());
+    }
+
+    public function action_password_recover()
+    {
+        $this->layout('/password/recover');
+    }
+
+    public function action_password_recover__POST()
+    {
+        $user = FCom_Admin_Model_User::i()->load(BRequest::i()->request('email'), 'email');
+        if ($user) {
+            $user->recoverPassword();
+        }
+        BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.', 'success', 'admin');
+        BResponse::i()->redirect(BApp::href());
+    }
+
+    public function action_password_reset()
+    {
+        $token = BRequest::i()->request('token');
+        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+            $this->layout('/password/reset');
+        } else {
+            BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'admin');
+            BResponse::i()->redirect(BApp::href());
+        }
+    }
+
+    public function action_password_reset__POST()
+    {
+        $token = BRequest::i()->request('token');
+        $password = BRequest::i()->post('password');
+        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+            $user->resetPassword($password);
+            BSession::i()->addMessage('Password has been reset', 'success', 'admin');
+        } else {
+            BSession::i()->addMessage('Invalid form data', 'error', 'admin');
+        }
+        BResponse::i()->redirect(BApp::href());
     }
 
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::baseUrl());
+        BResponse::i()->redirect(BApp::href());
     }
 
     public function action_my_account()

@@ -477,7 +477,7 @@ return [true, 'Testing error'];
         $cfg = $this->_processConfig($cfg);
         $columns = $cfg['grid']['colModel'];
         $headers = array();
-        foreach ($columns as $col) {
+        foreach ($columns as $i=>$col) {
             if (!empty($col['hidden'])) continue;
             $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
             if (!empty($col['editoptions']['value']) && is_string($col['editoptions']['value'])) {
@@ -487,6 +487,7 @@ return [true, 'Testing error'];
                     list($k, $v) = explode(':', $o);
                     $col['editoptions']['value'][$k] = $v;
                 }
+                $columns[$i] = $col;
             }
         }
         $dir = BConfig::i()->get('fs/storage_dir').'/export';

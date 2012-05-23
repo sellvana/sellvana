@@ -63,7 +63,7 @@ class FCom_Core extends BClass
 
         $baseHref = $config->get('web/base_href');
         if (!$baseHref) {
-            $baseHref = BRequest::i()->baseUrl();
+            $baseHref = BRequest::i()->webRoot();
             $localConfig['web']['base_href'] = $baseHref;
         }
         if (!$config->get('web/base_src')) {
@@ -252,7 +252,7 @@ class FCom_Core extends BClass
     {
         static $url;
         if (!$url) {
-            $url = BConfig::i()->get('web/base_store').'/resize.php';
+            $url = BApp::href('resize.php', 1, 1);
         }
         return $url;
     }
@@ -314,7 +314,7 @@ class FCom_Core extends BClass
             $s->data('lastNav', array($r->rawPath(), $r->get()));
         } else {
             $d = $s->data('lastNav');
-            return BApp::baseUrl().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
+            return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
     }
 }

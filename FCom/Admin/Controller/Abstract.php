@@ -13,7 +13,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function authenticate($args=array())
     {
-        return FCom_Admin_Model_User::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
+        return FCom_Admin_Model_User::i()->isLoggedIn();
     }
 
     public function authorize($args=array())
@@ -39,7 +39,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             BResponse::i()->json(array('error'=>'login'));
         } else {
             BSession::i()->data('login_orig_url', $r->currentUrl());
-            $this->messages('login')->layout('/login');
+            $this->layout('/login');
             BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
         }
     }
