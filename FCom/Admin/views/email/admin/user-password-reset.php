@@ -3,6 +3,6 @@
 <!--{ From: "<?=$c->get('modules/FCom_Core/store_name')?>" <<?=$c->get('modules/FCom_Core/admin_email')?>> }-->
 <!--{ Subject: Password reset confirmation }-->
 
-Hello, <?=$u->firstname?>.
+Hello <?=$u->firstname?>,
 
 Thank you, your password has been successfully reset.

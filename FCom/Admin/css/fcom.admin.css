@@ -135,7 +135,7 @@ input[type="text"].sz1, input[type="password"].sz1 {
 
 /* Forms - Buttons */
 /* Buttons have st1, st2, st3, st4, sz1, sz2 */
-button.btn, input[type="submit"].btn {
+button.btn, input[type="submit"].btn, input[type="button"].btn {
 	display:inline-block;
 	height:auto;
 	border-radius:4px;
@@ -144,7 +144,7 @@ button.btn, input[type="submit"].btn {
 	font:bold 14px/1 'Helvetica Nue', Arial, Helvetica, sans-serif;
 	overflow:visible;
 }
-button.st1, input[type="submit"].st1 {
+button.st1, input[type="submit"].st1, input[type="button"].st1 {
 	/* Key button in page example:Save */
 	box-shadow: inset 0 1px 0 #a0b5db;
 	-moz-box-shadow: inset 0 1px 0 #a0b5db;
@@ -165,7 +165,7 @@ button.st1, input[type="submit"].st1 {
 	);
 	text-shadow:0 -1px 0 #2c4779;
 	}
-button.st2, input[type="submit"].st2 {
+button.st2, input[type="submit"].st2, input[type="button"].st2 {
 	/* Auxiliary button in page example:Edit */
 	border:1px solid #adadad;
 	background:#d8d8d8;
@@ -183,7 +183,7 @@ button.st2, input[type="submit"].st2 {
 	color:#444;
 	text-shadow:0 1px 0 #fff;
 	}
-button.st3, input[type="submit"].st3 {
+button.st3, input[type="submit"].st3, input[type="button"].st3 {
 	/* Cancel text button */
 	border:none;
 	background:none;
@@ -191,11 +191,11 @@ button.st3, input[type="submit"].st3 {
 	color:#0640a9;
 	font-weight:normal;
 	}
-button.st4, input[type="submit"].st4 {
+button.st4, input[type="submit"].st4, input[type="button"].st4 {
     /* Key button in page example:Save */
-    box-shadow: inset 0 1px 0 #FF704D;
-    -moz-box-shadow: inset 0 1px 0 #FF704D;
-    -webkit-box-shadow: inset 0 1px 0 #FF704D;
+    box-shadow: inset 0 1px 0 #ff704d;
+    -moz-box-shadow: inset 0 1px 0 #ff704d;
+    -webkit-box-shadow: inset 0 1px 0 #ff704d;
     border:1px solid #800000;
     color:#fff;
 	background:#dd6600;
@@ -212,8 +212,8 @@ button.st4, input[type="submit"].st4 {
 	);
     text-shadow:0 -1px 0 #603;
     }
-button.sz1, input[type="submit"].sz1 { padding:8px 25px; font-size:14px; }
-button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
+button.sz1, input[type="submit"].sz1, input[type="button"].sz1 { padding:8px 25px; font-size:14px; }
+button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15px; font-size:12px; }
 
 /* Section Titles */
 .adm-page-title {
@@ -401,6 +401,7 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 	text-shadow:0 -1px 0 #4f6fa7;
 	}
 .ui-search-toolbar .ui-th-column { background:#f6f6f6; padding:4px !important; }
+.ui-button .ui-button-text { border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
 
 /* Modal */
 .ui-dialog { padding:0 !important; }
@@ -755,7 +756,9 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-form-subtable { border:solid 1px #AAA; border-radius:3px }
 .adm-form-subtable td { padding:5px; }
 
-.ui-jqdialog td.first { padding-left:20px; border-left:dotted 1px #CCC; }
+/*.ui-jqdialog td.first { padding-left:20px; border-left:dotted 1px #CCC; }*/
+.ui-jqdialog td { padding:3px 5px; }
+.ui-jqdialog td.first { padding-left:2px; border-left:8px solid #ddd; }
 
 /* =============================================================================
    Per Page
@@ -795,7 +798,7 @@ button.sz2, input[type="submit"].sz2 { padding:6px 15px; font-size:12px; }
 .adm-login-form input[type="text"],
 .adm-login-form input[type="password"] { width:250px; }
 .adm-login-form .btn { margin-left:130px; }
-.adm-login-form .app-logo { width:265px; height:55px; margin-bottom:10px; background:url(../img/logo_blk.png) no-repeat; text-indent:-999em; }
+.adm-login-form .app-logo { margin-bottom:10px; }
 .adm-login-form .msgs { margin:-13px 0 16px; }
 
 /* Product Edit/View */
