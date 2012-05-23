@@ -259,6 +259,9 @@
                     'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
                     //'depends' => array('FCom_Frontend'),
                 ),
+                "FCom_Cron" => array(
+                    "bootstrap" => array("file" => "IndexTankCron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")
+                )
             ),
         ),
         // PHPUnit Tests integration
