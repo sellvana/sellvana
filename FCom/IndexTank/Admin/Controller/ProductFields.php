@@ -33,14 +33,8 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             'scoring' => array('label'=>'Scoring'),
             'var_number' => array('label'=>'Scoring variable #'),
             'priority' => array('label'=>'Priority'),
-            'show' => array('label'=>'Display as'),
             'filter' => array('label'=>'Filter type'),
         );
-
-        //$expr = "*/5 * * * *";
-        //$callback = "Fcom_IndexTank_Cron_Index::index_all()";
-        //FCom_Cron::i()->task($expr, $callback);
-
 
         return $config;
     }
