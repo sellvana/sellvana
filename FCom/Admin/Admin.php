@@ -34,7 +34,9 @@ class FCom_Admin extends BClass
             ->route('_ /noroute', 'FCom_Admin_Controller.noroute', array(), null, false)
             ->route('GET /', 'FCom_Admin_Controller.index')
             ->route('GET /blank', 'FCom_Admin_Controller.blank')
-            ->route('POST /login', 'FCom_Admin_Controller.login_post')
+            ->route('POST /login', 'FCom_Admin_Controller.login')
+            ->route('GET|POST /password/recover', 'FCom_Admin_Controller.password_recover')
+            ->route('GET|POST /password/reset', 'FCom_Admin_Controller.password_reset')
             ->route('GET /logout', 'FCom_Admin_Controller.logout')
 
             ->route('GET /my_account', 'FCom_Admin_Controller.my_account')

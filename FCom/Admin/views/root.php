@@ -4,7 +4,7 @@
     <?php echo $this->hook('head') ?>
     <script>
 window.appConfig = {
-    baseHref: '<?php echo BApp::baseUrl(true) ?>'
+    baseHref: '<?php echo BApp::href() ?>'
 }
     </script>
 </head>

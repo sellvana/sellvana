@@ -2,7 +2,7 @@
 
 class FCom_Email_Migrate extends BClass
 {
-    public static function run()
+    public function run()
     {
         BMigrate::i()->install('0.1.0', array($this, 'install'));
     }
