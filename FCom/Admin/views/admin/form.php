@@ -29,6 +29,7 @@ head(function() {
             <?=join(' ', (array)$this->actions)?>
         </div>
     </header>
+    <?=$this->messagesHtml('admin')?>
     <section class="adm-content-box info-view-mode">
         <aside class="<?=$this->sidebar_img ? 'form-img-sidebar' : 'adm-sidebar'?>">
             <?php if ($this->sidebar_img): ?>

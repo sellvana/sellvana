@@ -146,6 +146,20 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         static::$_sessionUser = null;
     }
 
+    public function recoverPassword()
+    {
+        $this->set(array('token'=>BUtil::randomString(), 'token_dt'=>BDb::now()))->save();
+        BLayout::i()->view('email/admin/user-password-recover')->set('user', $this)->email();
+        return $this;
+    }
+
+    public function resetPassword($password)
+    {
+        $this->set(array('token'=>null, 'token_dt'=>null))->setPassword($password)->save()->login();
+        BLayout::i()->view('email/admin/user-password-reset')->set('user', $this)->email();
+        return $this;
+    }
+
     public function tzOffset()
     {
         return BLocale::i()->tzOffset($this->tz);
@@ -233,6 +247,7 @@ CREATE TABLE IF NOT EXISTS {$tUser} (
   `create_dt` datetime NOT NULL,
   `update_dt` datetime DEFAULT NULL,
   `token` varchar(20) DEFAULT NULL,
+  `token_dt` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNQ_email` (`email`),
   UNIQUE KEY `UNQ_username` (`username`),
