@@ -5,6 +5,7 @@ class FCom_IndexTank_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
     }
 
     public function uninstall()
