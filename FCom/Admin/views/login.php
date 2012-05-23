@@ -1,9 +1,10 @@
+<?php $storeName = BConfig::i()->get('modules/FCom_Core/store_name'); ?>
 <section class="adm-login-form">
-	<!--<h3 class="app-logo">Denteva</h3>-->
+	<h3 class="app-logo"><?=$this->q($storeName)?></h3>
 	<form method="post" action="<?=BApp::href('login')?>">
 	    <fieldset>
 	    	<header class="section-title">Log into Account</header>
-            <?php echo $this->messagesHtml() ?>
+            <?php echo $this->messagesHtml('admin') ?>
 	        <ul class="form-list">
 	        	<li class="label-l">
 	        		<label for="#">Email/Username</label>
@@ -15,8 +16,8 @@
 	        	</li>
 	        </ul>
 	        <input class="btn st1 sz1" type="submit" value="Login"/>
-	        <a href="#">Recover your password</a>
+	        <a href="<?=BApp::href('password/recover')?>">Recover your password</a>
 	    </fieldset>
 	</form>
-	<!--<p class="copyright">&copy; <?php echo date("Y")?> Denteva LLC. All rights reserved.</p>-->
+	<p class="copyright">&copy; <?php echo date("Y")?> <?=$this->q($storeName)?>. All rights reserved.</p>
 </section>
