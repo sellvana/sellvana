@@ -11,7 +11,10 @@
                     <input type="text" name="email" class="sz1"/>
                 </li>
             </ul>
-            <input class="btn st1 sz1" type="submit" value="Send Recovery Instructions"/>
+            <div class="btns-set">
+            	<input class="btn st1 sz1" type="submit" value="Send Recovery Instructions"/>
+            	<p><a href="<?=BApp::href('')?>">&laquo; Back to Login</a></p>
+            </div>
         </fieldset>
     </form>
     <p class="copyright">&copy; <?php echo date("Y")?> <?=$this->q($storeName)?>. All rights reserved.</p>
