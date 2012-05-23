@@ -823,12 +823,32 @@ class BUtil
         if (!empty($parsed['query'])) {
             foreach (explode('&', $parsed['query']) as $q) {
                 $a = explode('=', $q);
+                $a[0] = urldecode($a[0]);
                 $query[$a[0]] = urldecode($a[1]);
+
+                if(isset($params[$a[0]]) && $params[$a[0]] === ""){
+                    unset($query[$a[0]]);
+                    unset($params[$a[0]]);
+                }
             }
         }
         $query = array_merge($query, $params);
         $parsed['query'] = http_build_query($query);
         return static::unparseUrl($parsed);
+    }
+
+    public static function getCurrentUrl()
+    {
+        $pageURL = (@$_SERVER["HTTPS"] == "on") ? "https://" : "http://";
+        if ($_SERVER["SERVER_PORT"] != "80")
+        {
+            $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+        }
+        else
+        {
+            $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+        }
+        return $pageURL;
     }
 
     public static function paginateSortUrl($url, $state, $field)

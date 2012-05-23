@@ -9,6 +9,12 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function gridConfig()
     {
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
+        if($indexingStatus){
+            BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
+        } else {
+            BLayout::i()->view('indextank/product_fields')->set('indexing_status', "N/A");
+        }
         try {
             $status = FCom_IndexTank_Index_Product::i()->status();
             BLayout::i()->view('indextank/product_fields')->set('status', $status);
@@ -27,14 +33,15 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             'scoring' => array('label'=>'Scoring'),
             'var_number' => array('label'=>'Scoring variable #'),
             'priority' => array('label'=>'Priority'),
-            'show' => array('label'=>'Display as'),
             'filter' => array('label'=>'Filter type'),
         );
+
         return $config;
     }
 
     public function formViewBefore($args)
     {
+
         parent::formViewBefore($args);
         $m = $args['model'];
         $args['view']->set(array(
@@ -49,8 +56,12 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         $id = $r->params('id', true);
         $model = $id ? $class::i()->load($id) : $class::i()->create();
         if ($model){
-            //clear index for the field
-            FCom_IndexTank_Admin::productIndexDropField($model->field_name);
+            //clear field in index
+            $products = $model->products();
+            if($products){
+                $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($model);
+                FCom_IndexTank_Index_Product::i()->updateTextField($products, $field_name, '');
+            }
         }
         //remove field from database
         parent::action_form__POST();

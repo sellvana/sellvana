@@ -557,7 +557,14 @@ class BModule extends BClass
         //TODO: optimize path calculations
         if (!BUtil::isPathAbsolute($this->root_dir)) {
 //echo "{$m['root_dir']}, {$args['root_dir']}\n";
-            $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
+            if($m['root_dir'] != $this->root_dir)
+                $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
+            else{
+                $this->root_dir = BUtil::normalizePath($this->root_dir);
+            }
+
+            //$this->root_dir = BUtil::normalizePath($this->root_dir);
+            //echo $this->root_dir."\n";
         }
         $this->run_level = static::ONDEMAND; // disallow declaring run_level in manifest
         /*

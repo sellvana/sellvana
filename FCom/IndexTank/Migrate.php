@@ -5,10 +5,67 @@ class FCom_IndexTank_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+    }
+
+    public function uninstall()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed; ");
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed_at; ");
+
+        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
+        BDb::run( " DROP TABLE {$pIndexHelperTable}; ");
+
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " DROP TABLE {$pFieldsTable}; ");
+
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " DROP TABLE {$pFunctionsTable}; ");
+
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " ALTER TABLE {$pFieldsTable} DROP `show`; ");
+    }
+
+    public function upgrade_0_1_1()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+
     }
 
     public function install()
     {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
             CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
@@ -33,7 +90,6 @@ class FCom_IndexTank_Migrate extends BClass
             `scoring` tinyint(1) not null default 0,
             `var_number` tinyint(3) not null default -1,
             `priority` int(11) unsigned NOT NULL DEFAULT '1',
-            `show` enum('','link','checkbox') NOT NULL DEFAULT '',
             `filter` enum('','inclusive','exclusive') NOT NULL DEFAULT '',
             `source_type` varchar(255) NOT NULL,
             `source_value` varchar(255) NOT NULL,
@@ -73,6 +129,7 @@ class FCom_IndexTank_Migrate extends BClass
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
         }
+
     }
 
     public function installProductSchema()
@@ -89,6 +146,9 @@ class FCom_IndexTank_Migrate extends BClass
         }
         $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
         foreach($fields as $f){
+            if ($f->Field == "indextank_indexed" || $f->Field == "indextank_indexed_at"){
+                continue;
+            }
             $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
             if($doc){
                 continue;

@@ -52,8 +52,9 @@
         <?php endif; ?>
 
         <li>
-            <h3>Additional fields (advanced)</h3>
             <hr/>
+            <h3>Additional fields (advanced)</h3>
+
         </li>
         <li>
             <h4 class="label">Source type</h4>
@@ -71,6 +72,25 @@
             <h4 class="label">Source name</h4>
             <input type="text" name="model[source_value]" value="<?php echo $this->q($m->source_value) ?>"/>
         </li>
+
+
+    </ul>
+
+    <ul class="form-list">
+       <?php if ($m->facets || !$m->id()):?>
+        <li>
+            <hr/>
+            <h3>Display settings</h3>
+        </li>
+        <li>
+            <h4 class="label">Filter type</h4>
+            <select name="model[filter]">
+                <option <?=('' == $m->filter)?'selected':''?> value="">---</option>
+                <option <?=('exclusive' == $m->filter)?'selected':''?> value="exclusive">Exclusive</option>
+                <option <?=('inclusive' == $m->filter)?'selected':''?> value="inclusive">Inclusive</option>
+            </select>
+        </li>
+        <?php endif; ?>
     </ul>
 </fieldset>
 <script>

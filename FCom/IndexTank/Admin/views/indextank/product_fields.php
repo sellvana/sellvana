@@ -13,6 +13,7 @@
         Status: <?=$this->status['status']?>
 </h3>
 <h3>Size: <?=$this->status['size']?> documents</h3>
+<h3>Indexing: <?=$this->indexing_status?></h3>
 <?php endif; ?>
 
 <?php echo $this->view('jqgrid') ?>
