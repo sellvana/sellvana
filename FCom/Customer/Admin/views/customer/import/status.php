@@ -1,6 +1,6 @@
-<?php $config = FCom_Customer_Import::i()->config(); $start = BRequest::i()->get('start'); ?>
+<?php $c = FCom_Customer_Import::i()->config(); $start = BRequest::i()->get('start'); ?>
 
-<?php if ($start || $config['status']==='running'): ?>
+<?php if ($start || $c['status']==='running'): ?>
 
 <button type="button" class="btn st1 sz2" id="step3-stop">Stop Import</button>
 
@@ -16,57 +16,71 @@ setTimeout(function() {
 <?php else: ?>
 
 <button type="button" class="btn st1 sz2" id="step3-start">Start Import with selected configuration</button>
+<hr>
 
 <?php endif ?>
-<pre><?php print_r($config); ?></pre>
+<!--<pre><?php print_r($c); ?></pre>-->
 
+<?php if (!empty($c['status'])): ?>
+<?php $pct = intval($c['rows_processed']/$c['rows_total']*100); ?>
 <table class="data-table">
-	<tr>
-		<th>Status</th>
-		<td style="background:#bbf4a5;">Done</td>
-	</tr>
+    <tr>
+        <th>Status</th>
+        <td><?=$c['status']?></td>
+    </tr>
+    <tr>
+        <th>Progress</th>
+        <td>
+            <div style="background:#bbf4a5; overflow:visible; width:<?=$pct?>%; font-weight:bold"><?=$pct.'%'?></div>
+        </td>
+    </tr>
 	<tr>
 		<th>Start Time</th>
-		<td>1337753864</td>
+		<td><?=date('Y-m-d H:i:s', $c['start_time'])?></td>
 	</tr>
-	<tr>
-		<th>Rows Total</th>
-		<td>3076</td>
-	</tr>
+    <tr>
+        <th>Crunch Rate</th>
+        <td><?=$c['rows_processed'] ? number_format($c['rows_processed']/$c['run_time'], 2) : 0 ?> rows/sec</td>
+    </tr>
+    <tr>
+        <th>Rows Total</th>
+        <td><?=$c['rows_total']?></td>
+    </tr>
 	<tr>
 		<th>Rows Processed</th>
-		<td>3075</td>
+		<td><?=$c['rows_processed']?></td>
 	</tr>
 	<tr>
 		<th>Rows Skipped</th>
-		<td>1</td>
+		<td><?=$c['rows_skipped']?></td>
 	</tr>
 	<tr>
 		<th>Rows Warning</th>
-		<td>0</td>
+		<td <?=$c['rows_warning']?'style="background:#FFFFC0"':''?>><?=$c['rows_warning']?></td>
 	</tr>
 	<tr>
 		<th>Rows Error</th>
-		<td>0</td>
+		<td <?=$c['rows_error']?'style="background:#fe9696"':''?>><?=$c['rows_error']?></td>
 	</tr>
 	<tr>
 		<th>Rows No Change</th>
-		<td style="background:#fe9696;">0</td>
+		<td><?=$c['rows_nochange']?></td>
 	</tr>
 	<tr>
 		<th>Rows Created</th>
-		<td>0</td>
+		<td <?=$c['rows_created']?'style="background:#bbf4a5"':''?>><?=$c['rows_created']?></td>
 	</tr>
 	<tr>
 		<th>Rows Updated</th>
-		<td>115</td>
+		<td <?=$c['rows_updated']?'style="background:#bbf4a5"':''?>><?=$c['rows_updated']?></td>
 	</tr>
 	<tr>
 		<th>Memory Usage</th>
-		<td>166471312</td>
+		<td><?=number_format($c['memory_usage'], 0)?></td>
 	</tr>
 	<tr>
 		<th>Run Time</th>
-		<td>14.808820009232</td>
+		<td><?=number_format($c['run_time'], 4)?> sec</td>
 	</tr>
 </table>
+<?php endif ?>

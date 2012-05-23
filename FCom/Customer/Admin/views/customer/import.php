@@ -15,7 +15,7 @@
             'multiselect'=>false,
             'autowidth'=>false,
             'width'=>600,
-            'height'=>200,
+            'height'=>300,
         ),
     ),
 ))) ?>
@@ -32,10 +32,12 @@
         <div id="import-status">
         </div>
     </div>
+    <!--
     <h3><a href="#">Step 4: Review Import results</a></h3>
     <div>
 
     </div>
+    -->
 </div>
 <script>
 head(function() {

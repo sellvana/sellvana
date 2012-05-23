@@ -180,6 +180,7 @@ class FCom_Customer_Import extends BClass
         $status['memory_usage'] = memory_get_usage();
         $status['run_time'] = microtime(true)-$timer;
         $status['status'] = 'done';
+        $status['rows_processed'] = $status['rows_total'];
         $this->config($status, true);
 
         return true;
