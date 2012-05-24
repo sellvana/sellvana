@@ -207,6 +207,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             if($this->_rollup_category){
                 $category_rollup = implode(",", $this->_rollup_category);
             }
+
             $result = $this->model()->search($query_string, $start, $len, $this->_scoring_function,
                     null, null, $this->_filter_category,
                     null, $this->_filter_docvar, null, $category_rollup, true );
@@ -431,7 +432,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $obj->key = $this->get_category_key($category);
                         $obj->level = $level;
                         $obj->category = true;
-                        $obj->param = "f[{$obj->key}][]";
+                        $obj->param = "f[category]";
                         $category_data['Categories'][$category->id_path] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }

@@ -92,16 +92,30 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 <? endforeach ?>
     </select>
     </div>
-        <br/><br/>
+    <br/>
+        <br/>
+        <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
+        <br/>
 
-<?php foreach($s['available_facets'] as $label => $data):?>
+        <a href="/indextank/search?q=<?=$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
+        <br/>
+
+<?php foreach($s['available_facets'] as $label => $data):
+    if('Categories' == $label){
+                continue;
+    }
+    ?>
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
-
+            <?php if($obj->level) echo str_repeat("&nbsp;&nbsp;", $obj->level) ?>
                 <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
                     <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php else:?>
+                    <?php if($obj->category):?>
+                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->key.':'.$obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <?php else:?>
                     <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <?php endif; ?>
                 <?php endif; ?>
                 <br/>
         <? endforeach ?>

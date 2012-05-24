@@ -33,10 +33,20 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $product_fields = FCom_IndexTank_Model_ProductField::i()->get_list();
         $inclusive_fields = FCom_IndexTank_Model_ProductField::i()->get_inclusive_list();
+
         $filters_selected = array();
         $filters_invisible = array();
+
         if ($f){
             foreach($f as $key => $values) {
+                if($key == 'category'){
+                    $kv = explode(":", $values);
+                    if(empty($kv)){
+                        continue;
+                    }
+                    $key = $kv[0];
+                    $values = array($kv[1]);
+                }
                 if (!is_array($values)){
                     $values = array($values);
                 }
@@ -77,6 +87,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $result_per_page);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+        //print_r($facets);exit;
         $productsData = array();
         if ( $productsORM ) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));

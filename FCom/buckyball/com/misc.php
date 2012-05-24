@@ -825,11 +825,14 @@ class BUtil
                 $a = explode('=', $q);
                 $a[0] = urldecode($a[0]);
                 $query[$a[0]] = urldecode($a[1]);
-
-                if(isset($params[$a[0]]) && $params[$a[0]] === ""){
-                    unset($query[$a[0]]);
-                    unset($params[$a[0]]);
+            }
+        }
+        foreach($params as $k => $v){
+            if($v === ""){
+                if(isset($query[$k])){
+                    unset($query[$k]);
                 }
+                unset($params[$k]);
             }
         }
         $query = array_merge($query, $params);
