@@ -430,6 +430,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $obj->count = $fcount;
                         $obj->key = $this->get_category_key($category);
                         $obj->level = $level;
+                        $obj->category = true;
+                        $obj->param = "f[{$obj->key}][]";
                         $category_data['Categories'][$category->id_path] = $obj;
                         unset($filters_invisible[$fname][$fvalue]);
                     }
@@ -442,6 +444,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                             $obj->name = $fvalue;
                             $obj->count = $fcount;
                             $obj->key = $fname;
+                            $obj->category = false;
+                            if ('inclusive' == $facets_fields[$fname]->filter || empty($facets_fields[$fname]->filter)){
+                                $obj->param = "f[{$obj->key}][{$obj->name}]";
+                            } else {
+                                $obj->param = "f[{$obj->key}][]";
+                            }
                             $facets_data[$facets_fields[$fname]->field_nice_name][] = $obj;
                             unset($filters_invisible[$fname][$fvalue]);
                     }
@@ -615,6 +623,33 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }else if ($product->base_price < 900) {
             return '$800 to $899';
         }else if ($product->base_price < 1000) {
+            return '$900 to $999';
+        }
+
+
+    }
+
+    protected function _field_min_price_range_large($product, $type='')
+    {
+        if ($product->min_price < 100) {
+            return '$0 to $99';
+        } else if ($product->min_price < 200) {
+            return '$100 to $199';
+        }else if ($product->min_price < 300) {
+            return '$200 to $299';
+        }else if ($product->min_price < 400) {
+            return '$300 to $399';
+        }else if ($product->min_price < 500) {
+            return '$400 to $499';
+        }else if ($product->min_price < 600) {
+            return '$500 to $599';
+        }else if ($product->min_price < 700) {
+            return '$600 to $699';
+        }else if ($product->min_price < 800) {
+            return '$700 to $799';
+        }else if ($product->min_price < 900) {
+            return '$800 to $899';
+        }else if ($product->min_price < 1000) {
             return '$900 to $999';
         }
 

@@ -27,7 +27,7 @@ $loggedIn = Denteva_Model_User::i()->isLoggedIn();
             <p><span class="price">$<?=number_format($p->base_price)?></span>
                 <span class="supplier">Darby Dental</span></p>
             <div class="price-range">
-                <strong><a href="#" class="vendor-count">13 Vendors</a></strong>: $24-$49
+                <strong><a href="#" class="vendor-count">13 Vendors</a></strong>: $<?=number_format($p->min_price,0)?> - $<?=number_format($p->max_price,0)?>
             </div>
             <div class="tt tooltip">
                 <div class="tt-arrow"></div>
