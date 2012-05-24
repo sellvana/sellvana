@@ -98,7 +98,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
 
-                <? if(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
                     <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php else:?>
                     <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
