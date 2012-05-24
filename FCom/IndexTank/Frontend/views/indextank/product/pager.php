@@ -97,26 +97,11 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 <?php foreach($s['available_facets'] as $label => $data):?>
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
-<!--                    <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>"
-                    value="<?=$obj->name?>" style="display:none;"
-                    <?=(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
-                    <?php if(!empty($obj->level)):?>
-                    <span style="margin:<?=$obj->level*10?>px;"></span>
-                    <?php endif; ?>
--->
 
                 <? if(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array("f[{$obj->key}][]" => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-
-<!--                <a onclick="$('#<?=$obj->key?>').attr('checked', false);$('#product_list_pager').submit();"
-                   href="javascript:void(0);" style="color:grey;"><?=$obj->name?> (<?=$obj->count?>)</a>
--->
+                    <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php else:?>
-                <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array("f[{$obj->key}][]" => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-
-<!--                <a onclick="$('#<?=$obj->key?>').attr('checked', true);$('#product_list_pager').submit();"
-                   href="javascript:void(0);"><?=$obj->name?> (<?=$obj->count?>)</a>
--->
+                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php endif; ?>
                 <br/>
         <? endforeach ?>
