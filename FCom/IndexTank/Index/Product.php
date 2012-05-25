@@ -458,6 +458,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 if ($pos !== false){
                     $cat_id = substr($fname, strlen('ct_'));
                     $category = FCom_Catalog_Model_Category::i()->load($cat_id);
+                    if(!$category){
+                        continue;
+                    }
                     $level = count(explode("/", $category->id_path))-1;
                     foreach($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
