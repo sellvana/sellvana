@@ -29,9 +29,9 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
 function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
-    .done(function( msg ) { alert( msg ); }); }
+    .done(function( msg ) { alert( "Products re-indexing scheduled" ); }); }
 function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href('indextank/products/index').'"})
-    .done(function( msg ) { alert( msg ); }); }
+    .done(function( msg ) { alert( "Index recreated" ); }); }
 </script>
 ';
         if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
