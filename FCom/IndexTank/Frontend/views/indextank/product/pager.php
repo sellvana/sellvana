@@ -100,41 +100,21 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <a href="/indextank/search?q=<?=$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
         <br/>
 
-<?php foreach($s['available_facets'] as $label => $data):
-    if('Categories' == $label){
-                continue;
-    }
-    ?>
+<?php foreach($s['available_facets'] as $label => $data):?>
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
-            <?php if($obj->level) echo str_repeat("&nbsp;&nbsp;", $obj->level) ?>
                 <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
                     <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-                <?php else:?>
-                    <?php if($obj->category):?>
-                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->key.':'.$obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-                    <?php else:?>
-                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <?php if(true == $s['save_filter']):?>
+                        <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
                     <?php endif; ?>
+                <?php else:?>
+                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php endif; ?>
                 <br/>
         <? endforeach ?>
                 <br/>
 <?php endforeach; ?>
-
-<?php if (!empty($s['filter_invisible'])):?>
-    <? foreach ($s['filter_invisible'] as $filter_key => $filter_name): ?>
-           <?php if (!empty($filter_name)):?>
-                <?php foreach($filter_name as $fname):?>
-                <input type="hidden" name="f[<?=$filter_key?>][]"
-                    value="<?=$fname?>" style="display:none;" checked="checked" />
-                <?php endforeach; ?>
-           <?php endif; ?>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-
-
 
 </div>
 
