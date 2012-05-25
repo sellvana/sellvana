@@ -1,6 +1,11 @@
 <?php $m = $this->model; ?>
 <fieldset class="adm-section-group">
     <ul class="form-list">
+        <?php if( $m->field_name == 'ct_categories' ):?>
+        <li>
+            <h2 class="label" style="color:red">Categories is a virtual field. Settings for this field will be applied to all categories.</h2>
+        </li>
+        <?php endif; ?>
         <li>
             <h2 class="label">Field</h2>
             <?php if($m->id()):?>
