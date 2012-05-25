@@ -19,7 +19,6 @@ setTimeout(function() {
 <hr>
 
 <?php endif ?>
-<!--<pre><?php print_r($c); ?></pre>-->
 
 <?php if (!empty($c['status'])): ?>
 <?php $pct = intval($c['rows_processed']/$c['rows_total']*100); ?>
@@ -40,7 +39,7 @@ setTimeout(function() {
 	</tr>
     <tr>
         <th>Crunch Rate</th>
-        <td><?=$c['rows_processed'] ? number_format($c['rows_processed']/$c['run_time'], 2) : 0 ?> rows/sec</td>
+        <td><?=$c['run_time'] ? number_format($c['rows_processed']/$c['run_time'], 2) : 0 ?> rows/sec</td>
     </tr>
     <tr>
         <th>Rows Total</th>
