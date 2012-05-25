@@ -92,50 +92,29 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 <? endforeach ?>
     </select>
     </div>
-        <br/><br/>
+    <br/>
+        <br/>
+        <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
+        <br/>
+
+        <a href="/indextank/search?q=<?=$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
+        <br/>
 
 <?php foreach($s['available_facets'] as $label => $data):?>
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
-<!--                    <input type="checkbox" name="f[<?=$obj->key?>][]" id="<?=$obj->key?>"
-                    value="<?=$obj->name?>" style="display:none;"
-                    <?=(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key]))?'checked':''?> />
-                    <?php if(!empty($obj->level)):?>
-                    <span style="margin:<?=$obj->level*10?>px;"></span>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                    <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <?php if(true == $s['save_filter']):?>
+                        <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
                     <?php endif; ?>
--->
-
-                <? if(!empty($s['filter_selected']) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array("f[{$obj->key}][]" => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-
-<!--                <a onclick="$('#<?=$obj->key?>').attr('checked', false);$('#product_list_pager').submit();"
-                   href="javascript:void(0);" style="color:grey;"><?=$obj->name?> (<?=$obj->count?>)</a>
--->
                 <?php else:?>
-                <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array("f[{$obj->key}][]" => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
-
-<!--                <a onclick="$('#<?=$obj->key?>').attr('checked', true);$('#product_list_pager').submit();"
-                   href="javascript:void(0);"><?=$obj->name?> (<?=$obj->count?>)</a>
--->
+                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php endif; ?>
                 <br/>
         <? endforeach ?>
                 <br/>
 <?php endforeach; ?>
-
-<?php if (!empty($s['filter_invisible'])):?>
-    <? foreach ($s['filter_invisible'] as $filter_key => $filter_name): ?>
-           <?php if (!empty($filter_name)):?>
-                <?php foreach($filter_name as $fname):?>
-                <input type="hidden" name="f[<?=$filter_key?>][]"
-                    value="<?=$fname?>" style="display:none;" checked="checked" />
-                <?php endforeach; ?>
-           <?php endif; ?>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-
-
 
 </div>
 

@@ -12,8 +12,8 @@ class FCom_IndexTank_Migrate extends BClass
     public function uninstall()
     {
         $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed; ");
-        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed_at; ");
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed,
+        DROP indextank_indexed_at; ");
 
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( " DROP TABLE {$pIndexHelperTable}; ");
@@ -35,8 +35,8 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_1_1()
     {
         $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+        ADD indextank_indexed_at datetime not null; ");
 
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
         BDb::run( "
@@ -53,8 +53,8 @@ class FCom_IndexTank_Migrate extends BClass
     public function install()
     {
         $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0; ");
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed_at datetime not null; ");
+        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+        ADD indextank_indexed_at datetime not null; ");
 
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
         BDb::run( "

@@ -1,6 +1,11 @@
 <?php $m = $this->model; ?>
 <fieldset class="adm-section-group">
     <ul class="form-list">
+        <?php if( $m->field_name == 'ct_categories' ):?>
+        <li>
+            <h2 class="label" style="color:red">Categories is a virtual field. Settings for this field will be applied to all categories.</h2>
+        </li>
+        <?php endif; ?>
         <li>
             <h2 class="label">Field</h2>
             <?php if($m->id()):?>
@@ -10,13 +15,10 @@
             <?php endif; ?>
         </li>
 
-        <?php if ($m->facets || !$m->id()):?>
         <li>
-            <h4 class="label">Label</h4>
+            <h4 class="label">Label (only for facets) </h4>
             <input type="text" name="model[field_nice_name]" value="<?php echo $this->q($m->field_nice_name) ?>"/>
-            (only for facets)
         </li>
-        <?php endif; ?>
 
         <li>
             <h4 class="label">Search</h4>
@@ -35,21 +37,19 @@
             (Scoring accept only float or integer type of variables. Text fields couldn't be used as scoring variable without transformation.)
         </li>
 
-        <?php if ($m->search || !$m->id()):?>
         <li>
-            <h4 class="label">Priority</h4>
-            <input type="text" size="3" id="main-content" name="model[priority]" value="<?php echo $this->q($m->priority) ?>">
-            (Default 1)
-        </li>
-        <?php endif; ?>
-
-        <?php if ($m->scoring || !$m->id()):?>
-        <li>
-            <h4 class="label">Variable number</h4>
+            <h4 class="label">Variable number (only for variables)</h4>
             <input type="text" size="3" name="model[var_number]" value="<?php echo $m->var_number ?>"/>
             (Start from 0)
         </li>
-        <?php endif; ?>
+
+        <li>
+            <h4 class="label">Priority (only for search fields)</h4>
+            <input type="text" size="3" id="main-content" name="model[priority]" value="<?php echo $this->q($m->priority) ?>">
+            (Default 1)
+        </li>
+
+
 
         <li>
             <hr/>
@@ -76,22 +76,22 @@
 
     </ul>
 
+    <?php if( $m->field_name != 'ct_categories' ):?>
     <ul class="form-list">
-       <?php if ($m->facets || !$m->id()):?>
         <li>
             <hr/>
             <h3>Display settings</h3>
         </li>
         <li>
-            <h4 class="label">Filter type</h4>
+            <h4 class="label">Filter type (only for facets)</h4>
             <select name="model[filter]">
                 <option <?=('' == $m->filter)?'selected':''?> value="">---</option>
                 <option <?=('exclusive' == $m->filter)?'selected':''?> value="exclusive">Exclusive</option>
                 <option <?=('inclusive' == $m->filter)?'selected':''?> value="inclusive">Inclusive</option>
             </select>
         </li>
-        <?php endif; ?>
     </ul>
+    <?php endif; ?>
 </fieldset>
 <script>
 head(function() {
