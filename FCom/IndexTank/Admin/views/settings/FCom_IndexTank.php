@@ -18,6 +18,14 @@
                         <input size="50" type="text" name="config[modules][FCom_IndexTank][index_name]" value="<?php echo $this->q($c->get('modules/FCom_IndexTank/index_name'))?>"/>
                     </td>
                 </tr>
+                <tr>
+                    <td>Save current filters on new search query</td>
+                    <td>
+                        <input type="hidden" name="config[modules][FCom_IndexTank][save_filter]" value="0" />
+                        <input size="50" type="checkbox" name="config[modules][FCom_IndexTank][save_filter]"
+                               <?=($c->get('modules/FCom_IndexTank/save_filter')==1)?'checked':''?> value="1"/>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>

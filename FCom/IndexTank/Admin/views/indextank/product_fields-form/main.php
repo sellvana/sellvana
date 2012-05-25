@@ -32,7 +32,7 @@
             (Scoring accept only float or integer type of variables. Text fields couldn't be used as scoring variable without transformation.)
         </li>
 
-         <li>
+        <li>
             <h4 class="label">Variable number (only for variables)</h4>
             <input type="text" size="3" name="model[var_number]" value="<?php echo $m->var_number ?>"/>
             (Start from 0)
@@ -71,6 +71,7 @@
 
     </ul>
 
+    <?php if( $m->field_name != 'ct_categories' ):?>
     <ul class="form-list">
         <li>
             <hr/>
@@ -85,6 +86,7 @@
             </select>
         </li>
     </ul>
+    <?php endif; ?>
 </fieldset>
 <script>
 head(function() {

@@ -405,7 +405,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->delete_documents($docids);
     }
 
-    public function prepareFacets($facets, &$filters_invisible)
+    /**
+     * Process facets filters to show in view
+     * @param type $facets
+     * @return type
+     */
+    public function collectFacets($facets)
     {
         $facets_data = array();
         if($facets){
@@ -415,8 +420,37 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             };
 
             $facets_fields = FCom_IndexTank_Model_ProductField::i()->get_facets_list();
-            $category_data = array();
 
+            //get categories
+            foreach($facets as $fname => $fvalues){
+                //get other fields
+                if( isset($facets_fields[$fname]) ){
+                    foreach($fvalues as $fvalue => $fcount) {
+                            $obj = new stdClass();
+                            $obj->name = $fvalue;
+                            $obj->count = $fcount;
+                            $obj->key = $fname;
+                            $obj->category = false;
+                            if ('inclusive' == $facets_fields[$fname]->filter || empty($facets_fields[$fname]->filter)){
+                                $obj->param = "f[{$obj->key}][{$obj->name}]";
+                            } else {
+                                $obj->param = "f[{$obj->key}][]";
+                            }
+                            $facets_data[$facets_fields[$fname]->field_nice_name][] = $obj;
+                    }
+                }
+            }
+            foreach($facets_data as &$values){
+                usort($values, $cmp);
+            }
+        }
+        return $facets_data;
+    }
+
+    public function collectCategories($facets)
+    {
+        $category_data = array();
+        if($facets){
             //get categories
             foreach($facets as $fname => $fvalues){
                 //hard coded ct_categories prefix
@@ -434,40 +468,17 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $obj->category = true;
                         $obj->param = "f[category]";
                         $category_data['Categories'][$category->id_path] = $obj;
-                        unset($filters_invisible[$fname][$fvalue]);
-                    }
-                    continue;
-                }
-                //get other fields
-                if( isset($facets_fields[$fname]) ){
-                    foreach($fvalues as $fvalue => $fcount) {
-                            $obj = new stdClass();
-                            $obj->name = $fvalue;
-                            $obj->count = $fcount;
-                            $obj->key = $fname;
-                            $obj->category = false;
-                            if ('inclusive' == $facets_fields[$fname]->filter || empty($facets_fields[$fname]->filter)){
-                                $obj->param = "f[{$obj->key}][{$obj->name}]";
-                            } else {
-                                $obj->param = "f[{$obj->key}][]";
-                            }
-                            $facets_data[$facets_fields[$fname]->field_nice_name][] = $obj;
-                            unset($filters_invisible[$fname][$fvalue]);
                     }
                 }
-            }
-            foreach($facets_data as &$values){
-                usort($values, $cmp);
             }
 
             if (!empty($category_data['Categories'])){
                 ksort($category_data['Categories']);
             }
-            //put categories first
-            $facets_data = (array)$category_data + (array)$facets_data;
         }
-        return $facets_data;
+        return $category_data;
     }
+
 
     protected function _processFields($fields_list, $product, $type='')
     {
