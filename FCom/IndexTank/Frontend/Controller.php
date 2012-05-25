@@ -33,10 +33,21 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $product_fields = FCom_IndexTank_Model_ProductField::i()->get_list();
         $inclusive_fields = FCom_IndexTank_Model_ProductField::i()->get_inclusive_list();
+
         $filters_selected = array();
-        $filters_invisible = array();
+
         if ($f){
             foreach($f as $key => $values) {
+                $is_category = false;
+                if($key == 'category'){
+                    $is_category = true;
+                    $kv = explode(":", $values);
+                    if(empty($kv)){
+                        continue;
+                    }
+                    $key = $kv[0];
+                    $values = array($kv[1]);
+                }
                 if (!is_array($values)){
                     $values = array($values);
                 }
@@ -46,10 +57,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
                 foreach ($values as $value){
                     FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
-                    $filters_invisible[$key][$value] = $value;
                 }
                 $filters_selected[$key] = $values;
-
             }
         }
 
@@ -77,6 +86,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $result_per_page);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+        //print_r($facets);exit;
         $productsData = array();
         if ( $productsORM ) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
@@ -87,14 +97,16 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
         $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->total_found()));
 
-        $facets_data = FCom_IndexTank_Index_Product::i()->prepareFacets($facets, $filters_invisible);
+        $facets_data = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
+        $categories_data = FCom_IndexTank_Index_Product::i()->collectCategories($facets);
 
         $productsData['state']['fields'] = $product_fields;
         $productsData['state']['facets'] = $facets;
         $productsData['state']['filter_selected'] = $filters_selected;
-        $productsData['state']['filter_invisible'] = $filters_invisible;
         $productsData['state']['available_facets'] = $facets_data;
+        $productsData['state']['available_categories'] = $categories_data;
         $productsData['state']['filter'] = $v;
+        $productsData['state']['save_filter'] = BConfig::i()->get('modules/FCom_IndexTank/save_filter');
 
 
         BApp::i()
