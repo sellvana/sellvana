@@ -71,7 +71,6 @@ class FCom_IndexTank_Admin extends BClass
     {
         FCom_IndexTank_Index_Product::i()->drop_index();
         FCom_IndexTank_Index_Product::i()->create_index();
-        echo 'Index recreated';
     }
 
     /**
@@ -80,7 +79,7 @@ class FCom_IndexTank_Admin extends BClass
     static public function productsIndexAll()
     {
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
-        echo 'Products re-indexing scheduled';
+        //echo 'Products re-indexing scheduled';
     }
 
     /**

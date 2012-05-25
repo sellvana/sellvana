@@ -57,10 +57,8 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         $model = $id ? $class::i()->load($id) : $class::i()->create();
         if ($model){
             //clear field in index
-            $products = $model->products();
-            if($products){
-                $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($model);
-                FCom_IndexTank_Index_Product::i()->updateTextField($products, $field_name, '');
+            if ($r->post('do')==='DELETE') {
+                FCom_IndexTank_Admin::productsIndexAll();
             }
         }
         //remove field from database
