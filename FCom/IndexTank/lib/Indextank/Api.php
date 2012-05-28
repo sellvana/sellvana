@@ -86,8 +86,6 @@ class Indextank_Api
 
         }
 
-        //file_put_contents("/tmp/indexden", $url ."\n".$args."\n\n", FILE_APPEND);
-
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_CUSTOMREQUEST, $method); // Tell curl to use HTTP method of choice
         curl_setopt($session, CURLOPT_POSTFIELDS, $args); // Tell curl that this is the body of the POST

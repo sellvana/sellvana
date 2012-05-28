@@ -26,6 +26,12 @@
                                <?=($c->get('modules/FCom_IndexTank/save_filter')==1)?'checked':''?> value="1"/>
                     </td>
                 </tr>
+                <tr>
+                    <td>How many product index per minute via cron (optimal 1000):</td>
+                    <td>
+                        <input size="50" type="text" name="config[modules][FCom_IndexTank][index_products_limit]" value="<?php echo $this->q($c->get('modules/FCom_IndexTank/index_products_limit'))?>"/>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
