@@ -11,7 +11,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $f = BRequest::i()->get('f');
         $v = BRequest::i()->get('v');
         $page = BRequest::i()->get('p');
-        $result_per_page = BRequest::i()->get('ps');
+        $resultPerPage = BRequest::i()->get('ps');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
         /*
