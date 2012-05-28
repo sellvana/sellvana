@@ -47,7 +47,7 @@ $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 //$price_ranges = $this->price_ranges;
 
-$psOptions = array(2, 25, 50, 100, 500, 30000);
+$psOptions = array(25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
@@ -97,7 +97,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
         <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
         <br/>
 
-        <a href="/indextank/search?q=<?=$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
+        <a href="<?= BApp::baseUrl(true).'indextank/search?q='.$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
         <br/>
 
 <?php foreach($s['available_facets'] as $label => $data):?>
