@@ -120,11 +120,11 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
         );
-        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->get_list();
         //add initial functions
         foreach($functions as $func_name => $func){
             //add new function only if function not exists yet
-            if(!empty($functions_list[$func['number']])){
+            if(!empty($functionsList[$func['number']])){
                 continue;
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
@@ -214,8 +214,8 @@ class FCom_IndexTank_Migrate extends BClass
         $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
         if ($fields){
             foreach($fields as $f){
-                $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($f);
-                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
+                $fieldName = FCom_IndexTank_Index_Product::i()->get_custom_field_key($f);
+                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
                 if ($doc){
                     continue;
                 }
@@ -225,7 +225,7 @@ class FCom_IndexTank_Migrate extends BClass
                 preg_match("#(\w+)#", $f->table_field_type, $matches);
                 $type = $matches[1];
 
-                $doc->field_name        = $field_name;
+                $doc->field_name        = $fieldName;
                 $doc->field_nice_name   = $f->frontend_label;
                 $doc->field_type        = $type;
                 $doc->facets            = 1;
