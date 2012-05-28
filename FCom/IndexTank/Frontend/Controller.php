@@ -21,11 +21,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
          *
          */
 
+        if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
+            die('Please set up correct API URL at Admin Setting page');
+        }
+        /*
         try {
             FCom_IndexTank_Index_Product::i()->status();
         } catch (Exception $e){
             die('Please set up correct API URL at Admin Setting page');
         }
+         * 
+         */
 
         if ($sc){
             FCom_IndexTank_Index_Product::i()->scoring_by($sc);

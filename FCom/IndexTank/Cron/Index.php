@@ -15,7 +15,10 @@ class Fcom_IndexTank_Cron_Index extends BClass
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
         $total_records = $orm->count();
-        $batch_size = 500;
+        $batch_size = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        if(0 == $batch_size){
+            $batch_size = 500;
+        }
         $offset = 0;
         $counter = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
@@ -48,7 +51,10 @@ class Fcom_IndexTank_Cron_Index extends BClass
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
         $total_records = $orm->count();
-        $batch_size = 500;
+        $batch_size = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        if(0 == $batch_size){
+            $batch_size = 500;
+        }
         $offset = 0;
         $counter = 0;
         $products = $orm->offset($offset)->limit($batch_size)->find_many();
