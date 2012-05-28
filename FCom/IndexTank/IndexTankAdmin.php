@@ -57,7 +57,7 @@ class FCom_IndexTank_Admin extends BClass
         FCom_IndexTank_Index_Product::i()->install();
 
         //insert predefined functions
-        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         foreach($functionsList as $func){
             FCom_IndexTank_Index_Product::i()->updateFunction($func->number, $func->definition);
         }

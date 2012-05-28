@@ -70,7 +70,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         //scoring functions definition for IndexDen
         //todo: move them into configuration
-        $functionList  =  FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functionList  =  FCom_IndexTank_Model_ProductFunction::i()->getList();
         foreach ($functionList as $func) {
             $this->_functions[$func->name] = $func;
         }
@@ -178,7 +178,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         if (!empty($query)){
 
-            $productFields = FCom_IndexTank_Model_ProductField::i()->get_search_list();
+            $productFields = FCom_IndexTank_Model_ProductField::i()->getSearchList();
             $queryString = '';
 
             foreach($productFields as $pfield){
@@ -376,7 +376,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function updateFunctions()
     {
-        $functions = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functions = FCom_IndexTank_Model_ProductFunction::i()->getList();
         if(!$functions){
             return;
         }
@@ -419,7 +419,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 return strnatcmp($a->name, $b->name);
             };
 
-            $facetsFields = FCom_IndexTank_Model_ProductField::i()->get_facets_list();
+            $facetsFields = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
 
             //get categories
             foreach($facets as $fname => $fvalues){
@@ -495,7 +495,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     break;
                 case 'function':
                     //call function
-                    $valuesList = $this->{"_field_".$field->source_value}($product, $type);
+                    $valuesList = $this->{$field->source_value}($product, $type);
                     //process results
                     if($valuesList){
                         if(is_array($valuesList)){
@@ -515,7 +515,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareFields($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->get_search_list();
+        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getSearchList();
         $searches = $this->_processFields($fieldsList, $product, 'search');
         //add two special fields
         $searches['timestamp'] = strtotime($product->update_dt);
@@ -531,7 +531,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     protected function _prepareCategories($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->get_facets_list();
+        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
         $categories = $this->_processFields($fieldsList, $product);
         return $categories;
 
@@ -539,7 +539,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareVariables($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->get_varialbes_list();
+        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
         $variablesList = $this->_processFields($fieldsList, $product);
 
         $variables = array();
@@ -586,17 +586,16 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
 
     /*************** Field init functions *******************
-     * Start field functions with _field_ prefix
      * Example:
-     * For field with source_type 'function' and source_value 'get_label'
+     * For field with source_type 'function' and source_value 'getLabel'
      * create following function
-     * private function _field_get_label()
+     * private function getLabel()
      * {
      *      return 'Text label';
      * }
      */
 
-    protected function _field_get_categories($product, $type='')
+    private function fieldGetCategories($product, $type='')
     {
         $categories = array();
         $productCategories = $product->categories($product->id()); //get all categories for product
@@ -612,39 +611,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $categories;
     }
 
-    protected function _field_get_brands($product, $type='')
-    {
-        return (rand(0, 100) % 2 == 0) ? "Brand 1": "Brand 2";
-    }
-
-    protected function _field_price_range_large($product, $type='')
-    {
-        if ($product->base_price < 100) {
-            return '$0 to $99';
-        } else if ($product->base_price < 200) {
-            return '$100 to $199';
-        }else if ($product->base_price < 300) {
-            return '$200 to $299';
-        }else if ($product->base_price < 400) {
-            return '$300 to $399';
-        }else if ($product->base_price < 500) {
-            return '$400 to $499';
-        }else if ($product->base_price < 600) {
-            return '$500 to $599';
-        }else if ($product->base_price < 700) {
-            return '$600 to $699';
-        }else if ($product->base_price < 800) {
-            return '$700 to $799';
-        }else if ($product->base_price < 900) {
-            return '$800 to $899';
-        }else if ($product->base_price < 1000) {
-            return '$900 to $999';
-        }
-
-
-    }
-
-    protected function _field_min_price_range_large($product, $type='')
+    private function fieldPriceRange($product, $type='')
     {
         if ($product->min_price < 100) {
             return '$0 to $99';
@@ -670,19 +637,4 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
 
     }
-
-    protected function _field_price_range_smart($product, $type='')
-    {
-        $p = $product->base_price;
-        $p2_u = ceil($p/10)*10;
-        $p2_d = floor($p/10)*10;
-        if($p2_u == $p2_d){
-            $p2_u += 10;
-        }
-        return '$'.$p2_d.' to $'.$p2_u;
-    }
-
-
-
-
 }

@@ -14,7 +14,7 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
 
-    public function get_list()
+    public function getList()
     {
         $functions = FCom_IndexTank_Model_ProductFunction::i()->orm()->find_many();
         $result = array();
