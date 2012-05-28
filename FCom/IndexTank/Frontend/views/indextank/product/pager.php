@@ -47,7 +47,7 @@ $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 //$price_ranges = $this->price_ranges;
 
-$psOptions = array(25, 50, 100, 500, 30000);
+$psOptions = array(2, 25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
@@ -67,15 +67,14 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <br/>
     <div class="pages">
     <label>Page:</label>
+    <? if ($s['p']>1): ?>
+        <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']-1))?>" class="arrow-left" >&lt;</a>
+    <? endif ?>
+        <?=$s['p']?> of <?=$s['mp']?>
+    <? if ($s['p']<$s['mp']): ?>
+        <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']+1))?>" class="arrow-right" >&gt;</a>
+    <? endif ?>
 
-    <? if ($s['p']>1): ?><a href="#" class="arrow-left" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']-1?>); $(this).parents('form').submit()">&lt;</a><? endif ?>
-    <!--<select name="p" onchange="this.form.submit()">
-<? for ($i=1; $i<=$s['mp']; $i++): ?>
-        <option value="<?=$i?>" <?=$s['p']==$i?'selected':''?>><?=$i?></option>
-<? endfor ?>
-    </select>-->
-    <input type="text" id="p" name="p" value="<?=$s['p']?>"/> of <?=$s['mp']?>
-    <? if ($s['p']<$s['mp']): ?><a href="#" class="arrow-right" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']+1?>); $(this).parents('form').submit()">&gt;</a><? endif ?>
 	</div>
 
 	<div class="rows f-right">
