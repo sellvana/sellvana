@@ -17,7 +17,8 @@ class FCom_IndexTank_Api extends BClass
      */
     public function __construct()
     {
-        BApp::m()->autoload('lib');
+        include_once 'lib/indextank.php';
+        //BApp::m()->autoload('lib');
     }
 
     /**
