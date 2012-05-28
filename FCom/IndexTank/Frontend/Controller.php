@@ -26,7 +26,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         if ($sc){
-            FCom_IndexTank_Index_Product::i()->scoring_by($sc);
+            FCom_IndexTank_Index_Product::i()->scoringBy($sc);
         }
 
         $productFields = FCom_IndexTank_Model_ProductField::i()->get_list();
@@ -50,11 +50,11 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                     $values = array($values);
                 }
                 if( isset($inclusiveFields[$key]) ){
-                    FCom_IndexTank_Index_Product::i()->rollup_by($key);
+                    FCom_IndexTank_Index_Product::i()->rollupBy($key);
                 }
 
                 foreach ($values as $value){
-                    FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
+                    FCom_IndexTank_Index_Product::i()->filterBy($key, $value);
                 }
                 $filtersSelected[$key] = $values;
             }
@@ -68,7 +68,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 }
                 if( in_array($key, $variablesFields) ){
                     if ($values['from'] < $values['to']){
-                        FCom_IndexTank_Index_Product::i()->filter_range($variablesFields[$key]->var_number, $values['from'], $values['to']);
+                        FCom_IndexTank_Index_Product::i()->filterRange($variablesFields[$key]->var_number, $values['from'], $values['to']);
                     }
                 }
             }
@@ -93,7 +93,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
             //$productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
         }
-        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->total_found()));
+        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r,
+                array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound()));
 
         $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
         $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets);

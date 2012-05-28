@@ -40,7 +40,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     {
         $post = BRequest::i()->post('model');
         if (!empty($post)){
-            FCom_IndexTank_Index_Product::i()->update_function($post['number'], $post['definition']);
+            FCom_IndexTank_Index_Product::i()->updateFunction($post['number'], $post['definition']);
         }
 
         parent::action_form__POST();
