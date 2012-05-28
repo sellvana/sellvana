@@ -120,7 +120,7 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
         );
-        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         //add initial functions
         foreach($functions as $func_name => $func){
             //add new function only if function not exists yet

@@ -29,8 +29,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             FCom_IndexTank_Index_Product::i()->scoringBy($sc);
         }
 
-        $productFields = FCom_IndexTank_Model_ProductField::i()->get_list();
-        $inclusiveFields = FCom_IndexTank_Model_ProductField::i()->get_inclusive_list();
+        $productFields = FCom_IndexTank_Model_ProductField::i()->getList();
+        $inclusiveFields = FCom_IndexTank_Model_ProductField::i()->getInclusiveList();
 
         $filtersSelected = array();
 
@@ -61,7 +61,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         if($v){
-            $variablesFields = FCom_IndexTank_Model_ProductField::i()->get_varialbes_list();
+            $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
             foreach($v as $key => $values) {
                 if (!is_array($values)){
                     $values = array($values);

@@ -5,19 +5,19 @@ class FCom_IndexTank_Cron extends BClass
     public static function bootstrap()
     {
         FCom_Cron::i()
-            ->task('* * * * *', 'FCom_IndexTank_Cron.index_all');
+            ->task('* * * * *', 'FCom_IndexTank_Cron.indexAll');
     }
 
-    public function index_all()
+    public function indexAll()
     {
         set_time_limit(0);
         //first finish not finsihed
-        $this->index_all_in_indexing();
+        $this->indexAllInIndexing();
         //then finit not indexed
-        $this->index_all_not_indexed();
+        $this->indexAllNotIndexed();
     }
 
-    protected function index_all_in_indexing()
+    protected function indexAllInIndexing()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
         $batchSize = 500;
@@ -39,10 +39,10 @@ class FCom_IndexTank_Cron extends BClass
                     "id in (".implode(",", $productIds).")");
 
         $total_records = FCom_Catalog_Model_Product::i()->orm('p')->where("indextank_indexed", 1)->count();
-        $this->update_info_status("index_all_crashed", $total_records);
+        $this->updateInfoStatus("index_all_crashed", $total_records);
     }
 
-    protected function index_all_not_indexed()
+    protected function indexAllNotIndexed()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
         $batchSize = 500;
@@ -67,10 +67,10 @@ class FCom_IndexTank_Cron extends BClass
                     "id in (".implode(",", $productIds).")");
 
         $total_records = FCom_Catalog_Model_Product::i()->orm('p')->where("indextank_indexed", 0)->count();
-        $this->update_info_status("index_all_new", $total_records);
+        $this->updateInfoStatus("index_all_new", $total_records);
     }
 
-    protected function update_info_status($task, $total)
+    protected function updateInfoStatus($task, $total)
     {
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", $task)->find_one();
         if (!$indexingStatus){

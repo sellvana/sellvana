@@ -14,7 +14,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
 
-    public function get_list()
+    public function getList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()->find_many();
         $result = array();
@@ -24,7 +24,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function get_facets_list()
+    public function getFacetsList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('facets', 1)->find_many();
@@ -35,7 +35,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function get_search_list()
+    public function getSearchList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('search', 1)->find_many();
@@ -46,7 +46,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function get_varialbes_list()
+    public function getVarialbesList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('scoring', 1)->find_many();
@@ -57,7 +57,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function get_inclusive_list()
+    public function getInclusiveList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('filter', 'inclusive')->find_many();
