@@ -4,7 +4,6 @@ class Fcom_IndexTank_Cron_Index extends BClass
 {
     static public function index_all()
     {
-        set_time_limit(0);
         //first finish not finsihed
         $this->index_all_in_indexing();
         //then finit not indexed
@@ -14,35 +13,38 @@ class Fcom_IndexTank_Cron_Index extends BClass
     protected function index_all_in_indexing()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
-        $total_records = $orm->count();
-        $batch_size = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
-        if(0 == $batch_size){
-            $batch_size = 500;
+        $totalRecords = $orm->count();
+        if(!$totalRecords){
+            return;
+        }
+        $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        if(0 == $batchSize){
+            $batchSize = 500;
         }
         $offset = 0;
         $counter = 0;
-        $products = $orm->offset($offset)->limit($batch_size)->find_many();
+        $products = $orm->offset($offset)->limit($batchSize)->find_many();
         while($products) {
             $counter += count($products);
-            $product_ids = array();
+            $productIds = array();
             foreach($products as $p){
-                $product_ids[] = $p->id();
+                $productIds[] = $p->id();
             }
             //before indexing
             //indexing
-            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
+            FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
             //after indexing
             FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 2, "indextank_indexed_at" => date("Y-m-d H:i:s")),
-                    "id in (".implode(",", $product_ids).")");
+                    "id in (".implode(",", $productIds).")");
 
-            $percent = round(($counter/$total_records)*100, 2);
+            $percent = round(($counter/$totalRecords)*100, 2);
             $this->update_info_status("index_all_crashed", $percent);
 
-            $offset += $batch_size;
+            $offset += $batchSize;
             //get new batch of data
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
-            $products = $orm->offset($offset)->limit($batch_size)->find_many();
+            $products = $orm->offset($offset)->limit($batchSize)->find_many();
             unset($orm);
         }
     }
@@ -50,38 +52,41 @@ class Fcom_IndexTank_Cron_Index extends BClass
     protected function index_all_not_indexed()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
-        $total_records = $orm->count();
-        $batch_size = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
-        if(0 == $batch_size){
-            $batch_size = 500;
+        $totalRecords = $orm->count();
+        if(!$totalRecords){
+            return;
+        }
+        $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        if(0 == $batchSize){
+            $batchSize = 500;
         }
         $offset = 0;
         $counter = 0;
-        $products = $orm->offset($offset)->limit($batch_size)->find_many();
+        $products = $orm->offset($offset)->limit($batchSize)->find_many();
         while($products) {
             $counter += count($products);
-            $product_ids = array();
+            $productIds = array();
             foreach($products as $p){
-                $product_ids[] = $p->id();
+                $productIds[] = $p->id();
             }
             //before index
             FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 1, "indextank_indexed_at" => date("Y-m-d H:i:s")),
-                    "id in (".implode(",", $product_ids).")");
+                    "id in (".implode(",", $productIds).")");
             //index
-            FCom_IndexTank_Index_Product::i()->add($products, $batch_size);
+            FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
             //after index
             FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 2, "indextank_indexed_at" => date("Y-m-d H:i:s")),
-                    "id in (".implode(",", $product_ids).")");
+                    "id in (".implode(",", $productIds).")");
 
-            $percent = round(($counter/$total_records)*100, 2);
+            $percent = round(($counter/$totalRecords)*100, 2);
             $this->update_info_status("index_all_new", $percent);
 
-            $offset += $batch_size;
+            $offset += $batchSize;
             //get new batch of data
             $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
-            $products = $orm->offset($offset)->limit($batch_size)->find_many();
+            $products = $orm->offset($offset)->limit($batchSize)->find_many();
             unset($orm);
         }
     }
