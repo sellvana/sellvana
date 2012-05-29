@@ -59,6 +59,41 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 
 <div class="pager">
+
+    <form autocomplete="off" method="get" action="">
+        <input type="hidden" name="q" value="<?=$this->q(BRequest::i()->get('q'))?>">
+        <?php foreach($s['available_facets'] as $label => $data):?>
+        <? foreach ($data as $obj): ?>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                    <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
+                <?php endif; ?>
+        <? endforeach ?>
+    <?php endforeach; ?>
+
+   <?php foreach($s['available_categories'] as $data):?>
+        <? foreach ($data as $obj):            ?>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                    <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->key.':'.$obj->name?>" />
+                <?php endif; ?>
+        <? endforeach ?>
+    <?php endforeach; ?>
+    <div class="rows f-right">
+    <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
+<? foreach ($psOptions as $i): ?>
+        <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
+<? endforeach ?>
+    </select>
+	</div>
+    <div class="sort-by f-right">
+    <label>Sort:</label> <select name="sc" onchange="this.form.submit()">
+<? foreach ($sortOptions as $k=>$v): ?>
+        <option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
+<? endforeach ?>
+    </select>
+    </div>
+
+    </form>
+
     <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
     <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
     <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
@@ -77,20 +112,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 	</div>
 
-	<div class="rows f-right">
-    <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
-<? foreach ($psOptions as $i): ?>
-        <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
-<? endforeach ?>
-    </select>
-	</div>
-    <div class="sort-by f-right">
-    <label>Sort:</label> <select name="sc" onchange="this.form.submit()">
-<? foreach ($sortOptions as $k=>$v): ?>
-        <option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
-<? endforeach ?>
-    </select>
-    </div>
+
     <br/>
         <br/>
         <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
