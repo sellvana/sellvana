@@ -80,7 +80,9 @@ ALTER TABLE {$tCustomer}
         if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
             $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
         }
-        $addr->set($data['address']);
+        if(!empty($data['address'])){
+            $addr->set($data['address']);
+        }
         $addr->save();
 
         if (!$cust->default_billing_id) {
