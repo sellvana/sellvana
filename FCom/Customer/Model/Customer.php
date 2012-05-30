@@ -13,6 +13,20 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function recoverPassword()
+    {
+        $this->set(array('token'=>BUtil::randomString()))->save();
+        BLayout::i()->view('customer/email/customer-password-recover')->set('customer', $this)->email();
+        return $this;
+    }
+
+    public function resetPassword($password)
+    {
+        $this->set(array('token'=>null))->setPassword($password)->save()->login();
+        BLayout::i()->view('customer/email/customer-password-reset')->set('customer', $this)->email();
+        return $this;
+    }
+
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;
@@ -91,6 +105,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
+    }
+
+    static public function register($r)
+    {
+        if (empty($r['email'])
+            || empty($r['password']) || empty($r['password_confirm'])
+            || $r['password']!=$r['password_confirm']
+        ) {
+            throw new Exception('Incomplete or invalid form data.');
+        }
+
+        unset($r['id']);
+        $customer = static::i()->create($r)->save();
+        BLayout::i()->view('customer/email/new-customer')->set('customer', $customer)->email();
+        BLayout::i()->view('customer/email/new-admin')->set('customer', $customer)->email();
+        return $customer;
     }
 
     public function install()

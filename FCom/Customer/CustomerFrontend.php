@@ -10,8 +10,9 @@ class FCom_Customer_Frontend extends BClass
 
         BFrontController::i()
             ->route('GET|POST /login', 'FCom_Customer_Frontend_Controller.login')
-            ->route('GET|POST /password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
-            ->route('GET|POST /password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
+            ->route('GET|POST /customer/register', 'FCom_Customer_Frontend_Controller.register')
+            ->route('GET|POST /customer/password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
+            ->route('GET|POST /customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
             ->route('GET /logout', 'FCom_Customer_Frontend_Controller.logout')
 
             ->route('GET /myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
@@ -27,6 +28,10 @@ class FCom_Customer_Frontend extends BClass
             '/customer/login'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/login')),
+            ),
+            '/customer/register'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/register')),
             ),
             '/customer/password/recover'=>array(
                 array('layout', 'base'),
