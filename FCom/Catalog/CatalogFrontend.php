@@ -26,6 +26,7 @@ class FCom_Catalog_Frontend extends BClass
 
             '/catalog/product'=>array(
                 array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/product'))
             ),
 
             '/catalog/search'=>array(

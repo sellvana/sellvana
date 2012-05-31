@@ -6,7 +6,6 @@ class FCom_IndexTank_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function uninstall()
@@ -26,11 +25,6 @@ class FCom_IndexTank_Migrate extends BClass
 
     }
 
-    public function upgrade_0_1_2()
-    {
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run( " ALTER TABLE {$pFieldsTable} DROP `show`; ");
-    }
 
     public function upgrade_0_1_1()
     {
@@ -52,20 +46,6 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function install()
     {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-        ADD indextank_indexed_at datetime not null; ");
-
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( "
-            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
-            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `task` VARCHAR( 255 ) NOT NULL ,
-            `info` VARCHAR( 255 ) NOT NULL ,
-            `updated_at` datetime
-            ) ENGINE = InnoDB;
-         ");
-
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
             CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
