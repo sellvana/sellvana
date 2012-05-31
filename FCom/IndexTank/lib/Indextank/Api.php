@@ -34,6 +34,11 @@ class Indextank_Api
         $this->api_url = rtrim($api_url, "/");
     }
 
+    /**
+     *
+     * @param type $index_name
+     * @return Indextank_Index object
+     */
     public function get_index($index_name)
     {
         return new Indextank_Index($this, $index_name);

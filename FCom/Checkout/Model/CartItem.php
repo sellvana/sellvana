@@ -1,6 +1,6 @@
 <?php
 
-class Denteva_Model_CartItem extends Denteva_Model_Abstract
+class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cart_item';
 
