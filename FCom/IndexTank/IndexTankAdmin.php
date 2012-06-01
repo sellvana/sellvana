@@ -26,20 +26,22 @@ class FCom_IndexTank_Admin extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
 
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
-            BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
-                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
+            if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
+                BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+                        ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
-                    //for categories
-                    ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
-                    ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
-                    ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
-                    ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
-                    //for custom fields
-                    ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
-                    ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
-                    //for API init
-                    ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
-            ;
+                        //for categories
+                        ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
+                        ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+                        ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
+                        ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
+                        //for custom fields
+                        ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
+                        ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                ;
+            }
+            //for API init
+            BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
         }
         FCom_IndexTank_Admin_Controller::bootstrap();
     }

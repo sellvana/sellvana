@@ -567,10 +567,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_indexName);
         }
 
-        $functionList  =  FCom_IndexTank_Model_ProductFunction::i()->getList();
-        foreach ($functionList as $func) {
-            $this->_model->add_function($func->number, $func->definition);
-        }
+        $this->updateFunctions();
     }
 
     public function dropIndex()
