@@ -11,7 +11,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 
 <? else: ?>
 
-    <form name="cart" action="<?=BApp::href('checkout/cart')?>" method="post">
+    <form name="cart" action="<?=BApp::href('cart')?>" method="post">
         <table class="product-list">
             <col width="30"/>
             <col width="60"/>
@@ -72,7 +72,7 @@ TEST
                 <td></td>
                 <td></td>
                 <td><input type="submit" class="button" value="Update Cart"/></td>
-                <td>$<span class="cart-subtotal"><?=number_format($cart->subtotal)?></span></td>
+                <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
             </tfoot>
         </table>
     </form>
