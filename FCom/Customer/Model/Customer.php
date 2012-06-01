@@ -50,6 +50,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
+    public function sessionCart()
+    {
+        return $this->relatedModel('FCom_Checkout_Model_Cart', $this->session_cart_id);
+    }
+
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {

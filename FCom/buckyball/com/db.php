@@ -1874,6 +1874,7 @@ class BModel extends Model
             } else {
                 $model = $modelClass::i()->load($idValue);
             }
+
             if ($autoCreate && !$model) {
                 if (is_array($idValue)) {
                     $model = $modelClass::i()->create($idValue);
@@ -1909,7 +1910,10 @@ class BModel extends Model
     public function childById($var, $id, $idField='id')
     {
         $collection = $this->get($var);
-        if (!$collection) return null;
+        if (!$collection){
+            $collection = $this->{$var};
+            if (!$collection) return null;
+        }
         foreach ($collection as $k=>$v) {
             if ($v->get($idField)==$id) return $v;
         }
