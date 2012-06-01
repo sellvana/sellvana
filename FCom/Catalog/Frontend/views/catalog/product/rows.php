@@ -1,6 +1,7 @@
 <?
-$loggedIn = Denteva_Model_User::i()->isLoggedIn();
-Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
+//$loggedIn = Denteva_Model_User::i()->isLoggedIn();
+//Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
+$loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
 ?>
 <? foreach ($this->products as $p): ?>
 <tr id="tr-product-<?=$p->id?>">
@@ -44,14 +45,10 @@ Denteva_Model_Manuf::i()->cachePreloadFrom($this->products, 'manuf_id');
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                     </ul>
                 </div>
             </div>
-            <button class="button btn-add-to-cart" onclick="dentevaCart.add(<?=$p->id?>)">+ Add to Cart</button>
+            <button class="button btn-add-to-cart" onclick="add_cart(<?=$p->id?>)">+ Add to Cart</button>
         </div>
     </td>
 </tr>

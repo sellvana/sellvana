@@ -2,12 +2,6 @@
 $prod = $this->product;
 $cat = $this->category;
 ?>
-<script type="text/javascript">
-    function add_cart(id, qty){
-        var fc = new FulleronCart({"apiUrl":"/cart"});
-        fc.add(id, qty);
-    }
-</script>
 
 <div class="main col1-layout">
     <?=$this->view('breadcrumbs')?>
@@ -123,7 +117,7 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
 				            </tbody>
 				        </table>
         			</div>
@@ -135,7 +129,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>
@@ -147,7 +141,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>
