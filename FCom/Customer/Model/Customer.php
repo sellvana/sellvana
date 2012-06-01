@@ -16,14 +16,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function recoverPassword()
     {
         $this->set(array('token'=>BUtil::randomString()))->save();
-        BLayout::i()->view('customer/email/customer-password-recover')->set('customer', $this)->email();
+        BLayout::i()->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }
 
     public function resetPassword($password)
     {
         $this->set(array('token'=>null))->setPassword($password)->save()->login();
-        BLayout::i()->view('customer/email/customer-password-reset')->set('customer', $this)->email();
+        BLayout::i()->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
 
@@ -118,8 +118,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         unset($r['id']);
         $customer = static::i()->create($r)->save();
-        BLayout::i()->view('customer/email/new-customer')->set('customer', $customer)->email();
-        BLayout::i()->view('customer/email/new-admin')->set('customer', $customer)->email();
+        BLayout::i()->view('email/new-customer')->set('customer', $customer)->email();
+        BLayout::i()->view('email/new-admin')->set('customer', $customer)->email();
         return $customer;
     }
 
