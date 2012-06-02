@@ -876,11 +876,14 @@ class BClassRegistry extends BClass
     public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
         $class = $origClass ? $origClass : $class;
-
+        
         if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
-        } else {
+        } elseif (method_exists($class, $method)) {
             $callback = array($class, $method);
+        } else {
+            BDebug::error('Invalid method: '.$class.'::'.$method);
+            return null;
         }
 
         $result = call_user_func_array($callback, $args);
