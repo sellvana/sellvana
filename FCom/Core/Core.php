@@ -47,6 +47,8 @@ class FCom_Core extends BClass
 
     public function initConfig($area)
     {
+        date_default_timezone_set('UTC');
+        
         $config = BConfig::i();
 
         // $localConfig used to override saved config with settings from entry point
