@@ -8,7 +8,9 @@ if (FCom_Customer_Model_Customer::isLoggedIn()) {
     $cart = FCom_Customer_Model_Customer::sessionGuestCart();
 }
 $itemNum = 0;
+$itemPrice = 0;
 if($cart){
+    $itemPrice = round($cart->subtotal,2);
     $itemNum = ceil($cart->item_num);
 }
 ?>
@@ -23,7 +25,7 @@ if($cart){
                 <?php else: ?>
                     <li class="header-sup-signin">Hello there! <strong><a href="<?=BApp::href('login')?>">Sign in</a></strong></li>
                 <?php endif; ?>
-                <li class="header-sup-cart"><a href="<?=BApp::href('cart')?>">Your Cart <span class="count">(<?=$itemNum?>)</span></a></li>
+                <li class="header-sup-cart"><a href="<?=BApp::href('cart')?>">Your Cart <span class="count">(<?=$itemNum?>)</span> | Total: $<?=$itemPrice?></a></li>
                 <li class="header-sup-wishlist"><a href="<?=BApp::href('wishlist')?>">Your Wishlist</a></li>
             </ul>
         </nav>

@@ -9,7 +9,19 @@ class FCom_Checkout extends BClass
             ->route('POST /cart', 'FCom_Checkout_Frontend_Controller.cart_post')
 
             //checkout
-            ->route( 'GET /checkout', 'FCom_Checkout_Frontend_Controller.checkout')
+            ->route( 'GET /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
+            ->route( 'POST /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_post')
+
+            //payment
+            ->route( 'GET /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
+            ->route( 'POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment_post')
+
+            //shipping address
+            ->route( 'GET /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping')
+            ->route('POST /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping_post')
+            //billing address
+            ->route( 'GET /checkout/address/billing', 'FCom_Checkout_Frontend_Controller_Address.billing')
+            ->route('POST /checkout/address/billing', 'FCom_Checkout_Frontend_Controller_Address.billing_post')
         ;
 
         //merge cart sessions after user login
@@ -25,7 +37,28 @@ class FCom_Checkout extends BClass
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('checkout/cart'))
             ),
+            '/checkout/checkout'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/checkout'))
+            ),
+            '/checkout/payment'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/payment'))
+            ),
+            '/checkout/address/shipping'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/address/shipping'))
+            ),
+            '/checkout/address/billing'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/address/billing'))
+            ),
         ));
+    }
+
+    public function getShippingMethods()
+    {
+        return array(new stdClass());
     }
 
     public function install()
