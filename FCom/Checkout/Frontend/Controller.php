@@ -8,7 +8,9 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Cart', 'active'=>true));
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
         BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
+        $shippingEstimate = BSession::i()->data('shipping_estimate');
         $layout->view('checkout/cart')->cart = $cart;
+        $layout->view('checkout/cart')->shipping_esitmate = $shippingEstimate;
         $this->layout('/checkout/cart');
         BResponse::i()->render();
     }
@@ -48,26 +50,23 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     if ($item) $item->set('qty', $qty)->save();
                 }
             }
+            if (!empty($post['postcode'])) {
+                $estimateMin = null;
+                foreach (FCom_Checkout::i()->getShippingMethods() as $shipping) {
+                    $estimateMin = '10 days - Free Standard shipping';
+                    continue;
+                    $estimate = $shipping->estimate($post['postcode']);
+                    if (null === $estimateMin) {
+                        $estimateMin = $estimate;
+                    }
+                    if ($estimate < $estimateMin) {
+                        $estimateMin = $estimate;
+                    }
+                }
+                BSession::i()->data('shipping_estimate', $estimateMin);
+            }
             $cart->calcTotals()->save();
             BResponse::i()->redirect($cartHref);
         }
     }
-/*
-    public function action_checkout()
-    {
-        $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Checkout', 'active'=>true));
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
-        //get countries
-        $countries = FCom_Checkout_Model_Countries::i()->getList();
-
-
-        BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_checkout.checkout', array('cart'=>$cart));
-        $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->countries = $countries;
-        $this->layout('/checkout/checkout');
-        BResponse::i()->render();
-    }
- * 
- */
 }
