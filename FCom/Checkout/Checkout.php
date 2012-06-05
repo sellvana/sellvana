@@ -7,7 +7,13 @@ class FCom_Checkout extends BClass
         BFrontController::i()
             ->route( 'GET /cart', 'FCom_Checkout_Frontend_Controller.cart')
             ->route('POST /cart', 'FCom_Checkout_Frontend_Controller.cart_post')
+
+            //checkout
+            ->route( 'GET /checkout', 'FCom_Checkout_Frontend_Controller.checkout')
         ;
+
+        //merge cart sessions after user login
+        BPubSub::i()->on('FCom_Customer_Frontend_Controller::action_login', 'FCom_Checkout_Model_Cart::userLogin');
 
         BLayout::i()->addAllViews('Frontend/views')
                 ->afterTheme('FCom_Checkout::layout');

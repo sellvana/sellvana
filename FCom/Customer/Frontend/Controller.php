@@ -20,8 +20,8 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     throw new Exception('Invalid email or password.');
                 }
             }
-            
-            FCom_Checkout_Model_Cart::userLogin();
+
+            BPubSub::i()->fire('FCom_Customer_Frontend_Controller::action_login', array('user'=>$user));
 
             $url = BSession::i()->data('login_orig_url');
             BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());

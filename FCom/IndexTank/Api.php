@@ -10,14 +10,14 @@ class FCom_IndexTank_Api extends BClass
     *
     * @var Indextank_API
     */
-    protected $_indextank = null;
+    protected $indextank = null;
 
     /**
      * Load IndexTank library
      */
     public function __construct()
     {
-        include_once 'lib/indextank.php';
+        include_once __DIR__ . '/lib/indextank.php';
         //BApp::m()->autoload('lib');
     }
 
@@ -27,10 +27,10 @@ class FCom_IndexTank_Api extends BClass
      */
     public function service()
     {
-        if (empty($this->_indextank)) {
-            $api_url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
-            $this->_indextank = new Indextank_Api($api_url);
+        if (empty($this->indextank)) {
+            $apiUrl = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+            $this->indextank = new Indextank_Api($apiUrl);
         }
-        return $this->_indextank;
+        return $this->indextank;
     }
 }

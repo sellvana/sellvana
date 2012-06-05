@@ -54,6 +54,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         return $this->relatedModel('FCom_Checkout_Model_Cart', $this->session_cart_id);
     }
+    static public function sessionGuestCart()
+    {
+        $cart_id = BSession::i()->data('cart_id');
+        if ($cart_id) {
+            return self::i()->relatedModel('FCom_Checkout_Model_Cart', $cart_id);
+        }
+        return false;
+    }
 
     static public function sessionUser($reset=false)
     {
