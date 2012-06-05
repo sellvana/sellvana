@@ -48,19 +48,19 @@ class FCom_IndexTank_Admin extends BClass
 
     static public function onSaveAdminSettings($post)
     {
-        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])){
+        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])) {
             return false;
         }
-        $api_url = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
+        $apiUrl = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
 
-        BConfig::i()->set('modules/FCom_IndexTank/api_url', $api_url);
+        BConfig::i()->set('modules/FCom_IndexTank/api_url', $apiUrl);
 
         //create product index
         FCom_IndexTank_Index_Product::i()->install();
 
         //insert predefined functions
         $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
-        foreach($functionsList as $func){
+        foreach ($functionsList as $func) {
             FCom_IndexTank_Index_Product::i()->updateFunction($func->number, $func->definition);
         }
     }
@@ -116,7 +116,7 @@ class FCom_IndexTank_Admin extends BClass
         $category = $args['model'];
         $products = $category->products();
         $productIds = array();
-        foreach($products as $product){
+        foreach ($products as $product) {
             $productIds[] = $product->id();
         }
         FCom_Catalog_Model_Product::i()->update_many(
@@ -142,7 +142,7 @@ class FCom_IndexTank_Admin extends BClass
         $category = $args['model'];
         $products = $category->products();
         $productIds = array();
-        foreach($products as $product){
+        foreach ($products as $product) {
             $productIds[] = $product->id();
         }
         FCom_Catalog_Model_Product::i()->update_many(
@@ -169,7 +169,7 @@ class FCom_IndexTank_Admin extends BClass
         //add custom field to the IndexTank product field table if not exists yet
         $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($cfModel);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
-        if (!$doc){
+        if (!$doc) {
             $doc = FCom_IndexTank_Model_ProductField::orm()->create();
             $matches = array();
             preg_match("#(\w+)#", $cfModel->table_field_type, $matches);
@@ -184,13 +184,13 @@ class FCom_IndexTank_Admin extends BClass
             $doc->source_value      = $cfModel->field_code;
 
             $doc->save();
-        } elseif('product' == $doc->source_type && $doc->source_value != $cfModel->field_code) {
+        } elseif ('product' == $doc->source_type && $doc->source_value != $cfModel->field_code) {
             $doc->source_value      = $cfModel->field_code;
             $doc->save();
         }
 
         $products = $cfModel->products();
-        foreach($products as $product){
+        foreach ($products as $product) {
             FCom_IndexTank_Index_Product::i()->updateCategories($product);
         }
     }
@@ -205,17 +205,17 @@ class FCom_IndexTank_Admin extends BClass
         $cfModel = $args['model'];
         $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($cfModel);
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
-        if (!$doc){
+        if (!$doc) {
             return;
         }
         $products = $cfModel->products();
-        if (!$products){
+        if (!$products) {
             return;
         }
-        if($doc->search){
+        if ($doc->search) {
             FCom_IndexTank_Index_Product::i()->updateTextField($products, $fieldName, '');
         }
-        if($doc->facets){
+        if ($doc->facets) {
             foreach($products as $product){
                 FCom_IndexTank_Index_Product::i()->deleteCategory($product, $fieldName);
             }

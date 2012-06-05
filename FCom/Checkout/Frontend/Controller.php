@@ -52,4 +52,22 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect($cartHref);
         }
     }
+/*
+    public function action_checkout()
+    {
+        $layout = BLayout::i();
+        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Checkout', 'active'=>true));
+        $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
+        //get countries
+        $countries = FCom_Checkout_Model_Countries::i()->getList();
+
+
+        BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_checkout.checkout', array('cart'=>$cart));
+        $layout->view('checkout/checkout')->cart = $cart;
+        $layout->view('checkout/checkout')->countries = $countries;
+        $this->layout('/checkout/checkout');
+        BResponse::i()->render();
+    }
+ * 
+ */
 }
