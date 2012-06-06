@@ -77,9 +77,11 @@ ALTER TABLE {$tCustomer}
         if (empty($addr)) {
             $addr = static::create(array('customer_id' => $cust->id));
         }
-        if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
+        //save full contry name
+        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
             $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
         }
+*/
         if(!empty($data['address'])){
             $addr->set($data['address']);
         }

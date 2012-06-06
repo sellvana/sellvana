@@ -44,7 +44,7 @@
                         <span class="price">$<?=number_format($p->base_price)?>
                     </td>
                     <td >
-                        <b><?=$item->qty*1?></b>
+                        <b><?=number_format($item->qty, 0)?></b>
                     </td>
                     <td >
                         <span class="price">$<?=number_format($item->rowTotal(), 2)?></span>
