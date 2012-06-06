@@ -5,16 +5,10 @@
 <br/><br/>
 
 <h4>Shipping to:</h4>
-<a href="/checkout/address/shipping">Change</a><br/>
-<b>(Show active shipping address if any )</b><br/>
-Jon Doe<br>
-Some address here<br>
-Some address here<br>
-Some address here<br>
-Some address here<br><br>
+<a href="<?=BApp::href('customer/address/shipping')?>">Change</a><br/>
+<?=$this->shippingAddress?><br>
+<br>
 
-<b>(or show form for address)</b><br/>
-Address: <input type="text" name="address[shipping]" value=""><br/><br/>
 
 
 <h4>Shipping Options:</h4>
@@ -24,15 +18,49 @@ Address: <input type="text" name="address[shipping]" value=""><br/><br/>
     <li><input type="radio" name="shipping_method">UPS Shipping (2 days)</li>
     <li><input type="radio" name="shipping_method">Fedex Shipping (2 days)</li>
 </ul>
-<a href="/cart">Need to change quantities or delete?</a><br/><br/>
 
 <b>Estimated day delivery: June 07 2012</b>
-
-<ul>
-    <li>Product item #1</li>
-    <li>Product item #2</li>
-    <li>Product item #3</li>
-</ul>
+<br/><br/>
+<table class="product-list">
+            <col width="500"/>
+            <col width="70"/>
+            <col width="70"/>
+            <col width="70"/>
+            <thead>
+                <tr>
+                    <td>Product</td>
+                    <td>Price</td>
+                    <td>Qty</td>
+                    <td>Subtotal</td>
+                </tr>
+            </thead>
+            <tbody>
+<? foreach ($this->cart->items() as $item): $p = $item->product() ?>
+                <tr id="tr-product-<?=$p->id?>">
+                    <td>
+                        <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
+                    </td>
+                    <td >
+                        <span class="price">$<?=number_format($p->base_price)?>
+                    </td>
+                    <td >
+                        <b><?=$item->qty*1?></b>
+                    </td>
+                    <td >
+                        <span class="price">$<?=number_format($item->rowTotal(), 2)?></span>
+                    </td>
+                </tr>
+<? endforeach ?>
+            </tbody>
+            <tfoot>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tfoot>
+        </table>
+<br/>
+<a href="/cart">Need to change quantities or delete?</a>
 <br/><br/>
 <h4>Shipping Summary:</h4>
 
@@ -52,15 +80,7 @@ Credit card<br/>
 Visa<br/>
 <br/><br/>
 <h4>Billing address</h4>
-<a href="/checkout/address/billing">Change</a><br/>
-<b>(Show active billing address if any )</b><br/>
-Jon Doe<br/>
-Some address here<br>
-Some address here<br>
-Some address here<br>
-
-<b>(or show form for address)</b><br/>
-As shipping: <input type="checkbox" name="address[billing_as_shipping]" value="1"> Yes<br/>
-Address: <input type="text" name="address[shipping]" value=""><br/><br/>
+<a href="<?=BApp::href('customer/address/billing')?>">Change</a><br/>
+<?=$this->billingAddress?><br><br>
 
 </form>

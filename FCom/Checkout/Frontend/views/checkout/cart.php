@@ -69,7 +69,7 @@ TEST
             <tfoot>
                 <td></td>
                 <td></td>
-                <td></td>
+                <td><a href="<?=BApp::href('checkout/shipping')?>">Checkout multi page</a></td>
                 <td><a href="<?=BApp::href('checkout')?>">Checkout single page</a></td>
                 <td><input type="submit" class="button" value="Update Cart"/></td>
                 <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
