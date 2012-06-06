@@ -16,6 +16,10 @@ class FCom_Checkout extends BClass
             ->route( 'GET /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
             ->route( 'POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment_post')
 
+            //payment
+            ->route( 'GET /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
+            ->route( 'POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping_post')
+
             //shipping address
             ->route( 'GET /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping')
             ->route('POST /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping_post')
@@ -44,6 +48,10 @@ class FCom_Checkout extends BClass
             '/checkout/payment'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('checkout/payment'))
+            ),
+            '/checkout/shipping'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/shipping'))
             ),
             '/checkout/address/shipping'=>array(
                 array('layout', 'base'),

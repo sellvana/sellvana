@@ -6,6 +6,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_sessionUser;
+    protected $defaultShipping = null;
+    protected $defaultBilling = null;
 
     public function setPassword($password)
     {
@@ -36,6 +38,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
         return true;
+    }
+
+    public function afterSave()
+    {
+        parent::afterSave();
+
+        BSession::i()->data('customer_user', serialize($this));
+        static::$_sessionUser = $this;
     }
 
     public function getData()
@@ -193,10 +203,18 @@ CREATE TABLE IF NOT EXISTS {$tCustomer} (
 
     public function defaultBilling()
     {
-        if ($this->default_billing_id && !$this->default_billing) {
-            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
+        if ($this->default_billing_id && !$this->defaultBilling) {
+            $this->defaultBilling = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
         }
-        return $this->default_billing;
+        return $this->defaultBilling;
+    }
+
+    public function defaultShipping()
+    {
+        if ($this->default_shipping_id && !$this->defaultShipping) {
+            $this->defaultShipping = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
+        }
+        return $this->defaultShipping;
     }
 
     public function addresses()

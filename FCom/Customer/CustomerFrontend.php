@@ -17,6 +17,11 @@ class FCom_Customer_Frontend extends BClass
 
             ->route('GET /myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
             ->route('GET|POST /myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+
+            //addresses
+            ->route('GET /customer/address/shipping', 'FCom_Customer_Frontend_Controller_Address.shipping')
+            ->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
+            ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
@@ -44,6 +49,10 @@ class FCom_Customer_Frontend extends BClass
             '/customer/account'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/account')),
+            ),
+            '/customer/address'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address')),
             ),
         ));
     }
