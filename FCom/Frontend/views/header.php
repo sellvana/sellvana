@@ -10,6 +10,7 @@ if($cart){
     $itemPrice = round($cart->subtotal,2);
     $itemNum = ceil($cart->item_num);
 }
+$categories = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
 ?>
 <header class="header">
     <div class="header-top">
@@ -21,6 +22,7 @@ if($cart){
                     <strong><a href="<?=BApp::href('logout')?>">Logout</a></strong></li>
                 <?php else: ?>
                     <li class="header-sup-signin">Hello there! <strong><a href="<?=BApp::href('login')?>">Sign in</a></strong></li>
+                    <li class="header-sup-wishlist"><a href="<?=BApp::href('customer/register')?>">Sign up</a></li>
                 <?php endif; ?>
                 <li class="header-sup-cart"><a href="<?=BApp::href('cart')?>">Your Cart <span class="count">(<?=$itemNum?>)</span> | Total: $<?=$itemPrice?></a></li>
                 <li class="header-sup-wishlist"><a href="<?=BApp::href('wishlist')?>">Your Wishlist</a></li>
@@ -31,6 +33,10 @@ if($cart){
         <div class="site-nav-container">
             <nav class="site-nav">
                 <ul>
+                    <?php foreach($categories as $cat): ?>
+                    <li><a href="<?=Bapp::href($cat->url_path)?>"><?=$cat->node_name?></a></li>
+                    <?php endforeach; ?>
+                        <!--
                     <li class="active"><a href="<?=$homeUrl?>">Home</a></li>
                     <li><a href="<?=$sampleLandingUrl?>">Apparel</a></li>
                     <li><a href="<?=$sampleLandingUrl?>">Books</a></li>
@@ -50,6 +56,7 @@ if($cart){
                     <li><a href="<?=$homeUrl?>">Grocery</a></li>
                     <li><a href="<?=$homeUrl?>">Pets</a></li>
                     <li><a href="<?=$homeUrl?>">Sports</a></li>
+                        -->
                 </ul>
             </nav>
         </div>
