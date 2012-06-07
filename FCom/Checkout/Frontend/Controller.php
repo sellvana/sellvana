@@ -52,7 +52,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             if (!empty($post['postcode'])) {
                 $estimateMin = null;
-                foreach (FCom_Checkout::i()->getShippingMethods() as $shipping) {
+                foreach (FCom_Checkout_Frontend::i()->getShippingMethods() as $shipping) {
                     $estimateMin = '10 days - Free Standard shipping';
                     continue;
                     $estimate = $shipping->estimate($post['postcode']);
