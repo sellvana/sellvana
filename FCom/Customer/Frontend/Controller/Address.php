@@ -20,7 +20,14 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         if ($user->default_shipping_id == $user->default_billing_id) {
             $layout->view('customer/address')->address_equal = true;
         }
+        $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
+        $countriesList = '';
+        foreach($countries as $country){
+            $countriesList .= $country->iso.',';
+        }
+        $countriesList = substr($countriesList, 0, -1);
 
+        $layout->view('geo/embed')->countries = $countriesList;
         $layout->view('customer/address')->address = $shipAddress;
         $layout->view('customer/address')->address_type = 'shipping';
         $this->layout('/customer/address');

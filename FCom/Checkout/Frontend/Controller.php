@@ -25,7 +25,12 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             switch ($post['action']) {
             case 'add':
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                $cart->addProduct($post['id'], $post);
+                if (!$p){
+                    BResponse::i()->json(array('title'=>"Incorrect product id"));
+                    return;
+                }
+                $options=array('qty' => $post['qty'], 'price' => $p->base_price);
+                $cart->addProduct($p->id(), $options);
                 $result = array(
                     'title' => 'Added to cart',
                     'html' => '<img src="'.$p->thumbUrl(35, 35).'" width="35" height="35" style="float:left"/> '.htmlspecialchars($p->product_name)
