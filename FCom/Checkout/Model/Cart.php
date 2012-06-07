@@ -74,7 +74,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $cart = static::i()->load($cartId);
         foreach ($cart->items() as $item) {
-            $this->addProduct($item->product_id, array('qty'=>$item->qty));
+            $this->addProduct($item->product_id, array('qty'=>$item->qty, 'price'=>$item->price));
         }
         $cart->delete();
         $this->calcTotals();
@@ -169,7 +169,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         return BDb::many_as_array(FCom_Catalog_Model_Product::factory()
             ->join($tCartItem, array($tCartItem.'.product_id','=',$tProduct.'.id'))
             ->select($tProduct.'.*')
-            ->select($tCartItem.'.qty')
+            ->select($tCartItem.'.*')
             ->where($tCartItem.'.cart_id', $cartId)
             ->find_many());
     }
@@ -191,7 +191,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         if (true===$request->multirow_ids) {
             $request->multirow_ids = array();
-            $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')
+            $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')->select('price')
                 ->where('cart_id', $request->source_id)
                 ->find_many();
             foreach ($items as $item) {
@@ -202,7 +202,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $productIds = !empty($request->multirow_ids) ? $request->multirow_ids : (array)$request->row_id;
             $request->qtys = array();
             if (empty($items)) {
-                $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')
+                $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')->select('price')
                     ->where('cart_id', $request->source_id)->where_in('product_id', $productIds)
                     ->find_many();
             }
@@ -218,11 +218,16 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['qty']) || !is_numeric($options['qty'])) {
             $options['qty'] = 1;
         }
+        if (empty($options['price']) || !is_numeric($options['price'])) {
+            $options['price'] = 0;
+        }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item) {
             $item->add('qty', $options['qty']);
+            $item->add('price', $options['price']);
         } else {
-            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId, 'qty'=>$options['qty']));
+            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId,
+                'qty'=>$options['qty'], 'price' => $options['price']));
         }
         $item->save();
         if (empty($options['no_calc_totals'])) {
@@ -317,7 +322,7 @@ throw new Exception("Invalid cart_id: ".$cId);
         foreach ($this->items() as $item) {
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->product()->base_price*$item->qty;
+            $this->subtotal += $item->price*$item->qty;
         }
         return $this;
     }
