@@ -16,7 +16,7 @@ class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
 
     public function rowTotal()
     {
-        return $this->price*$this->qty;
+        return $this->price;
     }
 
     public static function install()

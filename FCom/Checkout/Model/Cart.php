@@ -236,6 +236,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         $user = FCom_Customer_Model_Customer::sessionUser();
         if($user){
             $user->session_cart_id = $this->id;
+            $user->save();
         }
         static::sessionCartId($this->id);
         return $this;
@@ -322,7 +323,7 @@ throw new Exception("Invalid cart_id: ".$cId);
         foreach ($this->items() as $item) {
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->price*$item->qty;
+            $this->subtotal += $item->price;
         }
         return $this;
     }

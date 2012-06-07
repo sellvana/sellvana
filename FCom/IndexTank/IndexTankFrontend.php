@@ -14,6 +14,8 @@ class FCom_IndexTank_Frontend extends BClass
         BLayout::i()->addAllViews('Frontend/views');
 
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Frontend::layout');
+
+        BClassRegistry::i()->overrideClass('FCom_Catalog_Frontend_Controller_Search', 'FCom_IndexTank_Frontend_Controller');
     }
 
     /**

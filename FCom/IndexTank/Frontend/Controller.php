@@ -2,7 +2,23 @@
 
 class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-
+    public function action_product()
+    {
+        FCom_Catalog_Frontend_Controller::i()->action_product();
+    }
+    public function action_category()
+    {
+        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
+        if (!$category) {
+            $this->forward(true);
+            return $this;
+        }
+        $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
+        $categoryKey .= ":".$category->node_name;
+        $href = BApp::href('indextank/search');
+        $href .= "?f[category]=".$categoryKey;
+        BResponse::i()->redirect($href);
+    }
     public function action_search()
     {
         $layout = BLayout::i();

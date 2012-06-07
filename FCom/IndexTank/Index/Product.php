@@ -105,7 +105,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $this->model();
         if (empty($this->_functions[$function])){
-            throw new Exception('Scoring function does not exist: ' . $function);
+            return;
         }
         $this->_scoringFunction = $this->_functions[$function]->number;
     }
