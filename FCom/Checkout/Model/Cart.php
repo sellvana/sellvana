@@ -54,13 +54,20 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
                 $user->save();
             } elseif ($user->session_cart_id != $sessCartId) {
                 if ($sessCartId) {
-                    $user->sessionCart()->merge($sessCartId)->save();
+                    $cart->merge($sessCartId)->save();
                 }
-                static::sessionCartId($user->session_cart_id);
             }
         } elseif ($sessCartId) {
             $user->set('session_cart_id', $sessCartId)->save();
         }
+
+        static::sessionCartId($user->session_cart_id);
+    }
+
+    static public function userLogout()
+    {
+        static::sessionCartId(false);
+        static::$_sessionCart = null;
     }
 
     public function merge($cartId)
@@ -318,5 +325,27 @@ throw new Exception("Invalid cart_id: ".$cId);
     public function urlHash($id)
     {
         return '/carts/items/'.$id;
+    }
+
+    public static function install()
+    {
+        BDb::run("
+CREATE TABLE IF NOT EXISTS ".static::table()." (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned DEFAULT NULL,
+  `location_id` int(10) unsigned DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `sort_order` int(11) DEFAULT NULL,
+  `item_qty` decimal(12,4) NOT NULL DEFAULT '0.0000',
+  `item_num` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
+  `session_id` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `NewIndex1` (`session_id`),
+  UNIQUE KEY `user_id` (`user_id`,`description`,`session_id`),
+  KEY `company_id` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 }

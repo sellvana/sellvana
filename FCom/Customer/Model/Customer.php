@@ -60,19 +60,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
-    public function sessionCart()
-    {
-        return $this->relatedModel('FCom_Checkout_Model_Cart', $this->session_cart_id);
-    }
-    static public function sessionGuestCart()
-    {
-        $cart_id = BSession::i()->data('cart_id');
-        if ($cart_id) {
-            return self::i()->relatedModel('FCom_Checkout_Model_Cart', $cart_id);
-        }
-        return false;
-    }
-
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
@@ -126,6 +113,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
+        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>$this));
+        
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
     }

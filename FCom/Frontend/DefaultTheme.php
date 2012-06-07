@@ -34,7 +34,6 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('js', 'countries', array('file'=>'{FCom_Core}/js/lib/countries2.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
-                        array('js', '{FCom_Catalog}/Admin/js/app.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
                         //array('js', '{FCom_Core}/js/core.js'),
