@@ -6,7 +6,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
     {
         FCom_Catalog_Frontend_Controller::i()->action_product();
     }
-    public function action_category()
+    public function action_category() 
     {
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
