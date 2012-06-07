@@ -190,6 +190,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Checkout',
             'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
+            'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
             'description' => "Base cart and checkout functionality",
         ),

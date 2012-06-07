@@ -20,6 +20,11 @@ class FCom_Catalog_Frontend extends BClass
     static public function layout()
     {
         BLayout::i()->layout(array(
+            'base'=>array(
+                array('view', 'head', 'do'=>array(
+                    array('js', '{FCom_Catalog}/Frontend/js/fcom.frontend.js'),
+                )
+            )),
             '/catalog/category'=>array(
                 array('layout', 'base'),
             ),

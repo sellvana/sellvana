@@ -2,11 +2,8 @@
 $homeUrl = BApp::href();
 $sampleLandingUrl = BApp::href('category/landing');
 $sampleCatProdUrl = BApp::href('category/products');
-if (FCom_Customer_Model_Customer::isLoggedIn()) {
-    $cart = FCom_Customer_Model_Customer::sessionUser()->sessionCart();
-} else {
-    $cart = FCom_Customer_Model_Customer::sessionGuestCart();
-}
+
+$cart = FCom_Checkout_Model_Cart::sessionCart();
 $itemNum = 0;
 $itemPrice = 0;
 if($cart){
