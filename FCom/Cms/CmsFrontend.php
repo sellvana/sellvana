@@ -19,6 +19,7 @@ class FCom_Cms_Frontend extends BClass
         }
 
         //BLayout::i()->addAllViews('Frontend/views');
+        //BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Cms_Frontend::layout');
     }
 
     public static function layout()
@@ -26,7 +27,7 @@ class FCom_Cms_Frontend extends BClass
         BLayout::i()->layout(array(
             '/cms'=>array(
 
-            ),
+            )
         ));
     }
 }

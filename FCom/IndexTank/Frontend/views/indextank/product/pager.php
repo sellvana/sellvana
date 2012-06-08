@@ -137,6 +137,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
                 <br/>
 <?php endforeach; ?>
 
+    </form>
+
 </div>
 
-</form>
