@@ -10,7 +10,6 @@ if($cart){
     $itemPrice = round($cart->subtotal,2);
     $itemNum = ceil($cart->item_num);
 }
-$categories = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
 ?>
 <header class="header">
     <div class="header-top">
@@ -33,30 +32,13 @@ $categories = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->fi
         <div class="site-nav-container">
             <nav class="site-nav">
                 <ul>
-                    <?php foreach($categories as $cat): ?>
-                    <li><a href="<?=Bapp::href($cat->url_path)?>"><?=$cat->node_name?></a></li>
-                    <?php endforeach; ?>
-                        <!--
-                    <li class="active"><a href="<?=$homeUrl?>">Home</a></li>
-                    <li><a href="<?=$sampleLandingUrl?>">Apparel</a></li>
-                    <li><a href="<?=$sampleLandingUrl?>">Books</a></li>
-                    <li><a href="<?=$sampleLandingUrl?>">Electronics</a>
-                        <ul>
-                            <li><a href="<?=$sampleCatProdUrl?>">Laptops, Tablets &amp; Netbooks</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Desktops &amp; Servers</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Computer Accessories &amp; Peripherals</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">External drives, mice, networking</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Computer Parts &amp; Components</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Software</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">PC Games</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Printers &amp; Ink</a></li>
-                            <li><a href="<?=$sampleCatProdUrl?>">Office &amp; School Supplies</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="<?=$homeUrl?>">Grocery</a></li>
-                    <li><a href="<?=$homeUrl?>">Pets</a></li>
-                    <li><a href="<?=$homeUrl?>">Sports</a></li>
-                        -->
+                    <?php if (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'cms'): ?>
+                        <?=$this->view('cms/nav')->set('root_id', BConfig::i()->get('modules/FCom_Frontend/nav_top/root_cms'))?>
+                    <?php elseif (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'categories') :?>
+                        <?=$this->view('category/nav')->set('root_id', BConfig::i()->get('modules/FCom_Frontend/nav_top/root_category'))?>
+                    <?php else: ?>
+                        Custom menu here
+                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
