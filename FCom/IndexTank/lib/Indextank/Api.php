@@ -34,6 +34,11 @@ class Indextank_Api
         $this->api_url = rtrim($api_url, "/");
     }
 
+    /**
+     *
+     * @param type $index_name
+     * @return Indextank_Index object
+     */
     public function get_index($index_name)
     {
         return new Indextank_Index($this, $index_name);
@@ -85,8 +90,6 @@ class Indextank_Api
             $args = json_encode($params);
 
         }
-
-        //file_put_contents("/tmp/indexden", $url ."\n".$args."\n\n", FILE_APPEND);
 
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_CUSTOMREQUEST, $method); // Tell curl to use HTTP method of choice

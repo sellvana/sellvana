@@ -8,14 +8,16 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Cart', 'active'=>true));
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
         BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
+        $shippingEstimate = BSession::i()->data('shipping_estimate');
         $layout->view('checkout/cart')->cart = $cart;
+        $layout->view('checkout/cart')->shipping_esitmate = $shippingEstimate;
         $this->layout('/checkout/cart');
         BResponse::i()->render();
     }
 
     public function action_cart_post()
     {
-        $cartHref = BApp::href('checkout/cart');
+        $cartHref = BApp::href('cart');
         $post = BRequest::i()->post();
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
         if (BRequest::i()->xhr()) {
@@ -47,6 +49,21 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     $item = $cart->childById('items', $id);
                     if ($item) $item->set('qty', $qty)->save();
                 }
+            }
+            if (!empty($post['postcode'])) {
+                $estimateMin = null;
+                foreach (FCom_Checkout::i()->getShippingMethods() as $shipping) {
+                    $estimateMin = '10 days - Free Standard shipping';
+                    continue;
+                    $estimate = $shipping->estimate($post['postcode']);
+                    if (null === $estimateMin) {
+                        $estimateMin = $estimate;
+                    }
+                    if ($estimate < $estimateMin) {
+                        $estimateMin = $estimate;
+                    }
+                }
+                BSession::i()->data('shipping_estimate', $estimateMin);
             }
             $cart->calcTotals()->save();
             BResponse::i()->redirect($cartHref);

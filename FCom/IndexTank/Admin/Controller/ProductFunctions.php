@@ -11,11 +11,11 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     {
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
         if($indexingStatus){
-            BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
+            BLayout::i()->view('indextank/product_functions')->set('indexing_status', $indexingStatus->info);
         } else {
-            BLayout::i()->view('indextank/product_fields')->set('indexing_status', "N/A");
+            BLayout::i()->view('indextank/product_functions')->set('indexing_status', "N/A");
         }
-        
+
         try {
             $status = FCom_IndexTank_Index_Product::i()->status();
             BLayout::i()->view('indextank/product_functions')->set('status', $status);
@@ -40,7 +40,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     {
         $post = BRequest::i()->post('model');
         if (!empty($post)){
-            FCom_IndexTank_Index_Product::i()->update_function($post['number'], $post['definition']);
+            FCom_IndexTank_Index_Product::i()->updateFunction($post['number'], $post['definition']);
         }
 
         parent::action_form__POST();

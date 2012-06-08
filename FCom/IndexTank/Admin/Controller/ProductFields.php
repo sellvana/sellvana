@@ -34,6 +34,8 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             'var_number' => array('label'=>'Scoring variable #'),
             'priority' => array('label'=>'Priority'),
             'filter' => array('label'=>'Filter type'),
+            'source_type' => array('label'=>'Source type'),
+            'source_value' => array('label'=>'Source'),
         );
 
         return $config;

@@ -1,5 +1,5 @@
 <?
-$loggedIn = FCom_Customer_Model_User::i()->isLoggedIn();
+$loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 ?>
     <div class="col-main">
         <div class="page-title category-title">
@@ -11,7 +11,7 @@ $loggedIn = FCom_Customer_Model_User::i()->isLoggedIn();
 
 <? else: ?>
 
-    <form name="cart" action="<?=BApp::href('checkout/cart')?>" method="post">
+    <form name="cart" action="<?=BApp::href('cart')?>" method="post">
         <table class="product-list">
             <col width="30"/>
             <col width="60"/>
@@ -69,11 +69,27 @@ TEST
             <tfoot>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
+                <td><a href="<?=BApp::href('checkout/shipping')?>">Checkout multi page</a></td>
+                <td><a href="<?=BApp::href('checkout')?>">Checkout single page</a></td>
                 <td><input type="submit" class="button" value="Update Cart"/></td>
-                <td>$<span class="cart-subtotal"><?=number_format($cart->subtotal)?></span></td>
+                <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
             </tfoot>
+        </table>
+    </form>
+
+    <form action="<?=BApp::href('cart')?>" method="post">
+        <table>
+            <?php if ($this->shipping_esitmate): ?>
+            <tr>
+                <td>Shipping estimate: <?=$this->shipping_esitmate?></td>
+            </tr>
+            <?php endif; ?>
+            <tr>
+                <td>Post code: <input type="text" size="4" name="postcode" value=""/></td>
+            </tr>
+            <tr>
+                <td><input type="submit" class="button" value="Estimate shipping"/></td>
+            </tr>
         </table>
     </form>
 <? endif ?>

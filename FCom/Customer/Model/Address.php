@@ -5,7 +5,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
 
-    public function as_html($obj=null)
+    public static function as_html($obj=null)
     {
         if (is_null($obj)) {
             $obj = $this;
@@ -16,7 +16,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
             .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
             .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
             .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->region.'</span> '
+            .'<span class="region">'.$obj->state.'</span> '
             .'<span class="postal-code">'.$obj->postcode.'</span>'
             .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
             .'</div>';
@@ -77,10 +77,14 @@ ALTER TABLE {$tCustomer}
         if (empty($addr)) {
             $addr = static::create(array('customer_id' => $cust->id));
         }
-        if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
+        //save full contry name
+        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
             $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
         }
-        $addr->set($data['address']);
+*/
+        if(!empty($data['address'])){
+            $addr->set($data['address']);
+        }
         $addr->save();
 
         if (!$cust->default_billing_id) {

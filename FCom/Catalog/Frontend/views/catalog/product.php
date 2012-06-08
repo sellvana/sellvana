@@ -2,6 +2,7 @@
 $prod = $this->product;
 $cat = $this->category;
 ?>
+
 <div class="main col1-layout">
     <?=$this->view('breadcrumbs')?>
     <div class="col-main">
@@ -13,7 +14,7 @@ $cat = $this->category;
                         <div class="add-to-cart">
                             <label for="qty">Qty:</label>
                             <input type="text" name="qty" id="qty" maxlength="12" value="1" title="Qty" class="input-text qty">
-                            <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="fulleronCart.add(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
+                            <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="add_cart(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
 
                             <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$prod->id?>"> Compare</label>
 
@@ -116,7 +117,7 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
 				            </tbody>
 				        </table>
         			</div>
@@ -128,7 +129,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>
@@ -140,7 +141,7 @@ $cat = $this->category;
                             <col>
                             <col width="180">
                             </colgroup><tbody>
-<?=$this->view('product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
                             </tbody>
                         </table>
                     </div>

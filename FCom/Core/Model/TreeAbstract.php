@@ -11,7 +11,7 @@ class FCom_Core_Model_TreeAbstract extends BModel
     {
         $cat = parent::load($id, $field, $cache);
         if ($cat) return $cat;
-        if ($id==1) {
+        if ($id===1) {
             return static::i()->create(array(
                 'id' => 1,
                 'id_path' => 1,
