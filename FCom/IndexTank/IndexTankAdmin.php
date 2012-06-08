@@ -17,50 +17,51 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
-        //    ->route('GET /indextank/dashboard', 'FCom_IndexTank_Admin_Controller.dashboard')
-
-                //api function
+            //api function
             ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
         BLayout::i()->addAllViews('Admin/views');
 
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
-        if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
-            BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
-                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
-                    //for categories
-                    ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
-                    ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
-                    ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
-                    ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
-                    //for custom fields
-                    ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
-                    ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
-                    //for API init
-                    ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings')
-            ;
+        if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
+            if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
+                BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+                        ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
+
+                        //for categories
+                        ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
+                        ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+                        ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
+                        ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
+                        //for custom fields
+                        ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
+                        ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                ;
+            }
+            //for API init
+            BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
         }
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
     {
-        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])){
+        if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])) {
             return false;
         }
-        $api_url = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
+        $apiUrl = $post['post']['config']['modules']['FCom_IndexTank']['api_url'];
 
-        BConfig::i()->set('modules/FCom_IndexTank/api_url', $api_url);
+        BConfig::i()->set('modules/FCom_IndexTank/api_url', $apiUrl);
 
         //create product index
         FCom_IndexTank_Index_Product::i()->install();
 
         //insert predefined functions
-        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
-        foreach($functions_list as $func){
-            FCom_IndexTank_Index_Product::i()->update_function($func->number, $func->definition);
+        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
+        foreach ($functionsList as $func) {
+            FCom_IndexTank_Index_Product::i()->updateFunction($func->number, $func->definition);
         }
     }
 
@@ -69,8 +70,8 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function productsDeleteAll()
     {
-        FCom_IndexTank_Index_Product::i()->drop_index();
-        FCom_IndexTank_Index_Product::i()->create_index();
+        FCom_IndexTank_Index_Product::i()->dropIndex();
+        FCom_IndexTank_Index_Product::i()->createIndex();
     }
 
     /**
@@ -101,7 +102,7 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductBeforeDelete($args)
     {
         $product = $args['model'];
-        FCom_IndexTank_Index_Product::i()->delete($product);
+        FCom_IndexTank_Index_Product::i()->deleteProducts($product);
     }
 
 
@@ -114,20 +115,20 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
-        $product_ids = array();
-        foreach($products as $product){
-            $product_ids[] = $product->id();
+        $productIds = array();
+        foreach ($products as $product) {
+            $productIds[] = $product->id();
         }
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
-                    "id in (".implode(",", $product_ids).")");
+                    "id in (".implode(",", $productIds).")");
     }
 
     static public function onCategoryProductAfterSave($args)
     {
         $cp = $args['model'];
         $product = FCom_Catalog_Model_Product::i()->load($cp->product_id);
-        FCom_IndexTank_Index_Product::i()->update_categories($product);
+        FCom_IndexTank_Index_Product::i()->updateCategories($product);
     }
 
 
@@ -140,13 +141,13 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
-        $product_ids = array();
-        foreach($products as $product){
-            $product_ids[] = $product->id();
+        $productIds = array();
+        foreach ($products as $product) {
+            $productIds[] = $product->id();
         }
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
-                    "id in (".implode(",", $product_ids).")");
+                    "id in (".implode(",", $productIds).")");
     }
 
     static public function onCategoryProductBeforeDelete($args)
@@ -154,7 +155,7 @@ class FCom_IndexTank_Admin extends BClass
         $cp = $args['model'];
         $product = FCom_Catalog_Model_Product::i()->load($cp->product_id);
         $category = FCom_Catalog_Model_Category::i()->load($cp->category_id);
-        FCom_IndexTank_Index_Product::i()->delete_categories($product, $category);
+        FCom_IndexTank_Index_Product::i()->deleteCategories($product, $category);
     }
 
     /**
@@ -164,33 +165,33 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function onCustomFieldAfterSave($args)
     {
-        $cf_model = $args['model'];
+        $cfModel = $args['model'];
         //add custom field to the IndexTank product field table if not exists yet
-        $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
-        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
-        if (!$doc){
+        $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($cfModel);
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
+        if (!$doc) {
             $doc = FCom_IndexTank_Model_ProductField::orm()->create();
             $matches = array();
-            preg_match("#(\w+)#", $cf_model->table_field_type, $matches);
+            preg_match("#(\w+)#", $cfModel->table_field_type, $matches);
             $type = $matches[1];
 
-            $doc->field_name        = $field_name;
-            $doc->field_nice_name   = $cf_model->frontend_label;
+            $doc->field_name        = $fieldName;
+            $doc->field_nice_name   = $cfModel->frontend_label;
             $doc->field_type        = $type;
             $doc->facets            = 0;
             $doc->search            = 0;
             $doc->source_type       = 'product';
-            $doc->source_value      = $cf_model->field_code;
+            $doc->source_value      = $cfModel->field_code;
 
             $doc->save();
-        } elseif('product' == $doc->source_type && $doc->source_value != $cf_model->field_code) {
-            $doc->source_value      = $cf_model->field_code;
+        } elseif ('product' == $doc->source_type && $doc->source_value != $cfModel->field_code) {
+            $doc->source_value      = $cfModel->field_code;
             $doc->save();
         }
 
-        $products = $cf_model->products();
-        foreach($products as $product){
-            FCom_IndexTank_Index_Product::i()->update_categories($product);
+        $products = $cfModel->products();
+        foreach ($products as $product) {
+            FCom_IndexTank_Index_Product::i()->updateCategories($product);
         }
     }
 
@@ -201,22 +202,22 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function onCustomFieldBeforeDelete($args)
     {
-        $cf_model = $args['model'];
-        $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($cf_model);
-        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
-        if (!$doc){
+        $cfModel = $args['model'];
+        $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($cfModel);
+        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
+        if (!$doc) {
             return;
         }
-        $products = $cf_model->products();
-        if (!$products){
+        $products = $cfModel->products();
+        if (!$products) {
             return;
         }
-        if($doc->search){
-            FCom_IndexTank_Index_Product::i()->updateTextField($products, $field_name, '');
+        if ($doc->search) {
+            FCom_IndexTank_Index_Product::i()->updateTextField($products, $fieldName, '');
         }
-        if($doc->facets){
+        if ($doc->facets) {
             foreach($products as $product){
-                FCom_IndexTank_Index_Product::i()->delete_category($product, $field_name);
+                FCom_IndexTank_Index_Product::i()->deleteCategory($product, $fieldName);
             }
         }
         $doc->delete();
@@ -229,21 +230,14 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function layout()
     {
-        $baseHref = BApp::href('indextank');
         BLayout::i()
             ->layout(array(
                 'base'=>array(
                     array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
-//                        array('addNav', 'indextank/dashboard', array('label'=>'Dashboard', 'pos'=>100, 'href'=>$baseHref.'/dashboard')),
                         array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
                         array('addNav', 'indextank/product_functions', array('label'=>'Product functions', 'href'=>BApp::href('indextank/product_functions'))),
                     ))),
-       /*         '/indextank/dashboard'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('indextank/dashboard')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/dashboard'))),
-                ),*/
                 '/indextank/product_fields'=>array(
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('indextank/product_fields')),

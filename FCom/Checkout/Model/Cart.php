@@ -33,7 +33,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
                     static::sessionCartId($cart->id);
                 } else {
                     static::$_sessionCart = static::i()->create();
-                    static::sessionCartId(null);
+                    static::sessionCartId();
                 }
             }
         }
@@ -42,13 +42,22 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function userLogin()
     {
-        $user = FCom_Customer_Model_User::sessionUser();
+        $user = FCom_Customer_Model_Customer::sessionUser();
+        if(!$user){
+            return;
+        }
         $sessCartId = static::sessionCartId();
         if ($user->session_cart_id) {
-            if ($sessCartId) {
-                $user->sessionCart()->merge($sessCartId)->save();
+            $cart = static::i()->load($user->session_cart_id);
+            if(!$cart){
+                $user->session_cart_id = $sessCartId;
+                $user->save();
+            } elseif ($user->session_cart_id != $sessCartId) {
+                if ($sessCartId) {
+                    $user->sessionCart()->merge($sessCartId)->save();
+                }
+                static::sessionCartId($user->session_cart_id);
             }
-            static::sessionCartId($user->session_cart_id);
         } elseif ($sessCartId) {
             $user->set('session_cart_id', $sessCartId)->save();
         }
@@ -136,7 +145,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
                 $productIds[$item->product_id] = $item->id;
             }
         }
-        FCom_Catalog_Model_Product::i()->cachePreloadFrom(array_keys($productIds));
+        if($productIds){
+            //todo: fix bug for ambigious field ID
+            //FCom_Catalog_Model_Product::i()->cachePreloadFrom(array_keys($productIds));
+        }
         foreach ($this->items() as $item) {
             $item->product = FCom_Catalog_Model_Product::i()->load($item->product_id);
         }
@@ -147,7 +159,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $tProduct = FCom_Catalog_Model_Product::table();
         $tCartItem = FCom_Checkout_Model_CartItem::table();
-        return BDb::many_as_array(FCom_Catalog_Model_Product::factory()->filter('current_company', true, $tProduct)
+        return BDb::many_as_array(FCom_Catalog_Model_Product::factory()
             ->join($tCartItem, array($tCartItem.'.product_id','=',$tProduct.'.id'))
             ->select($tProduct.'.*')
             ->select($tCartItem.'.qty')
@@ -209,6 +221,11 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['no_calc_totals'])) {
             $this->calcTotals()->save();
         }
+        $user = FCom_Customer_Model_Customer::sessionUser();
+        if($user){
+            $user->session_cart_id = $this->id;
+        }
+        static::sessionCartId($this->id);
         return $this;
     }
 
@@ -293,7 +310,7 @@ throw new Exception("Invalid cart_id: ".$cId);
         foreach ($this->items() as $item) {
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->product()->price*$item->qty;
+            $this->subtotal += $item->product()->base_price*$item->qty;
         }
         return $this;
     }

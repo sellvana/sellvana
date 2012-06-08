@@ -48,6 +48,7 @@
                     <label for="model-email">Email</label>
                     <input type="text" id="model-email" name="model[email]" value="<?=$this->q($m->email)?>"/>
                 </li>
+                <!--
                 <li class="label-l">
                     <label for="model-phone">Daytime Phone</label>
                     <input type="text" id="model-phone" name="model[phone]" value="<?=$this->q($m->phone)?>"/>
@@ -56,6 +57,7 @@
                     <label for="model-phone_work">Work Phone</label>
                     <input type="text" id="model-phone_work" name="model[phone_work]" value="<?=$this->q($m->phone_work)?>"/>
                 </li>
+                -->
                 <!--
                 <li class="label-l">
                 <label for="model-status">Status</label>

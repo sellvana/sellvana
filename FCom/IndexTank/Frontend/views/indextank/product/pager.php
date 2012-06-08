@@ -59,26 +59,25 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 
 <div class="pager">
-    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
-    <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
-    <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
-    <input type="submit" value="Search">
 
-    <br/>
-    <div class="pages">
-    <label>Page:</label>
+    <form autocomplete="off" method="get" action="">
+        <input type="hidden" name="q" value="<?=$this->q(BRequest::i()->get('q'))?>">
+        <?php foreach($s['available_facets'] as $label => $data):?>
+        <? foreach ($data as $obj): ?>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                    <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
+                <?php endif; ?>
+        <? endforeach ?>
+    <?php endforeach; ?>
 
-    <? if ($s['p']>1): ?><a href="#" class="arrow-left" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']-1?>); $(this).parents('form').submit()">&lt;</a><? endif ?>
-    <!--<select name="p" onchange="this.form.submit()">
-<? for ($i=1; $i<=$s['mp']; $i++): ?>
-        <option value="<?=$i?>" <?=$s['p']==$i?'selected':''?>><?=$i?></option>
-<? endfor ?>
-    </select>-->
-    <input type="text" id="p" name="p" value="<?=$s['p']?>"/> of <?=$s['mp']?>
-    <? if ($s['p']<$s['mp']): ?><a href="#" class="arrow-right" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']+1?>); $(this).parents('form').submit()">&gt;</a><? endif ?>
-	</div>
-
-	<div class="rows f-right">
+   <?php foreach($s['available_categories'] as $data):?>
+        <? foreach ($data as $obj):            ?>
+                <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
+                    <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->key.':'.$obj->name?>" />
+                <?php endif; ?>
+        <? endforeach ?>
+    <?php endforeach; ?>
+    <div class="rows f-right">
     <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
 <? foreach ($psOptions as $i): ?>
         <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
@@ -92,24 +91,46 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 <? endforeach ?>
     </select>
     </div>
+
+    </form>
+
+    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
+    <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
+    <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
+    <input type="submit" value="Search">
+
+    <br/>
+    <div class="pages">
+    <label>Page:</label>
+    <? if ($s['p']>1): ?>
+        <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']-1))?>" class="arrow-left" >&lt;</a>
+    <? endif ?>
+        <?=$s['p']?> of <?=$s['mp']?>
+    <? if ($s['p']<$s['mp']): ?>
+        <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']+1))?>" class="arrow-right" >&gt;</a>
+    <? endif ?>
+
+	</div>
+
+
     <br/>
         <br/>
         <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
         <br/>
 
-        <a href="/indextank/search?q=<?=$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
+        <a href="<?= BApp::baseUrl(true).'indextank/search?q='.$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
         <br/>
 
 <?php foreach($s['available_facets'] as $label => $data):?>
         <label><?=$label?>:</label><br/>
         <? foreach ($data as $obj): ?>
                 <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                    <a style="color:grey;" href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <a style="color:grey;" href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array($obj->param => ''))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                     <?php if(true == $s['save_filter']):?>
                         <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
                     <?php endif; ?>
                 <?php else:?>
-                    <a href="<?=BUtil::setUrlQuery(BUtil::getCurrentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
+                    <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array($obj->param => $obj->name))?>"><?=$obj->name?> (<?=$obj->count?>)</a>
                 <?php endif; ?>
                 <br/>
         <? endforeach ?>

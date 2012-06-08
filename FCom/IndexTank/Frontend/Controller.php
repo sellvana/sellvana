@@ -11,7 +11,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $f = BRequest::i()->get('f');
         $v = BRequest::i()->get('v');
         $page = BRequest::i()->get('p');
-        $result_per_page = BRequest::i()->get('ps');
+        $resultPerPage = BRequest::i()->get('ps');
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
         /*
@@ -21,20 +21,18 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
          *
          */
 
-        try {
-            FCom_IndexTank_Index_Product::i()->status();
-        } catch (Exception $e){
+        if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
             die('Please set up correct API URL at Admin Setting page');
         }
 
         if ($sc){
-            FCom_IndexTank_Index_Product::i()->scoring_by($sc);
+            FCom_IndexTank_Index_Product::i()->scoringBy($sc);
         }
 
-        $product_fields = FCom_IndexTank_Model_ProductField::i()->get_list();
-        $inclusive_fields = FCom_IndexTank_Model_ProductField::i()->get_inclusive_list();
+        $productFields = FCom_IndexTank_Model_ProductField::i()->getList();
+        $inclusiveFields = FCom_IndexTank_Model_ProductField::i()->getInclusiveList();
 
-        $filters_selected = array();
+        $filtersSelected = array();
 
         if ($f){
             foreach($f as $key => $values) {
@@ -51,40 +49,40 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                if( isset($inclusive_fields[$key]) ){
-                    FCom_IndexTank_Index_Product::i()->rollup_by($key);
+                if( isset($inclusiveFields[$key]) ){
+                    FCom_IndexTank_Index_Product::i()->rollupBy($key);
                 }
 
                 foreach ($values as $value){
-                    FCom_IndexTank_Index_Product::i()->filter_by($key, $value);
+                    FCom_IndexTank_Index_Product::i()->filterBy($key, $value);
                 }
-                $filters_selected[$key] = $values;
+                $filtersSelected[$key] = $values;
             }
         }
 
         if($v){
-            $variables_fields = FCom_IndexTank_Model_ProductField::i()->get_varialbes_list();
+            $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
             foreach($v as $key => $values) {
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                if( in_array($key, $variables_fields) ){
+                if( in_array($key, $variablesFields) ){
                     if ($values['from'] < $values['to']){
-                        FCom_IndexTank_Index_Product::i()->filter_range($variables_fields[$key]->var_number, $values['from'], $values['to']);
+                        FCom_IndexTank_Index_Product::i()->filterRange($variablesFields[$key]->var_number, $values['from'], $values['to']);
                     }
                 }
             }
         }
 
-        if (empty($result_per_page)){
-            $result_per_page = 25;
+        if (empty($resultPerPage)){
+            $resultPerPage = 25;
         }
         if(empty($page)){
             $page = 1;
         }
-        $start = ($page - 1) * $result_per_page;
+        $start = ($page - 1) * $resultPerPage;
 
-        $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $result_per_page);
+        $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $resultPerPage);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
         //print_r($facets);exit;
         $productsData = array();
@@ -95,16 +93,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
             //$productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
         }
-        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->total_found()));
+        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r,
+                array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound()));
 
-        $facets_data = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
-        $categories_data = FCom_IndexTank_Index_Product::i()->collectCategories($facets);
+        $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
+        $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets);
 
-        $productsData['state']['fields'] = $product_fields;
+        $productsData['state']['fields'] = $productFields;
         $productsData['state']['facets'] = $facets;
-        $productsData['state']['filter_selected'] = $filters_selected;
-        $productsData['state']['available_facets'] = $facets_data;
-        $productsData['state']['available_categories'] = $categories_data;
+        $productsData['state']['filter_selected'] = $filtersSelected;
+        $productsData['state']['available_facets'] = $facetsData;
+        $productsData['state']['available_categories'] = $categoriesData;
         $productsData['state']['filter'] = $v;
         $productsData['state']['save_filter'] = BConfig::i()->get('modules/FCom_IndexTank/save_filter');
 

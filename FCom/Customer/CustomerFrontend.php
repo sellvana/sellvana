@@ -10,12 +10,18 @@ class FCom_Customer_Frontend extends BClass
 
         BFrontController::i()
             ->route('GET|POST /login', 'FCom_Customer_Frontend_Controller.login')
-            ->route('GET|POST /password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
-            ->route('GET|POST /password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
+            ->route('GET|POST /customer/register', 'FCom_Customer_Frontend_Controller.register')
+            ->route('GET|POST /customer/password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
+            ->route('GET|POST /customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
             ->route('GET /logout', 'FCom_Customer_Frontend_Controller.logout')
 
             ->route('GET /myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
             ->route('GET|POST /myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+
+            //addresses
+            ->route('GET /customer/address/shipping', 'FCom_Customer_Frontend_Controller_Address.shipping')
+            ->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
+            ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
@@ -28,6 +34,10 @@ class FCom_Customer_Frontend extends BClass
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/login')),
             ),
+            '/customer/register'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/register')),
+            ),
             '/customer/password/recover'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/password-recover')),
@@ -39,6 +49,10 @@ class FCom_Customer_Frontend extends BClass
             '/customer/account'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/account')),
+            ),
+            '/customer/address'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address')),
             ),
         ));
     }

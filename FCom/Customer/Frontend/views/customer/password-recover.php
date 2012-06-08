@@ -11,7 +11,7 @@
                     <li class="form-row">
                         <div class="form-field">
                             <label for="#">Email</label>
-                            <input type="email" name="login[email]" class="required"/>
+                            <input type="email" name="email" class="required"/>
                         </div>
                     </li>
                 </ul>

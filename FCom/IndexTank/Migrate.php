@@ -6,7 +6,6 @@ class FCom_IndexTank_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function uninstall()
@@ -26,11 +25,6 @@ class FCom_IndexTank_Migrate extends BClass
 
     }
 
-    public function upgrade_0_1_2()
-    {
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run( " ALTER TABLE {$pFieldsTable} DROP `show`; ");
-    }
 
     public function upgrade_0_1_1()
     {
@@ -52,20 +46,6 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function install()
     {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-        ADD indextank_indexed_at datetime not null; ");
-
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( "
-            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
-            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `task` VARCHAR( 255 ) NOT NULL ,
-            `info` VARCHAR( 255 ) NOT NULL ,
-            `updated_at` datetime
-            ) ENGINE = InnoDB;
-         ");
-
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
             CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
@@ -120,11 +100,11 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
         );
-        $functions_list = FCom_IndexTank_Model_ProductFunction::i()->get_list();
+        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         //add initial functions
         foreach($functions as $func_name => $func){
             //add new function only if function not exists yet
-            if(!empty($functions_list[$func['number']])){
+            if(!empty($functionsList[$func['number']])){
                 continue;
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
@@ -214,8 +194,8 @@ class FCom_IndexTank_Migrate extends BClass
         $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
         if ($fields){
             foreach($fields as $f){
-                $field_name = FCom_IndexTank_Index_Product::i()->get_custom_field_key($f);
-                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $field_name)->find_one();
+                $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($f);
+                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
                 if ($doc){
                     continue;
                 }
@@ -225,7 +205,7 @@ class FCom_IndexTank_Migrate extends BClass
                 preg_match("#(\w+)#", $f->table_field_type, $matches);
                 $type = $matches[1];
 
-                $doc->field_name        = $field_name;
+                $doc->field_name        = $fieldName;
                 $doc->field_nice_name   = $f->frontend_label;
                 $doc->field_type        = $type;
                 $doc->facets            = 1;

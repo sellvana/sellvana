@@ -18,7 +18,7 @@ class FCom_IndexTank_Index_Abstract extends BClass
         $r['sc'] = null;
         $d['donotlimit'] = true;
         $res = $orm->paginate($r, $d);
-        $res['state']['sc'] = !empty($rbak['sc']) ? $rbak['sc'] : 0;
+        $res['state']['sc'] = !empty($rbak['sc']) ? $rbak['sc'] : '';
         return $res;
     }
 }
