@@ -17,6 +17,9 @@ class FCom_Cms_Frontend extends BClass
             $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'].'/' : '';
             BFrontController::i()->route('GET /'.$prefix.'*nav', 'FCom_Cms_Frontend_Controller.nav');
         }
+
+        BLayout::i()->addAllViews('Frontend/views')
+            ->afterTheme('FCom_Catalog_Frontend::layout');
     }
 
     public static function layout()
