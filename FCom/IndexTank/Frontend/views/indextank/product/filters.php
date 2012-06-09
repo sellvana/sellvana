@@ -5,7 +5,7 @@ $s = $this->state;
 
 <div class="filters" style="border: 1px solid black; width: 200px;">
 
-    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
+    <form  method="get" action="">
     <br/>
         <br/>
         <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>

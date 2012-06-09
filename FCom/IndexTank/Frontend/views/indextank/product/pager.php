@@ -16,7 +16,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 <div style="border: 1px solid black">
 
-    <form autocomplete="off" method="get" action="">
+    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
         <?php foreach($s['available_facets'] as $label => $data):?>
         <? foreach ($data as $obj): ?>
                 <? if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>

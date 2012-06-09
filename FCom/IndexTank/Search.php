@@ -107,6 +107,26 @@ class FCom_IndexTank_Search extends BClass
         return $productsData;
     }
 
+    public function publicApiUrl()
+    {
+        $url = '';
+        if (BConfig::i()->get('modules/FCom_IndexTank/api_url')) {
+            $url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+            $parsed = parse_url($url);
+            unset($parsed['pass']);
+            $url = BUtil::unparseUrl($parsed);
+        }
+        return $url;
+    }
+
+    public function indexName()
+    {
+        if (BConfig::i()->get('modules/FCom_IndexTank/index_name')) {
+            return BConfig::i()->get('modules/FCom_IndexTank/index_name');
+        }
+        return '';
+    }
+
     /**
     * Shortcut to help with IDE autocompletion
     *

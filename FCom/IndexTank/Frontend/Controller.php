@@ -31,6 +31,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         FCom_Core::lastNav(true);
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('indextank/search')->query = $q;
+        $layout->view('indextank/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
+        $layout->view('indextank/search')->index_name = FCom_IndexTank_Search::i()->indexName();
         $layout->view('indextank/product/list')->products_data = $productsData;
 
         $this->layout('/indextank/search');
@@ -60,6 +62,8 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         FCom_Core::lastNav(true);
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('indextank/search')->query = $q;
+        $layout->view('indextank/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
+        $layout->view('indextank/search')->index_name = FCom_IndexTank_Search::i()->indexName();
         $layout->view('indextank/product/list')->products_data = $productsData;
 
         $this->layout('/indextank/search');
