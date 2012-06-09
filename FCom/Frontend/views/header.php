@@ -29,6 +29,7 @@ if($cart){
         <div class="site-nav-container">
             <nav class="site-nav">
                 <ul>
+                    <li><a href="<?=BApp::baseUrl()?>">Home</a>
                     <?=$this->view('nav')?>
                 </ul>
             </nav>

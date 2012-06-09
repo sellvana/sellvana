@@ -14,7 +14,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 ?>
 
 
-<div style="border: 1px solid black">
+<div style="">
 
     <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
         <?php foreach($s['available_facets'] as $label => $data):?>
@@ -26,7 +26,6 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <?php endforeach; ?>
 
     <div class="rows f-left">
-        <strong class="count"><?=!empty($s['c'])?$s['c']:0?> found.</strong>
         <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
         <input type="submit" value="Search">
     </div>
@@ -45,8 +44,10 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     </select>
     </div>
 
-                    <br/>
-    <div class="pages">
+
+    <div class="rows f-left" style="margin-left: 10px;">
+    <strong class="count"> Found: <?=!empty($s['c'])?$s['c']:0?></strong>.
+
     <label>Page:</label>
     <? if ($s['p']>1): ?>
         <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']-1))?>" class="arrow-left" >&lt;</a>

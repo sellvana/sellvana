@@ -3,7 +3,7 @@ $s = $this->state;
 ?>
 
 
-<div class="filters" style="border: 1px solid black; width: 200px;">
+<div style="width: 200px; ">
 
     <form  method="get" action="">
     <br/>
