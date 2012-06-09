@@ -40,17 +40,6 @@ $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                     </ul>
                 </div>
             </div>
