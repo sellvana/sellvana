@@ -1,8 +1,5 @@
 <?php
-$homeUrl = BApp::href();
-$sampleLandingUrl = BApp::href('category/landing');
-$sampleCatProdUrl = BApp::href('category/products');
-
+//TODO: check that cart module is loaded
 $cart = FCom_Checkout_Model_Cart::sessionCart();
 $itemNum = 0;
 $itemPrice = 0;
@@ -32,13 +29,7 @@ if($cart){
         <div class="site-nav-container">
             <nav class="site-nav">
                 <ul>
-                    <?php if (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'cms'): ?>
-                        <?=$this->view('cms/nav')->set('root_id', BConfig::i()->get('modules/FCom_Frontend/nav_top/root_cms'))?>
-                    <?php elseif (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'categories') :?>
-                        <?=$this->view('category/nav')->set('root_id', BConfig::i()->get('modules/FCom_Frontend/nav_top/root_category'))?>
-                    <?php else: ?>
-                        Custom menu here
-                    <?php endif; ?>
+                    <?=$this->view('nav')?>
                 </ul>
             </nav>
         </div>

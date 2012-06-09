@@ -9,8 +9,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             $this->forward(true);
             return $this;
         }
-        $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
-        $categoryKey .= ":".$category->node_name;
 
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
@@ -19,7 +17,10 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $v = BRequest::i()->get('v');
         $page = BRequest::i()->get('p');
 
-        $f['category'] = $categoryKey;
+        if (empty($f['category'])){
+            $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
+            $f['category'] = $categoryKey. ":".$category->node_name;
+        }
 
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
 
@@ -35,6 +36,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $this->layout('/indextank/search');
         BResponse::i()->render();
     }
+
     public function action_search()
     {
         $layout = BLayout::i();

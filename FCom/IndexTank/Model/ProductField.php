@@ -18,7 +18,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()->find_many();
         $result = array();
-        foreach($productFields as $p){
+        foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
         }
         return $result;
@@ -29,7 +29,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('facets', 1)->find_many();
         $result = array();
-        foreach($productFields as $p){
+        foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
         }
         return $result;
@@ -40,7 +40,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('search', 1)->find_many();
         $result = array();
-        foreach($productFields as $p){
+        foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
         }
         return $result;
@@ -51,7 +51,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('scoring', 1)->find_many();
         $result = array();
-        foreach($productFields as $p){
+        foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
         }
         return $result;
@@ -62,7 +62,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('filter', 'inclusive')->find_many();
         $result = array();
-        foreach($productFields as $p){
+        foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
         }
         return $result;

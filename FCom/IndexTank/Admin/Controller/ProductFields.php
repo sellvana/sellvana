@@ -10,7 +10,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
     public function gridConfig()
     {
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
-        if($indexingStatus){
+        if ($indexingStatus) {
             BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
         } else {
             BLayout::i()->view('indextank/product_fields')->set('indexing_status', "N/A");
@@ -18,7 +18,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         try {
             $status = FCom_IndexTank_Index_Product::i()->status();
             BLayout::i()->view('indextank/product_fields')->set('status', $status);
-        } catch (Exception $e){
+        } catch (Exception $e) {
             BLayout::i()->view('indextank/product_fields')->set('status', false);
         }
 
@@ -57,7 +57,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         $class = $this->_modelClass;
         $id = $r->params('id', true);
         $model = $id ? $class::i()->load($id) : $class::i()->create();
-        if ($model){
+        if ($model) {
             //clear field in index
             if ($r->post('do')==='DELETE') {
                 FCom_IndexTank_Admin::productsIndexAll();

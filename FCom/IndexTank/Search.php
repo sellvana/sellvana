@@ -18,7 +18,7 @@ class FCom_IndexTank_Search extends BClass
         $r = BRequest::i()->get(); // GET request
         $q = trim($q);
 
-        if ($sc){
+        if ($sc) {
             FCom_IndexTank_Index_Product::i()->scoringBy($sc);
         }
 
@@ -27,59 +27,63 @@ class FCom_IndexTank_Search extends BClass
 
         $filtersSelected = array();
 
-        if ($f){
-            foreach($f as $key => $values) {
+        $categorySelected = '';
+
+        if ($f) {
+            foreach ($f as $key => $values) {
                 $is_category = false;
-                if($key == 'category'){
+                if ($key == 'category') {
                     $is_category = true;
                     $kv = explode(":", $values);
-                    if(empty($kv)){
+                    if (empty($kv)) {
                         continue;
                     }
                     $key = $kv[0];
                     $values = array($kv[1]);
+                    $categorySelected = $key;
                 }
-                if (!is_array($values)){
+                if (!is_array($values)) {
                     $values = array($values);
                 }
-                if( isset($inclusiveFields[$key]) ){
+                if (isset($inclusiveFields[$key])) {
                     FCom_IndexTank_Index_Product::i()->rollupBy($key);
                 }
 
-                foreach ($values as $value){
+                foreach ($values as $value) {
                     FCom_IndexTank_Index_Product::i()->filterBy($key, $value);
                 }
                 $filtersSelected[$key] = $values;
             }
         }
 
-        if($v){
+        if ($v) {
             $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
-            foreach($v as $key => $values) {
+            foreach ($v as $key => $values) {
                 if (!is_array($values)){
                     $values = array($values);
                 }
-                if( in_array($key, $variablesFields) ){
-                    if ($values['from'] < $values['to']){
+                if (in_array($key, $variablesFields)) {
+                    if ($values['from'] < $values['to']) {
                         FCom_IndexTank_Index_Product::i()->filterRange($variablesFields[$key]->var_number, $values['from'], $values['to']);
                     }
                 }
             }
         }
 
-        if (empty($resultPerPage)){
+        if (empty($resultPerPage)) {
             $resultPerPage = 25;
         }
-        if(empty($page)){
+        if (empty($page)) {
             $page = 1;
         }
         $start = ($page - 1) * $resultPerPage;
 
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $resultPerPage);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+
         //print_r($facets);exit;
         $productsData = array();
-        if ( $productsORM ) {
+        if ($productsORM) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
             //$productsData = $productsORM->paginate(null, array('ps'=>25));
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_data', array('data'=>&$productsData));
@@ -90,7 +94,7 @@ class FCom_IndexTank_Search extends BClass
                 array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound()));
 
         $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
-        $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets);
+        $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets, $categorySelected);
 
         $productsData['state']['fields'] = $productFields;
         $productsData['state']['facets'] = $facets;
