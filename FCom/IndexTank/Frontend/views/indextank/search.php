@@ -10,8 +10,8 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
 <script type='text/javascript'>
-var publicApiUrl = "http://enavev.api.indexden.com";
-var indexName = "products";
+var publicApiUrl = "<?=$this->public_api_url?>";
+var indexName = "<?=$this->index_name?>";
 var elementId = "#query";
 var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 </script>
