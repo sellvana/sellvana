@@ -35,7 +35,23 @@ class FCom_Checkout_Frontend extends BClass
 
         BLayout::i()->addAllViews('Frontend/views')
                 ->afterTheme('FCom_Checkout_Frontend::layout');
+
+        self::initCart();
+
     }
+    static public function initCart()
+    {
+        $cart = FCom_Checkout_Model_Cart::sessionCart();
+        $itemNum = 0;
+        $itemPrice = 0;
+        if($cart){
+            $itemPrice = round($cart->subtotal,2);
+            $itemNum = ceil($cart->item_num);
+        }
+        BLayout::i()->view('cart/header')->cartItemPrice = $itemPrice;
+        BLayout::i()->view('cart/header')->cartItemNum = $itemNum;
+    }
+
     static public function layout()
     {
         BLayout::i()->layout(array(
