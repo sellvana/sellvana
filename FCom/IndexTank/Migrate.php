@@ -102,9 +102,9 @@ class FCom_IndexTank_Migrate extends BClass
         );
         $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         //add initial functions
-        foreach($functions as $func_name => $func){
+        foreach ($functions as $func_name => $func) {
             //add new function only if function not exists yet
-            if(!empty($functionsList[$func['number']])){
+            if (!empty($functionsList[$func['number']])) {
                 continue;
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
@@ -121,16 +121,16 @@ class FCom_IndexTank_Migrate extends BClass
             if (!$check_table){
                 return false;
             }
-        } catch (Exception $e){
+        } catch (Exception $e) {
             return false;
         }
         $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
-        foreach($fields as $f){
-            if ($f->Field == "indextank_indexed" || $f->Field == "indextank_indexed_at"){
+        foreach ($fields as $f) {
+            if ($f->Field == "indextank_indexed" || $f->Field == "indextank_indexed_at") {
                 continue;
             }
             $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
-            if($doc){
+            if ($doc) {
                 continue;
             }
 
@@ -145,9 +145,9 @@ class FCom_IndexTank_Migrate extends BClass
                 'source_type'       => 'product',
                 'source_value'      => $f->Field
             );
-            if ( in_array($type, array('varchar', 'text')) ){
+            if (in_array($type, array('varchar', 'text'))) {
                 $data['search'] = 1;
-            } else if ( in_array($type, array('decimal', 'timestamp')) ) {
+            } elseif (in_array($type, array('decimal', 'timestamp'))) {
                 if("base_price" == $f->Field){
                     $data['scoring'] = 1;
                     $data['var_number'] = 0;
@@ -162,7 +162,7 @@ class FCom_IndexTank_Migrate extends BClass
 
 
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'custom_price_range')->find_one();
-        if (!$doc){
+        if (!$doc) {
             //add price range
             $data = array(
                     'field_name'        => 'custom_price_range',
@@ -176,7 +176,7 @@ class FCom_IndexTank_Migrate extends BClass
         }
 
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'ct_categories')->find_one();
-        if (!$doc){
+        if (!$doc) {
             //add categories
             $data = array(
                     'field_name'        => 'ct_categories',
@@ -192,11 +192,11 @@ class FCom_IndexTank_Migrate extends BClass
 
         //add custom fields
         $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
-        if ($fields){
-            foreach($fields as $f){
+        if ($fields) {
+            foreach ($fields as $f) {
                 $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($f);
                 $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
-                if ($doc){
+                if ($doc) {
                     continue;
                 }
                 $doc = FCom_IndexTank_Model_ProductField::orm()->create();
