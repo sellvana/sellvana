@@ -8,30 +8,30 @@
     Street 1: <input type="text" name="street1" value="<?=$this->address->street1?>"><br/>
     Street 2: <input type="text" name="street2" value="<?=$this->address->street2?>"><br/>
     City: <input type="text" name="city" value="<?=$this->address->city?>"><br/>
-<?php /*
+
     <?=$this->view('geo/embed')?>
     <script>
         head(function() {
-        $('.geo-country').geoCountryRegion({country:'US', region:'AL'});
-        }
+        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->state?>'});
+        })
     </script>
     <label for="#">Country<em class="required">*</em></label>
-    <select class="geo-country" name="address[country_id]" id="country">
+    <select class="geo-country" name="country" id="country">
         <option value="">Select an option</option>
     </select>
 
-    <select class="geo-region required" name="address[region]">
+    <select class="geo-region required" name="state" >
         <option value="">Select an option</option>
     </select>
-    <input type="text" class="geo-region" name="address[region]"/>
-*/?>
+    <input type="text" class="geo-region" name="state" />
+<?php /*
 
     Select Country:
     <select onchange="print_state('state',this.selectedIndex);" id="country" name = "country"></select> <br />
     City/District/State:
     <select name ="state" id = "state"></select>
     <script language="javascript">print_country("country", "<?=$this->address->country?>", "state", "<?=$this->address->state?>");</script>
-
+*/ ?>
     <br/>
     Zip: <input type="text" name="zip" value="<?=$this->address->zip?>"><br/>
 
