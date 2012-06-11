@@ -16,6 +16,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $f = BRequest::i()->get('f');
         $v = BRequest::i()->get('v');
         $page = BRequest::i()->get('p');
+        $resultPerPage = BRequest::i()->get('ps');
 
         if (empty($f['category'])){
             $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
