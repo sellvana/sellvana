@@ -48,6 +48,10 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('404')),
                 ),
+                '/denied'=>array(
+                    array('layout', 'base'),
+                    array('hook', 'main', 'views'=>array('denied')),
+                ),
 
                 '/'=>array(
                     array('layout', 'base'),

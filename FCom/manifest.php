@@ -279,7 +279,7 @@
             'root_dir' => 'Test',
             'depends' => array('FCom_Core'),
             'description' => "PHPUnit tests integration",
-            'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap'),
+            'bootstrap' => array('file'=>'Test.php', 'callback'=>'FCom_Test::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap')

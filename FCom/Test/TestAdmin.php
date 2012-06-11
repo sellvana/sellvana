@@ -21,6 +21,7 @@ class FCom_Test_Admin extends BClass
      */
     static public function layout()
     {
+        
         BLayout::i()
             ->layout(array(
                 'base'=>array(
