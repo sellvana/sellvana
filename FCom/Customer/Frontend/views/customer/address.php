@@ -24,14 +24,7 @@
         <option value="">Select an option</option>
     </select>
     <input type="text" class="geo-region" name="state" />
-<?php /*
 
-    Select Country:
-    <select onchange="print_state('state',this.selectedIndex);" id="country" name = "country"></select> <br />
-    City/District/State:
-    <select name ="state" id = "state"></select>
-    <script language="javascript">print_country("country", "<?=$this->address->country?>", "state", "<?=$this->address->state?>");</script>
-*/ ?>
     <br/>
     Zip: <input type="text" name="zip" value="<?=$this->address->zip?>"><br/>
 
