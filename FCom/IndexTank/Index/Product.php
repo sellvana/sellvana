@@ -462,6 +462,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $level = count(explode("/", $category->id_path))-1;
                     foreach ($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
+                        $obj->show_count = false;
                         $obj->name = $fvalue;
                         $obj->url_path = $category->url_path;
                         $obj->count = $fcount;
@@ -482,7 +483,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
             //show total count only for children categoris
             foreach ($categoryData['Categories'] as $obj) {
-                if (strpos($obj->url_path, $urlPath) !== false) {
+                if (strpos($obj->url_path, $urlPath) === 0) {
                     $obj->show_count = true;
                 }
             }

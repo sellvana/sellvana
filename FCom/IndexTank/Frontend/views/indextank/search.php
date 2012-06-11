@@ -7,20 +7,22 @@
 
 </div>
 
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
+
 <script type='text/javascript'>
 var publicApiUrl = "<?=$this->public_api_url?>";
 var indexName = "<?=$this->index_name?>";
 var elementId = "#query";
 var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 </script>
+
 <script src='https://www.google.com/jsapi' type='text/javascript'></script>
-			<script type='text/javascript'>
+
+<script type='text/javascript'>
 			var theme = "flick";
-			google.load("jqueryui", "1.8.7");
-			google.loader.writeLoadTag("css", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/" + theme + "/jquery-ui.css");
-			</script>
+			google.load("jqueryui", "1.8.17");
+			google.loader.writeLoadTag("css", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/" + theme + "/jquery-ui.css");
+</script>
+
 <script type='text/javascript'>
 			google.setOnLoadCallback(function() {
 			$(function() {
