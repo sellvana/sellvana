@@ -35,7 +35,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     'title' => 'Added to cart',
                     'html' => '<img src="'.$p->thumbUrl(35, 35).'" width="35" height="35" style="float:left"/> '.htmlspecialchars($p->product_name)
                         .(!empty($post['qty']) && $post['qty']>1 ? ' ('.$post['qty'].')' : '')
-                        .'<br><a href="'.$cartHref.'" class="button">Go to cart</a>',
+                        .'<br><br><a href="'.$cartHref.'" class="button">Go to cart</a>',
                     'cnt' => $cart->itemQty(),
                 );
                 break;
