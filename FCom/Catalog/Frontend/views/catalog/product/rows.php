@@ -14,7 +14,6 @@ $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
     <td>
         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
         <span class="sku">Part #: <?=$this->q($p->manuf_sku)?></span>
-        <span class="manuf-name"><?=$this->q($p->manuf()->manuf_name)?></span>
         <span class="rating">
             <span class="rating-out"><span class="rating-in" style="width:35px"></span></span>
             3.5 of 5 (<a href="#">16 reviews</a>)
@@ -35,20 +34,10 @@ $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
                     <ul>
                         <li><span class="label">Darby Dental</span><span class="lowest-price">Lowest Price</span><span class="price">$24</span></li>
                         <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-                        <li><span class="label">Darby Dental</span><span class="price">$24</span></li>
                     </ul>
                 </div>
             </div>
-            <button class="button btn-add-to-cart" onclick="add_cart(<?=$p->id?>)">+ Add to Cart</button>
+            <button class="button btn-add-to-cart" onclick="add_cart(<?=$p->id?>, 1)">+ Add to Cart</button>
         </div>
     </td>
 </tr>

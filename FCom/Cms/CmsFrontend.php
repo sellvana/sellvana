@@ -19,7 +19,7 @@ class FCom_Cms_Frontend extends BClass
         }
 
         BLayout::i()->addAllViews('Frontend/views')
-            ->afterTheme('FCom_Catalog_Frontend::layout');
+            ->afterTheme('FCom_Cms_Frontend::layout');
     }
 
     public static function layout()

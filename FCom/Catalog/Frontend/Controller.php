@@ -1,7 +1,7 @@
 <?php
 
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
-{   
+{
     public function action_manuf()
     {
         $this->forward(true);
@@ -24,7 +24,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        BLayout::i()->view('catalog/product')->product = $product;
+        $layout->view('catalog/product')->product = $product;
 
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
