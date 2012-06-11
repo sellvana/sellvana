@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
+class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_customer_address';
+    protected static $_table = 'fcom_checkout_address';
     protected static $_origClass = __CLASS__;
 
     public static function as_html($obj=null)
@@ -33,12 +33,13 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     public static function install()
     {
-        $tCustomer = FCom_Customer_Model_Customer::table();
+        $tCart = FCom_Checkout_Model_Cart::table();
         $tAddress = static::table();
         BDb::run("
 CREATE TABLE IF NOT EXISTS {$tAddress} (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `customer_id` int(11) unsigned NOT NULL,
+  `cart_id` int(11) unsigned NOT NULL,
+  `atype` ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping',
   `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -56,42 +57,8 @@ CREATE TABLE IF NOT EXISTS {$tAddress} (
   `lat` decimal(15,10) DEFAULT NULL,
   `lng` decimal(15,10) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-ALTER TABLE {$tCustomer}
-  ADD CONSTRAINT `FK_{$tCustomer}_billing` FOREIGN KEY (`default_billing_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_{$tCustomer}_shipping` FOREIGN KEY (`default_shipping_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
         ");
-    }
-
-    public static function import($data, $cust)
-    {
-        if ($cust->default_billing_id) {
-            $addr = static::load($cust->default_billing_id);
-            //$addr = Model::factory('FCom_Customer_Model_Address')->find_one($cust->default_billing_id);
-        }
-        if (empty($addr)) {
-            $addr = static::create(array('customer_id' => $cust->id));
-        }
-        //save full contry name
-        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
-            $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
-        }
-*/
-        if(!empty($data['address'])){
-            $addr->set($data['address']);
-        }
-        $addr->save();
-
-        if (!$cust->default_billing_id) {
-            $cust->set('default_billing_id', $addr->id);
-        }
-        if (!$cust->default_shipping_id) {
-            $cust->set('default_shipping_id', $addr->id);
-        }
-        $cust->save();
-
-        return $addr;
     }
 }

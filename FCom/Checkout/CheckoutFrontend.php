@@ -22,11 +22,8 @@ class FCom_Checkout_Frontend extends BClass
             ->route( 'POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping_post')
 
             //shipping address
-            ->route( 'GET /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping')
-            ->route('POST /checkout/address/shipping', 'FCom_Checkout_Frontend_Controller_Address.shipping_post')
-            //billing address
-            ->route( 'GET /checkout/address/billing', 'FCom_Checkout_Frontend_Controller_Address.billing')
-            ->route('POST /checkout/address/billing', 'FCom_Checkout_Frontend_Controller_Address.billing_post')
+            ->route( 'GET /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
+            ->route('POST /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address_post')
         ;
 
         //merge cart sessions after user login
@@ -76,14 +73,10 @@ class FCom_Checkout_Frontend extends BClass
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('checkout/shipping'))
             ),
-            '/checkout/address/shipping'=>array(
+            '/checkout/address'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/address/shipping'))
-            ),
-            '/checkout/address/billing'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/address/billing'))
-            ),
+                array('hook', 'main', 'views'=>array('checkout/address'))
+            )
         ));
     }
 

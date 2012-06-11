@@ -11,19 +11,26 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $user = FCom_Customer_Model_Customer::sessionUser();
         $shipAddress = null;
         $billAddress = null;
-        if ($user) {
+        if ($cart) {
+            $shipAddress = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype','shipping')->find_one();
+            $billAddress = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype','billing')->find_one();
+        } elseif ($user) {
+            //todo: copy customer address into checkout address and load it into view
             $shipAddress = $user->defaultShipping();
             $billAddress = $user->defaultBilling();
         }
-        
-        if (empty($shipAddress) || empty($billAddress)) {
-            $href = BApp::href('customer/address/shipping');
+
+        if (empty($shipAddress)) {
+            $href = BApp::href('checkout/address?t=s');
+            BResponse::i()->redirect($href);
+        } elseif (empty($billAddress)) {
+            $href = BApp::href('checkout/address?t=b');
             BResponse::i()->redirect($href);
         }
 
         $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->shippingAddress = FCom_Customer_Model_Address::as_html($shipAddress);
-        $layout->view('checkout/checkout')->billingAddress = FCom_Customer_Model_Address::as_html($billAddress);
+        $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
+        $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $this->layout('/checkout/checkout');
         BResponse::i()->render();
     }
