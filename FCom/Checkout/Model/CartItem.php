@@ -36,5 +36,17 @@ CREATE TABLE IF NOT EXISTS {$tCartItem} (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
     }
+
+    public static function upgrade_0_1_1()
+    {
+        $tCartItem = static::table();
+        $field = BDb::ddlFieldInfo($tCartItem, 'price');
+        if ($field){
+            return;
+        }
+        BDb::run("
+            alter table {$tCartItem} add  `price` decimal(12,4) NOT NULL DEFAULT '0.0000'
+        ");
+    }
 }
 
