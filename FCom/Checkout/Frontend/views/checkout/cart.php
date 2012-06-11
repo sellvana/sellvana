@@ -39,22 +39,10 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
                     </td>
                     <td>
                         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
-                        <span class="manuf-name"><?=$this->q($p->manuf()->manuf_name)?></span>
-                        <span class="sku">Part #: <?=$this->q($p->manuf_sku)?></span>
-                        <span class="rating">
-                            <span class="rating-out"><span class="rating-in" style="width:35px"></span></span>
-                            3.5 of 5 (<a href="#">16 reviews</a>)
-                        </span>
                     </td>
                     <td class="actions last a-left">
                         <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
-                            <? if ($loggedIn): ?><span class="availability in-stock">In Inventory</span><? endif ?>
-                            <span class="price-label">As low as</span>
-                            <p><span class="price">$<?=number_format($p->base_price)?></span><span class="supplier">Darby Dental</span></p>
-                            <span class="price-range"><strong><a href="#" class="vendor-count">13 Vendors</a>
-                            <span class="tooltip">
-TEST
-                            </span></strong>: $24-$49</span>
+                            <span class="price">$<?=number_format($p->base_price)?></span>
                         </div>
                     </td>
                     <td>

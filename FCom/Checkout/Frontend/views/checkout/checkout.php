@@ -5,7 +5,7 @@
 <br/><br/>
 
 <h4>Shipping to:</h4>
-<a href="<?=BApp::href('customer/address/shipping')?>">Change</a><br/>
+<a href="<?=BApp::href('checkout/address?t=s')?>">Change</a><br/>
 <?=$this->shippingAddress?><br>
 <br>
 
@@ -80,7 +80,7 @@ Credit card<br/>
 Visa<br/>
 <br/><br/>
 <h4>Billing address</h4>
-<a href="<?=BApp::href('customer/address/billing')?>">Change</a><br/>
+<a href="<?=BApp::href('checkout/address?t=b')?>">Change</a><br/>
 <?=$this->billingAddress?><br><br>
 
 </form>
