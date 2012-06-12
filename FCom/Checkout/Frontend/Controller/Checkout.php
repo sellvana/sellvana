@@ -54,6 +54,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $cart->shipping_method = $post['shipping_method'];
             $cart->shipping_price = FCom_Checkout_Api::i()->getShippingMethod($post['shipping_method'])->getPrice();
         }
+
         if (!empty($post['payment'])) {
             $cart->payment_details = BUtil::toJson($post['payment']);
         }
