@@ -13,7 +13,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
         switch ($this->node_type) {
         case 'cms_page':
             $this->_page = FCom_Cms_Model_Page::i()->load($this->reference, 'handle');
-            return !!$this->_page;
+            return $this->_page;
 
         default:
             return true;
