@@ -354,4 +354,18 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
     }
+
+    public static function upgrade_0_1_3()
+    {
+        if (BDb::ddlFieldInfo(static::table(), "shipping_method")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `shipping_method` VARCHAR( 50 ) NOT NULL ,
+ADD `shipping_price` DECIMAL( 10, 2 ) NOT NULL ,
+ADD `payment_method` VARCHAR( 50 ) NOT NULL ,
+ADD `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+ADD `discount_code` VARCHAR( 50 ) NOT NULL
+            ");
+    }
 }

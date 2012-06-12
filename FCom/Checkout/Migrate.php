@@ -13,6 +13,12 @@ class FCom_Checkout_Migrate extends BClass
         FCom_Checkout_Model_Cart::install();
         FCom_Checkout_Model_CartItem::install();
     }
+
+    public function upgrade_0_1_3()
+    {
+        FCom_Checkout_Model_Cart::upgrade_0_1_3();
+    }
+
     public function upgrade_0_1_2()
     {
         FCom_Checkout_Model_Address::install();
