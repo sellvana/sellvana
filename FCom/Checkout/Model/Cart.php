@@ -328,6 +328,34 @@ throw new Exception("Invalid cart_id: ".$cId);
         return $this;
     }
 
+    public function totalAsHtml()
+    {
+        $subtotal = $this->subtotal;
+        $shipping = 0;
+        if ($this->shipping_method) {
+            $shipping = $this->shipping_price;
+        }
+        $discount = 0;
+        if ($this->discount_code) {
+            $discount = 10;
+        }
+        //if tax
+        $beforeTax = $subtotal + $shipping - $discount;
+        $estimatedTax = 0;
+        if (1) {
+            $estimatedTax = $beforeTax*0.2;
+        }
+        $total = $beforeTax + $estimatedTax;
+        $html = '
+Items: $'.$subtotal.'<br>
+Shipping and handling: $'.$shipping.'<br>
+Discount: -$'.$discount.'<br/>
+Total before tax: $'.$beforeTax.'<br>
+Estimated tax: $'.$estimatedTax.'<br>
+<b>Order total: $'.$total.'</b>';
+        return $html;
+    }
+
     public function urlHash($id)
     {
         return '/carts/items/'.$id;

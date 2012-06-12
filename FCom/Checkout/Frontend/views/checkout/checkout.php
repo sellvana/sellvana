@@ -67,11 +67,8 @@
 <br/><br/>
 <h4>Shipping Summary:</h4>
 
-Items: $10<br>
-Shipping and handling: $0<br>
-Total before tax: $10<br>
-Estimated tax: $0<br>
-<b>Order total: $10</b><br/><br/>
+<?=$this->cart->totalAsHtml();?>
+<br/><br/>
 
 <b>Coupon, discount or promo code:</b>
 <input type="text" name="discount_code"> <input type="submit" name="coupon_submit" value="Apply">
