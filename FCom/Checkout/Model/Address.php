@@ -5,6 +5,10 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_checkout_address';
     protected static $_origClass = __CLASS__;
 
+    public function getAddress($cartId, $atype)
+    {
+        return FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cartId)->where('atype', $atype)->find_one();
+    }
     public static function as_html($obj=null)
     {
         if (is_null($obj)) {
