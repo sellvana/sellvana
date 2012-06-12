@@ -18,6 +18,10 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         $countriesList = substr($countriesList, 0, -1);
 
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+        if (!$cart->id()){
+            $href = BApp::href('cart');
+            BResponse::i()->redirect($href);
+        }
 
         if ('s' == $atype) {
             $addressType = 'shipping';
@@ -61,25 +65,34 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         if ('s' == $atype) {
             $addressType = 'shipping';
+            $addressType2 = 'billing';
         } else {
             $addressType = 'billing';
+            $addressType2 = 'shipping';
         }
 
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
-        $address = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype',$addressType)->find_one();
+        if (!$cart->id()){
+            $href = BApp::href('cart');
+            BResponse::i()->redirect($href);
+        }
+
+        $address = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType);
         if ($address) {
-            $address->set($r)->save();
+            $address->set($r);
+            $address->atype = $addressType;
+            $address->save();
         }
 
         if ($r['address_equal']) {
             //copy of shipping address for billing address
-            $addressCopy = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype','billing')->find_one();
+            $addressCopy = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType2);
             if (!$addressCopy) {
                 $addressCopy = FCom_Checkout_Model_Address::i()->orm()->create();
                 $addressCopy->cart_id = $cart->id();
             }
             $addressCopy->set($r);
-            $addressCopy->atype = 'billing';
+            $addressCopy->atype = $addressType2;
             $addressCopy->save();
         }
 

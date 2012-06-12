@@ -6,18 +6,25 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     {
         $layout = BLayout::i();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Checkout', 'active'=>true));
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
 
-        $user = FCom_Customer_Model_Customer::sessionUser();
         $shipAddress = null;
         $billAddress = null;
-        if ($cart) {
-            $shipAddress = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype','shipping')->find_one();
-            $billAddress = FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cart->id())->where('atype','billing')->find_one();
-        } elseif ($user) {
-            //todo: copy customer address into checkout address and load it into view
-            $shipAddress = $user->defaultShipping();
-            $billAddress = $user->defaultBilling();
+
+        $user = FCom_Customer_Model_Customer::sessionUser();
+        $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
+
+        if ($cart->id()) {
+            $shipAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+            $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
+
+            if ($user && !$shipAddress) {
+                //todo: create shipping & billing address entries from user address data
+                $shipAddress = $user->defaultShipping();
+            }
+            if ($user && !$billAddress) {
+                //todo: create shipping & billing address entries from user address data
+                $billAddress = $user->defaultBilling();
+            }
         }
 
         if (empty($shipAddress)) {
