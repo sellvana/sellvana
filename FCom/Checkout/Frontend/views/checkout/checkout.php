@@ -1,6 +1,7 @@
 <h2>Review the information below then click "Place your order"</h2>
 <form action="<?=BApp::href('checkout')?>" method="post">
 <input type="submit" name="place_order" value="Place your order">
+<input type="submit" name="update" value="Apply changes">
 
 <br/><br/>
 
@@ -121,5 +122,7 @@ CVV: <input type="text" name="payment[cvv]" /><br/>
 <h4>Billing address</h4>
 <a href="<?=BApp::href('checkout/address?t=b')?>">Change</a><br/>
 <?=$this->billingAddress?><br><br>
+
+<input type="submit" name="update" value="Apply changes">
 
 </form>
