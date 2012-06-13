@@ -65,6 +65,13 @@ class FCom_Frontend extends BClass
         }
         return trim($href.'/'.ltrim($url, '/'), '/');
     }
+
+    public static function href($url='')
+    {
+        $r = BRequest::i();
+        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
+        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
+    }
 }
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract

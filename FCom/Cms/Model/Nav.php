@@ -10,18 +10,18 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 
     public function getUrl()
     {
-        if ("cms_page" == $this->node_type){
-            return FCom_Cms_Model_Page::i()->getUrlForHandle($this->reference);
+        if ($this->url_href) {
+            if (0 === stripos($this->url_href, array('http://', 'https://'))) {
+                return $this->url_href;
+            } else {
+                return FCom_Frontend::href($this->url_href);
+            }
         }
         $config = BConfig::i()->get('modules/FCom_Cms');
         $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'].'/' : '';
-        if ($this->reference) {
-            return $this->reference;
-        } elseif ($prefix) {
-            return $prefix . $this->url_key;
-        } else {
-            return $this->url_path;
-        }
+
+        return FCom_Frontend::href($prefix . $this->url_path);
+
     }
 
     public function validate()
