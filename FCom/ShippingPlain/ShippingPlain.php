@@ -4,7 +4,7 @@ class FCom_ShippingPlain extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Checkout_Api::i()->addShippingMethod('ShippingPlain', 'FCom_ShippingPlain');
+        FCom_Checkout_Model_Cart::i()->addShippingMethod('ShippingPlain', 'FCom_ShippingPlain');
     }
 
     public function getEstimate()

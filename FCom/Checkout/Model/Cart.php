@@ -6,6 +6,8 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_sessionCart;
+    protected $shippingMethods = array();
+    protected $shippingClasses = array();
 
     public $items;
 
@@ -354,6 +356,38 @@ Total before tax: $'.$beforeTax.'<br>
 Estimated tax: $'.$estimatedTax.'<br>
 <b>Order total: $'.$total.'</b>';
         return $html;
+    }
+
+     public function addShippingMethod($method, $class)
+    {
+        $this->shippingMethods[$method] = $class;
+    }
+
+    /**
+     *
+     * @return Array of Shipping Method objects
+     */
+    public function getShippingMethods()
+    {
+        if (!$this->shippingMethods) {
+            return false;
+        }
+        if (empty($this->shippingClasses)) {
+            foreach($this->shippingMethods as $method => $class) {
+                $this->shippingClasses[$method] = $class::i();
+            }
+        }
+        return $this->shippingClasses;
+    }
+
+    public function getShippingMethod($method)
+    {
+        $this->getShippingMethods();
+        if (!empty($this->shippingClasses[$method])){
+            return $this->shippingClasses[$method];
+        } else {
+            return false;
+        }
     }
 
     public function urlHash($id)
