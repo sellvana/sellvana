@@ -21,7 +21,7 @@
         <?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)</li>
     <?php endforeach; ?>
 </ul>
-
+<input type="submit" name="update" value="Apply changes">
 <br/><br/>
 <?php endif; ?>
 

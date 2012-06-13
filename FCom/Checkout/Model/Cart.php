@@ -390,6 +390,85 @@ Estimated tax: $'.$estimatedTax.'<br>
         }
     }
 
+    public function addTotalRow($key, $options)
+    {
+        $cart = self::sessionCart();
+        $totals = BUtil::fromJson($cart->totals_json);
+        $totals[$key] = $options;
+        $cart->totals_json = Butil::toJson($totals);
+        $cart->save();
+    }
+
+    public function calculateTotals()
+    {
+        $totals = BUtil::fromJson($this->totals_json);
+
+        $totalObjects = array();
+        foreach ($totals as $key => $options) {
+            $obj = new stdClass();
+            $obj->name = $key;
+            $obj->options = $options;
+            $totalObjects[$key] = $obj;
+        }
+
+        // take care of 'load_after' option
+        foreach ($totalObjects as $key => $total) {
+            if ($total->options['after']) {
+                $total->parents[] = $total->options['after'];
+                $totalObjects[$total->options['after']]->children[] = $total->name;
+            }
+        }
+        // get modules without dependencies
+        $rootModules = array();
+        foreach ($totalObjects as $key => $total) {
+            if (empty($total->parents)) {
+                $rootModules[] = $total;
+            }
+        }
+
+        $sorted = array();
+        while($totalObjects) {
+            // check for circular reference
+            if (!$rootModules)die("circular reference");// return false;
+            // remove this node from root modules and add it to the output
+            $n = array_pop($rootModules);
+
+            $sorted[$n->name] = $n;
+
+            if (empty($n->children)) {
+                break;
+            }
+            // for each of its children: queue the new node, finally remove the original
+            for ($i = count($n->children)-1; $i>=0; $i--) {
+                // get child module
+                $childModule = $totalObjects[$n->children[$i]];
+                // remove child modules from parent
+                unset($n->children[$i]);
+                // remove parent from child module
+                unset($childModule->parents[array_search($n->name, $childModule->parents)]);
+                // check if this child has other parents. if not, add it to the root modules list
+                if (!$childModule->parents) array_push($rootModules, $childModule);
+            }
+            // remove processed module from list
+            unset($totalObjects[$n->name]);
+        }        
+    }
+
+    public function subtotal()
+    {
+        $cart = self::sessionCart();
+        return $cart->subtotal;
+    }
+
+    public function discount()
+    {
+        $cart = self::sessionCart();
+        if ($cart->discount_code) {
+            return 10;
+        }
+        return 0;
+    }
+
     public function urlHash($id)
     {
         return '/carts/items/'.$id;
@@ -429,5 +508,16 @@ ADD `payment_method` VARCHAR( 50 ) NOT NULL ,
 ADD `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
 ADD `discount_code` VARCHAR( 50 ) NOT NULL
             ");
+    }
+
+    public static function upgrade_0_1_4()
+    {
+        if (BDb::ddlFieldInfo(static::table(), "calc_balance")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
+            ADD `totals_json` TEXT NOT NULL "
+        );
     }
 }
