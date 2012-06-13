@@ -451,7 +451,7 @@ Estimated tax: $'.$estimatedTax.'<br>
             }
             // remove processed module from list
             unset($totalObjects[$n->name]);
-        }        
+        }
     }
 
     public function subtotal()
@@ -506,17 +506,8 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 ADD `shipping_price` DECIMAL( 10, 2 ) NOT NULL ,
 ADD `payment_method` VARCHAR( 50 ) NOT NULL ,
 ADD `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-ADD `discount_code` VARCHAR( 50 ) NOT NULL
-            ");
-    }
-
-    public static function upgrade_0_1_4()
-    {
-        if (BDb::ddlFieldInfo(static::table(), "calc_balance")){
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".static::table()." ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
+ADD `discount_code` VARCHAR( 50 ) NOT NULL,
+ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
             ADD `totals_json` TEXT NOT NULL "
         );
     }
