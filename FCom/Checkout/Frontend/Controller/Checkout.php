@@ -35,6 +35,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
+        $cart->calculateTotals();
+
         $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
 
         $layout->view('checkout/checkout')->cart = $cart;
