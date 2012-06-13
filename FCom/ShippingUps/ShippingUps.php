@@ -1,10 +1,10 @@
 <?php
 
-class FCom_UpsShipping extends BClass
+class FCom_ShippingUps extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Checkout_Api::i()->addShippingMethod('UpsShipping', 'FCom_UpsShipping');
+        FCom_Checkout_Api::i()->addShippingMethod('ShippingUps', 'FCom_ShippingUps');
     }
 
     public function getEstimate()
