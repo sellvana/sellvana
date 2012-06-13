@@ -449,6 +449,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $categoryData = array();
         if ($facets) {
+            $urlPath = '';
             //get categories
             foreach ($facets as $fname => $fvalues) {
                 //hard coded ct_categories prefix
@@ -483,6 +484,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
             //show total count only for children categoris
             foreach ($categoryData['Categories'] as $obj) {
+                if (!$obj->url_path || !$urlPath) {
+                    continue;
+                }
                 if (strpos($obj->url_path, $urlPath) === 0) {
                     $obj->show_count = true;
                 }

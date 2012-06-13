@@ -10,6 +10,23 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function getUrl()
+    {
+        $config = BConfig::i()->get('modules/FCom_Cms');
+        $prefix = !empty($config['page_url_prefix']) ? $config['page_url_prefix'].'/' : '';
+        return $prefix . $this->handle;
+    }
+
+    public function getUrlForHandle($handle)
+    {
+        $page = FCom_Cms_Model_Page::i()->orm()->where("handle", $handle)->find_one();
+        if ($page) {
+            return $page->getUrl();
+        }
+        return false;
+    }
+
+
     public function render()
     {
         BLayout::i()
