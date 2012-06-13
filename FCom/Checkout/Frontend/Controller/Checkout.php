@@ -35,7 +35,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
-        $shippingMethods = FCom_Checkout_Api::i()->getShippingMethods();
+        $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
 
         $layout->view('checkout/checkout')->cart = $cart;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
@@ -52,7 +52,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (!empty($post['shipping_method'])) {
             $cart->shipping_method = $post['shipping_method'];
-            $cart->shipping_price = FCom_Checkout_Api::i()->getShippingMethod($post['shipping_method'])->getPrice();
+            $cart->shipping_price = FCom_Checkout_Model_Cart::i()->getShippingMethod($post['shipping_method'])->getPrice();
         }
 
         if (!empty($post['payment'])) {
