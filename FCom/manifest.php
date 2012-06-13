@@ -187,7 +187,7 @@
         ),
         // cart, checkout and customer account views and controllers
         'FCom_Checkout' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'Checkout',
             'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
