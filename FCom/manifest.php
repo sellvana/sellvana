@@ -202,26 +202,26 @@
             ),
             'description' => "Base cart and checkout functionality",
         ),
-        'FCom_PlainShipping' => array(
+        'FCom_ShippingPlain' => array(
             'version' => '0.1.0',
-            'root_dir' => 'PlainShipping',
+            'root_dir' => 'ShippingPlain',
             'depends' => array('FCom_Checkout'),
-            'bootstrap' => array('file'=>'PlainShipping.php', 'callback'=>'FCom_PlainShipping::bootstrap'),
+            'bootstrap' => array('file'=>'ShippingPlain.php', 'callback'=>'FCom_ShippingPlain::bootstrap'),
             'areas' => array(
                 'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'PlainShipping.php', 'callback'=>'FCom_PlainShipping::bootstrap'),
+                    'bootstrap' => array('file'=>'ShippingPlain.php', 'callback'=>'FCom_ShippingPlain::bootstrap'),
                 ),
             ),
             'description' => "Plain shipping module for checkout",
         ),
-        'FCom_UpsShipping' => array(
+        'FCom_ShippingUps' => array(
             'version' => '0.1.0',
-            'root_dir' => 'UpsShipping',
+            'root_dir' => 'ShippingUps',
             'depends' => array('FCom_Checkout'),
-            'bootstrap' => array('file'=>'UpsShipping.php', 'callback'=>'FCom_UpsShipping::bootstrap'),
+            'bootstrap' => array('file'=>'ShippingUps.php', 'callback'=>'FCom_ShippingUps::bootstrap'),
             'areas' => array(
                 'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'UpsShipping.php', 'callback'=>'FCom_UpsShipping::bootstrap'),
+                    'bootstrap' => array('file'=>'ShippingUps.php', 'callback'=>'FCom_ShippingUps::bootstrap'),
                 ),
             ),
             'description' => "Universal post service shipping module for checkout",

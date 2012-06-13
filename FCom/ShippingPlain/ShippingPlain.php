@@ -1,10 +1,10 @@
 <?php
 
-class FCom_PlainShipping extends BClass
+class FCom_ShippingPlain extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Checkout_Api::i()->addShippingMethod('PlainShipping', 'FCom_PlainShipping');
+        FCom_Checkout_Api::i()->addShippingMethod('ShippingPlain', 'FCom_ShippingPlain');
     }
 
     public function getEstimate()
