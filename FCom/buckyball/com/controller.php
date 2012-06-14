@@ -1011,6 +1011,8 @@ class BResponse extends BClass
         session_write_close();
         // bypass initial webservice buffering
         echo str_pad('', 2000, ' ');
+        // continue in background if the browser request was interrupted
+        //ignore_user_abort(true);
     }
 
     public function shutdown($lastMethod=null)
