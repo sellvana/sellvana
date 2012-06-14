@@ -30,6 +30,8 @@ class FCom_Checkout_Frontend extends BClass
         BPubSub::i()->on('FCom_Customer_Model_Customer::login.after', 'FCom_Checkout_Model_Cart::userLogin');
         BPubSub::i()->on('FCom_Customer_Model_Customer::logout.before', 'FCom_Checkout_Model_Cart::userLogout');
 
+        BPubSub::i()->on('bootstrap::after', 'FCom_Checkout_Frontend::initCartTotals');
+
         BLayout::i()->addAllViews('Frontend/views')
                 ->afterTheme('FCom_Checkout_Frontend::layout');
 
@@ -47,17 +49,24 @@ class FCom_Checkout_Frontend extends BClass
         }
         BLayout::i()->view('cart/header')->cartItemPrice = $itemPrice;
         BLayout::i()->view('cart/header')->cartItemNum = $itemNum;
+    }
 
+    /**
+     * Init cart after all modules are registered
+     */
+    public static function initCartTotals()
+    {
+        $cart = FCom_Checkout_Model_Cart::sessionCart();
         FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotalCallback', 'label' => 'Items', 'after'=>''));
         if ($cart->shipping_method) {
-            FCom_Checkout_Model_Cart::i()->addTotalRow('shipping', array('callback'=>'FCom_'.$cart->shipping_method.'.getPrice',
+            $shippingClass = FCom_Checkout_Model_Cart::i()->getShippingClassName($cart->shipping_method);
+            FCom_Checkout_Model_Cart::i()->addTotalRow('shipping', array('callback'=>$shippingClass.'.getRateCallback',
                 'label' => 'Shipping', 'after'=>'subtotal'));
         }
         if ($cart->discount_code) {
             FCom_Checkout_Model_Cart::i()->addTotalRow('discount', array('callback'=>'FCom_Checkout_Model_Cart.discountCallback',
                 'label' => 'Discount', 'after'=>'shipping'));
         }
-
     }
 
     static public function layout()

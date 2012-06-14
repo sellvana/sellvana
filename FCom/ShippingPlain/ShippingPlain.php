@@ -1,6 +1,6 @@
 <?php
 
-class FCom_ShippingPlain extends BClass
+class FCom_ShippingPlain extends FCom_Checkout_Model_Shipping_Abstract
 {
     public static function bootstrap()
     {
@@ -9,12 +9,22 @@ class FCom_ShippingPlain extends BClass
 
     public function getEstimate()
     {
-        return '2-4 days';
+        return 'approx. 2-4 days';
     }
 
-    public function getPrice()
+    public function getServices()
+    {
+        return array('01' => 'Air', '02' => 'Ground');
+    }
+
+    public function getRateCallback($cart)
     {
         return rand(10,100);
+    }
+
+    public function getError()
+    {
+        return '';
     }
 
     public function getDescription()
