@@ -11,26 +11,28 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
 
     }
 
-    public function getEstimate()
+    public function apiCall($shipNumber, $fromzip, $tozip, $service, $length, $width, $height, $weight)
     {
-        $approx = '';
+        $this->rate = new UpsRate('FC7DECC55E57CF90','A31T84','UPS!@#*()', $shipNumber);
+        $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
+    }
+
+    public function getEstimate($tozip=0, $service=01, $length=0, $width=0, $height=0, $weight=0)
+    {
         if (!$this->rate) {
-            $this->rate = new UpsRate('FC7DECC55E57CF90','A31T84','UPS!@#*()', rand(1,1000));
+            $cart = FCom_Checkout_Model_Cart::sessionCart();
             $fromzip = 82108;
             $tozip = 90203;
-            $service = '01';
-            $length = $width = $height = 10;
-            $weight = 10;
-            $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
-            $approx = 'approx. ';
+            $service = $serviceNumber ? $serviceNumber : $cart->shipping_service;
+            $length = $width = $height = $weight = 10;
+            $this->apiCall($cart->id(), $fromzip, $tozip, $service, $length, $width, $height, $weight);
         }
-
         $estimate = $this->rate->getEstimate();
         if (!$estimate) {
             return 'Unable to calculate';
         }
         $days = ($estimate == 1) ? ' day' : ' days';
-        return $approx . $estimate . $days;
+        return $estimate . $days;
     }
 
     /**
@@ -58,12 +60,16 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
     public function getRateCallback($cart)
     {
         $this->rate = new UpsRate('FC7DECC55E57CF90','A31T84','UPS!@#*()', $cart->id());
+        //address
         $fromzip = 82108;
-        $tozip = 90203;
+        $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+        $tozip = $shippingAddress->zip;
+        //service
         $service = $cart->shipping_service;
+        //package
         $length = $width = $height = 10;
         $weight = 10;
-        return $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
+        return $this->apiCall($cart->id(), $fromzip, $tozip, $service, $length, $width, $height, $weight);
     }
 
     public function getError()

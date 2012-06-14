@@ -69,7 +69,15 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
         <table>
             <?php if ($this->shipping_esitmate): ?>
             <tr>
-                <td>Shipping estimate: <?=$this->shipping_esitmate?></td>
+                <td>Shipping estimate:<br/>
+                    <?php if ($this->shipping_esitmate) :?>
+                    <ul>
+                        <?php foreach($this->shipping_esitmate as $estimate): ?>
+                            <li><?=$estimate['description']?> (<?=$estimate['estimate']?>)</li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <?php endif; ?>
+                </td>
             </tr>
             <?php endif; ?>
             <tr>
