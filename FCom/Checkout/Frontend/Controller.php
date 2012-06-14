@@ -56,19 +56,11 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 }
             }
             if (!empty($post['postcode'])) {
-                $estimateMin = null;
-                foreach (FCom_Checkout_Frontend::i()->getShippingMethods() as $shipping) {
-                    $estimateMin = '10 days - Free Standard shipping';
-                    continue;
-                    $estimate = $shipping->estimate($post['postcode']);
-                    if (null === $estimateMin) {
-                        $estimateMin = $estimate;
-                    }
-                    if ($estimate < $estimateMin) {
-                        $estimateMin = $estimate;
-                    }
+                $estimate = array();
+                foreach (FCom_Checkout_Model_Cart::i()->getShippingMethods() as $shipping) {
+                    $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
                 }
-                BSession::i()->data('shipping_estimate', $estimateMin);
+                BSession::i()->data('shipping_estimate', $estimate);
             }
             $cart->calcTotals()->save();
             BResponse::i()->redirect($cartHref);
