@@ -37,12 +37,14 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $cart->calculateTotals();
 
+
         $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
 
         $layout->view('checkout/checkout')->cart = $cart;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $layout->view('checkout/checkout')->shippingMethods = $shippingMethods;
+        $layout->view('checkout/checkout')->totals = $cart->getTotals();
         $this->layout('/checkout/checkout');
         BResponse::i()->render();
     }

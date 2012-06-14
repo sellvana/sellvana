@@ -329,7 +329,7 @@ throw new Exception("Invalid cart_id: ".$cId);
         }
         return $this;
     }
-
+/*
     public function totalAsHtml()
     {
         $subtotal = $this->subtotal;
@@ -357,7 +357,7 @@ Estimated tax: $'.$estimatedTax.'<br>
 <b>Order total: $'.$total.'</b>';
         return $html;
     }
-
+*/
      public function addShippingMethod($method, $class)
     {
         $this->shippingMethods[$method] = $class;
@@ -390,81 +390,113 @@ Estimated tax: $'.$estimatedTax.'<br>
         }
     }
 
-    public function addTotalRow($key, $options)
+    public function addTotalRow($name, $options)
     {
         $cart = self::sessionCart();
         $totals = BUtil::fromJson($cart->totals_json);
-        $totals[$key] = $options;
-        $cart->totals_json = Butil::toJson($totals);
+        $totals[$name] = array('name' => $name, 'options' => $options);
+        $cart->totals_json = BUtil::toJson($totals);
         $cart->save();
     }
 
     public function calculateTotals()
     {
+        $this->calc_balance = 0;
         $totals = BUtil::fromJson($this->totals_json);
-
-        $totalObjects = array();
-        foreach ($totals as $key => $options) {
-            $obj = new stdClass();
-            $obj->name = $key;
-            $obj->options = $options;
-            $totalObjects[$key] = $obj;
+        $sorted = $this->sortTotals($totals);
+        if (!$sorted) {
+            return;
         }
 
+        foreach($sorted as $key => $totalMethod) {
+            if (empty($totalMethod['options']['callback'])) {
+                continue;
+            }
+            list($class, $func) = explode(".", $totalMethod['options']['callback']);
+            if (!is_callable("$class::i()->{$func}()")) {
+                continue;
+            }
+            $totals[$key]['total'] = $class::i()->{$func}();
+            $this->calc_balance += $totals[$key]['total'];
+        }
+        $this->totals_json = BUtil::toJson($totals);
+        $this->save();
+    }
+
+    public function getTotals()
+    {
+        return BUtil::fromJson($this->totals_json);
+    }
+
+
+    public function sortTotals($totals)
+    {
+        $totalObjects = $totals;
         // take care of 'load_after' option
-        foreach ($totalObjects as $key => $total) {
-            if ($total->options['after']) {
-                $total->parents[] = $total->options['after'];
-                $totalObjects[$total->options['after']]->children[] = $total->name;
+        foreach ($totalObjects as $index => $data) {
+            if (!empty($data['options']['after'])) {
+                $totalObjects[$index]['parents'][] = $data['options']['after'];
+                $totalObjects[$data['options']['after']]['children'][] = $data['name'];
             }
         }
+
         // get modules without dependencies
         $rootModules = array();
-        foreach ($totalObjects as $key => $total) {
-            if (empty($total->parents)) {
-                $rootModules[] = $total;
+        foreach ($totalObjects as $data) {
+            if (empty($data['parents'])) {
+                $rootModules[] = $data;
             }
         }
 
         $sorted = array();
         while($totalObjects) {
             // check for circular reference
-            if (!$rootModules)die("circular reference");// return false;
+            if (!$rootModules) return false;
             // remove this node from root modules and add it to the output
             $n = array_pop($rootModules);
 
-            $sorted[$n->name] = $n;
+            $sorted[$n['name']] = $n;
 
-            if (empty($n->children)) {
-                break;
+            if (empty($n['children'])) {
+                unset($totalObjects[$n['name']]);
+                continue;
             }
             // for each of its children: queue the new node, finally remove the original
-            for ($i = count($n->children)-1; $i>=0; $i--) {
+            for ($i = count($n['children'])-1; $i>=0; $i--) {
                 // get child module
-                $childModule = $totalObjects[$n->children[$i]];
+                $childModule = $totalObjects[$n['children'][$i]];
                 // remove child modules from parent
-                unset($n->children[$i]);
+                unset($n['children'][$i]);
                 // remove parent from child module
-                unset($childModule->parents[array_search($n->name, $childModule->parents)]);
+                unset($childModule['parents'][array_search($n['name'], $childModule['parents'])]);
                 // check if this child has other parents. if not, add it to the root modules list
-                if (!$childModule->parents) array_push($rootModules, $childModule);
+                if (empty($childModule['parents'])) array_push($rootModules, $childModule);
             }
             // remove processed module from list
-            unset($totalObjects[$n->name]);
+            unset($totalObjects[$n['name']]);
         }
+
+        $sortedTotals = array();
+        foreach($sorted as $key => $data){
+            $sortedTotals[$key] = $totals[$key];
+        }
+        return $sortedTotals;
     }
 
-    public function subtotal()
+    //todo: rename to subtotalCallback
+    public function subtotalCallback()
     {
         $cart = self::sessionCart();
         return $cart->subtotal;
     }
 
-    public function discount()
+    //this is example
+    //todo: move this to discout module when it will be ready
+    public function discountCallback()
     {
         $cart = self::sessionCart();
         if ($cart->discount_code) {
-            return 10;
+            return -10;
         }
         return 0;
     }

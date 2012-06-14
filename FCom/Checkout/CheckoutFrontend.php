@@ -48,13 +48,16 @@ class FCom_Checkout_Frontend extends BClass
         BLayout::i()->view('cart/header')->cartItemPrice = $itemPrice;
         BLayout::i()->view('cart/header')->cartItemNum = $itemNum;
 
-        FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotal', 'after'=>''));
+        FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotalCallback', 'label' => 'Items', 'after'=>''));
         if ($cart->shipping_method) {
-            FCom_Checkout_Model_Cart::i()->addTotalRow('shipping', array('callback'=>$cart->shipping_method.'.getPrice', 'after'=>'subtotal'));
+            FCom_Checkout_Model_Cart::i()->addTotalRow('shipping', array('callback'=>'FCom_'.$cart->shipping_method.'.getPrice',
+                'label' => 'Shipping', 'after'=>'subtotal'));
         }
         if ($cart->discount_code) {
-            FCom_Checkout_Model_Cart::i()->addTotalRow('discount', array('callback'=>'FCom_Checkout_Model_Cart.discount', 'after'=>'shipping'));
+            FCom_Checkout_Model_Cart::i()->addTotalRow('discount', array('callback'=>'FCom_Checkout_Model_Cart.discountCallback',
+                'label' => 'Discount', 'after'=>'shipping'));
         }
+
     }
 
     static public function layout()

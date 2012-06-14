@@ -68,7 +68,14 @@
 <br/><br/>
 <h4>Shipping Summary:</h4>
 
-<?=$this->cart->totalAsHtml();?>
+<?php if (!empty($this->totals)) : ?>
+    <ul>
+    <?php foreach($this->totals as $totals) :?>
+        <li><?=$totals['options']['label']?>: <?=$totals['total']?></li>
+    <?php endforeach; ?>
+        <li>Grand total: <?=$this->cart->calc_balance?></li>
+    </ul>
+<?php endif; ?>
 <br/><br/>
 
 <b>Coupon, discount or promo code:</b>
