@@ -358,7 +358,7 @@ Estimated tax: $'.$estimatedTax.'<br>
         return $html;
     }
 */
-     public function addShippingMethod($method, $class)
+    public function addShippingMethod($method, $class)
     {
         $this->shippingMethods[$method] = $class;
     }
@@ -378,6 +378,11 @@ Estimated tax: $'.$estimatedTax.'<br>
             }
         }
         return $this->shippingClasses;
+    }
+
+    public function getShippingClassName($method)
+    {
+        return $this->shippingMethods[$method];
     }
 
     public function getShippingMethod($method)
@@ -416,7 +421,17 @@ Estimated tax: $'.$estimatedTax.'<br>
             if (!is_callable("$class::i()->{$func}()")) {
                 continue;
             }
-            $totals[$key]['total'] = $class::i()->{$func}();
+            $res = $class::i()->{$func}($this);
+            if (false === $res) {
+                $totals[$key]['total'] = 0;
+                if (is_callable("$class::i()->getError()")) {
+                    $totals[$key]['error'] = $class::i()->getError();
+                }
+
+            } else {
+                $totals[$key]['total'] = $res;
+            }
+
             $this->calc_balance += $totals[$key]['total'];
         }
         $this->totals_json = BUtil::toJson($totals);
@@ -542,5 +557,16 @@ ADD `discount_code` VARCHAR( 50 ) NOT NULL,
 ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
             ADD `totals_json` TEXT NOT NULL "
         );
+    }
+
+    public static function upgrade_0_1_4()
+    {
+        if (BDb::ddlFieldInfo(static::table(), "shipping_service")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `shipping_service` CHAR( 2 ) NOT NULL AFTER `shipping_price`"
+        );
+
     }
 }

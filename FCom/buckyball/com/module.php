@@ -388,6 +388,7 @@ echo "</pre>"; exit;
             $mod->bootstrap();
             $this->popModule();
         }
+        BPubSub::i()->fire('bootstrap::after');
         return $this;
     }
 

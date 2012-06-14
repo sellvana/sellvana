@@ -18,7 +18,16 @@
     <?php foreach($this->shippingMethods as $shippingMethod => $shippingClass): ?>
     <li><input type="radio" name="shipping_method" value="<?=$shippingMethod?>"
         <?= $shippingMethod == $this->cart->shipping_method ? 'checked' : '' ?>>
-        <?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)</li>
+        <?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)
+        <ul>
+        <?php foreach($shippingClass->getServices() as $serviceKey => $service) :?>
+            <li style="margin-left: 20px;">
+                <input type="radio" name="shipping_service" value="<?=$serviceKey?>"
+                <?= $shippingMethod == $this->cart->shipping_method &&
+                        $serviceKey == $this->cart->shipping_service ? 'checked' : '' ?>> <?=$service?></li>
+        <?php endforeach; ?>
+        </ul>
+    </li>
     <?php endforeach; ?>
 </ul>
 <input type="submit" name="update" value="Apply changes">
@@ -71,7 +80,11 @@
 <?php if (!empty($this->totals)) : ?>
     <ul>
     <?php foreach($this->totals as $totals) :?>
-        <li><?=$totals['options']['label']?>: <?=$totals['total']?></li>
+        <li><?=$totals['options']['label']?>: <?=$totals['total']?>
+            <?php if (!empty($totals['error'])) :?>
+                (<span style="color:red"><?=$totals['error']?></span>)
+            <?php endif; ?>
+        </li>
     <?php endforeach; ?>
         <li>Grand total: <?=$this->cart->calc_balance?></li>
     </ul>
