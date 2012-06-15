@@ -100,10 +100,5 @@ class FCom_Checkout_Frontend extends BClass
         ));
     }
 
-    public function getShippingMethods()
-    {
-        return array(new stdClass());
-    }
-
 }
 
