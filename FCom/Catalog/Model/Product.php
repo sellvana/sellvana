@@ -122,5 +122,18 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
         ");
     }
+
+    public static function upgrade_0_1_2()
+    {
+        $tProduct = static::table();
+        $field = BDb::ddlFieldInfo($tProduct, 'weight');
+        if ($field){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `weight` DECIMAL( 10, 4 ) NOT NULL
+        ");
+
+    }
 }
 

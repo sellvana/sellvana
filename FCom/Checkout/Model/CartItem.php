@@ -19,6 +19,21 @@ class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
         return $this->price;
     }
 
+    public function isGroupAble()
+    {
+        return  true;
+    }
+
+    public function getWeight()
+    {
+        return $this->product()->weight;
+    }
+
+    public function getQty()
+    {
+        return $this->qty;
+    }
+
     public static function install()
     {
         $tCartItem = static::table();

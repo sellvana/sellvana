@@ -131,7 +131,7 @@
         ),
         // catalog views and controllers
         'FCom_Catalog' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.2',
             'root_dir' => 'Catalog',
             'depends' => array('FCom_Core'),
             'description' => "Categories and products management, admin and frontend",
@@ -220,6 +220,9 @@
             'depends' => array('FCom_Checkout'),
             'bootstrap' => array('file'=>'ShippingUps.php', 'callback'=>'FCom_ShippingUps::bootstrap'),
             'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'ShippingUpsAdmin.php', 'callback'=>'FCom_ShippingUps_Admin::bootstrap'),
+                ),
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'ShippingUps.php', 'callback'=>'FCom_ShippingUps::bootstrap'),
                 ),
