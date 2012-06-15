@@ -229,6 +229,19 @@
             ),
             'description' => "Universal post service shipping module for checkout",
         ),
+        'FCom_Wishlist' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Wishlist',
+            'migrate' => 'FCom_Wishlist_Migrate',
+            'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),
+            'areas' => array(
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'WishlistFrontend.php', 'callback'=>'FCom_Wishlist_Frontend::bootstrap'),
+                ),
+            ),
+            'description' => "Wishlist functionality",
+        ),
         'FCom_Email' => array(
             'version' => '0.1.0',
             'root_dir' => 'Email',

@@ -15,6 +15,7 @@ $cat = $this->category;
                             <label for="qty">Qty:</label>
                             <input type="text" name="qty" id="qty" maxlength="12" value="1" title="Qty" class="input-text qty">
                             <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="add_cart(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
+                            <button type="button" title="Add to Wishlist" class="button btn-add-to-cart" onclick="add_wishlist(<?=$prod->id?>)"><span>+ Add to Wishlist</span></button>
 
                             <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$prod->id?>"> Compare</label>
 

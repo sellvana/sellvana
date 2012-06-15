@@ -13,7 +13,7 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
     }
 
     public function apiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
-    {
+    { 
         $config = BConfig::i()->get('modules/FCom_ShippingUps');
         $password = $config['password'];
         $account = $config['account'];
