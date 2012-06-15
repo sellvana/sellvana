@@ -80,7 +80,7 @@
 <?php if (!empty($this->totals)) : ?>
     <ul>
     <?php foreach($this->totals as $totals) :?>
-        <li><?=$totals['options']['label']?>: <?=$totals['total']?>
+        <li><?=$totals['options']['label']?>: $<?=$totals['total']?>
             <?php if (!empty($totals['error'])) :?>
                 (<span style="color:red"><?=$totals['error']?></span>)
             <?php endif; ?>

@@ -2,30 +2,33 @@
 
 class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
 {
+    protected $name = 'Universal post service';
+    protected $code = 'ShippingUps';
     protected $rate;
 
     public static function bootstrap()
     {
         include_once __DIR__ .'/lib/UpsRate.php';
         FCom_Checkout_Model_Cart::i()->addShippingMethod('ShippingUps', 'FCom_ShippingUps');
-
     }
 
-    public function apiCall($shipNumber, $fromzip, $tozip, $service, $length, $width, $height, $weight)
+    public function apiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
     {
-        $this->rate = new UpsRate('FC7DECC55E57CF90','A31T84','UPS!@#*()', $shipNumber);
+        $config = BConfig::i()->get('modules/FCom_ShippingUps');
+        $password = $config['password'];
+        $account = $config['account'];
+        $accessKey = $config['access_key'];
+        $fromzip = BConfig::i()->get('modules/FCom_Checkout/store_zip');
+
+        $this->rate = new UpsRate($accessKey,$account, $password, $shipNumber);
         $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
     }
 
-    public function getEstimate($tozip=0, $service=01, $length=0, $width=0, $height=0, $weight=0)
+    public function getEstimate()
     {
         if (!$this->rate) {
             $cart = FCom_Checkout_Model_Cart::sessionCart();
-            $fromzip = 82108;
-            $tozip = 90203;
-            $service = $serviceNumber ? $serviceNumber : $cart->shipping_service;
-            $length = $width = $height = $weight = 10;
-            $this->apiCall($cart->id(), $fromzip, $tozip, $service, $length, $width, $height, $weight);
+            $this->getRateCallback($cart);
         }
         $estimate = $this->rate->getEstimate();
         if (!$estimate) {
@@ -59,17 +62,53 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
 
     public function getRateCallback($cart)
     {
-        $this->rate = new UpsRate('FC7DECC55E57CF90','A31T84','UPS!@#*()', $cart->id());
         //address
-        $fromzip = 82108;
         $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
         $tozip = $shippingAddress->zip;
         //service
-        $service = $cart->shipping_service;
-        //package
+        if ($cart->shipping_method == $this->code) {
+            $service = $cart->shipping_service;
+        } else {
+            $service = '01';
+        }
+        //package dimension
+        $items = $cart->items();
         $length = $width = $height = 10;
-        $weight = 10;
-        return $this->apiCall($cart->id(), $fromzip, $tozip, $service, $length, $width, $height, $weight);
+        $packages = array();
+        $packageId = 0;
+        $groupPackageId = 0;
+        foreach($items as $item) {
+            if ( $item->getWeight() > 250 ||  $item->getWeight() == 0 ) {
+                continue;
+            }
+            for ($i = 0; $i < $item->getQty(); $i++) {
+                if ($item->isGroupAble()){
+                    if (!empty($packages[$groupPackageId]) && $item->getWeight() + $packages[$groupPackageId] >= 150) {
+                        $packageId++;
+                        $groupPackageId = $packageId;
+                    }
+                    if (!empty($packages[$groupPackageId])) {
+                        $packages[$groupPackageId] += $item->getWeight();
+                    } else {
+                        $packages[$groupPackageId] = $item->getWeight();
+                    }
+
+                } else {
+                    $packageId++;
+                    $packages[$packageId] = $item->getWeight();
+                }
+            }
+        }
+        //package weight
+        $total = 0;
+        foreach($packages as $pack) {
+            $this->apiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
+            if ($this->rate->isError()) {
+                 continue;
+            }
+            $total += $this->rate->getTotal();
+        }
+        return $total;
     }
 
     public function getError()
@@ -77,13 +116,8 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
         return $this->rate->getError();
     }
 
-    public function getPrice()
-    {
-        return 2;
-    }
-
     public function getDescription()
     {
-        return 'Universal post service';
+        return $this->name;
     }
 }

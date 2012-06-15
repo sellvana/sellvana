@@ -86,30 +86,43 @@ class UpsRate {
 			</PackageWeight>
 		    </Package>
 		</Shipment>
-		</RatingServiceSelectionRequest>";
-		$ch = curl_init("https://www.ups.com/ups.app/xml/Rate");
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch,CURLOPT_POST,1);
-		curl_setopt($ch,CURLOPT_TIMEOUT, 60);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
-		$result=curl_exec ($ch);
-                //echo '<!-- '. $result. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
-                $ratings = new SimpleXMLElement($result);
-                $this->response = $ratings;
-                echo '<!-- '. print_r($ratings, 1). ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
-                if ($ratings->Response->ResponseStatusCode == 1) {
-                    return (string) $ratings->RatedShipment->TotalCharges->MonetaryValue;
-                }
-        return false;
+        </RatingServiceSelectionRequest>";
+	$ch = curl_init("https://www.ups.com/ups.app/xml/Rate");
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch,CURLOPT_POST,1);
+	curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+	$result=curl_exec ($ch);
+        //echo '<!-- '. $result. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
+        $ratings = new SimpleXMLElement($result);
+        $this->response = $ratings;
+        //echo '<!-- '. print_r($ratings, 1). ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
 
+        if ($this->isError()) {
+            return false;
+        }
+        return $this->getTotal();
     }
 
-    public function getEstimate ()
+    public function getTotal()
+    {
+        return (string) $this->response->RatedShipment->TotalCharges->MonetaryValue;
+    }
+
+    public function getEstimate()
     {
         return (string) $this->response->RatedShipment->GuaranteedDaysToDelivery;
+    }
+
+    public function isError()
+    {
+        if ($this->response->Response->ResponseStatusCode != 1) {
+            return true;
+        }
+        return false;
     }
 
     public function getError()

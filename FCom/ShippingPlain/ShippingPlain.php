@@ -9,7 +9,7 @@ class FCom_ShippingPlain extends FCom_Checkout_Model_Shipping_Abstract
 
     public function getEstimate()
     {
-        return 'approx. 2-4 days';
+        return '2-4 days';
     }
 
     public function getServices()
