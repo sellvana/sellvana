@@ -116,7 +116,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
         BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
-        $data = BDb::many_as_array($orm->find_many());
+        $data = $orm->find_many();//BDb::many_as_array($orm->find_many());
 
         $gridId = 'linked_products_'.$type;
         $config = array(
@@ -151,7 +151,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        extract($args);
+        $model = $args['model'];
+        $data = BRequest::i()->post();
         $this->processCategoriesPost($model);
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
@@ -200,6 +201,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
     public function processLinkedProductsPost($model, $data)
     {
+        //echo "<pre>"; print_r($data); echo "</pre>";
         $hlp = FCom_Catalog_Model_ProductLink::i();
         foreach (array('related', 'similar') as $type) {
             $typeName = 'linked_products_'.$type;
@@ -220,12 +222,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             'link_type' => $type,
                             'linked_product_id' => $linkedId,
                         ))->save();
-#echo "<pre>"; print_r($m->as_array()); echo "</pre>";
                     }
                 }
             }
         }
-#exit;
+//exit;
         return $this;
     }
 

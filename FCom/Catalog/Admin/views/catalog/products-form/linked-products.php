@@ -1,6 +1,8 @@
 <?php
 $m = $this->model;
 $prodCtrl = FCom_Catalog_Admin_Controller_Products::i();
+
+$prodCtrl->linkedProductGridConfig($m, 'related');
 ?>
 <div id="linked-products-layout">
     <div class="ui-layout-west">
