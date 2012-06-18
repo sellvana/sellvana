@@ -30,6 +30,10 @@ class FCom_Checkout_Frontend extends BClass
         BPubSub::i()->on('FCom_Customer_Model_Customer::login.after', 'FCom_Checkout_Model_Cart::userLogin');
         BPubSub::i()->on('FCom_Customer_Model_Customer::logout.before', 'FCom_Checkout_Model_Cart::userLogout');
 
+        //add to cart
+        BPubSub::i()->on('FCom_Catalog_Frontend_Controller::action_product.addToCart',
+                'FCom_Checkout_Frontend_Controller::onAddToCart');
+
         BPubSub::i()->on('bootstrap::after', 'FCom_Checkout_Frontend::initCartTotals');
 
         BLayout::i()->addAllViews('Frontend/views')

@@ -50,4 +50,15 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect($wishlistHref);
         }
     }
+
+    public static function onAddToWishlist($args)
+    {
+        $product = $args['product'];
+        if (!$product || !$product->id()) {
+            return false;
+        }
+
+        $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
+        $wishlist->addItem($product->id());
+    }
 }
