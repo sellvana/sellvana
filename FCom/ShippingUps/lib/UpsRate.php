@@ -5,10 +5,18 @@ class UpsRate {
     protected $Password;
     protected $shipperNumber;
     protected $credentials;
+    protected $rateApiUrl = 'https://www.ups.com/ups.app/xml/Rate';
 
     protected $response;
 
-    function UpsRate($access,$user,$pass,$shipper) {
+    public function __construct($rateApiUrl='')
+    {
+        if (!empty($rateApiUrl)) {
+            $this->rateApiUrl = $rateApiUrl;
+        }
+    }
+    public function setUpsParams($access,$user,$pass,$shipper)
+    {
 	$this->AccessLicenseNumber = $access;
 	$this->UserID = $user;
 	$this->Password = $pass;
@@ -17,7 +25,7 @@ class UpsRate {
     }
 
     // Define the function getRate() - no parameters
-    public function getRate($PostalCode,$dest_zip,$service,$length,$width,$height,$weight)
+    public function getRate($fromZip,$toZip,$service,$length,$width,$height,$weight)
     {
 	if ($this->credentials != 1) {
 		print 'Please set your credentials with the setCredentials function';
@@ -45,26 +53,26 @@ class UpsRate {
 		<Shipment>
 		    <Shipper>
 			<Address>
-			    <PostalCode>$PostalCode</PostalCode>
+			    <PostalCode>".addslashes($fromZip)."</PostalCode>
 			    <CountryCode>US</CountryCode>
 			</Address>
 		    <ShipperNumber>$this->shipperNumber</ShipperNumber>
 		    </Shipper>
 		    <ShipTo>
 			<Address>
-			    <PostalCode>$dest_zip</PostalCode>
+			    <PostalCode>".addslashes($toZip)."</PostalCode>
 			    <CountryCode>US</CountryCode>
 			<ResidentialAddressIndicator/>
 			</Address>
 		    </ShipTo>
 		    <ShipFrom>
 			<Address>
-			    <PostalCode>$PostalCode</PostalCode>
+			    <PostalCode>".addslashes($fromZip)."</PostalCode>
 			    <CountryCode>US</CountryCode>
 			</Address>
 		    </ShipFrom>
 		    <Service>
-			<Code>$service</Code>
+			<Code>".addslashes($service)."</Code>
 		    </Service>
 		    <Package>
 			<PackagingType>
@@ -74,20 +82,22 @@ class UpsRate {
 			    <UnitOfMeasurement>
 				<Code>IN</Code>
 			    </UnitOfMeasurement>
-			    <Length>$length</Length>
-			    <Width>$width</Width>
-			    <Height>$height</Height>
+			    <Length>".  addslashes($length)."</Length>
+			    <Width>".addslashes($width)."</Width>
+			    <Height>".addslashes($height)."</Height>
 			</Dimensions>
 			<PackageWeight>
 			    <UnitOfMeasurement>
 				<Code>LBS</Code>
 			    </UnitOfMeasurement>
-			    <Weight>$weight</Weight>
+			    <Weight>".addslashes($weight)."</Weight>
 			</PackageWeight>
 		    </Package>
 		</Shipment>
         </RatingServiceSelectionRequest>";
-	$ch = curl_init("https://www.ups.com/ups.app/xml/Rate");
+
+	$ch = curl_init($this->rateApiUrl);
+
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 	curl_setopt($ch,CURLOPT_POST,1);
 	curl_setopt($ch,CURLOPT_TIMEOUT, 60);
