@@ -13,14 +13,11 @@ $cat = $this->category;
                     <input type="hidden" name="id" value="<?=$prod->id?>">
                     <div class="product-shop">
                         <div class="add-to-cart">
-                            <label for="qty">Qty:</label>
-                            <input type="text" name="qty" id="qty" maxlength="12" value="1" title="Qty" class="input-text qty">
-                            <button type="submit" title="Add to Cart" class="button btn-add-to-cart"
-                                onclick="add_cart(<?=$prod->id?>, this.form.qty.value);" name="add2cart" value="<?=$prod->id?>"
-                                ><span>+ Add to Cart</span></button>
-                            <button type="submit" title="Add to Wishlist" class="button btn-add-to-cart"
-                                    onclick="add_wishlist(<?=$prod->id?>)" name="add2wishlist" value="<?=$prod->id?>"
-                                    ><span>+ Add to Wishlist</span></button>
+
+                            <?=$this->view('cart/add2cart')->set('prod', $prod)?>
+
+                             <?=$this->view('wishlist/add2wishlist')->set('prod', $prod)?>
+
                             <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$prod->id?>"> Compare</label>
 
                             <?=$this->view('compare/block')?>
