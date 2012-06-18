@@ -8,6 +8,10 @@ class FCom_Wishlist_Frontend extends BClass
             ->route( 'GET /wishlist', 'FCom_Wishlist_Frontend_Controller.wishlist')
             ->route( 'POST /wishlist', 'FCom_Wishlist_Frontend_Controller.wishlist_post');
 
+        //add to wishlist
+        BPubSub::i()->on('FCom_Catalog_Frontend_Controller::action_product.addToWishlist',
+                'FCom_Wishlist_Frontend_Controller::onAddToWishlist');
+
         BLayout::i()->addAllViews('Frontend/views')
                 ->afterTheme('FCom_Wishlist_Frontend::layout');
     }

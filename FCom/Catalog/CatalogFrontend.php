@@ -11,6 +11,7 @@ class FCom_Catalog_Frontend extends BClass
                 //catalog
             ->route( 'GET /*manuf', 'FCom_Catalog_Frontend_Controller.manuf')
             ->route( 'GET /:product', 'FCom_Catalog_Frontend_Controller.product')
+            ->route( 'POST /:product', 'FCom_Catalog_Frontend_Controller.product_post')
             ->route( 'GET /*category/:product', 'FCom_Catalog_Frontend_Controller.product')
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
         ;

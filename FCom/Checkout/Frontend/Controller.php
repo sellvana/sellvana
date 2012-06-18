@@ -66,4 +66,18 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect($cartHref);
         }
     }
+
+    public static function onAddToCart($args)
+    {
+        $product = $args['product'];
+        $qty = $args['qty'];
+        if (!$product || !$product->id()) {
+            return false;
+        }
+
+        $qty = !empty($qty) ? $qty : 1;
+        $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+        $options=array('qty' => $qty, 'price' => $product->base_price);
+        $cart->addProduct($product->id(), $options);
+    }
 }

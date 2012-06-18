@@ -48,6 +48,27 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BResponse::i()->render();
     }
 
+    public function action_product_post()
+    {
+        $r = explode('/', BRequest::i()->params('product'));
+        $href = $r[0];
+
+        $post = BRequest::post();
+        $product = FCom_Catalog_Model_Product::i()->load($post['id']);
+        if (!$product) {
+            BResponse::i()->redirect($href);
+        }
+
+        if (!empty($post['add2cart'])) {
+            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToCart', array('product'=>&$product, 'qty' => $post['qty']));
+        }
+
+        if (!empty($post['add2wishlist'])) {
+            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
+        }
+        BResponse::i()->redirect($href);
+    }
+
     public function action_compare()
     {
         $layout = BLayout::i();

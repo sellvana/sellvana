@@ -222,6 +222,8 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         }
         if (empty($options['price']) || !is_numeric($options['price'])) {
             $options['price'] = 0;
+        } else {
+            $options['price'] = $options['price'] * $options['qty'];
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item) {
