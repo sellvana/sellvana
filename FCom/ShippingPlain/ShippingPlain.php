@@ -17,6 +17,26 @@ class FCom_ShippingPlain extends FCom_Checkout_Model_Shipping_Abstract
         return array('01' => 'Air', '02' => 'Ground');
     }
 
+    public function getDefaultService()
+    {
+        return array('02' => 'Ground');
+    }
+
+    public function getServicesSelected()
+    {
+        $c = BConfig::i();
+        $selected = array();
+        foreach($this->getServices() as $sId => $sName) {
+            if ($c->get('modules/FCom_ShippingPlain/services/s'.$sId) == 1) {
+                $selected[$sId] = $sName;
+            }
+        }
+        if (empty($selected)) {
+            $selected = $this->getDefaultService();
+        }
+        return $selected;
+    }
+
     public function getRateCallback($cart)
     {
         return rand(10,100);

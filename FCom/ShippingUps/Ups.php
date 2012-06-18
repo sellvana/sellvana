@@ -1,6 +1,6 @@
 <?php
 
-class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
+class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
 {
     protected $name = 'Universal post service';
     protected $code = 'ShippingUps';
@@ -8,19 +8,25 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
 
     public static function bootstrap()
     {
-        include_once __DIR__ .'/lib/UpsRate.php';
-        FCom_Checkout_Model_Cart::i()->addShippingMethod('ShippingUps', 'FCom_ShippingUps');
     }
 
-    public function apiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
-    { 
+    public function rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
+    {
         $config = BConfig::i()->get('modules/FCom_ShippingUps');
-        $password = $config['password'];
-        $account = $config['account'];
-        $accessKey = $config['access_key'];
+        $password = !empty($config['password']) ? $config['password'] : '';
+        $account = !empty($config['account']) ? $config['account'] : '';
+        $accessKey = !empty($config['access_key']) ? $config['access_key'] : '';
+        $rateApiUrl = !empty($config['rate_api_url']) ? $config['rate_api_url'] : '';
+
+        //todo: notify if fromzip is not set
         $fromzip = BConfig::i()->get('modules/FCom_Checkout/store_zip');
 
-        $this->rate = new UpsRate($accessKey,$account, $password, $shipNumber);
+        if (empty($accessKey) || empty($account) || empty($password)) {
+            return false;
+        }
+
+        $this->rate = new UpsRate($rateApiUrl);
+        $this->rate->setUpsParams($accessKey,$account, $password, $shipNumber);
         $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
     }
 
@@ -58,6 +64,26 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
             '59' => 'UPS Second Day Air AM',
             '65' => 'UPS Saver'
         );
+    }
+
+    public function getDefaultService()
+    {
+        return array('03' => 'UPS Ground');
+    }
+
+    public function getServicesSelected()
+    {
+        $c = BConfig::i();
+        $selected = array();
+        foreach($this->getServices() as $sId => $sName) {
+            if ($c->get('modules/FCom_ShippingUps/services/s'.$sId) == 1) {
+                $selected[$sId] = $sName;
+            }
+        }
+        if (empty($selected)) {
+            $selected = $this->getDefaultService();
+        }
+        return $selected;
     }
 
     public function getRateCallback($cart)
@@ -102,7 +128,7 @@ class FCom_ShippingUps extends FCom_Checkout_Model_Shipping_Abstract
         //package weight
         $total = 0;
         foreach($packages as $pack) {
-            $this->apiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
+            $this->rateApiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
             if ($this->rate->isError()) {
                  continue;
             }

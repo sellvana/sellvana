@@ -20,7 +20,7 @@
         <?= $shippingMethod == $this->cart->shipping_method ? 'checked' : '' ?>>
         <?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)
         <ul>
-        <?php foreach($shippingClass->getServices() as $serviceKey => $service) :?>
+        <?php foreach($shippingClass->getServicesSelected() as $serviceKey => $service) :?>
             <li style="margin-left: 20px;">
                 <input type="radio" name="shipping_service" value="<?=$serviceKey?>"
                 <?= $shippingMethod == $this->cart->shipping_method &&
