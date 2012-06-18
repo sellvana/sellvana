@@ -85,10 +85,22 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'similar')) ?>
 				            </tbody>
 				        </table>
-        			</div>
+        	</div>
+                <div class="tab-content">
+                    	<h4>Related Products</h4>
+                    	<table class="product-list">
+				        	<colgroup><col width="30">
+				        	<col width="60">
+				        	<col>
+				        	<col width="180">
+				            </colgroup><tbody>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'related')) ?>
+				            </tbody>
+				        </table>
+        	</div>
                     <div class="tab-content">
                         <h4>Family Products</h4>
                         <table class="product-list">
