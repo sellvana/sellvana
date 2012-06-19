@@ -30,6 +30,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('css', 'boilerplate_post', array('file'=>'{FCom_Frontend}/css/boilerplate_post.css')),
                         array('css', 'pnotify', array('file'=>'{FCom_Core}/js/lib/css/jquery.pnotify.default.css')),
                         array('js_raw', 'js_init', array('content'=>"window.less={env:'development'}")),
+                        array('js_raw', 'js_base_href', array('content'=>"base_href='".BApp::baseUrl()."'")),
                         array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),

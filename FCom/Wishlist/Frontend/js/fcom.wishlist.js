@@ -11,6 +11,6 @@ function FulleronWishlist(opt) {
 }
 
 function add_wishlist(id){
-    var fc = new FulleronWishlist({"apiUrl":"/wishlist"});
+    var fc = new FulleronWishlist({"apiUrl":base_href + "wishlist"});
     fc.add(id, 1);
 }

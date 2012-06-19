@@ -11,6 +11,6 @@ function FulleronCart(opt) {
 }
 
 function add_cart(id, qty){
-    var fc = new FulleronCart({"apiUrl":"/cart"});
+    var fc = new FulleronCart({"apiUrl":base_href + "cart"});
     fc.add(id, qty);
 }
