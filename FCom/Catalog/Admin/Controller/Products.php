@@ -116,7 +116,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
         BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
-        $data = $orm->find_many();//BDb::many_as_array($orm->find_many());
+        //$data = BDb::many_as_array($orm->find_many());
+        $data = $orm->find_many();
 
         $gridId = 'linked_products_'.$type;
         $config = array(
@@ -126,12 +127,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'datatype'      => 'local',
                 'caption'       => $caption,
                 'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
+                    array('name'=>'id', 'label'=>'ID', 'index'=>'id', 'width'=>40, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
                     array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
                 ),
                 'rowNum'        => 10,
-                'sortname'      => 'p.product_name',
+                'sortname'      => 'product_name',
                 'sortorder'     => 'asc',
                 'autowidth'     => false,
                 'multiselect'   => true,
