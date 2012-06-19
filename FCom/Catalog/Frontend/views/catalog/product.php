@@ -1,4 +1,4 @@
-<?
+<?php
 $prod = $this->product;
 $cat = $this->category;
 ?>
