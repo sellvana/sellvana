@@ -216,7 +216,12 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     public function addProduct($productId, $options=array())
     {
-        $this->save();
+        if (!$this->id) {
+            //todo: save function should work without field set
+            $this->user_id = 0;
+            $this->save();
+        }
+
         if (empty($options['qty']) || !is_numeric($options['qty'])) {
             $options['qty'] = 1;
         }
