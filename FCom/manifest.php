@@ -168,7 +168,7 @@
         ),
         // catalog views and controllers
         'FCom_CustomField' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'CustomField',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
             'depends' => array('FCom_Catalog'),
@@ -292,7 +292,7 @@
         ),
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.1.2',
+            'version' => '0.1.1',
             'root_dir' => 'IndexTank',
             'depends' => array('FCom_Core'),
             'description' => "IndexTank API integration",
