@@ -16,8 +16,8 @@ class FCom_Customer_Frontend extends BClass
             ->route('GET|POST /customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
             ->route('GET /logout', 'FCom_Customer_Frontend_Controller.logout')
 
-            ->route('GET /myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
-            ->route('GET|POST /myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+            ->route('GET /customer/myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
+            ->route('GET|POST /customer/myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
 
             //addresses
             ->route('GET /customer/address/shipping', 'FCom_Customer_Frontend_Controller_Address.shipping')
@@ -50,6 +50,10 @@ class FCom_Customer_Frontend extends BClass
             '/customer/account'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/account')),
+            ),
+            '/customer/account/edit'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/account/edit')),
             ),
             '/customer/address'=>array(
                 array('layout', 'base'),
