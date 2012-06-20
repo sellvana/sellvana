@@ -77,6 +77,20 @@ class FCom_Catalog_Model_Product extends BModel
         return FCom_CustomField_Model_ProductField::i()->productFields($product);
     }
 
+    public function customFieldsShowOnFrontend()
+    {
+        $result = array();
+        $fields = FCom_CustomField_Model_ProductField::i()->productFields($this);
+        if ($fields) {
+            foreach ($fields as $f) {
+                if ($f->frontend_show) {
+                    $result[] = $f;
+                }
+            }
+        }
+        return $result;
+    }
+
 
     public function mediaORM($type)
     {

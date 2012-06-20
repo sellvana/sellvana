@@ -33,6 +33,9 @@ $cat = $this->category;
                         <div class="short-description">
                             <?=$this->q($prod->description)?>
                         </div>
+                        <div>
+                            <?=$this->view('customfields/product', array('prod' => $prod))?>
+                        </div>
                     </div>
 
                     <div class="product-img-box">
