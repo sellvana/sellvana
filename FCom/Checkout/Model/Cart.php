@@ -552,6 +552,7 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
 
     public static function upgrade_0_1_3()
     {
+        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo(static::table(), "shipping_method")){
             return;
         }
@@ -568,6 +569,7 @@ ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
 
     public static function upgrade_0_1_4()
     {
+        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo(static::table(), "shipping_service")){
             return;
         }
