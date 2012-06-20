@@ -115,22 +115,26 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             break;
         }
 
-        BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
-        //$data = BDb::many_as_array($orm->find_many());
-        $data = $orm->find_many();
+
 
         $gridId = 'linked_products_'.$type;
         $config = array(
             'grid' => array(
                 'id'            => $gridId,
-                'data'          => $data,
+                'data'          => null,
                 'datatype'      => 'local',
                 'caption'       => $caption,
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'width'=>30),
+                    'product_name' => array('label'=>'Product name', 'width'=>250),
+                    'manuf_sku' => array('label'=>'Mfr Part #', 'width'=>250),
+                ),
+                /*
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'id', 'width'=>40, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
                     array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
-                ),
+                ),*/
                 'rowNum'        => 10,
                 'sortname'      => 'product_name',
                 'sortorder'     => 'asc',
@@ -143,6 +147,19 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
         );
+
+        BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        $data = BDb::many_as_array($orm->find_many());
+        //unset unused columns
+        $columnKeys = array_keys($config['grid']['columns']);
+        foreach($data as &$prod){
+            foreach($prod as $k => $p) {
+                if (!in_array($k, $columnKeys)) {
+                    unset($prod[$k]);
+                }
+            }
+        }
+        $config['grid']['data'] = $data;
 
         BPubSub::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
 
