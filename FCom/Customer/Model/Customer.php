@@ -76,7 +76,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     static public function sessionUserId()
     {
         $user = self::sessionUser();
-        return !empty($user) ? $user['id'] : false;
+        return !empty($user) ? $user->id() : false;
     }
 
     static public function isLoggedIn()
@@ -114,7 +114,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     static public function logout()
     {
         BPubSub::i()->fire(__METHOD__.'.before', array('user'=>$this));
-        
+
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
     }

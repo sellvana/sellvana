@@ -4,8 +4,12 @@
         <nav class="sup-links">
             <ul>
                 <?php if(FCom_Customer_Model_Customer::isLoggedIn()):?>
-                <li class="header-sup-signin">Hello <?=FCom_Customer_Model_Customer::sessionUser()->email?>
-                    <strong><a href="<?=BApp::href('logout')?>">Logout</a></strong></li>
+                    <li><strong><a href="<?=BApp::href('customer/myaccount')?>">My account</a></strong></li>
+                    <li class="header-sup-signin">
+                        Hello <?=FCom_Customer_Model_Customer::sessionUser()->email?>
+                        <strong><a href="<?=BApp::href('logout')?>">Logout</a></strong>
+                    </li>
+
                 <?php else: ?>
                     <li class="header-sup-signin">Hello there! <strong><a href="<?=BApp::href('login')?>">Sign in</a></strong></li>
                     <li class="header-sup-wishlist"><a href="<?=BApp::href('customer/register')?>">Sign up</a></li>
