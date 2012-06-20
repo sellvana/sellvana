@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
     public static function upgrade_0_1_2()
     {
         $tProduct = static::table();
+        BDb::ddlClearCache();
         $field = BDb::ddlFieldInfo($tProduct, 'weight');
         if ($field){
             return;

@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS {$tCartItem} (
     public static function upgrade_0_1_1()
     {
         $tCartItem = static::table();
+        BDb::ddlClearCache();
         $field = BDb::ddlFieldInfo($tCartItem, 'price');
         if ($field){
             return;
