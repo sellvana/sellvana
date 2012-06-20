@@ -22,15 +22,15 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
             BLayout::i()->view('indextank/product_fields')->set('status', false);
         }
 
-
+        $fld = FCom_IndexTank_Model_ProductField::i();
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
             'field_nice_name' => array('label'=>'Name', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
                 'baseLinkUrl' => BApp::href('indextank/product_fields/form'), 'idName' => 'id',
             )),
-            'search' => array('label'=>'Search'),
-            'facets' => array('label'=>'Facets'),
-            'scoring' => array('label'=>'Scoring'),
+            'search' => array('label'=>'Search', 'options'=>$fld->fieldOptions('search')),
+            'facets' => array('label'=>'Facets', 'options'=>$fld->fieldOptions('facets')),
+            'scoring' => array('label'=>'Scoring', 'options'=>$fld->fieldOptions('scoring')),
             'var_number' => array('label'=>'Scoring variable #'),
             'priority' => array('label'=>'Priority'),
             'filter' => array('label'=>'Filter type'),
