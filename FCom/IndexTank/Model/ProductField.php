@@ -4,6 +4,21 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_indextank_product_field';
 
+    protected static $_fieldOptions = array(
+        'search' => array(
+            '1' => 'Yes',
+            '0' => 'No'
+        ),
+        'facets' => array(
+            '1' => 'Yes',
+            '0' => 'No'
+        ),
+        'scoring' => array(
+            '1' => 'Yes',
+            '0' => 'No'
+        ),
+    );
+
     /**
     * Shortcut to help with IDE autocompletion
     *
