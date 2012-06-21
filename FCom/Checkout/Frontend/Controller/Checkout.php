@@ -67,6 +67,52 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $cart->discount_code = $post['discount_code'];
         }
         $cart->save();
+
+        if (!empty($post['place_order'])) {
+            //todo: create order
+            //redirect to payment page
+            $orderData = array();
+            $orderData['cart_id'] = $cart->id();
+            $orderData['user_id'] = $cart->user_id;
+            $orderData['item_qty']  = $cart->item_qty;
+            $orderData['subtotal']  = $cart->subtotal;
+            $orderData['shipping_method'] = $cart->shipping_method;
+            $orderData['shipping_service'] = $cart->shipping_service;
+            $orderData['payment_method'] = $cart->payment_method;
+            $orderData['payment_details'] = $cart->payment_details;
+            $orderData['discount_code'] = $cart->discount_code;
+            $orderData['tax'] = $cart->tax;
+            $orderData['total_json'] = $cart->total_json;
+            $orderData['balance'] = $cart->calc_balance;
+
+            $salesOrder = FCom_Sales_Model_Order::i()->load('cart_id', $cart->id());
+            if (!$salesOrder) {
+                $salesOrder = FCom_Sales_Model_Order::i()->add($orderData);
+            }
+
+            foreach ($cart->items() as $item) {
+                $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($salesOrder->id(), $item->product_id);
+                if ($testItem) {
+                    continue;
+                }
+                $orderItem = array();
+                $orderItem['order_id'] = $salesOrder->id();
+                $orderItem['product_id'] = $item->product_id;
+                $orderItem['qty'] = $item->qty;
+                $orderItem['total'] = $item->price;
+                FCom_Sales_Model_OrderItem::i()->add($orderItem);
+            }
+
+            //todo - made payment
+
+            //update sales order
+            $salesOrder->paid();
+
+            $href = BApp::href('checkout/success');
+            BResponse::i()->redirect($href);
+        }
+
+
         $href = BApp::href('checkout');
         BResponse::i()->redirect($href);
     }

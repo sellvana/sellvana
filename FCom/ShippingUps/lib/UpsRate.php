@@ -109,7 +109,7 @@ class UpsRate {
         //echo '<!-- '. $result. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
         $ratings = new SimpleXMLElement($result);
         $this->response = $ratings;
-        //echo '<!-- '. print_r($ratings, 1). ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
+        echo '<!-- '. print_r($ratings, 1). ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
 
         if ($this->isError()) {
             return false;
