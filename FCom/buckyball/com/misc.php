@@ -739,7 +739,7 @@ class BUtil
     */
     public static function post($url, $data)
     {
-        list($content) = static::i()->remoteHttp('POST', $url, $data);
+        list($content) = static::remoteHttp('POST', $url, $data);
         parse_str($content, $response);
         return $response;
     }
@@ -908,7 +908,7 @@ class BUtil
         }
         return $callback;
     }
-    
+
     public static function call($callback, $args=array(), $array=false)
     {
         $callback = static::extCallback($callback);
