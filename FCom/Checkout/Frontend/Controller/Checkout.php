@@ -85,7 +85,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['total_json'] = $cart->total_json;
             $orderData['balance'] = $cart->calc_balance;
 
-            $salesOrder = FCom_Sales_Model_Order::i()->load('cart_id', $cart->id());
+            $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
             if (!$salesOrder) {
                 $salesOrder = FCom_Sales_Model_Order::i()->add($orderData);
             }
@@ -103,12 +103,9 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 FCom_Sales_Model_OrderItem::i()->add($orderItem);
             }
 
-            //todo - made payment
+            //Made payment
 
-            //update sales order
-            $salesOrder->paid();
-
-            $href = BApp::href('checkout/success');
+            $href = BApp::href('paypal/redirect');
             BResponse::i()->redirect($href);
         }
 
