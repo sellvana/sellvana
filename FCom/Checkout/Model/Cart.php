@@ -420,23 +420,20 @@ Estimated tax: $'.$estimatedTax.'<br>
             return;
         }
 
-        foreach($sorted as $key => $totalMethod) {
+        foreach ($sorted as $key => $totalMethod) {
             if (empty($totalMethod['options']['callback'])) {
                 continue;
             }
-            list($class, $func) = explode(".", $totalMethod['options']['callback']);
-            if (!is_callable("$class::i()->{$func}()")) {
+            $callback = BUtil::extCallback($totalMethod['options']['callback']);
+            if (!is_callable($callback)) {
+                BDebug::warning('Invalid cart total callback: '.$key);
                 continue;
             }
-            $res = $class::i()->{$func}($this);
-            if (false === $res) {
+            try {
+                $totals[$key]['total'] = call_user_func($callback, $this);
+            } catch (FCom_Checkout_Exception_CartTotal $e) {
                 $totals[$key]['total'] = 0;
-                if (is_callable("$class::i()->getError()")) {
-                    $totals[$key]['error'] = $class::i()->getError();
-                }
-
-            } else {
-                $totals[$key]['total'] = $res;
+                $totals[$key]['error'] = $e->getMessage();
             }
 
             $this->calc_balance += $totals[$key]['total'];
@@ -463,19 +460,19 @@ Estimated tax: $'.$estimatedTax.'<br>
         }
 
         // get modules without dependencies
-        $rootModules = array();
+        $rootObjects = array();
         foreach ($totalObjects as $data) {
             if (empty($data['parents'])) {
-                $rootModules[] = $data;
+                $rootObjects[] = $data;
             }
         }
 
         $sorted = array();
         while($totalObjects) {
             // check for circular reference
-            if (!$rootModules) return false;
+            if (!$rootObjects) return false;
             // remove this node from root modules and add it to the output
-            $n = array_pop($rootModules);
+            $n = array_pop($rootObjects);
 
             $sorted[$n['name']] = $n;
 
@@ -486,13 +483,13 @@ Estimated tax: $'.$estimatedTax.'<br>
             // for each of its children: queue the new node, finally remove the original
             for ($i = count($n['children'])-1; $i>=0; $i--) {
                 // get child module
-                $childModule = $totalObjects[$n['children'][$i]];
+                $childObject = $totalObjects[$n['children'][$i]];
                 // remove child modules from parent
                 unset($n['children'][$i]);
                 // remove parent from child module
-                unset($childModule['parents'][array_search($n['name'], $childModule['parents'])]);
+                unset($childObject['parents'][array_search($n['name'], $childObject['parents'])]);
                 // check if this child has other parents. if not, add it to the root modules list
-                if (empty($childModule['parents'])) array_push($rootModules, $childModule);
+                if (empty($childObject['parents'])) array_push($rootObjects, $childObject);
             }
             // remove processed module from list
             unset($totalObjects[$n['name']]);

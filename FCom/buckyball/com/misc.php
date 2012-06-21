@@ -894,7 +894,7 @@ class BUtil
             .($params ? '?'.http_build_query($params) : '');
     }
 
-    public static function call($callback, $args=array(), $array=false)
+    public static function extCallback($callback)
     {
         if (is_string($callback)) {
             if (($c = explode('.', $callback))) {
@@ -902,8 +902,16 @@ class BUtil
             } elseif (($c = explode('->', $callback))) {
                 list($class, $method) = $c;
             }
-            $callback = array($class::i(), $method);
+            if (!empty($class)) {
+                $callback = array($class::i(), $method);
+            }
         }
+        return $callback;
+    }
+    
+    public static function call($callback, $args=array(), $array=false)
+    {
+        $callback = static::extCallback($callback);
         if ($array) {
             return call_user_func_array($callback, $args);
         } else {

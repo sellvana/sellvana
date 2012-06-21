@@ -338,7 +338,9 @@ class FCom_Core_Controller_Abstract extends BActionController
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
         $layout = BLayout::i();
-        $layout->applyTheme($theme);
+        if ($theme) {
+            $layout->applyTheme($theme);
+        }
         foreach ((array)$name as $l) {
             $layout->layout($l);
         }

@@ -1617,6 +1617,7 @@ class BModel extends Model
     {
         try {
             BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
+            BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
         } catch (BModelException $e) {
             return false;
         }
@@ -1674,6 +1675,7 @@ class BModel extends Model
     public function afterSave()
     {
         BPubSub::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
+        BPubSub::i()->fire('BModel::afterSave', array('model'=>$this));
         return $this;
     }
 
