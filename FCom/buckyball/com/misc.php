@@ -686,6 +686,7 @@ class BUtil
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
@@ -740,6 +741,14 @@ class BUtil
     public static function post($url, $data)
     {
         list($content) = static::remoteHttp('POST', $url, $data);
+        parse_str($content, $response);
+        return $response;
+    }
+
+    public static function httpClient($method, $url, $data)
+    {
+        $method = strtoupper($method);
+        list($content) = static::remoteHttp($method, $url, $data);
         parse_str($content, $response);
         return $response;
     }

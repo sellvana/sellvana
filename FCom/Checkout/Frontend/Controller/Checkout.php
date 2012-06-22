@@ -152,4 +152,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $href = BApp::href('checkout/payment');
         BResponse::i()->redirect($href);
     }
+
+    public function action_success()
+    {
+        $this->layout('/checkout/success');
+        BResponse::i()->render();
+    }
 }
