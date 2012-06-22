@@ -21,9 +21,14 @@ class FCom_Checkout_Frontend extends BClass
             ->route( 'GET /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
             ->route( 'POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping_post')
 
+            //checkout finish page
+            ->route( 'GET /checkout/success', 'FCom_Checkout_Frontend_Controller_Checkout.success')
+
             //shipping address
             ->route( 'GET /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
             ->route('POST /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address_post')
+
+
         ;
 
         //merge cart sessions after user login
@@ -85,7 +90,11 @@ class FCom_Checkout_Frontend extends BClass
             '/checkout/address'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('checkout/address'))
-            )
+            ),
+            '/checkout/success'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/success'))
+            ),
         ));
     }
 

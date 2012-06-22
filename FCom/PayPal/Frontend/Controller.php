@@ -11,32 +11,33 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             BResponse::i()->redirect($href);
         }
 
-        $baseUrl = BApp::m('FCom_PayPal')->baseHref();
+        $baseUrl = BApp::href('paypal');
 
         $nvpArr = array(
-//            'INVNUM'        => $salesOrder->id(),
-            'AMT'           => $salesOrder->balance,
-//            'PAYMENTACTION' => 'Sale',
-//            'CURRENCYCODE'  => 'USD',
-            'RETURNURL'     => $baseUrl.'/return',
-            'CANCELURL'     => $baseUrl.'/cancel',
+            'INVNUM'                            => $salesOrder->id(),
+            'PAYMENTREQUEST_0_AMT'              => number_format($salesOrder->balance, 2),
+            'PAYMENTREQUEST_0_PAYMENTACTION'    => 'Sale',
+            'PAYMENTREQUEST_0_CURRENCYCODE'     => 'USD',
+            'RETURNURL'                         => $baseUrl.'/return',
+            'CANCELURL'                         => $baseUrl.'/cancel',
             //'PAGESTYLE'     => 'paypal',
         );
 
         $resArr = FCom_PayPal_Api::i()->call('SetExpressCheckout', $nvpArr);
 //echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
         if (false===$resArr) {
-            throw new BException(print_r($resArr, 1));
+            throw new BException(FCom_PayPal_Api::i()->getError());
         }
         $sData =& BSession::i()->dataToUpdate();
         $sData['paypal']['token'] = $resArr['TOKEN'];
-        BResponse::i()->redirect(self::$_webUrl.'webscr?cmd=_express-checkout&useraction=commit&token='.$resArr['TOKEN']);
+        BResponse::i()->redirect(FCom_PayPal_Api::getExpressCheckoutUrl($resArr['TOKEN']));
     }
 
     public function action_return()
     {
         $sData =& BSession::i()->dataToUpdate();
-        $salesOrder = FCom_Sales_Model_Order::i()->load('cart_id', $cart->id());
+        $cart = FCom_Checkout_Model_Cart::sessionCart();
+        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
@@ -68,7 +69,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'TOKEN'         => $resArr['TOKEN'],
             'PAYERID'       => $resArr['PAYERID'],
             'PAYMENTACTION' => 'Sale',
-            'AMT'           => $sData['cart']['data']['subtotal'],
+            'AMT'           => number_format($salesOrder->balance, 2),
             'CURRENCYCODE'  => 'USD',
             'IPADDRESS'     => $_SERVER['SERVER_NAME'],
             //'BUTTONSOURCE'  => '',
@@ -96,10 +97,12 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $salesOrder->paid();
 
-        $sData['last_order']['id'] = $order->id;
+        $sData['last_order']['id'] = $salesOrder->id();
 
         FCom_Checkout_Model_Cart::sessionCartId(null);
-        BResponse::i()->redirect(BConfig::i()->get('secure_url')."/checkout_success");
+
+        $hrefUrl = BApp::href('checkout/success');
+        BResponse::i()->redirect($hrefUrl);
     }
 
     public function action_cancel()

@@ -89,7 +89,11 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
     public function getRateCallback($cart)
     {
         //address
+        $user = FCom_Customer_Model_Customer::sessionUser();
         $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+        if ($user && !$shippingAddress) {
+            $shippingAddress = $user->defaultShipping();
+        }
         $tozip = $shippingAddress->zip;
         //service
         if ($cart->shipping_method == $this->code) {
