@@ -1295,7 +1295,7 @@ class BRouteNode
 
         // convert route name into regex and save param references
         if ($this->route_name[0]==='^') {
-            $this->regex = $this->route_name;
+            $this->regex = '#'.$this->route_name.'#';
             return;
         }
         $a = explode(' ', $this->route_name);

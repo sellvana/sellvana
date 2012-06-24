@@ -32,7 +32,9 @@
         <h3><a href="#">System</a></h3>
         <div>
             <table>
-
+                <tr><td>Hide script file name in URL</td><td><select name="config[web][hide_script_name]">
+                    <?php echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name')) ?>
+                </select></td></tr>
             </table>
         </div>
     </div>
