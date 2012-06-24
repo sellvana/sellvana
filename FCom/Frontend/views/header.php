@@ -15,7 +15,7 @@
                     <li class="header-sup-wishlist"><a href="<?=BApp::href('customer/register')?>">Sign up</a></li>
                 <?php endif; ?>
                 <?=$this->view('cart/header')?>
-                <li class="header-sup-wishlist"><a href="<?=BApp::href('wishlist')?>">Your Wishlist</a></li>
+                <li><a href="<?=BApp::href('wishlist')?>">Your Wishlist</a></li>
             </ul>
         </nav>
     </div>
