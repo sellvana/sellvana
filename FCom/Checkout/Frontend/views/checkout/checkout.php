@@ -3,6 +3,11 @@
 <input type="submit" name="place_order" value="Place your order">
 <input type="submit" name="update" value="Apply changes">
 
+<?php if ($this->messagesHtml()) :?>
+<br/>
+<span style="color:red"><?php echo $this->messagesHtml() ?></span>
+<?php endif; ?>
+
 <br/><br/>
 
 <h4>Shipping to:</h4>

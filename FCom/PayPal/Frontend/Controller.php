@@ -45,7 +45,13 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $resArr = FCom_PayPal_Api::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
         if (false===$resArr) {
-            return false;
+            BSession::i()->addMessage(FCom_PayPal_Api::i()->getError(), 'error', 'frontend');
+            BResponse::i()->redirect(BApp::href('checkout/checkout'));
+        }
+
+        if (empty($resArr['PAYERID'])) {
+            BSession::i()->addMessage('Payment action not initiated', 'error', 'frontend');
+            BResponse::i()->redirect(BApp::href('checkout'));
         }
         /*
         $cart->set(array(
@@ -80,7 +86,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             */
         $resArr = FCom_PayPal_Api::i()->call('DoExpressCheckoutPayment', $nvpArr);
         if (false===$resArr) {
-            return false;
+            BSession::i()->addMessage(FCom_PayPal_Api::i()->getError(), 'error', 'frontend');
+            BResponse::i()->redirect(BApp::href('checkout'));
         }
         /*
         $cart->set(array(
@@ -94,8 +101,6 @@ class FCom_PayPal_Frontend_Controller extends BActionController
          *
          */
         //Cart::notify();
-
-        $salesOrder->paid();
 
         $sData['last_order']['id'] = $salesOrder->id();
 

@@ -40,6 +40,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
 
+        $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
@@ -95,11 +96,16 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 if ($testItem) {
                     continue;
                 }
+                $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
+                if (!$product) {
+                    continue;
+                }
                 $orderItem = array();
                 $orderItem['order_id'] = $salesOrder->id();
                 $orderItem['product_id'] = $item->product_id;
                 $orderItem['qty'] = $item->qty;
                 $orderItem['total'] = $item->price;
+                $orderItem['product_info'] = BUtil::toJson($product->as_array());
                 FCom_Sales_Model_OrderItem::i()->add($orderItem);
             }
 
@@ -155,6 +161,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
     public function action_success()
     {
+        $sData =& BSession::i()->dataToUpdate();
+        if (empty($sData['last_order']['id'])) {
+            BResponse::i()->redirect(BApp::href('checkout'));
+        }
+        $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
+        $salesOrder->paid();
         $this->layout('/checkout/success');
         BResponse::i()->render();
     }
