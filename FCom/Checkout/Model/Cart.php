@@ -218,9 +218,14 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     public function addProduct($productId, $options=array())
     {
+        //save cart to DB on add first product
         if (!$this->id) {
-            //todo: save function should work without field set
-            $this->user_id = 0;
+            $user = FCom_Customer_Model_Customer::sessionUser();
+            if($user){
+                $this->user_id = $user->id();
+            } else {
+                $this->user_id = 0;
+            }
             $this->save();
         }
 
