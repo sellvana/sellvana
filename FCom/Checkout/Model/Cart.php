@@ -439,6 +439,9 @@ Estimated tax: $'.$estimatedTax.'<br>
     {
         $this->calc_balance = 0;
         $totals = BUtil::fromJson($this->totals_json);
+        if (!$totals) {
+            return;
+        }
         $sorted = $this->sortTotals($totals);
         if (!$sorted) {
             return;

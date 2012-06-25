@@ -42,7 +42,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (empty($cart->payment_detials) && $user) {
             $cart->payment_detials = $user->getPaymentDetails();
         }
-
+        //print_r($cart);exit;
         $cart->calculateTotals();
 
 
