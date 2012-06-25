@@ -32,7 +32,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             } else {
                 if (($cartId = static::sessionCartId()) && ($cart = static::load($cartId))) {
                     static::$_sessionCart = $cart;
-                } elseif (($cart = static::i()->load(BSession::i()->sessionId(), 'session_id'))) {
+                } elseif (($cart = static::i()->orm()->where('session_id',BSession::i()->sessionId())->where('status', 'new')->find_one() )) {
                     static::$_sessionCart = $cart;
                     static::sessionCartId($cart->id);
                 } else {
@@ -599,4 +599,17 @@ ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
         );
 
     }
+
+    public static function upgrade_0_1_5()
+    {
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo(static::table(), "status")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `status` ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new'"
+        );
+    }
+
+
 }

@@ -45,6 +45,8 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
         $this->newAddress($cartId, 'billing', $userData->as_array());
     }
 
+
+
     public function newAddress($cartId, $type, $userData)
     {
         $address = array(

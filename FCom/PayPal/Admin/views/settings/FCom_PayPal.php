@@ -28,6 +28,15 @@ $c = $this->model;
                                value="<?php echo $this->q($c->get('modules/FCom_PayPal/production/signature'))?>"/>
                     </td>
                 </tr>
+                <tr>
+                    <td>Show shipping address on PayPal</td>
+                    <td>
+                        <input type="radio" name="config[modules][FCom_PayPal][show_shipping]"
+                              value="on" <?= 'on' == $c->get('modules/FCom_PayPal/show_shipping') ? 'checked':''?>/> Yes
+                        <input type="radio" name="config[modules][FCom_PayPal][show_shipping]"
+                              value="off" <?= 'off' == $c->get('modules/FCom_PayPal/show_shipping') ? 'checked':''?>/> No
+                    </td>
+                </tr>
             </table>
         </div>
         <h3><a href="#">Sandbox</a></h3>
