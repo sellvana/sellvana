@@ -51,6 +51,9 @@ class FCom_Checkout_Frontend extends BClass
     public static function initCartTotals()
     {
         $cart = FCom_Checkout_Model_Cart::sessionCart();
+        if (false == $cart->items()) {
+            return;
+        }
         FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotalCallback', 'label' => 'Items', 'after'=>''));
         if ($cart->shipping_method) {
             $shippingClass = FCom_Checkout_Model_Cart::i()->getShippingClassName($cart->shipping_method);
