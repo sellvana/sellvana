@@ -35,6 +35,43 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function newShipping($cartId, $userData)
+    {
+        $this->newAddress($cartId, 'shipping', $userData->as_array());
+    }
+
+    public function newBilling($cartId, $userData)
+    {
+        $this->newAddress($cartId, 'billing', $userData->as_array());
+    }
+
+    public function newAddress($cartId, $type, $userData)
+    {
+        $address = array(
+            'cart_id' => $cartId,
+            'atype' => $type,
+            'firstname' => $userData['firstname'],
+            'lastname' => $userData['lastname'],
+            'attn' => $userData['attn'],
+            'street1' => $userData['street1'],
+            'street2' => $userData['street2'],
+            'street3' => $userData['street3'],
+            'city' => $userData['city'],
+            'state' => $userData['state'],
+            'zip' => $userData['zip'],
+            'country' => $userData['country'],
+            'phone' => $userData['phone'],
+            'fax' => $userData['fax'],
+            'lat' => $userData['lat'],
+            'lng' => $userData['lng'],
+            'created_dt' => null,
+            'updated_dt' => null
+        );
+        $newAddress = FCom_Checkout_Model_Address::create($address);
+        $newAddress->save();
+        return $newAddress;
+    }
+
     public static function install()
     {
         $tCart = FCom_Checkout_Model_Cart::table();
