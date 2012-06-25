@@ -35,9 +35,12 @@ class FCom_PayPal_Api extends BClass
 
         $resArr = BUtil::httpClient('GET', self::$_apiUrl, $nvpArr);
 
-        $ack = strtoupper($resArr['ACK']);
-        if ($ack == 'SUCCESS' || $ack=='SUCCESSWITHWARNING') {
-            return $resArr;
+        $ack = 'undefined';
+        if (!empty($resArr['ACK'])) {
+            $ack = strtoupper($resArr['ACK']);
+            if ($ack == 'SUCCESS' || $ack=='SUCCESSWITHWARNING') {
+                return $resArr;
+            }
         }
         $errorArr = array(
             'type' => 'API',
@@ -62,6 +65,9 @@ class FCom_PayPal_Api extends BClass
 
     public function getError()
     {
+        if (empty($this->errorArr['code'])) {
+            return "[PAYPAL ERROR N/A] N/A";
+        }
         return "[PAYPAL ERROR {$this->errorArr['code']}] {$this->errorArr['short_message']} - {$this->errorArr['long_message']}";
     }
 

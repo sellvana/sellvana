@@ -28,6 +28,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
         $this->rate = new UpsRate($rateApiUrl);
         $this->rate->setUpsParams($accessKey,$account, $password, $shipNumber);
         $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
+
     }
 
     public function getEstimate()
@@ -35,6 +36,9 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
         if (!$this->rate) {
             $cart = FCom_Checkout_Model_Cart::sessionCart();
             $this->getRateCallback($cart);
+            if (!$this->rate) {
+                return 'Unable to calculate';
+            }
         }
         $estimate = $this->rate->getEstimate();
         if (!$estimate) {

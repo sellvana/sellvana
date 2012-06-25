@@ -12,6 +12,23 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         }
 
         $baseUrl = BApp::href('paypal');
+        $nvpShippingAddress = array();
+        if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
+            $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+            $nvpShippingAddress = array(
+                'NOSHIPPING' => 0,
+                'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
+                'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
+                'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
+                'PAYMENTREQUEST_0_SHIPTOCITY' => $shippingAddress->city,
+                'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->state,
+                'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->zip,
+                'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
+                'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
+            );
+        } else {
+            $nvpShippingAddress['NOSHIPPING'] = 1;
+        }
 
         $nvpArr = array(
             'INVNUM'                            => $salesOrder->id(),
@@ -20,10 +37,10 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'PAYMENTREQUEST_0_CURRENCYCODE'     => 'USD',
             'RETURNURL'                         => $baseUrl.'/return',
             'CANCELURL'                         => $baseUrl.'/cancel',
-            'NOSHIPPING'                        => 1
             //'PAGESTYLE'     => 'paypal',
         );
-
+        $nvpArr = array_merge($nvpArr, $nvpShippingAddress);
+        //print_r($nvpArr);exit;
         $resArr = FCom_PayPal_Api::i()->call('SetExpressCheckout', $nvpArr);
 //echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
         if (false===$resArr) {
@@ -105,6 +122,9 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $sData['last_order']['id'] = $salesOrder->id();
 
+        //unset cart
+        $cart->status = 'finished';
+        $cart->save();
         FCom_Checkout_Model_Cart::sessionCartId(null);
 
         $hrefUrl = BApp::href('checkout/success');
