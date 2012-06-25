@@ -247,17 +247,20 @@ class BApp extends BClass
             /** @var BRequest */
             $r = BRequest::i();
             $c = BConfig::i();
+            $scriptPath = pathinfo($r->scriptName());
             switch ($method) {
                 case 1:
                     $url = $c->get('web/base_href');
-                    if (!$url) $url = $r->webRoot();
-                    break;
-                case 2:
-                    $url = $r->scriptName();
-                    if ($r->modRewriteEnabled() && !$c->get('web/show_script_name')) {
-                        $url = dirname($url);
+                    if (!$url) {
+                        $url = $scriptPath['dirname'];
                     }
                     break;
+                case 2:
+                    $url = $scriptPath['dirname'];
+                    break;
+            }
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
+                $url .= '/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
@@ -288,7 +291,8 @@ class BApp extends BClass
 
     public static function href($url='', $full=true, $method=2)
     {
-        return BApp::baseUrl($full, $method) . BFrontController::processHref($url);
+        return BApp::baseUrl($full, $method) 
+            . BFrontController::processHref($url);
     }
 
     /**
