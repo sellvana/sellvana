@@ -20,6 +20,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'PAYMENTREQUEST_0_CURRENCYCODE'     => 'USD',
             'RETURNURL'                         => $baseUrl.'/return',
             'CANCELURL'                         => $baseUrl.'/cancel',
+            'NOSHIPPING'                        => 1
             //'PAGESTYLE'     => 'paypal',
         );
 
