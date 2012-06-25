@@ -31,6 +31,36 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public static function import($data, $cust)
+    {
+        if ($cust->default_billing_id) {
+            $addr = static::load($cust->default_billing_id);
+            //$addr = Model::factory('FCom_Customer_Model_Address')->find_one($cust->default_billing_id);
+        }
+        if (empty($addr)) {
+            $addr = static::create(array('customer_id' => $cust->id));
+        }
+        //save full contry name
+        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
+            $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
+        }
+*/
+        if(!empty($data['address'])){
+            $addr->set($data['address']);
+        }
+        $addr->save();
+
+        if (!$cust->default_billing_id) {
+            $cust->set('default_billing_id', $addr->id);
+        }
+        if (!$cust->default_shipping_id) {
+            $cust->set('default_shipping_id', $addr->id);
+        }
+        $cust->save();
+
+        return $addr;
+    }
+
     public static function install()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
@@ -66,33 +96,16 @@ ALTER TABLE {$tCustomer}
   */
     }
 
-    public static function import($data, $cust)
+    public static function upgrade_0_1_1()
     {
-        if ($cust->default_billing_id) {
-            $addr = static::load($cust->default_billing_id);
-            //$addr = Model::factory('FCom_Customer_Model_Address')->find_one($cust->default_billing_id);
+        try {
+            BDb::run("
+                ALTER TABLE ".self::table()."
+                ADD COLUMN `lat` DECIMAL(15,10) NULL,
+                ADD COLUMN `lng` DECIMAL(15,10) NULL;
+            ");
+        } catch (Exception $e) {
+            //columns already exist
         }
-        if (empty($addr)) {
-            $addr = static::create(array('customer_id' => $cust->id));
-        }
-        //save full contry name
-        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
-            $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
-        }
-*/
-        if(!empty($data['address'])){
-            $addr->set($data['address']);
-        }
-        $addr->save();
-
-        if (!$cust->default_billing_id) {
-            $cust->set('default_billing_id', $addr->id);
-        }
-        if (!$cust->default_shipping_id) {
-            $cust->set('default_shipping_id', $addr->id);
-        }
-        $cust->save();
-
-        return $addr;
     }
 }

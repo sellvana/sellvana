@@ -8,6 +8,8 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_sessionCart;
     protected $shippingMethods = array();
     protected $shippingClasses = array();
+    protected $paymentMethods = array();
+    protected $paymentClasses = array();
 
     public $items;
 
@@ -400,6 +402,28 @@ Estimated tax: $'.$estimatedTax.'<br>
         } else {
             return false;
         }
+    }
+
+    public function addPaymentMethod($method, $class)
+    {
+        $this->paymentMethods[$method] = $class;
+    }
+
+    /**
+     *
+     * @return Array of Payment Methods
+     */
+    public function getPaymentMethods()
+    {
+        if (!$this->paymentMethods) {
+            return false;
+        }
+        if (empty($this->paymentClasses)) {
+            foreach($this->paymentMethods as $method => $class) {
+                $this->paymentClasses[$method] = $class::i();
+            }
+        }
+        return $this->paymentClasses;
     }
 
     public function addTotalRow($name, $options)
