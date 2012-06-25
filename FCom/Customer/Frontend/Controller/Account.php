@@ -27,14 +27,6 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
                 if (empty($r['email'])) {
                     throw new Exception('Incomplete or invalid form data.');
                 }
-                /*
-                if (!empty($post['password_confirm']) && $post['password']!=$post['password_confirm']) {
-                    throw new Exception('Incomplete or invalid form data.');
-                } elseif ($post['password']== $post['password_confirm']) {
-                    $customer->setPassword($post['password']);
-                }
-                 *
-                 */
                 $customer->set($r)->save();
 
                 $url = Bapp::href('customer/myaccount');
@@ -50,5 +42,38 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $this->messages('customer/account/edit');
         $this->view('customer/account/edit')->customer = $customer;
         $this->layout('/customer/account/edit');
+    }
+
+    public function action_editpassword()
+    {
+        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customer = FCom_Customer_Model_Customer::i()->load($customerId);
+
+        $post = BRequest::i()->post();
+        if ($post) {
+            $r = $post['model'];
+            try {
+
+                if (!empty($r['password_confirm']) && $r['password']!=$r['password_confirm']) {
+                    throw new Exception('Incomplete or invalid form data.');
+                } elseif ($r['password']== $r['password_confirm']) {
+                    $customer->setPassword($r['password']);
+                }
+
+                $customer->save();
+
+                $url = Bapp::href('customer/myaccount');
+                BResponse::i()->redirect($url);
+            } catch(Exception $e) {
+                BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+                $url = Bapp::href('customer/myaccount/editpassword');
+                BResponse::i()->redirect($url);
+            }
+
+        }
+
+        $this->messages('customer/account/editpassword');
+        $this->view('customer/account/editpassword')->customer = $customer;
+        $this->layout('/customer/account/editpassword');
     }
 }
