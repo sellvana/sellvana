@@ -18,12 +18,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
 
             if ($user && !$shipAddress) {
-                //todo: create shipping & billing address entries from user address data
-                $shipAddress = $user->defaultShipping();
+                FCom_Checkout_Model_Address::i()->newShipping($cart->id(), $user->defaultShipping());
+                $shipAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
             }
             if ($user && !$billAddress) {
-                //todo: create shipping & billing address entries from user address data
-                $billAddress = $user->defaultBilling();
+                FCom_Checkout_Model_Address::i()->newBilling($cart->id(), $user->defaultBilling());
+                $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
             }
         }
 
