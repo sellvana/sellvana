@@ -82,7 +82,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address->set($r)->save();
         }
 
-        $href = BApp::href('checkout');
+        $href = BApp::href('customer/myaccount');
         BResponse::i()->redirect($href);
     }
 }
