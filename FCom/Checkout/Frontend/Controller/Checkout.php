@@ -35,11 +35,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
-        if (empty($cart->payment_method)) {
+        if (empty($cart->payment_method) && $user) {
             $cart->payment_method = $user->getPaymentMethod();
         }
 
-        if (empty($cart->payment_detials)) {
+        if (empty($cart->payment_detials) && $user) {
             $cart->payment_detials = $user->getPaymentDetails();
         }
 
