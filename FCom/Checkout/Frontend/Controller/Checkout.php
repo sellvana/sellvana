@@ -130,9 +130,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             }
 
             //Made payment
-
-            $href = BApp::href('paypal/redirect');
-            BResponse::i()->redirect($href);
+            $paymentMethods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
+            if (is_object($paymentMethods[$cart->payment_method])) {
+                $paymentMethods[$cart->payment_method]->processPayment();
+            }
+            
         }
 
 

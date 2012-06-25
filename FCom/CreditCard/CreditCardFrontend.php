@@ -13,4 +13,9 @@ class FCom_CreditCard_Frontend extends BClass
     {
         return 'Credit Card';
     }
+
+    public function processPayment()
+    {
+        die("Credit Card payment not imlemented yet");
+    }
 }
