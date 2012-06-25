@@ -35,16 +35,31 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
+        if (empty($cart->payment_method)) {
+            $cart->payment_method = $user->getPaymentMethod();
+        }
+
+        if (empty($cart->payment_detials)) {
+            $cart->payment_detials = $user->getPaymentDetails();
+        }
+
         $cart->calculateTotals();
 
 
         $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
+        $paymentMethods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
+        if (!empty($paymentMethods[$cart->payment_method])) {
+            $layout->view('checkout/checkout')->paymentMethod = $cart->payment_method;
+            $layout->view('checkout/checkout')->paymentClass = $paymentMethods[$cart->payment_method];
+            $layout->view('checkout/checkout')->paymentDetails = BUtil::fromJson($cart->payment_detials);
+        }
 
         $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $layout->view('checkout/checkout')->shippingMethods = $shippingMethods;
+
         $layout->view('checkout/checkout')->totals = $cart->getTotals();
         $this->layout('/checkout/checkout');
         BResponse::i()->render();
@@ -53,6 +68,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout_post()
     {
         $post = BRequest::i()->post();
+
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
 
         if (!empty($post['shipping_method'])) {
@@ -63,6 +79,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (!empty($post['payment'])) {
             $cart->payment_details = BUtil::toJson($post['payment']);
+            if (FCom_Customer_Model_Customer::isLoggedIn()) {
+                $user = FCom_Customer_Model_Customer::sessionUser();
+                $user->setPaymentDetails($post['payment']);
+            }
         }
         if (!empty($post['discount_code'])) {
             $cart->discount_code = $post['discount_code'];
@@ -122,9 +142,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
     public function action_payment()
     {
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
         $layout = BLayout::i();
+        $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+        $paymentMethods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Payment methods', 'active'=>true));
+        $layout->view('checkout/payment')->payment_methods = $paymentMethods;
         $layout->view('checkout/payment')->cart = $cart;
         $this->layout('/checkout/payment');
         BResponse::i()->render();
