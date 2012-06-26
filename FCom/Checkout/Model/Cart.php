@@ -220,12 +220,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         //save cart to DB on add first product
         if (!$this->id) {
-            $user = FCom_Customer_Model_Customer::sessionUser();
-            if($user){
-                $this->user_id = $user->id();
-            } else {
-                $this->user_id = 0;
-            }
+            $this->item_qty = 1;
             $this->save();
         }
 

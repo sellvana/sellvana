@@ -5,6 +5,13 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_cart()
     {
         $layout = BLayout::i();
+
+        $layout->view('checkout/cart')->redirectLogin = false;
+        if (BApp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn() == false) {
+            $layout->view('checkout/cart')->redirectLogin = true;
+        }
+
+
         $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Cart', 'active'=>true));
 
@@ -31,7 +38,12 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     BResponse::i()->json(array('title'=>"Incorrect product id"));
                     return;
                 }
+
                 $options=array('qty' => $post['qty'], 'price' => $p->base_price);
+                if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
+                    $cart->user_id = FCom_Customer_Model_Customer::sessionUserId();
+                    $cart->save();
+                }
                 $cart->addProduct($p->id(), $options);
                 $result = array(
                     'title' => 'Added to cart',
@@ -39,6 +51,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                         .(!empty($post['qty']) && $post['qty']>1 ? ' ('.$post['qty'].')' : '')
                         .'<br><br><a href="'.$cartHref.'" class="button">Go to cart</a>',
                     'cnt' => $cart->itemQty(),
+                    'subtotal' => $cart->calcTotals()->subtotal
                 );
                 break;
             }

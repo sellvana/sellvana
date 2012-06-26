@@ -17,6 +17,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
             $nvpShippingAddress = array(
                 'NOSHIPPING' => 0,
+                'REQCONFIRMSHIPPING' => 0,
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
                 'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
                 'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
@@ -92,12 +93,31 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         $nvpArr = array(
             'TOKEN'         => $resArr['TOKEN'],
             'PAYERID'       => $resArr['PAYERID'],
-            'PAYMENTACTION' => 'Sale',
-            'AMT'           => number_format($salesOrder->balance, 2),
-            'CURRENCYCODE'  => 'USD',
+            'PAYMENTREQUEST_0_PAYMENTACTION' => 'Sale',
+            'PAYMENTREQUEST_0_AMT'           => number_format($salesOrder->balance, 2),
+//            'PAYMENTREQUEST_0_ITEMAMT'           => number_format($salesOrder->balance, 2),
+            'PAYMENTREQUEST_0_CURRENCYCODE'  => 'USD',
             'IPADDRESS'     => $_SERVER['SERVER_NAME'],
             //'BUTTONSOURCE'  => '',
         );
+        $nvpShipArr = array();
+        if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
+            $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+            $nvpShipArr = array(
+                'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
+                    'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
+                    'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
+                    'PAYMENTREQUEST_0_SHIPTOCITY' => $shippingAddress->city,
+                    'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->state,
+                    'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->zip,
+                    'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
+                    'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
+                //'BUTTONSOURCE'  => '',
+            );
+        }
+        if (!empty($nvpShipArr)) {
+            $nvpArr = array_merge($nvpArr, $nvpShipArr);
+        }
 
          /* Make the call to PayPal to finalize payment
             If an error occured, show the resulting errors

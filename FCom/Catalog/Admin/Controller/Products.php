@@ -280,6 +280,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processMediaPost($model, $data)
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
+        //print_r($data['grid']);exit;
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
             $typeName = 'product_'.$typeName;
             if (!empty($data['grid'][$typeName]['del'])) {
@@ -289,6 +290,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'file_id'    => explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
+
             if (!empty($data['grid'][$typeName]['add'])) {
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)

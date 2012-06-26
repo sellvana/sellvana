@@ -22,12 +22,7 @@
 <?php elseif ($this->mode==='create' || $this->mode==='edit'): ?>
 
     <fieldset class="adm-section-group">
-<?php if ($this->mode!=='create'): ?>
-        <div class="btns-set">
-            <button class="btn st3 sz2 btn-cancel" onclick="return adminForm.tabAction('cancel', this);"><span>Cancel</span></button>
-            <button class="btn st1 sz2 btn-save" onclick="return adminForm.tabAction('save', this);"><span>Save</span></button>
-        </div>
-<?php endif ?>
+
 <style>
 #pager-product_fieldsets .ui-pg-table,
 #pager-product_fields .ui-pg-table { table-layout:auto !important; }
