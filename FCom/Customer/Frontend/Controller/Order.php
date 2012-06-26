@@ -11,6 +11,10 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
     {
         $customerId = FCom_Customer_Model_Customer::sessionUserId();
         $orders = FCom_Sales_Model_Order::i()->orm()->where('user_id', $customerId)->find_many();
+
+        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'Orders', 'active'=>true);
+        $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/order/list')->orders = $orders;
         $this->layout('/customer/order/list');
     }
@@ -26,6 +30,11 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
         }
 
         $orderItems = FCom_Sales_Model_OrderItem::i()->orm()->where("order_id", $order->id())->find_many();
+
+        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'Orders', 'href'=>Bapp::href('customer/order'));
+        $crumbs[] = array('label'=>'View order', 'active'=>true);
+        $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/order/view')->order = $order;
         $this->view('customer/order/view')->orderItems = $orderItems;
         $this->layout('/customer/order/view');

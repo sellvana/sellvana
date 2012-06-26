@@ -5,7 +5,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Checkout', 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Checkout', 'active'=>true));
 
         $shipAddress = null;
         $billAddress = null;
@@ -147,7 +148,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout = BLayout::i();
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
         $paymentMethods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Payment methods', 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = array(
+            array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
+            array('label'=>'Payment methods', 'active'=>true));
         $layout->view('checkout/payment')->payment_methods = $paymentMethods;
         $layout->view('checkout/payment')->cart = $cart;
         $this->layout('/checkout/payment');
@@ -170,7 +174,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_shipping()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Shipping', 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = array(
+            array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
+            array('label'=>'Shipping address', 'active'=>true));
         $layout->view('checkout/shipping')->address = array();
         $layout->view('checkout/shipping')->methods = array();
         $this->layout('/checkout/shipping');
@@ -191,6 +198,9 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
         $salesOrder->paid();
+        $layout->view('breadcrumbs')->crumbs = array(
+            array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Confirmation', 'active'=>true));
         $this->layout('/checkout/success');
         BResponse::i()->render();
     }

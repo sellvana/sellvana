@@ -43,10 +43,14 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         $address->save();
         $address = FCom_Checkout_Model_Address::i()->load($address->id());
         if ('shipping' == $address->atype) {
-            $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Shipping address', 'active'=>true));
+            $breadCrumbLabel = 'Shipping address';
         } else {
-            $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Billing address', 'active'=>true));
+            $breadCrumbLabel = 'Billing address';
         }
+        $layout->view('breadcrumbs')->crumbs = array(
+            array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
+            array('label'=>$breadCrumbLabel, 'active'=>true));
         $layout->view('geo/embed')->countries = $countriesList;
         $layout->view('checkout/address')->address = $address;
         $layout->view('checkout/address')->address_type = $atype;
@@ -100,5 +104,5 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         BResponse::i()->redirect($href);
     }
 
-    
+
 }
