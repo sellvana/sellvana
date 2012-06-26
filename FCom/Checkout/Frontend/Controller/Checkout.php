@@ -2,6 +2,15 @@
 
 class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controller_Abstract
 {
+    public function action_checkout_login()
+    {
+        $layout = BLayout::i();
+        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Login or guest checkout', 'active'=>true));
+        $this->layout('/checkout/login');
+        BResponse::i()->render();
+    }
+
     public function action_checkout()
     {
         $layout = BLayout::i();
@@ -11,7 +20,15 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $shipAddress = null;
         $billAddress = null;
 
-        $user = FCom_Customer_Model_Customer::sessionUser();
+        $user = false;
+        if (BApp::m('FCom_Customer')) {
+            $user = FCom_Customer_Model_Customer::sessionUser();
+        }
+        $guestCheckout = false;
+        if (!$user) {
+            $guestCheckout = true;
+        }
+
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
 
         if ($cart->id()) {
@@ -57,6 +74,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
+        $layout->view('checkout/checkout')->guest = $guestCheckout;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $layout->view('checkout/checkout')->shippingMethods = $shippingMethods;
@@ -72,9 +90,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
 
-        if (!empty($post['shipping_method'])) {
-            $cart->shipping_method = $post['shipping_method'];
-            $cart->shipping_service = $post['shipping_service'];
+        if (!empty($post['shipping'])) {
+            $shipping = explode(":", $post['shipping']);
+            $cart->shipping_method = $shipping[0];
+            $cart->shipping_service = $shipping[1];
             //$cart->shipping_price = FCom_Checkout_Model_Cart::i()->getShippingMethod($post['shipping_method'])->getPrice();
         }
 
@@ -87,6 +106,17 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         if (!empty($post['discount_code'])) {
             $cart->discount_code = $post['discount_code'];
+        }
+        if (!empty($post['create_account'])) {
+            $r = $post['account'];
+            try {
+                $customer = FCom_Customer_Model_Customer::i()->register($r);
+                $cart->user_id = $customer->id();
+                $cart->save();
+            } catch (Exception $e) {
+                //die($e->getMessage());
+            }
+            //$cart->discount_code = $post['discount_code'];
         }
         $cart->save();
 
@@ -198,9 +228,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
         $salesOrder->paid();
-        $layout->view('breadcrumbs')->crumbs = array(
+        $this->view('breadcrumbs')->crumbs = array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Confirmation', 'active'=>true));
+        $this->view('checkout/success')->order = $salesOrder;
         $this->layout('/checkout/success');
         BResponse::i()->render();
     }

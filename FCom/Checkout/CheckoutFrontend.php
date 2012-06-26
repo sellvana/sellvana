@@ -12,7 +12,7 @@ class FCom_Checkout_Frontend extends BClass
             //checkout
             ->route( 'GET /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
             ->route( 'POST /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_post')
-
+            ->route( 'GET /checkout/login', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_login')
             //payment
             ->route( 'GET /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
             ->route( 'POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment_post')
@@ -54,7 +54,7 @@ class FCom_Checkout_Frontend extends BClass
         if (false == $cart->items()) {
             return;
         }
-        FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotalCallback', 'label' => 'Items', 'after'=>''));
+        FCom_Checkout_Model_Cart::i()->addTotalRow('subtotal', array('callback'=>'FCom_Checkout_Model_Cart.subtotalCallback', 'label' => 'Subtotal', 'after'=>''));
         if ($cart->shipping_method) {
             $shippingClass = FCom_Checkout_Model_Cart::i()->getShippingClassName($cart->shipping_method);
             FCom_Checkout_Model_Cart::i()->addTotalRow('shipping', array('callback'=>$shippingClass.'.getRateCallback',
@@ -81,6 +81,10 @@ class FCom_Checkout_Frontend extends BClass
             '/checkout/checkout'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('checkout/checkout'))
+            ),
+            '/checkout/login'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('checkout/login'))
             ),
             '/checkout/payment'=>array(
                 array('layout', 'base'),

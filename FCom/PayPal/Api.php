@@ -41,7 +41,7 @@ class FCom_PayPal_Api extends BClass
             if ($ack == 'SUCCESS' || $ack=='SUCCESSWITHWARNING') {
                 return $resArr;
             }
-        }
+        } 
         $errorArr = array(
             'type' => 'API',
             'ack' => $ack,

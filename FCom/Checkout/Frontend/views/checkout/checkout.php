@@ -21,13 +21,11 @@
 
     <ul>
         <?php foreach($this->shippingMethods as $shippingMethod => $shippingClass): ?>
-        <li><input type="radio" name="shipping_method" value="<?=$shippingMethod?>"
-            <?= $shippingMethod == $this->cart->shipping_method ? 'checked' : '' ?>>
-            <?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)
+        <li><?=$shippingClass->getDescription()?> (<?=$shippingClass->getEstimate()?>)
             <ul>
             <?php foreach($shippingClass->getServicesSelected() as $serviceKey => $service) :?>
                 <li style="margin-left: 20px;">
-                    <input type="radio" name="shipping_service" value="<?=$serviceKey?>"
+                    <input type="radio" name="shipping" value="<?=$shippingMethod.':'.$serviceKey?>"
                     <?= $shippingMethod == $this->cart->shipping_method &&
                             $serviceKey == $this->cart->shipping_service ? 'checked' : '' ?>> <?=$service?></li>
             <?php endforeach; ?>
@@ -59,7 +57,7 @@
                         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
                     </td>
                     <td >
-                        <span class="price">$<?=number_format($p->base_price)?>
+                        <span class="price">$<?=number_format($p->base_price, 2)?>
                     </td>
                     <td >
                         <b><?=number_format($item->qty, 0)?></b>
@@ -80,12 +78,11 @@
 <br/>
 <a href="/cart">Need to change quantities or delete?</a>
 <br/><br/>
-<h4>Shipping Summary:</h4>
 
 <?php if (!empty($this->totals)) : ?>
     <ul>
     <?php foreach($this->totals as $totals) :?>
-        <li><?=$totals['options']['label']?>: $<?=$totals['total']?>
+        <li><?=$totals['options']['label']?>: $<?=number_format($totals['total'], 2)?>
             <?php if (!empty($totals['error'])) :?>
                 (<span style="color:red"><?=$totals['error']?></span>)
             <?php endif; ?>
@@ -115,6 +112,17 @@
 <h4>Billing address</h4>
 <a href="<?=BApp::href('checkout/address?t=b')?>">Change</a><br/>
 <?=$this->billingAddress?><br><br>
+
+<?php if ($this->guest) :?>
+<label for="#">Create an account?</label>
+<input type="checkbox" name="create_account" value="1" class="required"><br/>
+<label for="#">E-mail</label>
+<input type="text" name="account[email]" value="" class="required"><br/>
+<label for="#">Password</label>
+<input type="password" name="account[password]" class="required" id="model-password"/><br/>
+<label for="#">Confirm Password </label>
+<input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/><br/>
+<?php endif; ?>
 
 <input type="submit" name="update" value="Apply changes">
 
