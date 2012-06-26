@@ -5,7 +5,9 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_cart()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Cart', 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Cart', 'active'=>true));
+
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
         BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
         $shippingEstimate = BSession::i()->data('shipping_estimate');

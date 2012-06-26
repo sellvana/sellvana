@@ -27,6 +27,9 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
         $countriesList = substr($countriesList, 0, -1);
 
+        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
+        $this->view('breadcrumbs')->crumbs = $crumbs;
         $layout->view('geo/embed')->countries = $countriesList;
         $layout->view('customer/address')->address = $shipAddress;
         $layout->view('customer/address')->address_type = 'shipping';
@@ -48,6 +51,9 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $layout->view('customer/address')->address_equal = true;
         }
 
+        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
+        $this->view('breadcrumbs')->crumbs = $crumbs;
         $layout->view('customer/address')->address = $address;
         $layout->view('customer/address')->address_type = 'billing';
         $this->layout('/customer/address');

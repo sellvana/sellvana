@@ -4,7 +4,6 @@ $cat = $this->category;
 ?>
 
 <div class="main col1-layout">
-    <?=$this->view('breadcrumbs')?>
     <div class="col-main">
         <div id="messages_product_view"></div>
         <div class="product-view">
