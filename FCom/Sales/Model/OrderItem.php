@@ -19,6 +19,7 @@ class FCom_Sales_Model_OrderItem extends FCom_Core_Model_Abstract
 
     public function add($data)
     {
+        BPubSub::i()->fire(__CLASS__.'.add', array('orderItem'=>$data));
         return $this->create($data)->save();
     }
 
