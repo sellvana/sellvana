@@ -40,7 +40,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 $shipAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
             }
             if ($user && !$billAddress) {
-                FCom_Checkout_Model_Address::i()->newBilling($cart->id(), $user->defaultBilling());
+                FCom_Checkout_Model_Address::i()->newBilling($cart->id(), $user->defaultBilling(), $user->email);
                 $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
             }
         }
@@ -77,6 +77,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout->view('checkout/checkout')->guest = $guestCheckout;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
+        $layout->view('checkout/checkout')->billingAddressObject = $billAddress;
         $layout->view('checkout/checkout')->shippingMethods = $shippingMethods;
 
         $layout->view('checkout/checkout')->totals = $cart->getTotals();
@@ -109,6 +110,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         if (!empty($post['create_account'])) {
             $r = $post['account'];
+            //$billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
+            //$r['email'] = $billAddress->email;
             try {
                 $customer = FCom_Customer_Model_Customer::i()->register($r);
                 $cart->user_id = $customer->id();
@@ -226,8 +229,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (empty($sData['last_order']['id'])) {
             BResponse::i()->redirect(BApp::href('checkout'));
         }
+
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
         $salesOrder->paid();
+
+        BLayout::i()->view('email/new-bill')->set('order', $salesOrder)->email();
         $this->view('breadcrumbs')->crumbs = array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Confirmation', 'active'=>true));

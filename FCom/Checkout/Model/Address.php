@@ -40,17 +40,16 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
         $this->newAddress($cartId, 'shipping', $userData->as_array());
     }
 
-    public function newBilling($cartId, $userData)
+    public function newBilling($cartId, $userData, $email)
     {
-        $this->newAddress($cartId, 'billing', $userData->as_array());
+        $this->newAddress($cartId, 'billing', $userData->as_array(), $email);
     }
 
-
-
-    public function newAddress($cartId, $type, $userData)
+    public function newAddress($cartId, $type, $userData, $email = '')
     {
         $address = array(
             'cart_id' => $cartId,
+            'email' => $email,
             'atype' => $type,
             'firstname' => $userData['firstname'],
             'lastname' => $userData['lastname'],
@@ -103,5 +102,16 @@ CREATE TABLE IF NOT EXISTS {$tAddress} (
   CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
+    }
+
+    public static function upgrade_0_1_1()
+    {
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo(static::table(), "email")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `email` VARCHAR( 100 ) NOT NULL "
+        );
     }
 }

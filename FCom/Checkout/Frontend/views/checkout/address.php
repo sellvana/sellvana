@@ -8,6 +8,7 @@
     Street 1: <input type="text" name="street1" value="<?=$this->address->street1?>"><br/>
     Street 2: <input type="text" name="street2" value="<?=$this->address->street2?>"><br/>
     City: <input type="text" name="city" value="<?=$this->address->city?>"><br/>
+    E-mail: <input type="text" name="email" value="<?=$this->address->email?>"><br/>
 
     <?=$this->view('geo/embed')?>
     <script>

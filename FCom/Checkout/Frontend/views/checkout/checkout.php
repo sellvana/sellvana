@@ -117,7 +117,7 @@
 <label for="#">Create an account?</label>
 <input type="checkbox" name="create_account" value="1" class="required"><br/>
 <label for="#">E-mail</label>
-<input type="text" name="account[email]" value="" class="required"><br/>
+<input type="text" name="account[email]" value="<?=$this->billingAddressObject->email?>" class="required"><br/>
 <label for="#">Password</label>
 <input type="password" name="account[password]" class="required" id="model-password"/><br/>
 <label for="#">Confirm Password </label>
