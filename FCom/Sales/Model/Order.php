@@ -26,6 +26,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function add($data)
     {
         $data['status'] = 'new';
+        BPubSub::i()->fire(__CLASS__.'.add', array('order'=>$data));
         return $this->create($data)->save();
     }
 
