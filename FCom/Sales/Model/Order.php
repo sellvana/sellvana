@@ -17,6 +17,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
     }
 
+    public function billing()
+    {
+        return FCom_Checkout_Model_Address::i()->orm('a')
+                ->where('cart_id', $this->cart_id)->where('atype', 'billing')->find_one();
+    }
+
     public function add($data)
     {
         $data['status'] = 'new';
