@@ -24,7 +24,8 @@ class FCom_Customer_Frontend extends BClass
             ->route('GET /customer/order/.action', 'FCom_Customer_Frontend_Controller_Order')
 
             //addresses
-            ->route('GET /customer/address/shipping', 'FCom_Customer_Frontend_Controller_Address.shipping')
+            ->route('GET /customer/address', 'FCom_Customer_Frontend_Controller_Address.index')
+            ->route('GET /customer/address/edit', 'FCom_Customer_Frontend_Controller_Address.edit')
             ->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
             ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
         ;
@@ -63,9 +64,13 @@ class FCom_Customer_Frontend extends BClass
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/account/editpassword')),
             ),
-            '/customer/address'=>array(
+            '/customer/address/edit'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('customer/address')),
+                array('hook', 'main', 'views'=>array('customer/address/edit')),
+            ),
+            '/customer/address/list'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address/list')),
             ),
             '/customer/order/list'=>array(
                 array('layout', 'base'),
