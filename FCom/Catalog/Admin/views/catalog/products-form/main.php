@@ -52,21 +52,12 @@ head(function() {
                 <textarea id="general-info-description" name="model[description]"><?php echo $this->q($m->description) ?></textarea>
             </li>
             <li>
-                <h4 class="label">Unit of Measures</h4>
-                Kilograms (kg) <input type="radio" name="model[base_uom]" value="kg" <?='kg' == $m->base_uom ? 'checked':'' ?>/>
-                Pounds (lb) <input type="radio" name="model[base_uom]" value="lb" <?='lb' == $m->base_uom ? 'checked':'' ?>/>
-            </li>
-            <li>
                 <h4 class="label">Price</h4>
                 <input type="text" name="model[base_price]" value="<?php echo $this->q($m->base_price) ?>"/>
             </li>
             <li>
-                <h4 class="label">Weight</h4>
+                <h4 class="label">Shipping Weight</h4>
                 <input type="text" name="model[weight]" value="<?php echo $this->q($m->weight) ?>"/>
-            </li>
-            <li>
-                <h4 class="label">Quantity</h4>
-                <input type="text" name="model[base_qty]" value="<?php echo $this->q($m->base_qty) ?>"/>
             </li>
         </ul>
     </fieldset>
