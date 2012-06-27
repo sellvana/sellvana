@@ -24,6 +24,8 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
+        $productReviews = FCom_Catalog_Model_ProductReview::i()->orm()->where("product_id", $product->id())->find_many();
+        $layout->view('catalog/product')->product_reviews = $productReviews;
         $layout->view('catalog/product')->product = $product;
 
         if ($r) {
@@ -53,11 +55,13 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $r = explode('/', BRequest::i()->params('product'));
         $href = $r[0];
 
-        $post = BRequest::post();
-        $product = FCom_Catalog_Model_Product::i()->load($post['id']);
+        $p = array_pop($r);
+        $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             BResponse::i()->redirect($href);
         }
+
+        $post = BRequest::post();
 
         if (!empty($post['add2cart'])) {
             BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToCart', array('product'=>&$product, 'qty' => $post['qty']));
@@ -65,6 +69,11 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         if (!empty($post['add2wishlist'])) {
             BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
+        }
+
+        if (!empty($post['review'])) {
+            $customer = FCom_Customer_Model_Customer::sessionUser();
+            FCom_Catalog_Model_ProductReview::i()->add($customer->id(), $product->id(), $post['review']);
         }
         BResponse::i()->redirect($href);
     }
