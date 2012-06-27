@@ -11,5 +11,4 @@ E-mail: <b><?=$this->customer->email?></b><br/>
 
 <br/>
 <br/>
-<a href="<?=BApp::href('customer/address/shipping')?>">Shipping Address</a><br/>
-<a href="<?=BApp::href('customer/address/billing')?>">Billing Address</a><br/>
+<a href="<?=BApp::href('customer/address')?>">View Addresses</a><br/>

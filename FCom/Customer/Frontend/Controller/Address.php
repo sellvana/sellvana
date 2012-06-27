@@ -7,19 +7,35 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
     }
 
-    public function action_shipping()
+    public function action_index()
+    {
+        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $addresses = $customer->addresses();
+
+        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'View Addresses', 'active'=>true);
+        $this->view('breadcrumbs')->crumbs = $crumbs;
+        $this->view('customer/address/list')->customer = $customer;
+        $this->view('customer/address/list')->addresses = $addresses;
+        $this->layout('/customer/address/list');
+        BResponse::i()->render();
+    }
+    public function action_edit()
     {
         $layout = BLayout::i();
-        $user = FCom_Customer_Model_Customer::sessionUser();
-        $shipAddress = $user->defaultShipping();
-        if (!$shipAddress) {
-            $shipAddress = FCom_Customer_Model_Address::i()->orm()->create();
-            $shipAddress->customer_id = $user->id();
-            $shipAddress->save();
+        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $id = BRequest::i()->get('id');
+        $address = FCom_Customer_Model_Address::i()->load($id);
+
+        $defaultShipping = false;
+        if ($customer->default_shipping_id == $address->id) {
+            $defaultShipping = true;
         }
-        if ($user->default_shipping_id == $user->default_billing_id) {
-            $layout->view('customer/address')->address_equal = true;
+        $defaultBilling = false;
+        if ($customer->default_billing_id == $address->id) {
+            $defaultBilling = true;
         }
+
         $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
         $countriesList = '';
         foreach($countries as $country){
@@ -28,67 +44,42 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $countriesList = substr($countriesList, 0, -1);
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'View Addresses', 'href'=>Bapp::href('customer/address'));
         $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $layout->view('geo/embed')->countries = $countriesList;
-        $layout->view('customer/address')->address = $shipAddress;
-        $layout->view('customer/address')->address_type = 'shipping';
-        $this->layout('/customer/address');
-        BResponse::i()->render();
-    }
-
-    public function action_billing()
-    {
-        $layout = BLayout::i();
-        $user = FCom_Customer_Model_Customer::sessionUser();
-        $address = $user->defaultBilling();
-        if (!$address) {
-            $address = FCom_Customer_Model_Address::i()->orm()->create();
-            $address->customer_id = $user->id();
-            $address->save();
-        }
-        if ($user->default_shipping_id == $user->default_billing_id) {
-            $layout->view('customer/address')->address_equal = true;
-        }
-
-        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
-        $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
-        $this->view('breadcrumbs')->crumbs = $crumbs;
-        $layout->view('customer/address')->address = $address;
-        $layout->view('customer/address')->address_type = 'billing';
-        $this->layout('/customer/address');
+        $layout->view('customer/address/edit')->address = $address;
+        $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
+        $layout->view('customer/address/edit')->default_billing = $defaultBilling;
+        $this->layout('/customer/address/edit');
         BResponse::i()->render();
     }
 
     public function action_address_post()
     {
-        $user = FCom_Customer_Model_Customer::sessionUser();
+        $customer = FCom_Customer_Model_Customer::sessionUser();
         $r = BRequest::i()->post();
 
         //create new address if shipping address not equal to billing
-        if (0 == $r['address_equal'] && $user->default_shipping_id == $user->default_billing_id){
-            $address = FCom_Customer_Model_Address::i()->orm()->create();
-            $address->customer_id = $user->id();
-            $address->save();
-            if ($r['address_type'] == 'shipping') {
-                $user->default_shipping_id = $address->id();
-            } elseif ($r['address_type'] == 'billing') {
-                $user->default_billing_id = $address->id();
+        if ($r){
+            if (!empty($r['id'])) {
+                $address = FCom_Customer_Model_Address::i()->load($r['id']);
+            } else {
+                $address = FCom_Customer_Model_Address::i()->orm()->create();
+                $address->customer_id = $customer->id();
             }
-
-            $user->save();
+            $address->set($r);
+            $address->save();
+            if (!empty($r['address_default_shipping'])) {
+                $customer->default_shipping_id = $address->id();
+            }
+            if (!empty($r['address_default_billing'])) {
+                $customer->default_billing_id = $address->id();
+            }
+            $customer->save();
         }
 
-        if ($r['address_type'] == 'shipping') {
-            $address = $user->defaultShipping();
-        } elseif ($r['address_type'] == 'billing') {
-            $address = $user->defaultBilling();
-        }
-        if ($address) {
-            $address->set($r)->save();
-        }
-
-        $href = BApp::href('customer/myaccount');
+        $href = BApp::href('customer/address');
         BResponse::i()->redirect($href);
     }
 }
