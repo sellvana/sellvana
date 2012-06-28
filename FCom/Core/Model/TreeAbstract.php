@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Core_Model_TreeAbstract extends BModel
+class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 {
     protected static $_separator = '|';
 
