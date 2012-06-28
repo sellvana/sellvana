@@ -14,6 +14,9 @@ class FCom_Catalog_Frontend extends BClass
             ->route( 'POST /:product', 'FCom_Catalog_Frontend_Controller.product_post')
             ->route( 'GET /*category/:product', 'FCom_Catalog_Frontend_Controller.product')
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
+            ->route( 'GET /:product/review/add', 'FCom_Catalog_Frontend_Controller_Review.add')
+            ->route( 'POST /:product/review/add', 'FCom_Catalog_Frontend_Controller_Review.add_post')
+            ->route( 'POST /:product/review/helpful', 'FCom_Catalog_Frontend_Controller_Review.helpful_post')
         ;
 
         BLayout::i()->addAllViews('Frontend/views')
@@ -41,6 +44,11 @@ class FCom_Catalog_Frontend extends BClass
             '/catalog/search'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('catalog/search'))
+            ),
+
+            '/catalog/review/add'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/review/add'))
             ),
 
             '/catalog/compare'=>array(

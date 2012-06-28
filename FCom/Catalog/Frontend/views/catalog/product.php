@@ -77,23 +77,36 @@ $cat = $this->category;
                     </div>
                     <div class="tab-content">
                         <h4>Reviews</h4>
+                        <a href="<?=Bapp::href($prod->url_key.'/review/add')?>">Add review</a><br/><br/>
                         <?php if ($this->product_reviews) :?>
                             <?php foreach ($this->product_reviews as $review) :?>
-                                <b><?=$review->title?></b> (<?=$review->rating?>)<br/>
+                            <div style="border:1 px solid black;">
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="1" <?=$review->rating == 1 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="2" <?=$review->rating == 2 ? 'checked': ''?> />
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="3" <?=$review->rating == 3 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="4" <?=$review->rating == 4 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="5" <?=$review->rating == 5 ? 'checked': ''?>/>
+                                <span style="font-weight: bold; padding-left: 15px;"><?=$review->title?></span>
+                                <?=date("F d, Y", strtotime($review->created_at))?>
+    <br/>
                                 <?=$review->text?><br/>
+                                <div id="block_review_helpful_<?=$review->id?>">
+                                    <form action="<?=Bapp::href($prod->url_key.'/review/helpful')?>" method="post"  onsubmit="return false;">
+                                    <input type="hidden" name="rid" value="<?=$review->id?>">
+                                    Was this review helpful to you?
+                                    <button type="submit" name="review_helpful" value="yes"
+                                            onclick="add_review_rating('<?=Bapp::href($prod->url_key.'/review/helpful')?>', <?=$review->id?>, 'yes');">Yes</button>
+                                    <button type="submit" name="review_helpful" value="no"
+                                            onclick="add_review_rating('<?=Bapp::href($prod->url_key.'/review/helpful')?>', <?=$review->id?>, 'no');">No</button>
+                                    </form>
+                                </div>
+                                <span id="block_review_helpful_done_<?=$review->id?>" style="color:green"></span>
+                                <br/><br/>
+                            </div>
                             <?php endforeach; ?>
+
                         <?php endif; ?>
-                        <form action="" method="post">
-                            <input name="review[rating]" type="radio" class="star" value="1"/>
-                            <input name="review[rating]" type="radio" class="star" value="2"/>
-                            <input name="review[rating]" type="radio" class="star" checked="checked" value="3"/>
-                            <input name="review[rating]" type="radio" class="star" value="4"/>
-                            <input name="review[rating]" type="radio" class="star" value="5"/>
-                            <br/>
-                            <input type="text" name="review[title]" placeholder="Title" /><br/>
-                            <textarea name="review[text]" placeholder="Your review here"></textarea><br/>
-                            <input type="submit">
-                        </form>
+
                     </div>
                     <div class="tab-content">
                     	<h4>Similar Products</h4>
