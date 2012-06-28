@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Model_Product extends BModel
+class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
