@@ -166,6 +166,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
+    
+
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);

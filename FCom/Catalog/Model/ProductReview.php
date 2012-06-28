@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
   `helpful` int(11) not null DEFAULT '0',
   `helpful_voices` bigint(11) not null DEFAULT '0',
   `title` varchar(255) NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `created_dt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `text` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
