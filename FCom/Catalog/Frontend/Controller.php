@@ -46,6 +46,12 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
+        $user = false;
+        if (Bapp::m('FCom_Customer')) {
+            $user = FCom_Customer_Model_Customer::sessionUser();
+        }
+        $layout->view('catalog/product')->user = $user;
+
         $this->layout('/catalog/product');
         BResponse::i()->render();
     }
@@ -71,10 +77,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
         }
 
-        if (!empty($post['review'])) {
-            $customer = FCom_Customer_Model_Customer::sessionUser();
-            FCom_Catalog_Model_ProductReview::i()->add($customer->id(), $product->id(), $post['review']);
-        }
+        
         BResponse::i()->redirect($href);
     }
 
