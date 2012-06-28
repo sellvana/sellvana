@@ -802,8 +802,10 @@ class BClassRegistry extends BClass
         }
         if (!empty($this->_methods[$method][$static][$type]['extends'])) {
             $parents = class_parents($class);
+#echo "<pre>"; echo $class.'::'.$method.';'; print_r($parents); print_r($this->_methods[$method][$static][$type]['extends']); echo "</pre><hr>";
             foreach ($this->_methods[$method][$static][$type]['extends'] as $c=>$v) {
                 if (isset($parents[$c])) {
+#echo ' * ';
                     $this->_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }
@@ -836,7 +838,8 @@ class BClassRegistry extends BClass
     */
     public function callMethod($origObject, $method, array $args=array(), $origClass=null)
     {
-        $class = $origClass ? $origClass : get_class($origObject);
+        //$class = $origClass ? $origClass : get_class($origObject);
+        $class = get_class($origObject);
 
         if (($info = $this->findMethodInfo($class, $method, 0, 'override'))) {
             $callback = $info['callback'];
@@ -879,12 +882,16 @@ class BClassRegistry extends BClass
     */
     public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
-        $class = $origClass ? $origClass : $class;
+        //$class = $origClass ? $origClass : $class;
 
         if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
         } else {
-            $callback = array($class, $method);
+            if (method_exists($class, $method)) {
+                $callback = array($class, $method);
+            } else {
+                throw new Exception('Invalid static method: '.$class.'::'.$method);
+            }
         }
 
         $result = call_user_func_array($callback, $args);
