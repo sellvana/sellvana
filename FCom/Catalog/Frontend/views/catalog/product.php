@@ -89,7 +89,7 @@ $cat = $this->category;
                                 <span style="font-weight: bold; padding-left: 15px;"><?=$review->title?></span>
                                 <?=date("F d, Y", strtotime($review->created_at))?>
     <br/>
-                                <?=$review->text?><br/>
+                                <?=nl2br($review->text)?><br/>
                                 <div id="block_review_helpful_<?=$review->id?>">
                                     <form action="<?=Bapp::href($prod->url_key.'/review/helpful')?>" method="post"  onsubmit="return false;">
                                     <input type="hidden" name="rid" value="<?=$review->id?>">
