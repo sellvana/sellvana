@@ -6,6 +6,7 @@ class FCom_Catalog_Admin_Controller_ProductReviews extends FCom_Admin_Controller
     protected $_gridHref = 'catalog/reviews';
     protected $_modelClass = 'FCom_Catalog_Model_ProductReview';
     protected $_mainTableAlias = 'pr';
+    //protected $_formLayoutName = 'catalog/reviews/main';
 
     public function gridConfig($model)
     {
@@ -52,7 +53,19 @@ class FCom_Catalog_Admin_Controller_ProductReviews extends FCom_Admin_Controller
         $m = $args['model'];
         $args['view']->set(array(
             'title' => $m->id ? 'Edit Product Review: '.$m->title : 'Create New Product Review',
+            'actions' => array(
+                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href("catalog/products/form?id=".$m->product_id).'\'"><span>Back to product</span></button>',
+                'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
+            ),
         ));
+
+        //print_r($args);exit;
+    }
+
+    public function action_index()
+    {
+        BResponse::i()->redirect(BApp::href("catalog/products"));
     }
 
 }
