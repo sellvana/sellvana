@@ -159,19 +159,3 @@ $(function(){
     );
 });
 
-function add_review_rating(url, rid, helpful)
-{
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: { rid: rid, review_helpful: helpful }
-    }).done(function( msg ) {
-        if (msg['redirect']) {
-            window.location.replace(msg['redirect']);
-            return false;
-        }
-        $('#block_review_helpful_'+rid).hide();
-        $('#block_review_helpful_done_'+rid).html("Thank you for your feedback!");
-    });
-
-}

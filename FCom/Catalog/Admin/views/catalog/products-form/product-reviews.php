@@ -1,6 +1,6 @@
 <?php
 $m = $this->model;
-$prodCtrl = FCom_Catalog_Admin_Controller_ProductReviews::i();
+$prodCtrl = FCom_ProductReviews_Admin_Controller::i();
 ?>
 <div id="linked-products-layout">
     <div class="ui-layout-west">

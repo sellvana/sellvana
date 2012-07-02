@@ -1,4 +1,5 @@
 <form action="" method="post">
+    <input type="hidden" name="pid" value="<?=$this->pid?>">
     <input name="review[rating]" type="radio" class="star" value="1"/>
     <input name="review[rating]" type="radio" class="star" value="2"/>
     <input name="review[rating]" type="radio" class="star" checked="checked" value="3"/>

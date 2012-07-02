@@ -14,9 +14,6 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
             ->route('GET|POST /catalog/products/.action', 'FCom_Catalog_Admin_Controller_Products')
 
-            ->route('GET|POST /catalog/reviews', 'FCom_Catalog_Admin_Controller_ProductReviews.index')
-            ->route('GET|POST /catalog/reviews/.action', 'FCom_Catalog_Admin_Controller_ProductReviews')
-
             ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
             ->route('GET|POST /catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
 
@@ -142,22 +139,6 @@ class FCom_Catalog_Admin extends BClass
                     array('layout', 'base'),
                     array('hook', 'main', 'views'=>array('admin/grid')),
                     array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/families'))),
-                ),
-
-                '/catalog/reviews'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('catalog/reviews')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/reviews'))),
-                ),
-                '/catalog/reviews/form'=>array(
-                    array('layout', 'base'),
-                    array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('admin/form')),
-                    array('view', 'admin/form', 'set'=>array(
-                        'tab_view_prefix' => 'catalog/catalog-reviews-form/',
-                    ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Review', 'pos'=>10))
-                    )),
                 ),
 
                 '/settings'=>array(

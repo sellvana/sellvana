@@ -32,4 +32,5 @@ class FCom_Catalog_Migrate extends BClass
     {
         FCom_Catalog_Model_Product::upgrade_0_1_2();
     }
+    
 }
