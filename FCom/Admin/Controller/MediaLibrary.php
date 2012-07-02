@@ -120,10 +120,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             //ob_implicit_flush();
             //ignore_user_abort(true);
             $uploads = $_FILES['upload'];
+
             foreach ($uploads['name'] as $i=>$fileName) {
+
                 if (!$fileName) {
                     continue;
                 }
+
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir.'/'.$fileName)) {
                     $att = $attModel->load(array('folder'=>$folder, 'file_name'=>$fileName));
                     if (!$att) {
@@ -146,8 +149,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $id = '';
                     $status = 'ERROR';
                 }
-                $row = array('id'=>$id, 'act'=>$status, 'file_name'=>$fileName, 'file_size'=>$att->file_size);
-                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row).")</script>";
+
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
+                //file_put_contents("/tmp/test", BUtil::toJson($row));
+                //echo "<script>alert('{$gridId}')</script>";
+                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
             }
             exit;
 
