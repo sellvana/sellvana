@@ -98,7 +98,6 @@ class FCom_Catalog_Admin extends BClass
                             array('addTab', 'categories', array('label'=>'Categories', 'pos'=>30, 'async'=>true)),
                             array('addTab', 'attachments', array('label'=>'Attachments', 'pos'=>40, 'async'=>true)),
                             array('addTab', 'images', array('label'=>'Images', 'pos'=>50, 'async'=>true)),
-                            array('addTab', 'product-reviews', array('label'=>'Product Reviews', 'pos'=>70, 'async'=>true)),
                         ),
                     ),
                 ),
