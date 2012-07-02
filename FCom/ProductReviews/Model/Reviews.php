@@ -26,7 +26,7 @@ class FCom_ProductReviews_Model_Reviews extends FCom_Core_Model_Abstract
         $this->save();
     }
 
-    public static function install()
+    public function install()
     {
         BDb::run("
 CREATE TABLE IF NOT EXISTS ".static::table()." (
