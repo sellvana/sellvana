@@ -37,14 +37,19 @@ $cat = $this->category;
                         </div>
                     </div>
 
+                    <?php
+                    $mediaList = FCom_Catalog_Model_ProductMedia::i()->orm()->where('product_id', $prod->id())->where('media_type', 'I')->find_many();
+                    ?>
                     <div class="product-img-box">
                         <p class="product-img">
                             <img src="<?=$prod->thumbUrl(50, 50)?>" alt="<?=$this->q($prod->product_name)?>" title="<?=$this->q($prod->product_name)?>"></p>
                         <div class="additional-views">
                             <ul>
+                                <?php foreach($mediaList as $media):?>
                                 <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
+                                    <a href="<?=$media->getUrl()?>" rel="lightbox[prod_<?=$prod->id?>]" title=""><img src="<?=$media->getUrl()?>" width="40" height="40" alt=""></a>
                                 </li>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     </div>
