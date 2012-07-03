@@ -1,3 +1,5 @@
+<a href="<?=Bapp::href("customer/address/edit")?>">Add new address</a>
+<br/>
 <?php foreach($this->addresses as $address): ?>
     <?php if ('s' == $this->type) :?>
         <?php if ($address->id == $this->customer->default_shipping_id): ?>
@@ -13,3 +15,5 @@
         <a href="<?=Bapp::href("customer/address/choose")?>?id=<?=$address->id?>&t=<?=$this->type?>">Select</a>
     <hr/>
 <?php endforeach; ?>
+<br/>
+
