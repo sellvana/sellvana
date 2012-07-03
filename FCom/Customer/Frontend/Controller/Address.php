@@ -25,15 +25,19 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout = BLayout::i();
         $customer = FCom_Customer_Model_Customer::sessionUser();
         $id = BRequest::i()->get('id');
-        $address = FCom_Customer_Model_Address::i()->load($id);
-
         $defaultShipping = false;
-        if ($customer->default_shipping_id == $address->id) {
-            $defaultShipping = true;
-        }
         $defaultBilling = false;
-        if ($customer->default_billing_id == $address->id) {
-            $defaultBilling = true;
+        $address = false;
+        if ($id) {
+            $address = FCom_Customer_Model_Address::i()->load($id);
+            if ($customer->default_shipping_id == $address->id) {
+                $defaultShipping = true;
+            }
+            if ($customer->default_billing_id == $address->id) {
+                $defaultBilling = true;
+            }
+        } else {
+            $address = FCom_Customer_Model_Address::create();
         }
 
         $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
