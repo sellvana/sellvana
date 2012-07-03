@@ -68,7 +68,12 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
             'created_dt' => null,
             'updated_dt' => null
         );
-        $newAddress = FCom_Checkout_Model_Address::create($address);
+        $newAddress = $this->orm()->where('cart_id', $cartId)->where('atype', $type)->find_one();
+        if (!$newAddress) {
+            $newAddress = FCom_Checkout_Model_Address::create($address);
+        } else {
+            $newAddress->set($address);
+        }
         $newAddress->save();
         return $newAddress;
     }
