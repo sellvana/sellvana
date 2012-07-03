@@ -19,7 +19,6 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         );
 
         $config['grid']['id'] = 'productreview';
-        $config['grid']['datatype'] = 'local';
         $config['grid']['autowidth'] = false;
         $config['grid']['caption'] = 'All review';
         $config['grid']['multiselect'] = false;
@@ -32,6 +31,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['grid']['url'] = BApp::href('prodreviews/grid_data');
             $config['custom'] = array('personalize'=>true);
         } else {
+            $config['grid']['datatype'] = 'local';
             $config['grid']['editurl'] = '';
             $config['grid']['url'] = '';
             $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
