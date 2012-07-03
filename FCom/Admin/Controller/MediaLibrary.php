@@ -151,9 +151,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
 
                 $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
-                //file_put_contents("/tmp/test", BUtil::toJson($row));
-                //echo "<script>alert('{$gridId}')</script>";
+
                 echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
+                //TODO: properly refresh grid after file upload
+                // solution addRowData method if we could prevent add new row after Upload file on client side
+                // another solution is to find a way to pass rowid to the server side
+                //echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".BUtil::toJson($row)."); </script>";
             }
             exit;
 
