@@ -40,6 +40,7 @@
             'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Frontend_DefaultTheme::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Default frontend theme",
+            'provides' => array('theme' => 'FCom_Frontend_DefaultTheme'),
         ),
         // administration panel views and controllers
         'FCom_Admin' => array(
@@ -57,6 +58,7 @@
             'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Admin_DefaultTheme::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Default admin theme",
+            'provides' => array('theme' => 'FCom_Admin_DefaultTheme'),
         ),
         // cron jobs processing
         'FCom_Cron' => array(
