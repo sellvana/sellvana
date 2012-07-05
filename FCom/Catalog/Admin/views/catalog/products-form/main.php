@@ -22,7 +22,12 @@
                 <?php echo $m->description ?>
             </li>
             <li>
-                <h4 class="label">Unit of Measures</h4>
+                <h4 class="label">Price</h4>
+                <?php echo $this->q($m->base_price) ?>
+            </li>
+            <li>
+                <h4 class="label">Shipping Weight</h4>
+                <?php echo $this->q($m->weight) ?>
             </li>
         </ul>
     </div>

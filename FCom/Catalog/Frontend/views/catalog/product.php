@@ -37,14 +37,19 @@ $cat = $this->category;
                         </div>
                     </div>
 
+                    <?php
+                    $mediaList = FCom_Catalog_Model_ProductMedia::i()->orm()->where('product_id', $prod->id())->where('media_type', 'I')->find_many();
+                    ?>
                     <div class="product-img-box">
                         <p class="product-img">
                             <img src="<?=$prod->thumbUrl(50, 50)?>" alt="<?=$this->q($prod->product_name)?>" title="<?=$this->q($prod->product_name)?>"></p>
                         <div class="additional-views">
                             <ul>
+                                <?php foreach($mediaList as $media):?>
                                 <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
+                                    <a href="<?=$media->getUrl()?>" rel="lightbox[prod_<?=$prod->id?>]" title=""><img src="<?=$media->getUrl()?>" width="40" height="40" alt=""></a>
                                 </li>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     </div>
@@ -77,7 +82,7 @@ $cat = $this->category;
                     </div>
                     <div class="tab-content">
                         <h4>Reviews</h4>
-                        <a href="<?=Bapp::href($prod->url_key.'/review/add')?>">Add review</a><br/><br/>
+                        <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>">Add review</a><br/><br/>
                         <?php if ($this->product_reviews) :?>
                             <?php foreach ($this->product_reviews as $review) :?>
                             <div style="border:1 px solid black;">
@@ -91,13 +96,14 @@ $cat = $this->category;
     <br/>
                                 <?=nl2br($review->text)?><br/>
                                 <div id="block_review_helpful_<?=$review->id?>">
-                                    <form action="<?=Bapp::href($prod->url_key.'/review/helpful')?>" method="post"  onsubmit="return false;">
+                                    <form action="<?=Bapp::href('prodreviews/helpful')?>" method="post"  onsubmit="return false;">
+                                    <input type="hidden" name="pid" value="<?=$prod->id?>">
                                     <input type="hidden" name="rid" value="<?=$review->id?>">
                                     Was this review helpful to you?
                                     <button type="submit" name="review_helpful" value="yes"
-                                            onclick="add_review_rating('<?=Bapp::href($prod->url_key.'/review/helpful')?>', <?=$review->id?>, 'yes');">Yes</button>
+                                            onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'yes');">Yes</button>
                                     <button type="submit" name="review_helpful" value="no"
-                                            onclick="add_review_rating('<?=Bapp::href($prod->url_key.'/review/helpful')?>', <?=$review->id?>, 'no');">No</button>
+                                            onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'no');">No</button>
                                     </form>
                                 </div>
                                 <span id="block_review_helpful_done_<?=$review->id?>" style="color:green"></span>
