@@ -25,9 +25,10 @@ class FCom_Customer_Frontend extends BClass
 
             //addresses
             ->route('GET /customer/address', 'FCom_Customer_Frontend_Controller_Address.index')
-            ->route('GET /customer/address/edit', 'FCom_Customer_Frontend_Controller_Address.edit')
-            ->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
             ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
+            ->route('GET /customer/address/.action', 'FCom_Customer_Frontend_Controller_Address')
+            //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
+
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
@@ -71,6 +72,10 @@ class FCom_Customer_Frontend extends BClass
             '/customer/address/list'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/address/list')),
+            ),
+            '/customer/address/choose'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address/choose')),
             ),
             '/customer/order/list'=>array(
                 array('layout', 'base'),

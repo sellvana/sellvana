@@ -10,6 +10,9 @@ class FCom_ProductReviews_Frontend extends BClass
 
         BFrontController::i()
             ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
+            ->route( 'GET /prodreviews/add', 'FCom_ProductReviews_Frontend_Controller.add')
+            ->route( 'POST /prodreviews/add', 'FCom_ProductReviews_Frontend_Controller.add_post')
+            ->route( 'POST /prodreviews/helpful', 'FCom_ProductReviews_Frontend_Controller.helpful_post')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
@@ -18,8 +21,14 @@ class FCom_ProductReviews_Frontend extends BClass
     public static function layout()
     {
         BLayout::i()->layout(array(
-            '/prodreviews'=>array(
-
+            'base'=>array(
+                array('view', 'head', 'do'=>array(
+                    array('js', '{FCom_ProductReviews}/Frontend/js/fcom.productreviews.js'),
+                )
+            )),
+            '/prodreviews/add'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('prodreviews/add'))
             ),
         ));
     }
