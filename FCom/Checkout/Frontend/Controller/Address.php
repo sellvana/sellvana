@@ -40,8 +40,8 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
         }
 
-        $address->save();
-        $address = FCom_Checkout_Model_Address::i()->load($address->id());
+        //$address->save();
+        //$address = FCom_Checkout_Model_Address::i()->load($address->id());
         if ('shipping' == $address->atype) {
             $breadCrumbLabel = 'Shipping address';
         } else {
@@ -82,14 +82,18 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $address = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType);
+        if (!$address) {
+            $address = FCom_Checkout_Model_Address::i()->orm()->create();
+        }
         if ($address) {
             $address->set($r);
             $address->atype = $addressType;
+            $address->cart_id = $cart->id();
             $address->save();
         }
 
         if ($r['address_equal']) {
-            //copy of shipping address for billing address
+            //copy shipping address to billing address
             $addressCopy = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType2);
             if (!$addressCopy) {
                 $addressCopy = FCom_Checkout_Model_Address::i()->orm()->create();
@@ -98,6 +102,25 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressCopy->set($r);
             $addressCopy->atype = $addressType2;
             $addressCopy->save();
+        }
+
+        if (BApp::m('FCom_Customer')) {
+            $user = FCom_Customer_Model_Customer::sessionUser();
+            if ('shipping' == $addressType) {
+                if ($user && !$user->defaultShipping()) {
+                    $newAddress = $address->as_array();
+                    unset($newAddress['id']);
+                    FCom_Customer_Model_Address::i()->newShipping($newAddress, $user);
+                }
+            }
+
+            if ('billing' == $addressType) {
+                if ($user && !$user->defaultBilling()) {
+                    $newAddress = $address->as_array();
+                    unset($newAddress['id']);
+                    FCom_Customer_Model_Address::i()->newBilling($newAddress, $user);
+                }
+            }
         }
 
         $href = BApp::href('checkout');

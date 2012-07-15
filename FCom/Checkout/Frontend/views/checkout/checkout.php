@@ -106,11 +106,11 @@
 <?php if (!empty($this->paymentMethod)) :?>
     <a href="/checkout/payment">Change</a><br/>
 
-    <b><?=$this->paymentClass->getName()?></b><br/>
+    <i><?=$this->paymentClass->getName()?></i><br/>
     <?= $this->view($this->paymentMethod.'/form')->set('paymentDetails', $this->paymentDetails);?>
     <br/><br/>
 <?php else: ?>
-    <a href="/checkout/payment">Select payment method</a><br/>
+    <a href="/checkout/payment" style="color:red">Select payment method</a><br/>
 <?php endif; ?>
 
 
