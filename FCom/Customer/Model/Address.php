@@ -45,16 +45,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     public static function import($data, $cust, $atype='billing')
     {
-        $addr = false;
-        if ($cust->default_billing_id && 'billing' == $atype) {
-            $addr = static::load($cust->default_billing_id);
-        }
-        if ($cust->default_shipping_id && 'shipping' == $atype) {
-            $addr = static::load($cust->default_shipping_id);
-        }
-        if (empty($addr)) {
-            $addr = static::create(array('customer_id' => $cust->id));
-        }
+        $addr = static::create(array('customer_id' => $cust->id));
 
         if(!empty($data['address'])){
             $addr->set($data['address']);
@@ -68,7 +59,9 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
             $cust->set('default_shipping_id', $addr->id);
         }
 
-        $cust->save();
+        if ($cust->is_dirty()) {
+            $cust->save();
+        }
 
         return $addr;
     }
