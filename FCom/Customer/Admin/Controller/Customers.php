@@ -36,7 +36,6 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $orm->left_outer_join('FCom_Customer_Model_Address', array('a.id','=','c.default_billing_id'), 'a')
             ->select(array('a.street1', 'a.city', 'a.state', 'a.zip', 'a.country'))
         ;
-        //file_put_contents("/tmp/test", print_r($orm, 1));
     }
 
     public function formViewBefore($args)
