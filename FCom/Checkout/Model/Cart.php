@@ -46,6 +46,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function userLogin()
     {
+        if (!BApp::m('FCom_Customer')) {
+            return false;
+        }
+        
         $user = FCom_Customer_Model_Customer::sessionUser();
         if(!$user){
             return;

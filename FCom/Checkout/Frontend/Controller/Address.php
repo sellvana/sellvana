@@ -105,6 +105,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         if (BApp::m('FCom_Customer')) {
+            //todo move this code to FCom_Customer and add the trigger for this event
             $user = FCom_Customer_Model_Customer::sessionUser();
             if ('shipping' == $addressType) {
                 if ($user && !$user->defaultShipping()) {
