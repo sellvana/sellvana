@@ -21,7 +21,6 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('checkout/cart')->cart = $cart;
         $layout->view('checkout/cart')->shipping_esitmate = $shippingEstimate;
         $this->layout('/checkout/cart');
-        BResponse::i()->render();
     }
 
     public function action_cart_post()

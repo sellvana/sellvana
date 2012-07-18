@@ -37,7 +37,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('indextank/product/list')->products_data = $productsData;
 
         $this->layout('/indextank/search');
-        BResponse::i()->render();
     }
 
     public function action_search()
@@ -68,7 +67,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('indextank/product/list')->products_data = $productsData;
 
         $this->layout('/indextank/search');
-        BResponse::i()->render();
     }
 
 

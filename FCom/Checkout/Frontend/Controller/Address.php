@@ -55,7 +55,6 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout->view('checkout/address')->address = $address;
         $layout->view('checkout/address')->address_type = $atype;
         $this->layout('/checkout/address');
-        BResponse::i()->render();
     }
 
     public function action_address_post()
