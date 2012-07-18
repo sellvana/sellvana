@@ -60,23 +60,25 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $catId = $args['id'];
         $prodIds = $args['ref'];
-        if (!$copy) {
-
-        }
+        //todo
     }
 
-    public function categories($pId)
+    /**
+     * Find all categories which belong to product
+     * @return type
+     */
+    public function categories()
     {
         return FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
                 ->join('FCom_Catalog_Model_Category', array('cp.category_id','=','c.id'), 'c')
-                ->where('cp.product_id', $pId)->find_many();
+                ->where('cp.product_id', $this->id())->find_many();
     }
-
+/*
     public function customFields($product)
     {
         return FCom_CustomField_Model_ProductField::i()->productFields($product);
     }
-
+*/
     public function customFieldsShowOnFrontend()
     {
         $result = array();
