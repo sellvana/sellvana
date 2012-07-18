@@ -292,6 +292,21 @@
                 ),
             ),
         ),
+        'FCom_Disqus' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Disqus',
+            'depends' => array('FCom_Core'),
+            'description' => "Disqus comments",
+            'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'DisqusAdmin.php', 'callback'=>'FCom_Disqus_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
+                ),
+            ),
+        ),
         // test CreditCard module
         'FCom_CreditCard' => array(
             'version' => '0.1.0',
