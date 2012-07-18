@@ -31,18 +31,18 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
 
         if ($cart->id()) {
-            $shipAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
-            $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
+            $shipAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
+            $billAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'billing');
 
             if ($user) {
                 //copy user address to checkout address
                 if (!$shipAddress && $user->defaultShipping()) {
                     FCom_Checkout_Model_Address::i()->newShipping($cart->id(), $user->defaultShipping());
-                    $shipAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+                    $shipAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
                 }
                 if (!$billAddress && $user->defaultBilling()) {
                     FCom_Checkout_Model_Address::i()->newBilling($cart->id(), $user->defaultBilling(), $user->email);
-                    $billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
+                    $billAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'billing');
                 }
             }
         }
@@ -117,7 +117,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         if (!empty($post['create_account'])) {
             $r = $post['account'];
-            //$billAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'billing');
+            //$billAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'billing');
             //$r['email'] = $billAddress->email;
             try {
                 $customer = FCom_Customer_Model_Customer::i()->register($r);

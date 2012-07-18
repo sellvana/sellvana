@@ -80,7 +80,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             BResponse::i()->redirect($href);
         }
 
-        $address = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType);
+        $address = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), $addressType);
         if (!$address) {
             $address = FCom_Checkout_Model_Address::i()->orm()->create();
         }
@@ -93,7 +93,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         if ($r['address_equal']) {
             //copy shipping address to billing address
-            $addressCopy = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), $addressType2);
+            $addressCopy = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), $addressType2);
             if (!$addressCopy) {
                 $addressCopy = FCom_Checkout_Model_Address::i()->orm()->create();
                 $addressCopy->cart_id = $cart->id();
