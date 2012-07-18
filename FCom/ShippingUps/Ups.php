@@ -94,7 +94,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
     {
         //address
         $user = FCom_Customer_Model_Customer::sessionUser();
-        $shippingAddress = FCom_Checkout_Model_Address::i()->getAddress($cart->id(), 'shipping');
+        $shippingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
         }
