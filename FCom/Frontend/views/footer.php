@@ -1,3 +1,5 @@
+<?= $this->view('disqus/embed');?>
+
 <footer class="footer">
     <div class="col4-set">
         <dl class="col first">
@@ -33,3 +35,4 @@
     </div>
     <p class="copyright">&copy; 2012 Fulleron Inc. <a href="#">Sitemap</a> <a href="#">Privacy</a> <a href="#">Terms of Use</a></p>
 </footer>
+
