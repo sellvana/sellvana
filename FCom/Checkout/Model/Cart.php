@@ -46,10 +46,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function userLogin()
     {
-        if (!BApp::m('FCom_Customer')) {
+        if (false == BModuleRegistry::isLoaded('FCom_Customer')) {
             return false;
         }
-        
+
         $user = FCom_Customer_Model_Customer::sessionUser();
         if(!$user){
             return;
@@ -190,7 +190,11 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     public static function by_user($orm, $userId)
     {
         if (is_null($userId)) {
-            $userId = FCom_Customer_Model_User::sessionUserId();
+            if (BModuleRegistry::isLoaded('FCom_Customer')) {
+                $userId = FCom_Customer_Model_Customer::sessionUserId();
+            } else {
+                return;
+            }
         }
         return $orm->where('user_id', $userId);
     }
@@ -248,11 +252,9 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['no_calc_totals'])) {
             $this->calcTotals()->save();
         }
-        $user = FCom_Customer_Model_Customer::sessionUser();
-        if($user){
-            $user->session_cart_id = $this->id;
-            $user->save();
-        }
+
+        BPubSub::i()->fire(__CLASS__.'::'.__METHOD__, array('model'=>$this));
+
         static::sessionCartId($this->id);
         return $this;
     }

@@ -8,7 +8,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Login or guest checkout', 'active'=>true));
         $this->layout('/checkout/login');
-        BResponse::i()->render();
     }
 
     public function action_checkout()
@@ -91,7 +90,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $layout->view('checkout/checkout')->totals = $cart->getTotals();
         $this->layout('/checkout/checkout');
-        BResponse::i()->render();
     }
 
     public function action_checkout_post()
@@ -197,7 +195,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout->view('checkout/payment')->payment_methods = $paymentMethods;
         $layout->view('checkout/payment')->cart = $cart;
         $this->layout('/checkout/payment');
-        BResponse::i()->render();
     }
 
     public function action_payment_post()
@@ -229,7 +226,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout->view('checkout/shipping')->address = array();
         $layout->view('checkout/shipping')->methods = array();
         $this->layout('/checkout/shipping');
-        BResponse::i()->render();
     }
 
     public function action_shipping_post()
@@ -260,6 +256,5 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->view('checkout/success')->order = $salesOrder;
         $this->view('checkout/success')->user = $user;
         $this->layout('/checkout/success');
-        BResponse::i()->render();
     }
 }

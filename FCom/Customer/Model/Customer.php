@@ -207,6 +207,17 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $this->save();
     }
 
+    public function onAddProductToCart($args)
+    {
+        $cart = $args['model'];
+
+        $user = self::sessionUser();
+        if($user){
+            $user->session_cart_id = $cart->id();
+            $user->save();
+        }
+    }
+
     public function install()
     {
         $tCustomer = static::table();

@@ -29,7 +29,6 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         FCom_Core::lastNav(true);
 
         $this->layout('/catalog/category');
-        BResponse::i()->render();
     }
 
     public function action_search()
@@ -57,6 +56,5 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('catalog/product/list')->products_data = $productsData;
 
         $this->layout('/catalog/search');
-        BResponse::i()->render();
     }
 }
