@@ -1,5 +1,3 @@
-<?= $this->view('disqus/embed');?>
-
 <footer class="footer">
     <div class="col4-set">
         <dl class="col first">
