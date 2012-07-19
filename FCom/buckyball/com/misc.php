@@ -1787,6 +1787,7 @@ class BLocale extends BClass
             if (!BUtil::isPathAbsolute($data)) {
                 $data = BApp::m($module)->root_dir.'/'.$data;
             }
+            
             if (is_readable($data)) {
                 $fp = fopen($data, 'r');
                 while (($r = fgetcsv($fp, 2084))) {
@@ -1802,6 +1803,11 @@ class BLocale extends BClass
                 static::addTranslation($r, $module);
             }
         }
+    }
+
+    static public function addTranslationsFile($file)
+    {
+        self::importTranslations($file);
     }
 
     protected static function addTranslation($r, $module=null)
@@ -1856,6 +1862,7 @@ class BLocale extends BClass
                 $tr = current($arr); // and use it
             }
         }
+
         return BUtil::sprintfn($tr, $params);
     }
 
