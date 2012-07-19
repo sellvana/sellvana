@@ -10,6 +10,7 @@ $c = $this->model;
                 <tr>
                     <td>Show on all pages</td>
                     <td>
+                        <input type="hidden" name="config[modules][FCom_Disqus][show_on_all_pages]" value="0">
                         <input type="checkbox" value="1"  name="config[modules][FCom_Disqus][show_on_all_pages]"
                                <?= $c->get('modules/FCom_Disqus/show_on_all_pages') == 1? 'checked': ''?> >
                     </td>
