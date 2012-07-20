@@ -1787,13 +1787,33 @@ class BLocale extends BClass
             if (!BUtil::isPathAbsolute($data)) {
                 $data = BApp::m($module)->root_dir.'/'.$data;
             }
-            
+
             if (is_readable($data)) {
-                $fp = fopen($data, 'r');
-                while (($r = fgetcsv($fp, 2084))) {
-                    static::addTranslation($r, $module);
+                $extension = !empty($params['extension']) ? $params['extension'] : 'csv';
+                switch ($extension) {
+                    case 'csv':
+                        $fp = fopen($data, 'r');
+                        while (($r = fgetcsv($fp, 2084))) {
+                            static::addTranslation($r, $module);
+                        }
+                        fclose($fp);
+                        break;
+
+                    case 'json':
+                        $content = file_get_contents($data);
+                        $translations = BUtil::fromJson($content);
+                        foreach ($translations as $word => $tr) {
+                            static::addTranslation(array($word,$tr), $module);
+                        }
+                        break;
+                        
+                    case 'php':
+                        $translations = include $data;
+                        foreach ($translations as $word => $tr) {
+                            static::addTranslation(array($word,$tr), $module);
+                        }
+                        break;
                 }
-                fclose($fp);
             } else {
                 BDebug::warning('Could not load translation file: '.$data);
                 return;
@@ -1807,7 +1827,12 @@ class BLocale extends BClass
 
     static public function addTranslationsFile($file)
     {
-        self::importTranslations($file);
+        $pathInfo = pathinfo($file);
+        if (empty($pathInfo['extension'])) {
+            return;
+        }
+        $params['extension'] = $pathInfo['extension'];
+        self::importTranslations($file, $params);
     }
 
     protected static function addTranslation($r, $module=null)
