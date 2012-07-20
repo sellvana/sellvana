@@ -363,7 +363,7 @@ class BUtil
 
         case 'end': $result = array_merge($array, $items); break;
 
-        case 'offset':
+        case 'offset': // for associative only
             $i = 0;
             foreach ($array as $k=>$v) {
                 if ($key===$i++) {
@@ -375,7 +375,7 @@ class BUtil
             }
             break;
 
-        case 'key':
+        case 'key': // for associative only
             $rel = $w2[1];
             $key = $w1[1];
             foreach ($array as $k=>$v) {

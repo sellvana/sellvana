@@ -1266,12 +1266,8 @@ class BPubSub extends BClass
         if (($moduleName = BModuleRegistry::currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
-        if (empty($args['position'])) {
-            $this->_events[$eventName]['observers'][] = $observer;
-        } else {
-            $this->_events[$eventName]['observers'] = BUtil::arrayInsert(
-                $this->_events[$eventName]['observers'], $observer, $args['position']);
-        }
+        //TODO: create named observers
+        $this->_events[$eventName]['observers'][] = $observer;
         BDebug::debug('SUBSCRIBE '.$eventName.': '.var_export($callback, 1), 1);
         return $this;
     }
@@ -1321,7 +1317,22 @@ class BPubSub extends BClass
         if (empty($this->_events[$eventName])) {
             return $result;
         }
-        foreach ($this->_events[$eventName]['observers'] as $i=>$observer) {
+        $observers =& $this->_events[$eventName]['observers'];
+        // sort order observers
+        do {
+            $dirty = false;
+            foreach ($observers as $i=>$observer) {
+                if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
+                    unset($observers[$i]);
+                    $observer['ordered'] = true;
+                    $observers = BUtil::arrayInsert($observers, $observer, $observer['position']);
+                    $dirty = true;
+                    break;
+                }
+            }
+        } while ($dirty);
+        
+        foreach ($observers as $i=>$observer) {
             if (!empty($this->_events[$eventName]['args'])) {
                 $args = array_merge($this->_events[$eventName]['args'], $args);
             }
@@ -1353,7 +1364,7 @@ class BPubSub extends BClass
                         $cb = array($r[0]::i(), $r[1]);
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
-                        $this->_events[$eventName]['observers'][$i]['callback'] = $cb;
+                        $observers[$i]['callback'] = $cb;
                         break;
                     }
                 }
