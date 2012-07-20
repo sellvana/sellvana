@@ -436,14 +436,18 @@ class BLayout extends BClass
 
     public function metaDirectiveHookCallback($d)
     {
+        $args = !empty($d['args']) ? $d['args'] : array();
+        if (!empty($d['position'])) {
+            $args['position'] = $d['position'];
+        }
         if (!empty($d['callbacks'])) {
             foreach ($d['callbacks'] as $cb) {
-                $this->hook($d['name'], $cb);
+                $this->hook($d['name'], $cb, $args);
             }
         }
         if (!empty($d['views'])) {
             foreach ($d['views'] as $v) {
-                $this->hookView($d['name'], $v);
+                $this->hookView($d['name'], $v, $args);
             }
         }
     }
