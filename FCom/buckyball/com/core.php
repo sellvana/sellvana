@@ -1266,7 +1266,12 @@ class BPubSub extends BClass
         if (($moduleName = BModuleRegistry::currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
-        $this->_events[$eventName]['observers'][] = $observer;
+        if (empty($args['position'])) {
+            $this->_events[$eventName]['observers'][] = $observer;
+        } else {
+            $this->_events[$eventName]['observers'] = BUtil::arrayInsert(
+                $this->_events[$eventName]['observers'], $observer, $args['position']);
+        }
         BDebug::debug('SUBSCRIBE '.$eventName.': '.var_export($callback, 1), 1);
         return $this;
     }

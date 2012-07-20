@@ -367,7 +367,7 @@ class FCom_Core_Controller_Abstract extends BActionController
         }
         if (!$page || !($view = $this->view($viewPrefix.$page))) {
             $this->forward(true);
-            return;
+            return false;
         }
         $this->layout('base');
         BLayout::i()->applyLayout($viewPrefix.$page);
@@ -388,6 +388,7 @@ class FCom_Core_Controller_Abstract extends BActionController
             $root->addBodyClass('page-'.$page);
         }
         BLayout::i()->hookView('main', $viewPrefix.$page);
+        return $page;
     }
 }
 
@@ -419,6 +420,12 @@ class FCom_Core_View_Abstract extends BView
 class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
     protected $_htmlAttr = array('lang'=>'en');
+    
+    public function __construct(array $params)
+    {
+        parent::__construct($params);
+        $this->addBodyClass(strtolower(trim(preg_replace('#[^a-z0-9]+#i', '-', BRequest::i()->rawPath()), '-')));
+    }
 
     public function addBodyClass($class)
     {
