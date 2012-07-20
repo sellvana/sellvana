@@ -1806,7 +1806,7 @@ class BLocale extends BClass
                             static::addTranslation(array($word,$tr), $module);
                         }
                         break;
-                        
+
                     case 'php':
                         $translations = include $data;
                         foreach ($translations as $word => $tr) {
@@ -1823,6 +1823,28 @@ class BLocale extends BClass
                 static::addTranslation($r, $module);
             }
         }
+    }
+
+    static public function collectTranslations($rootDir, $targetFile, $fileType)
+    {
+        //find all files by mask
+        $files = array();
+        $dirs[] = $rootDir;
+        while ($dirs) {
+            $tmpdirs = array();
+            foreach($dirs as $index => $dir) {
+                $dir = rtrim($dir, '/').'/';
+                $files[$dir] = glob($dir.'*.'.$fileType);
+                unset($dirs[$index]);
+                $tmpdirs = array_merge($tmpdirs, glob($dir.'*', GLOB_ONLYDIR));
+            }
+            $dirs = $tmpdirs;
+        }
+        if (empty($files)) {
+            return;
+        }
+
+        
     }
 
     static public function addTranslationsFile($file)
