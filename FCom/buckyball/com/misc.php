@@ -1844,7 +1844,7 @@ class BLocale extends BClass
             return;
         }
 
-        
+
     }
 
     static public function addTranslationsFile($file)
@@ -2043,5 +2043,10 @@ class BLocale extends BClass
     public function datetimeDbToLocal($value, $full=false)
     {
         return strftime($full ? '%c' : '%x', strtotime($value));
+    }
+
+    static public function getTranslations()
+    {
+        return self::$_tr;
     }
 }

@@ -320,6 +320,19 @@
                 ),
             ),
         ),
+        // translations Admin module
+        'FCom_Translation' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Translation',
+            'depends' => array('FCom_Core'),
+            'description' => "Translations module",
+            'bootstrap' => array('file'=>'TranslationAdmin.php', 'callback'=>'FCom_Translation_Admin::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'TranslationAdmin.php', 'callback'=>'FCom_Translation_Admin::bootstrap'),
+                ),
+            ),
+        ),
         // freshbook simple invoicing
         'FCom_FreshBooks' => array(
             'version' => '0.1.0',
