@@ -7,7 +7,7 @@ class FCom_Disqus_Frontend extends BClass
         BLayout::i()->addAllViews('Frontend/views');
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Disqus_Frontend::layout');
         setLocale(LC_ALL, 'ru_RU.UTF-8');
-        BLocale::addTranslationsFile('tr.csv');
+        BLocale::addTranslationsFile('tr.json');
     }
 
     static public function layout()
