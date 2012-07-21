@@ -119,6 +119,9 @@ class FCom_Core extends BClass
         } else {
             $configFileStatus = false;
         }
+        if (file_exists($configDir.'/defaults.php')) {
+            $config->addFile('defaults.php', true);
+        }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
@@ -420,7 +423,7 @@ class FCom_Core_View_Abstract extends BView
 class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
     protected $_htmlAttr = array('lang'=>'en');
-    
+
     public function __construct(array $params)
     {
         parent::__construct($params);

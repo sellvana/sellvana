@@ -55,7 +55,7 @@ class BModuleRegistry extends BClass
     {
         return static::$_modules;
     }
-    
+
     public static function isLoaded($modName)
     {
         return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_level===BModule::LOADED;
@@ -391,6 +391,12 @@ echo "</pre>"; exit;
         foreach (static::$_modules as $mod) {
             $this->pushModule($mod->name);
             $mod->bootstrap();
+            //load translations
+            if (!empty($mod->translations)) {
+                foreach($mod->translations as $file) {
+                    BLocale::addTranslationsFile($file);
+                }
+            }
             $this->popModule();
         }
         BPubSub::i()->fire('bootstrap::after');
