@@ -120,7 +120,7 @@ class FCom_Core extends BClass
             $configFileStatus = false;
         }
         if (file_exists($configDir.'/defaults.php')) {
-            $config->addFile('defaults.php', true);
+            include_once $configDir.'/defaults.php';
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
