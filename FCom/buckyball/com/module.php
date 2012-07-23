@@ -721,6 +721,13 @@ class BModule extends BClass
         return $href;
     }
 
+    public function baseDir()
+    {
+        $dir = $this->root_dir;
+
+        return $dir;
+    }
+
     public function runLevel($level=null, $updateConfig=false)
     {
         if (is_null($level)) {
