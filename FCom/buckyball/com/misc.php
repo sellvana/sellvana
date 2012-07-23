@@ -1830,6 +1830,7 @@ class BLocale extends BClass
      * @param string $rootDir - start directory to look for translation calls BLocale::_
      * @param string $targetFile - output file which contain translation values
      * @return boolean - TRUE on success
+     * @example BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
      */
     static public function collectTranslations($rootDir, $targetFile)
     {
@@ -1888,8 +1889,10 @@ class BLocale extends BClass
         }
         //add undefined translation to $targetFile
         $newtranslations = array();
-        foreach($translations as $trkey => $tr){
-            list(,$newtranslations[$trkey]) = each($tr);
+        if ($translations) {
+            foreach($translations as $trkey => $tr){
+                list(,$newtranslations[$trkey]) = each($tr);
+            }
         }
         $newtranslations = array_merge($newtranslations, $keys);
 
@@ -1907,7 +1910,7 @@ class BLocale extends BClass
             default:
                 throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
         }
-        
+
     }
 
     static protected function saveToPHP($targetFile, $array)
@@ -1921,6 +1924,21 @@ class BLocale extends BClass
         }
         $code = "<?php return array($code);";
         file_put_contents($targetFile, $code);
+    }
+
+    static protected function saveToJSON($targetFile, $array)
+    {
+        $json = json_encode($array);
+        file_put_contents($targetFile, $json);
+    }
+
+    static protected function saveToCSV($targetFile, $array)
+    {
+        $handle = fopen($targetFile, "w");
+        foreach ($array as $k => $v) {
+            fputcsv($handle, array($k, $v));
+        }
+        fclose($handle);
     }
 
     static public function getFilesFromDir($dir)
