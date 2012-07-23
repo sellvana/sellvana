@@ -1497,7 +1497,7 @@ class BSession extends BClass
             $this->data =& $_SESSION[$namespace];
         }
 
-        if (BConfig::i()->get('locale')) {
+        if (empty($this->data['_locale'])) {
             $this->data['_locale'] = BConfig::i()->get('locale');
         }
 
