@@ -5,7 +5,7 @@
 
         <li>
             <h4 class="label">Source </h4>
-            <textarea name="source" ><?php echo $this->q($m->source) ?></textarea>
+            <textarea name="source" style="width: 600px; height: 200px;" ><?php echo $this->q($m->source) ?></textarea>
         </li>
 
 

@@ -13,6 +13,7 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
         $config = array();
         $columns = array(
             'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
+            'locale' => array('label'=>'Locale', 'width'=>250, 'editable'=>true),
             'file'=>array('label'=>'File', 'width'=>60, 'editable'=>true)
         );
 
@@ -33,8 +34,12 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
         $modules = BModuleRegistry::getAllModules();
         foreach($modules as $module){
             if (!empty($module->translations)) {
-                foreach($module->translations as $trfile) {
-                    $data[] = array('module' => $module->name, 'file' => $trfile, 'id'=>$module->name.'/'.$trfile);
+                foreach($module->translations as $trlocale => $trfile) {
+                    $data[] = array(
+                        'module' => $module->name,
+                        'locale' => $trlocale,
+                        'file' => $trfile,
+                        'id'=>$module->name.'/'.$trfile);
                 }
             }
         }

@@ -379,6 +379,7 @@ class BModuleRegistry extends BClass
     */
     public function bootstrap()
     {
+        $locale = BSession::i()->data('_locale');
         $this->checkDepends();
         $this->sortDepends();
 /*
@@ -392,9 +393,13 @@ echo "</pre>"; exit;
             $this->pushModule($mod->name);
             $mod->bootstrap();
             //load translations
-            if (!empty($mod->translations)) {
-                foreach($mod->translations as $file) {
-                    BLocale::addTranslationsFile($file);
+            if (!empty($locale) && $locale != 'en_US.UTF-8') {
+                if (!empty($mod->translations)) {
+                    foreach($mod->translations as $trLocale => $file) {
+                        if ($trLocale == $locale) {
+                            BLocale::addTranslationsFile($file);
+                        }
+                    }
                 }
             }
             $this->popModule();
