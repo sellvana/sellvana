@@ -1860,7 +1860,7 @@ class BLocale extends BClass
     protected static function addTranslation($r, $module=null)
     {
         if (empty($r[1])) {
-            BDebug::warning('No translation specified for '.$r[0]);
+            BDebug::debug('No translation specified for '.$r[0]);
             return;
         }
         // short and quick way
