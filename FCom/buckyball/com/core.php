@@ -291,7 +291,7 @@ class BApp extends BClass
 
     public static function href($url='', $full=true, $method=2)
     {
-        return BApp::baseUrl($full, $method) 
+        return BApp::baseUrl($full, $method)
             . BFrontController::processHref($url);
     }
 
@@ -1331,7 +1331,7 @@ class BPubSub extends BClass
                 }
             }
         } while ($dirty);
-        
+
         foreach ($observers as $i=>$observer) {
             if (!empty($this->_events[$eventName]['args'])) {
                 $args = array_merge($this->_events[$eventName]['args'], $args);
@@ -1505,6 +1505,8 @@ class BSession extends BClass
             } elseif (is_string($this->data['_locale'])) {
                 setlocale(LC_ALL, $this->data['_locale']);
             }
+        } else {
+            setLocale(LC_ALL, 'en_US.UTF-8');
         }
 
         if (!empty($this->data['_timezone'])) {
