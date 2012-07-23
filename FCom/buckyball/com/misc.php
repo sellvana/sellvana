@@ -1825,35 +1825,132 @@ class BLocale extends BClass
         }
     }
 
-    static public function collectTranslations($rootDir, $targetFile, $fileType)
+    /**
+     * Collect all translation keys & values start from $rootDir and save into $targetFile
+     * @param string $rootDir - start directory to look for translation calls BLocale::_
+     * @param string $targetFile - output file which contain translation values
+     * @return boolean - TRUE on success
+     */
+    static public function collectTranslations($rootDir, $targetFile)
     {
-        //find all files by mask
-        $files = array();
-        $dirs[] = $rootDir;
-        while ($dirs) {
-            $tmpdirs = array();
-            foreach($dirs as $index => $dir) {
-                $dir = rtrim($dir, '/').'/';
-                $files[$dir] = glob($dir.'*.'.$fileType);
-                unset($dirs[$index]);
-                $tmpdirs = array_merge($tmpdirs, glob($dir.'*', GLOB_ONLYDIR));
-            }
-            $dirs = $tmpdirs;
-        }
+        //find files recursively
+        $files = self::getFilesFromDir($rootDir);
         if (empty($files)) {
-            return;
+            return true;
         }
 
+        //find all BLocale::_ calls and extract first parameter - translation key
+        $keys = array();
+        foreach($files as $file) {
+            $source = file_get_contents($file);
+            $tokens = token_get_all($source);
+            $func = 0;
+            $class = 0;
+            $sep = 0;
+            foreach($tokens as $token) {
+                if (empty($token[1])){
+                    continue;
+                }
+                if ($token[1] =='BLocale') {
+                    $class = 1;
+                    continue;
+                }
+                if ($class && $token[1] == '::') {
+                    $class = 0;
+                    $sep = 1;
+                    continue;
+                }
+                if ($sep && $token[1] == '_') {
+                    $sep = 0;
+                    $func = 1;
+                    continue;
+                }
+                if($func) {
+                    $token[1] = trim($token[1], "'");
+                    $keys[$token[1]] = '';
+                    $func = 0;
+                    continue;
+                }
+            }
+        }
 
+        //import translation from $targetFile
+
+        self::$_tr = '';
+        self::addTranslationsFile($targetFile);
+        $translations = self::getTranslations();
+
+        //find undefined translations
+        foreach ($keys as $key => $v) {
+            if(isset($translations[$key])) {
+                unset($keys[$key]);
+            }
+        }
+        //add undefined translation to $targetFile
+        $newtranslations = array();
+        foreach($translations as $trkey => $tr){
+            list(,$newtranslations[$trkey]) = each($tr);
+        }
+        $newtranslations = array_merge($newtranslations, $keys);
+
+        $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+        switch ($ext) {
+            case 'php':
+                self::saveToPHP($targetFile, $newtranslations);
+                break;
+            case 'csv':
+                self::saveToCSV($targetFile, $newtranslations);
+                break;
+            case 'json':
+                self::saveToJSON($targetFile, $newtranslations);
+                break;
+            default:
+                throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
+        }
+        
+    }
+
+    static protected function saveToPHP($targetFile, $array)
+    {
+        $code = '';
+        foreach($array as $k => $v) {
+            if (!empty($code)) {
+                $code .= ','."\n";
+            }
+            $code .= "'$k' => '$v'";
+        }
+        $code = "<?php return array($code);";
+        file_put_contents($targetFile, $code);
+    }
+
+    static public function getFilesFromDir($dir)
+    {
+        $files = array();
+        if (false !== ($handle = opendir($dir))) {
+            while (false !== ($file = readdir($handle))) {
+                if ($file != "." && $file != "..") {
+                    if(is_dir($dir.'/'.$file)) {
+                        $dir2 = $dir.'/'.$file;
+                        $files = array_merge($files, self::getFilesFromDir($dir2));
+                    }
+                    else {
+                        $files[] = $dir.'/'.$file;
+                    }
+                }
+            }
+            closedir($handle);
+        }
+
+        return $files;
     }
 
     static public function addTranslationsFile($file)
     {
-        $pathInfo = pathinfo($file);
-        if (empty($pathInfo['extension'])) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if (empty($ext)) {
             return;
         }
-        $params['extension'] = $pathInfo['extension'];
+        $params['extension'] = $ext;
         self::importTranslations($file, $params);
     }
 
