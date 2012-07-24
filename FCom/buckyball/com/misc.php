@@ -1785,7 +1785,7 @@ class BLocale extends BClass
         $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::currentModuleName();
         if (is_string($data)) {
             if (!BUtil::isPathAbsolute($data)) {
-                $data = BApp::m($module)->root_dir.'/'.$data;
+                $data = BApp::m($module)->root_dir.'/i18n/'.$data;
             }
 
             if (is_readable($data)) {

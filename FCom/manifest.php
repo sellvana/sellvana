@@ -296,7 +296,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Disqus',
             'depends' => array('FCom_Core'),
-            'translations' => array('ru_RU.UTF-8' => 'ru.json', 'es_ES.UTF-8' => 'es.csv', 'gr_GR.UTF-8' => array('gr.php')),
+            'translations' => array('ru' => 'ru.json', 'es' => 'es.csv', 'de' => array('de.php')),
             'description' => "Disqus comments",
             'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
             'areas' => array(
