@@ -394,11 +394,12 @@ echo "</pre>"; exit;
             $mod->bootstrap();
             //load translations
             if (!empty($locale) && $locale != 'en_US.UTF-8') {
-                if (!empty($mod->translations)) {
-                    foreach($mod->translations as $trLocale => $file) {
-                        if ($trLocale == $locale) {
-                            BLocale::addTranslationsFile($file);
-                        }
+                if (!empty($mod->translations[$locale])) {
+                    if (!is_array($mod->translations[$locale])) {
+                        $mod->translations[$locale] = array($mod->translations[$locale]);
+                    }
+                    foreach($mod->translations[$locale] as $file) {
+                        BLocale::addTranslationsFile($file);
                     }
                 }
             }
