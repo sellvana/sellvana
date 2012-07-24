@@ -1764,7 +1764,7 @@ class BLocale extends BClass
 
     public static function setCurrentLanguage($lang)
     {
-        $this->_currentLanguage = $lang;
+        self::$_currentLanguage = $lang;
     }
 
     public static function getCurrentLanguage()

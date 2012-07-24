@@ -616,6 +616,10 @@ class BClassRegistry extends BClass
     *
     * Usage: BClassRegistry::i()->overrideClass('BaseClass', 'MyClass');
     *
+    * Overridden class should be called one of the following ways:
+    * - BClassRegistry::i()->instance('BaseClass')
+    * - BaseClass:i() -- if it extends BClass or has the shortcut defined
+    *
     * Remembering the module that overrode the class for debugging
     *
     * @todo figure out how to update events on class override
@@ -1013,6 +1017,11 @@ class BClassRegistry extends BClass
         }
 
         return $instance;
+    }
+
+    public function unsetInstance()
+    {
+        self::$_instance = null;
     }
 }
 
