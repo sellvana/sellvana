@@ -1497,10 +1497,14 @@ class BSession extends BClass
             $this->data =& $_SESSION[$namespace];
         }
 
-        if (empty($this->data['_locale'])) {
-            $this->data['_locale'] = BConfig::i()->get('locale');
+        $lang = BRequest::language();
+        if (!empty($lang)) {
+            $this->data['_language'] = $lang;
+        } else {
+            $this->data['_language'] = '';
         }
 
+        $this->data['_locale'] = BConfig::i()->get('locale');
         if (!empty($this->data['_locale'])) {
             if (is_array($this->data['_locale'])) {
                 foreach ($this->data['_locale'] as $c=>$l) {
