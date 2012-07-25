@@ -69,7 +69,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $a = BClassRegistry_Test_A::i();
 
         //todo: uncomment
-        $this->assertEquals(5, $a->foo);
+        $this->assertEquals(10, $a->foo);
     }
 }
 
@@ -120,6 +120,6 @@ class BClassRegistry_Test_AugmentProperty extends BClass
 
     static public function newGetter($object, $property, $prevResult)
     {
-        return $prevResult+5;
+        return $prevResult+10;
     }
 }
