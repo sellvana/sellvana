@@ -1074,7 +1074,7 @@ exit;
             if ($this->_is_new) {
                 $this->_is_new = false;
                 if (is_null($this->id())) {
-                    $this->_data[$this->_get_id_column_name()] = static::$_db->lastInsertId();
+                    $this->_data[$this->_get_id_column_name()] = self::$_db->lastInsertId();
                 }
             }
 

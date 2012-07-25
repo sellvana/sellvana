@@ -5,7 +5,7 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_checkout_address';
     protected static $_origClass = __CLASS__;
 
-    public function getAddress($cartId, $atype)
+    public function findByCartType($cartId, $atype)
     {
         return FCom_Checkout_Model_Address::i()->orm()->where("cart_id",$cartId)->where('atype', $atype)->find_one();
     }
@@ -45,12 +45,12 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
         $this->newAddress($cartId, 'billing', $userData->as_array(), $email);
     }
 
-    public function newAddress($cartId, $type, $userData, $email = '')
+    public function newAddress($cartId, $atype, $userData, $email = '')
     {
         $address = array(
             'cart_id' => $cartId,
             'email' => $email,
-            'atype' => $type,
+            'atype' => $atype,
             'firstname' => $userData['firstname'],
             'lastname' => $userData['lastname'],
             'attn' => $userData['attn'],
@@ -68,7 +68,12 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
             'created_dt' => null,
             'updated_dt' => null
         );
-        $newAddress = FCom_Checkout_Model_Address::create($address);
+        $newAddress = $this->findByCartType($cartId, $atype);
+        if (!$newAddress) {
+            $newAddress = FCom_Checkout_Model_Address::create($address);
+        } else {
+            $newAddress->set($address);
+        }
         $newAddress->save();
         return $newAddress;
     }

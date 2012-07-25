@@ -120,10 +120,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             //ob_implicit_flush();
             //ignore_user_abort(true);
             $uploads = $_FILES['upload'];
+
             foreach ($uploads['name'] as $i=>$fileName) {
+
                 if (!$fileName) {
                     continue;
                 }
+
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir.'/'.$fileName)) {
                     $att = $attModel->load(array('folder'=>$folder, 'file_name'=>$fileName));
                     if (!$att) {
@@ -146,8 +149,15 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $id = '';
                     $status = 'ERROR';
                 }
-                $row = array('id'=>$id, 'act'=>$status, 'file_name'=>$fileName, 'file_size'=>$att->file_size);
-                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row).")</script>";
+
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
+                //echo BUtil::toJson($row);
+                echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
+                // TODO: properly refresh grid after file upload
+                // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
+                // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".BUtil::toJson($row)."); </script>";
+                // solution two is to find a way to pass rowid to the server side
+
             }
             exit;
 

@@ -30,6 +30,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('css', 'boilerplate_post', array('file'=>'{FCom_Frontend}/css/boilerplate_post.css')),
                         array('css', 'pnotify', array('file'=>'{FCom_Core}/js/lib/css/jquery.pnotify.default.css')),
                         array('css', 'rating', array('file'=>'{FCom_Core}/js/lib/css/jquery.rating.css')),
+                        array('css', 'lightbox', array('file'=>'{FCom_Core}/js/lib/css/lightbox/lightbox.css')),
                         array('js_raw', 'js_init', array('content'=>"window.less={env:'development'}")),
                         array('js_raw', 'js_base_href', array('content'=>"Fcom={base_href:'".BApp::baseUrl()."'}")),
                         array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
@@ -38,6 +39,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.rating.min.js'),
+                        array('js', '{FCom_Core}/js/lib/lightbox/lightbox.js'),
 
                         //array('js', '{FCom_Core}/js/core.js'),
                     )),

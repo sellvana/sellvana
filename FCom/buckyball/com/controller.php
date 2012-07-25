@@ -107,6 +107,42 @@ class BRequest extends BClass
     }
 
     /**
+     * Retrive language based on HTTP_ACCEPT_LANGUAGE
+     * @return string
+     */
+    static public function language()
+    {
+        $langs = array();
+
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            // break up string into pieces (languages and q factors)
+            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+            if (count($lang_parse[1])) {
+                // create a list like "en" => 0.8
+                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+                // set default to 1 for any without q factor
+                foreach ($langs as $lang => $val) {
+                    if ($val === '') $langs[$lang] = 1;
+                }
+
+                // sort list based on value
+                arsort($langs, SORT_NUMERIC);
+            }
+        }
+
+        //if no language detected return false
+        if (empty($langs)) {
+            return false;
+        }
+
+        list($toplang) = each($langs);
+        //return en, de, es, it.... first two characters of language code
+        return substr($toplang, 0, 2);
+    }
+
+    /**
     * Whether request is AJAX
     *
     * @return bool
@@ -1230,7 +1266,7 @@ class BFrontController extends BClass
 
         $attempts = 0;
         $forward = true; // null: no forward, true: try next route, array: forward without new route
-
+#echo "<pre>"; print_r($this->_routes); exit;
         while (($attempts++<100) && $forward) {
             $route = $this->findRoute($requestRoute);
             if (!$route) {

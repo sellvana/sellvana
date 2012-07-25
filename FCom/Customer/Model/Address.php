@@ -31,32 +31,37 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public static function import($data, $cust)
+    public function newShipping($address, $customer)
     {
-        if ($cust->default_billing_id) {
-            $addr = static::load($cust->default_billing_id);
-            //$addr = Model::factory('FCom_Customer_Model_Address')->find_one($cust->default_billing_id);
-        }
-        if (empty($addr)) {
-            $addr = static::create(array('customer_id' => $cust->id));
-        }
-        //save full contry name
-        /*if (!empty($data['address']['country']) && strlen($data['address']['country'])>2) {
-            $data['address']['country'] = FCom_Geo_Model_Country::i()->getIsoByName($data['address']['country']);
-        }
-*/
+        $data = array('address' => $address);
+        self::import($data, $customer, 'shipping');
+    }
+
+    public function newBilling($address, $customer)
+    {
+        $data = array('address' => $address);
+        self::import($data, $customer, 'billing');
+    }
+
+    public static function import($data, $cust, $atype='billing')
+    {
+        $addr = static::create(array('customer_id' => $cust->id));
+
         if(!empty($data['address'])){
             $addr->set($data['address']);
         }
         $addr->save();
 
-        if (!$cust->default_billing_id) {
+        if (!$cust->default_billing_id && 'billing' == $atype) {
             $cust->set('default_billing_id', $addr->id);
         }
-        if (!$cust->default_shipping_id) {
+        if (!$cust->default_shipping_id && 'shipping' == $atype) {
             $cust->set('default_shipping_id', $addr->id);
         }
-        $cust->save();
+
+        if ($cust->is_dirty()) {
+            $cust->save();
+        }
 
         return $addr;
     }
