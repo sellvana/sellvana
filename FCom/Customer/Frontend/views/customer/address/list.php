@@ -1,3 +1,6 @@
+<a href="<?=Bapp::href("customer/address/edit")?>">Add new address</a>
+<br/>
+
 <?php foreach($this->addresses as $address): ?>
     <?php if ($address->id == $this->customer->default_shipping_id): ?>
         <b>Default shipping address</b><br/>

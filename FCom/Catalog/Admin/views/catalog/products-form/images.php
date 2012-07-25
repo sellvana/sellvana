@@ -53,5 +53,6 @@ head(function() {
     new FCom.Admin.TargetGrid({source:'#all_images', target:'#product_images'});
 
 })
+
 </script>
 <?php echo $this->hook('catalog/products/tab/images', array('model'=>$this->model)); ?>

@@ -11,9 +11,14 @@
 <br/><br/>
 
 <h4>Shipping to:</h4>
-<a href="<?=BApp::href('checkout/address?t=s')?>">Change</a><br/>
-<?=$this->shippingAddress?><br>
-<br>
+
+<?=$this->shippingAddress?>
+<?php if($this->guest_checkout) :?>
+    <a href="<?=BApp::href('checkout/address?t=s')?>">Change</a>
+<?php else :?>
+    <a href="<?=BApp::href('customer/address/choose?t=s')?>">Change</a>
+<?php endif; ?>
+<br><br>
 
 
 <?php if (!empty($this->shippingMethods)) :?>
@@ -101,17 +106,23 @@
 <?php if (!empty($this->paymentMethod)) :?>
     <a href="/checkout/payment">Change</a><br/>
 
-    <b><?=$this->paymentClass->getName()?></b><br/>
+    <i><?=$this->paymentClass->getName()?></i><br/>
     <?= $this->view($this->paymentMethod.'/form')->set('paymentDetails', $this->paymentDetails);?>
     <br/><br/>
 <?php else: ?>
-    <a href="/checkout/payment">Select payment method</a><br/>
+    <a href="/checkout/payment" style="color:red">Select payment method</a><br/>
 <?php endif; ?>
 
 
 <h4>Billing address</h4>
-<a href="<?=BApp::href('checkout/address?t=b')?>">Change</a><br/>
-<?=$this->billingAddress?><br><br>
+
+<?=$this->billingAddress?>
+<?php if($this->guest_checkout) :?>
+    <a href="<?=BApp::href('checkout/address?t=b')?>">Change</a>
+<?php else :?>
+    <a href="<?=BApp::href('customer/address/choose?t=b')?>">Change</a>
+<?php endif; ?>
+<br><br>
 
 <?php if ($this->guest) :?>
 <label for="#">Create an account?</label>

@@ -26,9 +26,15 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     {
         if (!parent::beforeSave()) return false;
 
+        if (!$this->is_dirty()) {
+            return false;
+        }
+
         if (!$this->get('create_dt')) {
             $this->set('create_dt', BDb::now());
         }
+        $this->set('version', $this->version ? $this->version + 1 : '1');
+//        $this->set('version_comments', $this->version ? $this->version : '1');
         $this->set('update_dt', BDb::now());
         return true;
     }
@@ -43,7 +49,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             'user_id' => $user ? $user->id : null,
             'username' => $user ? $user->username : null,
             'version' => $this->version,
-            'comments' => $this->version_comments,
+            'comments' => $this->version_comments ? $this->version_comments : 'version ' . $this->version,
             'ts' => BDb::now(),
             'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(),
                 'handle,description,content')),

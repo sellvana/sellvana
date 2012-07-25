@@ -56,6 +56,11 @@ class BModuleRegistry extends BClass
         return static::$_modules;
     }
 
+    public static function isLoaded($modName)
+    {
+        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_level===BModule::LOADED;
+    }
+
     /**
     * Register or return module object
     *
@@ -374,6 +379,7 @@ class BModuleRegistry extends BClass
     */
     public function bootstrap()
     {
+        $language = BSession::i()->data('_language');
         $this->checkDepends();
         $this->sortDepends();
 /*
@@ -386,6 +392,15 @@ echo "</pre>"; exit;
         foreach (static::$_modules as $mod) {
             $this->pushModule($mod->name);
             $mod->bootstrap();
+            //load translations
+            if (!empty($language) && !empty($mod->translations[$language])) {
+                if (!is_array($mod->translations[$language])) {
+                    $mod->translations[$language] = array($mod->translations[$language]);
+                }
+                foreach($mod->translations[$language] as $file) {
+                    BLocale::addTranslationsFile($file);
+                }
+            }
             $this->popModule();
         }
         BPubSub::i()->fire('bootstrap::after');
@@ -708,6 +723,13 @@ class BModule extends BClass
             $href = $r->scheme().'://'.$r->httpHost().$href;
         }
         return $href;
+    }
+
+    public function baseDir()
+    {
+        $dir = $this->root_dir;
+
+        return $dir;
     }
 
     public function runLevel($level=null, $updateConfig=false)

@@ -7,7 +7,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->forward(true);
         return;
         BLayout::i()->layout('/catalog/manuf');
-        BResponse::i()->render();
     }
 
     public function action_product()
@@ -24,7 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        $productReviews = FCom_Catalog_Model_ProductReview::i()->orm()->where("product_id", $product->id())->find_many();
+        $productReviews = FCom_ProductReviews_Model_Reviews::i()->orm()->where("product_id", $product->id())->find_many();
         $layout->view('catalog/product')->product_reviews = $productReviews;
         $layout->view('catalog/product')->product = $product;
 
@@ -53,7 +52,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('catalog/product')->user = $user;
 
         $this->layout('/catalog/product');
-        BResponse::i()->render();
     }
 
     public function action_product_post()
@@ -77,7 +75,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
         }
 
-        
+
         BResponse::i()->redirect($href);
     }
 
@@ -108,6 +106,5 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 array('label'=>'Compare '.sizeof($products).' products', 'active'=>true)
             );
         }
-        BResponse::i()->render();
     }
 }
