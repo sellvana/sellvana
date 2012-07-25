@@ -791,6 +791,8 @@ class BClassRegistry extends BClass
         } else {
             $this->_properties[$class][$property][$op.'_'.$type][] = $entry;
         }
+        //have to be added to redefine augmentProperty Setter/Getter methods
+        $this->_decoratedClasses[$class] = true;
         return $this;
     }
 
@@ -798,7 +800,8 @@ class BClassRegistry extends BClass
     {
         //$this->_methods[$method][$static ? 1 : 0]['override'][$rel][$class]
         if (!empty($this->_methods[$method][$static][$type]['is'][$class])) {
-            return $class;
+            //return $class;
+            return $this->_methods[$method][$static][$type]['is'][$class];
         }
         $cacheKey = $class.'|'.$method.'|'.$static.'|'.$type;
         if (!empty($this->_methodOverrideCache[$cacheKey])) {
@@ -869,7 +872,6 @@ class BClassRegistry extends BClass
                 $args[0] = $result;
             }
         }
-
         return $result;
     }
 
@@ -921,22 +923,22 @@ class BClassRegistry extends BClass
     public function callSetter($origObject, $property, $value)
     {
         $class = get_class($origObject);
-
-        if (!empty($this->_properties[$class][$method]['set_before'])) {
-            foreach ($this->_properties[$class][$method]['set_before'] as $entry) {
+//print_r($this->_properties);exit;
+        if (!empty($this->_properties[$class][$property]['set_before'])) {
+            foreach ($this->_properties[$class][$property]['set_before'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
 
-        if (!empty($this->_properties[$class][$method]['set_override'])) {
-            $callback = $this->_properties[$class][$method]['set_override']['callback'];
+        if (!empty($this->_properties[$class][$property]['set_override'])) {
+            $callback = $this->_properties[$class][$property]['set_override']['callback'];
             call_user_func($callback, $origObject, $property, $value);
         } else {
             $origObject->$property = $value;
         }
 
-        if (!empty($this->_properties[$class][$method]['set_after'])) {
-            foreach ($this->_properties[$class][$method]['set_after'] as $entry) {
+        if (!empty($this->_properties[$class][$property]['set_after'])) {
+            foreach ($this->_properties[$class][$property]['set_after'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
@@ -955,15 +957,15 @@ class BClassRegistry extends BClass
 
         // get_before does not make much sense, so is not implemented
 
-        if (!empty($this->_properties[$class][$method]['get_override'])) {
-            $callback = $this->_properties[$class][$method]['get_override']['callback'];
+        if (!empty($this->_properties[$class][$property]['get_override'])) {
+            $callback = $this->_properties[$class][$property]['get_override']['callback'];
             $result = call_user_func($callback, $origObject, $property);
         } else {
             $result = $origObject->$property;
         }
 
-        if (!empty($this->_properties[$class][$method]['get_after'])) {
-            foreach ($this->_properties[$class][$method]['get_after'] as $entry) {
+        if (!empty($this->_properties[$class][$property]['get_after'])) {
+            foreach ($this->_properties[$class][$property]['get_after'] as $entry) {
                 $result = call_user_func($entry['callback'], $origObject, $property, $result);
             }
         }
