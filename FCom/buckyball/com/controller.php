@@ -138,7 +138,7 @@ class BRequest extends BClass
         }
 
         list($toplang) = each($langs);
-        //return en, de, es, it.... first two characters of language
+        //return en, de, es, it.... first two characters of language code
         return substr($toplang, 0, 2);
     }
 

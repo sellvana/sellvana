@@ -63,6 +63,8 @@ class BClass
     {
         return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
+
+
 }
 
 /**
@@ -534,6 +536,11 @@ class BConfig extends BClass
         if (!file_put_contents($filename, $contents, LOCK_EX)) {
             BDebug::error('Error writing configuration file: '.$filename);
         }
+    }
+
+    public function unsetConfig()
+    {
+        $this->_config = array();
     }
 }
 
@@ -1023,7 +1030,7 @@ class BClassRegistry extends BClass
 
     public function unsetInstance()
     {
-        self::$_instance = null;
+        static::$_instance = null;
     }
 }
 
@@ -1043,7 +1050,7 @@ class BClassDecorator
     /**
     * Decorator constructor, creates an instance of decorated class
     *
-    * @param object|string $class
+    * @param array(object|string $class)
     * @return BClassDecorator
     */
     public function __construct($args)
@@ -1051,6 +1058,11 @@ class BClassDecorator
 //echo '1: '; print_r($class);
         $class = array_shift($args);
         $this->_decoratedComponent = is_string($class) ? BClassRegistry::i()->instance($class, $args) : $class;
+    }
+
+    public function __destruct()
+    {
+        $this->_decoratedComponent = null;
     }
 
     /**
@@ -1165,6 +1177,11 @@ class BClassDecorator
             return $this->_decoratedComponent(func_get_args());
         }
         return null;
+    }
+
+    public function getDecoratedComponent()
+    {
+        return $this->_decoratedComponent;
     }
 }
 
