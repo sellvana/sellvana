@@ -1179,6 +1179,10 @@ class BClassDecorator
         return null;
     }
 
+    /**
+     * Return object of decorated class
+     * @return object
+     */
     public function getDecoratedComponent()
     {
         return $this->_decoratedComponent;
