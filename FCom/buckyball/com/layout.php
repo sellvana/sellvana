@@ -87,7 +87,6 @@ class BLayout extends BClass
     */
     public function viewRootDir($rootDir=null)
     {
-        $module = BModuleRegistry::i()->currentModule();
         if (is_null($rootDir)) {
             return $this->getViewRootDir();
         }
@@ -123,7 +122,7 @@ class BLayout extends BClass
     }
 
     /**
-    * put your comment there...
+    * Alias for addAllViews()
     *
     * @deprecated alias
     * @param mixed $rootDir
@@ -185,7 +184,7 @@ class BLayout extends BClass
     }
 
     /**
-    * put your comment there..
+    * Set default view class
     *
     * @todo rename to setDefaultViewClass()
     * @param mixed $className
@@ -436,14 +435,18 @@ class BLayout extends BClass
 
     public function metaDirectiveHookCallback($d)
     {
+        $args = !empty($d['args']) ? $d['args'] : array();
+        if (!empty($d['position'])) {
+            $args['position'] = $d['position'];
+        }
         if (!empty($d['callbacks'])) {
             foreach ($d['callbacks'] as $cb) {
-                $this->hook($d['name'], $cb);
+                $this->hook($d['name'], $cb, $args);
             }
         }
         if (!empty($d['views'])) {
             foreach ($d['views'] as $v) {
-                $this->hookView($d['name'], $v);
+                $this->hookView($d['name'], $v, $args);
             }
         }
     }
@@ -1127,7 +1130,7 @@ class BViewHead extends BView
     }
 
     /**
-    * put your comment there...
+    * Alis for addTitle($title)
     *
     * @deprecated
     * @param mixed $title

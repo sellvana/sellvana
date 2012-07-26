@@ -296,6 +296,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Disqus',
             'depends' => array('FCom_Core'),
+            'translations' => array('ru' => 'ru.json', 'es' => 'es.csv', 'de' => array('de.php')),
             'description' => "Disqus comments",
             'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
             'areas' => array(
@@ -317,6 +318,22 @@
             'areas' => array(
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
+                ),
+            ),
+        ),
+        // translations Admin module
+        'FCom_Translation' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Translation',
+            'depends' => array('FCom_Core'),
+            'description' => "Translations module",
+            'bootstrap' => array('file'=>'Translation.php', 'callback'=>'FCom_Translation::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'TranslationAdmin.php', 'callback'=>'FCom_Translation_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'TranslationFrontend.php', 'callback'=>'FCom_Translation_Frontend::bootstrap'),
                 ),
             ),
         ),
