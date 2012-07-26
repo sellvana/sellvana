@@ -260,7 +260,7 @@ class BApp extends BClass
                     break;
             }
             if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
-                $url .= '/'.$scriptPath['basename'];
+                $url = rtrim($url, '/').'/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
