@@ -2,15 +2,7 @@
 
 class BView_Test extends PHPUnit_Framework_TestCase
 {
-    public function SetUp()
-    {
-        BView::i()->unsetInstance();
-    }
-
-    public function tearDown()
-    {
-        BView::i()->unsetInstance();
-    }
+    
 
     public function testViewFactory()
     {

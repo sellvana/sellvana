@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('PHPUnit_MAIN_METHOD')) {
+    define('PHPUnit_MAIN_METHOD', '');
+}
 /**
 * All Fulleron Tests
 *
@@ -25,6 +27,11 @@ class FCom_Test_AllTests {
                 $suite->addTestSuite(call_user_func(array($module->tests, 'suite')));
             }
         }
+
+        //$suite = new PHPUnit_Framework_TestSuite('Buckyball');
+        require_once FULLERON_ROOT_DIR.'/FCom/buckyball/tests/buckyball/AllTests.php';
+        $suite->addTest(BAllTests::suite());
+
         return $suite;
     }
 }
