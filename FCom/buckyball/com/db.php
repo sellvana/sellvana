@@ -1722,7 +1722,7 @@ class BModel extends Model
         } catch(BModelException $e) {
             return $this;
         }
-        
+
         if (($cache =& static::$_cache[$this->_origClass()])) {
             foreach ($cache as $k=>$cache) {
                 $key = $this->get($k);
