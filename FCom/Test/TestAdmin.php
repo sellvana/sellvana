@@ -21,13 +21,12 @@ class FCom_Test_Admin extends BClass
      */
     static public function layout()
     {
-        
+
         BLayout::i()
             ->layout(array(
                 'base'=>array(
                     array('view', 'admin/header', 'do'=>array(
-                        array('addNav', 'tests', array('label'=>'Tests', 'pos'=>100)),
-                        array('addNav', 'tests/index', array('label'=>'All tests', 'href'=>BApp::href('tests/index')))
+                        array('addNav', 'system/tests', array('label'=>'Tests', 'pos'=>100, 'href'=>BApp::href('tests/index'))),
                     ))),
                     '/tests/index'=>array(
                         array('layout', 'base'),
