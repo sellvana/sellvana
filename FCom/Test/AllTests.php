@@ -30,7 +30,7 @@ class FCom_Test_AllTests {
                 $suite->addTestSuite(call_user_func(array($module->tests, 'suite')));
             }
         }
-        
+
         require_once FULLERON_ROOT_DIR.'/FCom/buckyball/tests/buckyball/AllTests.php';
         $suite->addTest(BAllTests::suite());
 
