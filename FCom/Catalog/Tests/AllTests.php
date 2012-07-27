@@ -14,6 +14,7 @@ class FCom_Catalog_Tests_AllTests
 
         $suite->addTestSuite('FCom_Catalog_Tests_Model_ProductTest');
         $suite->addTestSuite('FCom_Catalog_Tests_Model_CategoryProductTest');
+        $suite->addTestSuite('FCom_Catalog_Tests_Model_CategoryTest');
 
         return $suite;
     }
