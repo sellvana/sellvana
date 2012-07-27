@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_customer id="1" email="test1@test.com" firstname="Test 1" default_shipping_id="1" />
+    <fcom_customer id="2" email="test2@test.com" firstname="Test 2" default_billing_id="2" />
+</dataset>
