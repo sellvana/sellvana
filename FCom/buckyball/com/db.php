@@ -145,6 +145,7 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         );
+
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -1616,14 +1617,6 @@ class BModel extends Model
     public function beforeSave()
     {
         return $this;
-        //not used any more
-        try {
-            BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
-            BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
-        } catch (BModelException $e) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -1653,6 +1646,7 @@ class BModel extends Model
     public function save($beforeAfter=true)
     {
         if ($beforeAfter) {
+            $this->beforeSave();
             try {
                 BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
                 BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
@@ -1668,6 +1662,7 @@ class BModel extends Model
         if ($beforeAfter) {
             BPubSub::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
             BPubSub::i()->fire('BModel::afterSave', array('model'=>$this));
+            $this->afterSave();
         }
 
         if (static::$_cacheAuto) {
@@ -1682,10 +1677,6 @@ class BModel extends Model
     */
     public function afterSave()
     {
-        return $this;
-        //not used any more
-        BPubSub::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
-        BPubSub::i()->fire('BModel::afterSave', array('model'=>$this));
         return $this;
     }
 
