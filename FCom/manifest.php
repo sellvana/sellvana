@@ -155,6 +155,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Customer',
             'depends' => array('FCom_Core'),
+            'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",
             'migrate' => 'FCom_Customer_Migrate',
             'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
