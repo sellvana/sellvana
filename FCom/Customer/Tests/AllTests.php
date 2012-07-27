@@ -13,6 +13,7 @@ class FCom_Customer_Tests_AllTests
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit CustomField');
 
         $suite->addTestSuite('FCom_Customer_Tests_Model_CustomerTest');
+        $suite->addTestSuite('FCom_Customer_Tests_Model_AddressTest');
 
         return $suite;
     }
