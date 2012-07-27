@@ -175,6 +175,7 @@
             'version' => '0.1.1',
             'root_dir' => 'CustomField',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
+            'tests' => "FCom_CustomField_Tests_AllTests",
             'depends' => array('FCom_Catalog'),
             'after' => array('FCom_Customer'),
             'description' => "Base custom fields implementation, currently for catalog only",
