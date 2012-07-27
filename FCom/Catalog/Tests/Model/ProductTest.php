@@ -4,7 +4,7 @@ class FCom_Catalog_Tests_Model_ProductTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/product.xml');
+        return $this->createFlatXmlDataSet(__DIR__.'/ProductTest.xml');
     }
 
     public function testAddEntry()
@@ -56,7 +56,7 @@ class FCom_Catalog_Tests_Model_ProductTest extends FCom_Test_DatabaseTestCase
         $this->assertTrue(!empty($entry->url_key), "url_key generation failed");
     }
 
-    public function testUrlKeyMethod()
+    public function testUrlKeyAlgorithm()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product'), "Pre-Condition");
 
