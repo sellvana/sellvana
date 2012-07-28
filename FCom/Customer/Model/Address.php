@@ -23,6 +23,23 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     }
 
+    public function beforeDelete() {
+        if (!parent::beforeDelete()) return false;
+
+        $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);
+
+        if ($this->id == $customer->default_shipping_id) {
+            $customer->default_shipping_id = null;
+            $customer->save();
+        }
+        if ($this->id == $customer->default_billing_id) {
+            $customer->default_billing_id = null;
+            $customer->save();
+        }
+
+        return $this;
+    }
+
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;

@@ -34,17 +34,6 @@ class BClassDecorator_Test extends PHPUnit_Framework_TestCase
         unset($a->foo);
         $this->assertFalse(isset($b->foo));
     }
-
-    public function testSerialize()
-    {
-        $a = new BClassDecorator(array("BClassDecorator_Test_A"));
-        $a->foo = 123;
-        $dataA = serialize($a);
-        $b = $a->getDecoratedComponent();
-        $dataB = serialize($b);
-
-        $this->assertEquals($dataA, $dataB);
-    }
 }
 
 class BClassDecorator_Test_A
@@ -58,14 +47,4 @@ class BClassDecorator_Test_A
     {
         return 'A';
     }
-
-    public function __sleep()
-    {
-
-    }
-
-     public function __wakeup()
-     {
-         
-     }
 }

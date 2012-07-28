@@ -117,7 +117,7 @@
         ),
         // product reviews
         'FCom_ProductReviews' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'ProductReviews',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
             'description' => "Product reviews by customers",
@@ -137,6 +137,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Catalog',
             'depends' => array('FCom_Core'),
+            'tests' => "FCom_Catalog_Tests_AllTests",
             'description' => "Categories and products management, admin and frontend",
             'migrate' => 'FCom_Catalog_Migrate',
             //'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
@@ -154,6 +155,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Customer',
             'depends' => array('FCom_Core'),
+            'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",
             'migrate' => 'FCom_Customer_Migrate',
             'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
@@ -174,6 +176,7 @@
             'version' => '0.1.1',
             'root_dir' => 'CustomField',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
+            'tests' => "FCom_CustomField_Tests_AllTests",
             'depends' => array('FCom_Catalog'),
             'after' => array('FCom_Customer'),
             'description' => "Base custom fields implementation, currently for catalog only",
