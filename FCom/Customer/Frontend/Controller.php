@@ -21,8 +21,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 }
             }
 
-            BPubSub::i()->fire('FCom_Customer_Frontend_Controller::action_login', array('user'=>$user));
-
             $url = BSession::i()->data('login_orig_url');
             BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
         } catch (Exception $e) {

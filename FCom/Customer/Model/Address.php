@@ -31,43 +31,6 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function install()
-    {
-        $tCustomer = FCom_Customer_Model_Customer::table();
-        $tAddress = static::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tAddress} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `customer_id` int(11) unsigned NOT NULL,
-  `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `street1` text COLLATE utf8_unicode_ci NOT NULL,
-  `street2` text COLLATE utf8_unicode_ci,
-  `street3` text COLLATE utf8_unicode_ci,
-  `city` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `county` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `county_id` int(11) DEFAULT NULL,
-  `region` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `region_id` int(11) DEFAULT NULL,
-  `postcode` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `country` char(2) COLLATE utf8_unicode_ci NOT NULL,
-  `phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `create_dt` datetime NOT NULL,
-  `update_dt` datetime NOT NULL,
-  `lat` decimal(15,10) DEFAULT NULL,
-  `lng` decimal(15,10) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-ALTER TABLE {$tCustomer}
-  ADD CONSTRAINT `FK_{$tCustomer}_billing` FOREIGN KEY (`default_billing_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_{$tCustomer}_shipping` FOREIGN KEY (`default_shipping_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-        ");
-    }
-
     public static function import($data, $cust)
     {
         if ($cust->default_billing_id) {
@@ -96,5 +59,53 @@ ALTER TABLE {$tCustomer}
         $cust->save();
 
         return $addr;
+    }
+
+    public static function install()
+    {
+        $tCustomer = FCom_Customer_Model_Customer::table();
+        $tAddress = static::table();
+        BDb::run("
+CREATE TABLE IF NOT EXISTS {$tAddress} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `customer_id` int(11) unsigned NOT NULL,
+  `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `street1` text COLLATE utf8_unicode_ci NOT NULL,
+  `street2` text COLLATE utf8_unicode_ci,
+  `street3` text COLLATE utf8_unicode_ci,
+  `city` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `state` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `country` char(2) COLLATE utf8_unicode_ci NOT NULL,
+  `phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `create_dt` datetime NOT NULL,
+  `update_dt` datetime NOT NULL,
+  `lat` decimal(15,10) DEFAULT NULL,
+  `lng` decimal(15,10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ");
+    /*
+ALTER TABLE {$tCustomer}
+  ADD CONSTRAINT `FK_{$tCustomer}_billing` FOREIGN KEY (`default_billing_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_{$tCustomer}_shipping` FOREIGN KEY (`default_shipping_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  */
+    }
+
+    public static function upgrade_0_1_1()
+    {
+        try {
+            BDb::run("
+                ALTER TABLE ".self::table()."
+                ADD COLUMN `lat` DECIMAL(15,10) NULL,
+                ADD COLUMN `lng` DECIMAL(15,10) NULL;
+            ");
+        } catch (Exception $e) {
+            //columns already exist
+        }
     }
 }

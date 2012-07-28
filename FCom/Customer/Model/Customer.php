@@ -60,19 +60,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
-    public function sessionCart()
-    {
-        return $this->relatedModel('FCom_Checkout_Model_Cart', $this->session_cart_id);
-    }
-    static public function sessionGuestCart()
-    {
-        $cart_id = BSession::i()->data('cart_id');
-        if ($cart_id) {
-            return self::i()->relatedModel('FCom_Checkout_Model_Cart', $cart_id);
-        }
-        return false;
-    }
-
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
@@ -89,7 +76,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     static public function sessionUserId()
     {
         $user = self::sessionUser();
-        return !empty($user) ? $user['id'] : false;
+        return !empty($user) ? $user->id() : false;
     }
 
     static public function isLoggedIn()
@@ -126,6 +113,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
+        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>$this));
+
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
     }
@@ -146,27 +135,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $customer;
     }
 
-    public function install()
-    {
-        $tCustomer = static::table();
-        $tAddress = FCom_Customer_Model_Address::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tCustomer} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `firstname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `lastname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `password_hash` text COLLATE utf8_unicode_ci,
-  `default_shipping_id` int(11) unsigned DEFAULT NULL,
-  `default_billing_id` int(11) unsigned DEFAULT NULL,
-  `create_dt` datetime NOT NULL,
-  `update_dt` datetime NOT NULL,
-  `last_login` datetime DEFAULT NULL,
-  `token` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-        ");
-    }
+
 
     public static function import($data)
     {
@@ -220,5 +189,57 @@ CREATE TABLE IF NOT EXISTS {$tCustomer} (
     public function addresses()
     {
         return FCom_Customer_Model_Address::i()->orm('a')->where('customer_id', $this->id)->find_many();
+    }
+
+    public function getPaymentMethod()
+    {
+        return self::i()->load($this->id)->payment_method;
+    }
+
+    public function getPaymentDetails()
+    {
+        return self::i()->load($this->id)->payment_details;
+    }
+
+    public function setPaymentDetails($data)
+    {
+        $this->payment_details = Butil::toJson($data);
+        $this->save();
+    }
+
+    public function install()
+    {
+        $tCustomer = static::table();
+        $tAddress = FCom_Customer_Model_Address::table();
+        BDb::run("
+CREATE TABLE IF NOT EXISTS {$tCustomer} (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `firstname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `lastname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `password_hash` text COLLATE utf8_unicode_ci,
+  `default_shipping_id` int(11) unsigned DEFAULT NULL,
+  `default_billing_id` int(11) unsigned DEFAULT NULL,
+  `create_dt` datetime NOT NULL,
+  `update_dt` datetime NOT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `token` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ");
+    }
+
+    public static function upgrade_0_1_2()
+    {
+        try {
+            BDb::run("
+                ALTER TABLE ".  self::table()."
+                    ADD `payment_method` VARCHAR( 20 ) NOT NULL,
+                    ADD `payment_details` TEXT NOT NULL
+                    ;
+            ");
+        } catch (Exception $e) {
+            //columns already exist
+        }
     }
 }

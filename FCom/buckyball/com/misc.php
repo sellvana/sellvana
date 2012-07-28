@@ -24,7 +24,7 @@ class BUtil
     *
     * @var string default sha512 for strength and slowness
     */
-    protected static $_hashAlgo = 'sha256';
+    protected static $_hashAlgo = 'bcrypt';
 
     /**
     * Default number of hash iterations
@@ -578,6 +578,22 @@ class BUtil
         }
         return $pattern;
     }
+    
+    /**
+    * Create or verify password hash using bcrypt
+    * 
+    * @param string $plain
+    * @param string $hash
+    * @return boolean|string if $hash is null, return hash, otherwise return verification flag
+    */
+    public static function bcrypt($plain, $hash=null)
+    {
+        if (is_null($hash)) {
+            return crypt($plain, '$2a$09$'.static::randomString(20).'$');
+        } else {
+            return crypt($plain, substr($hash, 0, 28)) === $hash;
+        }
+    }
 
     /**
     * Generate salted hash
@@ -606,6 +622,9 @@ class BUtil
     public static function fullSaltedHash($string, $salt=null, $algo=null, $iter=null)
     {
         $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
+        if ('bcrypt'===$algo) {
+            return static::bcrypt($string);   
+        }
         $iter = !is_null($iter) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
         $hash = $s.$algo.$s.$iter;
@@ -625,6 +644,9 @@ class BUtil
     */
     public static function validateSaltedHash($string, $storedHash)
     {
+        if (strpos($storedHash, '$2a$')===0) {
+            return static::bcrypt($string, $storedHash);
+        }
         $sep = $storedHash[0];
         $arr = explode($sep, $storedHash);
         array_shift($arr);
@@ -686,6 +708,7 @@ class BUtil
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
@@ -739,7 +762,15 @@ class BUtil
     */
     public static function post($url, $data)
     {
-        list($content) = static::i()->remoteHttp('POST', $url, $data);
+        list($content) = static::remoteHttp('POST', $url, $data);
+        parse_str($content, $response);
+        return $response;
+    }
+
+    public static function httpClient($method, $url, $data)
+    {
+        $method = strtoupper($method);
+        list($content) = static::remoteHttp($method, $url, $data);
         parse_str($content, $response);
         return $response;
     }
@@ -761,13 +792,13 @@ class BUtil
     public static function globRecursive($pattern, $flags=0)
     {
         $files = glob($pattern, $flags);
-	if (!$files) $files = array();
-	$dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-	if ($dirs) {
-		foreach ($dirs as $dir) {
-		    $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
-		}
-	}
+    if (!$files) $files = array();
+    $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
+    if ($dirs) {
+        foreach ($dirs as $dir) {
+            $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+        }
+    }
         return $files;
     }
 
@@ -894,7 +925,7 @@ class BUtil
             .($params ? '?'.http_build_query($params) : '');
     }
 
-    public static function call($callback, $args=array(), $array=false)
+    public static function extCallback($callback)
     {
         if (is_string($callback)) {
             if (($c = explode('.', $callback))) {
@@ -902,8 +933,16 @@ class BUtil
             } elseif (($c = explode('->', $callback))) {
                 list($class, $method) = $c;
             }
-            $callback = array($class::i(), $method);
+            if (!empty($class)) {
+                $callback = array($class::i(), $method);
+            }
         }
+        return $callback;
+    }
+
+    public static function call($callback, $args=array(), $array=false)
+    {
+        $callback = static::extCallback($callback);
         if ($array) {
             return call_user_func_array($callback, $args);
         } else {

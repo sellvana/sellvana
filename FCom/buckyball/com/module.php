@@ -55,6 +55,11 @@ class BModuleRegistry extends BClass
     {
         return static::$_modules;
     }
+    
+    public static function isLoaded($modName)
+    {
+        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_level===BModule::LOADED;
+    }
 
     /**
     * Register or return module object
@@ -388,6 +393,7 @@ echo "</pre>"; exit;
             $mod->bootstrap();
             $this->popModule();
         }
+        BPubSub::i()->fire('bootstrap::after');
         return $this;
     }
 

@@ -39,22 +39,10 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
                     </td>
                     <td>
                         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
-                        <span class="manuf-name"><?=$this->q($p->manuf()->manuf_name)?></span>
-                        <span class="sku">Part #: <?=$this->q($p->manuf_sku)?></span>
-                        <span class="rating">
-                            <span class="rating-out"><span class="rating-in" style="width:35px"></span></span>
-                            3.5 of 5 (<a href="#">16 reviews</a>)
-                        </span>
                     </td>
                     <td class="actions last a-left">
                         <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
-                            <? if ($loggedIn): ?><span class="availability in-stock">In Inventory</span><? endif ?>
-                            <span class="price-label">As low as</span>
-                            <p><span class="price">$<?=number_format($p->base_price)?></span><span class="supplier">Darby Dental</span></p>
-                            <span class="price-range"><strong><a href="#" class="vendor-count">13 Vendors</a>
-                            <span class="tooltip">
-TEST
-                            </span></strong>: $24-$49</span>
+                            <span class="price">$<?=number_format($p->base_price)?></span>
                         </div>
                     </td>
                     <td>
@@ -69,8 +57,14 @@ TEST
             <tfoot>
                 <td></td>
                 <td></td>
-                <td><a href="<?=BApp::href('checkout/shipping')?>">Checkout multi page</a></td>
-                <td><a href="<?=BApp::href('checkout')?>">Checkout single page</a></td>
+                <td></td>
+                <td>
+                    <?php if ($this->redirectLogin) :?>
+                        <a href="<?=BApp::href('checkout/login')?>">Checkout</a>
+                    <?php else :?>
+                        <a href="<?=BApp::href('checkout')?>">Checkout</a>
+                    <?php endif; ?>
+                </td>
                 <td><input type="submit" class="button" value="Update Cart"/></td>
                 <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
             </tfoot>
@@ -81,7 +75,15 @@ TEST
         <table>
             <?php if ($this->shipping_esitmate): ?>
             <tr>
-                <td>Shipping estimate: <?=$this->shipping_esitmate?></td>
+                <td>Shipping estimate:<br/>
+                    <?php if ($this->shipping_esitmate) :?>
+                    <ul>
+                        <?php foreach($this->shipping_esitmate as $estimate): ?>
+                            <li><?=$estimate['description']?> (<?=$estimate['estimate']?>)</li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <?php endif; ?>
+                </td>
             </tr>
             <?php endif; ?>
             <tr>

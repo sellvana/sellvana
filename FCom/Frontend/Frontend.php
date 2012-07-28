@@ -65,6 +65,13 @@ class FCom_Frontend extends BClass
         }
         return trim($href.'/'.ltrim($url, '/'), '/');
     }
+
+    public static function href($url='')
+    {
+        $r = BRequest::i();
+        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
+        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
+    }
 }
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
@@ -73,6 +80,32 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         $this->view($viewName)->messages = BSession::i()->messages($namespace);
         return $this;
+    }
+
+    public function action_unauthenticated()
+    {
+        $r = BRequest::i();
+        if ($r->xhr()) {
+            BSession::i()->data('login_orig_url', $r->referrer());
+            BResponse::i()->json(array('error'=>'login'));
+        } else {
+            BSession::i()->data('login_orig_url', $r->currentUrl());
+            $this->layout('/customer/login');
+            BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
+        }
+    }
+
+    public function action_unauthorized()
+    {
+        $r = BRequest::i();
+        if ($r->xhr()) {
+            BSession::i()->data('login_orig_url', $r->referrer());
+            BResponse::i()->json(array('error'=>'denied'));
+        } else {
+            BSession::i()->data('login_orig_url', $r->currentUrl());
+            $this->layout('/denied');
+            BResponse::i()->status(403, 'Forbidden');
+        }
     }
 }
 

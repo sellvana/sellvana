@@ -18,7 +18,8 @@ class FCom_Cms_Frontend extends BClass
             BFrontController::i()->route('GET /'.$prefix.'*nav', 'FCom_Cms_Frontend_Controller.nav');
         }
 
-        //BLayout::i()->addAllViews('Frontend/views');
+        BLayout::i()->addAllViews('Frontend/views')
+            ->afterTheme('FCom_Cms_Frontend::layout');
     }
 
     public static function layout()
@@ -26,7 +27,7 @@ class FCom_Cms_Frontend extends BClass
         BLayout::i()->layout(array(
             '/cms'=>array(
 
-            ),
+            )
         ));
     }
 }

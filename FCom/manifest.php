@@ -40,6 +40,7 @@
             'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Frontend_DefaultTheme::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Default frontend theme",
+            'provides' => array('theme' => 'FCom_Frontend_DefaultTheme'),
         ),
         // administration panel views and controllers
         'FCom_Admin' => array(
@@ -57,6 +58,7 @@
             'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Admin_DefaultTheme::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "Default admin theme",
+            'provides' => array('theme' => 'FCom_Admin_DefaultTheme'),
         ),
         // cron jobs processing
         'FCom_Cron' => array(
@@ -120,6 +122,7 @@
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
             'description' => "Product reviews by customers",
             'bootstrap' => array('file'=>'ProductReviewsFrontend.php', 'callback'=>'FCom_ProductReviews_Frontend::bootstrap'),
+            'migrate' => 'FCom_ProductReviews_Migrate',
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'ProductReviewsAdmin.php', 'callback'=>'FCom_ProductReviews_Admin::bootstrap'),
@@ -131,7 +134,7 @@
         ),
         // catalog views and controllers
         'FCom_Catalog' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.2',
             'root_dir' => 'Catalog',
             'depends' => array('FCom_Core'),
             'description' => "Categories and products management, admin and frontend",
@@ -148,7 +151,7 @@
         ),
         // customer account and management
         'FCom_Customer' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.2',
             'root_dir' => 'Customer',
             'depends' => array('FCom_Core'),
             'description' => "Customer Accounts and Management",
@@ -168,7 +171,7 @@
         ),
         // catalog views and controllers
         'FCom_CustomField' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'CustomField',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
             'depends' => array('FCom_Catalog'),
@@ -187,11 +190,75 @@
         ),
         // cart, checkout and customer account views and controllers
         'FCom_Checkout' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.6',
             'root_dir' => 'Checkout',
-            'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
+            'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
+            'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'CheckoutAdmin.php', 'callback'=>'FCom_Checkout_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'CheckoutFrontend.php', 'callback'=>'FCom_Checkout_Frontend::bootstrap'),
+                ),
+            ),
             'description' => "Base cart and checkout functionality",
+        ),
+        'FCom_Sales' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Sales',
+            'migrate' => 'FCom_Sales_Migrate',
+            'bootstrap' => array('file'=>'Sales.php', 'callback'=>'FCom_Sales::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'SalesAdmin.php', 'callback'=>'FCom_Sales_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'SalesFrontend.php', 'callback'=>'FCom_Sales_Frontend::bootstrap'),
+                ),
+            ),
+            'description' => "Sales module",
+        ),
+        'FCom_ShippingPlain' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'ShippingPlain',
+            'depends' => array('FCom_Checkout'),
+            'bootstrap' => array('file'=>'ShippingPlain.php', 'callback'=>'FCom_ShippingPlain::bootstrap'),
+            'areas' => array(
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'ShippingPlain.php', 'callback'=>'FCom_ShippingPlain::bootstrap'),
+                ),
+            ),
+            'description' => "Plain shipping module for checkout",
+        ),
+        'FCom_ShippingUps' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'ShippingUps',
+            'depends' => array('FCom_Checkout'),
+            'bootstrap' => array('file'=>'Ups.php', 'callback'=>'FCom_ShippingUps_Ups::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'ShippingUpsAdmin.php', 'callback'=>'FCom_ShippingUps_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'ShippingUpsFrontend.php', 'callback'=>'FCom_ShippingUps_Frontend::bootstrap'),
+                ),
+            ),
+            'description' => "Universal post service shipping module for checkout",
+        ),
+        'FCom_Wishlist' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Wishlist',
+            'migrate' => 'FCom_Wishlist_Migrate',
+            'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),
+            'areas' => array(
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'WishlistFrontend.php', 'callback'=>'FCom_Wishlist_Frontend::bootstrap'),
+                ),
+            ),
+            'description' => "Wishlist functionality",
         ),
         'FCom_Email' => array(
             'version' => '0.1.0',
@@ -225,6 +292,19 @@
                 ),
             ),
         ),
+        // test CreditCard module
+        'FCom_CreditCard' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'CreditCard',
+            'depends' => array('FCom_Core'),
+            'description' => "Credit Card test module",
+            'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
+            'areas' => array(
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
+                ),
+            ),
+        ),
         // freshbook simple invoicing
         'FCom_FreshBooks' => array(
             'version' => '0.1.0',
@@ -243,7 +323,7 @@
         ),
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.1.2',
+            'version' => '0.1.1',
             'root_dir' => 'IndexTank',
             'depends' => array('FCom_Core'),
             'description' => "IndexTank API integration",
@@ -270,7 +350,7 @@
             'root_dir' => 'Test',
             'depends' => array('FCom_Core'),
             'description' => "PHPUnit tests integration",
-            'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap'),
+            'bootstrap' => array('file'=>'Test.php', 'callback'=>'FCom_Test::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'TestAdmin.php', 'callback'=>'FCom_Test_Admin::bootstrap')

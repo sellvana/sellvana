@@ -9,19 +9,26 @@ class FCom_Customer_Frontend extends BClass
         ;
 
         BFrontController::i()
-            ->route('GET|POST /login', 'FCom_Customer_Frontend_Controller.login')
+            ->route('GET /login', 'FCom_Customer_Frontend_Controller.login')
+            ->route('POST /login', 'FCom_Customer_Frontend_Controller.login__POST')
             ->route('GET|POST /customer/register', 'FCom_Customer_Frontend_Controller.register')
             ->route('GET|POST /customer/password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
             ->route('GET|POST /customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
             ->route('GET /logout', 'FCom_Customer_Frontend_Controller.logout')
 
-            ->route('GET /myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
-            ->route('GET|POST /myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+            ->route('GET /customer/myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
+            ->route('GET|POST /customer/myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+
+            //orders
+            ->route('GET|POST /customer/order', 'FCom_Customer_Frontend_Controller_Order.index')
+            ->route('GET /customer/order/.action', 'FCom_Customer_Frontend_Controller_Order')
 
             //addresses
-            ->route('GET /customer/address/shipping', 'FCom_Customer_Frontend_Controller_Address.shipping')
-            ->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
+            ->route('GET /customer/address', 'FCom_Customer_Frontend_Controller_Address.index')
             ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
+            ->route('GET /customer/address/.action', 'FCom_Customer_Frontend_Controller_Address')
+            //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
+
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
@@ -50,9 +57,33 @@ class FCom_Customer_Frontend extends BClass
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/account')),
             ),
-            '/customer/address'=>array(
+            '/customer/account/edit'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('customer/address')),
+                array('hook', 'main', 'views'=>array('customer/account/edit')),
+            ),
+            '/customer/account/editpassword'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/account/editpassword')),
+            ),
+            '/customer/address/edit'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address/edit')),
+            ),
+            '/customer/address/list'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address/list')),
+            ),
+            '/customer/address/choose'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/address/choose')),
+            ),
+            '/customer/order/list'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/order/list')),
+            ),
+            '/customer/order/view'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('customer/order/view')),
             ),
         ));
     }

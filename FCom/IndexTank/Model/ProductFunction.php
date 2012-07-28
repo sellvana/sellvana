@@ -18,7 +18,7 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
     {
         $functions = FCom_IndexTank_Model_ProductFunction::i()->orm()->find_many();
         $result = array();
-        foreach($functions as $f){
+        foreach ($functions as $f) {
             $result[$f->number] = $f;
         }
         return $result;

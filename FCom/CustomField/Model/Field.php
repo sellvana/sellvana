@@ -24,6 +24,10 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'select' => 'Drop down',
             'boolean' => 'Yes/No',
         ),
+        'frontend_show' => array(
+            '1' => 'Yes',
+            '0' => 'No'
+        ),
     );
 
     protected static $_fieldTypes = array(
@@ -112,9 +116,21 @@ CREATE TABLE IF NOT EXISTS {$tField} (
   `table_field_type` varchar(20) NOT NULL,
   `admin_input_type` varchar(20) NOT NULL DEFAULT 'text',
   `frontend_label` text,
+  `frontend_show` tinyint(1) not null default 1,
   `config_json` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+    }
+
+    public static function upgrade_0_1_1()
+    {
+        $table = static::table();
+        $fieldName = 'frontend_show';
+        if (BDb::ddlFieldInfo($table, $fieldName)) {
+            return false;
+        }
+
+        BDb::run( " ALTER TABLE {$table} ADD {$fieldName} tinyint(1) not null default 1; ");
     }
 }

@@ -10,6 +10,23 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function getUrl()
+    {
+        $config = BConfig::i()->get('modules/FCom_Cms');
+        $prefix = !empty($config['page_url_prefix']) ? $config['page_url_prefix'].'/' : '';
+        return $prefix . $this->handle;
+    }
+
+    public function getUrlForHandle($handle)
+    {
+        $page = FCom_Cms_Model_Page::i()->orm()->where("handle", $handle)->find_one();
+        if ($page) {
+            return $page->getUrl();
+        }
+        return false;
+    }
+
+
     public function render()
     {
         BLayout::i()
@@ -68,7 +85,7 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
             'user_id' => $user ? $user->id : null,
             'username' => $user ? $user->username : null,
             'version' => $this->version,
-            'comments' => $this->version_comments,
+            'comments' => $this->version_comments ? $this->version_comments : '',
             'ts' => BDb::now(),
             'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(),
                 'handle,title,content,layout_update,meta_title,meta_description,meta_keywords')),
