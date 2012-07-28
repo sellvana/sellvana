@@ -145,6 +145,7 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         );
+
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -1616,14 +1617,6 @@ class BModel extends Model
     public function beforeSave()
     {
         return $this;
-        //not used any more
-        try {
-            BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
-            BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
-        } catch (BModelException $e) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -1654,6 +1647,7 @@ class BModel extends Model
     {
         if ($beforeAfter) {
             try {
+                $this->beforeSave();
                 BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
                 BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
             } catch (BModelException $e) {
@@ -1666,6 +1660,7 @@ class BModel extends Model
         parent::save();
 
         if ($beforeAfter) {
+            $this->afterSave();
             BPubSub::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
             BPubSub::i()->fire('BModel::afterSave', array('model'=>$this));
         }
@@ -1682,10 +1677,6 @@ class BModel extends Model
     */
     public function afterSave()
     {
-        return $this;
-        //not used any more
-        BPubSub::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
-        BPubSub::i()->fire('BModel::afterSave', array('model'=>$this));
         return $this;
     }
 
@@ -1706,10 +1697,7 @@ class BModel extends Model
     */
     public function beforeDelete()
     {
-        return true;
-        //not used any more
-        BPubSub::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
-        return true;
+        return $this;
     }
 
     public function delete()
@@ -1718,11 +1706,12 @@ class BModel extends Model
             return $this;
         }*/
         try {
+            $this->beforeDelete();
             BPubSub::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
         } catch(BModelException $e) {
             return $this;
         }
-        
+
         if (($cache =& static::$_cache[$this->_origClass()])) {
             foreach ($cache as $k=>$cache) {
                 $key = $this->get($k);
@@ -1731,16 +1720,16 @@ class BModel extends Model
             }
         }
         parent::delete();
-        //$this->afterDelete();
+
+        $this->afterDelete();
         BPubSub::i()->fire($this->_origClass().'::afterDelete', array('model'=>$this));
+
         return $this;
     }
 
     public function afterDelete()
     {
         return;
-        //not used any more
-        BPubSub::i()->fire($this->_origClass().'::afterDelete', array('model'=>$this));
     }
 
     /**

@@ -58,7 +58,7 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
             BDebug::error('Invalid Filename: '.$id);
         }
         $moduleClass = BApp::m($module);
-        $filename = $moduleClass->baseDir().'/'.$file;
+        $filename = $moduleClass->baseDir().'/i18n/'.$file;
 
         $model = new stdClass();
         $model->id = $id;

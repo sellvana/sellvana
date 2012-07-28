@@ -8,6 +8,7 @@ class FCom_Disqus_Frontend extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Disqus_Frontend::layout');
         //BLocale::addTranslationsFile('tr.json');
         //BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
+
     }
 
     static public function layout()
