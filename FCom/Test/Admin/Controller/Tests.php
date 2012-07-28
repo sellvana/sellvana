@@ -10,9 +10,12 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
     {
 
         $path = realpath(dirname(__FILE__).'/../..');
-        $res = exec("phpunit {$path}/AllTests.php", $output);
-        echo implode("<br>", $output);
+        $pathBB = FULLERON_ROOT_DIR.'/FCom/buckyball/tests';
 
+        $res = exec("phpunit {$path}/AllTests.php", $output);
+
+        echo "<h2>FCom tests</h2><br/>";
+        echo implode("<br>", $output);
         //echo $res;
         exit;
     }
@@ -34,7 +37,6 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         $results = ob_get_contents();
         ini_set('html_errors', $html_errors);
         ob_end_clean();
-
         $textPrinter = new PHPUnit_TextUI_ResultPrinter;
         ob_start();
         ini_set('html_errors', 0);

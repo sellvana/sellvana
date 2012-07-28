@@ -87,7 +87,6 @@ class BLayout extends BClass
     */
     public function viewRootDir($rootDir=null)
     {
-        $module = BModuleRegistry::i()->currentModule();
         if (is_null($rootDir)) {
             return $this->getViewRootDir();
         }
@@ -123,7 +122,7 @@ class BLayout extends BClass
     }
 
     /**
-    * put your comment there...
+    * Alias for addAllViews()
     *
     * @deprecated alias
     * @param mixed $rootDir
@@ -185,7 +184,7 @@ class BLayout extends BClass
     }
 
     /**
-    * put your comment there..
+    * Set default view class
     *
     * @todo rename to setDefaultViewClass()
     * @param mixed $className
@@ -1131,7 +1130,7 @@ class BViewHead extends BView
     }
 
     /**
-    * put your comment there...
+    * Alis for addTitle($title)
     *
     * @deprecated
     * @param mixed $title

@@ -9,6 +9,11 @@ require_once __DIR__.'/com/BLocaleTest.php';
 require_once __DIR__.'/com/BAppTest.php';
 require_once __DIR__.'/com/BConfigTest.php';
 require_once __DIR__.'/com/BClassRegistryTest.php';
+require_once __DIR__.'/com/BPubSubTest.php';
+require_once __DIR__.'/com/BLayoutTest.php';
+require_once __DIR__.'/com/BViewTest.php';
+require_once __DIR__.'/com/BViewHeadTest.php';
+require_once __DIR__.'/com/BClassDecoratorTest.php';
 
 class BAllTests
 {
@@ -32,6 +37,11 @@ class BAllTests
         $suite->addTestSuite('BApp_Test');
         $suite->addTestSuite('BConfig_Test');
         $suite->addTestSuite('BClassRegistry_Test');
+        $suite->addTestSuite('BPubSub_Test');
+        $suite->addTestSuite('BLayout_Test');
+        $suite->addTestSuite('BView_Test');
+        $suite->addTestSuite('BViewHead_Test');
+        $suite->addTestSuite('BClassDecorator_Test');
 
 
         return $suite;
