@@ -6,6 +6,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         BMigrate::install('0.1.1', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function install()
@@ -26,4 +27,10 @@ class FCom_Catalog_Migrate extends BClass
         FCom_Catalog_Model_ProductLink::i()->install();
         FCom_Catalog_Model_ProductFamily::i()->install();
     }
+
+    public function upgrade_0_1_2()
+    {
+        FCom_Catalog_Model_Product::upgrade_0_1_2();
+    }
+    
 }

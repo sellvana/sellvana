@@ -6,6 +6,7 @@ class FCom_Customer_Migrate extends BClass
     {
         BMigrate::install('0.1.1', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function install()
@@ -16,14 +17,11 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade_0_1_1()
     {
-        try {
-            BDb::run("
-ALTER TABLE ".FCom_Customer_Model_Address::table()."
-    ADD COLUMN `lat` DECIMAL(15,10) NULL AFTER `update_dt`,
-    ADD COLUMN `lng` DECIMAL(15,10) NULL AFTER `lat`;
-            ");
-        } catch (Exception $e) {
-            //columns already exist
-        }
+        FCom_Customer_Model_Address::upgrade_0_1_1();
+    }
+
+    public function upgrade_0_1_2()
+    {
+        FCom_Customer_Model_Customer::upgrade_0_1_2();
     }
 }

@@ -6,6 +6,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_sessionCart;
+    protected $shippingMethods = array();
+    protected $shippingClasses = array();
+    protected $paymentMethods = array();
+    protected $paymentClasses = array();
 
     public $items;
 
@@ -28,7 +32,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             } else {
                 if (($cartId = static::sessionCartId()) && ($cart = static::load($cartId))) {
                     static::$_sessionCart = $cart;
-                } elseif (($cart = static::i()->load(BSession::i()->sessionId(), 'session_id'))) {
+                } elseif (($cart = static::i()->orm()->where('session_id',BSession::i()->sessionId())->where('status', 'new')->find_one() )) {
                     static::$_sessionCart = $cart;
                     static::sessionCartId($cart->id);
                 } else {
@@ -54,20 +58,27 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
                 $user->save();
             } elseif ($user->session_cart_id != $sessCartId) {
                 if ($sessCartId) {
-                    $user->sessionCart()->merge($sessCartId)->save();
+                    $cart->merge($sessCartId)->save();
                 }
-                static::sessionCartId($user->session_cart_id);
             }
         } elseif ($sessCartId) {
             $user->set('session_cart_id', $sessCartId)->save();
         }
+
+        static::sessionCartId($user->session_cart_id);
+    }
+
+    static public function userLogout()
+    {
+        static::sessionCartId(false);
+        static::$_sessionCart = null;
     }
 
     public function merge($cartId)
     {
         $cart = static::i()->load($cartId);
         foreach ($cart->items() as $item) {
-            $this->addProduct($item->product_id, array('qty'=>$item->qty));
+            $this->addProduct($item->product_id, array('qty'=>$item->qty, 'price'=>$item->price));
         }
         $cart->delete();
         $this->calcTotals();
@@ -162,7 +173,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         return BDb::many_as_array(FCom_Catalog_Model_Product::factory()
             ->join($tCartItem, array($tCartItem.'.product_id','=',$tProduct.'.id'))
             ->select($tProduct.'.*')
-            ->select($tCartItem.'.qty')
+            ->select($tCartItem.'.*')
             ->where($tCartItem.'.cart_id', $cartId)
             ->find_many());
     }
@@ -184,7 +195,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         if (true===$request->multirow_ids) {
             $request->multirow_ids = array();
-            $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')
+            $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')->select('price')
                 ->where('cart_id', $request->source_id)
                 ->find_many();
             foreach ($items as $item) {
@@ -195,7 +206,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $productIds = !empty($request->multirow_ids) ? $request->multirow_ids : (array)$request->row_id;
             $request->qtys = array();
             if (empty($items)) {
-                $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')
+                $items = FCom_Checkout_Model_CartItem::factory()->select('product_id')->select('qty')->select('price')
                     ->where('cart_id', $request->source_id)->where_in('product_id', $productIds)
                     ->find_many();
             }
@@ -207,15 +218,27 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     public function addProduct($productId, $options=array())
     {
-        $this->save();
+        //save cart to DB on add first product
+        if (!$this->id) {
+            $this->item_qty = 1;
+            $this->save();
+        }
+
         if (empty($options['qty']) || !is_numeric($options['qty'])) {
             $options['qty'] = 1;
+        }
+        if (empty($options['price']) || !is_numeric($options['price'])) {
+            $options['price'] = 0;
+        } else {
+            $options['price'] = $options['price'] * $options['qty'];
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item) {
             $item->add('qty', $options['qty']);
+            $item->add('price', $options['price']);
         } else {
-            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId, 'qty'=>$options['qty']));
+            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId,
+                'qty'=>$options['qty'], 'price' => $options['price']));
         }
         $item->save();
         if (empty($options['no_calc_totals'])) {
@@ -224,6 +247,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         $user = FCom_Customer_Model_Customer::sessionUser();
         if($user){
             $user->session_cart_id = $this->id;
+            $user->save();
         }
         static::sessionCartId($this->id);
         return $this;
@@ -310,13 +334,285 @@ throw new Exception("Invalid cart_id: ".$cId);
         foreach ($this->items() as $item) {
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->product()->base_price*$item->qty;
+            $this->subtotal += $item->price;
         }
         return $this;
+    }
+/*
+    public function totalAsHtml()
+    {
+        $subtotal = $this->subtotal;
+        $shipping = 0;
+        if ($this->shipping_method) {
+            $shipping = $this->shipping_price;
+        }
+        $discount = 0;
+        if ($this->discount_code) {
+            $discount = 10;
+        }
+        //if tax
+        $beforeTax = $subtotal + $shipping - $discount;
+        $estimatedTax = 0;
+        if (1) {
+            $estimatedTax = $beforeTax*0.2;
+        }
+        $total = $beforeTax + $estimatedTax;
+        $html = '
+Items: $'.$subtotal.'<br>
+Shipping and handling: $'.$shipping.'<br>
+Discount: -$'.$discount.'<br/>
+Total before tax: $'.$beforeTax.'<br>
+Estimated tax: $'.$estimatedTax.'<br>
+<b>Order total: $'.$total.'</b>';
+        return $html;
+    }
+*/
+    public function addShippingMethod($method, $class)
+    {
+        $this->shippingMethods[$method] = $class;
+    }
+
+    /**
+     *
+     * @return Array of Shipping Method objects
+     */
+    public function getShippingMethods()
+    {
+        if (!$this->shippingMethods) {
+            return false;
+        }
+        if (empty($this->shippingClasses)) {
+            foreach($this->shippingMethods as $method => $class) {
+                $this->shippingClasses[$method] = $class::i();
+            }
+        }
+        return $this->shippingClasses;
+    }
+
+    public function getShippingClassName($method)
+    {
+        return $this->shippingMethods[$method];
+    }
+
+    public function getShippingMethod($method)
+    {
+        $this->getShippingMethods();
+        if (!empty($this->shippingClasses[$method])){
+            return $this->shippingClasses[$method];
+        } else {
+            return false;
+        }
+    }
+
+    public function addPaymentMethod($method, $class)
+    {
+        $this->paymentMethods[$method] = $class;
+    }
+
+    /**
+     *
+     * @return Array of Payment Methods
+     */
+    public function getPaymentMethods()
+    {
+        if (!$this->paymentMethods) {
+            return false;
+        }
+        if (empty($this->paymentClasses)) {
+            foreach($this->paymentMethods as $method => $class) {
+                $this->paymentClasses[$method] = $class::i();
+            }
+        }
+        return $this->paymentClasses;
+    }
+
+    public function addTotalRow($name, $options)
+    {
+        $cart = self::sessionCart();
+        $totals = BUtil::fromJson($cart->totals_json);
+        $totals[$name] = array('name' => $name, 'options' => $options);
+        $cart->totals_json = BUtil::toJson($totals);
+        $cart->save();
+    }
+
+    public function calculateTotals()
+    {
+        $this->calc_balance = 0;
+        $totals = BUtil::fromJson($this->totals_json);
+        if (!$totals) {
+            return;
+        }
+        $sorted = $this->sortTotals($totals);
+        if (!$sorted) {
+            return;
+        }
+
+        foreach ($sorted as $key => $totalMethod) {
+            if (empty($totalMethod['options']['callback'])) {
+                continue;
+            }
+            $callback = BUtil::extCallback($totalMethod['options']['callback']);
+            if (!is_callable($callback)) {
+                BDebug::warning('Invalid cart total callback: '.$key);
+                continue;
+            }
+            try {
+                $totals[$key]['total'] = call_user_func($callback, $this);
+            } catch (FCom_Checkout_Exception_CartTotal $e) {
+                $totals[$key]['total'] = 0;
+                $totals[$key]['error'] = $e->getMessage();
+            }
+
+            $this->calc_balance += $totals[$key]['total'];
+        }
+        $this->totals_json = BUtil::toJson($totals);
+        $this->save();
+    }
+
+    public function getTotals()
+    {
+        return BUtil::fromJson($this->totals_json);
+    }
+
+
+    public function sortTotals($totals)
+    {
+        $totalObjects = $totals;
+        // take care of 'load_after' option
+        foreach ($totalObjects as $index => $data) {
+            if (!empty($data['options']['after'])) {
+                $totalObjects[$index]['parents'][] = $data['options']['after'];
+                $totalObjects[$data['options']['after']]['children'][] = $data['name'];
+            }
+        }
+
+        // get modules without dependencies
+        $rootObjects = array();
+        foreach ($totalObjects as $data) {
+            if (empty($data['parents'])) {
+                $rootObjects[] = $data;
+            }
+        }
+
+        $sorted = array();
+        while($totalObjects) {
+            // check for circular reference
+            if (!$rootObjects) return false;
+            // remove this node from root modules and add it to the output
+            $n = array_pop($rootObjects);
+
+            $sorted[$n['name']] = $n;
+
+            if (empty($n['children'])) {
+                unset($totalObjects[$n['name']]);
+                continue;
+            }
+            // for each of its children: queue the new node, finally remove the original
+            for ($i = count($n['children'])-1; $i>=0; $i--) {
+                // get child module
+                $childObject = $totalObjects[$n['children'][$i]];
+                // remove child modules from parent
+                unset($n['children'][$i]);
+                // remove parent from child module
+                unset($childObject['parents'][array_search($n['name'], $childObject['parents'])]);
+                // check if this child has other parents. if not, add it to the root modules list
+                if (empty($childObject['parents'])) array_push($rootObjects, $childObject);
+            }
+            // remove processed module from list
+            unset($totalObjects[$n['name']]);
+        }
+
+        $sortedTotals = array();
+        foreach($sorted as $key => $data){
+            $sortedTotals[$key] = $totals[$key];
+        }
+        return $sortedTotals;
+    }
+
+    //todo: rename to subtotalCallback
+    public function subtotalCallback()
+    {
+        $cart = self::sessionCart();
+        return $cart->subtotal;
+    }
+
+    //this is example
+    //todo: move this to discout module when it will be ready
+    public function discountCallback()
+    {
+        $cart = self::sessionCart();
+        if ($cart->discount_code) {
+            return -10;
+        }
+        return 0;
     }
 
     public function urlHash($id)
     {
         return '/carts/items/'.$id;
     }
+
+    public static function install()
+    {
+        BDb::run("
+CREATE TABLE IF NOT EXISTS ".static::table()." (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned DEFAULT NULL,
+  `location_id` int(10) unsigned DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `sort_order` int(11) DEFAULT NULL,
+  `item_qty` decimal(12,4) NOT NULL DEFAULT '0.0000',
+  `item_num` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
+  `session_id` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `NewIndex1` (`session_id`),
+  UNIQUE KEY `user_id` (`user_id`,`description`,`session_id`),
+  KEY `company_id` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
+    }
+
+    public static function upgrade_0_1_3()
+    {
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo(static::table(), "shipping_method")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `shipping_method` VARCHAR( 50 ) NOT NULL ,
+ADD `shipping_price` DECIMAL( 10, 2 ) NOT NULL ,
+ADD `payment_method` VARCHAR( 50 ) NOT NULL ,
+ADD `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+ADD `discount_code` VARCHAR( 50 ) NOT NULL,
+ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
+            ADD `totals_json` TEXT NOT NULL "
+        );
+    }
+
+    public static function upgrade_0_1_4()
+    {
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo(static::table(), "shipping_service")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `shipping_service` CHAR( 2 ) NOT NULL AFTER `shipping_price`"
+        );
+
+    }
+
+    public static function upgrade_0_1_5()
+    {
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo(static::table(), "status")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".static::table()." ADD `status` ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new'"
+        );
+    }
+
+
 }

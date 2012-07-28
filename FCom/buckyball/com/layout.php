@@ -770,15 +770,20 @@ class BView extends BClass
     *
     * @todo detect multi-level circular references
     * @param string $viewname
+    * @param array $params
     * @return BModule
     */
-    public function view($viewname)
+    public function view($viewname, $params = null)
     {
         if ($viewname===$this->param('view_name')) {
             throw new BException(BLocale::_('Circular reference detected: %s', $viewname));
         }
+        $view = BLayout::i()->view($viewname);
 
-        return BLayout::i()->view($viewname);
+        if ($view && $params) {
+            $view->set($params);
+        }
+        return $view;
     }
 
     /**

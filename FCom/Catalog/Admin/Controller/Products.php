@@ -115,23 +115,28 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             break;
         }
 
-        BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
-        $data = BDb::many_as_array($orm->find_many());
+
 
         $gridId = 'linked_products_'.$type;
         $config = array(
             'grid' => array(
                 'id'            => $gridId,
-                'data'          => $data,
+                'data'          => null,
                 'datatype'      => 'local',
                 'caption'       => $caption,
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'width'=>30),
+                    'product_name' => array('label'=>'Product name', 'width'=>250),
+                    'manuf_sku' => array('label'=>'Mfr Part #', 'width'=>250),
+                ),
+                /*
                 'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
+                    array('name'=>'id', 'label'=>'ID', 'index'=>'id', 'width'=>40, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
                     array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
-                ),
+                ),*/
                 'rowNum'        => 10,
-                'sortname'      => 'p.product_name',
+                'sortname'      => 'product_name',
                 'sortorder'     => 'asc',
                 'autowidth'     => false,
                 'multiselect'   => true,
@@ -143,15 +148,31 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
         );
 
+        BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        $data = BDb::many_as_array($orm->find_many());
+        //unset unused columns
+        $columnKeys = array_keys($config['grid']['columns']);
+        foreach($data as &$prod){
+            foreach($prod as $k => $p) {
+                if (!in_array($k, $columnKeys)) {
+                    unset($prod[$k]);
+                }
+            }
+        }
+        $config['grid']['data'] = $data;
+
         BPubSub::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
 
         return $config;
     }
 
+
+
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        extract($args);
+        $model = $args['model'];
+        $data = BRequest::i()->post();
         $this->processCategoriesPost($model);
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
@@ -200,6 +221,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
     public function processLinkedProductsPost($model, $data)
     {
+        //echo "<pre>"; print_r($data); echo "</pre>";
         $hlp = FCom_Catalog_Model_ProductLink::i();
         foreach (array('related', 'similar') as $type) {
             $typeName = 'linked_products_'.$type;
@@ -220,12 +242,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             'link_type' => $type,
                             'linked_product_id' => $linkedId,
                         ))->save();
-#echo "<pre>"; print_r($m->as_array()); echo "</pre>";
                     }
                 }
             }
         }
-#exit;
+//exit;
         return $this;
     }
 
@@ -261,6 +282,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processMediaPost($model, $data)
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
+        
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
             $typeName = 'product_'.$typeName;
             if (!empty($data['grid'][$typeName]['del'])) {
@@ -270,6 +292,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'file_id'    => explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
+
             if (!empty($data['grid'][$typeName]['add'])) {
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)

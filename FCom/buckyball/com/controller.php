@@ -1253,7 +1253,7 @@ class BFrontController extends BClass
 
         $attempts = 0;
         $forward = true; // null: no forward, true: try next route, array: forward without new route
-
+#echo "<pre>"; print_r($this->_routes); exit;
         while (($attempts++<100) && $forward) {
             $route = $this->findRoute($requestRoute);
             if (!$route) {

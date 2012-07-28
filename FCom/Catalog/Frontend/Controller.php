@@ -2,64 +2,6 @@
 
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function action_category()
-    {
-        $layout = BLayout::i();
-        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
-        if (!$category) {
-            $this->forward(true);
-            return $this;
-        }
-
-        $productsORM = $category->productsORM();
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_category.products_orm', array('data'=>$productsORM));
-        $productsData = $category->productsORM()->paginate(null, array('ps'=>25));
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_category.products_data', array('data'=>&$productsData));
-
-        BApp::i()
-            ->set('current_category', $category)
-            ->set('products_data', $productsData);
-
-        $crumbs = array('home');
-        foreach ($category->ascendants() as $c) if ($c->node_name) $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
-        $layout->view('catalog/product/list')->products_data = $productsData;
-
-        FCom_Core::lastNav(true);
-
-        $this->layout('/catalog/category');
-        BResponse::i()->render();
-    }
-
-    public function action_search()
-    {
-        $layout = BLayout::i();
-        $q = BRequest::i()->get('q');
-        $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
-        if (!$qs) {
-            BResponse::i()->redirect(BApp::baseUrl());
-        }
-        $and = array();
-        foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
-        $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_complex(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
-        $productsData = $productsORM->paginate(null, array('ps'=>25));
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_data', array('data'=>&$productsData));
-
-        BApp::i()
-            ->set('current_query', $q)
-            ->set('products_data', $productsData);
-
-        FCom_Core::lastNav(true);
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-        $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/product/list')->products_data = $productsData;
-
-        $this->layout('/catalog/search');
-        BResponse::i()->render();
-    }
-
     public function action_manuf()
     {
         $this->forward(true);
@@ -82,7 +24,9 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        BLayout::i()->view('catalog/product')->product = $product;
+        $productReviews = FCom_ProductReviews_Model_Reviews::i()->orm()->where("product_id", $product->id())->find_many();
+        $layout->view('catalog/product')->product_reviews = $productReviews;
+        $layout->view('catalog/product')->product = $product;
 
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
@@ -102,8 +46,39 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
+        $user = false;
+        if (Bapp::m('FCom_Customer')) {
+            $user = FCom_Customer_Model_Customer::sessionUser();
+        }
+        $layout->view('catalog/product')->user = $user;
+
         $this->layout('/catalog/product');
         BResponse::i()->render();
+    }
+
+    public function action_product_post()
+    {
+        $r = explode('/', BRequest::i()->params('product'));
+        $href = $r[0];
+
+        $p = array_pop($r);
+        $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
+        if (!$product) {
+            BResponse::i()->redirect($href);
+        }
+
+        $post = BRequest::post();
+
+        if (!empty($post['add2cart'])) {
+            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToCart', array('product'=>&$product, 'qty' => $post['qty']));
+        }
+
+        if (!empty($post['add2wishlist'])) {
+            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
+        }
+
+
+        BResponse::i()->redirect($href);
     }
 
     public function action_compare()

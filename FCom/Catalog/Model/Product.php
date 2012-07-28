@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Model_Product extends BModel
+class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
@@ -77,6 +77,20 @@ class FCom_Catalog_Model_Product extends BModel
         return FCom_CustomField_Model_ProductField::i()->productFields($product);
     }
 
+    public function customFieldsShowOnFrontend()
+    {
+        $result = array();
+        $fields = FCom_CustomField_Model_ProductField::i()->productFields($this);
+        if ($fields) {
+            foreach ($fields as $f) {
+                if ($f->frontend_show) {
+                    $result[] = $f;
+                }
+            }
+        }
+        return $result;
+    }
+
 
     public function mediaORM($type)
     {
@@ -121,6 +135,20 @@ CREATE TABLE IF NOT EXISTS ".static::table()." (
   UNIQUE KEY `url_key` (`url_key`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
         ");
+    }
+
+    public static function upgrade_0_1_2()
+    {
+        $tProduct = static::table();
+        BDb::ddlClearCache();
+        $field = BDb::ddlFieldInfo($tProduct, 'weight');
+        if ($field){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `weight` DECIMAL( 10, 4 ) NOT NULL
+        ");
+
     }
 }
 

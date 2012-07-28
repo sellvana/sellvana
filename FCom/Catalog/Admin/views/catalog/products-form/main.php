@@ -22,7 +22,12 @@
                 <?php echo $m->description ?>
             </li>
             <li>
-                <h4 class="label">Unit of Measures</h4>
+                <h4 class="label">Price</h4>
+                <?php echo $this->q($m->base_price) ?>
+            </li>
+            <li>
+                <h4 class="label">Shipping Weight</h4>
+                <?php echo $this->q($m->weight) ?>
             </li>
         </ul>
     </div>
@@ -36,12 +41,7 @@ head(function() {
 <?php elseif ($this->mode==='create' || $this->mode==='edit'): ?>
 
     <fieldset class="adm-section-group">
-<?php if ($this->mode!=='create'): ?>
-        <div class="btns-set">
-            <button class="btn st3 sz2 btn-cancel" onclick="return adminForm.tabAction('cancel', this);"><span>Cancel</span></button>
-            <button class="btn st1 sz2 btn-save" onclick="return adminForm.tabAction('save', this);"><span>Save</span></button>
-        </div>
-<?php endif ?>
+
         <ul class="form-list">
             <li>
                 <h4 class="label">Product Name</h4>
@@ -57,7 +57,12 @@ head(function() {
                 <textarea id="general-info-description" name="model[description]"><?php echo $this->q($m->description) ?></textarea>
             </li>
             <li>
-                <h4 class="label">Unit of Measures</h4>
+                <h4 class="label">Price</h4>
+                <input type="text" name="model[base_price]" value="<?php echo $this->q($m->base_price) ?>"/>
+            </li>
+            <li>
+                <h4 class="label">Shipping Weight</h4>
+                <input type="text" name="model[weight]" value="<?php echo $this->q($m->weight) ?>"/>
             </li>
         </ul>
     </fieldset>

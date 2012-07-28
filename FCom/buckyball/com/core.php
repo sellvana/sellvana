@@ -247,17 +247,20 @@ class BApp extends BClass
             /** @var BRequest */
             $r = BRequest::i();
             $c = BConfig::i();
+            $scriptPath = pathinfo($r->scriptName());
             switch ($method) {
                 case 1:
                     $url = $c->get('web/base_href');
-                    if (!$url) $url = $r->webRoot();
-                    break;
-                case 2:
-                    $url = $r->scriptName();
-                    if ($r->modRewriteEnabled() && !$c->get('web/show_script_name')) {
-                        $url = dirname($url);
+                    if (!$url) {
+                        $url = $scriptPath['dirname'];
                     }
                     break;
+                case 2:
+                    $url = $scriptPath['dirname'];
+                    break;
+            }
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
+                $url .= '/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
@@ -288,7 +291,8 @@ class BApp extends BClass
 
     public static function href($url='', $full=true, $method=2)
     {
-        return BApp::baseUrl($full, $method) . BFrontController::processHref($url);
+        return BApp::baseUrl($full, $method) 
+            . BFrontController::processHref($url);
     }
 
     /**
@@ -798,8 +802,10 @@ class BClassRegistry extends BClass
         }
         if (!empty($this->_methods[$method][$static][$type]['extends'])) {
             $parents = class_parents($class);
+#echo "<pre>"; echo $class.'::'.$method.';'; print_r($parents); print_r($this->_methods[$method][$static][$type]['extends']); echo "</pre><hr>";
             foreach ($this->_methods[$method][$static][$type]['extends'] as $c=>$v) {
                 if (isset($parents[$c])) {
+#echo ' * ';
                     $this->_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }
@@ -832,7 +838,8 @@ class BClassRegistry extends BClass
     */
     public function callMethod($origObject, $method, array $args=array(), $origClass=null)
     {
-        $class = $origClass ? $origClass : get_class($origObject);
+        //$class = $origClass ? $origClass : get_class($origObject);
+        $class = get_class($origObject);
 
         if (($info = $this->findMethodInfo($class, $method, 0, 'override'))) {
             $callback = $info['callback'];
@@ -875,15 +882,14 @@ class BClassRegistry extends BClass
     */
     public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
-        $class = $origClass ? $origClass : $class;
-        
         if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
-        } elseif (method_exists($class, $method)) {
-            $callback = array($class, $method);
         } else {
-            BDebug::error('Invalid method: '.$class.'::'.$method);
-            return null;
+            if (method_exists($class, $method)) {
+                $callback = array($class, $method);
+            } else {
+                throw new Exception('Invalid static method: '.$class.'::'.$method);
+            }
         }
 
         $result = call_user_func_array($callback, $args);

@@ -14,6 +14,8 @@ class FCom_IndexTank_Frontend extends BClass
         BLayout::i()->addAllViews('Frontend/views');
 
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Frontend::layout');
+
+        BClassRegistry::i()->overrideClass('FCom_Catalog_Frontend_Controller_Search', 'FCom_IndexTank_Frontend_Controller');
     }
 
     /**
@@ -22,6 +24,11 @@ class FCom_IndexTank_Frontend extends BClass
     static public function layout()
     {
         BLayout::i()->layout(array(
+            'base'=>array(
+                array('view', 'head', 'do'=>array(
+                    array('js', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js')
+                )
+            )),
             '/indextank/search'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('indextank/search'))

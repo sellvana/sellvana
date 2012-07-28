@@ -1,37 +1,23 @@
-<?
+<?php
 $prod = $this->product;
 $cat = $this->category;
 ?>
 
 <div class="main col1-layout">
-    <?=$this->view('breadcrumbs')?>
     <div class="col-main">
         <div id="messages_product_view"></div>
         <div class="product-view">
             <div class="product-essential">
-                <form action="" method="post">
+                <form action="" method="post" onsubmit="return false;">
+                    <input type="hidden" name="id" value="<?=$prod->id?>">
                     <div class="product-shop">
                         <div class="add-to-cart">
-                            <label for="qty">Qty:</label>
-                            <input type="text" name="qty" id="qty" maxlength="12" value="1" title="Qty" class="input-text qty">
-                            <button type="button" title="Add to Cart" class="button btn-add-to-cart" onclick="add_cart(<?=$prod->id?>, this.form.qty.value)"><span>+ Add to Cart</span></button>
+
+                            <?=$this->view('cart/add2cart', array('prod' => $prod))?>
+
+                            <?=$this->view('wishlist/add2wishlist', array('prod' => $prod))?>
 
                             <label class="compare-label"><input type="checkbox" name="compare" class="compare-checkbox" value="<?=$prod->id?>"> Compare</label>
-
-							<ul class="price-list">
-								<li><span class="label">Darby Dental</span><span class="lowest-price">Lowest Price</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-								<li><span class="label">Darby Dental</span><span class="price">$24</span></li>
-							</ul>
 
                             <?=$this->view('compare/block')?>
 
@@ -39,41 +25,31 @@ $cat = $this->category;
                         <div class="product-name">
                             <h1><?=$this->q($prod->product_name)?></h1>
                         </div>
-                        <p><span class="sku">Part #: 6131600</span><span class="manuf-name">National Keystone Group</span></p>
-						<p class="availability in-stock">Status: Active</span></p>
                         <div class="price-box">
                             <span class="price">$<?=number_format($prod->base_price, 2)?></span>
                         </div>
                         <p class="no-rating"><a href="">Be the first to review this product</a></p>
                         <div class="short-description">
-                            <!--<?=$this->q($prod->description)?>-->
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s.
+                            <?=$this->q($prod->description)?>
+                        </div>
+                        <div>
+                            <?=$this->view('customfields/product', array('prod' => $prod))?>
                         </div>
                     </div>
 
+                    <?php
+                    $mediaList = FCom_Catalog_Model_ProductMedia::i()->orm()->where('product_id', $prod->id())->where('media_type', 'I')->find_many();
+                    ?>
                     <div class="product-img-box">
                         <p class="product-img">
-                            <img src="<?=$prod->thumbUrl(250, 250)?>" alt="<?=$this->q($prod->product_name)?>" title="<?=$this->q($prod->product_name)?>"></p>
+                            <img src="<?=$prod->thumbUrl(50, 50)?>" alt="<?=$this->q($prod->product_name)?>" title="<?=$this->q($prod->product_name)?>"></p>
                         <div class="additional-views">
                             <ul>
+                                <?php foreach($mediaList as $media):?>
                                 <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
+                                    <a href="<?=$media->getUrl()?>" rel="lightbox[prod_<?=$prod->id?>]" title=""><img src="<?=$media->getUrl()?>" width="40" height="40" alt=""></a>
                                 </li>
-                                <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
-                                </li>
-                                <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
-                                </li>
-                                <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
-                                </li>
-                                <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
-                                </li>
-                                <li>
-                                    <a href="<?=$prod->imageUrl(true)?>" title=""><img src="<?=$prod->thumbUrl(40, 40)?>" width="40" height="40" alt=""></a>
-                                </li>
+                                <?php endforeach; ?>
                             </ul>
                         </div>
                     </div>
@@ -93,10 +69,6 @@ $cat = $this->category;
             		<li><a href="#accessories">Accessories</a></li>
             	</ul>
                 <div class="panes">
-                    <div class="tab-content box-iframe">
-                        <a href="#" onclick="return manufIframe.expand()">Expand</a>
-                        <iframe src="http://www.miltex.us/prodInfo/dental/oralSurgery.aspx" frameborder="0" id="manuf_iframe" style="width:100%; height:500px; background:#fff; border:solid 1px #aaa; z-index:9999;"></iframe>
-                    </div>
                     <div class="tab-content box-description">
                         <h4>Overview</h4>
                             Tray Acrylic Material
@@ -108,7 +80,40 @@ $cat = $this->category;
                     <div class="tab-content box-tags">
                         <h4>Specifications</h4>
                     </div>
-                    <div class="tab-content">Reviews</div>
+                    <div class="tab-content">
+                        <h4>Reviews</h4>
+                        <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>">Add review</a><br/><br/>
+                        <?php if ($this->product_reviews) :?>
+                            <?php foreach ($this->product_reviews as $review) :?>
+                            <div style="border:1 px solid black;">
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="1" <?=$review->rating == 1 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="2" <?=$review->rating == 2 ? 'checked': ''?> />
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="3" <?=$review->rating == 3 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="4" <?=$review->rating == 4 ? 'checked': ''?>/>
+                                <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="5" <?=$review->rating == 5 ? 'checked': ''?>/>
+                                <span style="font-weight: bold; padding-left: 15px;"><?=$review->title?></span>
+                                <?=date("F d, Y", strtotime($review->created_at))?>
+    <br/>
+                                <?=nl2br($review->text)?><br/>
+                                <div id="block_review_helpful_<?=$review->id?>">
+                                    <form action="<?=Bapp::href('prodreviews/helpful')?>" method="post"  onsubmit="return false;">
+                                    <input type="hidden" name="pid" value="<?=$prod->id?>">
+                                    <input type="hidden" name="rid" value="<?=$review->id?>">
+                                    Was this review helpful to you?
+                                    <button type="submit" name="review_helpful" value="yes"
+                                            onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'yes');">Yes</button>
+                                    <button type="submit" name="review_helpful" value="no"
+                                            onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'no');">No</button>
+                                    </form>
+                                </div>
+                                <span id="block_review_helpful_done_<?=$review->id?>" style="color:green"></span>
+                                <br/><br/>
+                            </div>
+                            <?php endforeach; ?>
+
+                        <?php endif; ?>
+
+                    </div>
                     <div class="tab-content">
                     	<h4>Similar Products</h4>
                     	<table class="product-list">
@@ -117,10 +122,22 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->limit(5)->find_many()) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'similar')) ?>
 				            </tbody>
 				        </table>
-        			</div>
+        	</div>
+                <div class="tab-content">
+                    	<h4>Related Products</h4>
+                    	<table class="product-list">
+				        	<colgroup><col width="30">
+				        	<col width="60">
+				        	<col>
+				        	<col width="180">
+				            </colgroup><tbody>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'related')) ?>
+				            </tbody>
+				        </table>
+        	</div>
                     <div class="tab-content">
                         <h4>Family Products</h4>
                         <table class="product-list">
@@ -150,12 +167,3 @@ $cat = $this->category;
         </div>
     </div>
 </div>
-<script>
-var manufIframe = new ManufIframe({iframe:'#manuf_iframe'});
-
-$('ul.tabs').tabs('div.panes > div', {history:true});
-
-$(function() {
-    $('.price-range').tooltip({effect:'slide',position:'bottom left', offset:[-30, 80], events:{def:'click,mouseleave'}}).dynamic({classNames:''});
-});
-</script>

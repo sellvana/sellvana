@@ -5,7 +5,7 @@
     <p class="note-msg">There are no products matching the selection.</p>
 
 <? else: ?>
-
+<div style="width: 750px; float: right; margin-top: 20px;">
     <table class="product-list">
         <col width="30"/>
         <col width="60"/>
@@ -17,7 +17,8 @@
                 ->set('category', $this->category) ?>
         </tbody>
     </table>
-
+</div>
+    <?=$this->view('indextank/product/filters')->set('state', $this->products_data['state'])?>
 <script>
 /*$('.price-range').tooltip({effect:'slide',position:'bottom left', offset:[-30, 80], events:{def:'click,mouseleave'}}).dynamic({classNames:''});*/
 </script>

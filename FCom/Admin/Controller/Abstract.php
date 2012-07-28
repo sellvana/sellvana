@@ -35,10 +35,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         $r = BRequest::i();
         if ($r->xhr()) {
-            BSession::i()->data('login_orig_url', $r->referrer());
+            BSession::i()->data('admin_login_orig_url', $r->referrer());
             BResponse::i()->json(array('error'=>'login'));
         } else {
-            BSession::i()->data('login_orig_url', $r->currentUrl());
+            BSession::i()->data('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
             BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
         }
@@ -48,10 +48,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         $r = BRequest::i();
         if ($r->xhr()) {
-            BSession::i()->data('login_orig_url', $r->referrer());
+            BSession::i()->data('admin_login_orig_url', $r->referrer());
             BResponse::i()->json(array('error'=>'denied'));
         } else {
-            BSession::i()->data('login_orig_url', $r->currentUrl());
+            BSession::i()->data('admin_login_orig_url', $r->currentUrl());
             $this->layout('/denied');
             BResponse::i()->status(403, 'Forbidden');
         }
@@ -77,30 +77,32 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             $allowed = explode(',', $allowed);
         }
         $tabs = $view->tabs;
-        foreach ($tabs as $k=>&$tab) {
-            if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
-                $tab['disabled'] = true;
-                continue;
-            }
-            if (!$curTab) {
-                $curTab = $k;
-            }
-            if ($curTab===$k) {
-                $tab['async'] = false;
-            }
-            if (!empty($tab['view'])) {
-                $tabView = $layout->view($tab['view']);
-                if ($tabView) {
-                    $tabView->set(array(
-                        'model' => $model,
-                        'mode' => $mode,
-                    ));
-                } else {
-                    BDebug::warning('MISSING VIEW: '.$tab['view']);
+        if ($tabs) {
+            foreach ($tabs as $k=>&$tab) {
+                if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
+                    $tab['disabled'] = true;
+                    continue;
+                }
+                if (!$curTab) {
+                    $curTab = $k;
+                }
+                if ($curTab===$k) {
+                    $tab['async'] = false;
+                }
+                if (!empty($tab['view'])) {
+                    $tabView = $layout->view($tab['view']);
+                    if ($tabView) {
+                        $tabView->set(array(
+                            'model' => $model,
+                            'mode' => $mode,
+                        ));
+                    } else {
+                        BDebug::warning('MISSING VIEW: '.$tab['view']);
+                    }
                 }
             }
+            unset($tab);
         }
-        unset($tab);
         $view->set(array(
             'tabs' => $tabs,
             'model' => $model,

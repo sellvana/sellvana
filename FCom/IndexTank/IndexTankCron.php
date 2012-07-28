@@ -23,11 +23,11 @@ class FCom_IndexTank_Cron extends BClass
         $batchSize = 500;
         $offset = 0;
         $products = $orm->offset($offset)->limit($batchSize)->find_many();
-        if(!$products){
+        if (!$products) {
             return;
         }
         $productIds = array();
-        foreach($products as $p){
+        foreach ($products as $p) {
             $productIds[] = $p->id();
         }
         //before indexing
@@ -48,11 +48,11 @@ class FCom_IndexTank_Cron extends BClass
         $batchSize = 500;
         $offset = 0;
         $products = $orm->offset($offset)->limit($batchSize)->find_many();
-        if(!$products){
+        if (!$products) {
             return;
         }
         $productIds = array();
-        foreach($products as $p){
+        foreach ($products as $p) {
             $productIds[] = $p->id();
         }
         //before index
@@ -73,7 +73,7 @@ class FCom_IndexTank_Cron extends BClass
     protected function updateInfoStatus($task, $total)
     {
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", $task)->find_one();
-        if (!$indexingStatus){
+        if (!$indexingStatus) {
             $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->create();
             $indexingStatus->task = $task;
         }

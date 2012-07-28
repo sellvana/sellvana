@@ -5,11 +5,14 @@ class FCom_Catalog_Frontend extends BClass
     static public function bootstrap()
     {
         BFrontController::i()
-            ->route( 'GET /*category', 'FCom_Catalog_Frontend_Controller.category')
+                //search
+            ->route( 'GET /*category', 'FCom_Catalog_Frontend_Controller_Search.category')
+            ->route( 'GET /catalog/search', 'FCom_Catalog_Frontend_Controller_Search.search')
+                //catalog
             ->route( 'GET /*manuf', 'FCom_Catalog_Frontend_Controller.manuf')
             ->route( 'GET /:product', 'FCom_Catalog_Frontend_Controller.product')
+            ->route( 'POST /:product', 'FCom_Catalog_Frontend_Controller.product_post')
             ->route( 'GET /*category/:product', 'FCom_Catalog_Frontend_Controller.product')
-            ->route( 'GET /catalog/search', 'FCom_Catalog_Frontend_Controller.search')
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
         ;
 
@@ -20,8 +23,14 @@ class FCom_Catalog_Frontend extends BClass
     static public function layout()
     {
         BLayout::i()->layout(array(
+            'base'=>array(
+                array('view', 'head', 'do'=>array(
+                    array('js', '{FCom_Catalog}/Frontend/js/fcom.frontend.js'),
+                )
+            )),
             '/catalog/category'=>array(
                 array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/category'))
             ),
 
             '/catalog/product'=>array(
@@ -31,6 +40,12 @@ class FCom_Catalog_Frontend extends BClass
 
             '/catalog/search'=>array(
                 array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/search'))
+            ),
+
+            '/catalog/review/add'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/review/add'))
             ),
 
             '/catalog/compare'=>array(

@@ -16,7 +16,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
         );
         return $config;
     }
-
+    
     public function action_form_post()
     {
         $r = BRequest::i();
