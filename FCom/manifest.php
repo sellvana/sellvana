@@ -117,7 +117,7 @@
         ),
         // product reviews
         'FCom_ProductReviews' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'ProductReviews',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
             'description' => "Product reviews by customers",
@@ -137,6 +137,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Catalog',
             'depends' => array('FCom_Core'),
+            'tests' => "FCom_Catalog_Tests_AllTests",
             'description' => "Categories and products management, admin and frontend",
             'migrate' => 'FCom_Catalog_Migrate',
             //'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
@@ -154,6 +155,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Customer',
             'depends' => array('FCom_Core'),
+            'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",
             'migrate' => 'FCom_Customer_Migrate',
             'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
@@ -174,6 +176,7 @@
             'version' => '0.1.1',
             'root_dir' => 'CustomField',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
+            'tests' => "FCom_CustomField_Tests_AllTests",
             'depends' => array('FCom_Catalog'),
             'after' => array('FCom_Customer'),
             'description' => "Base custom fields implementation, currently for catalog only",
@@ -292,6 +295,22 @@
                 ),
             ),
         ),
+        'FCom_Disqus' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Disqus',
+            'depends' => array('FCom_Core'),
+            'translations' => array('ru' => 'ru.json', 'es' => 'es.csv', 'de' => array('de.php')),
+            'description' => "Disqus comments",
+            'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'DisqusAdmin.php', 'callback'=>'FCom_Disqus_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
+                ),
+            ),
+        ),
         // test CreditCard module
         'FCom_CreditCard' => array(
             'version' => '0.1.0',
@@ -302,6 +321,22 @@
             'areas' => array(
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
+                ),
+            ),
+        ),
+        // translations Admin module
+        'FCom_Translation' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Translation',
+            'depends' => array('FCom_Core'),
+            'description' => "Translations module",
+            'bootstrap' => array('file'=>'Translation.php', 'callback'=>'FCom_Translation::bootstrap'),
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'TranslationAdmin.php', 'callback'=>'FCom_Translation_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'TranslationFrontend.php', 'callback'=>'FCom_Translation_Frontend::bootstrap'),
                 ),
             ),
         ),

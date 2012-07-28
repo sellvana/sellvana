@@ -7,7 +7,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->forward(true);
         return;
         BLayout::i()->layout('/catalog/manuf');
-        BResponse::i()->render();
     }
 
     public function action_product()
@@ -53,7 +52,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('catalog/product')->user = $user;
 
         $this->layout('/catalog/product');
-        BResponse::i()->render();
     }
 
     public function action_product_post()
@@ -108,6 +106,5 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 array('label'=>'Compare '.sizeof($products).' products', 'active'=>true)
             );
         }
-        BResponse::i()->render();
     }
 }

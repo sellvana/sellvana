@@ -20,7 +20,7 @@ setTimeout(function() {
 
 <?php endif ?>
 
-<?php if (!empty($c['status'])): ?>
+<?php if (!empty($c['status']) && isset($c['rows_processed'])): ?>
 <?php $pct = intval($c['rows_processed']/$c['rows_total']*100); ?>
 <table class="data-table">
     <tr>

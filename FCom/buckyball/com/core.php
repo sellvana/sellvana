@@ -63,6 +63,8 @@ class BClass
     {
         return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
+
+
 }
 
 /**
@@ -260,7 +262,7 @@ class BApp extends BClass
                     break;
             }
             if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
-                $url .= '/'.$scriptPath['basename'];
+                $url = rtrim($url, '/').'/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
@@ -291,7 +293,7 @@ class BApp extends BClass
 
     public static function href($url='', $full=true, $method=2)
     {
-        return BApp::baseUrl($full, $method) 
+        return BApp::baseUrl($full, $method)
             . BFrontController::processHref($url);
     }
 
@@ -535,6 +537,11 @@ class BConfig extends BClass
             BDebug::error('Error writing configuration file: '.$filename);
         }
     }
+
+    public function unsetConfig()
+    {
+        $this->_config = array();
+    }
 }
 
 /**
@@ -615,6 +622,10 @@ class BClassRegistry extends BClass
     * Override a class
     *
     * Usage: BClassRegistry::i()->overrideClass('BaseClass', 'MyClass');
+    *
+    * Overridden class should be called one of the following ways:
+    * - BClassRegistry::i()->instance('BaseClass')
+    * - BaseClass:i() -- if it extends BClass or has the shortcut defined
     *
     * Remembering the module that overrode the class for debugging
     *
@@ -787,6 +798,8 @@ class BClassRegistry extends BClass
         } else {
             $this->_properties[$class][$property][$op.'_'.$type][] = $entry;
         }
+        //have to be added to redefine augmentProperty Setter/Getter methods
+        $this->_decoratedClasses[$class] = true;
         return $this;
     }
 
@@ -794,7 +807,8 @@ class BClassRegistry extends BClass
     {
         //$this->_methods[$method][$static ? 1 : 0]['override'][$rel][$class]
         if (!empty($this->_methods[$method][$static][$type]['is'][$class])) {
-            return $class;
+            //return $class;
+            return $this->_methods[$method][$static][$type]['is'][$class];
         }
         $cacheKey = $class.'|'.$method.'|'.$static.'|'.$type;
         if (!empty($this->_methodOverrideCache[$cacheKey])) {
@@ -865,7 +879,6 @@ class BClassRegistry extends BClass
                 $args[0] = $result;
             }
         }
-
         return $result;
     }
 
@@ -915,22 +928,22 @@ class BClassRegistry extends BClass
     public function callSetter($origObject, $property, $value)
     {
         $class = get_class($origObject);
-
-        if (!empty($this->_properties[$class][$method]['set_before'])) {
-            foreach ($this->_properties[$class][$method]['set_before'] as $entry) {
+//print_r($this->_properties);exit;
+        if (!empty($this->_properties[$class][$property]['set_before'])) {
+            foreach ($this->_properties[$class][$property]['set_before'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
 
-        if (!empty($this->_properties[$class][$method]['set_override'])) {
-            $callback = $this->_properties[$class][$method]['set_override']['callback'];
+        if (!empty($this->_properties[$class][$property]['set_override'])) {
+            $callback = $this->_properties[$class][$property]['set_override']['callback'];
             call_user_func($callback, $origObject, $property, $value);
         } else {
             $origObject->$property = $value;
         }
 
-        if (!empty($this->_properties[$class][$method]['set_after'])) {
-            foreach ($this->_properties[$class][$method]['set_after'] as $entry) {
+        if (!empty($this->_properties[$class][$property]['set_after'])) {
+            foreach ($this->_properties[$class][$property]['set_after'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
@@ -949,15 +962,15 @@ class BClassRegistry extends BClass
 
         // get_before does not make much sense, so is not implemented
 
-        if (!empty($this->_properties[$class][$method]['get_override'])) {
-            $callback = $this->_properties[$class][$method]['get_override']['callback'];
+        if (!empty($this->_properties[$class][$property]['get_override'])) {
+            $callback = $this->_properties[$class][$property]['get_override']['callback'];
             $result = call_user_func($callback, $origObject, $property);
         } else {
             $result = $origObject->$property;
         }
 
-        if (!empty($this->_properties[$class][$method]['get_after'])) {
-            foreach ($this->_properties[$class][$method]['get_after'] as $entry) {
+        if (!empty($this->_properties[$class][$property]['get_after'])) {
+            foreach ($this->_properties[$class][$property]['get_after'] as $entry) {
                 $result = call_user_func($entry['callback'], $origObject, $property, $result);
             }
         }
@@ -1012,6 +1025,11 @@ class BClassRegistry extends BClass
 
         return $instance;
     }
+
+    public function unsetInstance()
+    {
+        static::$_instance = null;
+    }
 }
 
 /**
@@ -1030,7 +1048,7 @@ class BClassDecorator
     /**
     * Decorator constructor, creates an instance of decorated class
     *
-    * @param object|string $class
+    * @param array(object|string $class)
     * @return BClassDecorator
     */
     public function __construct($args)
@@ -1038,6 +1056,11 @@ class BClassDecorator
 //echo '1: '; print_r($class);
         $class = array_shift($args);
         $this->_decoratedComponent = is_string($class) ? BClassRegistry::i()->instance($class, $args) : $class;
+    }
+
+    public function __destruct()
+    {
+        $this->_decoratedComponent = null;
     }
 
     /**
@@ -1153,6 +1176,15 @@ class BClassDecorator
         }
         return null;
     }
+
+    /**
+     * Return object of decorated class
+     * @return object
+     */
+    public function getDecoratedComponent()
+    {
+        return $this->_decoratedComponent;
+    }
 }
 
 class BClassAutoload extends BClass
@@ -1264,6 +1296,7 @@ class BPubSub extends BClass
         if (($moduleName = BModuleRegistry::currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
+        //TODO: create named observers
         $this->_events[$eventName]['observers'][] = $observer;
         BDebug::debug('SUBSCRIBE '.$eventName.': '.var_export($callback, 1), 1);
         return $this;
@@ -1314,7 +1347,22 @@ class BPubSub extends BClass
         if (empty($this->_events[$eventName])) {
             return $result;
         }
-        foreach ($this->_events[$eventName]['observers'] as $i=>$observer) {
+        $observers =& $this->_events[$eventName]['observers'];
+        // sort order observers
+        do {
+            $dirty = false;
+            foreach ($observers as $i=>$observer) {
+                if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
+                    unset($observers[$i]);
+                    $observer['ordered'] = true;
+                    $observers = BUtil::arrayInsert($observers, $observer, $observer['position']);
+                    $dirty = true;
+                    break;
+                }
+            }
+        } while ($dirty);
+
+        foreach ($observers as $i=>$observer) {
             if (!empty($this->_events[$eventName]['args'])) {
                 $args = array_merge($this->_events[$eventName]['args'], $args);
             }
@@ -1346,7 +1394,7 @@ class BPubSub extends BClass
                         $cb = array($r[0]::i(), $r[1]);
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
-                        $this->_events[$eventName]['observers'][$i]['callback'] = $cb;
+                        $observers[$i]['callback'] = $cb;
                         break;
                     }
                 }
@@ -1479,6 +1527,14 @@ class BSession extends BClass
             $this->data =& $_SESSION[$namespace];
         }
 
+        if (empty($this->data['_language'])) {
+            $lang = BRequest::language();
+            if (!empty($lang)) {
+                $this->data['_language'] = $lang;
+            }
+        }
+
+        $this->data['_locale'] = BConfig::i()->get('locale');
         if (!empty($this->data['_locale'])) {
             if (is_array($this->data['_locale'])) {
                 foreach ($this->data['_locale'] as $c=>$l) {
@@ -1487,6 +1543,8 @@ class BSession extends BClass
             } elseif (is_string($this->data['_locale'])) {
                 setlocale(LC_ALL, $this->data['_locale']);
             }
+        } else {
+            setLocale(LC_ALL, 'en_US.UTF-8');
         }
 
         if (!empty($this->data['_timezone'])) {

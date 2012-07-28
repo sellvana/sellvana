@@ -1,6 +1,9 @@
 storage/config/local.php
 storage/config/db.php
 storage/log/
+storage/import/
+storage/phptal/
+storage/run/
 media/product/
 lib/*
 local/*
