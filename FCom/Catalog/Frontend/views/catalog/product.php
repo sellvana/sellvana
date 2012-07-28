@@ -122,7 +122,7 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'similar')) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->productsByType($prod->id, 'similar')) ?>
 				            </tbody>
 				        </table>
         	</div>
@@ -134,7 +134,7 @@ $cat = $this->category;
 				        	<col>
 				        	<col width="180">
 				            </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->products($prod->id, 'related')) ?>
+<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->productsByType($prod->id, 'related')) ?>
 				            </tbody>
 				        </table>
         	</div>
