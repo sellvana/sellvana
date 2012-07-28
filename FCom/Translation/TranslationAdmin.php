@@ -18,7 +18,7 @@ class FCom_Translation_Admin extends BClass
         BLayout::i()->layout(array(
             'base'=>array(
                 array('view', 'admin/header', 'do'=>array(
-                    array('addNav', 'translation', array('label'=>'Translations',
+                    array('addNav', 'system/translation', array('label'=>'Translations',
                         'href'=>BApp::href('translations'))),
                 )),
             ),

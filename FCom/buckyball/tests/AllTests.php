@@ -9,7 +9,7 @@ require_once __DIR__.'/../../../tests/index.php';
 
 require_once 'buckyball/AllTests.php';
 
-class AllTests
+class AllTests_Buckyball
 {
     public static function main()
     {
@@ -32,5 +32,5 @@ class AllTests
 }
 
 if (PHPUnit_MAIN_METHOD == 'AllTests::main') {
-    AllTests::main();
+    AllTests_Buckyball::main();
 }

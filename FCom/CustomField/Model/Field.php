@@ -81,12 +81,14 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $field = BDb::ddlFieldInfo($fTable, $this->field_code);
         if (!$field && empty($this->_oldTableFieldCode)) {
             BDb::run("ALTER TABLE {$fTable} ADD COLUMN {$fCode} {$fType}");
-        } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode) {
+        } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode && !empty($this->_oldTableFieldCode)) {
             BDb::run("ALTER TABLE {$fTable} CHANGE COLUMN {$this->_oldTableFieldCode} {$fCode} {$fType}");
+
         }
         //fix field code name
         if($this->field_code != $fCode){
             $this->field_code = $fCode;
+            $this->_oldTableFieldCode = $this->field_code;
             $this->save();
         }
 

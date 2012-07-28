@@ -145,6 +145,7 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         );
+
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -1649,6 +1650,7 @@ class BModel extends Model
                 return this;
             }
             try {
+                $this->beforeSave();
                 BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
                 BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
             } catch (BModelException $e) {
@@ -1707,11 +1709,12 @@ class BModel extends Model
             return $this;
         }
         try {
+            $this->beforeDelete();
             BPubSub::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
         } catch(BModelException $e) {
             return $this;
         }
-        
+
         if (($cache =& static::$_cache[$this->_origClass()])) {
             foreach ($cache as $k=>$cache) {
                 $key = $this->get($k);
