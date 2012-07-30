@@ -197,6 +197,7 @@
             'root_dir' => 'Checkout',
             'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
+            'tests' => "FCom_Checkout_Tests_AllTests",
             'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
