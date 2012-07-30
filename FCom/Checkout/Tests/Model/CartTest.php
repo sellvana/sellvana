@@ -31,6 +31,20 @@ class FCom_Checkout_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
     }
 
+    public function testAddCartItemsWithZeroProductId()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
+
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
+
+        $cart->addProduct(0, array('qty' => 2, 'price'=>5));
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
+        $this->assertEquals(3, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
+    }
+
     public function testUpdateCartItems()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
@@ -84,5 +98,32 @@ class FCom_Checkout_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(3, count($cart->items()), "Items count is not correct");
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
+    }
+
+    public function testResetSessionCart()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
+
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+
+        $reset = FCom_Checkout_Model_Cart::load(2);
+        $cart = FCom_Checkout_Model_Cart::sessionCart($reset);
+        $this->assertEquals(1, count($cart->items()), "Reset failed");
+        $this->assertEquals(2, $cart->id(), "Reset failed");
+    }
+
+    public function testAddPaymentMethod()
+    {
+        FCom_Checkout_Model_Cart::i()->addPaymentMethod('paypal', 'FCom_PayPal_Frontend');
+        $methods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
+        $this->assertTrue(isset($methods['paypal']));
+    }
+
+    public function testAddShippingMethod()
+    {
+        FCom_Checkout_Model_Cart::i()->addShippingMethod('ShippingUps', 'FCom_ShippingUps_Ups');
+        $methods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
+        $this->assertTrue(isset($methods['ShippingUps']));
     }
 }
