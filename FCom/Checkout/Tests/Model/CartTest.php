@@ -23,11 +23,66 @@ class FCom_Checkout_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
 
         $cart = FCom_Checkout_Model_Cart::load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
         $cart->addProduct(3, array('qty' => 2, 'price'=>5));
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
         $this->assertEquals(3, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
+    }
 
+    public function testUpdateCartItems()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
+
+        $cart->addProduct(2, array('qty' => 2, 'price'=>5));
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
+        $this->assertEquals(2, count($cart->items()), "Update cart items failed");
+        $this->assertEquals(7, $cart->itemQty(), "Update cart items failed");
+    }
+
+    public function testRemoveCartItem()
+    {
+        $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_cart_item'), "Pre-Condition");
+
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
+
+        $cart->removeProduct(2);
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart_item'), "Update cart failed");
+        $this->assertEquals(1, count($cart->items()), "Update cart items failed");
+        $this->assertEquals(4, $cart->itemQty(), "Update cart items failed");
+    }
+
+    public function testClearCart()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
+
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+
+        foreach($cart->items() as $item) {
+            $cart->removeItem($item);
+        }
+
+        $this->assertEquals(0, count($cart->items()), "Items count is not correct");
+        $this->assertEquals(0, $cart->itemQty(), "Update cart items failed");
+    }
+
+    public function testMergeCarts()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
+
+        $cart = FCom_Checkout_Model_Cart::load(1);
+        $this->assertEquals(2, count($cart->items()), "Items count is not correct");
+        $cart->merge(2);
+        $this->assertEquals(3, count($cart->items()), "Items count is not correct");
+
+        $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
     }
 }
