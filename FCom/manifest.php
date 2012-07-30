@@ -120,6 +120,7 @@
             'version' => '0.1.1',
             'root_dir' => 'ProductReviews',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'tests' => "FCom_ProductReviews_Tests_AllTests",
             'description' => "Product reviews by customers",
             'bootstrap' => array('file'=>'ProductReviewsFrontend.php', 'callback'=>'FCom_ProductReviews_Frontend::bootstrap'),
             'migrate' => 'FCom_ProductReviews_Migrate',
