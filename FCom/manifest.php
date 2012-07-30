@@ -257,6 +257,7 @@
             'root_dir' => 'Wishlist',
             'migrate' => 'FCom_Wishlist_Migrate',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'tests' => "FCom_Wishlist_Tests_AllTests",
             'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),
             'areas' => array(
                 'FCom_Frontend' => array(
