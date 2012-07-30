@@ -85,7 +85,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->addProduct($item->product_id, array('qty'=>$item->qty, 'price'=>$item->price));
         }
         $cart->delete();
-        $this->calcTotals();
+        $this->calcTotals()->save();
         return $this;
     }
 
@@ -141,6 +141,11 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         return $carts;
     }
 
+    /**
+     * Return total UNIQUE number of items in the cart
+     * @param boolean $assoc
+     * @return array
+     */
     public function items($assoc=true)
     {
         $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
@@ -180,6 +185,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             ->find_many());
     }
 
+    /**
+     * Return total number of items in the cart
+     * @return integer
+     */
     public function itemQty()
     {
         return $this->item_qty*1;
@@ -266,6 +275,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if ($item) {
             unset($this->items[$item->id]);
             $item->delete();
+            $this->calcTotals()->save();
         }
         return $this;
     }
