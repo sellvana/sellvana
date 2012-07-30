@@ -143,9 +143,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     public function items($assoc=true)
     {
-        if (is_null($this->items)) {
-            $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
-        }
+        $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
