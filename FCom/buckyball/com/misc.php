@@ -1936,6 +1936,7 @@ class BLocale extends BClass
     {
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
+            $k = trim($k, '"');
             fputcsv($handle, array($k, $v));
         }
         fclose($handle);
