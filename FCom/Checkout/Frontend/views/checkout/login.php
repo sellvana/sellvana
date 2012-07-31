@@ -1,2 +1,2 @@
-<a href="<?=BApp::href('login')?>">Login</a> (put form here) or
-<a href="<?=BApp::href('checkout')?>">Checkout</a>
+<a href="<?=BApp::href('login')?>"><?= BLocale::_("Login"); ?></a> (put form here) or
+<a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout"); ?></a>
