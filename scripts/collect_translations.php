@@ -21,5 +21,6 @@ foreach ($modules as $modName => $mod) {
         touch($targetFile);
     }
     echo $targetFile."\n";
+    chmod($targetFile, 0777);
     BLocale::collectTranslations($viewDir, $targetFile);
 }
