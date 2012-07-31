@@ -16,7 +16,7 @@
     <fcom_sales_order id="2" user_id="1" cart_id="2" status="new" item_qty="1" subtotal="3" />
 
 
-    <fcom_order_items id="1" order_id="1" product_id="1" qty="4" total="8" />
-    <fcom_order_items id="2" order_id="1" product_id="2" qty="1" total="2" />
-    <fcom_order_items id="3" order_id="2" product_id="3" qty="1" total="3" />
+    <fcom_sales_order_item id="1" order_id="1" product_id="1" qty="4" total="8" />
+    <fcom_sales_order_item id="2" order_id="1" product_id="2" qty="1" total="2" />
+    <fcom_sales_order_item id="3" order_id="2" product_id="3" qty="1" total="3" />
 </dataset>

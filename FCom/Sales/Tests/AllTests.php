@@ -12,7 +12,7 @@ class FCom_Sales_Tests_AllTests
     {
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit Sales');
 
-        //$suite->addTestSuite('FCom_Wishlist_Tests_Model_WishlistTest');
+        $suite->addTestSuite('FCom_Sales_Tests_Model_OrderTest');
 
 
         return $suite;
