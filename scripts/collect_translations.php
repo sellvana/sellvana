@@ -20,6 +20,6 @@ foreach ($modules as $modName => $mod) {
     if (!file_exists($targetFile)) {
         touch($targetFile);
     }
-
+    echo $targetFile."\n";
     BLocale::collectTranslations($viewDir, $targetFile);
 }
