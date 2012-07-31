@@ -1,8 +1,8 @@
 <?php
 $s = $this->s;
 ?>
-Categories:<br/>
-<a href="<?=BApp::href('indextank/search').'?'.BRequest::rawGet()?>">Any department</a><br/>
+<?= BLocale::_("Categories"); ?>:<br/>
+<a href="<?=BApp::href('indextank/search').'?'.BRequest::rawGet()?>"><?= BLocale::_("Any department"); ?></a><br/>
 <?php foreach($s['available_categories'] as $data):?>
         <? foreach ($data as $obj):            ?>
             <?php if($obj->level) echo str_repeat("&nbsp;&nbsp;", $obj->level) ?>
