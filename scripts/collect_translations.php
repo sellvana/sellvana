@@ -16,7 +16,7 @@ foreach ($modules as $modName => $mod) {
     if (!file_exists($targetFile)) {
         mkdir($targetFile);
     }
-    $targetFile .='/in.csv';
+    $targetFile .='/de.csv';
     if (!file_exists($targetFile)) {
         touch($targetFile);
     }
