@@ -89,6 +89,22 @@
                 ),
             ),
         ),
+        // FCom_Market description here
+        'FCom_MarketServer' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'MarketServer',
+            'bootstrap' => array('file'=>'MarketServer.php', 'callback'=>'FCom_MarketServer::bootstrap'),
+            'depends' => array('FCom_Core', 'FCom_Customer'),
+            'description' => "FCom_MarketServer description here",
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'MarketServerAdmin.php', 'callback'=>'FCom_MarketServer_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'MarketServerFrontend.php', 'callback'=>'FCom_MarketServer_Frontend::bootstrap'),
+                ),
+            ),
+        ),
         // Geographic information about countries and states
         'FCom_Geo' => array(
             'version' => '0.1.0',
