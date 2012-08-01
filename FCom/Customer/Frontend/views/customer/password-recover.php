@@ -10,13 +10,13 @@
                 <ul>
                     <li class="form-row">
                         <div class="form-field">
-                            <label for="#">Email</label>
+                            <label for="#"><?= BLocale::_("Email"); ?></label>
                             <input type="email" name="email" class="required"/>
                         </div>
                     </li>
                 </ul>
                 <div class="form-buttons">
-                    <input type="submit" value="Send Recovery Instructions"/>
+                    <input type="submit" value="<?= BLocale::_("Send Recovery Instructions"); ?>"/>
                 </div>
             </fieldset>
         </form>

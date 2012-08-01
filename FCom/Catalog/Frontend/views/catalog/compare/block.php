@@ -2,8 +2,8 @@
     <div class="block-title"><strong>Compare</strong>up to 4 items</div>
     <div class="block-content">
         <ul><li></li><li></li><li></li><li></li></ul>
-        <a href="<?php echo BApp::href('catalog/compare')?>" class="button" rel="#compare-overlay">Compare</a>
-        <a href="#" class="reset-btn">Reset</a>
+        <a href="<?php echo BApp::href('catalog/compare')?>" class="button" rel="#compare-overlay"><?= BLocale::_("Compare"); ?></a>
+        <a href="#" class="reset-btn"><?= BLocale::_("Reset"); ?></a>
     </div>
 </div>
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>

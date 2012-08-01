@@ -17,7 +17,7 @@ BConfig::i()->add(array(
     'username' => 'root',
     'password' => '',),
 ));
-
+//BApp::set('area', 'FCom_Frontend', true);
 BModuleRegistry::i()->bootstrap();
 
 //FCom_Test_AllTests::suite();
