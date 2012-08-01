@@ -431,10 +431,24 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf($methods=array('POST','DELETE','PUT'))
+    public static function csrf()
     {
-        if (!in_array(static::method(), $methods)) {
+        $c = BConfig::i();
+        
+        $m = $c->get('web/csrf_methods');
+        $methods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        $whitelist = $c->get('web/csrf_whitelist');
+        
+        if (is_array($methods) && !in_array(static::method(), $methods)) {
             return false; // not one of checked methods, pass
+        }
+        if ($whitelist) {
+            $path = static::rawPath();
+            foreach ((array)$whitelist as $pattern) {
+                if (preg_match($pattern, $path)) {
+                    return false;
+                }
+            }
         }
         if (!($ref = static::referrer())) {
             return true; // no referrer sent, high prob. csrf
