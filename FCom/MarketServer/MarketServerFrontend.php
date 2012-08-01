@@ -18,6 +18,11 @@ class FCom_MarketServer_Frontend extends BClass
 
     static public function layout()
     {
-        return BLayout::i()->layout(array());
+        return BLayout::i()->layout(array(
+             '/market/list'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('market/list')),
+            ),
+        ));
     }
 }
