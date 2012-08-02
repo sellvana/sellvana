@@ -87,6 +87,9 @@
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'MarketAdmin.php', 'callback'=>'FCom_Market_Admin::bootstrap'),
                 ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'MarketFrontend.php', 'callback'=>'FCom_Market_Frontend::bootstrap'),
+                ),
             ),
         ),
         // FCom_Market description here
@@ -95,6 +98,7 @@
             'root_dir' => 'MarketServer',
             'bootstrap' => array('file'=>'MarketServer.php', 'callback'=>'FCom_MarketServer::bootstrap'),
             'depends' => array('FCom_Core', 'FCom_Customer'),
+            'migrate' => 'FCom_MarketServer_Migrate',
             'description' => "FCom_MarketServer description here",
             'areas' => array(
                 'FCom_Admin' => array(

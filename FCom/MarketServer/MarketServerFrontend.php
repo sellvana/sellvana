@@ -6,8 +6,10 @@ class FCom_MarketServer_Frontend extends BClass
     {
         BFrontController::i()
             ->route( 'GET /market', 'FCom_MarketServer_Frontend_Controller.market')
+            ->route( 'GET /market/view', 'FCom_MarketServer_Frontend_Controller.view')
 
             ->route( 'GET /market/account', 'FCom_MarketServer_Frontend_Controller_Account.index')
+            ->route( 'POST /market/account', 'FCom_MarketServer_Frontend_Controller_Account.index__POST')
             ->route( 'GET|POST /market/account/.action', 'FCom_MarketServer_Frontend_Controller_Account')
         ;
 
@@ -22,6 +24,14 @@ class FCom_MarketServer_Frontend extends BClass
              '/market/list'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('market/list')),
+            ),
+             '/market/view'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('market/view')),
+            ),
+            '/market/account'=>array(
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('market/account')),
             ),
         ));
     }
