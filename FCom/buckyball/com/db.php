@@ -1389,6 +1389,16 @@ class BModel extends Model
     }
 
     /**
+    * Place holder for custom load ORM logic
+    *
+    * @param BORM $orm
+    */
+    protected static function _loadORM($orm)
+    {
+
+    }
+
+    /**
     * Load a model object based on ID, another field or multiple fields
     *
     * @param int|string|array $id
@@ -1411,6 +1421,7 @@ class BModel extends Model
         }
 
         $orm = static::factory();
+        static::_loadORM($orm);
         BPubSub::i()->fire($class.'::load.orm', array('orm'=>$orm, 'class'=>$class, 'called_class'=>get_called_class()));
         if (is_array($id)) {
             $orm->where_complex($id);
@@ -1723,10 +1734,10 @@ class BModel extends Model
             }
         }
         parent::delete();
-        
+
         $this->afterDelete();
         BPubSub::i()->fire($this->_origClass().'::afterDelete', array('model'=>$this));
-        
+
         return $this;
     }
 
