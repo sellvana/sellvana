@@ -927,6 +927,21 @@ class BUtil
             return call_user_func($callback, $args);
         }
     }
+
+    public static function formatDateRecursive($source, $format='m/d/Y')
+    {
+        foreach ($source as $i=>$val) {
+            if (is_string($val)) {
+                // checking only beginning of string for speed, assuming it is a date
+                if (preg_match('#^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]( |$)#', $val)) {
+                    $source[$i] = date($format, strtotime($val));
+                }
+            } elseif (is_array($val)) {
+                $source[$i] = static::formatDateRecursive($val, $format);
+            }
+        }
+        return $source;
+    }
 }
 
 /**
