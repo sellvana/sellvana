@@ -895,8 +895,6 @@ class BClassRegistry extends BClass
     */
     public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
-        //$class = $origClass ? $origClass : $class;
-
         if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
         } else {
