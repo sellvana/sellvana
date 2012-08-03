@@ -1,6 +1,6 @@
 <?php
 
-class FCom_MarketServer_Migrate extends BClass
+class FCom_Market_Migrate extends BClass
 {
     public function run()
     {
@@ -9,8 +9,7 @@ class FCom_MarketServer_Migrate extends BClass
 
     public function install()
     {
-        FCom_MarketServer_Model_Account::install();
-        FCom_MarketServer_Model_Modules::install();
+        FCom_Market_Model_Modules::install();
     }
 
 }

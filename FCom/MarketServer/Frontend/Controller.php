@@ -4,13 +4,13 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
 {
     public function action_market()
     {
-        $modules = BModuleRegistry::getAllModules();
+        $modules = FCom_MarketServer_Model_Modules::i()->getAllModules();
         $customerId = FCom_Customer_Model_Customer::sessionUserId();
         $options = FCom_MarketServer_Model_Account::i()->getOptions($customerId);
 
         //get remote modules manifest
         if ($options && !empty($options->site_url) ) {
-            $manifest = BUtil::fromJson(file_get_contents($options->site_url.'/market/manifest'));
+            $manifest = BUtil::fromJson(file_get_contents($options->site_url.'/market/modules'));
         }
 
         //check modules difference
@@ -41,7 +41,7 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
     public function action_modules()
     {
-        $modules = BModuleRegistry::getAllModules();
+        $modules = FCom_MarketServer_Model_Modules::i()->getAllModules();
         $manifest = array();
         foreach($modules as $mod) {
             if (empty($mod->description)) continue;
