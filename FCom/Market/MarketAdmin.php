@@ -27,19 +27,18 @@ class FCom_Market_Admin extends BClass
                     array('hook', 'main', 'views'=>array('admin/grid')),
                     array('view', 'admin/header', 'do'=>array(array('setNav', 'market'))),
                 ),
-            /*
+
              '/market/form'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('admin/form')),
                     array('view', 'admin/form', 'set'=>array(
-                        'tab_view_prefix' => 'translations/',
+                        'tab_view_prefix' => 'market/',
                     ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Translations', 'pos'=>10))
+                        array('addTab', 'main', array('label'=>'Market', 'pos'=>10))
                     )),
              ),
-             * 
-             */
+
         ));
     }
 }
