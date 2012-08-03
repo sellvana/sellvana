@@ -35,6 +35,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->set('status', 'paid')->save();
     }
 
+    /**
+     * Return total UNIQUE number of items in the order
+     * @param boolean $assoc
+     * @return array
+     */
+    public function items($assoc=true)
+    {
+        $this->items = FCom_Sales_Model_OrderItem::factory()->where('order_id', $this->id)->find_many_assoc();
+        return $assoc ? $this->items : array_values($this->items);
+    }
+
     public static function install()
     {
         BDb::run("

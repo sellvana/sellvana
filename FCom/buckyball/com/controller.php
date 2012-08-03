@@ -107,6 +107,42 @@ class BRequest extends BClass
     }
 
     /**
+     * Retrive language based on HTTP_ACCEPT_LANGUAGE
+     * @return string
+     */
+    static public function language()
+    {
+        $langs = array();
+
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            // break up string into pieces (languages and q factors)
+            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+            if (count($lang_parse[1])) {
+                // create a list like "en" => 0.8
+                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+                // set default to 1 for any without q factor
+                foreach ($langs as $lang => $val) {
+                    if ($val === '') $langs[$lang] = 1;
+                }
+
+                // sort list based on value
+                arsort($langs, SORT_NUMERIC);
+            }
+        }
+
+        //if no language detected return false
+        if (empty($langs)) {
+            return false;
+        }
+
+        list($toplang) = each($langs);
+        //return en, de, es, it.... first two characters of language code
+        return substr($toplang, 0, 2);
+    }
+
+    /**
     * Whether request is AJAX
     *
     * @return bool
@@ -395,10 +431,24 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf($methods=array('POST','DELETE','PUT'))
+    public static function csrf()
     {
-        if (!in_array(static::method(), $methods)) {
+        $c = BConfig::i();
+        
+        $m = $c->get('web/csrf_methods');
+        $methods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        $whitelist = $c->get('web/csrf_whitelist');
+        
+        if (is_array($methods) && !in_array(static::method(), $methods)) {
             return false; // not one of checked methods, pass
+        }
+        if ($whitelist) {
+            $path = static::rawPath();
+            foreach ((array)$whitelist as $pattern) {
+                if (preg_match($pattern, $path)) {
+                    return false;
+                }
+            }
         }
         if (!($ref = static::referrer())) {
             return true; // no referrer sent, high prob. csrf
@@ -596,7 +646,7 @@ class BRequest extends BClass
             $modules = apache_get_modules();
             $modRewrite = in_array('mod_rewrite', $modules);
         } else {
-            $modRewrite =  getenv('HTTP_MOD_REWRITE')=='On' ? true : false;
+            $modRewrite =  strtolower(getenv('HTTP_MOD_REWRITE'))=='on' ? true : false;
         }
         return $modRewrite;
     }

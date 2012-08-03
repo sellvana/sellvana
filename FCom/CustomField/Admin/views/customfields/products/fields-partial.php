@@ -1,12 +1,14 @@
 <?php
 $m = $this->model;
 ?>
-<input type="text" name="model[_fieldset_ids]" value="<?=$m->_fieldset_ids?>"/>
-<input type="text" name="model[_add_field_ids]" value="<?=$m->_add_field_ids?>" id="cf_add_fields_ids"/>
-<input type="text" name="model[_hide_field_ids]" value="<?=$m->_hide_field_ids?>" id="cf_hide_fields_ids"/>
+<input type="hidden" name="model[_fieldset_ids]" value="<?=$m->_fieldset_ids?>"/>
+<input type="hidden" name="model[_add_field_ids]" value="<?=$m->_add_field_ids?>" id="cf_add_fields_ids"/>
+<input type="hidden" name="model[_hide_field_ids]" value="<?=$m->_hide_field_ids?>" id="cf_hide_fields_ids"/>
 <?php if(!empty($this->fields)):?>
+<br/>
+<h2>Custom fields</h2>
     <?php foreach($this->fields as $field):?>
-    <div id="cf_field_<?=$field->id?>">
+    <div id="cf_field_<?=$field->id?>" style="margin-top: 15px;">
         <h3><?=$field->frontend_label?></h3>
 
 
@@ -49,8 +51,8 @@ $m = $this->model;
     <?php endforeach; ?>
 <?php endif; ?>
 <pre>
-<? print_r(BDb::many_as_array($this->fields)); ?>
-<? print_r($m->as_array()) ?>
+<?// print_r(BDb::many_as_array($this->fields)); ?>
+<?// print_r($m->as_array()) ?>
 </pre>
 
 <script type="text/javascript">

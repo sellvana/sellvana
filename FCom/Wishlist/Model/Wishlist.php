@@ -28,9 +28,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function items($refresh=false)
     {
-        if (is_null($this->items) || $refresh) {
-            $this->items = FCom_Wishlist_Model_WishlistItem::factory()->where('wishlist_id', $this->id)->find_many_assoc();
-        }
+        $this->items = FCom_Wishlist_Model_WishlistItem::factory()->where('wishlist_id', $this->id)->find_many_assoc();
         return $this->items;
     }
 
@@ -47,16 +45,22 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function removeItem($itemId)
+    public function removeItem($item)
     {
-        if (is_numeric($itemId)) {
+        if (is_numeric($item)) {
             $this->items();
-            $item = $this->childById('items', $itemId);
+            $item = $this->childById('items', $item);
         }
         if ($item) {
             unset($this->items[$item->id()]);
             $item->delete();
         }
+        return $this;
+    }
+
+    public function removeProduct($productId)
+    {
+        $this->removeItem($this->childById('items', $productId, 'product_id'));
         return $this;
     }
 

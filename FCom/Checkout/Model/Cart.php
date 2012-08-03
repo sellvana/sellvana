@@ -46,6 +46,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function userLogin()
     {
+        if (false == BModuleRegistry::isLoaded('FCom_Customer')) {
+            return false;
+        }
+
         $user = FCom_Customer_Model_Customer::sessionUser();
         if(!$user){
             return;
@@ -81,7 +85,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->addProduct($item->product_id, array('qty'=>$item->qty, 'price'=>$item->price));
         }
         $cart->delete();
-        $this->calcTotals();
+        $this->calcTotals()->save();
         return $this;
     }
 
@@ -137,11 +141,14 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         return $carts;
     }
 
+    /**
+     * Return total UNIQUE number of items in the cart
+     * @param boolean $assoc
+     * @return array
+     */
     public function items($assoc=true)
     {
-        if (is_null($this->items)) {
-            $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
-        }
+        $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
@@ -178,6 +185,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             ->find_many());
     }
 
+    /**
+     * Return total number of items in the cart
+     * @return integer
+     */
     public function itemQty()
     {
         return $this->item_qty*1;
@@ -186,7 +197,11 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     public static function by_user($orm, $userId)
     {
         if (is_null($userId)) {
-            $userId = FCom_Customer_Model_User::sessionUserId();
+            if (BModuleRegistry::isLoaded('FCom_Customer')) {
+                $userId = FCom_Customer_Model_Customer::sessionUserId();
+            } else {
+                return;
+            }
         }
         return $orm->where('user_id', $userId);
     }
@@ -244,11 +259,9 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['no_calc_totals'])) {
             $this->calcTotals()->save();
         }
-        $user = FCom_Customer_Model_Customer::sessionUser();
-        if($user){
-            $user->session_cart_id = $this->id;
-            $user->save();
-        }
+
+        BPubSub::i()->fire(__CLASS__.'::'.__METHOD__, array('model'=>$this));
+
         static::sessionCartId($this->id);
         return $this;
     }
@@ -262,6 +275,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if ($item) {
             unset($this->items[$item->id]);
             $item->delete();
+            $this->calcTotals()->save();
         }
         return $this;
     }

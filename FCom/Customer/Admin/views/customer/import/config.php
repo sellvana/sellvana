@@ -1,6 +1,7 @@
 <?php
 $hlp = FCom_Customer_Import::i();
 $info = $hlp->getFileInfo($this->dir.'/'.$this->file);
+
 ?>
 <form method="post" id="import-columns-form">
     <input type="hidden" name="config[filename]" value="<?=$this->q($this->file)?>"/>
@@ -43,7 +44,7 @@ $info = $hlp->getFileInfo($this->dir.'/'.$this->file);
 	            </tr>
 	            <?php endforeach ?>
 	            </tbody></table>
-	
+
 	        </td>
 	    </tr>
     </table>
