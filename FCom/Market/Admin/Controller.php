@@ -43,9 +43,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $modules = FCom_Market_Api::i()->getAllModules();
         $modulesInstalled = BModuleRegistry::getAllModules();
         foreach($modules as $module){
-            $notice = '';
+            $notice = 'Get module';
             if (!empty($modulesInstalled[$module['name']])) {
-                $notice = version_compare($module['version'], $modulesInstalled[$module['name']]->version) > 0 ? 'Need upgrade!' : 'Installed';
+                $notice = version_compare($module['version'], $modulesInstalled[$module['name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
             }
             $data[] = array(
                 'id' => $module['name'],
