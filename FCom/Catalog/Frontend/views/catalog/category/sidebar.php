@@ -5,12 +5,12 @@ $children = $category->children();
 <? if ($children): ?>
 <div class="block block-layered-nav">
    <div class="block-title">
-        <strong><span>Browse By</span></strong>
+        <strong><span><?= BLocale::_("Browse By"); ?></span></strong>
     </div>
     <div class="block-content">
 <? if ($children): ?>
         <dl id="narrow-by-list2">
-            <dt class="last odd">Category</dt>
+            <dt class="last odd"><?= BLocale::_("Category"); ?></dt>
             <dd class="last odd">
                 <ol>
 <? foreach ($children as $c): ?>

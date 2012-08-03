@@ -39,7 +39,7 @@ class FCom_ShippingPlain extends FCom_Checkout_Model_Shipping_Abstract
 
     public function getRateCallback($cart)
     {
-        return rand(10,100);
+        return 100;
     }
 
     public function getError()

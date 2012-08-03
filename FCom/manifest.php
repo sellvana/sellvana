@@ -103,6 +103,7 @@
             'version' => '0.1.1',
             'root_dir' => 'Cms',
             'depends' => array('FCom_Core', 'BPHPTAL'),
+            'translations' => array('de' => 'de.csv'),
             'description' => "CMS for custom pages and forms",
             'bootstrap' => array('file'=>'CmsFrontend.php', 'callback'=>'FCom_Cms_Frontend::bootstrap'),
             'migrate' => 'FCom_Cms_Migrate',
@@ -120,6 +121,8 @@
             'version' => '0.1.1',
             'root_dir' => 'ProductReviews',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'translations' => array('de' => 'de.csv'),
+            'tests' => "FCom_ProductReviews_Tests_AllTests",
             'description' => "Product reviews by customers",
             'bootstrap' => array('file'=>'ProductReviewsFrontend.php', 'callback'=>'FCom_ProductReviews_Frontend::bootstrap'),
             'migrate' => 'FCom_ProductReviews_Migrate',
@@ -137,6 +140,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Catalog',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'tests' => "FCom_Catalog_Tests_AllTests",
             'description' => "Categories and products management, admin and frontend",
             'migrate' => 'FCom_Catalog_Migrate',
@@ -155,6 +159,7 @@
             'version' => '0.1.2',
             'root_dir' => 'Customer',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",
             'migrate' => 'FCom_Customer_Migrate',
@@ -178,6 +183,7 @@
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
             'tests' => "FCom_CustomField_Tests_AllTests",
             'depends' => array('FCom_Catalog'),
+            'translations' => array('de' => 'de.csv'),
             'after' => array('FCom_Customer'),
             'description' => "Base custom fields implementation, currently for catalog only",
             'migrate' => 'FCom_CustomField_Migrate',
@@ -197,6 +203,8 @@
             'root_dir' => 'Checkout',
             'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
+            'translations' => array('de' => 'de.csv'),
+            'tests' => "FCom_Checkout_Tests_AllTests",
             'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
@@ -212,6 +220,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Sales',
             'migrate' => 'FCom_Sales_Migrate',
+            'tests' => "FCom_Sales_Tests_AllTests",
             'bootstrap' => array('file'=>'Sales.php', 'callback'=>'FCom_Sales::bootstrap'),
             'areas' => array(
                 'FCom_Admin' => array(
@@ -254,7 +263,9 @@
             'version' => '0.1.0',
             'root_dir' => 'Wishlist',
             'migrate' => 'FCom_Wishlist_Migrate',
+            'translations' => array('de' => 'de.csv'),
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'tests' => "FCom_Wishlist_Tests_AllTests",
             'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),
             'areas' => array(
                 'FCom_Frontend' => array(
@@ -267,6 +278,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Email',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'description' => "Base email subscription and mailing list management",
             'bootstrap' => array('file'=>'EmailFrontend.php', 'callback'=>'FCom_Email_Frontend::bootstrap'),
             'migrate' => 'FCom_Email_Migrate',
@@ -284,6 +296,7 @@
             'version' => '0.1.0',
             'root_dir' => 'PayPal',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'description' => "PayPal&reg; standard payment method",
             'bootstrap' => array('file'=>'PayPalFrontend.php', 'callback'=>'FCom_PayPal_Frontend::bootstrap'),
             'areas' => array(
@@ -299,7 +312,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Disqus',
             'depends' => array('FCom_Core'),
-            'translations' => array('ru' => 'ru.json', 'es' => 'es.csv', 'de' => array('de.php')),
+            'translations' => array('de' => 'de.csv'),
             'description' => "Disqus comments",
             'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
             'areas' => array(
@@ -316,6 +329,7 @@
             'version' => '0.1.0',
             'root_dir' => 'CreditCard',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'description' => "Credit Card test module",
             'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
             'areas' => array(
@@ -361,6 +375,7 @@
             'version' => '0.1.1',
             'root_dir' => 'IndexTank',
             'depends' => array('FCom_Core'),
+            'translations' => array('de' => 'de.csv'),
             'description' => "IndexTank API integration",
             'migrate' => 'FCom_IndexTank_Migrate',
             'tests' => "FCom_IndexTank_Tests_AllTests",

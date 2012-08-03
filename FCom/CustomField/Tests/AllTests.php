@@ -14,6 +14,7 @@ class FCom_CustomField_Tests_AllTests
 
         $suite->addTestSuite('FCom_CustomField_Tests_Model_FieldTest');
         $suite->addTestSuite('FCom_CustomField_Tests_Model_FieldOptionTest');
+        $suite->addTestSuite('FCom_CustomField_Tests_Model_SetTest');
 
         return $suite;
     }

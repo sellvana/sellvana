@@ -9,19 +9,19 @@
                 <ul>
                     <li class="form-row">
                         <div class="form-field">
-                            <label for="#">Password <span class="required">*</span></label>
+                            <label for="#"><?= BLocale::_("Password"); ?> <span class="required">*</span></label>
                             <input type="password" name="model[password]" class="required" id="model-password"/>
                         </div>
                         <div class="form-field">
-                            <label for="#">Confirm Password <span class="required">*</span></label>
+                            <label for="#"><?= BLocale::_("Confirm Password"); ?> <span class="required">*</span></label>
                             <input type="password" name="model[password_confirm]" class="required" equalto="#model-password"/>
                         </div>
                     </li>
 
                 </ul>
                 <div class="form-buttons">
-                	<span class="required-notice">* Indicates Required Fields</span>
-                    <input type="submit" class="button st3" value="Save"/>
+                	<span class="required-notice">* <?= BLocale::_("Indicates Required Fields"); ?></span>
+                    <input type="submit" class="button st3" value="<?= BLocale::_("Save"); ?>"/>
                 </div>
             </fieldset>
         </form>

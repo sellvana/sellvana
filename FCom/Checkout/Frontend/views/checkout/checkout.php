@@ -1,7 +1,7 @@
-<h2>Review the information below then click "Place your order"</h2>
+<h2><?= BLocale::_("Review the information below then click"); ?> "Place your order"</h2>
 <form action="<?=BApp::href('checkout')?>" method="post">
-<input type="submit" name="place_order" value="Place your order">
-<input type="submit" name="update" value="Apply changes">
+<input type="submit" name="place_order" value="<?= BLocale::_("Place your order"); ?>">
+<input type="submit" name="update" value="<?= BLocale::_("Apply changes"); ?>">
 
 <?php if ($this->messagesHtml()) :?>
 <br/>
@@ -10,19 +10,19 @@
 
 <br/><br/>
 
-<h4>Shipping to:</h4>
+<h4><?= BLocale::_("Shipping to"); ?>:</h4>
 
 <?=$this->shippingAddress?>
 <?php if($this->guest_checkout) :?>
-    <a href="<?=BApp::href('checkout/address?t=s')?>">Change</a>
+    <a href="<?=BApp::href('checkout/address?t=s')?>"><?= BLocale::_("Change"); ?></a>
 <?php else :?>
-    <a href="<?=BApp::href('customer/address/choose?t=s')?>">Change</a>
+    <a href="<?=BApp::href('customer/address/choose?t=s')?>"><?= BLocale::_("Change"); ?></a>
 <?php endif; ?>
 <br><br>
 
 
 <?php if (!empty($this->shippingMethods)) :?>
-    <h4>Shipping Options:</h4>
+    <h4><?= BLocale::_("Shipping Options"); ?>:</h4>
 
     <ul>
         <?php foreach($this->shippingMethods as $shippingMethod => $shippingClass): ?>
@@ -38,7 +38,7 @@
         </li>
         <?php endforeach; ?>
     </ul>
-    <input type="submit" name="update" value="Apply changes">
+    <input type="submit" name="update" value="<?= BLocale::_("Apply changes"); ?>">
     <br/><br/>
 <?php endif; ?>
 
@@ -49,10 +49,10 @@
             <col width="70"/>
             <thead>
                 <tr>
-                    <td>Product</td>
-                    <td>Price</td>
-                    <td>Qty</td>
-                    <td>Subtotal</td>
+                    <td><?= BLocale::_("Product"); ?></td>
+                    <td><?= BLocale::_("Price"); ?></td>
+                    <td><?= BLocale::_("Qty"); ?></td>
+                    <td><?= BLocale::_("Subtotal"); ?></td>
                 </tr>
             </thead>
             <tbody>
@@ -81,7 +81,7 @@
             </tfoot>
         </table>
 <br/>
-<a href="/cart">Need to change quantities or delete?</a>
+<a href="/cart"><?= BLocale::_("Need to change quantities or delete"); ?>?</a>
 <br/><br/>
 
 <?php if (!empty($this->totals)) : ?>
@@ -93,48 +93,48 @@
             <?php endif; ?>
         </li>
     <?php endforeach; ?>
-        <li>Grand total: <?=$this->cart->calc_balance?></li>
+        <li><?= BLocale::_("Grand total"); ?>: <?=$this->cart->calc_balance?></li>
     </ul>
 <?php endif; ?>
 <br/><br/>
 
-<b>Coupon, discount or promo code:</b>
-<input type="text" name="discount_code"> <input type="submit" name="coupon_submit" value="Apply">
+<b><?= BLocale::_("Coupon, discount or promo code"); ?>:</b>
+<input type="text" name="discount_code"> <input type="submit" name="coupon_submit" value="<?= BLocale::_("Apply"); ?>">
 <br/><br/>
 
-<h4>Payment method:</h4>
+<h4><?= BLocale::_("Payment method"); ?>:</h4>
 <?php if (!empty($this->paymentMethod)) :?>
-    <a href="/checkout/payment">Change</a><br/>
+    <a href="/checkout/payment"><?= BLocale::_("Change"); ?></a><br/>
 
     <i><?=$this->paymentClass->getName()?></i><br/>
     <?= $this->view($this->paymentMethod.'/form')->set('paymentDetails', $this->paymentDetails);?>
     <br/><br/>
 <?php else: ?>
-    <a href="/checkout/payment" style="color:red">Select payment method</a><br/>
+    <a href="/checkout/payment" style="color:red"><?= BLocale::_("Select payment method"); ?></a><br/>
 <?php endif; ?>
 
 
-<h4>Billing address</h4>
+<h4><?= BLocale::_("Billing address"); ?></h4>
 
 <?=$this->billingAddress?>
 <?php if($this->guest_checkout) :?>
-    <a href="<?=BApp::href('checkout/address?t=b')?>">Change</a>
+    <a href="<?=BApp::href('checkout/address?t=b')?>"><?= BLocale::_("Change"); ?></a>
 <?php else :?>
-    <a href="<?=BApp::href('customer/address/choose?t=b')?>">Change</a>
+    <a href="<?=BApp::href('customer/address/choose?t=b')?>"><?= BLocale::_("Change"); ?></a>
 <?php endif; ?>
 <br><br>
 
 <?php if ($this->guest) :?>
-<label for="#">Create an account?</label>
+<label for="#"><?= BLocale::_("Create an account"); ?>?</label>
 <input type="checkbox" name="create_account" value="1" class="required"><br/>
 <label for="#">E-mail</label>
 <input type="text" name="account[email]" value="<?=$this->billingAddressObject->email?>" class="required"><br/>
-<label for="#">Password</label>
+<label for="#"><?= BLocale::_("Password"); ?></label>
 <input type="password" name="account[password]" class="required" id="model-password"/><br/>
-<label for="#">Confirm Password </label>
+<label for="#"><?= BLocale::_("Confirm Password"); ?> </label>
 <input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/><br/>
 <?php endif; ?>
 
-<input type="submit" name="update" value="Apply changes">
+<input type="submit" name="update" value="<?= BLocale::_("Apply changes"); ?>">
 
 </form>
