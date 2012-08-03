@@ -5,6 +5,7 @@ storage/import/
 storage/phptal/
 storage/run/
 media/product/
+market/*
 lib/*
 local/*
 vendor/*

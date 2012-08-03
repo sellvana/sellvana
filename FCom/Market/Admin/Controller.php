@@ -70,13 +70,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $moduleName = BRequest::i()->params('id', true);
 
         $moduleClass = BApp::m($moduleName);
-        if ($moduleClass) {
-            $this->view($this->_formViewName)->set('module_exist', true);
-        }
+
         $model = new stdClass();
         $model->id = $moduleName;
+        $model->module = $moduleClass;
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
+
         $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
     }
@@ -89,40 +89,26 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => array(
                 'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
             ),
         ));
         BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
 
-    public function action_form__POST()
+    public function action_install()
     {
-        if (empty($_POST)) {
-            return;
+        $moduleName = BRequest::i()->params('id', true);
+
+        $moduleClass = BApp::m($moduleName);
+
+        if ($moduleClass) {
+            //$this->forward('index');
+            //return;
         }
-        $id = $_POST['file'];
+        // else install module
 
-        list($module, $file) = explode("/", $id);
-
-        if (!$file) {
-            BDebug::error('Invalid Filename: '.$id);
-        }
-        $moduleClass = BApp::m($module);
-        if (!is_object($moduleClass)) {
-            BDebug::error('Invalid Module name: '.$id);
-        }
-
-        $filename = $moduleClass->baseDir().'/i18n/'.$file;
-
-        if (!is_writable($filename)) {
-            BDebug::error('Not writeable filename: '.$filename);
-        }
-
-        if (!empty($_POST['source'])) {
-            file_put_contents($filename, $_POST['source']);
-        }
-
-        BResponse::i()->redirect(BApp::href($this->_gridHref));
+        $filename = FCom_Market_Api::i()->download($moduleName);
+        FCom_Market_Api::i()->extract($filename);
+        $this->forward('index');
     }
 
 }
