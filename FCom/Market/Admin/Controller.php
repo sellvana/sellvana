@@ -67,18 +67,14 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_form()
     {
-        $id = BRequest::i()->params('id', true);
-        list($module, $file) = explode("/", $id);
+        $moduleName = BRequest::i()->params('id', true);
 
-        if (!$file) {
-            BDebug::error('Invalid Filename: '.$id);
+        $moduleClass = BApp::m($moduleName);
+        if ($moduleClass) {
+            $this->view($this->_formViewName)->set('module_exist', true);
         }
-        $moduleClass = BApp::m($module);
-        $filename = $moduleClass->baseDir().'/i18n/'.$file;
-
         $model = new stdClass();
-        $model->id = $id;
-        $model->source = file_get_contents($filename);
+        $model->id = $moduleName;
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
         $this->layout($this->_formLayoutName);
