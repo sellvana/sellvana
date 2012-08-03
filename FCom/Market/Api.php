@@ -22,7 +22,7 @@ class FCom_Market_Api extends BClass
     public function download($moduleName)
     {
         //$fulleronUrl = BConfig::i()->get('FCom_Market/market_url');
-        //$fulleronUrl = 'http://fulleron.home/marketserver/modules/download?id='.$moduleName;
+        //$fulleronUrl = 'http://fulleron.home/marketserver/download?id='.$moduleName;
         $fulleronUrl = 'http://fulleron.home/download/'.$moduleName.'.zip';
 
         $storage = BConfig::i()->get('fs/storage_dir');
@@ -34,7 +34,7 @@ class FCom_Market_Api extends BClass
 
     public function extract($filename)
     {
-        $dir = BConfig::i()->get('fs/fcom_root_dir').'/market';
+        $dir = BConfig::i()->get('fs/fcom_root_dir').'/market-files';
 
         $zip = new ZipArchive;
         $res = $zip->open($filename);

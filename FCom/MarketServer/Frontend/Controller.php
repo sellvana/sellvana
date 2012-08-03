@@ -54,4 +54,11 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
         echo BUtil::toJson($manifest);
         exit;
     }
+
+    public function downlaod()
+    {
+        $modName = BRequest::i()->get('id');
+        $url = '/download/'.$modName.'.zip';
+        BResponse::i()->redirect($url);
+    }
 }

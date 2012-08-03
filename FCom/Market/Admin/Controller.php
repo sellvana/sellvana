@@ -107,7 +107,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         // else install module
 
         $filename = FCom_Market_Api::i()->download($moduleName);
-        FCom_Market_Api::i()->extract($filename);
+        $res = FCom_Market_Api::i()->extract($filename);
+
+        if ($res) {
+            $data = array('name' => $moduleName, 'version' => '0.1.0', 'description' => 'test');
+            FCom_Market_Model_Modules::create($data)->save();
+        }
+
         $this->forward('index');
     }
 
