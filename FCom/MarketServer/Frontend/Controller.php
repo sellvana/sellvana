@@ -38,4 +38,20 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $this->view('market/view')->module = $mod;
         $this->layout('/market/view');
     }
+
+    public function action_modules()
+    {
+        $modules = BModuleRegistry::getAllModules();
+        $manifest = array();
+        foreach($modules as $mod) {
+            if (empty($mod->description)) continue;
+            $manifest[$mod->name] = array(
+                'name' => $mod->name,
+                'version' => $mod->version,
+                'description' => $mod->description
+                    );
+        }
+        echo BUtil::toJson($manifest);
+        exit;
+    }
 }

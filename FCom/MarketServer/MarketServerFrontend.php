@@ -7,6 +7,8 @@ class FCom_MarketServer_Frontend extends BClass
         BFrontController::i()
             ->route( 'GET /market', 'FCom_MarketServer_Frontend_Controller.market')
             ->route( 'GET /market/view', 'FCom_MarketServer_Frontend_Controller.view')
+            ->route( 'GET /marketserver/modules', 'FCom_MarketServer_Frontend_Controller.modules')
+
 
             ->route( 'GET /market/account', 'FCom_MarketServer_Frontend_Controller_Account.index')
             ->route( 'POST /market/account', 'FCom_MarketServer_Frontend_Controller_Account.index__POST')
