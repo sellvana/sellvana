@@ -22,6 +22,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
             'description' => array('label'=>'Description', 'width'=>250, 'editable'=>true),
             'version' => array('label'=>'Version', 'width'=>250, 'editable'=>true),
+            'local_version' => array('label'=>'Local Version', 'width'=>250, 'editable'=>true),
             'notice' => array('label'=>'Notice', 'width'=>250, 'editable'=>true)
         );
 
@@ -50,6 +51,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 'id' => $module['name'],
                 'module' => $module['name'],
                 'version' => $module['version'],
+                'local_version' => $modulesInstalled[$module['name']]->version,
                 'description' => $module['description'],
                 'notice' => $notice
             );
