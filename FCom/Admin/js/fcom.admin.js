@@ -822,6 +822,12 @@ FCom.Admin.jqGrid.fmtNewWindow = function(val,opt,obj) {
     return "<a href='javascript:window.open(\""+val+"\", \"vendor_website_url\", \"width=800,height=600\")'>"+val+"</a>";
 }
 
+FCom.Admin.jqGrid.fmtRadioButton = function(val,opt,obj) {
+    var id = opt.colModel.inputId || opt.gid+'-'+opt.colModel.name+'-'+val;
+    var name = opt.colModel.inputName ||  opt.gid+'['+opt.colModel.name+']';
+    return '<input type="radio" id="'+id+'" name="'+name+'" value="'+val+'"/>';
+}
+
 $.widget('ui.fcom_autocomplete', {
     _create: function() {
         var self = this, input = this.element, field = $(this.options.field), value = field.val();
