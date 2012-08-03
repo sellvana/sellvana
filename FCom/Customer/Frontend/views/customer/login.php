@@ -10,20 +10,20 @@
 				<ul>
 					<li class="form-row">
 						<div class="form-field">
-							<label for="#">Email</label>
+							<label for="#"><?= BLocale::_("Email"); ?></label>
 							<input type="email" name="login[email]" class="required"/>
 						</div>
 					</li>
 					<li class="form-row">
 						<div class="form-field">
-							<label for="#">Password</label>
+							<label for="#"><?= BLocale::_("Password"); ?></label>
 							<input type="password" name="login[password]" class="required"/>
 						</div>
 					</li>
 				</ul>
 				<div class="form-buttons">
-					<input type="submit" value="Login"/>
-					<a href="<?php echo BApp::href('customer/password/recover')?>">Recover your password</a>
+					<input type="submit" value="<?= BLocale::_("Login"); ?>"/>
+					<a href="<?php echo BApp::href('customer/password/recover')?>"><?= BLocale::_("Recover your password"); ?></a>
 				</div>
 			</fieldset>
 		</form>

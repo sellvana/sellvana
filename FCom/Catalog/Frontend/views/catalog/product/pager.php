@@ -17,7 +17,7 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <strong class="count"><?=$s['c']?> found.</strong>
     <input type="hidden" name="q" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
     <div class="pages">
-    <label>Page:</label>
+    <label><?= BLocale::_("Page"); ?>:</label>
     <? if ($s['p']>1): ?><a href="#" class="arrow-left" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']-1?>); $(this).parents('form').submit()">&lt;</a><? endif ?>
     <!--<select name="p" onchange="this.form.submit()">
 <? for ($i=1; $i<=$s['mp']; $i++): ?>
@@ -28,14 +28,14 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <? if ($s['p']<$s['mp']): ?><a href="#" class="arrow-right" onclick="$(this).siblings('input[name=p]').val(<?=$s['p']+1?>); $(this).parents('form').submit()">&gt;</a><? endif ?>
 	</div>
 	<div class="rows f-right">
-    <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
+    <label><?= BLocale::_("Rows"); ?>:</label> <select name="ps" onchange="this.form.submit()">
 <? foreach ($psOptions as $i): ?>
         <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
 <? endforeach ?>
     </select>
 	</div>
     <div class="sort-by f-right">
-    <label>Sort:</label> <select name="sc" onchange="this.form.submit()">
+    <label><?= BLocale::_("Sort"); ?>:</label> <select name="sc" onchange="this.form.submit()">
 <? foreach ($sortOptions as $k=>$v): ?>
         <option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
 <? endforeach ?>
