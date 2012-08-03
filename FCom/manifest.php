@@ -237,7 +237,7 @@
             'description' => "Base cart and checkout functionality",
         ),
         'FCom_Sales' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.1',
             'root_dir' => 'Sales',
             'migrate' => 'FCom_Sales_Migrate',
             'tests' => "FCom_Sales_Tests_AllTests",
