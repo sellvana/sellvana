@@ -2,7 +2,7 @@
 
 <? if (!$this->products_data['state']['c']): ?>
 
-    <p class="note-msg">There are no products matching the selection.</p>
+    <p class="note-msg"><?= BLocale::_("There are no products matching the selection"); ?>.</p>
 
 <? else: ?>
 <div style="width: 750px; float: right; margin-top: 20px;">

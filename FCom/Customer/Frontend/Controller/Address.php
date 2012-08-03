@@ -18,7 +18,6 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->view('customer/address/list')->customer = $customer;
         $this->view('customer/address/list')->addresses = $addresses;
         $this->layout('/customer/address/list');
-        BResponse::i()->render();
     }
     public function action_edit()
     {
@@ -56,7 +55,6 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
         $layout->view('customer/address/edit')->default_billing = $defaultBilling;
         $this->layout('/customer/address/edit');
-        BResponse::i()->render();
     }
 
     public function action_address_post()
@@ -127,6 +125,5 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->view('customer/address/choose')->customer = $customer;
         $this->view('customer/address/choose')->addresses = $addresses;
         $this->layout('/customer/address/choose');
-        BResponse::i()->render();
     }
 }

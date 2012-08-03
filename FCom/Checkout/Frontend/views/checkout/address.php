@@ -3,11 +3,11 @@
 <form action="<?=BApp::href('checkout/address')?>" method="post">
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="<?=$this->address_type?>">
-    First name: <input type="text" name="firstname" value="<?=$this->address->firstname?>"><br/>
-    Last name: <input type="text" name="lastname" value="<?=$this->address->firstname?>"><br/>
-    Street 1: <input type="text" name="street1" value="<?=$this->address->street1?>"><br/>
-    Street 2: <input type="text" name="street2" value="<?=$this->address->street2?>"><br/>
-    City: <input type="text" name="city" value="<?=$this->address->city?>"><br/>
+    <?= BLocale::_("First name"); ?>: <input type="text" name="firstname" value="<?=$this->address->firstname?>"><br/>
+    <?= BLocale::_("Last name"); ?>: <input type="text" name="lastname" value="<?=$this->address->firstname?>"><br/>
+    <?= BLocale::_("Street 1"); ?>: <input type="text" name="street1" value="<?=$this->address->street1?>"><br/>
+    <?= BLocale::_("Street 2"); ?>: <input type="text" name="street2" value="<?=$this->address->street2?>"><br/>
+    <?= BLocale::_("City"); ?>: <input type="text" name="city" value="<?=$this->address->city?>"><br/>
     E-mail: <input type="text" name="email" value="<?=$this->address->email?>"><br/>
 
     <?=$this->view('geo/embed')?>
@@ -16,25 +16,25 @@
         $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->state?>'});
         })
     </script>
-    <label for="#">Country<em class="required">*</em></label>
+    <label for="#"><?= BLocale::_("Country"); ?><em class="required">*</em></label>
     <select class="geo-country" name="country" id="country">
-        <option value="">Select an option</option>
+        <option value=""><?= BLocale::_("Select an option"); ?></option>
     </select>
 
     <select class="geo-region required" name="state" >
-        <option value="">Select an option</option>
+        <option value=""><?= BLocale::_("Select an option"); ?></option>
     </select>
     <input type="text" class="geo-region" name="state" />
 
     <br/>
-    Zip: <input type="text" name="zip" value="<?=$this->address->zip?>"><br/>
+    <?= BLocale::_("Zip"); ?>: <input type="text" name="zip" value="<?=$this->address->zip?>"><br/>
 
 
     <?php if ('s' == $this->address_type): ?>
-        Billing address as shipping: <input type="checkbox" name="address_equal" value="1" <?=($this->address_equal?'checked':'')?>> Yes
+        <?= BLocale::_("Billing address as shipping"); ?>: <input type="checkbox" name="address_equal" value="1" <?=($this->address_equal?'checked':'')?>> Yes
     <?php endif; ?>
         <br/>
 
-    <input type="submit" value="Save address">
+    <input type="submit" value="<?= BLocale::_("Save address"); ?>">
 
 </form>

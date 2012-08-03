@@ -15,7 +15,6 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
         $layout->view('wishlist')->wishlist = $wishlist;
         $this->layout('/wishlist');
-        BResponse::i()->render();
     }
 
     public function action_wishlist_post()

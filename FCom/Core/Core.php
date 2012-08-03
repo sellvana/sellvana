@@ -15,10 +15,6 @@ class FCom_Core extends BClass
     public function init($area)
     {
         try {
-            if (BRequest::i()->csrf()) {
-                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
-            }
-
             // initialize start time and register error/exception handlers
             BDebug::i()->registerErrorHandlers();
 
@@ -118,6 +114,9 @@ class FCom_Core extends BClass
             $config->addFile('local.php', true);
         } else {
             $configFileStatus = false;
+        }
+        if (file_exists($configDir.'/defaults.php')) {
+            include_once $configDir.'/defaults.php';
         }
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
@@ -323,6 +322,10 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
+        if (BRequest::i()->csrf()) {
+            BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+        }
+
         if (($root = BLayout::i()->view('root'))) {
             $root->bodyClass = BRequest::i()->path(0, 1);
         }
@@ -367,7 +370,7 @@ class FCom_Core_Controller_Abstract extends BActionController
         }
         if (!$page || !($view = $this->view($viewPrefix.$page))) {
             $this->forward(true);
-            return;
+            return false;
         }
         $this->layout('base');
         BLayout::i()->applyLayout($viewPrefix.$page);
@@ -388,6 +391,7 @@ class FCom_Core_Controller_Abstract extends BActionController
             $root->addBodyClass('page-'.$page);
         }
         BLayout::i()->hookView('main', $viewPrefix.$page);
+        return $page;
     }
 }
 
@@ -419,6 +423,12 @@ class FCom_Core_View_Abstract extends BView
 class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
     protected $_htmlAttr = array('lang'=>'en');
+
+    public function __construct(array $params)
+    {
+        parent::__construct($params);
+        $this->addBodyClass(strtolower(trim(preg_replace('#[^a-z0-9]+#i', '-', BRequest::i()->rawPath()), '-')));
+    }
 
     public function addBodyClass($class)
     {

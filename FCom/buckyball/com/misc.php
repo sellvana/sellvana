@@ -363,7 +363,7 @@ class BUtil
 
         case 'end': $result = array_merge($array, $items); break;
 
-        case 'offset':
+        case 'offset': // for associative only
             $i = 0;
             foreach ($array as $k=>$v) {
                 if ($key===$i++) {
@@ -375,7 +375,7 @@ class BUtil
             }
             break;
 
-        case 'key':
+        case 'key': // for associative only
             $rel = $w2[1];
             $key = $w1[1];
             foreach ($array as $k=>$v) {
@@ -1786,7 +1786,7 @@ class BLocale extends BClass
 
     public static function setCurrentLanguage($lang)
     {
-        $this->_currentLanguage = $lang;
+        self::$_currentLanguage = $lang;
     }
 
     public static function getCurrentLanguage()
@@ -1807,14 +1807,35 @@ class BLocale extends BClass
         $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::currentModuleName();
         if (is_string($data)) {
             if (!BUtil::isPathAbsolute($data)) {
-                $data = BApp::m($module)->root_dir.'/'.$data;
+                $data = BApp::m($module)->root_dir.'/i18n/'.$data;
             }
+
             if (is_readable($data)) {
-                $fp = fopen($data, 'r');
-                while (($r = fgetcsv($fp, 2084))) {
-                    static::addTranslation($r, $module);
+                $extension = !empty($params['extension']) ? $params['extension'] : 'csv';
+                switch ($extension) {
+                    case 'csv':
+                        $fp = fopen($data, 'r');
+                        while (($r = fgetcsv($fp, 2084))) {
+                            static::addTranslation($r, $module);
+                        }
+                        fclose($fp);
+                        break;
+
+                    case 'json':
+                        $content = file_get_contents($data);
+                        $translations = BUtil::fromJson($content);
+                        foreach ($translations as $word => $tr) {
+                            static::addTranslation(array($word,$tr), $module);
+                        }
+                        break;
+
+                    case 'php':
+                        $translations = include $data;
+                        foreach ($translations as $word => $tr) {
+                            static::addTranslation(array($word,$tr), $module);
+                        }
+                        break;
                 }
-                fclose($fp);
             } else {
                 BDebug::warning('Could not load translation file: '.$data);
                 return;
@@ -1826,10 +1847,158 @@ class BLocale extends BClass
         }
     }
 
+    /**
+     * Collect all translation keys & values start from $rootDir and save into $targetFile
+     * @param string $rootDir - start directory to look for translation calls BLocale::_
+     * @param string $targetFile - output file which contain translation values
+     * @return boolean - TRUE on success
+     * @example BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
+     */
+    static public function collectTranslations($rootDir, $targetFile)
+    {
+        //find files recursively
+        $files = self::getFilesFromDir($rootDir);
+        if (empty($files)) {
+            return true;
+        }
+
+        //find all BLocale::_ calls and extract first parameter - translation key
+        $keys = array();
+        foreach($files as $file) {
+            $source = file_get_contents($file);
+            $tokens = token_get_all($source);
+            $func = 0;
+            $class = 0;
+            $sep = 0;
+            foreach($tokens as $token) {
+                if (empty($token[1])){
+                    continue;
+                }
+                if ($token[1] =='BLocale') {
+                    $class = 1;
+                    continue;
+                }
+                if ($class && $token[1] == '::') {
+                    $class = 0;
+                    $sep = 1;
+                    continue;
+                }
+                if ($sep && $token[1] == '_') {
+                    $sep = 0;
+                    $func = 1;
+                    continue;
+                }
+                if($func) {
+                    $token[1] = trim($token[1], "'");
+                    $keys[$token[1]] = '';
+                    $func = 0;
+                    continue;
+                }
+            }
+        }
+
+        //import translation from $targetFile
+
+        self::$_tr = '';
+        self::addTranslationsFile($targetFile);
+        $translations = self::getTranslations();
+
+        //find undefined translations
+        foreach ($keys as $key => $v) {
+            if(isset($translations[$key])) {
+                unset($keys[$key]);
+            }
+        }
+        //add undefined translation to $targetFile
+        $newtranslations = array();
+        if ($translations) {
+            foreach($translations as $trkey => $tr){
+                list(,$newtranslations[$trkey]) = each($tr);
+            }
+        }
+        $newtranslations = array_merge($newtranslations, $keys);
+
+        $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+        switch ($ext) {
+            case 'php':
+                self::saveToPHP($targetFile, $newtranslations);
+                break;
+            case 'csv':
+                self::saveToCSV($targetFile, $newtranslations);
+                break;
+            case 'json':
+                self::saveToJSON($targetFile, $newtranslations);
+                break;
+            default:
+                throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
+        }
+
+    }
+
+    static protected function saveToPHP($targetFile, $array)
+    {
+        $code = '';
+        foreach($array as $k => $v) {
+            if (!empty($code)) {
+                $code .= ','."\n";
+            }
+            $code .= "'$k' => '$v'";
+        }
+        $code = "<?php return array($code);";
+        file_put_contents($targetFile, $code);
+    }
+
+    static protected function saveToJSON($targetFile, $array)
+    {
+        $json = json_encode($array);
+        file_put_contents($targetFile, $json);
+    }
+
+    static protected function saveToCSV($targetFile, $array)
+    {
+        $handle = fopen($targetFile, "w");
+        foreach ($array as $k => $v) {
+            $k = trim($k, '"');
+            fputcsv($handle, array($k, $v));
+        }
+        fclose($handle);
+    }
+
+    static public function getFilesFromDir($dir)
+    {
+        $files = array();
+        if (false !== ($handle = opendir($dir))) {
+            while (false !== ($file = readdir($handle))) {
+                if ($file != "." && $file != "..") {
+                    if(is_dir($dir.'/'.$file)) {
+                        $dir2 = $dir.'/'.$file;
+                        $files = array_merge($files, self::getFilesFromDir($dir2));
+                    }
+                    else {
+                        $files[] = $dir.'/'.$file;
+                    }
+                }
+            }
+            closedir($handle);
+        }
+
+        return $files;
+    }
+
+    static public function addTranslationsFile($file)
+    {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if (empty($ext)) {
+            return;
+        }
+        $params['extension'] = $ext;
+        self::importTranslations($file, $params);
+    }
+
     protected static function addTranslation($r, $module=null)
     {
         if (empty($r[1])) {
-            BDebug::warning('No translation specified for '.$r[0]);
+            BDebug::debug('No translation specified for '.$r[0]);
             return;
         }
         // short and quick way
@@ -1878,6 +2047,7 @@ class BLocale extends BClass
                 $tr = current($arr); // and use it
             }
         }
+
         return BUtil::sprintfn($tr, $params);
     }
 
@@ -2011,5 +2181,10 @@ class BLocale extends BClass
     public function datetimeDbToLocal($value, $full=false)
     {
         return strftime($full ? '%c' : '%x', strtotime($value));
+    }
+
+    static public function getTranslations()
+    {
+        return self::$_tr;
     }
 }

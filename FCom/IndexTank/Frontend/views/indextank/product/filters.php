@@ -11,7 +11,7 @@ $s = $this->state;
         <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>
         <br/>
 
-        <a href="<?=BApp::href('indextank/search').'?q='.$this->q(BRequest::i()->get('q'))?>">Clear filters</a>
+        <a href="<?=BApp::href('indextank/search').'?q='.$this->q(BRequest::i()->get('q'))?>"><?= BLocale::_("Clear filters"); ?></a>
         <br/>
 
 <?php foreach($s['available_facets'] as $label => $data):?>
