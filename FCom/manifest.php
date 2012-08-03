@@ -82,6 +82,7 @@
             'root_dir' => 'Market',
             'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_Api::bootstrap'),
             'depends' => array('FCom_Core'),
+            'migrate' => 'FCom_Market_Migrate',
             'description' => "FCom_Market description here",
             'areas' => array(
                 'FCom_Admin' => array(
@@ -237,7 +238,7 @@
             'description' => "Base cart and checkout functionality",
         ),
         'FCom_Sales' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.0',
             'root_dir' => 'Sales',
             'migrate' => 'FCom_Sales_Migrate',
             'tests' => "FCom_Sales_Tests_AllTests",
