@@ -80,7 +80,7 @@
         'FCom_Market' => array(
             'version' => '0.1.0',
             'root_dir' => 'Market',
-            'bootstrap' => array('file'=>'Market.php', 'callback'=>'FCom_Market::bootstrap'),
+            'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_Api::bootstrap'),
             'depends' => array('FCom_Core'),
             'description' => "FCom_Market description here",
             'areas' => array(
