@@ -807,6 +807,20 @@ exit;
     }
 
     /**
+    * Extended where condition
+    *
+    * @param string|array $column_name if array - use where_complex() syntax
+    * @param mixed $value
+    */
+    public function where($column_name, $value=null)
+    {
+        if (is_array($column_name)) {
+            return $this->where_complex($column_name, !!$value);
+        }
+        return parent::where($column_name, $value);
+    }
+
+    /**
     * Add a complex where condition
     *
     * @see BDb::where
