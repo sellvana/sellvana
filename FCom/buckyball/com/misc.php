@@ -578,10 +578,10 @@ class BUtil
         }
         return $pattern;
     }
-    
+
     /**
     * Create or verify password hash using bcrypt
-    * 
+    *
     * @param string $plain
     * @param string $hash
     * @return boolean|string if $hash is null, return hash, otherwise return verification flag
@@ -623,7 +623,7 @@ class BUtil
     {
         $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
         if ('bcrypt'===$algo) {
-            return static::bcrypt($string);   
+            return static::bcrypt($string);
         }
         $iter = !is_null($iter) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
@@ -1497,12 +1497,12 @@ class BDebug extends BClass
 
         $l = self::$_level[self::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            echo '<div style="text-align:left; border:solid 1px red; font-family:monospace;">';
+            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             ob_start();
             echo $message."\n";
             debug_print_backtrace();
-            echo nl2br(htmlspecialchars(ob_get_clean()));
-            echo '</div>';
+            echo ob_get_clean();
+            echo '</xmp>';
         }
 /*
         $l = self::$_level[self::EXCEPTION];
