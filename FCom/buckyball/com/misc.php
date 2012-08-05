@@ -24,7 +24,7 @@ class BUtil
     *
     * @var string default sha512 for strength and slowness
     */
-    protected static $_hashAlgo = 'sha256';
+    protected static $_hashAlgo = 'bcrypt';
 
     /**
     * Default number of hash iterations
@@ -580,6 +580,22 @@ class BUtil
     }
 
     /**
+    * Create or verify password hash using bcrypt
+    *
+    * @param string $plain
+    * @param string $hash
+    * @return boolean|string if $hash is null, return hash, otherwise return verification flag
+    */
+    public static function bcrypt($plain, $hash=null)
+    {
+        if (is_null($hash)) {
+            return crypt($plain, '$2a$09$'.static::randomString(20).'$');
+        } else {
+            return crypt($plain, substr($hash, 0, 28)) === $hash;
+        }
+    }
+
+    /**
     * Generate salted hash
     *
     * @param string $string original text
@@ -606,6 +622,9 @@ class BUtil
     public static function fullSaltedHash($string, $salt=null, $algo=null, $iter=null)
     {
         $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
+        if ('bcrypt'===$algo) {
+            return static::bcrypt($string);
+        }
         $iter = !is_null($iter) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
         $hash = $s.$algo.$s.$iter;
@@ -625,6 +644,9 @@ class BUtil
     */
     public static function validateSaltedHash($string, $storedHash)
     {
+        if (strpos($storedHash, '$2a$')===0) {
+            return static::bcrypt($string, $storedHash);
+        }
         $sep = $storedHash[0];
         $arr = explode($sep, $storedHash);
         array_shift($arr);
@@ -770,13 +792,13 @@ class BUtil
     public static function globRecursive($pattern, $flags=0)
     {
         $files = glob($pattern, $flags);
-	if (!$files) $files = array();
-	$dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-	if ($dirs) {
-		foreach ($dirs as $dir) {
-		    $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
-		}
-	}
+    if (!$files) $files = array();
+    $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
+    if ($dirs) {
+        foreach ($dirs as $dir) {
+            $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+        }
+    }
         return $files;
     }
 
@@ -926,6 +948,21 @@ class BUtil
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    public static function formatDateRecursive($source, $format='m/d/Y')
+    {
+        foreach ($source as $i=>$val) {
+            if (is_string($val)) {
+                // checking only beginning of string for speed, assuming it is a date
+                if (preg_match('#^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]( |$)#', $val)) {
+                    $source[$i] = date($format, strtotime($val));
+                }
+            } elseif (is_array($val)) {
+                $source[$i] = static::formatDateRecursive($val, $format);
+            }
+        }
+        return $source;
     }
 }
 
@@ -1460,12 +1497,12 @@ class BDebug extends BClass
 
         $l = self::$_level[self::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            echo '<div style="text-align:left; border:solid 1px red; font-family:monospace;">';
+            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             ob_start();
             echo $message."\n";
             debug_print_backtrace();
-            echo nl2br(htmlspecialchars(ob_get_clean()));
-            echo '</div>';
+            echo ob_get_clean();
+            echo '</xmp>';
         }
 /*
         $l = self::$_level[self::EXCEPTION];
