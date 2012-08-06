@@ -3,8 +3,9 @@
 <a href="/market/account">Setup account</a> <br/><br/>
 
 <?php foreach($this->modules as $m): ?>
-    <h3><?= $m->name; ?></h3>
-    <?= $m->description; ?> <a href="<?=Bapp::href('market/view')?>?m=<?=$m->name?>">Install</a> <br/>
-    <?php if($m->need_upgrade) :?> <a href="<?=Bapp::href('market/view')?>?m=<?=$m->name?>" style="color: red">Need upgrade!</a> <?php endif; ?>
-    <br/>
+    <h3><?= $m->product_name; ?> (<?=$m->mod_name?>)</h3>
+    Version: <?=$m->version?><br/>
+    <?= $m->description; ?>
+    <a href="<?=$m->url()?>">View</a>
+    <br/> <br/>
 <?php endforeach; ?>
