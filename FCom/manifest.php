@@ -80,12 +80,33 @@
         'FCom_Market' => array(
             'version' => '0.1.0',
             'root_dir' => 'Market',
-            'bootstrap' => array('file'=>'Market.php', 'callback'=>'FCom_Market::bootstrap'),
+            'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_Api::bootstrap'),
             'depends' => array('FCom_Core'),
+            'migrate' => 'FCom_Market_Migrate',
             'description' => "FCom_Market description here",
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'MarketAdmin.php', 'callback'=>'FCom_Market_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'MarketFrontend.php', 'callback'=>'FCom_Market_Frontend::bootstrap'),
+                ),
+            ),
+        ),
+        // FCom_Market description here
+        'FCom_MarketServer' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'MarketServer',
+            'bootstrap' => array('file'=>'MarketServer.php', 'callback'=>'FCom_MarketServer::bootstrap'),
+            'depends' => array('FCom_Core', 'FCom_Customer'),
+            'migrate' => 'FCom_MarketServer_Migrate',
+            'description' => "FCom_MarketServer description here",
+            'areas' => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file'=>'MarketServerAdmin.php', 'callback'=>'FCom_MarketServer_Admin::bootstrap'),
+                ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'MarketServerFrontend.php', 'callback'=>'FCom_MarketServer_Frontend::bootstrap'),
                 ),
             ),
         ),
