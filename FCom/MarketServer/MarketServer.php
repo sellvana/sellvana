@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Market extends BClass
+class FCom_MarketServer extends BClass
 {
     public static function bootstrap()
     {
