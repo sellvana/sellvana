@@ -9,7 +9,7 @@ class FCom_Market_Model_Modules extends FCom_Core_Model_Abstract
         $modules = array();
         $modList = $this->orm()->find_many();
         foreach($modList as $mod) {
-            $modules[$mod->name] = $mod;
+            $modules[$mod->mod_name] = $mod;
         }
         return $modules;
     }

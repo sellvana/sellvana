@@ -4,9 +4,10 @@ storage/log/
 storage/import/
 storage/phptal/
 storage/run/
+storage/dlc/
+storage/downloads/
 media/product/
 market-files/*
-download/*
 lib/*
 local/*
 vendor/*

@@ -53,13 +53,18 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
     public function action_downlaod()
     {
-        $modName = BRequest::i()->get('mod_name');
+        $modName = BRequest::i()->get('id');
         $product = FCom_Catalog_Model_Product::orm()->where('mod_name', $modName)->find_one();
         if (!$product) {
             BResponse::i()->status(404, "Module not found");
             echo BUtil::toJson(array('Error' => 'Module '.$modName.' does not exist'));
             exit;
         }
+
+        $storage = BConfig::i()->get('fs/storage_dir');
+        $download = $storage . '/downloads/'. $modName.'.zip';
+
+        BResponse::i()->sendFile($download);
 
         //todo: check that product belong to user
 
