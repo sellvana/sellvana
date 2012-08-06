@@ -4,11 +4,13 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
 {
     public function action_market()
     {
-        $modules = FCom_MarketServer_Model_Modules::i()->getAllModules();
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
-        $options = FCom_MarketServer_Model_Account::i()->getOptions($customerId);
+        $category = FCom_Catalog_Model_Category::orm()->where('url_key', 'market')->find_one();
+        $modules = $category->products();
+        //$customerId = FCom_Customer_Model_Customer::sessionUserId();
+        //$options = FCom_MarketServer_Model_Account::i()->getOptions($customerId);
 
         //get remote modules manifest
+        /*
         if ($options && !empty($options->site_url) ) {
             $manifest = BUtil::fromJson(file_get_contents($options->site_url.'/market/modules'));
         }
@@ -24,41 +26,45 @@ class FCom_MarketServer_Frontend_Controller extends FCom_Frontend_Controller_Abs
                 }
             }
         }
+         *
+         */
         //todo: filter only public modules
         //show modules and description
         $this->view('market/list')->modules = $modules;
         $this->layout('/market/list');
     }
 
-    public function action_view()
-    {
-        $m = BRequest::get('m');
-
-        $mod = BApp::m($m);
-        $this->view('market/view')->module = $mod;
-        $this->layout('/market/view');
-    }
-
     public function action_modules()
     {
-        $modules = FCom_MarketServer_Model_Modules::i()->getAllModules();
-        $manifest = array();
+        $category = FCom_Catalog_Model_Category::orm()->where('url_key', 'market')->find_one();
+        $modules = $category->products();
+        $marketModules = array();
         foreach($modules as $mod) {
-            if (empty($mod->description)) continue;
-            $manifest[$mod->name] = array(
-                'name' => $mod->name,
+            $marketModules[$mod->mod_name] = array(
+                'mod_name' => $mod->mod_name,
+                'name' => $mod->product_name,
                 'version' => $mod->version,
                 'description' => $mod->description
                     );
         }
-        echo BUtil::toJson($manifest);
+        echo BUtil::toJson($marketModules);
         exit;
     }
 
-    public function downlaod()
+    public function action_downlaod()
     {
-        $modName = BRequest::i()->get('id');
-        $url = '/download/'.$modName.'.zip';
-        BResponse::i()->redirect($url);
+        $modName = BRequest::i()->get('mod_name');
+        $product = FCom_Catalog_Model_Product::orm()->where('mod_name', $modName)->find_one();
+        if (!$product) {
+            BResponse::i()->status(404, "Module not found");
+            echo BUtil::toJson(array('Error' => 'Module '.$modName.' does not exist'));
+            exit;
+        }
+
+        //todo: check that product belong to user
+
+        //$modName = $product->mod_name;
+        //$url = '/download/'.$modName.'.zip';
+        //BResponse::i()->redirect($url);
     }
 }

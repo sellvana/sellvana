@@ -4,6 +4,7 @@ class FCom_MarketServer_Frontend extends BClass
 {
     public static function bootstrap()
     {
+        
         BFrontController::i()
             ->route( 'GET /market', 'FCom_MarketServer_Frontend_Controller.market')
             ->route( 'GET /market/view', 'FCom_MarketServer_Frontend_Controller.view')
