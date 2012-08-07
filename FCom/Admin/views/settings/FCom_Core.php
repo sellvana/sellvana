@@ -29,6 +29,24 @@
         </div>
     </div>
     <div class="group">
+        <h3><a href="#">Session</a></h3>
+        <div>
+            <table>
+                <tr><td>Session Handler</td><td><select name="config[cookie][session_handler]">
+                    <option value="">Default</option>
+                    <?php echo $this->optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler')) ?>
+                </select></td></tr>
+                <tr><td>Cookie Timeout</td><td><input type="text" name="config[cookie][timeout]" value="<?php echo $this->q($c->get('cookie/timeout'))?>"/></td></tr>
+                <tr><td>Cookie Domain</td><td><input type="text" name="config[cookie][domain]" value="<?php echo $this->q($c->get('cookie/domain'))?>"/></td></tr>
+                <tr><td>Cookie Path</td><td><input type="text" name="config[cookie][path]" value="<?php echo $this->q($c->get('cookie/path'))?>"/></td></tr>
+                <tr><td>Session Namespace</td><td><input type="text" name="config[cookie][session_namespace]" value="<?php echo $this->q($c->get('cookie/session_namespace'))?>"/></td></tr>
+                <tr><td>Verify Session IP</td><td><select name="config[cookie][session_check_ip]">
+                    <?php echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip')) ?>
+                </select></td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="group">
         <h3><a href="#">System</a></h3>
         <div>
             <table>

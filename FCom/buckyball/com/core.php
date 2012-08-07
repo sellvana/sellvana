@@ -1329,6 +1329,29 @@ class BPubSub extends BClass
     }
 
     /**
+    * Disable all observers for an event or a specific observer
+    *
+    * @param string $eventName
+    * @param callback $callback
+    * @return BPubSub
+    */
+    public function off($eventName, $callback=null)
+    {
+        if (is_null($callback)) {
+            unset($this->_events[$eventName]);
+            return $this;
+        }
+        if (!empty($this->_events[$eventName]['observers'])) {
+            foreach ($this->_events[$eventName]['observers'] as $i=>$observer) {
+                if ($observer['callback']==$callback) {
+                    unset($this->_events[$eventName]['observers'][$i]);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
     * Dispatch event observers
     *
     * dispatch|fire|notify|pub|publish ?
@@ -1466,6 +1489,8 @@ class BSession extends BClass
     */
     protected $_dirty = false;
 
+    protected $_availableHandlers = array();
+
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -1474,6 +1499,17 @@ class BSession extends BClass
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
+    public function addHandler($name, $class)
+    {
+        $this->_availableHandlers[$name] = $class;
+    }
+
+    public function getHandlers()
+    {
+        $handlers = array_keys($this->_availableHandlers);
+        return array_combine($handlers, $handlers);
     }
 
     /**
@@ -1491,11 +1527,16 @@ class BSession extends BClass
         if (!empty($config['session_disable'])) {
             return $this;
         }
-        session_set_cookie_params(
-            !empty($config['timeout']) ? $config['timeout'] : 3600,
-            !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot(),
-            !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost()
-        );
+
+        $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
+        $path = !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot();
+        $domain = !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost();
+
+        if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
+            $class = $this->_availableHandlers[$config['session_handler']];
+            $class::i()->register($ttl);
+        }
+        session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : 'buckyball');
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
@@ -1728,3 +1769,77 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         //$this->close();
     }
 }
+
+class BSession_APC extends BClass
+{
+    protected $_prefix;
+    protected $_ttl = 0;
+
+    public function __construct()
+    {
+        if (function_exists('apc_store')) {
+            BSession::i()->addHandler('apc', __CLASS__);
+        }
+    }
+
+    public function register($ttl=null)
+    {
+        if ($ttl) {
+            $this->_ttl = $ttl;
+        }
+        session_set_save_handler(
+            array($this, 'open'), array($this, 'close'),
+            array($this, 'read'), array($this, 'write'),
+            array($this, 'destroy'), array($this, 'gc')
+        );
+    }
+
+    public function open($savePath, $sessionName)
+    {
+        $this->_prefix = 'BSession/'.$sessionName;
+        if (!apc_exists($this->_prefix)) {
+            // creating non-empty array @see http://us.php.net/manual/en/function.apc-store.php#107359
+            return apc_store($this->_prefix, array(''));
+        }
+        return true;
+    }
+
+    public function close()
+    {
+        return true;
+    }
+
+    public function read($id)
+    {
+        $key = $this->_prefix.'/'.$id;
+        return apc_exists($key) ? apc_fetch($key) : '';
+    }
+
+    public function write($id, $data)
+    {
+        $all = apc_fetch($this->_prefix);
+        $all[$id] = time();
+        return apc_store($this->_prefix.'/'.$id, $data, $this->_ttl) && apc_store($this->_prefix, $all);
+    }
+
+    public function destroy($id)
+    {
+        $all = apc_fetch($this->_prefix);
+        unset($all[$id]);
+        return apc_delete($this->_prefix.'/'.$id) && apc_store($this->_prefix, $all);
+    }
+
+    public function gc($maxlifetime)
+    {
+        if (!$this->_ttl || $maxlifetime<$this->_ttl) {
+            $all = apc_fetch($this->_prefix);
+            foreach ($all as $id=>$time) {
+                if ($time + $maxlifetime < time() && apc_exists($this->_prefix.'/'.$id)) {
+                    apc_delete($this->_prefix.'/'.$id);
+                }
+            }
+        }
+        return true;
+    }
+}
+BSession_APC::i();
