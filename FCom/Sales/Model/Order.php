@@ -45,4 +45,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->items = FCom_Sales_Model_OrderItem::factory()->where('order_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
+
+    public function isOrderExists($productId, $customerID)
+    {
+        return $this->orm('o')->join(FCom_Sales_Model_OrderItem::table(), "o.id = oi.order_id", "oi")
+                ->where("user_id", $customerID)->where("product_id", $productId)->find_one();
+
+    }
+
 }
