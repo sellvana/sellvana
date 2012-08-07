@@ -12,4 +12,5 @@ lib/*
 local/*
 vendor/*
 user/*
+FCom/MarketServer/
 index.local.php
