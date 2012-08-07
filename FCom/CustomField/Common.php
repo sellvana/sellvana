@@ -17,7 +17,8 @@ class FCom_CustomField_Common extends BClass
     public function productFindORM($args)
     {
         $tP = $args['orm']->table_alias();
-        $args['orm']->select($tP.'.*')
+        $args['orm']
+            ->select($tP.'.*')
             ->left_outer_join('FCom_CustomField_Model_ProductField', array('pcf.product_id','=',$tP.'.id'), 'pcf')
         ;
         $fields = FCom_CustomField_Model_Field::i()->fieldsInfo('product', true);
