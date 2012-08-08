@@ -81,31 +81,5 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
         }
         return $this;
     }
-
-    public static function install()
-    {
-        $tNav = static::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tNav} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(10) unsigned DEFAULT NULL,
-  `id_path` varchar(100) NOT NULL,
-  `node_name` varchar(255) NOT NULL,
-  `full_name` text NOT NULL,
-  `url_key` varchar(255) NOT NULL,
-  `url_path` varchar(255) NOT NULL,
-  `url_href` varchar(255) NOT NULL,
-  `sort_order` int(10) unsigned NOT NULL,
-  `num_children` int(10) unsigned DEFAULT NULL,
-  `num_descendants` int(10) unsigned DEFAULT NULL,
-  `node_type` varchar(20) DEFAULT NULL,
-  `reference` varchar(255) DEFAULT NULL,
-  `contents` text,
-  `layout_update` text,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-        ");
-    }
 }
 

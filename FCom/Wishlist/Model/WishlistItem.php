@@ -14,17 +14,4 @@ class FCom_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
         }
         return $this->product;
     }
-
-    public static function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `wishlist_id` int(10) unsigned NOT NULL,
-  `product_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `wishlist_id` (`wishlist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
 }

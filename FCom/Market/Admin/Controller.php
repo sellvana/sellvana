@@ -19,6 +19,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $formUrl = BApp::href($this->_gridHref.'/form');
         $config = array();
         $columns = array(
+            'id'=>array('label'=>'id', 'width'=>250, 'editable'=>true),
             'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
             'description' => array('label'=>'Description', 'width'=>250, 'editable'=>true),
             'version' => array('label'=>'Version', 'width'=>250, 'editable'=>true),
@@ -42,15 +43,16 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         //print_r($data);exit;
         $modules = FCom_Market_Api::i()->getAllModules();
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
+        
         foreach($modules as $module){
             $notice = 'Get module';
             $localVersion = '';
-            if (!empty($modulesInstalled[$module['name']])) {
-                $notice = version_compare($module['version'], $modulesInstalled[$module['name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
-                $localVersion = $modulesInstalled[$module['name']]->version;
+            if (!empty($modulesInstalled[$module['mod_name']])) {
+                $notice = version_compare($module['version'], $modulesInstalled[$module['mod_name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
+                $localVersion = $modulesInstalled[$module['mod_name']]->version;
             }
             $data[] = array(
-                'id' => $module['name'],
+                'id' => $module['mod_name'],
                 'module' => $module['name'],
                 'version' => $module['version'],
                 'local_version' => $localVersion,
@@ -69,11 +71,23 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleName = BRequest::i()->params('id', true);
 
-        $moduleClass = BApp::m($moduleName);
+        $modulesList = FCom_Market_Api::i()->getAllModules();
 
+        $module = $modulesList[$moduleName];
         $model = new stdClass();
         $model->id = $moduleName;
-        $model->module = $moduleClass;
+        $model->module = $module;
+
+        $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
+        $needUpgrade = false;
+        $localVersion = '';
+        if (!empty($modulesInstalled[$module['mod_name']])) {
+            $needUpgrade = version_compare($module['version'], $modulesInstalled[$module['mod_name']]->version) > 0 ? true : false;
+            $localVersion = $modulesInstalled[$module['mod_name']]->version;
+        }
+        $model->local_version = $localVersion;
+        $model->need_upgrade = $needUpgrade;
+
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
 
@@ -98,20 +112,23 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleName = BRequest::i()->params('id', true);
 
-        $moduleClass = BApp::m($moduleName);
-
-        if ($moduleClass) {
-            //$this->forward('index');
-            //return;
-        }
-        // else install module
-
         $filename = FCom_Market_Api::i()->download($moduleName);
         $res = FCom_Market_Api::i()->extract($filename);
 
+        if (!$res) {
+            BSession::i()->addMessage("Permissions denied to write into storage dir: ".BConfig::i()->get('fs/storage_dir'));
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+        }
+
         if ($res) {
-            $data = array('name' => $moduleName, 'version' => '0.1.0', 'description' => 'test');
-            FCom_Market_Model_Modules::create($data)->save();
+            $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
+            if (!$modExist) {
+                $modulesList = FCom_Market_Api::i()->getAllModules();
+                $module = $modulesList[$moduleName];
+                $data = array('name' => $module['name'], 'mod_name' => $module['mod_name'],
+                    'version' => $module['version'], 'description' => $module['description']);
+                FCom_Market_Model_Modules::create($data)->save();
+            }
         }
 
         $this->forward('index');
