@@ -44,7 +44,7 @@ class FCom_Core extends BClass
     public function initConfig($area)
     {
         date_default_timezone_set('UTC');
-        
+
         $config = BConfig::i();
 
         // $localConfig used to override saved config with settings from entry point
@@ -207,6 +207,9 @@ class FCom_Core extends BClass
         $rootDir = $config->get('fs/root_dir');
         $this->_modulesDirs[] = $rootDir.'/FCom';
         $this->_modulesDirs[] = $rootDir.'/market/*';
+        $this->_modulesDirs[] = $rootDir.'/market/*/*';
+        $this->_modulesDirs[] = $rootDir.'/market-files/*';
+        $this->_modulesDirs[] = $rootDir.'/market-files/*/*';
         $this->_modulesDirs[] = $rootDir.'/local/*';
 
         foreach ($this->_modulesDirs as $dir) {

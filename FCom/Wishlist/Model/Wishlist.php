@@ -63,16 +63,4 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         $this->removeItem($this->childById('items', $productId, 'product_id'));
         return $this;
     }
-
-    public static function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
 }

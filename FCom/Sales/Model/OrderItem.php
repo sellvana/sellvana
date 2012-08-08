@@ -28,22 +28,4 @@ class FCom_Sales_Model_OrderItem extends FCom_Core_Model_Abstract
         return $this->orm()->where("order_id", $orderId)
                         ->where("product_id", $product_id)->find_one();
     }
-
-    public static function install()
-    {
-        $tItem = static::table();
-        $tOrder = FCom_Sales_Model_Order::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tItem} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `order_id` int(10) unsigned DEFAULT NULL,
-  `product_id` int(10) unsigned DEFAULT NULL,
-  `qty` int(10) unsigned DEFAULT NULL,
-  `total` decimal(12,4) NOT NULL DEFAULT '0.0000',
-  `product_info` text,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK_{$tItem}_cart` FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
 }
