@@ -2,9 +2,16 @@
 <fieldset>
 <div class="settings-container">
     <div class="group">
-        <h3><a href="#">Token information</a></h3>
+        <h3><a href="#">API information</a></h3>
         <div>
             <table>
+                <tr>
+                    <td>API url</td>
+                    <td>
+                        <input size="50" type="text" name="config[modules][FCom_Market][market_url]"
+                               value="<?php echo $this->q($c->get('modules/FCom_Market/market_url'))?>"/> 
+                    </td>
+                </tr>
                 <tr>
                     <td>API token</td>
                     <td>
