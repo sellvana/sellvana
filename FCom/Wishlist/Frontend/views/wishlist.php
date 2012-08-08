@@ -1,9 +1,9 @@
 <div class="col-main">
         <div class="page-title category-title">
-            <h1>Wishlist</h1>
+            <h1><?= BLocale::_("Wishlist"); ?></h1>
         </div>
 <?php if (!$this->wishlist || !$this->wishlist->items()): ?>
-    <p class="note-msg">There are no products in wishlist.</p>
+    <p class="note-msg"><?= BLocale::_("There are no products in wishlist"); ?>.</p>
 <?php else: ?>
      <form name="cart" action="<?=BApp::href('wishlist')?>" method="post">
         <table class="product-list">
@@ -15,9 +15,9 @@
             <col width="70"/>
             <thead>
                 <tr>
-                    <td>Remove</td>
-                    <td colspan="2">Product</td>
-                    <td>Price</td>
+                    <td><?= BLocale::_("Remove"); ?></td>
+                    <td colspan="2"><?= BLocale::_("Product"); ?></td>
+                    <td><?= BLocale::_("Price"); ?></td>
                 </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="submit" class="button" value="Update Wishlist"/></td>
+                <td><input type="submit" class="button" value="<?= BLocale::_("Update Wishlist"); ?>"/></td>
             </tfoot>
         </table>
     </form>

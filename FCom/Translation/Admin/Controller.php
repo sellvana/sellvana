@@ -96,11 +96,11 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
             BDebug::error('Invalid Filename: '.$id);
         }
         $moduleClass = BApp::m($module);
-        if (is_object($moduleClass)) {
+        if (!is_object($moduleClass)) {
             BDebug::error('Invalid Module name: '.$id);
         }
 
-        $filename = $moduleClass->baseDir().'/'.$file;
+        $filename = $moduleClass->baseDir().'/i18n/'.$file;
 
         if (!is_writable($filename)) {
             BDebug::error('Not writeable filename: '.$filename);
