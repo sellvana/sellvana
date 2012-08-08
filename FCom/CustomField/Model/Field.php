@@ -81,12 +81,14 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $field = BDb::ddlFieldInfo($fTable, $this->field_code);
         if (!$field && empty($this->_oldTableFieldCode)) {
             BDb::run("ALTER TABLE {$fTable} ADD COLUMN {$fCode} {$fType}");
-        } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode) {
+        } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode && !empty($this->_oldTableFieldCode)) {
             BDb::run("ALTER TABLE {$fTable} CHANGE COLUMN {$this->_oldTableFieldCode} {$fCode} {$fType}");
+
         }
         //fix field code name
         if($this->field_code != $fCode){
             $this->field_code = $fCode;
+            $this->_oldTableFieldCode = $this->field_code;
             $this->save();
         }
 
@@ -102,35 +104,5 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     public function products()
     {
         return FCom_Catalog_Model_Product::i()->orm('p')->where_not_null($this->field_code)->find_many();
-    }
-
-    public static function install()
-    {
-        $tField = static::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tField} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `field_type` enum('product') NOT NULL DEFAULT 'product',
-  `field_code` varchar(50) NOT NULL,
-  `field_name` varchar(50) NOT NULL,
-  `table_field_type` varchar(20) NOT NULL,
-  `admin_input_type` varchar(20) NOT NULL DEFAULT 'text',
-  `frontend_label` text,
-  `frontend_show` tinyint(1) not null default 1,
-  `config_json` text,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
-
-    public static function upgrade_0_1_1()
-    {
-        $table = static::table();
-        $fieldName = 'frontend_show';
-        if (BDb::ddlFieldInfo($table, $fieldName)) {
-            return false;
-        }
-
-        BDb::run( " ALTER TABLE {$table} ADD {$fieldName} tinyint(1) not null default 1; ");
     }
 }

@@ -107,50 +107,5 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return $this->mediaORM($type)->find_many_assoc();
     }
-
-    public static function install()
-    {
-        BDb::run("
-
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `company_id` INT(10) UNSIGNED DEFAULT NULL,
-  `entity_id` INT(10) UNSIGNED DEFAULT NULL,
-  `manuf_id` INT(10) UNSIGNED DEFAULT NULL,
-  `manuf_vendor_id` INT(10) UNSIGNED DEFAULT NULL,
-  `manuf_sku` VARCHAR(100) NOT NULL,
-  `product_name` VARCHAR(255) NOT NULL,
-  `description` TEXT,
-  `url_key` VARCHAR(255) DEFAULT NULL,
-  `base_price` DECIMAL(12,4) NOT NULL,
-  `notes` TEXT,
-  `uom` VARCHAR(10) NOT NULL DEFAULT 'EACH',
-  `create_dt` DATETIME DEFAULT NULL,
-  `update_dt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `image_url` TEXT,
-  `calc_uom` VARCHAR(15) DEFAULT NULL,
-  `calc_qty` DECIMAL(12,4) UNSIGNED DEFAULT NULL,
-  `base_uom` VARCHAR(15) DEFAULT NULL,
-  `base_qty` INT(10) UNSIGNED DEFAULT NULL,
-  `pack_uom` VARCHAR(15) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `url_key` (`url_key`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
-        ");
-    }
-
-    public static function upgrade_0_1_2()
-    {
-        $tProduct = static::table();
-        BDb::ddlClearCache();
-        $field = BDb::ddlFieldInfo($tProduct, 'weight');
-        if ($field){
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD `weight` DECIMAL( 10, 4 ) NOT NULL
-        ");
-
-    }
 }
 

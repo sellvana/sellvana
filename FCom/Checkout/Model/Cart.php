@@ -85,7 +85,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->addProduct($item->product_id, array('qty'=>$item->qty, 'price'=>$item->price));
         }
         $cart->delete();
-        $this->calcTotals();
+        $this->calcTotals()->save();
         return $this;
     }
 
@@ -141,11 +141,14 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         return $carts;
     }
 
+    /**
+     * Return total UNIQUE number of items in the cart
+     * @param boolean $assoc
+     * @return array
+     */
     public function items($assoc=true)
     {
-        if (is_null($this->items)) {
-            $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
-        }
+        $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
@@ -182,6 +185,10 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             ->find_many());
     }
 
+    /**
+     * Return total number of items in the cart
+     * @return integer
+     */
     public function itemQty()
     {
         return $this->item_qty*1;
@@ -268,6 +275,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if ($item) {
             unset($this->items[$item->id]);
             $item->delete();
+            $this->calcTotals()->save();
         }
         return $this;
     }
@@ -557,68 +565,4 @@ Estimated tax: $'.$estimatedTax.'<br>
     {
         return '/carts/items/'.$id;
     }
-
-    public static function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `company_id` int(10) unsigned DEFAULT NULL,
-  `location_id` int(10) unsigned DEFAULT NULL,
-  `user_id` int(10) unsigned NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `sort_order` int(11) DEFAULT NULL,
-  `item_qty` decimal(12,4) NOT NULL DEFAULT '0.0000',
-  `item_num` smallint(6) unsigned NOT NULL DEFAULT '0',
-  `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
-  `session_id` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `NewIndex1` (`session_id`),
-  UNIQUE KEY `user_id` (`user_id`,`description`,`session_id`),
-  KEY `company_id` (`company_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
-
-    public static function upgrade_0_1_3()
-    {
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo(static::table(), "shipping_method")){
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".static::table()." ADD `shipping_method` VARCHAR( 50 ) NOT NULL ,
-ADD `shipping_price` DECIMAL( 10, 2 ) NOT NULL ,
-ADD `payment_method` VARCHAR( 50 ) NOT NULL ,
-ADD `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-ADD `discount_code` VARCHAR( 50 ) NOT NULL,
-ADD `calc_balance` DECIMAL( 10, 2 ) NOT NULL ,
-            ADD `totals_json` TEXT NOT NULL "
-        );
-    }
-
-    public static function upgrade_0_1_4()
-    {
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo(static::table(), "shipping_service")){
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".static::table()." ADD `shipping_service` CHAR( 2 ) NOT NULL AFTER `shipping_price`"
-        );
-
-    }
-
-    public static function upgrade_0_1_5()
-    {
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo(static::table(), "status")){
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".static::table()." ADD `status` ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new'"
-        );
-    }
-
-
 }

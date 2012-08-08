@@ -28,18 +28,4 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
         }
         return !empty($countries[$name]) ? $countries[$name] : null;
     }
-
-    public function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `iso` char(2) NOT NULL,
-  `iso3` char(3) DEFAULT NULL,
-  `numcode` smallint(6) DEFAULT NULL,
-  `name` varchar(80) NOT NULL,
-  PRIMARY KEY (`iso`),
-  KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
 }

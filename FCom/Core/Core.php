@@ -15,10 +15,6 @@ class FCom_Core extends BClass
     public function init($area)
     {
         try {
-            if (BRequest::i()->csrf()) {
-                BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
-            }
-
             // initialize start time and register error/exception handlers
             BDebug::i()->registerErrorHandlers();
 
@@ -47,6 +43,8 @@ class FCom_Core extends BClass
 
     public function initConfig($area)
     {
+        date_default_timezone_set('UTC');
+
         $config = BConfig::i();
 
         // $localConfig used to override saved config with settings from entry point
@@ -209,6 +207,9 @@ class FCom_Core extends BClass
         $rootDir = $config->get('fs/root_dir');
         $this->_modulesDirs[] = $rootDir.'/FCom';
         $this->_modulesDirs[] = $rootDir.'/market/*';
+        $this->_modulesDirs[] = $rootDir.'/market/*/*';
+        $this->_modulesDirs[] = $rootDir.'/market-files/*';
+        $this->_modulesDirs[] = $rootDir.'/market-files/*/*';
         $this->_modulesDirs[] = $rootDir.'/local/*';
 
         foreach ($this->_modulesDirs as $dir) {
@@ -326,6 +327,10 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
+        if (BRequest::i()->csrf()) {
+            BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+        }
+
         if (($root = BLayout::i()->view('root'))) {
             $root->bodyClass = BRequest::i()->path(0, 1);
         }

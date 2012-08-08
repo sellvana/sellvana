@@ -27,17 +27,17 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
     <div class="rows f-left">
         <input type="text" name="q" id="query" autocomplete="off" value="<?=$this->q(BRequest::i()->get('q'))?>"/>
-        <input type="submit" value="Search">
+        <input type="submit" value="<?= BLocale::_("Search"); ?>">
     </div>
     <div class="rows f-right">
-    <label>Rows:</label> <select name="ps" onchange="this.form.submit()">
+    <label><?= BLocale::_("Rows"); ?>:</label> <select name="ps" onchange="this.form.submit()">
 <? foreach ($psOptions as $i): ?>
         <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
 <? endforeach ?>
     </select>
 	</div>
     <div class="sort-by f-right">
-    <label>Sort:</label> <select name="sc" onchange="this.form.submit()">
+    <label><?= BLocale::_("Sort"); ?>:</label> <select name="sc" onchange="this.form.submit()">
 <? foreach ($sortOptions as $k=>$v): ?>
         <option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
 <? endforeach ?>
@@ -46,9 +46,9 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
 
 
     <div class="rows f-left" style="margin-left: 10px;">
-    <strong class="count"> Found: <?=!empty($s['c'])?$s['c']:0?></strong>.
+    <strong class="count"> <?= BLocale::_("Found"); ?>: <?=!empty($s['c'])?$s['c']:0?></strong>.
 
-    <label>Page:</label>
+    <label><?= BLocale::_("Page"); ?>:</label>
     <? if ($s['p']>1): ?>
         <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('p' => $s['p']-1))?>" class="arrow-left" >&lt;</a>
     <? endif ?>

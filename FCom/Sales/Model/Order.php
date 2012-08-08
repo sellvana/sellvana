@@ -35,27 +35,22 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->set('status', 'paid')->save();
     }
 
-    public static function install()
+    /**
+     * Return total UNIQUE number of items in the order
+     * @param boolean $assoc
+     * @return array
+     */
+    public function items($assoc=true)
     {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned NOT NULL,
-  `cart_id` int(10) unsigned NOT NULL,
-  `status` enum('new', 'paid') not null default 'new',
-  `item_qty` int(10) unsigned NOT NULL,
-  `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
-  `shipping_method` varchar(50) NOT NULL,
-  `shipping_service` char(2) NOT NULL,
-  `payment_method` varchar(50) NOT NULL,
-  `payment_details` text NOT NULL,
-  `discount_code` varchar(50) NOT NULL,
-  `tax` varchar(50) NOT NULL,
-  `balance` decimal(10,2) NOT NULL,
-  `totals_json` text NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY cart_id (`cart_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
+        $this->items = FCom_Sales_Model_OrderItem::factory()->where('order_id', $this->id)->find_many_assoc();
+        return $assoc ? $this->items : array_values($this->items);
     }
+
+    public function isOrderExists($productId, $customerID)
+    {
+        return $this->orm('o')->join(FCom_Sales_Model_OrderItem::table(), "o.id = oi.order_id", "oi")
+                ->where("user_id", $customerID)->where("product_id", $productId)->find_one();
+
+    }
+
 }

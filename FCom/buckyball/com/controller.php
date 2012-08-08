@@ -431,10 +431,24 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf($methods=array('POST','DELETE','PUT'))
+    public static function csrf()
     {
-        if (!in_array(static::method(), $methods)) {
+        $c = BConfig::i();
+
+        $m = $c->get('web/csrf_methods');
+        $methods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        $whitelist = $c->get('web/csrf_whitelist');
+
+        if (is_array($methods) && !in_array(static::method(), $methods)) {
             return false; // not one of checked methods, pass
+        }
+        if ($whitelist) {
+            $path = static::rawPath();
+            foreach ((array)$whitelist as $pattern) {
+                if (preg_match($pattern, $path)) {
+                    return false;
+                }
+            }
         }
         if (!($ref = static::referrer())) {
             return true; // no referrer sent, high prob. csrf
@@ -632,7 +646,7 @@ class BRequest extends BClass
             $modules = apache_get_modules();
             $modRewrite = in_array('mod_rewrite', $modules);
         } else {
-            $modRewrite =  getenv('HTTP_MOD_REWRITE')=='On' ? true : false;
+            $modRewrite =  strtolower(getenv('HTTP_MOD_REWRITE'))=='on' ? true : false;
         }
         return $modRewrite;
     }
@@ -1028,6 +1042,29 @@ class BResponse extends BClass
         return $this;
     }
 
+    public static function startLongResponse()
+    {
+        // improve performance by not processing debug log
+        if (BDebug::is('DEBUG')) {
+            BDebug::mode('DEVELOPMENT');
+        }
+        // redundancy: avoid memory leakage from debug log
+        BDebug::level(BDebug::MEMORY, false);
+        // remove process timeout limitation
+        set_time_limit(0);
+        // output in real time
+        ob_end_flush();
+        ob_implicit_flush();
+        // enable garbage collection
+        gc_enable();
+        // remove session lock
+        session_write_close();
+        // bypass initial webservice buffering
+        echo str_pad('', 2000, ' ');
+        // continue in background if the browser request was interrupted
+        //ignore_user_abort(true);
+    }
+
     public function shutdown($lastMethod=null)
     {
         BPubSub::i()->fire('BResponse::shutdown', array('last_method'=>$lastMethod));
@@ -1138,7 +1175,7 @@ class BFrontController extends BClass
     }
 
     /**
-    * Declare RESTful route
+    * Declare route
     *
     * @param string $route
     *   - "{GET|POST|DELETE|PUT|HEAD} /part1/part2/:param1"
@@ -1185,7 +1222,7 @@ class BFrontController extends BClass
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
-        if (!empty($this->_routes[$requestRoute])) {
+        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
             BDebug::debug('DIRECT ROUTE: '.$requestRoute);
             return $this->_routes[$requestRoute];
         }
@@ -1234,11 +1271,11 @@ class BFrontController extends BClass
     public function redirect($from, $to, $args=array())
     {
         $args['target'] = $to;
-        $this->route($from, array($this, '_redirectCallback'), $args);
+        $this->route($from, array($this, 'redirectCallback'), $args);
         return $this;
     }
 
-    protected function _redirectCallback($args)
+    public function redirectCallback($args)
     {
         BResponse::i()->redirect(BApp::href($args['target']));
     }
@@ -1343,25 +1380,34 @@ class BRouteNode
             $paramId = 2;
             foreach ($a1 as $i=>$k) {
                 $k0 = $k[0];
+                $part = '';
+                if ($k0==='?') {
+                    $k = substr($k, 1);
+                    $k0 = $k[0];
+                    $part = '?';
+                }
                 if ($k0===':') { // optional param
                     $this->params[++$paramId] = substr($k, 1);
-                    $a1[$i] = '([^/]*)';
-                }
-                if ($k0==='!') { // required param
+                    $part .= '([^/]*)';
+                } elseif ($k0==='!') { // required param
                     $this->params[++$paramId] = substr($k, 1);
-                    $a1[$i] = '([^/]+)';
-                }
-                elseif ($k0==='*') { // param until end of url
+                    $part .= '([^/]+)';
+                } elseif ($k0==='*') { // param until end of url
                     $this->params[++$paramId] = substr($k, 1);
-                    $a1[$i] = '(.*)';
-                }
-                elseif ($k0==='.') { // dynamic action
+                    $part .= '(.*)';
+                } elseif ($k0==='.') { // dynamic action
                     $this->params[++$paramId] = substr($k, 1);
                     $this->action_idx = $paramId;
-                    $a1[$i] = '([^/]+)';
+                    $part .= '([^/]*)';
+                } else {
+                    //$part .= preg_quote($a1[$i]);
+                }
+                if (''!==$part) {
+                    $a1[$i] = $part;
                 }
             }
             $this->regex = '#^('.$a[0].') (/'.join('/', $a1).'/?)$#'; // #...#i option?
+#echo $this->regex.'<hr>';
         }
     }
 
@@ -1374,7 +1420,7 @@ class BRouteNode
             return false;
         }
         if ($this->action_idx) {
-            $this->action_name = $match[$this->action_idx];
+            $this->action_name = !empty($match[$this->action_idx]) ? $match[$this->action_idx] : 'index';
         }
         if ($this->route_name[0]==='^') {
             $this->params_values = $match;
