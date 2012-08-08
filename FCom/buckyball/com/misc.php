@@ -742,7 +742,14 @@ class BUtil
             ));
             if ($method==='POST' || $method==='PUT') {
                 $opts['http']['content'] = $request;
-                $opts['http']['header'] .= "Content-Type: application/x-www-form-urlencoded\r\n"
+                $contentType = 'application/x-www-form-urlencoded';
+                foreach ($request as $k=>$v) {
+                    if (is_string($v) && $v[0]==='@') {
+                        $contentType = 'multipart/form-data';
+                        break;
+                    }
+                }
+                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n"
                     ."Content-Length: ".strlen($request)."\r\n";
             }
             $content = file_get_contents($url, false, stream_context_create($opts));
