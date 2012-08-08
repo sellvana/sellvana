@@ -43,7 +43,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         //print_r($data);exit;
         $modules = FCom_Market_Api::i()->getAllModules();
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
-        
+
         foreach($modules as $module){
             $notice = 'Get module';
             $localVersion = '';
@@ -121,10 +121,14 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         if ($res) {
+            $modulesList = FCom_Market_Api::i()->getAllModules();
+            $module = $modulesList[$moduleName];
             $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
             if (!$modExist) {
-                $modulesList = FCom_Market_Api::i()->getAllModules();
-                $module = $modulesList[$moduleName];
+                $modExist->version = $module['version'];
+                $modExist->description = $module['description'];
+                $modExist->save();
+            } else {
                 $data = array('name' => $module['name'], 'mod_name' => $module['mod_name'],
                     'version' => $module['version'], 'description' => $module['description']);
                 FCom_Market_Model_Modules::create($data)->save();
