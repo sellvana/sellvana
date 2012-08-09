@@ -80,17 +80,14 @@
         'FCom_Market' => array(
             'version' => '0.1.0',
             'root_dir' => 'Market',
-            'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_Api::bootstrap'),
+            'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_MarketApi::bootstrap'),
             'depends' => array('FCom_Core'),
             'migrate' => 'FCom_Market_Migrate',
             'description' => "FCom_Market description here",
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'MarketAdmin.php', 'callback'=>'FCom_Market_Admin::bootstrap'),
-                ),
-                'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'MarketFrontend.php', 'callback'=>'FCom_Market_Frontend::bootstrap'),
-                ),
+                )
             ),
         ),
         // FCom_Market description here
@@ -110,6 +107,14 @@
                 ),
             ),
         ),
+        'FCom_Ftp' => array(
+            'version' => '0.1.0',
+            'root_dir' => 'Ftp',
+            'bootstrap' => array('file'=>'Ftp.php', 'callback'=>'FCom_Ftp::bootstrap'),
+            'depends' => array('FCom_Core'),
+            'description' => "FTP client",
+        ),
+
         // Geographic information about countries and states
         'FCom_Geo' => array(
             'version' => '0.1.0',
@@ -393,7 +398,7 @@
         ),
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.2',
             'root_dir' => 'IndexTank',
             'depends' => array('FCom_Core'),
             'translations' => array('de' => 'de.csv'),

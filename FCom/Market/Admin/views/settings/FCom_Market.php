@@ -9,7 +9,7 @@
                     <td>API url</td>
                     <td>
                         <input size="50" type="text" name="config[modules][FCom_Market][market_url]"
-                               value="<?php echo $this->q($c->get('modules/FCom_Market/market_url'))?>"/> 
+                               value="<?php echo $this->q($c->get('modules/FCom_Market/market_url'))?>"/>
                     </td>
                 </tr>
                 <tr>
@@ -30,6 +30,14 @@
                     <td>
                         To perform the requested action, Fulleron needs to access your web server.
                         Please enter your FTP credentials to proceed. If you do not remember your credentials, you should contact your web host.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Enable FTP</td>
+                    <td>
+                        <input type="hidden" name="config[modules][FCom_Market][ftp][enabled]" value="0"/>
+                        <input type="checkbox" name="config[modules][FCom_Market][ftp][enabled]" value="1"
+                               <?= $c->get('modules/FCom_Market/ftp/enabled') == 1 ? 'checked': ''?>/>
                     </td>
                 </tr>
                 <tr>
