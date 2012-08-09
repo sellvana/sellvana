@@ -83,6 +83,12 @@ class FCom_Core extends BClass
             $config->set('fs/storage_dir', $storageDir);
         }
 
+        $marketModulesDir = $config->get('fs/market_modules_dir');
+        if (!$marketModulesDir) {
+            $marketModulesDir = $rootDir.'/market-modules';
+            $config->set('fs/market_modules_dir', $marketModulesDir);
+        }
+
         // local configuration (db, enabled modules)
         $configDir = $config->get('fs/config_dir');
         if (!$configDir) {
@@ -206,10 +212,10 @@ class FCom_Core extends BClass
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
         $this->_modulesDirs[] = $rootDir.'/FCom';
-        $this->_modulesDirs[] = $rootDir.'/market/*';
-        $this->_modulesDirs[] = $rootDir.'/market/*/*';
-        $this->_modulesDirs[] = $rootDir.'/market-files/*';
-        $this->_modulesDirs[] = $rootDir.'/market-files/*/*';
+        //$this->_modulesDirs[] = $rootDir.'/market/*';
+        //$this->_modulesDirs[] = $rootDir.'/market/*/*';
+        $this->_modulesDirs[] = $rootDir.'/market-modules/*';
+        $this->_modulesDirs[] = $rootDir.'/market-modules/*/*';
         $this->_modulesDirs[] = $rootDir.'/local/*';
 
         foreach ($this->_modulesDirs as $dir) {
@@ -218,7 +224,8 @@ class FCom_Core extends BClass
 #BDebug::profile($d);
 
         BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+        //BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
+        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market-modules'));
         BClassAutoload::i(true, array('root_dir'=>$rootDir));
 
         return $this;

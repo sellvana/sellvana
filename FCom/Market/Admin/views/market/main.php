@@ -1,7 +1,11 @@
 <?php $m = $this->model;?>
 
-
-
+<?php if ($this->messages) :?>
+    <?php foreach($this->messages as $message): ?>
+        <?=$message?><br/>
+    <?php endforeach; ?>
+<?php endif; ?>
+        
 <h2><?=$m->module['name']?> (<?=$m->module['mod_name']?>)</h2>
     Version: <?=$m->module['version']?><br/>
     <?= $m->module['description']; ?>

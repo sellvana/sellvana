@@ -41,7 +41,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
         //$data = BLocale::getTranslations();
         //print_r($data);exit;
-        $modules = FCom_Market_Api::i()->getAllModules();
+        $modules = FCom_Market_MarketApi::i()->getAllModules();
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
 
         foreach($modules as $module){
@@ -71,7 +71,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleName = BRequest::i()->params('id', true);
 
-        $modulesList = FCom_Market_Api::i()->getAllModules();
+        $modulesList = FCom_Market_MarketApi::i()->getAllModules();
 
         $module = $modulesList[$moduleName];
         $model = new stdClass();
@@ -97,7 +97,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function formViewBefore($args)
     {
+        $messages = BSession::i()->messages();
         $m = $args['model'];
+        $args['view']->set(array('messages', $messages));
         $args['view']->set(array(
             'form_id' => BLocale::transliterate($this->_formLayoutName),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
@@ -112,16 +114,37 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleName = BRequest::i()->params('id', true);
 
-        $filename = FCom_Market_Api::i()->download($moduleName);
-        $res = FCom_Market_Api::i()->extract($filename);
+        $moduleFile = FCom_Market_MarketApi::i()->download($moduleName);
 
-        if (!$res) {
-            BSession::i()->addMessage("Permissions denied to write into storage dir: ".BConfig::i()->get('fs/storage_dir'));
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+        $marketPath = BConfig::i()->get('fs/market_modules_dir');
+
+        $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
+        if ($ftpenabled) {
+            $modulePath = dirname($moduleFile).'/'.$moduleName;
+            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $modulePath);
+            //copy modulePath by FTP to marketPath
+            if (!$res) {
+                BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+            }
+            $errors = FCom_Ftp_FtpClient::i()->ftpUpload($modulePath, $marketPath);
+            if ($errors) {
+                foreach($errors as $error) {
+                    BSession::i()->addMessage($error);
+                }
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+            }
+
+        } else {
+            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $marketPath);
+            if (!$res) {
+                BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath);
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+            }
         }
 
         if ($res) {
-            $modulesList = FCom_Market_Api::i()->getAllModules();
+            $modulesList = FCom_Market_MarketApi::i()->getAllModules();
             $module = $modulesList[$moduleName];
             $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
             if (!$modExist) {

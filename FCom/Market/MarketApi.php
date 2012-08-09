@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Market_Api extends BClass
+class FCom_Market_MarketApi extends BClass
 {
     public static function bootstrap()
     {
@@ -9,7 +9,7 @@ class FCom_Market_Api extends BClass
 
     public function getAllModules()
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url'). '/marketserver/modules';
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url'). '/market/modules';
         //$fulleronUrl = 'http://fulleron.home/marketserver/modules';
         if (empty($fulleronUrl)) {
             return false;
@@ -21,7 +21,7 @@ class FCom_Market_Api extends BClass
 
     public function download($moduleName)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') . '/marketserver/download?id='.$moduleName;
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') . '/market/download?id='.$moduleName;
         //$fulleronUrl = 'http://fulleron.home/marketserver/download?id='.$moduleName;
         //$fulleronUrl = 'http://fulleron.home/download/'.$moduleName.'.zip';
 
@@ -36,13 +36,12 @@ class FCom_Market_Api extends BClass
         }
         $filename = $path . $moduleName.'.zip';
         file_put_contents($filename, $data);
+
         return $filename;
     }
 
-    public function extract($filename)
+    public function extract($filename, $dir)
     {
-        $dir = BConfig::i()->get('fs/fcom_root_dir').'/market-files';
-
         $zip = new ZipArchive;
         $res = $zip->open($filename);
         if ($res === TRUE) {
