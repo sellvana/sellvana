@@ -19,6 +19,11 @@
             "root_dir": "BFireLogger",
             "bootstrap": {"file":"BFireLogger.php", "callback":"BFireLogger::bootstrap"},
             "version": "1.0.0"
+        },
+        "MarkdownExtra": {
+            "root_dir": "MarkdownExtra",
+            "bootstrap": {"file":"markdown.php", "callback":"Markdown_Extra_Loader::bootstrap"},
+            "version": "1.0.0"
         }
     }
 }
