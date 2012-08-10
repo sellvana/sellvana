@@ -212,6 +212,7 @@ class FCom_Core extends BClass
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
         $this->_modulesDirs[] = $rootDir.'/FCom';
+        $this->_modulesDirs[] = $rootDir.'/FCom/*';
         //$this->_modulesDirs[] = $rootDir.'/market/*';
         //$this->_modulesDirs[] = $rootDir.'/market/*/*';
         $this->_modulesDirs[] = $rootDir.'/market-modules/*';
