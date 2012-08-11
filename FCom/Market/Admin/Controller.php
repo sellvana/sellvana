@@ -67,6 +67,18 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         return $config;
     }
 
+    public function action_market()
+    {
+        $config = BConfig::i()->get('modules/FCom_Market');
+        $timestamp = time();
+        $token = sha1($config['id'].$config['salt'].$timestamp);
+
+        $this->view('market/market')->token = $token;
+        $this->view('market/market')->timestamp = $timestamp;
+        $this->view('market/market')->config = $config;
+        $this->layout('/market/market');
+    }
+
     public function action_form()
     {
         $moduleName = BRequest::i()->params('id', true);

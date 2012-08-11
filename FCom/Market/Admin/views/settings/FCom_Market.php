@@ -6,18 +6,26 @@
         <div>
             <table>
                 <tr>
-                    <td>API url</td>
+                    <td>API url (we can get rid of this later)</td>
                     <td>
                         <input size="50" type="text" name="config[modules][FCom_Market][market_url]"
                                value="<?php echo $this->q($c->get('modules/FCom_Market/market_url'))?>"/>
                     </td>
                 </tr>
                 <tr>
-                    <td>API token</td>
+                    <td>ID</td>
                     <td>
-                        <input size="50" type="text" name="config[modules][FCom_Market][token]"
-                               value="<?php echo $this->q($c->get('modules/FCom_Market/token'))?>"/> <br/>
+                        <input size="50" type="text" name="config[modules][FCom_Market][id]"
+                               value="<?php echo $this->q($c->get('modules/FCom_Market/id'))?>"/> <br/>
                         <input type="button" onclick="location.href='http://fulleron.com/market/account'" value="Get one" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Salt</td>
+                    <td>
+                        <input size="50" type="text" name="config[modules][FCom_Market][salt]"
+                               value="<?php echo $this->q($c->get('modules/FCom_Market/salt'))?>"/> <br/>
+                        <span style="color:red">Keep ID and SALT in secret</span>
                     </td>
                 </tr>
             </table>
