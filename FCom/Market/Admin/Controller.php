@@ -19,7 +19,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $formUrl = BApp::href($this->_gridHref.'/form');
         $config = array();
         $columns = array(
-            'id'=>array('label'=>'id', 'width'=>250, 'editable'=>true),
+            'mod_name'=>array('label'=>'Code', 'width'=>250, 'editable'=>true),
             'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
             'description' => array('label'=>'Description', 'width'=>250, 'editable'=>true),
             'version' => array('label'=>'Version', 'width'=>250, 'editable'=>true),
@@ -52,7 +52,8 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 $localVersion = $modulesInstalled[$module['mod_name']]->version;
             }
             $data[] = array(
-                'id' => $module['mod_name'],
+                'id' => $module['id'],
+                'mod_name' => $module['mod_name'],
                 'module' => $module['name'],
                 'version' => $module['version'],
                 'local_version' => $localVersion,
@@ -81,13 +82,12 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_form()
     {
-        $moduleName = BRequest::i()->params('id', true);
+        $moduleId = BRequest::i()->params('id', true);
 
-        $modulesList = FCom_Market_MarketApi::i()->getAllModules();
+        $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
 
-        $module = $modulesList[$moduleName];
         $model = new stdClass();
-        $model->id = $moduleName;
+        $model->id = $moduleId;
         $model->module = $module;
 
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
@@ -124,9 +124,12 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_install()
     {
-        $moduleName = BRequest::i()->params('id', true);
+        $moduleId = BRequest::i()->params('id', true);
 
-        $moduleFile = FCom_Market_MarketApi::i()->download($moduleName);
+        $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+        $moduleName = $module['mod_name'];
+
+        $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
 
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
 
@@ -156,21 +159,20 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         if ($res) {
-            $modulesList = FCom_Market_MarketApi::i()->getAllModules();
-            $module = $modulesList[$moduleName];
             $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
-            if (!$modExist) {
+            if ($modExist) {
                 $modExist->version = $module['version'];
                 $modExist->description = $module['description'];
                 $modExist->save();
             } else {
                 $data = array('name' => $module['name'], 'mod_name' => $module['mod_name'],
                     'version' => $module['version'], 'description' => $module['description']);
-                FCom_Market_Model_Modules::create($data)->save();
+                FCom_Market_Model_Modules::orm()->create($data)->save();
             }
         }
 
-        $this->forward('index');
+        BResponse::i()->redirect("index");
+        //$this->forward('index');
     }
 
 }
