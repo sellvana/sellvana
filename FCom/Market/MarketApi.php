@@ -7,10 +7,32 @@ class FCom_Market_MarketApi extends BClass
         //BConfig::i()->get('FCom_Market/market_url');
     }
 
+    private function getTokenUrl()
+    {
+        $config = BConfig::i()->get('modules/FCom_Market');
+        $timestamp = time();
+        $token = sha1($config['id'].$config['salt'].$timestamp);
+
+        $str = 'id='.$config['id'].'&token='.$token.'&ts='.$timestamp;
+        return $str;
+    }
+
     public function getAllModules()
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url'). '/market/modules';
-        //$fulleronUrl = 'http://fulleron.home/marketserver/modules';
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
+                . '/market/module/apilist'.'?'.$this->getTokenUrl();
+        if (empty($fulleronUrl)) {
+            return false;
+        }
+
+        $data = BUtil::fromJson(file_get_contents($fulleronUrl));
+        return $data;
+    }
+
+    public function getModuleById($moduleId)
+    {
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url').
+                '/market/module/apiinfo?modid='.$moduleId.'&'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
@@ -21,9 +43,8 @@ class FCom_Market_MarketApi extends BClass
 
     public function download($moduleName)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') . '/market/download?id='.$moduleName;
-        //$fulleronUrl = 'http://fulleron.home/marketserver/download?id='.$moduleName;
-        //$fulleronUrl = 'http://fulleron.home/download/'.$moduleName.'.zip';
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') .
+                '/market/module/apidownload?modid='.$moduleName.'&'.$this->getTokenUrl();
 
         $storage = BConfig::i()->get('fs/storage_dir');
         $data = file_get_contents($fulleronUrl);
