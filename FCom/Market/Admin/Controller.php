@@ -162,11 +162,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
             if ($modExist) {
                 $modExist->version = $module['version'];
-                $modExist->description = $module['description'];
+                $modExist->description = $module['short_description'];
                 $modExist->save();
             } else {
                 $data = array('name' => $module['name'], 'mod_name' => $module['mod_name'],
-                    'version' => $module['version'], 'description' => $module['description']);
+                    'version' => $module['version'], 'description' => $module['short_description']);
                 FCom_Market_Model_Modules::orm()->create($data)->save();
             }
         }
