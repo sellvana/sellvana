@@ -44,23 +44,26 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $modules = FCom_Market_MarketApi::i()->getMyModules();
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
 
-        foreach($modules as $module){
-            $notice = 'Get module';
-            $localVersion = '';
-            if (!empty($modulesInstalled[$module['mod_name']])) {
-                $notice = version_compare($module['version'], $modulesInstalled[$module['mod_name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
-                $localVersion = $modulesInstalled[$module['mod_name']]->version;
-            }
-            $data[] = array(
-                'id' => $module['id'],
-                'mod_name' => $module['mod_name'],
-                'module' => $module['name'],
-                'version' => $module['version'],
-                'local_version' => $localVersion,
-                'description' => $module['description'],
-                'notice' => $notice
-            );
+        $data = array();
+        if (!empty($modules)) {
+            foreach($modules as $module){
+                $notice = 'Get module';
+                $localVersion = '';
+                if (!empty($modulesInstalled[$module['mod_name']])) {
+                    $notice = version_compare($module['version'], $modulesInstalled[$module['mod_name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
+                    $localVersion = $modulesInstalled[$module['mod_name']]->version;
+                }
+                $data[] = array(
+                    'id' => $module['id'],
+                    'mod_name' => $module['mod_name'],
+                    'module' => $module['name'],
+                    'version' => $module['version'],
+                    'local_version' => $localVersion,
+                    'description' => $module['description'],
+                    'notice' => $notice
+                );
 
+            }
         }
         //print_r($data);exit;
         //exit;
