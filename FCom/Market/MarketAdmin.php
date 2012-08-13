@@ -19,8 +19,9 @@ class FCom_Market_Admin extends BClass
         BLayout::i()->layout(array(
             'base'=>array(
                 array('view', 'admin/header', 'do'=>array(
-                    array('addNav', 'system/market', array('label'=>'Market',
-                        'href'=>BApp::href('market/market'))),
+                    array('addNav', 'market', array('label'=>'Market', 'pos'=>100)),
+                    array('addNav', 'market/market', array('label'=>'Market Center', 'href'=>BApp::href('market/market'))),
+                    array('addNav', 'market/index', array('label'=>'My modules', 'href'=>BApp::href('market/index'))),
                 )),
             ),
             '/market'=>array(

@@ -17,10 +17,10 @@ class FCom_Market_MarketApi extends BClass
         return $str;
     }
 
-    public function getAllModules()
+    public function getMyModules()
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
-                . '/market/module/apilist'.'?'.$this->getTokenUrl();
+                . '/market/module/apimylist'.'?'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
