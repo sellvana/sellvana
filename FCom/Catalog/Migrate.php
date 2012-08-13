@@ -6,6 +6,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         BMigrate::install('0.1.1', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -152,6 +153,18 @@ class FCom_Catalog_Migrate extends BClass
         }
         BDb::run("
             ALTER TABLE ".$tProduct." ADD `weight` DECIMAL( 10, 4 ) NOT NULL
+        ");
+    }
+
+    public function upgrade_0_1_3()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo($tProduct, 'short_description')) {
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `short_description` TEXT after product_name
         ");
     }
 
