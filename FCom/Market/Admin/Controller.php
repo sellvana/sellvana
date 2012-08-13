@@ -143,21 +143,21 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             //copy modulePath by FTP to marketPath
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
             }
             $errors = FCom_Ftp_FtpClient::i()->ftpUpload($modulePath, $marketPath);
             if ($errors) {
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);
                 }
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
             }
 
         } else {
             $res = FCom_Market_MarketApi::i()->extract($moduleFile, $marketPath);
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath);
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleName}");
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
             }
         }
 
