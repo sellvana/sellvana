@@ -20,9 +20,9 @@
             "bootstrap": {"file":"BFireLogger.php", "callback":"BFireLogger::bootstrap"},
             "version": "1.0.0"
         },
-        "MarkdownExtra": {
+        "BMarkdownExtra": {
             "root_dir": "MarkdownExtra",
-            "bootstrap": {"file":"markdown.php", "callback":"Markdown_Extra_Loader::bootstrap"},
+            "bootstrap": {"file":"markdown.php", "callback":"BMarkdown_Extra_Loader::bootstrap"},
             "version": "1.0.0"
         }
     }

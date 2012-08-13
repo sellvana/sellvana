@@ -11,11 +11,11 @@
 # <http://daringfireball.net/projects/markdown/>
 #
 
-class Markdown_Extra_Loader
+class BMarkdown_Extra_Loader
 {
     static public function bootstrap()
     {
-        
+
     }
 }
 

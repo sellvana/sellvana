@@ -2,7 +2,7 @@
     'modules' => array(
         // catalog views and controllers
         'FCom_Cms' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.0',
             'root_dir' => '',
             'depends' => array('FCom_Core', 'BPHPTAL'),
             'translations' => array('de' => 'de.csv'),
