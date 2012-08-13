@@ -41,7 +41,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
         //$data = BLocale::getTranslations();
         //print_r($data);exit;
-        $modules = FCom_Market_MarketApi::i()->getAllModules();
+        $modules = FCom_Market_MarketApi::i()->getMyModules();
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
 
         foreach($modules as $module){
