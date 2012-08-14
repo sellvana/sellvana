@@ -136,6 +136,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
         $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
 
+        if (!$moduleFile) {
+            BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
+        }
+
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
@@ -156,6 +161,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
 
         } else {
+            if (!class_exists('ZipArchive')) {
+                BSession::i()->addMessage("Class ZipArchive not exist ", 'error');
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
+            }
+            
             $res = FCom_Market_MarketApi::i()->extract($moduleFile, $marketPath);
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');

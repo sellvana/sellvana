@@ -63,6 +63,9 @@ class FCom_Market_MarketApi extends BClass
 
     public function extract($filename, $dir)
     {
+        if (!class_exists('ZipArchive')) {
+            return false;
+        }
         $zip = new ZipArchive;
         $res = $zip->open($filename);
         if ($res === TRUE) {
