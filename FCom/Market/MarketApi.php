@@ -78,7 +78,7 @@ class FCom_Market_MarketApi extends BClass
                 return true;
             }
         }
-        $this->error = $zip->getStatusString();
+        $this->error = ZipArchive::getStatusString();
         return false;
     }
 
