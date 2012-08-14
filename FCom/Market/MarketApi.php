@@ -76,9 +76,13 @@ class FCom_Market_MarketApi extends BClass
             $zip->close();
             if ($res) {
                 return true;
+            } else {
+                $this->error = "Can't extract zip archive: ".$filename . " to ".$dir;
             }
+        } else {
+            $this->error = "Can't open zip archive: ".$filename;
         }
-        $this->error = ZipArchive::getStatusString();
+
         return false;
     }
 
