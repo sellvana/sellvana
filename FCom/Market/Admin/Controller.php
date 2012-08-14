@@ -161,14 +161,14 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
 
         } else {
-            if (!class_exists('ZipArchive')) {
-                BSession::i()->addMessage("Class ZipArchive not exist ", 'error');
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
-            }
-            
             $res = FCom_Market_MarketApi::i()->extract($moduleFile, $marketPath);
             if (!$res) {
-                BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');
+                $error = FCom_Market_MarketApi::i()->getErrors();
+                if ($error) {
+                    BSession::i()->addMessage($error, 'error');
+                } else {
+                    BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');
+                }
                 BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
             }
         }
