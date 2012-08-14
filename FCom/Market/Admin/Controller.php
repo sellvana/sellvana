@@ -59,7 +59,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                     'module' => $module['name'],
                     'version' => $module['version'],
                     'local_version' => $localVersion,
-                    'description' => $module['description'],
+                    'description' => $module['short_description'],
                     'notice' => $notice
                 );
 
