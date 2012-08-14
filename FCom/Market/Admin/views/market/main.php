@@ -1,11 +1,15 @@
 <?php $m = $this->model;?>
 
-<?php if ($this->messages) :?>
-    <?php foreach($this->messages as $message): ?>
-        <?=$message?><br/>
+<?php if ($m->messages) :?>
+    <?php foreach($m->messages as $message): ?>
+        <?php if ('error' == $message['type']) :?>
+            <span style="color:red"><?=$message['msg']?></span><br/>
+        <?php else:?>
+            <span style="color:green"><?=$message['msg']?></span><br/>
+        <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>
-        
+
 <h2><?=$m->module['name']?> (<?=$m->module['mod_name']?>)</h2>
     Version: <?=$m->module['version']?><br/>
     <?= $m->module['description']; ?>

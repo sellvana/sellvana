@@ -66,11 +66,12 @@ class FCom_Market_MarketApi extends BClass
         $zip = new ZipArchive;
         $res = $zip->open($filename);
         if ($res === TRUE) {
-            $zip->extractTo($dir);
+            $res = $zip->extractTo($dir);
             $zip->close();
-            return true;
-        } else {
-            return false;
+            if ($res) {
+                return true;
+            }
         }
+        return false;
     }
 }
