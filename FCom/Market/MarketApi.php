@@ -2,6 +2,8 @@
 
 class FCom_Market_MarketApi extends BClass
 {
+    private $error='';
+
     public static function bootstrap()
     {
         //BConfig::i()->get('FCom_Market/market_url');
@@ -64,6 +66,7 @@ class FCom_Market_MarketApi extends BClass
     public function extract($filename, $dir)
     {
         if (!class_exists('ZipArchive')) {
+            $this->error = "Class ZipArchive doesn't exist";
             return false;
         }
         $zip = new ZipArchive;
@@ -75,6 +78,12 @@ class FCom_Market_MarketApi extends BClass
                 return true;
             }
         }
+        $this->error = $zip->getStatusString();
         return false;
+    }
+
+    public function getErrors()
+    {
+        return $this->error;
     }
 }
