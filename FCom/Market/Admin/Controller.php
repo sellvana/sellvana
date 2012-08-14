@@ -186,7 +186,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 FCom_Market_Model_Modules::orm()->create($data)->save();
             }
         }
-        BSession::i()->addMessage("Module successfully installed.");
+        BSession::i()->addMessage("Module successfully uploaded.");
         BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'info');
         //BResponse::i()->redirect("index");
         //$this->forward('index');
