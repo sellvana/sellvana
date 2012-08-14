@@ -15,7 +15,8 @@
     <?= $m->module['description']; ?>
     <br/>
     <?php if($m->local_version): ?>
-        Local version is: <?= $m->local_version ?>
+        Local version is: <?= $m->local_version ?> <br/>
+        <a href="<?=BApp::href('market/install')?>?id=<?=$m->id?>">Re-upload</a>
     <?php else:?>
         <a href="<?=BApp::href('market/install')?>?id=<?=$m->id?>">Install</a>
     <?php endif; ?>
