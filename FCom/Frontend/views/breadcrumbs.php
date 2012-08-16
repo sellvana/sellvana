@@ -27,13 +27,13 @@ unset($c);
 ?>
     <div class="breadcrumbs">
         <ul>
-<? foreach ($crumbs as $c): ?>
+<?php foreach ($crumbs as $c): ?>
             <li <?=!empty($c['li_class'])?'class="'.$c['li_class'].'"':''?>>
-<? if (!empty($c['href'])): ?><a href="<?=$c['href']?>" <?=!empty($c['title'])?'title="'.$c['title'].'"':''?>><?=$this->q($c['label'])?></a>
-<? else: ?><strong><?=$this->q($c['label'])?></strong>
-<? endif ?>
+<?php if (!empty($c['href'])): ?><a href="<?=$c['href']?>" <?=!empty($c['title'])?'title="'.$c['title'].'"':''?>><?=$this->q($c['label'])?></a>
+<?php else: ?><strong><?=$this->q($c['label'])?></strong>
+<?php endif ?>
             </li>
-<? endforeach ?>
+<?php endforeach ?>
         </ul>
     </div>
-<? endif ?>
+<?php endif ?>

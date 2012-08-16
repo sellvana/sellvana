@@ -1,10 +1,10 @@
 <?=$this->view('indextank/product/pager')->set('state', $this->products_data['state'])?>
 
-<? if (!$this->products_data['state']['c']): ?>
+<?php if (!$this->products_data['state']['c']): ?>
 
-    <p class="note-msg"><?= BLocale::_("There are no products matching the selection"); ?>.</p>
+    <p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 
-<? else: ?>
+<?php else: ?>
 <div style="width: 750px; float: right; margin-top: 20px;">
     <table class="product-list">
         <col width="30"/>
@@ -20,4 +20,4 @@
 </div>
     <?=$this->view('indextank/product/filters')->set('state', $this->products_data['state'])?>
 
-<? endif ?>
+<?php endif ?>

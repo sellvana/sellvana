@@ -1,9 +1,9 @@
 
-<? if (!$this->products_data['state']['c']): ?>
+<?php if (!$this->products_data['state']['c']): ?>
 
-    <p class="note-msg"><?= BLocale::_("There are no products matching the selection"); ?>.</p>
+    <p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 
-<? else: ?>
+<?php else: ?>
 
     <?=$this->view('catalog/product/pager')->set('state', $this->products_data['state'])?>
     <?=$this->view('catalog/compare/block')?>
@@ -19,4 +19,4 @@
         </tbody>
     </table>
 
-<? endif ?>
+<?php endif ?>

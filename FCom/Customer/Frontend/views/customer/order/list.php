@@ -1,13 +1,13 @@
-<h2><?= BLocale::_("Orders history"); ?></h2>
+<h2><?= BLocale::_("Orders history") ?></h2>
 
 <?php if ($this->orders) :?>
     <table border="1">
         <tr>
             <th width="50px;">ID</th>
-            <th width="200px;"><?= BLocale::_("Shipping"); ?></th>
-            <th width="200px;"><?= BLocale::_("Payment"); ?></th>
-            <th width="200px;"><?= BLocale::_("Status"); ?></th>
-            <th width="200px;"><?= BLocale::_("Balance"); ?></th>
+            <th width="200px;"><?= BLocale::_("Shipping") ?></th>
+            <th width="200px;"><?= BLocale::_("Payment") ?></th>
+            <th width="200px;"><?= BLocale::_("Status") ?></th>
+            <th width="200px;"><?= BLocale::_("Balance") ?></th>
         </tr>
     <?php foreach($this->orders as $order) :?>
         <tr>

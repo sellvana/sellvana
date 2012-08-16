@@ -55,4 +55,4 @@ head(function() {
 })
 
 </script>
-<?php echo $this->hook('catalog/products/tab/images', array('model'=>$this->model)); ?>
+<?php echo $this->hook('catalog/products/tab/images', array('model'=>$this->model)) ?>

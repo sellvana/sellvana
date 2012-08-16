@@ -74,4 +74,4 @@ head(function() {
 
 <?php endif ?>
 
-<?php echo $this->hook('catalog/products/tab/main', array('model'=>$this->model)); ?>
+<?php echo $this->hook('catalog/products/tab/main', array('model'=>$this->model)) ?>
