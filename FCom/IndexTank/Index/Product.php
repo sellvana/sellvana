@@ -104,6 +104,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function scoringBy($function)
     {
         $this->model();
+
         if (empty($this->_functions[$function])) {
             return;
         }
@@ -612,8 +613,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
         $variables = array();
         foreach ($fieldsList as $field) {
-            $variables[$field->var_number] = $variablesList[$field->source_value];
+            $variables[$field->var_number] = $variablesList[$field->field_name];
         }
+
         return $variables;
     }
 
@@ -662,7 +664,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * }
      */
 
-    private function fieldGetCategories($product, $type='')
+    public function fieldGetCategories($product, $type='')
     {
         $categories = array();
         $productCategories = $product->categories(false); //get all categories for product
@@ -678,7 +680,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $categories;
     }
 
-    private function fieldPriceRange($product, $type='')
+    public function fieldPriceRange($product, $type='')
     {
         if ($product->min_price < 100) {
             return '$0 to $99';
@@ -703,5 +705,31 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
 
 
+    }
+
+    public function fieldProductNameToOrdinal($product, $type='')
+    {
+        $string = BLocale::transliterate($product->product_name, '');
+
+        if (empty($string)) {
+            return '';
+        }
+
+
+
+        $cycles = 10;
+        $string = str_pad($string, $cycles, 0);
+        //$cycles = $indexLen < strlen($string) ? $indexLen : strlen($string);
+        $result = 0;
+        $c = $cycles;
+        for($i = 0; $i < $cycles ; $i++){
+            if ($c <= 0 ) {
+                $c = 1;
+            }
+            $result += (ord($string[$i])-48)*pow(36, $c);
+            $c -= 2;
+        }
+        //echo $result;exit;
+        return $result;
     }
 }

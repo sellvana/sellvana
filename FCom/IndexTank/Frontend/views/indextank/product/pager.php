@@ -7,8 +7,8 @@ $psOptions = array(2, 25, 50, 100, 500, 30000);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
-    'product_name|asc' => 'Product Name (A-Z)',
-    'product_name|desc' => 'Product Name (Z-A)',
+    'product_name_asc' => 'Product Name (A-Z)',
+    'product_name_desc' => 'Product Name (Z-A)',
     'base_price_asc' => 'Price (Lower first)',
     'base_price_desc' => 'Price (Higher first)',
 );
