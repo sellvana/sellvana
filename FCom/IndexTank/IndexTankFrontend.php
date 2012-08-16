@@ -31,8 +31,10 @@ class FCom_IndexTank_Frontend extends BClass
             )),
             '/indextank/search'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('indextank/search'))
-            )
+                array('hook', 'main', 'views'=>array('catalog/search')),
+                array('hook', 'search_filters_block', 'views'=>array('indextank/product/filters'))
+            ),
+
         ));
     }
 }
