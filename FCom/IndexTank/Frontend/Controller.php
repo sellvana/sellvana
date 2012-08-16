@@ -52,7 +52,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
             die('Please set up correct API URL at Admin Setting page');
         }
-
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
 
         BApp::i()

@@ -173,6 +173,7 @@ class BDb
     */
     public static function run($sql, $params=null, $options=array())
     {
+        BDb::connect();
         $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
         $results = array();
         foreach ($queries as $i=>$query){
