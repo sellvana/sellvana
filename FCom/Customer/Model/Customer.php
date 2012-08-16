@@ -113,7 +113,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>$this));
+        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
 
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;

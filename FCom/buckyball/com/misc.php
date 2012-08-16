@@ -3,7 +3,7 @@
 /**
 * Utility class to parse and construct strings and data structures
 */
-class BUtil
+class BUtil extends BClass
 {
     /**
     * IV for mcrypt operations
@@ -39,6 +39,16 @@ class BUtil
     * @var string
     */
     protected static $_hashSep = '$';
+
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return BUtil
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
 
     /**
     * Convert any data to JSON string

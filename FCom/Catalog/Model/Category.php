@@ -20,7 +20,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function url()
     {
-        return BApp::href('c/'.$this->url_path);
+        return BApp::href($this->url_path);
     }
 
     public function onReorderAZ($args)

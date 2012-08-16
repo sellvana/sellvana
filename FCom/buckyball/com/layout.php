@@ -1312,7 +1312,7 @@ class BViewHead extends BView
                 $this->_headJs['loaded'] = $name;
             }
         }
-BDebug::debug('EXT.RESOURCE '.$name.': '.print_r($this->_elements[$type.':'.$name], 1));
+#BDebug::debug('EXT.RESOURCE '.$name.': '.print_r($this->_elements[$type.':'.$name], 1));
         return $this;
     }
 

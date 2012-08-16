@@ -1246,7 +1246,14 @@ class BFrontController extends BClass
         uasort($this->_routes, function($a, $b) {
             $a1 = $a->num_parts;
             $b1 = $b->num_parts;
-            return $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
+            $res = $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
+            if ($res != 0) {
+                return $res;
+            }
+
+            $ap = strpos($a->route_name, "*");
+            $bp = strpos($b->route_name, "*");
+            return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
         return $this;
     }
