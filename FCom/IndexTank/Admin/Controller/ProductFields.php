@@ -9,33 +9,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function gridConfig()
     {
-
-        //testing
-        //$product = FCom_Catalog_Model_Product::load(1);
-/*
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('a super module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('a test ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('b product ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('c module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('FCom Coolmod module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('l module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('Product 3 ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('super module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('Testmod module ');
-        echo "<br>";
-        echo FCom_IndexTank_Index_Product::i()->fieldProductNameToOrdinal('very cool module ');
-exit;
- * 
- */
-
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
         if ($indexingStatus) {
             BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
