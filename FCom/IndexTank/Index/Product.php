@@ -424,17 +424,17 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 //get other fields
                 if (isset($facetsFields[$fname])) {
                     foreach ($fvalues as $fvalue => $fcount) {
-                            $obj = new stdClass();
-                            $obj->name = $fvalue;
-                            $obj->count = $fcount;
-                            $obj->key = $fname;
-                            $obj->category = false;
-                            if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
-                                $obj->param = "f[{$obj->key}][{$obj->name}]";
-                            } else {
-                                $obj->param = "f[{$obj->key}][]";
-                            }
-                            $facetsData[$facetsFields[$fname]->field_nice_name][] = $obj;
+                        $obj = new stdClass();
+                        $obj->name = $fvalue;
+                        $obj->count = $fcount;
+                        $obj->key = $fname;
+                        $obj->category = false;
+                        if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
+                            $obj->param = "f[{$obj->key}][{$obj->name}]";
+                        } else {
+                            $obj->param = "f[{$obj->key}][]";
+                        }
+                        $facetsData[$facetsFields[$fname]->field_nice_name][] = $obj;
                     }
                 }
             }
@@ -451,15 +451,62 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         if ($facets) {
             $urlPath = '';
             //get categories
+            $catIds = array();
+            foreach ($facets as $fname => $fvalues) {
+                //hard coded ct_categories prefix
+                if (strpos($fname, 'ct_') !== false) {
+                    $catIds[] = substr($fname, 3);
+                }
+            }
+            $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+            // fetch all ascendants that do not have products
+            $ascIds = array();
+            foreach ($categories as $cat) {
+                foreach (explode('/', $cat->id_path) as $id) {
+                    if ($id>1 && empty($categories[$id])) {
+                        $ascIds[$id] = 1;
+                    }
+                }
+            }
+            if ($ascIds) {
+                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', array_keys($ascIds))->find_many_assoc();
+                foreach ($ascendants as $id=>$cat) {
+                    $categories[$id] = $cat;
+                }
+            }
+            // sort by full name (including hierarchy)
+            uasort($categories, function($a, $b) {
+                return $a->full_name<$b->full_name ? -1 : ($a->full_name>$b->full_name ? 1 : 0);
+            });
+            foreach ($categories as $cat) {
+                $level = count(explode("/", $cat->id_path))-1;
+                $fvalues = !empty($facets['ct_'.$cat->id]) ? $facets['ct_'.$cat->id] : array($cat->node_name => '');
+                foreach ($fvalues as $fvalue => $fcount) {
+                    $obj = new stdClass();
+                    $obj->show_count = true;
+                    $obj->name = $fvalue;
+                    $obj->url_path = $cat->url_path;
+                    $obj->count = $fcount;
+                    $obj->key = $this->getCategoryKey($cat);
+                    $obj->level = $level;
+                    $obj->category = true;
+                    if ($categorySelected == $obj->key) {
+                        $urlPath = $cat->url_path;
+                    }
+                    $obj->param = "f[category]";
+                    $categoryData['Categories'][$cat->id_path] = $obj;
+                }
+            }
+            /*
             foreach ($facets as $fname => $fvalues) {
                 //hard coded ct_categories prefix
                 $pos = strpos($fname, 'ct_');
                 if ($pos !== false) {
-                    $cat_id = substr($fname, strlen('ct_'));
-                    $category = FCom_Catalog_Model_Category::i()->load($cat_id);
-                    if (!$category) {
+                    $cat_id = substr($fname, 3);
+                    if (empty($categories[$cat_id])) {
                         continue;
                     }
+                    $category = $categories[$cat_id];
                     $level = count(explode("/", $category->id_path))-1;
                     foreach ($fvalues as $fvalue => $fcount) {
                         $obj = new stdClass();
@@ -478,19 +525,20 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     }
                 }
             }
-
             if (!empty($categoryData['Categories'])) {
-                ksort($categoryData['Categories']);
-            }
-            //show total count only for children categoris
-            foreach ($categoryData['Categories'] as $obj) {
-                if (!$obj->url_path || !$urlPath) {
-                    continue;
+                //ksort($categoryData['Categories']);
+
+                //show total count only for children categoris
+                foreach ($categoryData['Categories'] as $obj) {
+                    if (!$obj->url_path || !$urlPath) {
+                        continue;
+                    }
+                    if (strpos($obj->url_path, $urlPath) === 0) {
+                        $obj->show_count = true;
+                    }
                 }
-                if (strpos($obj->url_path, $urlPath) === 0) {
-                    $obj->show_count = true;
-                }
             }
+            */
         }
         return $categoryData;
     }
@@ -508,7 +556,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     break;
                 case 'function':
                     //call function
-                    $valuesList = $this->{$field->source_value}($product, $type);
+                    if (strpos($field->source_value, '::')) {
+                        $callback = $field->source_value;
+                    } elseif (strpos($field->source_value, '.')) {
+                        $callback = BUtil::extCallback($field->source_value);
+                    } else {
+                        $callback = array($this, $field->source_value);
+                    }
+                    $valuesList = call_user_func($callback, $product, $type);
                     //process results
                     if ($valuesList) {
                         if (is_array($valuesList)) {
@@ -610,7 +665,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     private function fieldGetCategories($product, $type='')
     {
         $categories = array();
-        $productCategories = $product->categories(); //get all categories for product
+        $productCategories = $product->categories(false); //get all categories for product
         if ($productCategories) {
             foreach ($productCategories as $cat) {
                 $catPath = $this->getCategoryKey($cat);//str_replace("/","__",$cat->url_path);
