@@ -67,11 +67,30 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * Find all categories which belong to product
      * @return type
      */
-    public function categories()
+    public function categories($includeAscendants=false)
     {
-        return FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
-                ->join('FCom_Catalog_Model_Category', array('cp.category_id','=','c.id'), 'c')
-                ->where('cp.product_id', $this->id())->find_many();
+        $categories = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+            ->join('FCom_Catalog_Model_Category', array('cp.category_id','=','c.id'), 'c')
+            ->where('cp.product_id', $this->id())->find_many_assoc('cp.category_id');
+
+        if ($includeAscendants) {
+            $ascIds = array();
+            foreach ($categories as $cat) {
+                foreach (explode($cat->id_path, '/') as $id) {
+                    if ($id>1 && empty($categories[$id])) {
+                        $ascIds[$id] = 1;
+                    }
+                }
+            }
+            if ($ascIds) {
+                $hlp = FCom_Catalog_Model_CategoryProduct::i();
+                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $ascIds)->find_many_assoc();
+                foreach ($ascendants as $id=>$cat) {
+                    $categories[$id] = $hlp->create($cat->as_array());
+                }
+            }
+        }
+        return $categories;
     }
 /*
     public function customFields($product)
