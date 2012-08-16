@@ -101,8 +101,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * @param string $function
      * @throws Exception
      */
-    public function scoringBy($function)
+    public function scoringBy($scoringVar)
     {
+        if (strpos($scoringVar, "|")) {
+            list($field, $order) = explode("|", $scoringVar);
+            $function = $field.'_'.$order;
+        } else {
+            $function = $scoringVar;
+        }
         $this->model();
 
         if (empty($this->_functions[$function])) {
@@ -228,6 +234,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         foreach ($result->results as $res) {
             $products[] = $res->docid;
         }
+
         if (!$products) {
             return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id',array(-1));
         }
@@ -715,21 +722,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             return '';
         }
 
-
-
-        $cycles = 10;
-        $string = str_pad($string, $cycles, 0);
-        //$cycles = $indexLen < strlen($string) ? $indexLen : strlen($string);
+        $indexLen = 5;
+        $cycles = $indexLen < strlen($string) ? $indexLen : strlen($string);
         $result = 0;
-        $c = $cycles;
+        $pow = $indexLen;
         for($i = 0; $i < $cycles ; $i++){
-            if ($c <= 0 ) {
-                $c = 1;
-            }
-            $result += (ord($string[$i])-48)*pow(36, $c);
-            $c -= 2;
+            $result += (ord($string[$i])-48)*pow(36, $pow--);
         }
-        //echo $result;exit;
         return $result;
     }
 }

@@ -1,8 +1,7 @@
 <?php
 $s = $this->state;
 ?>
-
-
+<h2>Filters</h2>
 <div style="width: 200px; ">
 
     <form  method="get" action="">
