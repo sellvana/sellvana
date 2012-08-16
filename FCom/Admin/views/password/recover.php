@@ -1,4 +1,4 @@
-<?php $storeName = BConfig::i()->get('modules/FCom_Core/store_name'); ?>
+<?php $storeName = BConfig::i()->get('modules/FCom_Core/store_name') ?>
 <section class="adm-login-form">
     <h3 class="app-logo"><?=$this->q($storeName)?></h3>
     <form method="post" action="<?=BApp::href('password/recover')?>">

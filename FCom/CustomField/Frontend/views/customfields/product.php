@@ -5,7 +5,7 @@ if (!$fields) {
     return;
 }
 ?>
-<h2><?= BLocale::_("Custom fields here"); ?></h2>
+<h2><?= BLocale::_("Custom fields here") ?></h2>
 <?php foreach($fields as $f): ?>
     <?=$f->frontend_label?>: <?=$prod->{$f->field_code}?><br/>
 <?php endforeach; ?>

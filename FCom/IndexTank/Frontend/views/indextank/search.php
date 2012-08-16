@@ -1,6 +1,6 @@
 <div class="col-main">
         <div class="page-title category-title">
-            <h1><?= BLocale::_("Search"); ?>: <?=$this->q($this->query)?></h1>
+            <h1><?= BLocale::_("Search") ?>: <?=$this->q($this->query)?></h1>
         </div>
 
         <?=$this->view('indextank/product/list')?>

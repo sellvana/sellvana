@@ -1,4 +1,4 @@
-<?php $c = FCom_Customer_Import::i()->config(); $start = BRequest::i()->get('start'); ?>
+<?php $c = FCom_Customer_Import::i()->config(); $start = BRequest::i()->get('start') ?>
 
 <?php if ($start || $c['status']==='running'): ?>
 
@@ -21,7 +21,7 @@ setTimeout(function() {
 <?php endif ?>
 
 <?php if (!empty($c['status']) && isset($c['rows_processed'])): ?>
-<?php $pct = intval($c['rows_processed']/$c['rows_total']*100); ?>
+<?php $pct = intval($c['rows_processed']/$c['rows_total']*100) ?>
 <table class="data-table">
     <tr>
         <th>Status</th>

@@ -6,7 +6,7 @@
     <input name="review[rating]" type="radio" class="star" value="4"/>
     <input name="review[rating]" type="radio" class="star" value="5"/>
     <br/>
-    <input type="text" name="review[title]" placeholder="<?= BLocale::_("Title"); ?>" /><br/>
-    <textarea name="review[text]" placeholder="<?= BLocale::_("Your review here"); ?>"></textarea><br/>
+    <input type="text" name="review[title]" placeholder="<?= BLocale::_("Title") ?>" /><br/>
+    <textarea name="review[text]" placeholder="<?= BLocale::_("Your review here") ?>"></textarea><br/>
     <input type="submit">
 </form>
