@@ -25,11 +25,22 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
             return false;
         }
 
-        $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products();"><span>Index All Products</span></button>
+        //BConfig::i()->set('modules/FCom_IndexTank/cron_indexing', 1);
+        $cronIndexing = 0;
+        //echo $cronIndexing;exit;
+        if ($cronIndexing) {
+            $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products_stop();"><span>Stop Products Indexing</span></button>';
+        } else {
+            $insert = '<button class="st1 sz2 btn" onclick="ajax_index_all_products_start();"><span>Start Products Indexing</span></button>';
+        }
+
+        $insert .= '
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
-function ajax_index_all_products() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
-    .done(function( msg ) { alert( "Products re-indexing scheduled" ); }); }
+function ajax_index_all_products_start() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index').'"})
+    .done(function( msg ) { alert( "Products re-indexing started" ); }); }
+function ajax_index_all_products_stop() { $.ajax({ type: "GET", url: "'.BApp::href('indextank/products/index-stop').'"})
+    .done(function( msg ) { alert( "Products re-indexing interrupted" ); }); }
 function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href('indextank/products/index').'"})
     .done(function( msg ) { alert( "Index recreated" ); }); }
 </script>

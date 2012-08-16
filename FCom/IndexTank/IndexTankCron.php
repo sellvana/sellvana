@@ -11,6 +11,7 @@ class FCom_IndexTank_Cron extends BClass
     public function indexAll()
     {
         set_time_limit(0);
+
         //first finish not finsihed
         $this->indexAllInIndexing();
         //then finit not indexed
