@@ -581,7 +581,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         }  else {
                             $result[$field->field_name] = $valuesList;
                         }
-
+                    } else {
+                        $result[$field->field_name] = '';
                     }
                     break;
             }

@@ -71,7 +71,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $categories = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
             ->join('FCom_Catalog_Model_Category', array('cp.category_id','=','c.id'), 'c')
-            ->where('cp.product_id', $this->id())->find_many_assoc('cp.category_id');
+            ->where('cp.product_id', $this->id())->find_many_assoc();
 
         if ($includeAscendants) {
             $ascIds = array();
