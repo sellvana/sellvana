@@ -53,4 +53,4 @@ head(function() {
     new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
 })
 </script>
-<?php echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model)); ?>
+<?php echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model)) ?>

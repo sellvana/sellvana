@@ -3,13 +3,13 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 ?>
     <div class="col-main">
         <div class="page-title category-title">
-            <h1><?= BLocale::_("Cart"); ?></h1>
+            <h1><?= BLocale::_("Cart") ?></h1>
         </div>
-<? if (!$this->cart->items()): ?>
+<?php if (!$this->cart->items()): ?>
 
-    <p class="note-msg"><?= BLocale::_("There are no products matching the selection"); ?>.</p>
+    <p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 
-<? else: ?>
+<?php else: ?>
 
     <form name="cart" action="<?=BApp::href('cart')?>" method="post">
         <table class="product-list">
@@ -21,15 +21,15 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
             <col width="70"/>
             <thead>
                 <tr>
-                    <td><?= BLocale::_("Remove"); ?></td>
-                    <td colspan="2"><?= BLocale::_("Product"); ?></td>
-                    <td><?= BLocale::_("Price"); ?></td>
-                    <td><?= BLocale::_("Qty"); ?></td>
-                    <td><?= BLocale::_("Subtotal"); ?></td>
+                    <td><?= BLocale::_("Remove") ?></td>
+                    <td colspan="2"><?= BLocale::_("Product") ?></td>
+                    <td><?= BLocale::_("Price") ?></td>
+                    <td><?= BLocale::_("Qty") ?></td>
+                    <td><?= BLocale::_("Subtotal") ?></td>
                 </tr>
             </thead>
             <tbody>
-<? foreach ($this->cart->items() as $item): $p = $item->product() ?>
+<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
                 <tr id="tr-product-<?=$p->id?>">
                     <td class="first a-center">
                         <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="<?=$item->id?>"></label>
@@ -52,7 +52,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
                         <span class="price">$<?=number_format($item->rowTotal(), 2)?></span>
                     </td>
                 </tr>
-<? endforeach ?>
+<?php endforeach ?>
             </tbody>
             <tfoot>
                 <td></td>
@@ -60,12 +60,12 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
                 <td></td>
                 <td>
                     <?php if ($this->redirectLogin) :?>
-                        <a href="<?=BApp::href('checkout/login')?>"><?= BLocale::_("Checkout"); ?></a>
+                        <a href="<?=BApp::href('checkout/login')?>"><?= BLocale::_("Checkout") ?></a>
                     <?php else :?>
-                        <a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout"); ?></a>
+                        <a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout") ?></a>
                     <?php endif; ?>
                 </td>
-                <td><input type="submit" class="button" value="<?= BLocale::_("Update Cart"); ?>"/></td>
+                <td><input type="submit" class="button" value="<?= BLocale::_("Update Cart") ?>"/></td>
                 <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
             </tfoot>
         </table>
@@ -75,7 +75,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
         <table>
             <?php if ($this->shipping_esitmate): ?>
             <tr>
-                <td><?= BLocale::_("Shipping estimate"); ?>:<br/>
+                <td><?= BLocale::_("Shipping estimate") ?>:<br/>
                     <?php if ($this->shipping_esitmate) :?>
                     <ul>
                         <?php foreach($this->shipping_esitmate as $estimate): ?>
@@ -87,14 +87,14 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
             </tr>
             <?php endif; ?>
             <tr>
-                <td><?= BLocale::_("Post code"); ?>: <input type="text" size="4" name="postcode" value=""/></td>
+                <td><?= BLocale::_("Post code") ?>: <input type="text" size="4" name="postcode" value=""/></td>
             </tr>
             <tr>
-                <td><input type="submit" class="button" value="<?= BLocale::_("Estimate shipping"); ?>"/></td>
+                <td><input type="submit" class="button" value="<?= BLocale::_("Estimate shipping") ?>"/></td>
             </tr>
         </table>
     </form>
-<? endif ?>
+<?php endif ?>
 
     </div>
 <script>

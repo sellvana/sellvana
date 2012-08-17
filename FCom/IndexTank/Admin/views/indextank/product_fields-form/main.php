@@ -34,13 +34,8 @@
             <h4 class="label">Scoring variable</h4>
             <input type="hidden" name="model[scoring]" value="0" checked />
             <input type="checkbox" name="model[scoring]" value="1" <?= $m->scoring ?'checked' : '' ?>/>
-            (Scoring accept only float or integer type of variables. Text fields couldn't be used as scoring variable without transformation.)
-        </li>
-
-        <li>
-            <h4 class="label">Variable number (only for variables)</h4>
-            <input type="text" size="3" name="model[var_number]" value="<?php echo $m->var_number ?>"/>
-            (Start from 0)
+            (Scoring accept only float or integer type of variables. Text fields couldn't be used as scoring variable without transformation.
+            Variable number will be assigned automatically)
         </li>
 
         <li>

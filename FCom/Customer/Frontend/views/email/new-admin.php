@@ -1,4 +1,4 @@
-<? $d = $this->customer ?>
+<?php $d = $this->customer ?>
 <!--{ From: "<?=$d->firstname.' '.$d->lastname?>" <<?=$d->email?>> }-->
 <!--{ To: "Fulleron" <support@fulleron.com> }-->
 <!--{ Subject: New Customer Registration }-->

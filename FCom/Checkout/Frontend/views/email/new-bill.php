@@ -1,4 +1,4 @@
-<? $order = $this->order ?>
+<?php $order = $this->order ?>
 <!--{ Content-Type: text/html; charset=UTF-8 }-->
 <!--{ From: "Fulleron" <support@fulleron.com> }-->
 <!--{ To: "<?=$order->billing()->firstname.' '.$order->billing()->lastname?>" <<?=$order->billing()->email?>> }-->

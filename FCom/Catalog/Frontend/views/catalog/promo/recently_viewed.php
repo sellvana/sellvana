@@ -1,6 +1,6 @@
 <div class="block block-list block-viewed">
     <div class="block-title">
-        <strong><span><?= BLocale::_("Recently Viewed Products"); ?></span></strong>
+        <strong><span><?= BLocale::_("Recently Viewed Products") ?></span></strong>
     </div>
     <div class="block-content">
         <ol id="recently-viewed-items">

@@ -434,11 +434,11 @@ class BRequest extends BClass
     public static function csrf()
     {
         $c = BConfig::i();
-        
+
         $m = $c->get('web/csrf_methods');
         $methods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
         $whitelist = $c->get('web/csrf_whitelist');
-        
+
         if (is_array($methods) && !in_array(static::method(), $methods)) {
             return false; // not one of checked methods, pass
         }
@@ -1175,7 +1175,7 @@ class BFrontController extends BClass
     }
 
     /**
-    * Declare RESTful route
+    * Declare route
     *
     * @param string $route
     *   - "{GET|POST|DELETE|PUT|HEAD} /part1/part2/:param1"
@@ -1222,7 +1222,7 @@ class BFrontController extends BClass
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
-        if (!empty($this->_routes[$requestRoute])) {
+        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
             BDebug::debug('DIRECT ROUTE: '.$requestRoute);
             return $this->_routes[$requestRoute];
         }
@@ -1246,7 +1246,14 @@ class BFrontController extends BClass
         uasort($this->_routes, function($a, $b) {
             $a1 = $a->num_parts;
             $b1 = $b->num_parts;
-            return $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
+            $res = $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
+            if ($res != 0) {
+                return $res;
+            }
+
+            $ap = strpos($a->route_name, "*");
+            $bp = strpos($b->route_name, "*");
+            return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
         return $this;
     }

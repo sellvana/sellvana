@@ -173,6 +173,7 @@ class BDb
     */
     public static function run($sql, $params=null, $options=array())
     {
+        BDb::connect();
         $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
         $results = array();
         foreach ($queries as $i=>$query){
@@ -807,6 +808,20 @@ exit;
     }
 
     /**
+    * Extended where condition
+    *
+    * @param string|array $column_name if array - use where_complex() syntax
+    * @param mixed $value
+    */
+    public function where($column_name, $value=null)
+    {
+        if (is_array($column_name)) {
+            return $this->where_complex($column_name, !!$value);
+        }
+        return parent::where($column_name, $value);
+    }
+
+    /**
     * Add a complex where condition
     *
     * @see BDb::where
@@ -1389,6 +1404,16 @@ class BModel extends Model
     }
 
     /**
+    * Place holder for custom load ORM logic
+    *
+    * @param BORM $orm
+    */
+    protected static function _loadORM($orm)
+    {
+
+    }
+
+    /**
     * Load a model object based on ID, another field or multiple fields
     *
     * @param int|string|array $id
@@ -1411,6 +1436,7 @@ class BModel extends Model
         }
 
         $orm = static::factory();
+        static::_loadORM($orm);
         BPubSub::i()->fire($class.'::load.orm', array('orm'=>$orm, 'class'=>$class, 'called_class'=>get_called_class()));
         if (is_array($id)) {
             $orm->where_complex($id);
@@ -1723,10 +1749,10 @@ class BModel extends Model
             }
         }
         parent::delete();
-        
+
         $this->afterDelete();
         BPubSub::i()->fire($this->_origClass().'::afterDelete', array('model'=>$this));
-        
+
         return $this;
     }
 

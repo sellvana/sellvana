@@ -25,22 +25,4 @@ class FCom_ProductReviews_Model_Reviews extends FCom_Core_Model_Abstract
         $this->helpful_voices++;
         $this->save();
     }
-
-    public function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` int(10) unsigned NOT NULL,
-  `customer_id` int(10) unsigned NOT NULL,
-  `rating` tinyint(1) unsigned not null,
-  `helpful` int(11) not null DEFAULT '0',
-  `helpful_voices` bigint(11) not null DEFAULT '0',
-  `title` varchar(255) NOT NULL,
-  `created_dt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `text` text,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
 }

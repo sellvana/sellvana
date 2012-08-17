@@ -2,26 +2,26 @@
 $category = $this->category ? $this->category : BApp::i()->get('current_category');
 $children = $category->children();
 ?>
-<? if ($children): ?>
+<?php if ($children): ?>
 <div class="block block-layered-nav">
    <div class="block-title">
-        <strong><span><?= BLocale::_("Browse By"); ?></span></strong>
+        <strong><span><?= BLocale::_("Browse By") ?></span></strong>
     </div>
     <div class="block-content">
-<? if ($children): ?>
+<?php if ($children): ?>
         <dl id="narrow-by-list2">
-            <dt class="last odd"><?= BLocale::_("Category"); ?></dt>
+            <dt class="last odd"><?= BLocale::_("Category") ?></dt>
             <dd class="last odd">
                 <ol>
-<? foreach ($children as $c): ?>
+<?php foreach ($children as $c): ?>
                     <li>
                         <a href="<?=$this->q($c->url())?>"><span class="count"><?=(int)$c->num_products?></span><?=$this->q($c->node_name)?></a>
                     </li>
-<? endforeach ?>
+<?php endforeach ?>
                 </ol>
             </dd>
         </dl>
-<? endif ?>
+<?php endif ?>
     </div>
 </div>
-<? endif ?>
+<?php endif ?>

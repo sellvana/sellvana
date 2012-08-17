@@ -227,13 +227,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $children = array();
         $id = $this->id;
-        /*
+
         if (($cache = $this->cacheFetch())) {
             foreach ($cache as $c) {
                 if ($c->parent_id==$id) $children[$c->id] = $c;
             }
         }
-        */
+
         if (is_null($this->num_children) || sizeof($children)!=$this->num_children) {
             $class = get_class($this);
             $orm = $this->orm('t')->where('t.parent_id', $id);
@@ -252,13 +252,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $desc = array();
         $path = $this->id_path.'/';
-        /*
+
         if (($cache = $this->cacheFetch())) {
             foreach ($cache as $c) {
                 if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;
             }
         }
-        */
+
 #echo "<pre>"; print_r(BDb::many_as_array($desc)); exit;
         if (is_null($this->num_descendants) || sizeof($desc)!=$this->num_descendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path.'%');
