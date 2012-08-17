@@ -571,7 +571,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     } else {
                         $callback = array($this, $field->source_value);
                     }
-                    $valuesList = call_user_func($callback, $product, $type);
+                    $valuesList = call_user_func($callback, $product, $type, $field->field_name);
                     //process results
                     if ($valuesList) {
                         if (is_array($valuesList)) {
@@ -672,7 +672,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * }
      */
 
-    public function fieldGetCategories($product, $type='')
+    public function fieldGetCategories($product, $type='', $field='')
     {
         $categories = array();
         $productCategories = $product->categories(false); //get all categories for product
@@ -688,7 +688,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $categories;
     }
 
-    public function fieldPriceRange($product, $type='')
+    public function fieldPriceRange($product, $type='', $field='')
     {
         if ($product->min_price < 100) {
             return '$0 to $99';
@@ -715,15 +715,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     }
 
-    public function fieldProductNameToOrdinal($product, $type='')
+    public function fieldStringToOrdinal($product, $type='', $field='')
     {
-        $string = BLocale::transliterate($product->product_name, '');
+        $string = BLocale::transliterate($product->{$field}, '');
 
         if (empty($string)) {
             return '';
         }
 
-        $indexLen = 5;
+        $indexLen = 6;
         $cycles = $indexLen < strlen($string) ? $indexLen : strlen($string);
         $result = 0;
         $pow = $indexLen;
