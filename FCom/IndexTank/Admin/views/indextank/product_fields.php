@@ -17,3 +17,6 @@
 <?php endif; ?>
 
 <?php echo $this->view('jqgrid') ?>
+
+
+<div id="dialog">My dialog</div>
