@@ -11,6 +11,7 @@ class FCom_IndexTank_Cron extends BClass
     public function indexAll()
     {
         set_time_limit(0);
+
         //first finish not finsihed
         $this->indexAllInIndexing();
         //then finit not indexed
@@ -45,7 +46,7 @@ class FCom_IndexTank_Cron extends BClass
     protected function indexAllNotIndexed()
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
-        $batchSize = 500;
+        $batchSize = 700;
         $offset = 0;
         $products = $orm->offset($offset)->limit($batchSize)->find_many();
         if (!$products) {

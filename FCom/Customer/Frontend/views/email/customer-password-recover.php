@@ -1,4 +1,4 @@
-<? $d = $this->customer ?>
+<?php $d = $this->customer ?>
 <!--{ Content-Type: text/html; charset=UTF-8 }-->
 <!--{ To: "<?=$d->firstname.' '.$d->lastname?>" <<?=$d->email?>> }-->
 <!--{ From: "Fulleron" <support@fulleron.com> }-->

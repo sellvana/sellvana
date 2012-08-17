@@ -2,7 +2,7 @@
     <div class="portal-login-box">
         <header class="portal-login-header">
             <strong class="logo">
-                <?= BLocale::_("Reset Your Password"); ?>
+                <?= BLocale::_("Reset Your Password") ?>
             </strong>
         </header>
         <?php echo $this->messagesHtml() ?>
@@ -12,20 +12,20 @@
                 <ul>
                     <li class="form-row">
                         <div class="form-field">
-                            <label for="#"><?= BLocale::_("Password"); ?></label>
+                            <label for="#"><?= BLocale::_("Password") ?></label>
                             <input type="password" name="password" class="required"/>
                         </div>
                     </li>
                     <li class="form-row">
                         <div class="form-field">
-                            <label for="#"><?= BLocale::_("Confirm"); ?></label>
+                            <label for="#"><?= BLocale::_("Confirm") ?></label>
                             <input type="password" name="password_confirm" class="required"/>
                         </div>
                     </li>
                 </ul>
                 <div class="form-buttons">
                     <input type="hidden" name="token" value="<?=$this->q(BRequest::i()->request('token'))?>"/>
-                    <input type="submit" value="<?= BLocale::_("Reset Password"); ?>"/>
+                    <input type="submit" value="<?= BLocale::_("Reset Password") ?>"/>
                 </div>
             </fieldset>
         </form>

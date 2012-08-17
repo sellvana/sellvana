@@ -19,6 +19,7 @@ class FCom_IndexTank_Admin extends BClass
 
             //api function
             ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
+            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
         BLayout::i()->addAllViews('Admin/views');
@@ -80,7 +81,13 @@ class FCom_IndexTank_Admin extends BClass
     static public function productsIndexAll()
     {
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
-        //echo 'Products re-indexing scheduled';
+    }
+
+    /**
+     * Mark all product for re-index
+     */
+    static public function productsStopIndexAll()
+    {
     }
 
     /**

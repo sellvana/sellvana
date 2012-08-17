@@ -111,18 +111,4 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         $this->permissions_data = trim(join("\n", array_keys($this->permissions)));
         return true;
     }
-
-    public static function install()
-    {
-        $tRole = static::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tRole} (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `role_name` VARCHAR(50) NOT NULL,
-  `permissions_data` TEXT NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-    }
-
 }

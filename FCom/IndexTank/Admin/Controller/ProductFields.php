@@ -51,20 +51,25 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         ));
     }
 
-    public function action_form__POST()
+    public function formPostAfter($args)
     {
-        $r = BRequest::i();
-        $class = $this->_modelClass;
-        $id = $r->params('id', true);
-        $model = $id ? $class::i()->load($id) : $class::i()->create();
+        if ($args['do']==='DELETE') {
+            FCom_IndexTank_Admin::productsIndexAll();
+        }
+
+        $model = $args['model'];
         if ($model) {
-            //clear field in index
-            if ($r->post('do')==='DELETE') {
-                FCom_IndexTank_Admin::productsIndexAll();
+            if ( $model->scoring && ($model->var_number == -1 || !isset($model->var_number)) ) {
+                $maxVarField = FCom_IndexTank_Model_ProductField::orm()->select_expr("max(var_number) as max_var")->find_one();
+                $model->var_number = $maxVarField->max_var+1;
+                $model->save();
+            } elseif (0 == $model->scoring && $model->var_number >= 0) {
+                $model->var_number = -1;
+                $model->save();
             }
         }
-        //remove field from database
-        parent::action_form__POST();
+
+        parent::formPostAfter($args);
     }
 
 }

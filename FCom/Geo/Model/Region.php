@@ -34,19 +34,4 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
         if (!$result) return null;
         return $field ? $result->$field : $result;
     }
-
-    public function install()
-    {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS ".static::table()." (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `country` char(2) NOT NULL,
-  `code` varchar(10) DEFAULT NULL,
-  `name` varchar(40) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `country_code` (`country`,`code`),
-  KEY `name_country` (`name`,`country`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
-        ");
-    }
 }

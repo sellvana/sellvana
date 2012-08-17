@@ -6,14 +6,18 @@
             <input type="text" name="model[name]" value="<?php echo $this->q($m->name) ?>"/>
         </li>
         <li>
-            <h4 class="label">Number</h4>
-            <input type="text" size="3" id="main-content" name="model[number]" value="<?php echo $this->q($m->number) ?>">
-            (Start from 0)
-        </li>
-        <li>
             <h2 class="label">Definition</h2>
             <input type="text" size="50" name="model[definition]" value="<?php echo $this->q($m->definition) ?>"/>
             (See <a href="http://www.indexden.com/documentation/function-definition">Scoring Function Syntax</a>)
+        </li>
+
+        <li>
+            <?php if (!empty($m->scoring_fields)): ?>
+             <i>You have following variables:</i><br/>
+                <?php foreach($m->scoring_fields as $f):?>
+                    d[<?=$f->var_number?>] - <?=$f->field_name?><br/>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </li>
     </ul>
 </fieldset>

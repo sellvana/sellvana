@@ -3,7 +3,7 @@
 /**
 * Utility class to parse and construct strings and data structures
 */
-class BUtil
+class BUtil extends BClass
 {
     /**
     * IV for mcrypt operations
@@ -39,6 +39,16 @@ class BUtil
     * @var string
     */
     protected static $_hashSep = '$';
+
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return BUtil
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
 
     /**
     * Convert any data to JSON string
@@ -578,10 +588,10 @@ class BUtil
         }
         return $pattern;
     }
-    
+
     /**
     * Create or verify password hash using bcrypt
-    * 
+    *
     * @param string $plain
     * @param string $hash
     * @return boolean|string if $hash is null, return hash, otherwise return verification flag
@@ -623,7 +633,7 @@ class BUtil
     {
         $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
         if ('bcrypt'===$algo) {
-            return static::bcrypt($string);   
+            return static::bcrypt($string);
         }
         $iter = !is_null($iter) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
@@ -742,7 +752,14 @@ class BUtil
             ));
             if ($method==='POST' || $method==='PUT') {
                 $opts['http']['content'] = $request;
-                $opts['http']['header'] .= "Content-Type: application/x-www-form-urlencoded\r\n"
+                $contentType = 'application/x-www-form-urlencoded';
+                foreach ($request as $k=>$v) {
+                    if (is_string($v) && $v[0]==='@') {
+                        $contentType = 'multipart/form-data';
+                        break;
+                    }
+                }
+                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n"
                     ."Content-Length: ".strlen($request)."\r\n";
             }
             $content = file_get_contents($url, false, stream_context_create($opts));
@@ -948,6 +965,21 @@ class BUtil
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    public static function formatDateRecursive($source, $format='m/d/Y')
+    {
+        foreach ($source as $i=>$val) {
+            if (is_string($val)) {
+                // checking only beginning of string for speed, assuming it is a date
+                if (preg_match('#^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]( |$)#', $val)) {
+                    $source[$i] = date($format, strtotime($val));
+                }
+            } elseif (is_array($val)) {
+                $source[$i] = static::formatDateRecursive($val, $format);
+            }
+        }
+        return $source;
     }
 }
 
@@ -1482,12 +1514,12 @@ class BDebug extends BClass
 
         $l = self::$_level[self::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            echo '<div style="text-align:left; border:solid 1px red; font-family:monospace;">';
+            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             ob_start();
             echo $message."\n";
             debug_print_backtrace();
-            echo nl2br(htmlspecialchars(ob_get_clean()));
-            echo '</div>';
+            echo ob_get_clean();
+            echo '</xmp>';
         }
 /*
         $l = self::$_level[self::EXCEPTION];

@@ -6,6 +6,7 @@ class FCom_IndexTank_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function uninstall()
@@ -42,6 +43,12 @@ class FCom_IndexTank_Migrate extends BClass
             ) ENGINE = InnoDB;
          ");
 
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " ALTER TABLE {$pFunctionsTable} MODIFY `number` int(11) NOT NULL DEFAULT '-1'");
     }
 
     public function install()

@@ -113,7 +113,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>$this));
+        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
 
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
@@ -215,42 +215,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if($user){
             $user->session_cart_id = $cart->id();
             $user->save();
-        }
-    }
-
-    public function install()
-    {
-        $tCustomer = static::table();
-        $tAddress = FCom_Customer_Model_Address::table();
-        BDb::run("
-CREATE TABLE IF NOT EXISTS {$tCustomer} (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `firstname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `lastname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `password_hash` text COLLATE utf8_unicode_ci,
-  `default_shipping_id` int(11) unsigned DEFAULT NULL,
-  `default_billing_id` int(11) unsigned DEFAULT NULL,
-  `create_dt` datetime NOT NULL,
-  `update_dt` datetime NOT NULL,
-  `last_login` datetime DEFAULT NULL,
-  `token` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-        ");
-    }
-
-    public static function upgrade_0_1_2()
-    {
-        try {
-            BDb::run("
-                ALTER TABLE ".  self::table()."
-                    ADD `payment_method` VARCHAR( 20 ) NOT NULL,
-                    ADD `payment_details` TEXT NOT NULL
-                    ;
-            ");
-        } catch (Exception $e) {
-            //columns already exist
         }
     }
 }

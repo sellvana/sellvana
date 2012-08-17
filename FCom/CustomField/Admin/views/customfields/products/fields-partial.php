@@ -51,7 +51,7 @@ $m = $this->model;
     <?php endforeach; ?>
 <?php endif; ?>
 <pre>
-<?// print_r(BDb::many_as_array($this->fields)); ?>
+<?// print_r(BDb::many_as_array($this->fields)) ?>
 <?// print_r($m->as_array()) ?>
 </pre>
 

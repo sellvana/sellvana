@@ -102,4 +102,4 @@ head(function() {
     });
 })
 </script>
-<?php echo $this->hook('catalog/products/tab/linked-products', array('model'=>$this->model)); ?>
+<?php echo $this->hook('catalog/products/tab/linked-products', array('model'=>$this->model)) ?>

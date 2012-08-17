@@ -35,21 +35,31 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         return $config;
     }
 
-
-    public function action_form__POST()
+    public function formPostAfter($args)
     {
-        $post = BRequest::i()->post('model');
-        if (!empty($post)) {
-            FCom_IndexTank_Index_Product::i()->updateFunction($post['number'], $post['definition']);
+        $model = $args['model'];
+
+        if ($model) {
+            if ( $model->number < 0 || !isset($model->number)) {
+                $maxVarField = FCom_IndexTank_Model_ProductFunction::orm()->select_expr("max(number) as max_number")->find_one();
+                $model->number = $maxVarField->max_number+1;
+                $model->save();
+            }
+
+            FCom_IndexTank_Index_Product::i()->updateFunction($model->number, $model->definition);
         }
 
-        parent::action_form__POST();
+
+
+        parent::formPostAfter($args);
     }
 
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
+        $fields = $maxVarField = FCom_IndexTank_Model_ProductField::orm()->where('scoring', 1)->order_by_asc('var_number')->find_many();
         $m = $args['model'];
+        $m->scoring_fields = $fields;
         $args['view']->set(array(
             'title' => $m->id ? 'Edit Product Function: '.$m->name: 'Create New Product Function',
         ));

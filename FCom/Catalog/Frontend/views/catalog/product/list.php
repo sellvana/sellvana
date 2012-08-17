@@ -1,11 +1,11 @@
+<?=$this->view('catalog/product/pager')->set('state', $this->products_data['state'])?>
 
-<? if (!$this->products_data['state']['c']): ?>
+<?php if (!$this->products_data['state']['c']): ?>
+    <p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 
-    <p class="note-msg"><?= BLocale::_("There are no products matching the selection"); ?>.</p>
+<?php else: ?>
 
-<? else: ?>
 
-    <?=$this->view('catalog/product/pager')->set('state', $this->products_data['state'])?>
     <?=$this->view('catalog/compare/block')?>
     <table class="product-list">
         <col width="30"/>
@@ -19,8 +19,5 @@
         </tbody>
     </table>
 
-<script>
-$('.price-range').tooltip({effect:'slide',position:'bottom left', offset:[-30, 80], events:{def:'click,mouseleave'}}).dynamic({classNames:''});
-</script>
-
-<? endif ?>
+    <?=$this->hook('search_filters_block')?>
+<?php endif ?>

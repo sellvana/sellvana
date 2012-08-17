@@ -1,4 +1,4 @@
-<?php $w = BSession::i()->data('w'); ?>
+<?php $w = BSession::i()->data('w') ?>
 <style>
 .wizard label { display:block; width:80px; float:left; }
 </style>
