@@ -59,7 +59,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
         $model = $args['model'];
         if ($model) {
-            if ( $model->scoring && $model->var_number == -1 ) {
+            if ( $model->scoring && ($model->var_number == -1 || !isset($model->var_number)) ) {
                 $maxVarField = FCom_IndexTank_Model_ProductField::orm()->select_expr("max(var_number) as max_var")->find_one();
                 $model->var_number = $maxVarField->max_var+1;
                 $model->save();
