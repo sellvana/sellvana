@@ -19,7 +19,8 @@ class FCom_IndexTank_Admin extends BClass
 
             //api function
             ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
-            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
+            ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
+            //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
         BLayout::i()->addAllViews('Admin/views');
@@ -86,8 +87,22 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Mark all product for re-index
      */
-    static public function productsStopIndexAll()
+    static public function productsIndexingStatus()
     {
+        $countNotIndexed = FCom_Catalog_Model_Product::orm()->where('indextank_indexed', 0)->count();
+        $countTotal = FCom_Catalog_Model_Product::orm()->count();
+
+        // disable caching
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: Mon, 26 Jul 1991 05:00:00 GMT');  // disable IE caching
+        header('Content-Type: text/plain; charset=utf-8');
+
+        $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
+        $res = array('indexed' => $countTotal - $countNotIndexed, 'percent' => ceil($percent));
+        echo BUtil::toJson($res);
+        exit;
     }
 
     /**

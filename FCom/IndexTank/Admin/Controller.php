@@ -28,14 +28,11 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
         //BConfig::i()->set('modules/FCom_IndexTank/cron_indexing', 1);
 
         //echo $cronIndexing;exit;
-        /*
-         * <button class="st1 sz2 btn" onclick="dialog_start();"><span>Dialog</span></button>
-         * function dialog_start() {
-$(\'#dialog\').dialog();
-}
-         */
 
-        $insert = '
+         $insert =' <button class="st1 sz2 btn" onclick="control_index_dialog();"><span>Index Control Page</span></button>';
+
+
+        $insert .= '
             <button class="st1 sz2 btn" onclick="ajax_index_all_products_start();"><span>Start Products Indexing</span></button>
             <button class="st1 sz2 btn" onclick="ajax_products_clear_all();"><span>Clear Products Index</span></button>
 <script type="text/javascript">
