@@ -17,3 +17,5 @@
 <?php endif; ?>
 
 <?php echo $this->view('jqgrid') ?>
+
+<?php echo $this->view('indextank/control_index_dialog') ?>
