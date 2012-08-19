@@ -55,8 +55,15 @@ class FCom_IndexTank_Cron extends BClass
 
     protected function updateInfoStatus($total)
     {
+        $countNotIndexed = FCom_Catalog_Model_Product::orm()->where('indextank_indexed', 0)->count();
+        $countTotal = FCom_Catalog_Model_Product::orm()->count();
+        $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
+        $indexed= $countTotal - $countNotIndexed;
+
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
         $indexingStatus->status = 'start';
+        $indexingStatus->percent = ceil($percent);
+        $indexingStatus->indexed = $indexed;
         $indexingStatus->info = "{$total} documents left";
         $indexingStatus->updated_at = date("Y-m-d H:i:s");
         $indexingStatus->save();
