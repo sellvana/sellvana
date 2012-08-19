@@ -87,6 +87,10 @@ class FCom_IndexTank_Admin extends BClass
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "indextank_indexed != 0");
 
         FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        $indexingStatus->percent = 0;
+        $indexingStatus->indexed = 0;
+        $indexingStatus->save();
     }
 
     static public function productsIndexStop()
