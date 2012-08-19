@@ -6,12 +6,16 @@
 </div>
 
 <script type="text/javascript">
+    //timer interval
+    var interval;
 
-var interval;
     function control_index_dialog() {
 
         var options = {};
         options['title'] = "Indexing control panel";
+        options['close'] = function(event, ui) {
+            clearInterval(interval);
+        };
 
         $.ajax({
             type: "GET",
