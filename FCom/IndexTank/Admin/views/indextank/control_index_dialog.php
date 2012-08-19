@@ -6,6 +6,8 @@
 </div>
 
 <script type="text/javascript">
+
+var interval;
     function control_index_dialog() {
 
         var options = {};
@@ -39,8 +41,8 @@
             $('#control_index_dialog').dialog(options);
         });
 
-       updateIndexingProgressBar();
-       setInterval('updateIndexingProgressBar()', 5000);
+       //updateIndexingProgressBar();
+       //interval = setInterval('updateIndexingProgressBar()', 5000);
     }
 
     function updateIndexingProgressBar()
@@ -53,6 +55,7 @@
             data = JSON.parse(json);
             $('#progressbar').progressbar({value: parseInt(data.percent)});
             if (100 == data.percent) {
+                clearInterval(interval);
                 $('#progressbar').hide();
                 $('#indexing_message').html("Indexing done: "+data.indexed+" products indexed.");
                 updateDialogButtons('stop');
@@ -100,11 +103,14 @@
 
     function control_index_start()
     {
+        clearInterval(interval);
         $.ajax({
             type: "GET",
             url: "<?=BApp::href('indextank/products/index')?>"
             }
-        );
+        ).done(function( ) {
+            interval = setInterval('updateIndexingProgressBar()', 5000);
+        });
 
        //var r = Math.random()*100;
        $("#progressbar").progressbar({ value: 0 });
@@ -114,6 +120,7 @@
 
     function control_index_stop()
     {
+        clearInterval(interval);
         $.ajax({
             type: "GET",
             url: "<?=BApp::href('indextank/products/index-stop')?>"
@@ -127,11 +134,14 @@
             type: "GET",
             url: "<?=BApp::href('indextank/products/index-resume')?>"
             }
-        );
+        ).done(function( ) {
+            interval = setInterval('updateIndexingProgressBar()', 5000);
+        });
         updateDialogButtons('resume');
     }
     function control_index_pause()
     {
+        clearInterval(interval);
         $.ajax({
             type: "GET",
             url: "<?=BApp::href('indextank/products/index-pause')?>"
