@@ -30,6 +30,8 @@ var interval;
                     Stop:control_index_stop,
                     Pause:control_index_pause
                 };
+                updateIndexingProgressBar();
+                interval = setInterval('updateIndexingProgressBar()', 5000);
             } else if ( data.status == 'pause' ) {
                 options['buttons'] =
                 {
@@ -40,9 +42,6 @@ var interval;
 
             $('#control_index_dialog').dialog(options);
         });
-
-       //updateIndexingProgressBar();
-       //interval = setInterval('updateIndexingProgressBar()', 5000);
     }
 
     function updateIndexingProgressBar()
