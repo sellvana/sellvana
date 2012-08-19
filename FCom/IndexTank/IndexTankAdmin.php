@@ -109,9 +109,6 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function productsIndexingStatus()
     {
-        $countNotIndexed = FCom_Catalog_Model_Product::orm()->where('indextank_indexed', 0)->count();
-        $countTotal = FCom_Catalog_Model_Product::orm()->count();
-
         // disable caching
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
         header('Cache-Control: no-cache, must-revalidate');
@@ -120,8 +117,7 @@ class FCom_IndexTank_Admin extends BClass
         header('Content-Type: text/plain; charset=utf-8');
 
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
-        $res = array('indexed' => $countTotal - $countNotIndexed, 'percent' => ceil($percent), 'status' => $indexingStatus->status);
+        $res = array('indexed' => $indexingStatus->indexed, 'percent' => ceil($indexingStatus->percent), 'status' => $indexingStatus->status);
         echo BUtil::toJson($res);
         exit;
     }
