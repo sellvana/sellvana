@@ -9,7 +9,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function gridConfig()
     {
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
         if ($indexingStatus) {
             BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
         } else {

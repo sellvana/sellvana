@@ -12,44 +12,26 @@ class FCom_IndexTank_Cron extends BClass
     {
         set_time_limit(0);
 
-        //first finish not finsihed
-        $this->indexAllInIndexing();
-        //then finit not indexed
-        $this->indexAllNotIndexed();
-    }
-
-    protected function indexAllInIndexing()
-    {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 1);
-        $batchSize = 500;
-        $offset = 0;
-        $products = $orm->offset($offset)->limit($batchSize)->find_many();
-        if (!$products) {
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        if ($indexingStatus->status == 'stop' || $indexingStatus->status == 'pause') {
             return;
         }
-        $productIds = array();
-        foreach ($products as $p) {
-            $productIds[] = $p->id();
-        }
-        //before indexing
-        //indexing
-        FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
-        //after indexing
-        FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 2, "indextank_indexed_at" => date("Y-m-d H:i:s")),
-                    "id in (".implode(",", $productIds).")");
 
-        $total_records = FCom_Catalog_Model_Product::i()->orm('p')->where("indextank_indexed", 1)->count();
-        $this->updateInfoStatus("index_all_crashed", $total_records);
+        $this->indexAllNotIndexed();
     }
 
     protected function indexAllNotIndexed()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where("indextank_indexed", 0);
-        $batchSize = 700;
+        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where_in("indextank_indexed", array(1,0));
+        $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        if (!$batchSize) {
+            $batchSize = 500;
+        }
         $offset = 0;
         $products = $orm->offset($offset)->limit($batchSize)->find_many();
         if (!$products) {
+            FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('stop');
+
             return;
         }
         $productIds = array();
@@ -68,16 +50,13 @@ class FCom_IndexTank_Cron extends BClass
                     "id in (".implode(",", $productIds).")");
 
         $total_records = FCom_Catalog_Model_Product::i()->orm('p')->where("indextank_indexed", 0)->count();
-        $this->updateInfoStatus("index_all_new", $total_records);
+        $this->updateInfoStatus($total_records);
     }
 
-    protected function updateInfoStatus($task, $total)
+    protected function updateInfoStatus($total)
     {
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", $task)->find_one();
-        if (!$indexingStatus) {
-            $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->create();
-            $indexingStatus->task = $task;
-        }
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        $indexingStatus->status = 'start';
         $indexingStatus->info = "{$total} documents left";
         $indexingStatus->updated_at = date("Y-m-d H:i:s");
         $indexingStatus->save();

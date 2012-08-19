@@ -18,7 +18,10 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
             //api function
-            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
+            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexStart')
+            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsIndexStop')
+            ->route('GET /indextank/products/index-pause', 'FCom_IndexTank_Admin::productsIndexPause')
+            ->route('GET /indextank/products/index-resume', 'FCom_IndexTank_Admin::productsIndexResume')
             ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
             //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
@@ -79,9 +82,26 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Mark all product for re-index
      */
-    static public function productsIndexAll()
+    static public function productsIndexStart()
     {
-        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
+        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "indextank_indexed != 0");
+
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
+    }
+
+    static public function productsIndexStop()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('stop');
+    }
+
+    static public function productsIndexPause()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('pause');
+    }
+
+    static public function productsIndexResume()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
     }
 
     /**
@@ -99,8 +119,9 @@ class FCom_IndexTank_Admin extends BClass
         header('Expires: Mon, 26 Jul 1991 05:00:00 GMT');  // disable IE caching
         header('Content-Type: text/plain; charset=utf-8');
 
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
         $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
-        $res = array('indexed' => $countTotal - $countNotIndexed, 'percent' => ceil($percent));
+        $res = array('indexed' => $countTotal - $countNotIndexed, 'percent' => ceil($percent), 'status' => $indexingStatus->status);
         echo BUtil::toJson($res);
         exit;
     }
