@@ -19,7 +19,6 @@ class FCom_IndexTank_Admin extends BClass
 
             //api function
             ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexStart')
-            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsIndexStop')
             ->route('GET /indextank/products/index-pause', 'FCom_IndexTank_Admin::productsIndexPause')
             ->route('GET /indextank/products/index-resume', 'FCom_IndexTank_Admin::productsIndexResume')
             ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
@@ -91,11 +90,6 @@ class FCom_IndexTank_Admin extends BClass
         $indexingStatus->percent = 0;
         $indexingStatus->indexed = 0;
         $indexingStatus->save();
-    }
-
-    static public function productsIndexStop()
-    {
-        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('stop');
     }
 
     static public function productsIndexPause()

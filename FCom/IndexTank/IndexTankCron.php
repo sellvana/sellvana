@@ -13,7 +13,7 @@ class FCom_IndexTank_Cron extends BClass
         set_time_limit(0);
 
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        if ($indexingStatus->status == 'stop' || $indexingStatus->status == 'pause') {
+        if ($indexingStatus->status == 'pause') {
             return;
         }
 
@@ -30,8 +30,6 @@ class FCom_IndexTank_Cron extends BClass
         $offset = 0;
         $products = $orm->offset($offset)->limit($batchSize)->find_many();
         if (!$products) {
-            FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('stop');
-
             return;
         }
         $productIds = array();
