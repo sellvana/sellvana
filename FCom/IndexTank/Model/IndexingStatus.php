@@ -40,12 +40,16 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
         $countNotIndexed = FCom_Catalog_Model_Product::orm()->where('indextank_indexed', 0)->count();
         $countTotal = FCom_Catalog_Model_Product::orm()->count();
         $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
-        $indexed= $countTotal - $countNotIndexed;
+        $indexed = $countTotal - $countNotIndexed;
+
+        $status = FCom_IndexTank_Index_Product::i()->status();
+        $indexSize = $status['size'];
 
         $indexingStatus = $this->getIndexingStatus();
         $indexingStatus->status = 'start';
         $indexingStatus->percent = ceil($percent);
         $indexingStatus->to_index = $countNotIndexed;
+        $indexingStatus->index_size = $indexSize;
         $indexingStatus->indexed = $indexed;
         $indexingStatus->info = "{$countNotIndexed} documents left";
         $indexingStatus->updated_at = date("Y-m-d H:i:s");

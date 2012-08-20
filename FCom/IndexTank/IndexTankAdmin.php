@@ -112,7 +112,7 @@ class FCom_IndexTank_Admin extends BClass
 
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
         $res = array(
-            'indexed' => $indexingStatus->indexed,
+            'index_size' => $indexingStatus->index_size,
             'to_index' => $indexingStatus->to_index,
             'percent' => ceil($indexingStatus->percent),
             'status' => $indexingStatus->status
