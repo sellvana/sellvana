@@ -85,11 +85,7 @@ class FCom_IndexTank_Admin extends BClass
     {
         FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "indextank_indexed != 0");
 
-        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        $indexingStatus->percent = 0;
-        $indexingStatus->indexed = 0;
-        $indexingStatus->save();
+        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
     }
 
     static public function productsIndexPause()
@@ -115,7 +111,12 @@ class FCom_IndexTank_Admin extends BClass
         header('Content-Type: text/plain; charset=utf-8');
 
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        $res = array('indexed' => $indexingStatus->indexed, 'percent' => ceil($indexingStatus->percent), 'status' => $indexingStatus->status);
+        $res = array(
+            'indexed' => $indexingStatus->indexed,
+            'to_index' => $indexingStatus->to_index,
+            'percent' => ceil($indexingStatus->percent),
+            'status' => $indexingStatus->status
+                );
         echo BUtil::toJson($res);
         exit;
     }

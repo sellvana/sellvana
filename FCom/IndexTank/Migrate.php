@@ -10,6 +10,7 @@ class FCom_IndexTank_Migrate extends BClass
         BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
         BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
+        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
     }
 
     public function uninstall()
@@ -75,6 +76,12 @@ class FCom_IndexTank_Migrate extends BClass
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
         BDb::run( " ALTER TABLE {$pIndexingStatusTable}
         MODIFY `status` ENUM( 'start', 'pause' ) NOT NULL DEFAULT 'start'; ");
+    }
+
+    public function upgrade_0_1_6()
+    {
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function install()

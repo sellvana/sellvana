@@ -48,31 +48,31 @@
     {
         if ('start' == status) {
             interval = setInterval('updateIndexingStatus()', 1000*60); // 1 minute
-        }
-        if ('stop' == status) {
+        } else if ('stop' == status) {
             clearInterval(interval);
             interval = -1;
-        }
-        if ('pause' == status) {
-            clearInterval(interval);
         }
     }
 
     function updateDialogMessage(status, data)
     {
+        var html = '';
         if ( status == 'start' || status == 'resume'  ) {
-            $('#indexing_message').html("Indexing <b>RUNNING</b>: "+data.indexed+"("+data.percent+"%) products indexed.");
+            html = "Indexing status: <b>RUNNING</b><br/> ";
         } else if ( status == 'pause' ) {
-            $('#indexing_message').html("Indexing <b>PAUSED</b>: "+data.indexed+"("+data.percent+"%) products indexed.");
+            html = "Indexing status: <b>PAUSED</b><br/> ";
         } else if (status == 'idle') {
-            $('#indexing_message').html("Indexing <b>IDLE</b>:  "+data.indexed+"("+data.percent+"%) products indexed. Waiting for updates.");
+            html = "Indexing status: <b>IDLE</b> (waiting for updates)<br/> ";
         }
+        html += "Indexed: <b>" + data.percent + "%</b> products<br/>";
+        html += "Left to index: <b>" + data.to_index + "</b> products";
+        $('#indexing_message').html(html);
     }
 
     function updateDialogButtons(status)
     {
         var options = {};
-        options['close'] = manageInterval('stop');
+        options['close'] = function(event, ui) { manageInterval('stop'); }
         options['title'] = "Indexing control panel";
         options['width'] = 420;
 
@@ -129,7 +129,7 @@
             url: "<?=BApp::href('indextank/products/index-pause')?>"
             }
         ).done(function( ) {
-            manageInterval('pause');
+            manageInterval('stop');
             updateIndexingStatus();
         });
 
