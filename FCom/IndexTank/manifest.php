@@ -2,10 +2,10 @@
     'modules' => array(
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.1.2',
+            'version' => '0.1.7',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'description' => "IndexTank API integration",
             'migrate' => 'FCom_IndexTank_Migrate',
             'tests' => "FCom_IndexTank_Tests_AllTests",
@@ -20,7 +20,7 @@
                     //'depends' => array('FCom_Frontend'),
                 ),
                 "FCom_Cron" => array(
-                    "bootstrap" => array("file" => "IndexTankCron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")
+                    "bootstrap" => array("file" => "Cron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")
                 )
             ),
         ),
