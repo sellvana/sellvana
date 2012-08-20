@@ -18,8 +18,11 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
             //api function
-            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
-            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
+            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexStart')
+            ->route('GET /indextank/products/index-pause', 'FCom_IndexTank_Admin::productsIndexPause')
+            ->route('GET /indextank/products/index-resume', 'FCom_IndexTank_Admin::productsIndexResume')
+            ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
+            //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
         BLayout::i()->addAllViews('Admin/views');
@@ -41,14 +44,18 @@ class FCom_IndexTank_Admin extends BClass
                         ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
-            //for API init
-            BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
+
         }
+        //on update settings create new index if index was changed
+        BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
     {
+
         if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])) {
             return false;
         }
@@ -78,16 +85,44 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Mark all product for re-index
      */
-    static public function productsIndexAll()
+    static public function productsIndexStart()
     {
-        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
+        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "indextank_indexed != 0");
+
+        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+    }
+
+    static public function productsIndexPause()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('pause');
+    }
+
+    static public function productsIndexResume()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
     }
 
     /**
      * Mark all product for re-index
      */
-    static public function productsStopIndexAll()
+    static public function productsIndexingStatus()
     {
+        // disable caching
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: Mon, 26 Jul 1991 05:00:00 GMT');  // disable IE caching
+        header('Content-Type: text/plain; charset=utf-8');
+
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        $res = array(
+            'index_size' => $indexingStatus->index_size,
+            'to_index' => $indexingStatus->to_index,
+            'percent' => ceil($indexingStatus->percent),
+            'status' => $indexingStatus->status
+                );
+        echo BUtil::toJson($res);
+        exit;
     }
 
     /**
