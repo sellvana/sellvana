@@ -5,7 +5,7 @@
             'version' => '0.1.0',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'description' => "Credit Card test module",
             'bootstrap' => array('file'=>'CreditCardFrontend.php', 'callback'=>'FCom_CreditCard_Frontend::bootstrap'),
             'areas' => array(

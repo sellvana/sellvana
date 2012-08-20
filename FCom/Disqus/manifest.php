@@ -4,7 +4,7 @@
             'version' => '0.1.0',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'description' => "Disqus comments",
             'bootstrap' => array('file'=>'DisqusFrontend.php', 'callback'=>'FCom_Disqus_Frontend::bootstrap'),
             'areas' => array(

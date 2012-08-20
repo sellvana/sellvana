@@ -7,7 +7,7 @@
             'root_dir' => '',
             'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Checkout_Tests_AllTests",
             'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
             'areas' => array(

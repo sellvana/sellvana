@@ -7,7 +7,7 @@
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
             'tests' => "FCom_CustomField_Tests_AllTests",
             'depends' => array('FCom_Catalog'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'after' => array('FCom_Customer'),
             'description' => "Base custom fields implementation, currently for catalog only",
             'migrate' => 'FCom_CustomField_Migrate',
