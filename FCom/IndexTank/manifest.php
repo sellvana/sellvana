@@ -5,7 +5,7 @@
             'version' => '0.1.7',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'description' => "IndexTank API integration",
             'migrate' => 'FCom_IndexTank_Migrate',
             'tests' => "FCom_IndexTank_Tests_AllTests",
