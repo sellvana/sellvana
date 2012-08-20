@@ -1,8 +1,13 @@
 
 
-<div id="control_index_dialog">
+<div id="control_index_dialog" style="width: 400px; display: none;">
     <div id="progressbar"></div>
     <div id="indexing_message"></div>
+    <div id="indexing_info">
+        Index size: <b><?=number_format($this->status['size'])?></b><br/>
+        Index name: <b><?=$this->status['name']?></b><br/>
+        Index created at: <b><?=date("Y-m-d", strtotime($this->status['date']))?></b>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -11,11 +16,11 @@
 
     function control_index_dialog()
     {
-        updateIndexingProgressBar();
+        updateIndexingStatus();
         return;
     }
 
-    function updateIndexingProgressBar()
+    function updateIndexingStatus()
     {
         $.ajax({
             type: "GET",
@@ -26,10 +31,10 @@
             $('#progressbar').show();
 
             if (data.percent != 100) {
-                updateDialogMessage(data.status, data.indexed);
+                updateDialogMessage(data.status, data);
                 updateDialogButtons(data.status);
             } else {
-                updateDialogMessage('idle', data.indexed);
+                updateDialogMessage('idle', data);
                 updateDialogButtons(data.status);
             }
 
@@ -42,7 +47,7 @@
     function manageInterval(status)
     {
         if ('start' == status) {
-            interval = setInterval('updateIndexingProgressBar()', 1000*60); // 1 minute
+            interval = setInterval('updateIndexingStatus()', 1000*60); // 1 minute
         }
         if ('stop' == status) {
             clearInterval(interval);
@@ -53,54 +58,42 @@
         }
     }
 
-    function updateDialogMessage(status, indexed)
+    function updateDialogMessage(status, data)
     {
-        if ( status == 'start'  ) {
-            $('#indexing_message').html("Indexing STARTED: "+indexed+" products indexed.");
+        if ( status == 'start' || status == 'resume'  ) {
+            $('#indexing_message').html("Indexing <b>RUNNING</b>: "+data.indexed+"("+data.percent+"%) products indexed.");
         } else if ( status == 'pause' ) {
-            $('#indexing_message').html("Indexing PAUSED: "+indexed+" products indexed.");
-        } else if ( status == 'resume' ) {
-            $('#indexing_message').html("Indexing STARTED: "+indexed+" products indexed.");
+            $('#indexing_message').html("Indexing <b>PAUSED</b>: "+data.indexed+"("+data.percent+"%) products indexed.");
         } else if (status == 'idle') {
-            $('#indexing_message').html("Indexing IDLE: "+indexed+" products indexed.");
+            $('#indexing_message').html("Indexing <b>IDLE</b>:  "+data.indexed+"("+data.percent+"%) products indexed. Waiting for updates.");
         }
     }
 
     function updateDialogButtons(status)
     {
         var options = {};
-        options['close'] = function(event, ui) { manageInterval('stop'); }
-        options['title'] = "Indexing control panel: ";
+        options['close'] = manageInterval('stop');
+        options['title'] = "Indexing control panel";
+        options['width'] = 420;
 
-        if ( status == 'start'  ) {
-            options['title'] += "STARTED";
+        if ( status == 'start' || status == 'resume' ) {
             options['buttons'] =
             {
-                "Restart indexing":control_index_start,
-                Pause:control_index_pause
+                "Restart indexing":controlIndexStart,
+                Pause:controlIndexPause
             };
         } else if ( status == 'pause' ) {
-            options['title'] += "PAUSED";
             options['buttons'] =
             {
-                "Restart indexing":control_index_start,
-                Resume:control_index_resume
-            };
-        } else if ( status == 'resume' ) {
-            options['title'] += "STARTED";
-            options['buttons'] =
-            {
-                "Restart indexing":control_index_start,
-                Pause:control_index_pause
+                "Restart indexing":controlIndexStart,
+                Resume:controlIndexResume
             };
         }
-
-
 
         $('#control_index_dialog').dialog(options);
     }
 
-    function control_index_start()
+    function controlIndexStart()
     {
         updateDialogButtons('start');
         $("#progressbar").progressbar({ value: 0 });
@@ -110,12 +103,12 @@
             }
         ).done(function( ) {
             manageInterval('start');
-            updateIndexingProgressBar();
+            updateIndexingStatus();
         });
     }
 
 
-    function control_index_resume()
+    function controlIndexResume()
     {
         updateDialogButtons('resume');
         $.ajax({
@@ -124,11 +117,11 @@
             }
         ).done(function( ) {
             manageInterval('start');
-            updateIndexingProgressBar();
+            updateIndexingStatus();
         });
 
     }
-    function control_index_pause()
+    function controlIndexPause()
     {
         updateDialogButtons('pause');
         $.ajax({
@@ -137,7 +130,7 @@
             }
         ).done(function( ) {
             manageInterval('pause');
-            updateIndexingProgressBar();
+            updateIndexingStatus();
         });
 
     }
