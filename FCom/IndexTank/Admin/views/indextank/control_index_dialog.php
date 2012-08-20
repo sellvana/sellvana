@@ -4,7 +4,6 @@
     <div id="progressbar"></div>
     <div id="indexing_message"></div>
     <div id="indexing_info">
-        Index size: <b><?=number_format($this->status['size'])?></b><br/>
         Index name: <b><?=$this->status['name']?></b><br/>
         Index created at: <b><?=date("Y-m-d", strtotime($this->status['date']))?></b>
     </div>
@@ -65,7 +64,8 @@
             html = "Indexing status: <b>IDLE</b> (waiting for updates)<br/> ";
         }
         html += "Indexed: <b>" + data.percent + "%</b> products<br/>";
-        html += "Left to index: <b>" + data.to_index + "</b> products";
+        html += "Left to index: <b>" + data.to_index + "</b> products<br/>";
+        html += "Index size: <b>" + data.index_size + "</b> products<br/>";
         $('#indexing_message').html(html);
     }
 
