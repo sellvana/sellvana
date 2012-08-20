@@ -44,14 +44,18 @@ class FCom_IndexTank_Admin extends BClass
                         ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
-            //for API init
-            BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
+
         }
+        //on update settings create new index if index was changed
+        BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
     {
+
         if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])) {
             return false;
         }
