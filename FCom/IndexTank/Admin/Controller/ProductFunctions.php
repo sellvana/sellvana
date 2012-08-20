@@ -9,13 +9,6 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
     public function gridConfig()
     {
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        if ($indexingStatus) {
-            BLayout::i()->view('indextank/product_functions')->set('indexing_status', $indexingStatus->info);
-        } else {
-            BLayout::i()->view('indextank/product_functions')->set('indexing_status', "N/A");
-        }
-
         try {
             $status = FCom_IndexTank_Index_Product::i()->status();
             BLayout::i()->view('indextank/product_functions')->set('status', $status);
