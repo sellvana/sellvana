@@ -20,7 +20,7 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
         if (!$indexingStatus) {
             $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->create();
             $indexingStatus->task = $task;
-            $indexingStatus->status = 'stop';
+            $indexingStatus->status = 'start';
             $indexingStatus->updated_at = date("Y-m-d H:i:s");
             $indexingStatus->save();
         }

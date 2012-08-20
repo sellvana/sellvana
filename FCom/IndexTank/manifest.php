@@ -2,7 +2,7 @@
     'modules' => array(
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.1.4',
+            'version' => '0.1.5',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
             'translations' => array('de' => 'de.csv'),
