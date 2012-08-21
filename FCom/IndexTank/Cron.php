@@ -41,7 +41,12 @@ class FCom_IndexTank_Cron extends BClass
                     array("indextank_indexed" => 1, "indextank_indexed_at" => date("Y-m-d H:i:s")),
                     "id in (".implode(",", $productIds).")");
         //index
-        FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
+        try {
+            FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
+        } catch(Exception $e) {
+            //do not update products index status because of exception
+            return true;
+        }
         //after index
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 2, "indextank_indexed_at" => date("Y-m-d H:i:s")),
