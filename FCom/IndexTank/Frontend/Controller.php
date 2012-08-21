@@ -4,6 +4,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 {
     public function action_category()
     {
+#echo "<pre>"; debug_print_backtrace(); print_r(BFrontController::i()->currentRoute()); exit;
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
             $this->forward(true);
@@ -26,18 +27,31 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
 
         BApp::i()
+            ->set('current_category', $category)
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
         FCom_Core::lastNav(true);
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
+
+        $head = $this->view('head');
+        $crumbs = array('home');
+        foreach ($category->ascendants() as $c) {
+            if ($c->node_name) {
+                $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
+                $head->addTitle($c->node_name);
+            }
+        }
+        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
+        $head->addTitle($category->node_name);
+        $layout->view('breadcrumbs')->crumbs = $crumbs;
+
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
         $layout->view('catalog/product/list')->products_data = $productsData;
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
-        $this->layout('/indextank/search');
+        $this->layout('/catalog/category');
     }
 
     public function action_search()
@@ -67,7 +81,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/product/list')->products_data = $productsData;
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
-        $this->layout('/indextank/search');
+        $this->layout('/catalog/search');
     }
 
 

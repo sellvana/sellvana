@@ -27,3 +27,7 @@ FCom.tabs = function(options) {
 FCom._ = function(str) {
 return FCom.i18n[str] || str;
 }
+
+function addslashes(str) {
+    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+}
