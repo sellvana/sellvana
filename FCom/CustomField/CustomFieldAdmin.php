@@ -20,7 +20,7 @@ class FCom_CustomField_Admin extends BClass
         ;
 
         BPubSub::i()
-            ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
+//            ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
             ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns')
                 //
             ->on('FCom_Catalog_Admin_Controller_Products::formViewBefore', 'FCom_CustomField_Admin_Controller_Products.formViewBefore');
@@ -61,7 +61,7 @@ class FCom_CustomField_Admin extends BClass
                 ),*/
             ));
     }
-
+/*
     public function productAfterSave($args)
     {
         $p = $args['model'];
@@ -76,7 +76,7 @@ class FCom_CustomField_Admin extends BClass
         }
         // not deleting to preserve meta info about fields
     }
-
+*/
     public function productGridColumns($args)
     {
         $fields = FCom_CustomField_Model_Field::i()->orm('f')->find_many();

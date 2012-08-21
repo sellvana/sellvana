@@ -466,6 +466,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $catIds[] = substr($fname, 3);
                 }
             }
+            if (empty($catIds)) {
+                return array();
+            }
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
             // fetch all ascendants that do not have products
             $ascIds = array();
