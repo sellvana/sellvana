@@ -132,6 +132,7 @@ class BViewGrid extends BView
             }
         }
 
+        BDb::connect();
         // create collection factory
         #$orm = AModel::factory($config['model']);
         $table = $config['table'];

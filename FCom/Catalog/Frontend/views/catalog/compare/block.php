@@ -9,11 +9,13 @@
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>
 <script>
 $(function() { // let all checkboxes to load first
-    $('.block-compare').data('compare', new DentevaCompare({thumbContainer:'.block-compare', prodContainerPrefix:'#tr-product-', checkbox:'.compare-checkbox', img:'.product-img'}));
+    $('.block-compare').data('compare', new FCom.CompareBlock({thumbContainer:'.block-compare', prodContainerPrefix:'#tr-product-', checkbox:'.compare-checkbox', img:'.product-img'}));
 });
-$("a[rel]").overlay({mask:{color:'#000',loadSpeed:0,opacity:0.3}, effect:'default', speed:0, onBeforeLoad: function() {
-    this.getOverlay().find(".contentWrap").load(this.getTrigger().attr("href"));
-}});
+$(function() {
+    $("a[rel]").overlay({mask:{color:'#000',loadSpeed:0,opacity:0.3}, effect:'default', speed:0, onBeforeLoad: function() {
+        this.getOverlay().find(".contentWrap").load(this.getTrigger().attr("href"));
+    }});
+});
 </script>
 <style>
 .overlay .close { display:block; width:20px; height:20px; background:red; }

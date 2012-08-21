@@ -25,7 +25,7 @@ class FCom_Catalog_Frontend extends BClass
         BLayout::i()->layout(array(
             'base'=>array(
                 array('view', 'head', 'do'=>array(
-                    array('js', '{FCom_Catalog}/Frontend/js/fcom.frontend.js'),
+                    array('js', '{FCom_Catalog}/Frontend/js/fcom.catalog.js'),
                 )
             )),
             '/catalog/category'=>array(
@@ -49,11 +49,12 @@ class FCom_Catalog_Frontend extends BClass
             ),
 
             '/catalog/compare'=>array(
-
+                array('layout', 'base'),
+                array('hook', 'main', 'views'=>array('catalog/compare')),
             ),
 
-            '/catalog/compare/ajax'=>array(
-
+            '/catalog/compare/xhr'=>array(
+                array('root', 'catalog/compare'),
             ),
         ));
     }

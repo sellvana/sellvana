@@ -26,13 +26,18 @@ class FCom_IndexTank_Frontend extends BClass
         BLayout::i()->layout(array(
             'base'=>array(
                 array('view', 'head', 'do'=>array(
-                    array('js', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js')
+                    //array('js', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js')
                 )
             )),
-            '/indextank/search'=>array(
+            '/catalog/category'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('catalog/search')),
-                array('hook', 'search_filters_block', 'views'=>array('indextank/product/filters'))
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
+                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters'))
+            ),
+            '/catalog/search'=>array(
+                array('layout', 'base'),
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
+                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters'))
             ),
 
         ));
