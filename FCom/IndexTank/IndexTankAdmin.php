@@ -157,9 +157,15 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
+        if (!$products) {
+            return;
+        }
         $productIds = array();
         foreach ($products as $product) {
             $productIds[] = $product->id();
+        }
+        if (!$productIds) {
+            return;
         }
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
@@ -183,9 +189,15 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
+        if (!$products) {
+            return;
+        }
         $productIds = array();
         foreach ($products as $product) {
             $productIds[] = $product->id();
+        }
+        if (!$productIds) {
+            return;
         }
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
@@ -224,14 +236,17 @@ class FCom_IndexTank_Admin extends BClass
             $doc->search            = 0;
             $doc->source_type       = 'product';
             $doc->source_value      = $cfModel->field_code;
-
             $doc->save();
+
         } elseif ('product' == $doc->source_type && $doc->source_value != $cfModel->field_code) {
             $doc->source_value      = $cfModel->field_code;
             $doc->save();
         }
 
         $products = $cfModel->products();
+        if (!$products) {
+            return;
+        }
         foreach ($products as $product) {
             FCom_IndexTank_Index_Product::i()->updateCategories($product);
         }
@@ -263,7 +278,6 @@ class FCom_IndexTank_Admin extends BClass
             }
         }
         $doc->delete();
-
     }
 
 
