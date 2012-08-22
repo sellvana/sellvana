@@ -397,19 +397,36 @@ class BRequest extends BClass
             return;
         }
         $result = array();
-        foreach ($source['error'] as $key=>$error) {
-            if ($error==UPLOAD_ERR_OK) {
-                $tmpName = $source['tmp_name'][$key];
-                $name = $source['name'][$key];
-                $type = $source['type'][$key];
-                if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
-                    $result[$key] = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
-                    continue;
+        if (is_array($source['error'])) {
+            foreach ($source['error'] as $key=>$error) {
+                if ($error==UPLOAD_ERR_OK) {
+                    $tmpName = $source['tmp_name'][$key];
+                    $name = $source['name'][$key];
+                    $type = $source['type'][$key];
+                    if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
+                        $result[$key] = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
+                        continue;
+                    }
+                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
+                    $result[$key] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                } else {
+                    $result[$key] = array('error'=>$error);
                 }
-                move_uploaded_file($tmpName, $targetDir.'/'.$name);
-                $result[$key] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+            }
+        } else {
+            $error = $source['error'];
+            if ($error==UPLOAD_ERR_OK) {
+                $tmpName = $source['tmp_name'];
+                $name = $source['name'];
+                $type = $source['type'];
+                if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
+                    $result = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
+                } else {
+                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
+                    $result = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                }
             } else {
-                $result[$key] = array('error'=>$error);
+                $result = array('error'=>$error);
             }
         }
         return $result;
