@@ -13,6 +13,7 @@ class FCom_Frontend_DefaultTheme extends BClass
 
     public function layout()
     {
+        $cookieConfig = BConfig::i()->get('cookie');
         BLayout::i()
             ->layout(array(
                 'base'=>array(
@@ -21,8 +22,6 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('view', 'head', 'do'=>array(
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', '/favicon.ico'),
-                        //array('js', '{FCom_Core}/js/core.js' ),
-                        //array('js', '{FCom_Core}/js/core-i18n.js' ),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('js', '{FCom_Core}/js/lib/html5shiv.min.js', array('if'=>'lt IE 9')),
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),
@@ -33,15 +32,22 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('css', 'pnotify', array('file'=>'{FCom_Core}/js/lib/css/jquery.pnotify.default.css')),
                         array('css', 'rating', array('file'=>'{FCom_Core}/js/lib/css/jquery.rating.css')),
                         array('css', 'lightbox', array('file'=>'{FCom_Core}/js/lib/css/lightbox/lightbox.css')),
-                        array('js_raw', 'js_init', array('content'=>"window.less={env:'development'}")),
+                        array('js_raw', 'js_init', array('content'=>"
+window.less={env:'development'};
+head(function() {
+    $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+});
+")),
                         array('js_raw', 'js_base_href', array('content'=>"Fcom={base_href:'".BApp::baseUrl()."'}")),
                         //array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.rating.min.js'),
                         array('js', '{FCom_Core}/js/lib/lightbox/lightbox.js'),
+                        array('js', '{FCom_Core}/js/fcom.core.js'),
 
                     )),
                     array('hook', 'breadcrumbs', 'views'=>array('breadcrumbs')),

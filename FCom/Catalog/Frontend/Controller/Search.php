@@ -20,10 +20,18 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             ->set('current_category', $category)
             ->set('products_data', $productsData);
 
+        $head = $this->view('head');
         $crumbs = array('home');
-        foreach ($category->ascendants() as $c) if ($c->node_name) $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
+        foreach ($category->ascendants() as $c) {
+            if ($c->node_name) {
+                $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
+                $head->addTitle($c->node_name);
+            }
+        }
         $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
+        $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->crumbs = $crumbs;
+
         $layout->view('catalog/product/list')->products_data = $productsData;
 
         FCom_Core::lastNav(true);

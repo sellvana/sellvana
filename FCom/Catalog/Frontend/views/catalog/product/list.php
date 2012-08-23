@@ -18,6 +18,4 @@
                 ->set('category', $this->category) ?>
         </tbody>
     </table>
-
-    <?=$this->hook('search_filters_block')?>
 <?php endif ?>

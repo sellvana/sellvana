@@ -1,23 +1,7 @@
-function addslashes(str) {
-    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
-}
 
-function getCookie(name) {
-    for(var i=0, c=document.cookie.split(';'); c && i<c.length; i++) {
-        if(c[i].substr(0,c[i].indexOf('=')).replace(/^\s+|\s+$/g,'')==name) {
-            return unescape(c[i].substr(c[i].indexOf('=')+1));
-        }
-    }
-}
 
-function setCookie(name, value, exdays) {
-    var d=new Date(), exp=exdays===null?'':(value===null?'Thu, 01-Jan-1970 00:00:01 GMT':d.setDate(d.getDate()+exdays));
-    var c=window.cookieDefault;
-    document.cookie=name+'='+escape(value)+(exp?';expires='+exp:'')+';domain='+escape(c.domain)+';path='+escape(c.path);
-}
-
-function FulleronCompare(opt) {
-    var cookieName = opt.cookieName || 'fulleronCompare', cookie = getCookie(cookieName);
+FCom.CompareBlock = function(opt) {
+    var cookieName = opt.cookieName || 'fulleronCompare', cookie = $.cookie(cookieName);
     var selected = cookie ? JSON.parse(cookie) : [], ul = $('ul', opt.thumbContainer);
     var added = {}; // to avoid duplicate notifications
 
@@ -49,7 +33,7 @@ function FulleronCompare(opt) {
         selected.push(s);
         thumb(s, selected.length-1);
         check(id, true);
-        setCookie(cookieName, JSON.stringify(selected), 1);
+        $.cookie(cookieName, JSON.stringify(selected), {expires:1});
         $('.compare-num-products').html(selected.length);
         $(opt.thumbContainer).addClass('set');
         $(opt.thumbContainer).stop().animate({boxShadow:'0px 0px 15px #A2C2EA'}, 1000, function() {
@@ -66,7 +50,7 @@ function FulleronCompare(opt) {
         $(ul.children().get(i)).remove(); ul.append('<li/>');
         check(id, false);
         selected.splice(i, 1);
-        setCookie(cookieName, JSON.stringify(selected), 1);
+        $.cookie(cookieName, JSON.stringify(selected), {expires:1});
         if (trigger) {
             $(trigger).parents('li').remove();
             $(trigger).parents('ul').append('<li>&nbsp;</li>');
@@ -112,50 +96,4 @@ function FulleronCompare(opt) {
 
     return {add:add, remove:remove, toggle:toggle, reset:reset};
 }
-
-function ManufIframe(opt) {
-    iframe = $(opt.iframe);
-
-    //absolutize(el);
-    var o = iframe.offset(), w = iframe.width(), h = iframe.height(), close, placeholder;
-
-    function expand() {
-        var st = $(document).scrollTop(), sl = $(document).scrollLeft(),
-        ww = $(window).width(), wh = $(window).height();
-
-        iframe.css({position:'fixed', left:o.left-sl, top:o.top-st, width:w, height:h})
-        .animate({left:10, top:10, width:ww-20, height:wh-20}, function() {
-            close = $('<div style="background:red;position:fixed;top:0;left:0;z-index:1001"><a href="#">[X]</a>');
-            iframe.after(close);
-            close.children('a').click(function() { collapse(); return false; });
-            shortcut.add('Esc', function() { collapse(); });
-        });
-        placeholder = $('<div>').css({width:w, height:h});
-        iframe.after(placeholder);
-        return false;
-    }
-
-    function collapse() {
-        var st = $(document).scrollTop(), sl = $(document).scrollLeft();
-        close.remove();
-        iframe.animate({left:o.left-sl, top:o.top-st, width:w, height:h}, function() {
-            placeholder.remove();
-            iframe.css({position:'static', width:'100%', height:h});
-        });
-        shortcut.remove('Esc');
-    }
-
-    return {expand:expand, collapse:collapse};
-}
-
-$(function(){
-    $('.block-layered-nav .block-content a').hover(
-          function () {
-            $(this).animate({ backgroundColor: "#eee" }, 60);
-          },
-          function () {
-            $(this).animate({ backgroundColor: "#f7f7f7" }, 30);
-        }
-    );
-});
 

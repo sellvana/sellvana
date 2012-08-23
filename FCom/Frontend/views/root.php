@@ -9,7 +9,7 @@
             <?php echo $this->hook('header') ?>
 
             <div class="main <?php echo $this->layout_class ?>">
-            	<?php echo $this->hook('breadcrumbs') ?>
+            	<?php //echo $this->hook('breadcrumbs') ?>
 
 <?php if ($this->show_left_col): ?>
                 <div class="col-left sidebar">

@@ -1136,9 +1136,9 @@ class BViewHead extends BView
     * @param mixed $title
     * @return BViewHead
     */
-    public function title($title)
+    public function title($title, $start=false)
     {
-        $this->addTitle($title);
+        $this->addTitle($title, $start);
     }
 
     /**
@@ -1235,9 +1235,13 @@ class BViewHead extends BView
         return $this;
     }
 
-    public function addTitle($title)
+    public function addTitle($title, $start=false)
     {
-        $this->_title[] = $title;
+        if ($start) {
+            array_splice($this->_title, 0, 1, $title);
+        } else {
+            $this->_title[] = $title;
+        }
         return $this;
     }
 

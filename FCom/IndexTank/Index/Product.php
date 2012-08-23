@@ -678,7 +678,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function fieldGetCategories($product, $type='', $field='')
     {
         $categories = array();
-        $productCategories = $product->categories(false); //get all categories for product
+        $productCategories = $product->categories(true); //get all categories for product
         if ($productCategories) {
             foreach ($productCategories as $cat) {
                 $catPath = $this->getCategoryKey($cat);//str_replace("/","__",$cat->url_path);
