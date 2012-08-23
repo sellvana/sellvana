@@ -466,8 +466,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $catIds[] = substr($fname, 3);
                 }
             }
+            if (empty($catIds)) {
+                return array();
+            }
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
             // fetch all ascendants that do not have products
+            /*
             $ascIds = array();
             foreach ($categories as $cat) {
                 foreach (explode('/', $cat->id_path) as $id) {
@@ -482,6 +486,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $categories[$id] = $cat;
                 }
             }
+            */
             // sort by full name (including hierarchy)
             uasort($categories, function($a, $b) {
                 return $a->full_name<$b->full_name ? -1 : ($a->full_name>$b->full_name ? 1 : 0);
@@ -690,29 +695,27 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function fieldPriceRange($product, $type='', $field='')
     {
-        if ($product->min_price < 100) {
-            return '$0 to $99';
-        } else if ($product->min_price < 200) {
-            return '$100 to $199';
-        }else if ($product->min_price < 300) {
-            return '$200 to $299';
-        }else if ($product->min_price < 400) {
-            return '$300 to $399';
-        }else if ($product->min_price < 500) {
-            return '$400 to $499';
-        }else if ($product->min_price < 600) {
-            return '$500 to $599';
-        }else if ($product->min_price < 700) {
-            return '$600 to $699';
-        }else if ($product->min_price < 800) {
-            return '$700 to $799';
-        }else if ($product->min_price < 900) {
-            return '$800 to $899';
-        }else if ($product->min_price < 1000) {
-            return '$900 to $999';
-        }
-
-
+        $m = $product->min_price;
+        if ($m <   100) return '$0 to $99';
+        if ($m <   200) return '$100 to $199';
+        if ($m <   300) return '$200 to $299';
+        if ($m <   400) return '$300 to $399';
+        if ($m <   500) return '$400 to $499';
+        if ($m <   600) return '$500 to $599';
+        if ($m <   700) return '$600 to $699';
+        if ($m <   800) return '$700 to $799';
+        if ($m <   900) return '$800 to $899';
+        if ($m <  1000) return '$900 to $999';
+        if ($m <  2000) return '$1000 to $1999';
+        if ($m <  3000) return '$2000 to $2999';
+        if ($m <  4000) return '$3000 to $3999';
+        if ($m <  5000) return '$4000 to $4999';
+        if ($m <  6000) return '$5000 to $5999';
+        if ($m <  7000) return '$6000 to $6999';
+        if ($m <  8000) return '$7000 to $7999';
+        if ($m <  9000) return '$8000 to $8999';
+        if ($m < 10000) return '$9000 to $9999';
+        return '$10000 or more';
     }
 
     public function fieldStringToOrdinal($product, $type='', $field='')
