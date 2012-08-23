@@ -480,7 +480,8 @@ class BRequest extends BClass
 
     public static function currentUrl()
     {
-        return static::scheme().'://'.static::httpHost().static::webRoot()
+        $webroot = rtrim(static::webRoot(), '/');
+        return static::scheme().'://'.static::httpHost().$webroot
             .static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
     }
 

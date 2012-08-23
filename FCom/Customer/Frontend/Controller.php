@@ -46,7 +46,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 'success', 'frontend');
         BResponse::i()->redirect(BApp::href('login'));
     }
-    
+
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
