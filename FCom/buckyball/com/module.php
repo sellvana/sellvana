@@ -58,7 +58,7 @@ class BModuleRegistry extends BClass
 
     public static function isLoaded($modName)
     {
-        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_level===BModule::LOADED;
+        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_status===BModule::LOADED;
     }
 
     /**

@@ -2,7 +2,7 @@
 $s = $this->s;
 ?>
 <?= BLocale::_("Categories") ?>:<br/>
-<a href="<?=BApp::href('indextank/search').'?'.BRequest::rawGet()?>"><?= BLocale::_("Any department") ?></a><br/>
+<a href="<?=BApp::href('catalog/search').'?'.BRequest::rawGet()?>"><?= BLocale::_("All categories") ?></a><br/>
 <?php foreach($s['available_categories'] as $data):?>
     <?php foreach ($data as $obj):            ?>
         <div style="padding-left:<?=$obj->level*15?>px; white-space:nowrap;">

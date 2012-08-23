@@ -1505,12 +1505,12 @@ class BModel extends Model
     */
     public function cachePreload($where=null, $field=null, $sort=null)
     {
+        $orm = $this->factory();
         $class = $this->_origClass();
         if (is_null($field)) {
             $field = static::_get_id_column_name($class);
         }
         $cache =& static::$_cache[$class];
-        $orm = $this->factory();
         if ($where) $orm->where_complex($where);
         if ($sort) $orm->order_by_asc($sort);
         $options = !empty(static::$_cacheFlags[$field]) ? static::$_cacheFlags[$field] : array();
@@ -1546,7 +1546,8 @@ class BModel extends Model
             if (!empty(static::$_cache[$class][$lk][$key])) continue;
             $keys[$key] = 1;
         }
-        if ($keys) $this->cachePreload(array($lk=>array_keys($keys)), $lk);
+        $field = (strpos($lk, '.')===false ? '_main.' : '').$lk; //TODO: table alias flexibility
+        if ($keys) $this->cachePreload(array($field=>array_keys($keys)), $lk);
         return $this;
     }
 
