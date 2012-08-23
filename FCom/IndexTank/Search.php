@@ -81,7 +81,6 @@ class FCom_IndexTank_Search extends BClass
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $resultPerPage);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
 
-        //print_r($facets);exit;
         $productsData = array();
         if ($productsORM) {
             //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
@@ -101,6 +100,7 @@ class FCom_IndexTank_Search extends BClass
         $productsData['state']['filter_selected'] = $filtersSelected;
         $productsData['state']['available_facets'] = $facetsData;
         $productsData['state']['available_categories'] = $categoriesData;
+        $productsData['state']['category_selected'] = $categorySelected;
         $productsData['state']['filter'] = $v;
         $productsData['state']['save_filter'] = BConfig::i()->get('modules/FCom_IndexTank/save_filter');
 

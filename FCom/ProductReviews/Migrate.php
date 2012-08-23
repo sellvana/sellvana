@@ -5,7 +5,7 @@ class FCom_ProductReviews_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.1', array($this, 'install'));
-
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function install()
@@ -27,5 +27,12 @@ class FCom_ProductReviews_Migrate extends BClass
         ");
     }
 
-
+    public function upgrade_0_1_2()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+ALTER TABLE {$tProduct} ADD COLUMN avg_rating decimal(5,2) NULL;
+ALTER TABLE {$tProduct} ADD COLUMN num_reviews int NULL;
+        ");
+    }
 }
