@@ -28,7 +28,8 @@ class FCom_ProductReviews_Admin extends BClass
             'catalog_product_form_tabs'=>array(
                     array('view', 'admin/form',
                         'do'=>array(
-                            array('addTab', 'product_reviews', array('label' => 'Product Review', 'pos'=>'70', 'view'=>'prodreviews/products/tab', 'async'=>true)),
+                            array('addTab', 'product_reviews', array('label' => 'Product Review', 'pos'=>'70',
+                                'view'=>'prodreviews/products/tab', 'async'=>true)),
                         ),
                     ),
              ),
