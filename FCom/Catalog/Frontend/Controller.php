@@ -23,8 +23,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        $productReviews = FCom_ProductReviews_Model_Reviews::i()->orm()->where("product_id", $product->id())->find_many();
-        $layout->view('catalog/product')->product_reviews = $productReviews;
         $layout->view('catalog/product')->product = $product;
 
         if ($r) {
