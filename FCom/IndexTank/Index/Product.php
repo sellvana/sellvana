@@ -257,6 +257,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         if (!isset($this->_result->facets)) {
             return false;
         }
+#echo "<pre>"; print_r($this->_result->facets); exit;
         $facets = get_object_vars($this->_result->facets);
         $res = array();
         foreach ($facets as $k => $v) {
@@ -298,13 +299,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
 
             //submit every N products to IndexDen - this protect from network overloading
-            if ( 0 == $counter++ % $limit ) {
+            if ( 0 == ++$counter % $limit ) {
+                BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
                 $this->model()->add_documents($documents);
                 $documents = array();
             }
         }
 
         if ($documents) {
+            BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
         }
     }
@@ -720,7 +723,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function fieldStringToOrdinal($product, $type='', $field='')
     {
-        $string = BLocale::transliterate($product->{$field}, '');
+        $string = BLocale::transliterate($product->$field, '');
 
         if (empty($string)) {
             return '';
