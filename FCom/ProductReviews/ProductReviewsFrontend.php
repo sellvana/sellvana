@@ -11,8 +11,7 @@ class FCom_ProductReviews_Frontend extends BClass
 
         BFrontController::i()
             ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
-            ->route('GET|POST /prodreviews/add', 'FCom_ProductReviews_Frontend_Controller.add')
-            ->route('POST /prodreviews/helpful', 'FCom_ProductReviews_Frontend_Controller.helpful')
+            ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');

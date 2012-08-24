@@ -2,7 +2,7 @@
     'modules' => array(
         // product reviews
         'FCom_ProductReviews' => array(
-            'version' => '0.1.2',
+            'version' => '0.1.4',
             'root_dir' => '',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
             'translations' => array('de' => 'de.php'),
