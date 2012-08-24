@@ -3,12 +3,11 @@ $prod = $this->product;
 $reviews = $this->product_reviews;
 $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
 ?>
-
 <h4 id="reviews"><?= BLocale::_("Reviews") ?></h4>
-
 <?php if (!$reviews) :?>
-        <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Be the first to review this product") ?></a><br/><br/>
+    <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Be the first to review this product") ?></a><br/><br/>
 <?php else:?>
+    Total reviews: <?=$prod->num_reviews?><br/>
     <?php foreach ($reviews as $review) :?>
         <div style="border:1 px solid black;">
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="1" <?=$review->rating == 1 ? 'checked': ''?>/>
@@ -22,6 +21,10 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
         <?=nl2br($review->text)?><br/>
 
         <?php if ($isLoggedIn): ?>
+            <a href="javascript:void(0)"
+                onclick="$.get('<?=Bapp::href('prodreviews/offensive')?>?rid=<?=$review->id?>');$('#offensive_msg_<?=$review->id?>').show()"
+                style="color:red">Offensive review</a>
+            <div id="offensive_msg_<?=$review->id?>" style="display:none; color: green;">Thank you for your feedback!</div>
             <div id="block_review_helpful_<?=$review->id?>">
                 <form action="<?=Bapp::href('prodreviews/helpful')?>" method="post"  onsubmit="return false;">
                     <input type="hidden" name="pid" value="<?=$prod->id?>">
@@ -34,6 +37,8 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
                 </form>
             </div>
             <span id="block_review_helpful_done_<?=$review->id?>" style="color:green"></span>
+
+
         <?php endif; ?>
 
         <br/><br/>
