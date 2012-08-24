@@ -7,7 +7,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_modelClass = 'FCom_ProductReviews_Model_Reviews';
     protected $_mainTableAlias = 'prr';
 
-    public function gridConfig($productModel=null)
+    public function gridConfig($productModel = false)
     {
         $formUrl = BApp::href("prodreviews/form");
         $config = array();
@@ -15,7 +15,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'id'=>array('label'=>'ID', 'width'=>55),
             'title'=>array('label'=>'Title', 'width'=>250, 'editable'=>true),
             'rating'=>array('label'=>'Rating', 'width'=>60, 'editable'=>true),
-            'helpful'=>array('label'=>'Helpful', 'width'=>60, 'editable'=>true)
+            'helpful'=>array('label'=>'Helpful', 'width'=>60, 'editable'=>true),
+            'approved'=>array('label'=>'Approved', 'editable'=>true, 'options' => array('1' => 'Yes','0' => 'No'))
         );
 
         $config['grid']['id'] = 'productreview';
