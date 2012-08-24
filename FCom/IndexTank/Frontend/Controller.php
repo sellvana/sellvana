@@ -68,20 +68,22 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
             die('Please set up correct API URL at Admin Setting page');
         }
-        $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
+        if ($q) {
+            $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
+            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
 
-        BApp::i()
-            ->set('current_query', $q)
-            ->set('products_data', $productsData);
+            BApp::i()
+                ->set('current_query', $q)
+                ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-        $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
-        $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
-        $layout->view('catalog/product/list')->products_data = $productsData;
-        $layout->view('indextank/product/filters')->state = $productsData['state'];
+            FCom_Core::lastNav(true);
+            $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
+            $layout->view('catalog/search')->query = $q;
+            $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
+            $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
+            $layout->view('catalog/product/list')->products_data = $productsData;
+            $layout->view('indextank/product/filters')->state = $productsData['state'];
+        }
 
         $this->layout('/catalog/search');
     }
