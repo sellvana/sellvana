@@ -37,13 +37,15 @@ window.less={env:'development'};
 head(function() {
     $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
 });
+FCom = {};
+FCom.base_href = '".BApp::baseUrl()."';
 ")),
-                        array('js_raw', 'js_base_href', array('content'=>"Fcom={base_href:'".BApp::baseUrl()."'}")),
                         array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.validate.min.js'),
+                        //array('js', '{FCom_Core}/js/lib/jquery.animate-shadow-min.1.8.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.rating.min.js'),
                         array('js', '{FCom_Core}/js/lib/lightbox/lightbox.js'),
