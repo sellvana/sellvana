@@ -578,4 +578,12 @@ Estimated tax: $'.$estimatedTax.'<br>
     {
         return '/carts/items/'.$id;
     }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        return true;
+    }
 }

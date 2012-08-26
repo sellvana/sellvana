@@ -53,7 +53,6 @@ class FCom_Checkout_Migrate extends BClass
     public function upgrade_0_1_1()
     {
         $tCartItem = FCom_Checkout_Model_CartItem::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tCartItem, 'price')) {
             return;
         }
@@ -96,7 +95,6 @@ class FCom_Checkout_Migrate extends BClass
     public function upgrade_0_1_3()
     {
         $tCart = FCom_Checkout_Model_Cart::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tCart, "shipping_method")) {
             return;
         }
@@ -114,7 +112,6 @@ class FCom_Checkout_Migrate extends BClass
     public function upgrade_0_1_4()
     {
         $tCart = FCom_Checkout_Model_Cart::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tCart, "shipping_service")){
             return;
         }
@@ -126,7 +123,6 @@ class FCom_Checkout_Migrate extends BClass
     public function upgrade_0_1_5()
     {
         $tCart = FCom_Checkout_Model_Cart::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tCart, "status")){
             return;
         }
@@ -138,7 +134,6 @@ class FCom_Checkout_Migrate extends BClass
     public function upgrade_0_1_6()
     {
         $tAddress = FCom_Checkout_Model_Address::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tAddress, "email")){
             return;
         }
@@ -149,12 +144,15 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_7()
     {
+        $tCart = FCom_Checkout_Model_Cart::table();
         $tCartItem = FCom_Checkout_Model_CartItem::table();
-        BDb::ddlClearCache();
         if (BDb::ddlFieldInfo($tCartItem, "rowtotal")){
             return;
         }
         BDb::run("
+            ALTER TABLE {$tCart} ADD COLUMN `create_dt` DATETIME NULL AFTER `status`,
+                ADD COLUMN `update_dt` DATETIME NULL AFTER `create_dt`;
+
             ALTER TABLE {$tCartItem} ADD COLUMN `rowtotal` DECIMAL(12,4) NULL AFTER `price`,
                 ADD COLUMN `create_dt` DATETIME NOT NULL AFTER `rowtotal`,
                 ADD COLUMN `update_dt` DATETIME NOT NULL AFTER `create_dt`;
