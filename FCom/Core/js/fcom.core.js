@@ -1,5 +1,3 @@
-var FCom = {};
-
 FCom.tabs = function(options) {
     var tabs = $(options.tabs);
     var curLi = $(options.tabs+'[class=active]');

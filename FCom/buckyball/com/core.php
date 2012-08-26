@@ -1536,7 +1536,7 @@ class BSession extends BClass
             $class = $this->_availableHandlers[$config['session_handler']];
             $class::i()->register($ttl);
         }
-        session_set_cookie_params($ttl, $path, $domain);
+        //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : 'buckyball');
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
@@ -1545,6 +1545,9 @@ class BSession extends BClass
             BDebug::warning("Headers already sent, can't start session");
         } else {
             session_start();
+            // update session cookie expiration to reflect current visit
+            // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
+            setcookie(session_name(), session_id(), time()+$ttl, $path, $domain);
         }
         $this->_phpSessionOpen = true;
         $this->_sessionId = session_id();

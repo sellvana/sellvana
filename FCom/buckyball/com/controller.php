@@ -1269,8 +1269,8 @@ class BFrontController extends BClass
                 return $res;
             }
 
-            $ap = strpos($a->route_name, "*");
-            $bp = strpos($b->route_name, "*");
+            $ap = (strpos($a->route_name, '*') ? 10 : 0)+(strpos($a->route_name, '.') ? 5 : 0)+(strpos($a->route_name, ':') ? 1 : 0);
+            $bp = (strpos($b->route_name, '*') ? 10 : 0)+(strpos($b->route_name, '.') ? 5 : 0)+(strpos($b->route_name, ':') ? 1 : 0);
             return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
         return $this;
@@ -1336,7 +1336,7 @@ class BFrontController extends BClass
             }
             $this->_currentRoute = $route;
             $forward = $route->dispatch();
-
+#var_dump($route); exit;
             if (is_array($forward)) {
                 list($actionName, $forwardCtrlName, $params) = $forward;
                 $controllerName = $forwardCtrlName ? $forwardCtrlName : $route->controller_name;

@@ -147,10 +147,18 @@ class FCom_Checkout_Migrate extends BClass
         );
     }
 
-
-
-
-
-
+    public function upgrade_0_1_7()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo($tCartItem, "rowtotal")){
+            return;
+        }
+        BDb::run("
+            ALTER TABLE {$tCartItem} ADD COLUMN `rowtotal` DECIMAL(12,4) NULL AFTER `price`,
+                ADD COLUMN `create_dt` DATETIME NOT NULL AFTER `rowtotal`,
+                ADD COLUMN `update_dt` DATETIME NOT NULL AFTER `create_dt`;
+        ");
+    }
 
 }

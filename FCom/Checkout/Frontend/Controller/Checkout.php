@@ -92,7 +92,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/checkout');
     }
 
-    public function action_checkout_post()
+    public function action_checkout__POST()
     {
         $post = BRequest::i()->post();
 
@@ -197,7 +197,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/payment');
     }
 
-    public function action_payment_post()
+    public function action_payment__POST()
     {
         $post = BRequest::i()->post();
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
@@ -228,7 +228,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/shipping');
     }
 
-    public function action_shipping_post()
+    public function action_shipping__POST()
     {
         $href = BApp::href('checkout/payment');
         BResponse::i()->redirect($href);
