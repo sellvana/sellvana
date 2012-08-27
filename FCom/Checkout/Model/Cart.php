@@ -148,14 +148,27 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function items($assoc=true)
     {
-        $this->items = FCom_Checkout_Model_CartItem::factory()->where('cart_id', $this->id)->find_many_assoc();
+        $this->items = FCom_Checkout_Model_CartItem::i()->orm()->where('cart_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
-    public function loadProducts()
+    public function recentItems($limit=3)
     {
+        $orm = FCom_Checkout_Model_CartItem::i()->orm('ci')->where('ci.cart_id', $this->id)
+            ->order_by_desc('ci.update_dt')->limit($limit);
+        BPubSub::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
+        $items = $orm->find_many();
+        BPubSub::i()->fire(__METHOD__.'.data', array('items'=>&$items));
+        return $items;
+    }
+
+    public function loadProducts($items = null)
+    {
+        if (is_null($items)) {
+            $items = $this->items();
+        }
         $productIds = array();
-        foreach ($this->items() as $item) {
+        foreach ($items as $item) {
             if ($item->product) continue;
             if (($cached = FCom_Catalog_Model_Product::i()->cacheFetch('id', $item->product_id))) {
                 $item->product = $cached;
@@ -167,7 +180,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             //todo: fix bug for ambigious field ID
             //FCom_Catalog_Model_Product::i()->cachePreloadFrom(array_keys($productIds));
         }
-        foreach ($this->items() as $item) {
+        foreach ($items as $item) {
             $item->product = FCom_Catalog_Model_Product::i()->load($item->product_id);
         }
         return $this;
@@ -564,5 +577,13 @@ Estimated tax: $'.$estimatedTax.'<br>
     public function urlHash($id)
     {
         return '/carts/items/'.$id;
+    }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        return true;
     }
 }

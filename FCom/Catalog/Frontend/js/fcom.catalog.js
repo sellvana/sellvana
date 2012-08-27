@@ -19,7 +19,7 @@ FCom.CompareBlock = function(opt) {
     function notify(s) {
         if (added[s.id]) return;
         added[s.id] = true;
-        $.pnotify({pnotify_title:'Added to compare', pnotify_text:'<div style="width:100%;overflow:auto"><img src="'+s.src+'" width="35" height="35" style="float:left"/> '+s.alt+'</div>'});
+        //$.pnotify({pnotify_title:'Added to compare', pnotify_text:'<div style="width:100%;overflow:auto"><img src="'+s.src+'" width="35" height="35" style="float:left"/> '+s.alt+'</div>'});
     }
 
     function add(id) {
@@ -36,7 +36,9 @@ FCom.CompareBlock = function(opt) {
         $.cookie(cookieName, JSON.stringify(selected), {expires:1});
         $('.compare-num-products').html(selected.length);
         $(opt.thumbContainer).addClass('set');
+console.log('animate start');
         $(opt.thumbContainer).stop().animate({boxShadow:'0px 0px 15px #A2C2EA'}, 1000, function() {
+console.log('animate stop');
             $(opt.thumbContainer).stop().animate({boxShadow:'0px 0px'}, 1000);
         });
         //humanMsg.displayMsg('<img src="'+s.src+'" width="35" height="35"/> Added to compare: '+s.alt);

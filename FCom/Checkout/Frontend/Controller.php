@@ -23,7 +23,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->layout('/checkout/cart');
     }
 
-    public function action_cart_post()
+    public function action_cart__POST()
     {
         $cartHref = BApp::href('cart');
         $post = BRequest::i()->post();
@@ -49,6 +49,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     'html' => '<img src="'.$p->thumbUrl(35, 35).'" width="35" height="35" style="float:left"/> '.htmlspecialchars($p->product_name)
                         .(!empty($post['qty']) && $post['qty']>1 ? ' ('.$post['qty'].')' : '')
                         .'<br><br><a href="'.$cartHref.'" class="button">Go to cart</a>',
+                    'minicart_html' => BLayout::i()->view('checkout/cart/block')->render(),
                     'cnt' => $cart->itemQty(),
                     'subtotal' => $cart->calcTotals()->subtotal
                 );
