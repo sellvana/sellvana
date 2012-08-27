@@ -57,33 +57,36 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
     public function action_search()
     {
-        $layout = BLayout::i();
-        $q = BRequest::i()->get('q');
-        $sc = BRequest::i()->get('sc');
-        $f = BRequest::i()->get('f');
-        $v = BRequest::i()->get('v');
-        $page = BRequest::i()->get('p');
-        $resultPerPage = BRequest::i()->get('ps');
+        $req = BRequest::i();
+        $q = $req->get('q');
+        if (!$q) {
+            BResponse::i()->redirect(BApp::href());
+        }
+        $sc = $req->get('sc');
+        $f = $req->get('f');
+        $v = $req->get('v');
+        $page = $req->get('p');
+        $resultPerPage = $req->get('ps');
 
         if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
             die('Please set up correct API URL at Admin Setting page');
         }
-        if ($q) {
-            $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
 
-            BApp::i()
-                ->set('current_query', $q)
-                ->set('products_data', $productsData);
+        $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
+        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
 
-            FCom_Core::lastNav(true);
-            $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-            $layout->view('catalog/search')->query = $q;
-            $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
-            $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
-            $layout->view('catalog/product/list')->products_data = $productsData;
-            $layout->view('indextank/product/filters')->state = $productsData['state'];
-        }
+        BApp::i()
+            ->set('current_query', $q)
+            ->set('products_data', $productsData);
+
+        FCom_Core::lastNav(true);
+        $layout = BLayout::i();
+        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
+        $layout->view('catalog/search')->query = $q;
+        $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
+        $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
+        $layout->view('catalog/product/list')->products_data = $productsData;
+        $layout->view('indextank/product/filters')->state = $productsData['state'];
 
         $this->layout('/catalog/search');
     }

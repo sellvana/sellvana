@@ -218,7 +218,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $result = $this->model()->search($queryString, $start, $len, $this->_scoringFunction,
                     null, null, $this->_filterCategory,
                     null, $this->_filterDocvar, null, $categoryRollup, true );
-
+#var_dump($this->_filterCategory, $this->_filterDocvar, $categoryRollup, $result); exit;
         } catch(Exception $e) {
             throw $e;
         }
@@ -538,6 +538,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $categoryData['Categories'][$cat->id_path] = $obj;
                 }
             }
+
             /*
             foreach ($facets as $fname => $fvalues) {
                 //hard coded ct_categories prefix
