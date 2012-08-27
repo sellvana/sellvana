@@ -30,6 +30,7 @@ class FCom_IndexTank_Admin extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
 
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
+
             if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
                 BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
                         ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
