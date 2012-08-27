@@ -326,6 +326,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $categories = FCom_Catalog_Model_CategoryProduct::orm('cp')->where_in('cp.product_id', $pIds)
                 ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
                 ->select('c.id')->select('cp.product_id')->select('cp.category_id')->select('c.node_name')->find_many();
+        if (empty($categories)) {
+            return;
+        }
         foreach($categories as $cat) {
             $pId = $cat->product_id;
             $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
