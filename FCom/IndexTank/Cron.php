@@ -6,6 +6,9 @@ class FCom_IndexTank_Cron extends BClass
     {
         FCom_Cron::i()
             ->task('* * * * *', 'FCom_IndexTank_Cron.indexAll');
+
+        BPubSub::i()
+            ->on('FCom_IndexTank_Index_Product::add', 'FCom_IndexTank_Index_Product::onProductIndexAdd');
     }
 
     public function indexAll()

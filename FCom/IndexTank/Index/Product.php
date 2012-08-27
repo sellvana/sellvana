@@ -312,6 +312,27 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    static public function onProductIndexAdd($args)
+    {
+        // prepare products assoc array
+        $products = array();
+        foreach ($args['docs'] as &$doc) {
+            $products[$doc['docid']] =& $doc;
+        }
+        unset($doc);
+        $pIds = array_keys($products);
+
+        //add categories
+        $categories = FCom_Catalog_Model_CategoryProduct::orm('cp')->where_in('cp.product_id', $pIds)
+                ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+                ->select('c.id')->select('cp.product_id')->select('cp.category_id')->select('c.node_name')->find_many();
+        foreach($categories as $cat) {
+            $pId = $cat->product_id;
+            $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
+            $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
+        }
+    }
+
     public function updateTextField($products, $field, $fieldValue)
     {
         if (!is_array($products)){
@@ -347,7 +368,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function getCategoryKey($category)
     {
         //return 'ct_categories___'.str_replace("/","__",$category->url_path);
-        return 'ct_'.$category->id();
+        return 'ct_'.$category->id;
     }
 
     public function getCustomFieldKey($cf_model)
@@ -565,6 +586,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $result = array();
         foreach ($fieldsList as $field) {
+            if (empty($field->source_value)) {
+                continue;
+            }
             switch ($field->source_type) {
                 case 'product':
                     //get value of product object
@@ -579,6 +603,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $callback = BUtil::extCallback($field->source_value);
                     } else {
                         $callback = array($this, $field->source_value);
+                    }
+                    //check callback
+                    if (!is_callable($callback)) {
+                        continue;
                     }
                     $valuesList = call_user_func($callback, $product, $type, $field->field_name);
                     //process results
@@ -681,21 +709,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * }
      */
 
-    public function fieldGetCategories($product, $type='', $field='')
-    {
-        $categories = array();
-        $productCategories = $product->categories(true); //get all categories for product
-        if ($productCategories) {
-            foreach ($productCategories as $cat) {
-                $catPath = $this->getCategoryKey($cat);//str_replace("/","__",$cat->url_path);
-                $categories[$catPath] = $cat->node_name;
-            }
-        }
-        if ($categories && 'search' == $type) {
-            return "/".implode("/", $categories);
-        }
-        return $categories;
-    }
+
 
     public function fieldPriceRange($product, $type='', $field='')
     {
@@ -738,22 +752,5 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $result += (ord($string[$i])-48)*pow(36, $pow--);
         }
         return $result;
-    }
-
-    public function customFieldSupplierName($product, $type='', $field='')
-    {
-        $suppliers = array();
-        $productVendors = Denteva_Model_ProductVendor::i()->orm('pv')
-            ->join('Denteva_Model_Vendor', array('v.id','=','pv.vendor_id'), 'v')
-            ->where('pv.product_id', $product->id)->select('v.id')->select('v.vendor_name')->find_many();
-        if ($productVendors) {
-            foreach ($productVendors as $vnd) {
-                $suppliers['supplier_name'][] = $vnd->vendor_name;
-            }
-        }
-        if ('search' == $type) {
-            return "/".implode("/", $suppliers['supplier_name']);
-        }
-        return $suppliers;
     }
 }
