@@ -467,10 +467,10 @@ class Indextank_Index {
     private function convert_to_map($array_object) {
         $result = new stdClass();
 
-        for ($i = 0; $i < sizeof($array_object); ++$i) {
-            $result->{$i} = $array_object[$i];
+        //for ($i = 0; $i < sizeof($array_object); ++$i) {
+        foreach($array_object as $i => $v) {
+            $result->{$i} = $v;
         }
-
         return $result;
     }
 

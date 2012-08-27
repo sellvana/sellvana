@@ -196,7 +196,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 if (!empty($queryString)) {
                     $queryString .= " OR ";
                 } else {
-                    $queryString = $query . " OR ";
+                   // $queryString = $query . " OR ";
                 }
 
                 $queryString .= " {$pfield->field_name}:$query" . $priority." ";
@@ -442,6 +442,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $obj->category = false;
                         if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
                             $obj->param = "f[{$obj->key}][{$obj->name}]";
+                            //$obj->param = "f[{$obj->key}][]";
                         } else {
                             $obj->param = "f[{$obj->key}][]";
                         }
@@ -690,7 +691,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $categories[$catPath] = $cat->node_name;
             }
         }
-        if ('search' == $type) {
+        if ($categories && 'search' == $type) {
             return "/".implode("/", $categories);
         }
         return $categories;
@@ -737,5 +738,22 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $result += (ord($string[$i])-48)*pow(36, $pow--);
         }
         return $result;
+    }
+
+    public function customFieldSupplierName($product, $type='', $field='')
+    {
+        $suppliers = array();
+        $productVendors = Denteva_Model_ProductVendor::i()->orm('pv')
+            ->join('Denteva_Model_Vendor', array('v.id','=','pv.vendor_id'), 'v')
+            ->where('pv.product_id', $product->id)->select('v.id')->select('v.vendor_name')->find_many();
+        if ($productVendors) {
+            foreach ($productVendors as $vnd) {
+                $suppliers['supplier_name'][] = $vnd->vendor_name;
+            }
+        }
+        if ('search' == $type) {
+            return "/".implode("/", $suppliers['supplier_name']);
+        }
+        return $suppliers;
     }
 }

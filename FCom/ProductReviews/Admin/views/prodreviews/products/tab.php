@@ -1,4 +1,5 @@
 <?php
+$m = $this->model;
 $prodCtrl = FCom_ProductReviews_Admin_Controller::i();
 ?>
 <div id="linked-products-layout">
@@ -7,6 +8,6 @@ $prodCtrl = FCom_ProductReviews_Admin_Controller::i();
         </div>
     </div>
     <div class="ui-layout-center">
-        <?=$this->view('jqgrid')->set('config', $prodCtrl->gridConfig($this->model)) ?>
+        <?=$this->view('jqgrid')->set('config', $prodCtrl->gridConfig($m)) ?>
     </div>
 </div>

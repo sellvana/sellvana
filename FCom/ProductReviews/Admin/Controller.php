@@ -28,8 +28,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-            $config['grid']['editurl'] = BApp::href('prodreviews/grid_data');
-            $config['grid']['url'] = BApp::href('prodreviews/grid_data');
+            $config['grid']['datatype'] = 'local';
+            $config['grid']['editurl'] = '';
+            $config['grid']['url'] = '';
             $config['custom'] = array('personalize'=>true);
         } else {
             $config['grid']['datatype'] = 'local';
@@ -39,9 +40,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         }
 
         if ($productModel) {
-            $orm = FCom_ProductReviews_Model_Reviews::i()->orm()->where('product_id', $productModel->id());
+            $orm = FCom_ProductReviews_Model_Reviews::orm()->where('product_id', $productModel->id());
         } else {
-            $orm = FCom_ProductReviews_Model_Reviews::i()->orm();
+            $orm = FCom_ProductReviews_Model_Reviews::orm();
         }
         $data = BDb::many_as_array($orm->find_many());
 
