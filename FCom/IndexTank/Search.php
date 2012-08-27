@@ -42,6 +42,7 @@ class FCom_IndexTank_Search extends BClass
                     $values = array($kv[1]);
                     $categorySelected = $key;
                 }
+
                 if (!is_array($values)) {
                     $values = array($values);
                 }
@@ -81,17 +82,11 @@ class FCom_IndexTank_Search extends BClass
         $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $resultPerPage);
         $facets = FCom_IndexTank_Index_Product::i()->getFacets();
 
-        $productsData = array();
-        if ($productsORM) {
-            //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_orm', array('data'=>$productsORM));
-            //$productsData = $productsORM->paginate(null, array('ps'=>25));
-            //BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_search.products_data', array('data'=>&$productsData));
 
-            //$productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r, array('ps' => 25));
-        }
         $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r,
                 array('ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound()));
 
+        //get all facets exclude categories
         $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
         $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets, $categorySelected);
 
