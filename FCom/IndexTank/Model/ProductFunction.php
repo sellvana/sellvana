@@ -24,4 +24,18 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function getSortingArray()
+    {
+        $functions = FCom_IndexTank_Model_ProductFunction::i()->orm()->find_many();
+        $result = array();
+        foreach ($functions as $f) {
+            if ($f->use_custom_formula) {
+                $result[$f->name] = $f->label;
+            } else {
+                $result[$f->field_name.'|'.$f->sort_order] = $f->label;
+            }
+        }
+        return $result;
+    }
+
 }
