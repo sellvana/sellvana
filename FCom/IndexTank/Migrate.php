@@ -14,6 +14,7 @@ class FCom_IndexTank_Migrate extends BClass
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
         BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
+        BMigrate::upgrade('0.2.0', '0.2.0', array($this, 'upgrade_0_2_0'));
     }
 
     public function uninstall()
@@ -113,6 +114,14 @@ class FCom_IndexTank_Migrate extends BClass
         update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='manuf_sku_desc';
         ";
         BDb::run( $sql );
+    }
+
+    public function upgrade_0_2_0()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " ALTER TABLE {$pPFTable} ADD `field_name` varchar(100) NOT NULL ;");
+        BDb::run( " ALTER TABLE {$pPFTable} ADD `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc';");
+        BDb::run( " ALTER TABLE {$pPFTable} ADD `use_custom_formula` tinyint(1) NOT NULL DEFAULT 0;");
     }
 
 
