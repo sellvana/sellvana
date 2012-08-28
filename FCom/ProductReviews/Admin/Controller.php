@@ -13,6 +13,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config = array();
         $columns = array(
             'id'=>array('label'=>'ID', 'width'=>55),
+            'product_name'=>array('label'=>'Product name', 'width'=>250, 'editable'=>false),
             'title'=>array('label'=>'Title', 'width'=>250, 'editable'=>true),
             'rating'=>array('label'=>'Rating', 'width'=>60, 'editable'=>true),
             'helpful'=>array('label'=>'Helpful', 'width'=>60, 'editable'=>true),
@@ -40,9 +41,13 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         }
 
         if ($productModel) {
-            $orm = FCom_ProductReviews_Model_Reviews::orm()->where('product_id', $productModel->id());
+            $orm = FCom_ProductReviews_Model_Reviews::orm('pr')->where('product_id', $productModel->id())
+                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+                ->select('pr.*')->select('p.product_name');
         } else {
-            $orm = FCom_ProductReviews_Model_Reviews::orm();
+            $orm = FCom_ProductReviews_Model_Reviews::orm('pr')
+                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+                ->select('pr.*')->select('p.product_name');
         }
         $data = BDb::many_as_array($orm->find_many());
 
