@@ -2,6 +2,10 @@
 <fieldset class="adm-section-group">
     <ul class="form-list">
         <li>
+            <h2 class="label">Frontend label</h2>
+            <input type="text" name="model[label]" value="<?php echo $this->q($m->label) ?>"/>
+        </li>
+        <li>
             <h2 class="label">Name</h2>
             <input type="text" name="model[name]" value="<?php echo $this->q($m->name) ?>"/>
         </li>

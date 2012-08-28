@@ -12,6 +12,8 @@ class FCom_IndexTank_Migrate extends BClass
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
+        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
     }
 
     public function uninstall()
@@ -91,6 +93,29 @@ class FCom_IndexTank_Migrate extends BClass
         BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
     }
 
+    public function upgrade_0_1_8()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        $sql = "
+        update {$pPFTable} set label = 'Newest first' where name='age';
+        update {$pPFTable} set label = 'Relevance' where name='relevance';
+        update {$pPFTable} set label = 'Price (Lower first)' where name='base_price_asc';
+        update {$pPFTable} set label = 'Price (Higher first)' where name='base_price_desc';
+        update {$pPFTable} set label = 'Product name (A-Z)' where name='product_name_asc';
+        update {$pPFTable} set label = 'Product name (Z-A)' where name='product_name_desc';
+        update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='manuf_sku_asc';
+        update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='manuf_sku_desc';
+        ";
+        BDb::run( $sql );
+    }
+
+
     public function install()
     {
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
@@ -145,7 +170,11 @@ class FCom_IndexTank_Migrate extends BClass
                 'age'                   => array('number' => 0, 'definition' => '-age'         ),
                 'relevance'             => array('number' => 1, 'definition' => 'relevance'    ),
                 'base_price_asc'        => array('number' => 2, 'definition' => '-d[0]'  ),
-                'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   )
+                'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   ),
+                'product_name_asc'        => array('number' => 4, 'definition' => '-d[1]'  ),
+                'product_name_desc'       => array('number' => 5, 'definition' => 'd[1]'   ),
+                'manuf_sku_asc'        => array('number' => 6, 'definition' => '-d[2]'  ),
+                'manuf_sku_desc'       => array('number' => 7, 'definition' => 'd[2]'   ),
         );
         $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         //add initial functions
@@ -194,20 +223,24 @@ class FCom_IndexTank_Migrate extends BClass
             );
             if (in_array($type, array('varchar', 'text'))) {
                 $data['search'] = 1;
-            } elseif (in_array($type, array('decimal', 'timestamp'))) {
-                if("base_price" == $f->Field){
-                    $data['scoring'] = 1;
-                    $data['var_number'] = 0;
-                }
-            } else {
-                continue;
+            }
+            if ($f->Field == "base_price") {
+                $data['scoring'] = 1;
+                $data['var_number'] = 0;
+            }
+            if ($f->Field == "product_name") {
+                $data['scoring'] = 1;
+                $data['var_number'] = 1;
+            }
+            if ($f->Field == "manuf_sku") {
+                $data['scoring'] = 1;
+                $data['var_number'] = 2;
             }
 
             FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
-
         }
 
-
+        //price range field
         $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'custom_price_range')->find_one();
         if (!$doc) {
             //add price range
@@ -217,25 +250,11 @@ class FCom_IndexTank_Migrate extends BClass
                     'field_type'        => 'text',
                     'facets'            => 1,
                     'source_type'       => 'function',
-                    'source_value'      => 'price_range_large'
+                    'source_value'      => 'fieldPriceRange'
             );
             FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
         }
 
-        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'ct_categories')->find_one();
-        if (!$doc) {
-            //add categories
-            $data = array(
-                    'field_name'        => 'ct_categories',
-                    'field_nice_name'   => 'Categories',
-                    'field_type'        => 'text',
-                    'search'            => 1,
-                    'facets'            => 1,
-                    'source_type'       => 'function',
-                    'source_value'      => 'get_categories'
-            );
-            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
-        }
 
         //add custom fields
         $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
