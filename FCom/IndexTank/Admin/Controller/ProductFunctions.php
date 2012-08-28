@@ -18,6 +18,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
+            'label' => array('label'=>'Frontend Label'),
             'name' => array('label'=>'Name', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
                 'baseLinkUrl' => BApp::href('indextank/product_functions/form'), 'idName' => 'id',
             )),

@@ -305,7 +305,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $documents = array();
             }
         }
-
+        
         if ($documents) {
             BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
@@ -597,7 +597,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 case 'product':
                     //get value of product object
                     $value = $product->{$field->source_value};
-                    $result[$field->field_name] = $value;
+                    if ('variables' == $type && false == is_numeric($value)) {
+                        $result[$field->field_name] = $this->getStringToOrdinal($value) ;
+                    } else {
+                        $result[$field->field_name] = $value;
+                    }
                     break;
                 case 'function':
                     //call function
@@ -650,7 +654,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     protected function _prepareCategories($product)
     {
         $fieldsList = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
-        $categories = $this->_processFields($fieldsList, $product);
+        $categories = $this->_processFields($fieldsList, $product, 'categories');
         return $categories;
 
     }
@@ -658,7 +662,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     protected function _prepareVariables($product)
     {
         $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
-        $variablesList = $this->_processFields($fieldsList, $product);
+        $variablesList = $this->_processFields($fieldsList, $product, 'variables');
 
         $variables = array();
         foreach ($fieldsList as $field) {
@@ -717,7 +721,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function fieldPriceRange($product, $type='', $field='')
     {
-        $m = $product->min_price;
+        $m = $product->min_price ? $product->min_price : $product->base_price;
         if ($m <   100) return '$0 to $99';
         if ($m <   200) return '$100 to $199';
         if ($m <   300) return '$200 to $299';
@@ -742,7 +746,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function fieldStringToOrdinal($product, $type='', $field='')
     {
-        $string = BLocale::transliterate($product->$field, '');
+        if (!empty($product->$field)) {
+            return $this->getStringToOrdinal($product->$field);
+        }
+    }
+
+    public function getStringToOrdinal($string)
+    {
+        $string = BLocale::transliterate($string, '');
 
         if (empty($string)) {
             return '';
