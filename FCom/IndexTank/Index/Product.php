@@ -305,7 +305,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 $documents = array();
             }
         }
-        
+
         if ($documents) {
             BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
@@ -721,7 +721,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function fieldPriceRange($product, $type='', $field='')
     {
-        $m = $product->min_price ? $product->min_price : $product->base_price;
+        $m = isset($product->{$field}) ? $product->{$field} : $product->base_price;
         if ($m <   100) return '$0 to $99';
         if ($m <   200) return '$100 to $199';
         if ($m <   300) return '$200 to $299';

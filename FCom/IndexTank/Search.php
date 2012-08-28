@@ -90,6 +90,7 @@ class FCom_IndexTank_Search extends BClass
         $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
         $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets, $categorySelected);
 
+
         $productsData['state']['fields'] = $productFields;
         $productsData['state']['facets'] = $facets;
         $productsData['state']['filter_selected'] = $filtersSelected;

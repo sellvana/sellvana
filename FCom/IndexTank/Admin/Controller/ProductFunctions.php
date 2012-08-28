@@ -65,7 +65,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
                     $name = $model->field_name.'_asc';
                 } else {
                     $definition = "d[{$field->var_number}]";
-                    $name = $model->field_name.'_asc';
+                    $name = $model->field_name.'_desc';
                 }
             }
             if($model->use_custom_formula == false) {
@@ -76,8 +76,6 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
             FCom_IndexTank_Index_Product::i()->updateFunction($model->number, $model->definition);
         }
-
-
 
         parent::formPostAfter($args);
     }
