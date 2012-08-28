@@ -397,19 +397,36 @@ class BRequest extends BClass
             return;
         }
         $result = array();
-        foreach ($source['error'] as $key=>$error) {
-            if ($error==UPLOAD_ERR_OK) {
-                $tmpName = $source['tmp_name'][$key];
-                $name = $source['name'][$key];
-                $type = $source['type'][$key];
-                if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
-                    $result[$key] = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
-                    continue;
+        if (is_array($source['error'])) {
+            foreach ($source['error'] as $key=>$error) {
+                if ($error==UPLOAD_ERR_OK) {
+                    $tmpName = $source['tmp_name'][$key];
+                    $name = $source['name'][$key];
+                    $type = $source['type'][$key];
+                    if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
+                        $result[$key] = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
+                        continue;
+                    }
+                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
+                    $result[$key] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                } else {
+                    $result[$key] = array('error'=>$error);
                 }
-                move_uploaded_file($tmpName, $targetDir.'/'.$name);
-                $result[$key] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+            }
+        } else {
+            $error = $source['error'];
+            if ($error==UPLOAD_ERR_OK) {
+                $tmpName = $source['tmp_name'];
+                $name = $source['name'];
+                $type = $source['type'];
+                if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
+                    $result = array('error'=>'invalid_type', 'type'=>$type, 'name'=>$name);
+                } else {
+                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
+                    $result = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                }
             } else {
-                $result[$key] = array('error'=>$error);
+                $result = array('error'=>$error);
             }
         }
         return $result;
@@ -463,7 +480,8 @@ class BRequest extends BClass
 
     public static function currentUrl()
     {
-        return static::scheme().'://'.static::httpHost().static::webRoot()
+        $webroot = rtrim(static::webRoot(), '/');
+        return static::scheme().'://'.static::httpHost().$webroot
             .static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
     }
 
@@ -1251,8 +1269,8 @@ class BFrontController extends BClass
                 return $res;
             }
 
-            $ap = strpos($a->route_name, "*");
-            $bp = strpos($b->route_name, "*");
+            $ap = (strpos($a->route_name, '*') ? 10 : 0)+(strpos($a->route_name, '.') ? 5 : 0)+(strpos($a->route_name, ':') ? 1 : 0);
+            $bp = (strpos($b->route_name, '*') ? 10 : 0)+(strpos($b->route_name, '.') ? 5 : 0)+(strpos($b->route_name, ':') ? 1 : 0);
             return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
         return $this;
@@ -1318,7 +1336,7 @@ class BFrontController extends BClass
             }
             $this->_currentRoute = $route;
             $forward = $route->dispatch();
-
+#var_dump($route); exit;
             if (is_array($forward)) {
                 list($actionName, $forwardCtrlName, $params) = $forward;
                 $controllerName = $forwardCtrlName ? $forwardCtrlName : $route->controller_name;

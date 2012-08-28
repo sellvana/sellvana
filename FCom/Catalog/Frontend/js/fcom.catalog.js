@@ -19,7 +19,7 @@ FCom.CompareBlock = function(opt) {
     function notify(s) {
         if (added[s.id]) return;
         added[s.id] = true;
-        $.pnotify({pnotify_title:'Added to compare', pnotify_text:'<div style="width:100%;overflow:auto"><img src="'+s.src+'" width="35" height="35" style="float:left"/> '+s.alt+'</div>'});
+        //$.pnotify({pnotify_title:'Added to compare', pnotify_text:'<div style="width:100%;overflow:auto"><img src="'+s.src+'" width="35" height="35" style="float:left"/> '+s.alt+'</div>'});
     }
 
     function add(id) {
@@ -36,7 +36,9 @@ FCom.CompareBlock = function(opt) {
         $.cookie(cookieName, JSON.stringify(selected), {expires:1});
         $('.compare-num-products').html(selected.length);
         $(opt.thumbContainer).addClass('set');
+console.log('animate start');
         $(opt.thumbContainer).stop().animate({boxShadow:'0px 0px 15px #A2C2EA'}, 1000, function() {
+console.log('animate stop');
             $(opt.thumbContainer).stop().animate({boxShadow:'0px 0px'}, 1000);
         });
         //humanMsg.displayMsg('<img src="'+s.src+'" width="35" height="35"/> Added to compare: '+s.alt);
@@ -45,15 +47,21 @@ FCom.CompareBlock = function(opt) {
     }
 
     function remove(id, trigger) {
-        for (var i=0; i<selected.length; i++) if (selected[i].id==id) break;
+        var i, ii;
+        for (i=0, ii=selected.length; i<ii; i++) if (selected[i].id==id) break;
         if (i==selected.length) return false;
+
         $(ul.children().get(i)).remove(); ul.append('<li/>');
         check(id, false);
         selected.splice(i, 1);
         $.cookie(cookieName, JSON.stringify(selected), {expires:1});
+
         if (trigger) {
-            $(trigger).parents('li').remove();
-            $(trigger).parents('ul').append('<li>&nbsp;</li>');
+            var colIdx = $(trigger).closest('th,td').get(0).cellIndex;
+            var rows = $(trigger).closest('tbody').find('tr');
+            for (i=0, ii=rows.length; i<ii; i++) {
+                $($(rows[i]).children('th,td').get(colIdx)).remove();
+            }
         }
         $('.compare-num-products').html(selected.length);
         if (selected.length<2) {

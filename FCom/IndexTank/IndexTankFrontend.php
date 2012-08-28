@@ -11,6 +11,9 @@ class FCom_IndexTank_Frontend extends BClass
             ->route( 'GET /indextank/search', 'FCom_IndexTank_Frontend_Controller.search')
         ;
 
+        BPubSub::i()
+            ->on('FCom_IndexTank_Index_Product::add', 'FCom_IndexTank_Index_Product::onProductIndexAdd');
+
         BLayout::i()->addAllViews('Frontend/views');
 
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Frontend::layout');

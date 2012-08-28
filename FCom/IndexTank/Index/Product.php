@@ -196,7 +196,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 if (!empty($queryString)) {
                     $queryString .= " OR ";
                 } else {
-                    $queryString = $query . " OR ";
+                   // $queryString = $query . " OR ";
                 }
 
                 $queryString .= " {$pfield->field_name}:$query" . $priority." ";
@@ -218,7 +218,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $result = $this->model()->search($queryString, $start, $len, $this->_scoringFunction,
                     null, null, $this->_filterCategory,
                     null, $this->_filterDocvar, null, $categoryRollup, true );
-
+#var_dump($this->_filterCategory, $this->_filterDocvar, $categoryRollup, $result); exit;
         } catch(Exception $e) {
             throw $e;
         }
@@ -257,6 +257,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         if (!isset($this->_result->facets)) {
             return false;
         }
+#echo "<pre>"; print_r($this->_result->facets); exit;
         $facets = get_object_vars($this->_result->facets);
         $res = array();
         foreach ($facets as $k => $v) {
@@ -298,14 +299,40 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
 
             //submit every N products to IndexDen - this protect from network overloading
-            if ( 0 == $counter++ % $limit ) {
+            if ( 0 == ++$counter % $limit ) {
+                BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
                 $this->model()->add_documents($documents);
                 $documents = array();
             }
         }
 
         if ($documents) {
+            BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
+        }
+    }
+
+    static public function onProductIndexAdd($args)
+    {
+        // prepare products assoc array
+        $products = array();
+        foreach ($args['docs'] as &$doc) {
+            $products[$doc['docid']] =& $doc;
+        }
+        unset($doc);
+        $pIds = array_keys($products);
+
+        //add categories
+        $categories = FCom_Catalog_Model_CategoryProduct::orm('cp')->where_in('cp.product_id', $pIds)
+                ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+                ->select('c.id')->select('cp.product_id')->select('cp.category_id')->select('c.node_name')->find_many();
+        if (empty($categories)) {
+            return;
+        }
+        foreach($categories as $cat) {
+            $pId = $cat->product_id;
+            $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
+            $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
         }
     }
 
@@ -344,7 +371,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function getCategoryKey($category)
     {
         //return 'ct_categories___'.str_replace("/","__",$category->url_path);
-        return 'ct_'.$category->id();
+        return 'ct_'.$category->id;
     }
 
     public function getCustomFieldKey($cf_model)
@@ -439,6 +466,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $obj->category = false;
                         if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
                             $obj->param = "f[{$obj->key}][{$obj->name}]";
+                            //$obj->param = "f[{$obj->key}][]";
                         } else {
                             $obj->param = "f[{$obj->key}][]";
                         }
@@ -466,8 +494,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $catIds[] = substr($fname, 3);
                 }
             }
+            if (empty($catIds)) {
+                return array();
+            }
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
             // fetch all ascendants that do not have products
+            /*
             $ascIds = array();
             foreach ($categories as $cat) {
                 foreach (explode('/', $cat->id_path) as $id) {
@@ -482,6 +514,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $categories[$id] = $cat;
                 }
             }
+            */
             // sort by full name (including hierarchy)
             uasort($categories, function($a, $b) {
                 return $a->full_name<$b->full_name ? -1 : ($a->full_name>$b->full_name ? 1 : 0);
@@ -505,6 +538,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     $categoryData['Categories'][$cat->id_path] = $obj;
                 }
             }
+
             /*
             foreach ($facets as $fname => $fvalues) {
                 //hard coded ct_categories prefix
@@ -556,6 +590,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $result = array();
         foreach ($fieldsList as $field) {
+            if (empty($field->source_value)) {
+                continue;
+            }
             switch ($field->source_type) {
                 case 'product':
                     //get value of product object
@@ -570,6 +607,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $callback = BUtil::extCallback($field->source_value);
                     } else {
                         $callback = array($this, $field->source_value);
+                    }
+                    //check callback
+                    if (!is_callable($callback)) {
+                        continue;
                     }
                     $valuesList = call_user_func($callback, $product, $type, $field->field_name);
                     //process results
@@ -672,52 +713,36 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * }
      */
 
-    public function fieldGetCategories($product, $type='', $field='')
-    {
-        $categories = array();
-        $productCategories = $product->categories(true); //get all categories for product
-        if ($productCategories) {
-            foreach ($productCategories as $cat) {
-                $catPath = $this->getCategoryKey($cat);//str_replace("/","__",$cat->url_path);
-                $categories[$catPath] = $cat->node_name;
-            }
-        }
-        if ('search' == $type) {
-            return "/".implode("/", $categories);
-        }
-        return $categories;
-    }
+
 
     public function fieldPriceRange($product, $type='', $field='')
     {
-        if ($product->min_price < 100) {
-            return '$0 to $99';
-        } else if ($product->min_price < 200) {
-            return '$100 to $199';
-        }else if ($product->min_price < 300) {
-            return '$200 to $299';
-        }else if ($product->min_price < 400) {
-            return '$300 to $399';
-        }else if ($product->min_price < 500) {
-            return '$400 to $499';
-        }else if ($product->min_price < 600) {
-            return '$500 to $599';
-        }else if ($product->min_price < 700) {
-            return '$600 to $699';
-        }else if ($product->min_price < 800) {
-            return '$700 to $799';
-        }else if ($product->min_price < 900) {
-            return '$800 to $899';
-        }else if ($product->min_price < 1000) {
-            return '$900 to $999';
-        }
-
-
+        $m = $product->min_price;
+        if ($m <   100) return '$0 to $99';
+        if ($m <   200) return '$100 to $199';
+        if ($m <   300) return '$200 to $299';
+        if ($m <   400) return '$300 to $399';
+        if ($m <   500) return '$400 to $499';
+        if ($m <   600) return '$500 to $599';
+        if ($m <   700) return '$600 to $699';
+        if ($m <   800) return '$700 to $799';
+        if ($m <   900) return '$800 to $899';
+        if ($m <  1000) return '$900 to $999';
+        if ($m <  2000) return '$1000 to $1999';
+        if ($m <  3000) return '$2000 to $2999';
+        if ($m <  4000) return '$3000 to $3999';
+        if ($m <  5000) return '$4000 to $4999';
+        if ($m <  6000) return '$5000 to $5999';
+        if ($m <  7000) return '$6000 to $6999';
+        if ($m <  8000) return '$7000 to $7999';
+        if ($m <  9000) return '$8000 to $8999';
+        if ($m < 10000) return '$9000 to $9999';
+        return '$10000 or more';
     }
 
     public function fieldStringToOrdinal($product, $type='', $field='')
     {
-        $string = BLocale::transliterate($product->{$field}, '');
+        $string = BLocale::transliterate($product->$field, '');
 
         if (empty($string)) {
             return '';

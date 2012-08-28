@@ -888,7 +888,7 @@ exit;
             $key = $this->_get_id_column_name();
         }
         foreach ($objects as $r) {
-            $value = is_null($labelColumn) ? $r : $r->get($labelColumn);
+            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::arrayMask($r, $labelColumn) : $r->get($labelColumn));
             if (!is_array($key)) { // save on performance for 1D keys
                 $v = $r->get($key);
                 if (!empty($options['key_lower'])) $v = strtolower($v);

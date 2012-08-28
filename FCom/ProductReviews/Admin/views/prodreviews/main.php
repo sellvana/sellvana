@@ -21,5 +21,10 @@
             <h4 class="label">Number of voices for helpful mark</h4>
             <input type="text" name="model[helpful_voices]" value="<?php echo $this->q($m->helpful_voices) ?>"/>
         </li>
+        <li>
+            <h4 class="label">Approved</h4>
+            <input type="hidden" name="model[approved]" value="0">
+            <input type="checkbox" name="model[approved]" value="1" <?= $m->approved == 1 ?'checked': '' ?>/>
+        </li>
     </ul>
 </fieldset>
