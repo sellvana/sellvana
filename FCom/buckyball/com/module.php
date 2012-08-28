@@ -159,6 +159,7 @@ class BModuleRegistry extends BClass
                 case 'json':
                     $json = file_get_contents($file);
                     $manifest = BUtil::fromJson($json);
+
                     break;
                 default:
                     BDebug::error(BLocale::_("Unknown manifest file format: %s", $file));

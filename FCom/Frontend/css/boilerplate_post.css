@@ -21,7 +21,7 @@
 .f-left { float:left !important; }
 .f-right { float:right !important; }
 .f-none { float:none !important; }
-.a-left { text-align:right !important; }
+.a-left { text-align:left !important; }
 .a-center { text-align:center !important; }
 .a-right { text-align:right !important; }
 

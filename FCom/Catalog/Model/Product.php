@@ -76,7 +76,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($includeAscendants) {
             $ascIds = array();
             foreach ($categories as $cat) {
-                foreach (explode($cat->id_path, '/') as $id) {
+                foreach (explode('/', $cat->id_path) as $id) {
                     if ($id>1 && empty($categories[$id])) {
                         $ascIds[$id] = 1;
                     }
@@ -84,9 +84,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
             if ($ascIds) {
                 $hlp = FCom_Catalog_Model_CategoryProduct::i();
-                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $ascIds)->find_many_assoc();
-                foreach ($ascendants as $id=>$cat) {
-                    $categories[$id] = $hlp->create($cat->as_array());
+                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', array_keys($ascIds))->find_many();
+                foreach ($ascendants as $cat) {
+                    $categories[$cat->id] = $hlp->create($cat->as_array());
                 }
             }
         }

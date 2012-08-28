@@ -6,6 +6,7 @@ class FCom_ProductReviews_Admin extends BClass
     {
         BPubSub::i()
             ->on('BLayout::theme.load.after', 'FCom_ProductReviews_Admin::layout')
+            ->on('BLayout::hook.catalog/products/tab/main', 'FCom_ProductReviews_Admin.hookProductTab')
         ;
 
         BFrontController::i()
@@ -14,6 +15,12 @@ class FCom_ProductReviews_Admin extends BClass
         ;
 
         BLayout::i()->addAllViews('Admin/views');
+    }
+
+    public function hookProductTab($args)
+    {
+        $model = $args['model'];
+        BLayout::i()->view('prodreviews/products/tab')->model = $model;
     }
 
     public static function layout()
@@ -28,7 +35,8 @@ class FCom_ProductReviews_Admin extends BClass
             'catalog_product_form_tabs'=>array(
                     array('view', 'admin/form',
                         'do'=>array(
-                            array('addTab', 'product_reviews', array('label' => 'Product Review', 'pos'=>'70', 'view'=>'prodreviews/products/tab', 'async'=>true)),
+                            array('addTab', 'product_reviews', array('label' => 'Product Review', 'pos'=>'70',
+                                'view'=>'prodreviews/products/tab', 'async'=>true)),
                         ),
                     ),
              ),

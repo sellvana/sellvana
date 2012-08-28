@@ -37,7 +37,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function formViewBefore($args)
     {
-
         parent::formViewBefore($args);
         $m = $args['model'];
         $args['view']->set(array(
@@ -47,10 +46,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function formPostAfter($args)
     {
-        if ($args['do']==='DELETE') {
-            FCom_IndexTank_Admin::productsIndexAll();
-        }
-
         $model = $args['model'];
         if ($model) {
             if ( $model->scoring && ($model->var_number == -1 || !isset($model->var_number)) ) {

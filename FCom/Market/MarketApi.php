@@ -22,7 +22,7 @@ class FCom_Market_MarketApi extends BClass
     public function getMyModules()
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
-                . '/market/module/apimylist'.'?'.$this->getTokenUrl();
+                . '/market/api/mylist'.'?'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
@@ -34,7 +34,7 @@ class FCom_Market_MarketApi extends BClass
     public function getModuleById($moduleId)
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url').
-                '/market/module/apiinfo?modid='.$moduleId.'&'.$this->getTokenUrl();
+                '/market/api/info?modid='.$moduleId.'&'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
@@ -46,7 +46,7 @@ class FCom_Market_MarketApi extends BClass
     public function download($moduleName)
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') .
-                '/market/module/apidownload?modid='.$moduleName.'&'.$this->getTokenUrl();
+                '/market/api/download?modid='.$moduleName.'&'.$this->getTokenUrl();
 
         $storage = BConfig::i()->get('fs/storage_dir');
         $data = file_get_contents($fulleronUrl);
