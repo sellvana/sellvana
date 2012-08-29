@@ -1071,7 +1071,7 @@ class BResponse extends BClass
         // remove process timeout limitation
         set_time_limit(0);
         // output in real time
-        ob_end_flush();
+        @ob_end_flush();
         ob_implicit_flush();
         // enable garbage collection
         gc_enable();
