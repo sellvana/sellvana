@@ -436,8 +436,9 @@ class BDb
     * Add or change table columns
     *
     * BDb::ddlTableColumns('my_table', array(
-    *   'new_field'=>'varchar(255) not null',
-    *   'existing_field'=>'decimal(12,4) null',
+    *   'field_to_create' => 'varchar(255) not null',
+    *   'field_to_update' => 'decimal(12,4) null',
+    *   'field_to_drop'   => 'DROP',
     * ));
     *
     * @param string $fullTableName
