@@ -447,13 +447,7 @@ class BDb
     */
     public static function ddlTableColumns($fullTableName, $fields)
     {
-        if (!static::ddlTableExists($fullTableName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
-        }
-        $a = explode('.', $fullTableName);
-        $dbName = empty($a[1]) ? static::dbName() : $a[0];
-        $tableName = empty($a[1]) ? $fullTableName : $a[1];
-        $tableFields =& static::$_tables[$dbName][$tableName]['fields'];
+        $tableFields = static::ddlFieldInfo($fullTableName);
         $sqlArr = array();
         foreach ($fields as $f=>$def) {
             if ($def==='DROP') {
@@ -466,7 +460,7 @@ class BDb
                 $sqlArr[] = "CHANGE `{$f}` `{$f}` {$def}";
             }
         }
-        return BDb::run("ALTER TABLE `{$dbName}`.`{$tableName}` ".join(", ", $sqlArr));
+        return BDb::run("ALTER TABLE {$fullTableName} ".join(", ", $sqlArr));
     }
 
     /**
