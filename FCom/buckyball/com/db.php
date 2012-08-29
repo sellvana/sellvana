@@ -433,6 +433,42 @@ class BDb
     }
 
     /**
+    * Add or change table columns
+    *
+    * BDb::ddlTableColumns('my_table', array(
+    *   'new_field'=>'varchar(255) not null',
+    *   'existing_field'=>'decimal(12,4) null',
+    * ));
+    *
+    * @param string $fullTableName
+    * @param array $fields
+    * @return array
+    */
+    public static function ddlTableColumns($fullTableName, $fields)
+    {
+        if (!static::ddlTableExists($fullTableName)) {
+            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+        }
+        $a = explode('.', $fullTableName);
+        $dbName = empty($a[1]) ? static::dbName() : $a[0];
+        $tableName = empty($a[1]) ? $fullTableName : $a[1];
+        $tableFields =& static::$_tables[$dbName][$tableName]['fields'];
+        $sqlArr = array();
+        foreach ($fields as $f=>$def) {
+            if ($def==='DROP') {
+                if (!empty($tableFields[$f])) {
+                    $sqlArr[] = "DROP `{$f}`";
+                }
+            } elseif (empty($tableFields[$f])) {
+                $sqlArr[] = "ADD `{$f}` {$def}";
+            } else {
+                $sqlArr[] = "CHANGE `{$f}` `{$f}` {$def}";
+            }
+        }
+        return BDb::run("ALTER TABLE `{$dbName}`.`{$tableName}` ".join(", ", $sqlArr));
+    }
+
+    /**
     * Clean array or object fields based on table columns and return an array
     *
     * @param array|object $data
