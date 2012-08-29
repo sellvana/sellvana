@@ -87,13 +87,19 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleId = BRequest::i()->params('id', true);
 
-        $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+        try {
+            $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error');
+            BResponse::i()->redirect(BApp::href("market"), 'error');
+        }
 
         $model = new stdClass();
         $model->id = $moduleId;
         $model->module = $module;
 
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
+
         $needUpgrade = false;
         $localVersion = '';
         if (!empty($modulesInstalled[$module['mod_name']])) {
@@ -131,10 +137,20 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $moduleId = BRequest::i()->params('id', true);
 
-        $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+        try {
+            $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+        } catch(Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+        }
         $moduleName = $module['mod_name'];
 
-        $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
+        try {
+            $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
+        } catch(Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+        }
 
         if (!$moduleFile) {
             BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
