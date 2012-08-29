@@ -433,6 +433,30 @@ class BDb
     }
 
     /**
+    * Create or update table
+    *
+    * @param string $fullTableName
+    * @param array $fields
+    * @param array $options
+    *   - engine (default InnoDB)
+    *   - charset (default utf8)
+    */
+    public static function ddlTable($fullTableName, $fields, $options=null)
+    {
+        if (static::ddlTableExists($fullTableName)) {
+            return static::ddlTableColumns($fullTableName, $fields);
+        }
+        $fieldsArr = array();
+        foreach ($fields as $f=>$def) {
+            $fieldsArr[] = $f.' '.$def;
+        }
+        $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
+        $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+        return BDb::run("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
+            ENGINE={$engine} DEFAULT CHARSET={$charset}");
+    }
+
+    /**
     * Add or change table columns
     *
     * BDb::ddlTableColumns('my_table', array(
@@ -447,19 +471,19 @@ class BDb
     public static function ddlTableColumns($fullTableName, $fields)
     {
         $tableFields = static::ddlFieldInfo($fullTableName);
-        $sqlArr = array();
+        $fieldsArr = array();
         foreach ($fields as $f=>$def) {
             if ($def==='DROP') {
                 if (!empty($tableFields[$f])) {
-                    $sqlArr[] = "DROP `{$f}`";
+                    $fieldsArr[] = "DROP `{$f}`";
                 }
             } elseif (empty($tableFields[$f])) {
-                $sqlArr[] = "ADD `{$f}` {$def}";
+                $fieldsArr[] = "ADD `{$f}` {$def}";
             } else {
-                $sqlArr[] = "CHANGE `{$f}` `{$f}` {$def}";
+                $fieldsArr[] = "CHANGE `{$f}` `{$f}` {$def}";
             }
         }
-        return BDb::run("ALTER TABLE {$fullTableName} ".join(", ", $sqlArr));
+        return static::run("ALTER TABLE {$fullTableName} ".join(", ", $fieldsArr));
     }
 
     /**
