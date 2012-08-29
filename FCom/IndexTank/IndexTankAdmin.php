@@ -36,7 +36,8 @@ class FCom_IndexTank_Admin extends BClass
                         ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                         //for categories
-                        ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
+                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
+                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
                         ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
                         ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
                         ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
@@ -153,24 +154,65 @@ class FCom_IndexTank_Admin extends BClass
      *Catch move category
      * @param type $args
      */
-
-    static public function onCategoryMove($args)
+    static public function onCategoryMoveAfter($args)
     {
-        $category = $args['model'];
-        $products = $category->products();
-        if (!$products) {
+        if (empty($args['id'])) {
             return;
         }
-        $productIds = array();
-        foreach ($products as $product) {
-            $productIds[] = $product->id();
-        }
-        if (!$productIds) {
+        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $catIds = explode("/", $categoryMoving->id_path);
+
+        if (empty($catIds)) {
             return;
         }
-        FCom_Catalog_Model_Product::i()->update_many(
+        $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+        foreach($categories as $category) {
+            $products = $category->products();
+            if (!$products) {
+                continue;
+            }
+            $productIds = array();
+            foreach ($products as $product) {
+                $productIds[] = $product->id();
+            }
+            if (!$productIds) {
+                continue;
+            }
+            FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
                     "id in (".implode(",", $productIds).")");
+        }
+    }
+    static public function onCategoryMoveBefore($args)
+    {
+        if (empty($args['id'])) {
+            return;
+        }
+        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $catIds = explode("/", $categoryMoving->id_path);
+
+        if (empty($catIds)) {
+            return;
+        }
+        $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+        foreach($categories as $category) {
+            $products = $category->products();
+            if (!$products) {
+                continue;
+            }
+            $productIds = array();
+            foreach ($products as $product) {
+                //delete source categories for products
+                FCom_IndexTank_Index_Product::i()->deleteCategories($product, $category);
+                $productIds[] = $product->id();
+            }
+            if (!$productIds) {
+                continue;
+            }
+            FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $productIds).")");
+        }
     }
 
     static public function onCategoryProductAfterSave($args)

@@ -84,10 +84,15 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
                 'full_name' => trim($p->full_name.static::$_separator.$this->node_name, static::$_separator),
                 'url_path' => null,
             ));
+
             $this->register();
 
             $this->refreshDescendants(false, true);
-            $this->cacheSaveDirty();
+            try {
+                $this->cacheSaveDirty();
+            } catch (Exception $e) {
+                throw new Exception("Duplicate category name");
+            }
             //TODO: improve performance, figure out why can't calculate correct nums
             $this->cacheClear();
             $root = $this->load(1);
