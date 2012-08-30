@@ -17,7 +17,7 @@ $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
     </td>
     <td class="actions last a-left">
         <div class="price-box <?=(!empty($loggedIn))?'logged-in':'logged-out'?>">
-            <button class="button btn-add-to-cart" onclick="add_cart(<?=$p->id?>, 1)">+ <?= BLocale::_("Add to Cart") ?></button>
+            <button class="button btn-add-to-cart" onclick="FCom.cart.add(<?=$p->id?>, 1)">+ <?= BLocale::_("Add to Cart") ?></button>
         </div>
     </td>
 </tr>

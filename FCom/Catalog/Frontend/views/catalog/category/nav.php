@@ -6,5 +6,5 @@ $categories = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', $this-
 ?>
 
 <?php foreach($categories as $cat): ?>
-    <li><a href="<?=Bapp::href($cat->url_path)?>"><?=$cat->node_name?></a></li>
+    <li><a href="<?=Bapp::href($cat->url_path)?>"><?=$cat->node_name?><em class="icon"></em></a></li>
 <?php endforeach; ?>

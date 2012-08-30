@@ -843,6 +843,40 @@ class BClassRegistry extends BClass
     }
 
     /**
+    * Check if the callback is callable, accounting for dynamic methods
+    *
+    * @param mixed $cb
+    * @return boolean
+    */
+    public function isCallable($cb)
+    {
+        if (is_string($cb)) { // plain string callback?
+            $cb = explode('::', $cb);
+            if (empty($cb[1])) { // not static?
+                $cb = BUtil::extCallback($cb); // account for special singleton syntax
+            }
+        } elseif (!is_array($cb)) { // unknown?
+            return is_callable($cb);
+        }
+        if (empty($cb[1])) { // regular function?
+            return function_exists($cb[0]);
+        }
+        if (method_exists($cb[0], $cb[1])) { // regular method?
+            return true;
+        }
+        if (is_object($cb[0])) { // instance
+            if (!$cb[0] instanceof BClass) { // regular class?
+                return false;
+            }
+            return (bool)$this->findMethodInfo(get_class($cb[0]), $cb[1]);
+        } elseif (is_string($cb[0])) { // static?
+            return (bool)$this->findMethodInfo($cb[0], $cb[1], 1);
+        } else { // unknown?
+            return false;
+        }
+    }
+
+    /**
     * Call overridden method
     *
     * @param object $origObject
