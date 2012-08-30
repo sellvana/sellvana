@@ -1,7 +1,7 @@
-<div class="portal-login-box-container">
-	<div class="portal-login-box">
-		<header class="portal-login-header">
-			<strong class="logo">Fulleron</strong>
+<div class="page-main-wrapper">
+	<div class="page-main">
+		<header class="page-title">
+			<strong class="title">Fulleron</strong>
 		</header>
         <?php echo $this->messagesHtml() ?>
 		<!--<div class="msg success-msg">Something went wrong</div>-->

@@ -32,7 +32,11 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
-        $layout->view('catalog/product/list')->products_data = $productsData;
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsView = $layout->view($rowsViewName);
+        $layout->hookView('main_products', $rowsViewName);
+        $rowsView->category = $category;
+        $rowsView->products_data = $productsData;
 
         FCom_Core::lastNav(true);
 
@@ -58,11 +62,15 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/product/list')->products_data = $productsData;
 
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsView = $layout->view($rowsViewName);
+        $layout->hookView('main_products', $rowsViewName);
+        $rowsView->products_data = $productsData;
+
+        FCom_Core::lastNav(true);
         $this->layout('/catalog/search');
     }
 }

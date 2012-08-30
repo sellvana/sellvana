@@ -49,7 +49,13 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
-        $layout->view('catalog/product/list')->products_data = $productsData;
+
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsView = $layout->view($rowsViewName);
+        $layout->hookView('main_products', $rowsViewName);
+        $rowsView->category = $category;
+        $rowsView->products_data = $productsData;
+
         $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
@@ -87,7 +93,12 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
-        $layout->view('catalog/product/list')->products_data = $productsData;
+
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsView = $layout->view($rowsViewName);
+        $layout->hookView('main_products', $rowsViewName);
+        $rowsView->products_data = $productsData;
+
         $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
