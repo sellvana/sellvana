@@ -332,7 +332,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         foreach($categories as $cat) {
             $pId = $cat->product_id;
             $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
-            $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
+            if (empty($products[$pId]['fields']['ct_categories'])) {
+                $products[$pId]['fields']['ct_categories'] = '/'.$cat->node_name;
+            } else {
+                $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
+            }
         }
     }
 
