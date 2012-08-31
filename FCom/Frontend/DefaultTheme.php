@@ -27,7 +27,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),
                         //array('css', '{FCom_Frontend}/css/base.css'),
                         //array('less', '{FCom_Frontend}/css/base.less'),
-                        array('less', '{FCom_Frontend}/css/skin_default.css'),
+                        array('css', '{FCom_Frontend}/css/skin_default.css'),
                         array('css', 'boilerplate_post', array('file'=>'{FCom_Frontend}/css/boilerplate_post.css')),
                         array('css', 'pnotify', array('file'=>'{FCom_Core}/js/lib/css/jquery.pnotify.default.css')),
                         array('css', 'rating', array('file'=>'{FCom_Core}/js/lib/css/jquery.rating.css')),
@@ -36,11 +36,12 @@ class FCom_Frontend_DefaultTheme extends BClass
 window.less={env:'development'};
 head(function() {
     $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+    $('.select2').select2({width:'other values', minimumResultsForSearch:20});
 });
 FCom = {};
 FCom.base_href = '".BApp::baseUrl()."';
 ")),
-                        array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
+                        //array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
@@ -48,7 +49,11 @@ FCom.base_href = '".BApp::baseUrl()."';
                         //array('js', '{FCom_Core}/js/lib/jquery.animate-shadow-min.1.8.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         array('js', '{FCom_Core}/js/lib/jquery.rating.min.js'),
+                        array('js', '{FCom_Core}/js/lib/jquery.tools.min.js'),
                         array('js', '{FCom_Core}/js/lib/lightbox/lightbox.js'),
+                        array('css', '{FCom_Core}/js/select2/select2.css'),
+                        array('js', '{FCom_Core}/js/select2/select2.min.js'),
+                        array('js', '{FCom_Core}/js/fcom.core.js'),
                         array('js', '{FCom_Core}/js/fcom.core.js'),
 
                     )),

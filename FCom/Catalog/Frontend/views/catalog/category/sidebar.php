@@ -3,10 +3,10 @@ $category = $this->category ? $this->category : BApp::i()->get('current_category
 $children = $category->children();
 ?>
 <?php if ($children): ?>
-<div class="block block-layered-nav">
-   <div class="block-title">
-        <strong><span><?= BLocale::_("Browse By") ?></span></strong>
-    </div>
+<div class="block block-filter">
+   <header class="block-title">
+        <strong class="title"><?= BLocale::_("Browse By") ?></strong>
+    </header>
     <div class="block-content">
 <?php if ($children): ?>
         <dl id="narrow-by-list2">
