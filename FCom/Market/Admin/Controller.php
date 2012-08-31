@@ -168,7 +168,10 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
                 BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
             }
-            $errors = FCom_Ftp_FtpClient::i()->ftpUpload($modulePath, $marketPath);
+            $conf = BConfig::i()->get('modules/FCom_Market/ftp');
+            $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
+            BFtpClient::i()->setParams($conf['hostname'], $conf['port'], $conf['username'], $conf['password']);
+            $errors = BFtpClient::i()->ftpUpload($modulePath, $marketPath);
             if ($errors) {
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);

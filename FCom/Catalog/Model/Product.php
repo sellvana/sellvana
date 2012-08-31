@@ -43,7 +43,18 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         if (!parent::beforeSave()) return false;
 
+        //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
+
+        return true;
+    }
+
+    public function afterSave()
+    {
+        if (!parent::afterSave()) return false;
+
+        //todo: setup unique uniq_id
+        if (!$this->get('uniq_id')) $this->set('uniq_id', $this->id);
 
         return true;
     }
