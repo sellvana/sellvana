@@ -190,9 +190,6 @@ class FCom_Catalog_Migrate extends BClass
         ");
 
 
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD KEY uniq_id (`uniq_id`)(50)
-        ");
-
+        BDb::ddlTableColumns($tProduct, null, array('uniq_id'=>'(`uniq_id`)'));
     }
 }
