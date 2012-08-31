@@ -137,5 +137,81 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return $this->mediaORM($type)->find_many_assoc();
     }
+
+    static public function import($data)
+    {
+        if (empty($data) || !is_array($data)) {
+            return;
+        }
+
+        foreach($data as $d) {
+            $categoriesPath = array();
+            if (!empty($d['categories'])) {
+                $categoriesPath = explode(",", $d['categories']);
+                unset($d['categories']);
+            }
+
+            $imagesName = array();
+            if (!empty($d['images'])) {
+                $imagesName = explode(",", $d['images']);
+                unset($d['images']);
+            }
+
+            //create product and setup custom fields if any
+            try {
+                $p = self::orm()->create($d)->save();
+            } catch (Exception $e) {
+                $p = self::orm()->where("url_key", BLocale::transliterate($d['product_name']))->find_one();
+            }
+            if (!$p) {
+                continue;
+            }
+
+            //assign categories
+            if (!empty($categoriesPath)) {
+                $categories = FCom_Catalog_Model_Category::orm()->where_in("id_path", $categoriesPath)->find_many();
+                foreach($categories as $cat) {
+                    $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
+                            ->where('product_id', $p->id())
+                            ->where('category_id', $cat->id())
+                            ->find_one();
+                    if (!$catProduct) {
+                        $catdata=array('product_id' => $p->id(), 'category_id'=>$cat->id());
+                        FCom_Catalog_Model_CategoryProduct::create($catdata)->save();
+                    }
+                }
+            }
+
+            //assign images
+            if (!empty($imagesName)) {
+                $mediaLib = FCom_Core_Model_MediaLibrary::i();
+                $productMedia = FCom_Catalog_Model_ProductMedia::i();
+                foreach($imagesName as $path) {
+                    $size = filesize(FULLERON_ROOT_DIR.'/'.$path);
+                    $fileName = pathinfo($path, PATHINFO_BASENAME);
+                    $folder =  pathinfo($path, PATHINFO_DIRNAME);
+                    $att = $mediaLib->load(array('folder'=>$folder, 'file_name'=>$fileName));
+                    if (!$att) {
+                        $att = $mediaLib->create(array(
+                            'folder'    => $folder,
+                            'subfolder' => null,
+                            'file_name' => $fileName,
+                            'file_size' => $size,
+                        ))->save();
+                    }
+
+                    $fileId = $productMedia->orm()->where('product_id', $p->id())
+                            ->where('file_id', $att->id())->find_one();
+                    if (!$fileId) {
+                        $fileId = $productMedia->create(array(
+                            'product_id' => $p->id(),
+                            'media_type' => 'images',
+                            'file_id' => $att->id(),
+                        ))->save();
+                    }
+                }
+            }
+        }
+    }
 }
 
