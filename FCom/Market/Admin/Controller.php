@@ -170,8 +170,8 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
             $conf = BConfig::i()->get('modules/FCom_Market/ftp');
             $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
-            BFtpClient::i()->setParams($conf['hostname'], $conf['port'], $conf['username'], $conf['password']);
-            $errors = BFtpClient::i()->ftpUpload($modulePath, $marketPath);
+            $ftpClient = new BFtpClient($conf);
+            $errors = $ftpClient->ftpUpload($modulePath, $marketPath);
             if ($errors) {
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);
