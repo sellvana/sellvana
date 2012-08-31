@@ -25,7 +25,7 @@ foreach ($crumbs as $i=>&$c) {
 unset($c);
 
 ?>
-    <div class="breadcrumbs">
+    <nav class="breadcrumbs">
         <ul>
 <?php foreach ($crumbs as $c): ?>
             <li <?=!empty($c['li_class'])?'class="'.$c['li_class'].'"':''?>>
@@ -35,5 +35,5 @@ unset($c);
             </li>
 <?php endforeach ?>
         </ul>
-    </div>
+    </nav>
 <?php endif ?>

@@ -956,6 +956,11 @@ class BView extends BClass
         return htmlspecialchars($args ? BUtil::sprintfn($str, $args) : $str);
     }
 
+    public function s($str, $tags=null)
+    {
+        return strip_tags($str, $tags);
+    }
+
     public function optionsHtml($options, $default='')
     {
         $html = '';

@@ -965,6 +965,7 @@ class BMigrate extends BClass
                 try {
                     BDb::transaction();
                 */
+                    BDb::ddlClearCache(); // clear DDL cache before each migration step
                     BDebug::debug('DB.MIGRATE '.$script);
                     if (is_callable($script)) {
                         $result = call_user_func($script);
