@@ -151,9 +151,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 unset($d['categories']);
             }
 
-            $imagesName = array();
+            $imagesNames = array();
             if (!empty($d['images'])) {
-                $imagesName = explode(",", $d['images']);
+                $imagesNames = explode(",", $d['images']);
                 unset($d['images']);
             }
 
@@ -169,45 +169,51 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //assign categories
             if (!empty($categoriesPath)) {
-                $categories = FCom_Catalog_Model_Category::orm()->where_in("id_path", $categoriesPath)->find_many();
-                foreach($categories as $cat) {
+                foreach($categoriesPath as $catpath) {
+                    $category = FCom_Catalog_Model_Category::orm()->where("id_path", $catpath)->find_many();
+                    if (!$category) {
+                        break;
+                    }
                     $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
-                            ->where('product_id', $p->id())
-                            ->where('category_id', $cat->id())
-                            ->find_one();
+                        ->where('product_id', $p->id())
+                        ->where('category_id', $cat->id())
+                        ->find_one();
                     if (!$catProduct) {
                         $catdata=array('product_id' => $p->id(), 'category_id'=>$cat->id());
                         FCom_Catalog_Model_CategoryProduct::create($catdata)->save();
                     }
+
                 }
             }
 
             //assign images
-            if (!empty($imagesName)) {
+            if (!empty($imagesNames)) {
                 $mediaLib = FCom_Core_Model_MediaLibrary::i();
                 $productMedia = FCom_Catalog_Model_ProductMedia::i();
-                foreach($imagesName as $path) {
-                    $size = filesize(FULLERON_ROOT_DIR.'/'.$path);
-                    $fileName = pathinfo($path, PATHINFO_BASENAME);
-                    $folder =  pathinfo($path, PATHINFO_DIRNAME);
-                    $att = $mediaLib->load(array('folder'=>$folder, 'file_name'=>$fileName));
-                    if (!$att) {
-                        $att = $mediaLib->create(array(
-                            'folder'    => $folder,
-                            'subfolder' => null,
-                            'file_name' => $fileName,
-                            'file_size' => $size,
-                        ))->save();
-                    }
+                if (!empty($images)) {
+                    foreach($imagesNames as $path) {
+                        $size = filesize(FULLERON_ROOT_DIR.'/'.$path);
+                        $fileName = pathinfo($path, PATHINFO_BASENAME);
+                        $folder =  pathinfo($path, PATHINFO_DIRNAME);
+                        $att = $mediaLib->load(array('folder'=>$folder, 'file_name'=>$fileName));
+                        if (!$att) {
+                            $att = $mediaLib->create(array(
+                                'folder'    => $folder,
+                                'subfolder' => null,
+                                'file_name' => $fileName,
+                                'file_size' => $size,
+                            ))->save();
+                        }
 
-                    $fileId = $productMedia->orm()->where('product_id', $p->id())
-                            ->where('file_id', $att->id())->find_one();
-                    if (!$fileId) {
-                        $fileId = $productMedia->create(array(
-                            'product_id' => $p->id(),
-                            'media_type' => 'images',
-                            'file_id' => $att->id(),
-                        ))->save();
+                        $fileId = $productMedia->orm()->where('product_id', $p->id())
+                                ->where('file_id', $att->id())->find_one();
+                        if (!$fileId) {
+                            $fileId = $productMedia->create(array(
+                                'product_id' => $p->id(),
+                                'media_type' => 'images',
+                                'file_id' => $att->id(),
+                            ))->save();
+                        }
                     }
                 }
             }
