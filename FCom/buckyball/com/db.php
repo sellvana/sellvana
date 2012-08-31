@@ -422,14 +422,63 @@ class BDb
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
-        $tableFields =& static::$_tables[$dbName][$tableName]['fields'];
-        if (empty($tableFields)) {
-            $fields = BORM::i()->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", array())->find_many();
-            foreach ($fields as $f) {
-                $tableFields[$f->Field] = $f;
-            }
+        if (!isset(static::$_tables[$dbName][$tableName]['fields'])) {
+            static::$_tables[$dbName][$tableName]['fields'] = BORM::i()
+                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", array())->find_many_assoc('Field');
+
         }
-        return is_null($fieldName) ? $tableFields : (isset($tableFields[$fieldName]) ? $tableFields[$fieldName] : null);
+        $res = static::$_tables[$dbName][$tableName]['fields'];
+        return is_null($fieldName) ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
+    }
+
+    /**
+    * Retrieve table index(es) info, if exist
+    *
+    * @param string $fullTableName
+    * @param string $indexName
+    * @return array|null
+    */
+    public static function ddlIndexInfo($fullTableName, $indexName=null)
+    {
+        if (!static::ddlTableExists($fullTableName)) {
+            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+        }
+        $a = explode('.', $fullTableName);
+        $dbName = empty($a[1]) ? static::dbName() : $a[0];
+        $tableName = empty($a[1]) ? $fullTableName : $a[1];
+        if (!isset(static::$_tables[$dbName][$tableName]['indexes'])) {
+            static::$_tables[$dbName][$tableName]['indexes'] = BORM::i()
+                ->raw_query("SHOW KEYS FROM `{$dbName}`.`{$tableName}`", array())->find_many_assoc('Key_name');
+        }
+        $res = static::$_tables[$dbName][$tableName]['indexes'];
+        return is_null($indexName) ? $res : (isset($res[$indexName]) ? $res[$indexName] : null);
+    }
+
+    /**
+    * Retrieve table foreign key(s) info, if exist
+    *
+    * Mysql/InnoDB specific
+    *
+    * @param string $fullTableName
+    * @param string $fkName
+    * @result array|null
+    */
+    public static function ddlForeignKeyInfo($fullTableName, $fkName=null)
+    {
+        if (!static::ddlTableExists($fullTableName)) {
+            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+        }
+        $a = explode('.', $fullTableName);
+        $dbName = empty($a[1]) ? static::dbName() : $a[0];
+        $tableName = empty($a[1]) ? $fullTableName : $a[1];
+        if (!isset(static::$_tables[$dbName][$tableName]['fks'])) {
+            static::$_tables[$dbName][$tableName]['fks'] = BORM::i()
+                ->raw_query("SELECT * FROM information_schema.TABLE_CONSTRAINTS
+                    WHERE TABLE_SCHEMA='{$dbName}' AND TABLE_NAME='{$tableName}'
+                        AND CONSTRAINT_TYPE='FOREIGN KEY'", array())->find_many_assoc('CONSTRAINT_NAME');
+        }
+        $res = static::$_tables[$dbName][$tableName]['fks'];
+        return is_null($fkName) ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
     }
 
     /**
@@ -444,16 +493,18 @@ class BDb
     public static function ddlTable($fullTableName, $fields, $options=null)
     {
         if (static::ddlTableExists($fullTableName)) {
-            return static::ddlTableColumns($fullTableName, $fields);
+            static::ddlTableColumns($fullTableName, $fields);
+        } else {
+            $fieldsArr = array();
+            foreach ($fields as $f=>$def) {
+                $fieldsArr[] = $f.' '.$def;
+            }
+            $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
+            $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
+                ENGINE={$engine} DEFAULT CHARSET={$charset}", array());
         }
-        $fieldsArr = array();
-        foreach ($fields as $f=>$def) {
-            $fieldsArr[] = $f.' '.$def;
-        }
-        $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
-        $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
-        return BDb::run("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-            ENGINE={$engine} DEFAULT CHARSET={$charset}");
+        return true;
     }
 
     /**
@@ -467,24 +518,65 @@ class BDb
     *
     * @param string $fullTableName
     * @param array $fields
+    * @param array $indexes
+    * @param array $fks
     * @return array
     */
-    public static function ddlTableColumns($fullTableName, $fields)
+    public static function ddlTableColumns($fullTableName, $fields, $indexes=null, $fks=null)
     {
-        $tableFields = static::ddlFieldInfo($fullTableName);
-        $fieldsArr = array();
-        foreach ($fields as $f=>$def) {
-            if ($def==='DROP') {
-                if (!empty($tableFields[$f])) {
-                    $fieldsArr[] = "DROP `{$f}`";
+        $tableFields = static::ddlFieldInfo($fullTableName, null);
+        $alterArr = array();
+        if ($fields) {
+            foreach ($fields as $f=>$def) {
+                if ($def==='DROP') {
+                    if (!empty($tableFields[$f])) {
+                        $alterArr[] = "DROP `{$f}`";
+                    }
+                } elseif (empty($tableFields[$f])) {
+                    $alterArr[] = "ADD `{$f}` {$def}";
+                } else {
+                    $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
                 }
-            } elseif (empty($tableFields[$f])) {
-                $fieldsArr[] = "ADD `{$f}` {$def}";
-            } else {
-                $fieldsArr[] = "CHANGE `{$f}` `{$f}` {$def}";
             }
         }
-        return static::run("ALTER TABLE {$fullTableName} ".join(", ", $fieldsArr));
+        if ($indexes) {
+            $tableIndexes = static::ddlIndexInfo($fullTableName);
+            foreach ($indexes as $idx=>$def) {
+                if ($def==='DROP') {
+                    if (!empty($tableFKs[$idx])) {
+                        $alterArr[] = "DROP KEY `{$idx}`";
+                    }
+                } else {
+                    if (!empty($tableFKs[$idx])) {
+                        $alterArr[] = "DROP KEY `{$idx}`";
+                    }
+                    $alterArr[] = "ADD KEY `{$idx}` {$def}";
+                }
+            }
+        }
+        if ($fks) {
+            $tableFKs = static::ddlForeignKeyInfo($fullTableName);
+            // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
+            // You cannot add a foreign key and drop a foreign key in separate clauses of a single ALTER TABLE statement.
+            // Separate statements are required.
+            $dropArr = array();
+            foreach ($indexes as $idx=>$def) {
+                if ($def==='DROP') {
+                    if (!empty($tableFKs[$idx])) {
+                        $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
+                    }
+                } else {
+                    if (!empty($tableFKs[$idx])) {
+                        $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
+                    }
+                    $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
+                }
+            }
+            if (!empty($dropArr)) {
+                BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $dropArr), array());
+            }
+        }
+        return BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array());
     }
 
     /**
@@ -1085,7 +1177,7 @@ exit;
      *
      * @return BORMWrapper
      */
-    public function raw_query($query, $parameters)
+    public function raw_query($query, $parameters=array())
     {
         if (preg_match('#^\s*(SELECT|SHOW)#i', $query)) {
             BDb::connect($this->_readConnectionName);
