@@ -119,9 +119,11 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_2_0()
     {
         $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run( " ALTER TABLE {$pPFTable} ADD `field_name` varchar(100) NOT NULL ;");
-        BDb::run( " ALTER TABLE {$pPFTable} ADD `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc';");
-        BDb::run( " ALTER TABLE {$pPFTable} ADD `use_custom_formula` tinyint(1) NOT NULL DEFAULT 0;");
+        BDb::ddlTableColumns($pPFTable, array(
+            'field_name' => "varchar(100) NOT NULL",
+            'sort_order' => "enum('asc','desc') NOT NULL DEFAULT 'asc'",
+            'use_custom_formula' => "tinyint(1) NOT NULL DEFAULT 0",
+        ));
     }
 
 
@@ -135,7 +137,6 @@ class FCom_IndexTank_Migrate extends BClass
             `checkpoint` TIMESTAMP
             ) ENGINE = InnoDB;
          ");
-        BDb::i()->ddlClearCache();
         BDb::run("insert into {$pIndexHelperTable} (`index`, checkpoint) values('products', null)");
 
         //create table

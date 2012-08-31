@@ -433,6 +433,61 @@ class BDb
     }
 
     /**
+    * Create or update table
+    *
+    * @param string $fullTableName
+    * @param array $fields
+    * @param array $options
+    *   - engine (default InnoDB)
+    *   - charset (default utf8)
+    */
+    public static function ddlTable($fullTableName, $fields, $options=null)
+    {
+        if (static::ddlTableExists($fullTableName)) {
+            return static::ddlTableColumns($fullTableName, $fields);
+        }
+        $fieldsArr = array();
+        foreach ($fields as $f=>$def) {
+            $fieldsArr[] = $f.' '.$def;
+        }
+        $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
+        $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+        return BDb::run("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
+            ENGINE={$engine} DEFAULT CHARSET={$charset}");
+    }
+
+    /**
+    * Add or change table columns
+    *
+    * BDb::ddlTableColumns('my_table', array(
+    *   'field_to_create' => 'varchar(255) not null',
+    *   'field_to_update' => 'decimal(12,4) null',
+    *   'field_to_drop'   => 'DROP',
+    * ));
+    *
+    * @param string $fullTableName
+    * @param array $fields
+    * @return array
+    */
+    public static function ddlTableColumns($fullTableName, $fields)
+    {
+        $tableFields = static::ddlFieldInfo($fullTableName);
+        $fieldsArr = array();
+        foreach ($fields as $f=>$def) {
+            if ($def==='DROP') {
+                if (!empty($tableFields[$f])) {
+                    $fieldsArr[] = "DROP `{$f}`";
+                }
+            } elseif (empty($tableFields[$f])) {
+                $fieldsArr[] = "ADD `{$f}` {$def}";
+            } else {
+                $fieldsArr[] = "CHANGE `{$f}` `{$f}` {$def}";
+            }
+        }
+        return static::run("ALTER TABLE {$fullTableName} ".join(", ", $fieldsArr));
+    }
+
+    /**
     * Clean array or object fields based on table columns and return an array
     *
     * @param array|object $data

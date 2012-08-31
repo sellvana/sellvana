@@ -333,10 +333,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $pId = $cat->product_id;
             $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
             if (empty($products[$pId]['fields']['ct_categories'])) {
-                $products[$pId]['fields']['ct_categories'] = '/'.$cat->node_name;
-            } else {
-                $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
+                $products[$pId]['fields']['ct_categories'] = '';
             }
+            $products[$pId]['fields']['ct_categories'] .= '/'.$cat->node_name;
         }
     }
 
@@ -617,7 +616,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $callback = array($this, $field->source_value);
                     }
                     //check callback
-                    if (!is_callable($callback)) {
+                    if (!BClassRegistry::i()->isCallable($callback)) {
+                        //BDebug::warning('Invalid IndexTank custom field callback: '.$field->source_value);
                         continue;
                     }
                     $valuesList = call_user_func($callback, $product, $type, $field->field_name);
