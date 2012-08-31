@@ -163,6 +163,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             } catch (Exception $e) {
                 $p = self::orm()->where("url_key", BLocale::transliterate($d['product_name']))->find_one();
             }
+
             if (!$p) {
                 continue;
             }
@@ -170,7 +171,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             //assign categories
             if (!empty($categoriesPath)) {
                 foreach($categoriesPath as $catpath) {
-                    $category = FCom_Catalog_Model_Category::orm()->where("id_path", $catpath)->find_many();
+                    $category = FCom_Catalog_Model_Category::orm()->where("url_path", $catpath)->find_many();
                     if (!$category) {
                         break;
                     }
