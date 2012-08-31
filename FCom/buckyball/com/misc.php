@@ -2231,19 +2231,19 @@ class BFtpClient extends BClass
     protected $_ftpUsername = '';
     protected $_ftpPassword = '';
 
-    public function setParams($host='', $port='', $username='', $password='')
+    public function __construct($config)
     {
-        if (!empty($host)) {
-            $this->_ftpHost = $host;
+        if (!empty($config['hostname'])) {
+            $this->_ftpHost = $config['hostname'];
         }
-        if (!empty($port)) {
-            $this->_ftpPort = $port;
+        if (!empty($config['port'])) {
+            $this->_ftpPort = $config['port'];
         }
-        if (!empty($username)) {
-            $this->_ftpUsername = $username;
+        if (!empty($config['username'])) {
+            $this->_ftpUsername = $config['username'];
         }
-        if (!empty($password)) {
-            $this->_ftpPassword = $password;
+        if (!empty($config['password'])) {
+            $this->_ftpPassword = $config['password'];
         }
     }
 
@@ -2252,7 +2252,7 @@ class BFtpClient extends BClass
         if (!extension_loaded('ftp')) {
             new BException('FTP PHP extension is not installed');
         }
-        
+
         if (!($conn = ftp_connect($this->_ftpHost, $this->_ftpPort))) {
             throw new BException('Could not connect to FTP host');
         }
