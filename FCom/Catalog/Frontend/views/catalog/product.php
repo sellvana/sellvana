@@ -2,8 +2,6 @@
 $prod = $this->product;
 $cat = $this->category;
 ?>
-<div class="page-main-wrapper">
-	<div class="page-main">
         <div class="product-view">
             <div class="product-essential">
                 <form action="" method="post" onsubmit="return false;">
@@ -90,45 +88,43 @@ $cat = $this->category;
 				            </tbody>
 				        </table>
 				  	</div>
-        		</div>
-                <div class="tab-content">
-                    	<h4><?= BLocale::_("Related Products") ?></h4>
-                    	<table class="product-list">
-				        	<colgroup><col width="30">
-				        	<col width="60">
-				        	<col>
-				        	<col width="180">
-				            </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->productsByType($prod->id, 'related')) ?>
-				            </tbody>
-				        </table>
-				  	</div>
-        		</div>
-                <div class="tab-content">
-                    <h4><?= BLocale::_("Family Products") ?></h4>
-                    <table class="product-list">
-                        <colgroup><col width="30">
-                        <col width="60">
-                        <col>
-                        <col width="180">
-                        </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="tab-content">
-                    <h4><?= BLocale::_("Accessories") ?></h4>
-                    <table class="product-list">
-                        <colgroup><col width="30">
-                        <col width="60">
-                        <col>
-                        <col width="180">
-                        </colgroup><tbody>
-<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+	                <div class="tab-content">
+	                    	<h4><?= BLocale::_("Related Products") ?></h4>
+	                    	<table class="product-list">
+					        	<colgroup><col width="30">
+					        	<col width="60">
+					        	<col>
+					        	<col width="180">
+					            </colgroup><tbody>
+	<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_ProductLink::i()->productsByType($prod->id, 'related')) ?>
+					            </tbody>
+					        </table>
+					  	</div>
+	        		</div>
+	                <div class="tab-content">
+	                    <h4><?= BLocale::_("Family Products") ?></h4>
+	                    <table class="product-list">
+	                        <colgroup><col width="30">
+	                        <col width="60">
+	                        <col>
+	                        <col width="180">
+	                        </colgroup><tbody>
+	<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(20)->limit(10)->find_many()) ?>
+	                        </tbody>
+	                    </table>
+	                </div>
+	                <div class="tab-content">
+	                    <h4><?= BLocale::_("Accessories") ?></h4>
+	                    <table class="product-list">
+	                        <colgroup><col width="30">
+	                        <col width="60">
+	                        <col>
+	                        <col width="180">
+	                        </colgroup><tbody>
+	<?=$this->view('catalog/product/rows')->set('products', FCom_Catalog_Model_Product::i()->orm()->offset(30)->limit(10)->find_many()) ?>
+	                        </tbody>
+	                    </table>
+	                </div>
+            	</div>
+        	</div>
         </div>
-    </div>
-</div>
