@@ -6,7 +6,6 @@
 	<?=$this->view('catalog/compare/block')?>
 	<div class="product-listing">
 	    <table>
-	        <col width="30"/>
 	        <col width="60"/>
 	        <col/>
 	        <col width="100"/>
