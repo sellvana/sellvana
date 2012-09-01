@@ -1,102 +1,150 @@
 <?
 $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 ?>
-    <div class="col-main">
-        <div class="page-title category-title">
-            <h1><?= BLocale::_("Cart") ?></h1>
-        </div>
+        <header class="page-title">
+            <h1 class="title"><?= BLocale::_("Shopping Cart") ?></h1>
+        </header>
 <?php if (!$this->cart->items()): ?>
-
-    <p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
-
+    	<p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 <?php else: ?>
-
-    <form name="cart" action="<?=BApp::href('cart')?>" method="post">
-        <table class="product-list">
-            <col width="30"/>
-            <col width="60"/>
-            <col/>
-            <col width="180"/>
-            <col width="70"/>
-            <col width="70"/>
-            <thead>
-                <tr>
-                    <td><?= BLocale::_("Remove") ?></td>
-                    <td colspan="2"><?= BLocale::_("Product") ?></td>
-                    <td><?= BLocale::_("Price") ?></td>
-                    <td><?= BLocale::_("Qty") ?></td>
-                    <td><?= BLocale::_("Subtotal") ?></td>
-                </tr>
-            </thead>
-            <tbody>
-<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
-                <tr id="tr-product-<?=$p->id?>">
-                    <td class="first a-center">
-                        <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="<?=$item->id?>"></label>
-                    </td>
-                    <td>
-                        <img src="<?=$this->q($p->thumbUrl(85, 60))?>" width="85" height="60" class="product-img" alt="<?=$this->q($p->product_name)?>"/>
-                    </td>
-                    <td>
-                        <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
-                    </td>
-                    <td class="actions last a-left">
-                        <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
-                            <span class="price">$<?=number_format($p->base_price)?></span>
-                        </div>
-                    </td>
-                    <td>
-                        <input type="text" size="3" name="qty[<?=$item->id?>]" value="<?=$item->qty*1?>"/>
-                    </td>
-                    <td>
-                        <span class="price">$<?=number_format($item->rowTotal(), 2)?></span>
-                    </td>
-                </tr>
-<?php endforeach ?>
-            </tbody>
-            <tfoot>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                    <?php if ($this->redirectLogin) :?>
-                        <a href="<?=BApp::href('checkout/login')?>"><?= BLocale::_("Checkout") ?></a>
-                    <?php else :?>
-                        <a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout") ?></a>
-                    <?php endif; ?>
-                </td>
-                <td><input type="submit" class="button" value="<?= BLocale::_("Update Cart") ?>"/></td>
-                <td>$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
-            </tfoot>
-        </table>
-    </form>
-
-    <form action="<?=BApp::href('cart')?>" method="post">
-        <table>
-            <?php if ($this->shipping_esitmate): ?>
-            <tr>
-                <td><?= BLocale::_("Shipping estimate") ?>:<br/>
-                    <?php if ($this->shipping_esitmate) :?>
-                    <ul>
-                        <?php foreach($this->shipping_esitmate as $estimate): ?>
-                            <li><?=$estimate['description']?> (<?=$estimate['estimate']?>)</li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php endif; ?>
-            <tr>
-                <td><?= BLocale::_("Post code") ?>: <input type="text" size="4" name="postcode" value=""/></td>
-            </tr>
-            <tr>
-                <td><input type="submit" class="button" value="<?= BLocale::_("Estimate shipping") ?>"/></td>
-            </tr>
-        </table>
-    </form>
+    	<div class="col-cart data-table">
+	    	<form name="cart" action="<?=BApp::href('cart')?>" method="post">
+		        <table>
+		            <col width="20"/>
+		            <col/>
+		            <col/>
+		            <col width="100"/>
+		            <col width="80"/>
+		            <col width="100"/>
+		            <thead>
+		                <tr>
+		                	<th class="a-center">Remove</th>
+		                    <th colspan="2" class="a-left"><?= BLocale::_("Product") ?></th>
+		                    <th class="a-right"><?= BLocale::_("Price") ?></th>
+		                    <th class="a-center"><?= BLocale::_("Qty") ?></th>
+		                    <th class="a-right"><?= BLocale::_("Subtotal") ?></th>
+		                </tr>
+		            </thead>
+		            <tbody>
+		<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
+		                <tr id="tr-product-<?=$p->id?>">
+		                	<td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox" value="<?=$item->id?>"></label></td>
+		                    <td>
+		                        <img src="<?=$this->q($p->thumbUrl(85, 60))?>" width="85" height="60" class="product-img" alt="<?=$this->q($p->product_name)?>"/>
+		                    </td>
+		                    <td>
+		                        <span class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></span>
+		                    </td>
+		                    <td class="a-right">
+		                        <div class="price-box <?=$loggedIn?'logged-in':'logged-out'?>">
+		                            <div class=""><span class="price">$<?=number_format($p->base_price)?></span></div>
+		                        </div>
+		                    </td>
+		                    <td class="a-center">
+		                        <input type="text" size="3" name="qty[<?=$item->id?>]" value="<?=$item->qty*1?>"/>
+		                    </td>
+		                    <td class="a-right">
+		                    	<div class="price-box">
+		                        	<div class=""><span class="price">$<?=number_format($item->rowTotal(), 2)?></span></div>
+		                        </div>
+		                    </td>
+		                </tr>
+		<?php endforeach ?>
+		            </tbody>
+		            <tfoot>
+		                <td></td>
+		                <td></td>
+		                <td></td>
+		                <td>
+		                    <?php if ($this->redirectLogin) :?>
+		                        <a href="<?=BApp::href('checkout/login')?>"><?= BLocale::_("Checkout") ?></a>
+		                    <?php else :?>
+		                        <a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout") ?></a>
+		                    <?php endif; ?>
+		                </td>
+		                <td><button type="submit" class="button btn-aux"><span><?= BLocale::_("Update Cart") ?></span></button></td>
+		                <td class="a-right">$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
+		            </tfoot>
+		        </table>
+	    	</form>
+	    	<section class="col2-set sub-cart">
+		    	<form action="<?=BApp::href('cart')?>" method="post" class="col first">
+		    		<header><?= BLocale::_("Promo Code") ?></header>
+		    		<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
+		    		<p><input type="text"/><button class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
+		    	</form>
+		    	<form action="<?=BApp::href('cart')?>" method="post" class="col last">
+		    		<header><?= BLocale::_("Shipping Estimate") ?></header>
+		    		<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
+			            <?php if ($this->shipping_esitmate): ?>
+			           <?php if ($this->shipping_esitmate) :?>
+			                    <ul class="shipping-estimates">
+			                        <?php foreach($this->shipping_esitmate as $estimate): ?>
+			                            <li><?=$estimate['description']?> (<?=$estimate['estimate']?>)</li>
+			                        <?php endforeach; ?>
+			                    </ul>
+			                    <?php endif; ?>
+			            <?php endif; ?>
+		            <p><strong><?= BLocale::_("Post code") ?></strong><br/><input type="text" size="4" name="postcode" value=""/><button type="submit" class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
+		    	</form>
+	    	</section>
+    	</div>
+    	<div class="col-totals">
+    		<div class="grand-total"><span class="title">Grand Total:</span><span class="price">$4899.97</span></div>
+    		<button type="submit" class="button"><span><?= BLocale::_("Proceed to Checkout") ?></span></button>
+    	</div>
+    	<div class="clearer"></div>
+    	<br/><br/>
+		<section class="block block-who-bought-also-bought">
+			<header class="block-title"><strong class="title"><?= BLocale::_("Customers Who Bought Items in Your Shopping Cart Also Bought") ?></strong></header>
+			<div class="block-content">
+				<div class="product-listing style1">
+					<ul>
+						<li class="item">
+							<a href="#" class="product-image"><img src="http://dev.unirgy.com/fulleron/FCom/Frontend/img/ph/prod_thumbnail.png" width="150" height="150" alt=""/></a>
+							<a href="#" class="product-name">Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</a>
+							<div class="rating">
+								<span class="rating-out">
+									<span class="rating-in" style="width:35%;"></span>
+								</span>
+							</div>
+							<div class="price-box">
+								<span class="regular-price">$1,149.99</span>
+							</div>
+						</li>
+						<li class="item">
+							<a href="#" class="product-image"><img src="http://dev.unirgy.com/fulleron/FCom/Frontend/img/ph/prod_thumbnail.png" width="150" height="150" alt=""/></a>
+							<a href="#" class="product-name">Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</a>
+							<div class="price-box">
+								<span class="regular-price">$1,149.99</span>
+							</div>
+						</li>
+						<li class="item">
+							<a href="#" class="product-image"><img src="http://dev.unirgy.com/fulleron/FCom/Frontend/img/ph/prod_thumbnail.png" width="150" height="150" alt=""/></a>
+							<a href="#" class="product-name">Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</a>
+							<div class="price-box">
+								<span class="regular-price">$1,149.99</span>
+							</div>
+						</li>
+						<li class="item">
+							<a href="#" class="product-image"><img src="http://dev.unirgy.com/fulleron/FCom/Frontend/img/ph/prod_thumbnail.png" width="150" height="150" alt=""/></a>
+							<a href="#" class="product-name">Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</a>
+							<div class="price-box">
+								<span class="regular-price">$1,149.99</span>
+							</div>
+						</li>
+						<li class="item">
+							<a href="#" class="product-image"><img src="http://dev.unirgy.com/fulleron/FCom/Frontend/img/ph/prod_thumbnail.png" width="150" height="150" alt=""/></a>
+							<a href="#" class="product-name">Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</a>
+							<div class="price-box">
+								<span class="regular-price">$1,149.99</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
 <?php endif ?>
-
-    </div>
 <script>
 $('.vendor-count').tooltip({effect:'slide'});
 </script>

@@ -2,7 +2,7 @@
 $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 
-$psOptions = array(25, 50, 100, 500, 30000);
+$psOptions = array(25, 50, 100, 500);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'relevance' => 'Relevance',
