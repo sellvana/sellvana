@@ -1,21 +1,21 @@
 <?
 $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 ?>
-        <header class="page-title">
-            <h1 class="title"><?= BLocale::_("Shopping Cart") ?></h1>
-        </header>
 <?php if (!$this->cart->items()): ?>
     	<p class="note-msg"><?= BLocale::_("There are no products matching the selection") ?>.</p>
 <?php else: ?>
-    	<div class="col-cart data-table">
+    	<div class="col-cart-left data-table">
+	        <header class="page-title">
+	            <h1 class="title"><?= BLocale::_("Shopping Cart") ?></h1>
+	        </header>
 	    	<form name="cart" action="<?=BApp::href('cart')?>" method="post">
 		        <table>
-		            <col width="20"/>
+		            <col width="30"/>
+		            <col width="60"/>
 		            <col/>
-		            <col/>
-		            <col width="100"/>
+		            <col width="120"/>
 		            <col width="80"/>
-		            <col width="100"/>
+		            <col width="120"/>
 		            <thead>
 		                <tr>
 		                	<th class="a-center">Remove</th>
@@ -28,9 +28,9 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		            <tbody>
 		<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
 		                <tr id="tr-product-<?=$p->id?>">
-		                	<td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox" value="<?=$item->id?>"></label></td>
+		                	<td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="<?=$item->id?>"></label></td>
 		                    <td>
-		                        <img src="<?=$this->q($p->thumbUrl(85, 60))?>" width="85" height="60" class="product-img" alt="<?=$this->q($p->product_name)?>"/>
+		                        <img src="<?=$this->q($p->thumbUrl(80, 80))?>" width="80" height="80" class="product-image" alt="<?=$this->q($p->product_name)?>"/>
 		                    </td>
 		                    <td>
 		                        <span class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></span>
@@ -41,7 +41,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                        </div>
 		                    </td>
 		                    <td class="a-center">
-		                        <input type="text" size="3" name="qty[<?=$item->id?>]" value="<?=$item->qty*1?>"/>
+		                        <input type="text" size="3" name="qty[<?=$item->id?>]" class="qty" value="<?=$item->qty*1?>"/>
 		                    </td>
 		                    <td class="a-right">
 		                    	<div class="price-box">
@@ -55,13 +55,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                <td></td>
 		                <td></td>
 		                <td></td>
-		                <td>
-		                    <?php if ($this->redirectLogin) :?>
-		                        <a href="<?=BApp::href('checkout/login')?>"><?= BLocale::_("Checkout") ?></a>
-		                    <?php else :?>
-		                        <a href="<?=BApp::href('checkout')?>"><?= BLocale::_("Checkout") ?></a>
-		                    <?php endif; ?>
-		                </td>
+		                <td></td>
 		                <td><button type="submit" class="button btn-aux"><span><?= BLocale::_("Update Cart") ?></span></button></td>
 		                <td class="a-right">$<span class="cart-subtotal"><?=number_format($this->cart->subtotal)?></span></td>
 		            </tfoot>
@@ -85,13 +79,35 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 			                    </ul>
 			                    <?php endif; ?>
 			            <?php endif; ?>
-		            <p><strong><?= BLocale::_("Post code") ?></strong><br/><input type="text" size="4" name="postcode" value=""/><button type="submit" class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
+		            <p><strong><?= BLocale::_("Post code") ?></strong><br/>
+		            	<input type="text" size="4" name="postcode" value="" style="width:150px;"/><button type="submit" class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
 		    	</form>
 	    	</section>
     	</div>
-    	<div class="col-totals">
-    		<div class="grand-total"><span class="title">Grand Total:</span><span class="price">$4899.97</span></div>
-    		<button type="submit" class="button"><span><?= BLocale::_("Proceed to Checkout") ?></span></button>
+    	<div class="col-cart-right">
+    		<div class="cart-totals">
+	    		<table>
+	    			<tr>
+	    				<td>Subtotal</td>
+	    				<td>$4499.97</td>
+	    			</tr>
+	    			<tr>
+	    				<td>Shipping &amp; Handling</td>
+	    				<td>$399.99</td>
+	    			</tr>
+	    			<tr class="grand-total">
+	    				<td>Grand Total</td>
+	    				<td>$4899.97</td>
+	    			</tr>
+	    		</table>
+    		</div>
+           	<ul class="checkout-btns">
+           		<?php if ($this->redirectLogin) :?>
+	                <li><a href="<?=BApp::href('checkout/login')?>" class="button btn-sz2"><span><?= BLocale::_("Proceed to Checkout") ?></span></a></li>
+	            <?php else :?>
+	                <li><a href="<?=BApp::href('checkout')?>" class="button btn-sz2"><span><?= BLocale::_("Proceed to Checkout") ?></span></a></li>
+	            <?php endif; ?>
+	       	</ul>
     	</div>
     	<div class="clearer"></div>
     	<br/><br/>

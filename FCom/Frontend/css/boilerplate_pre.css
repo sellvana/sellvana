@@ -35,7 +35,7 @@ audio:not([controls]) { display:none; }
 [hidden] { display:none; }
 * { margin:0; padding:0; }
 html { font-size:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
-body { margin:0; font-size:.9em; line-height:1.4; }
+body { margin:0; font-size:.85em; line-height:1.4; }
 ::-moz-selection { text-shadow:none; }
 ::selection { text-shadow:none;  }
 a:hover, a:active { outline:0; }
@@ -56,7 +56,7 @@ sub, sup { font-size:75%; line-height:0; position:relative; vertical-align:basel
 sup { top:-0.5em; }
 sub { bottom:-0.25em; }
 del { text-decoration: line-through; }
-nav ul, nav ol { list-style:none; list-style-image:none; margin:0; padding:0; }
+nav ul, nav ol, nav li, header ul, header li { list-style:none; list-style-image:none; margin:0; padding:0; }
 img { border:0; -ms-interpolation-mode:bicubic; vertical-align:middle; }
 svg:not(:root) { overflow:hidden; }
 fieldset { border:0; }
