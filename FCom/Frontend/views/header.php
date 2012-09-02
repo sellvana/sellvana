@@ -2,7 +2,7 @@
 	<div class="header-top-wrapper">
 	    <div class="header-top">
 	        <a href="#" class="site-logo">Fulleron</a>
-	        <?=$this->view('cart/header')?>
+	        <div id="minicart-container"><?=$this->view('checkout/cart/block')?></div>
 	        <nav class="sup-links">
 	            <ul>
 	                <?php if(FCom_Customer_Model_Customer::isLoggedIn()):?>
