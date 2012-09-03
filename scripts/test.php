@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR_.'/../tests/index.php';
+require_once __DIR_.'/../shell/index.php';
 
 $handle = fopen(FULLERON_ROOT_DIR.'/storage/products.csv', 'r');
 $data = array();

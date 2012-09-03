@@ -54,7 +54,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!parent::afterSave()) return false;
 
         //todo: setup unique uniq_id
-        if (!$this->get('uniq_id')) $this->set('uniq_id', $this->id);
+        if (!$this->get('unique_id')) {
+            $this->set('unique_id', $this->id);
+            $this->save();
+        }
 
         return true;
     }
@@ -147,27 +150,74 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         foreach($data as $d) {
             $categoriesPath = array();
             if (!empty($d['categories'])) {
-                $categoriesPath = explode(",", $d['categories']);
+                $categoriesPath = explode(";", $d['categories']);
                 unset($d['categories']);
             }
 
             $imagesNames = array();
             if (!empty($d['images'])) {
-                $imagesNames = explode(",", $d['images']);
+                $imagesNames = explode(";", $d['images']);
                 unset($d['images']);
             }
 
-            //create product and setup custom fields if any
+            //create product
             try {
                 $p = self::orm()->create($d)->save();
             } catch (Exception $e) {
-                $p = self::orm()->where("url_key", BLocale::transliterate($d['product_name']))->find_one();
+                $p = self::orm()->where("unique_id", $d['unique_id'])->find_one();
             }
 
             if (!$p) {
                 continue;
             }
 
+            $p->set($d);
+            $p->save();
+
+            //HANDLE CUSTOM FIELDS
+            //
+            //find intersection of custom fields with data fields
+            $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
+            $cfKeys = array_keys($cfFields);
+            $dataKeys = array_keys($d);
+            $cfIntersection = array_intersect($cfKeys, $dataKeys);
+
+            //get custom fields values from data
+            //add new options if necessary
+            $customFields = array();
+            $fieldIds = array();
+            foreach($cfIntersection as $cfk) {
+                $field = $cfFields[$cfk];
+                $dataValue = $d[$cfk];
+                $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id());
+                if($options) {
+                    if (!isset($options[$dataValue])) {
+                        FCom_CustomField_Model_FieldOption::orm()->create(array('field_id' => $field->id(), 'label'=>$dataValue))->save();
+                    }
+                }
+                $customFields[$cfk] = $dataValue;
+                $fieldIds[] = $field->id();
+            }
+            //get or create custom field
+            $custom = FCom_CustomField_Model_ProductField::orm()->where("product_id", $p->id)->find_one();
+            if ($custom) {
+                if (!empty($custom->_add_field_ids)) {
+                    $custom->_add_field_ids = "," . implode(",",$fieldIds);
+                } else {
+                    $custom->_add_field_ids = implode(",",$fieldIds);
+                }
+                $custom->set($customFields);
+                $custom->save();
+            } else {
+                $customFields['product_id'] = $p->id();
+                $customFields['_add_field_ids'] = implode(",",$fieldIds);
+                $custom = FCom_CustomField_Model_ProductField::i()->create($customFields)->save();
+                $custom->product_id = $p->id;
+
+            }
+
+
+            continue;
             //assign categories
             if (!empty($categoriesPath)) {
                 foreach($categoriesPath as $catpath) {
@@ -177,10 +227,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     }
                     $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
                         ->where('product_id', $p->id())
-                        ->where('category_id', $cat->id())
+                        ->where('category_id', $category->id())
                         ->find_one();
                     if (!$catProduct) {
-                        $catdata=array('product_id' => $p->id(), 'category_id'=>$cat->id());
+                        $catdata=array('product_id' => $p->id(), 'category_id'=>$category->id());
                         FCom_Catalog_Model_CategoryProduct::create($catdata)->save();
                     }
 
