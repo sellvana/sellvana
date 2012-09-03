@@ -56,7 +56,7 @@
 					<h4><?= BLocale::_("Payment method") ?></h4>
 			<?php if (!empty($this->paymentMethod)) :?>
 			    	<small><a href="/checkout/payment"><?= BLocale::_("Change") ?></a></small><br/>
-			
+
 			    	<i><?=$this->paymentClass->getName()?></i><br/>
 			    	<?= $this->view($this->paymentMethod.'/form')->set('paymentDetails', $this->paymentDetails);?>
 			<?php else: ?>
@@ -110,8 +110,8 @@
 			    </table>
 			</section>
 			<p><a href="/cart"><?= BLocale::_("Need to change quantities or delete") ?>?</a></p>
-			
-			<?php if ($this->guest) :?>
+
+			<?php if ($this->guest_checkout) :?>
 				<label for="#"><?= BLocale::_("Create an account") ?>?</label>
 				<input type="checkbox" name="create_account" value="1" class="required"><br/>
 				<label for="#">E-mail</label>
