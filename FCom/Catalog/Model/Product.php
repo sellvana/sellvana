@@ -143,7 +143,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
-    static public function import($data, $config=array())
+    public function import($data, $config=array())
     {
         if (empty($data) || !is_array($data)) {
             return;
@@ -206,14 +206,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     'update' == $config['import_actions']
                     ) {
                 if (isset($d['unique_id'])) {
-                    $p = self::orm()->where("unique_id", $d['unique_id'])->find_one();
+                    $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
                 }
             }
             if (!$p && 'update' == $config['import_actions']) {
                 continue;
             } elseif (!$p) {
                 try {
-                    $p = self::orm()->create($d)->save();
+                    $p = $this->orm()->create($d)->save();
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
                     continue;
