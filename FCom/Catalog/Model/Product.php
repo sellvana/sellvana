@@ -213,11 +213,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $customFields['_add_field_ids'] = implode(",",$fieldIds);
                 $custom = FCom_CustomField_Model_ProductField::i()->create($customFields)->save();
                 $custom->product_id = $p->id;
-
             }
 
 
-            continue;
+            
             //assign categories
             if (!empty($categoriesPath)) {
                 foreach($categoriesPath as $catpath) {
