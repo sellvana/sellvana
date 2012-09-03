@@ -77,6 +77,11 @@ class FCom_Core extends BClass
             $config->set('fs/media_dir', $mediaDir);
         }
 
+        $imageFolder = $config->get('fs/image_folder');
+        if (!$imageFolder) {
+            $config->set('fs/image_folder', 'media/product/image');
+        }
+
         $storageDir = $config->get('fs/storage_dir');
         if (!$storageDir) {
             $storageDir = $rootDir.'/storage';

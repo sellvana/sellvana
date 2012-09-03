@@ -16,6 +16,5 @@ while($row = fgetcsv($handle, 1024, "\t", '"')) {
     }
     $data[] = $row;
 }
-print_r($data);
 
 FCom_Catalog_Model_Product::import($data);

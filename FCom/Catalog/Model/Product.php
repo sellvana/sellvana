@@ -160,7 +160,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 unset($d['images']);
             }
 
-            //create product
+            //HANDLE PRODUCT
             try {
                 $p = self::orm()->create($d)->save();
             } catch (Exception $e) {
@@ -215,46 +215,67 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $custom->product_id = $p->id;
             }
 
-
-            
-            //assign categories
+            //HANDLE CATEGORIES
             if (!empty($categoriesPath)) {
+                //check if parent category exist
+                $topParentCategory = FCom_Catalog_Model_Category::orm()->where_null("parent_id")->find_one();
+                if (!$topParentCategory) {
+                    $topParentCategory = FCom_Catalog_Model_Category::orm()->create(array('parent_id'=>null))->save();
+                }
+
+                //check if categories exists
+                //create new categories if not
+                $categories = array();
                 foreach($categoriesPath as $catpath) {
-                    $category = FCom_Catalog_Model_Category::orm()->where("url_path", $catpath)->find_many();
-                    if (!$category) {
-                        break;
+                    $catNodes = explode(">", $catpath);
+                    $parent = $topParentCategory;
+                    foreach($catNodes as $catnode) {
+                        $category = FCom_Catalog_Model_Category::orm()->where("node_name", $catnode)->find_one();
+                        if (!$category) {
+                            $category = $parent->createChild($catnode);
+                        }
+                        $parent = $category;
+                        $categories[$catpath] = $category;
                     }
+                }
+
+                //assign products to categories
+                foreach($categories as $category) {
                     $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
                         ->where('product_id', $p->id())
                         ->where('category_id', $category->id())
                         ->find_one();
                     if (!$catProduct) {
-                        $catdata=array('product_id' => $p->id(), 'category_id'=>$category->id());
-                        FCom_Catalog_Model_CategoryProduct::create($catdata)->save();
+                        FCom_Catalog_Model_CategoryProduct::orm()->create(array('product_id' => $p->id(), 'category_id'=>$category->id()))->save();
                     }
-
                 }
             }
 
-            //assign images
+
+            //HANDLE IMAGES
             if (!empty($imagesNames)) {
                 $mediaLib = FCom_Core_Model_MediaLibrary::i();
                 $productMedia = FCom_Catalog_Model_ProductMedia::i();
-                if (!empty($images)) {
-                    foreach($imagesNames as $path) {
-                        $size = filesize(FULLERON_ROOT_DIR.'/'.$path);
-                        $fileName = pathinfo($path, PATHINFO_BASENAME);
-                        $folder =  pathinfo($path, PATHINFO_DIRNAME);
-                        $att = $mediaLib->load(array('folder'=>$folder, 'file_name'=>$fileName));
+                $imageFolder = BConfig::i()->get('fs/image_folder');
+
+                foreach($imagesNames as $imagesString) {
+                    $images = explode(">", $imagesString);
+                    foreach($images as $fileName) {
+                        $att = $mediaLib->load(array('folder'=>$imageFolder, 'file_name'=>$fileName));
                         if (!$att) {
+                            $fullPathToFile = FULLERON_ROOT_DIR.'/'.$imageFolder.'/'.$fileName;
+                            $size = 0;
+                            if (file_exists($fullPathToFile)) {
+                                $size = filesize($fullPathToFile);
+                            }
+                            $pathinfo = pathinfo($fileName);
                             $att = $mediaLib->create(array(
-                                'folder'    => $folder,
-                                'subfolder' => null,
-                                'file_name' => $fileName,
+                                'folder'    => $imageFolder,
+                                'subfolder' => $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'],
+                                'file_name' => $pathinfo['basename'],
                                 'file_size' => $size,
                             ))->save();
                         }
-
                         $fileId = $productMedia->orm()->where('product_id', $p->id())
                                 ->where('file_id', $att->id())->find_one();
                         if (!$fileId) {
