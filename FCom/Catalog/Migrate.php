@@ -9,6 +9,7 @@ class FCom_Catalog_Migrate extends BClass
         BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
         BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
+        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
     }
 
     public function install()
@@ -191,5 +192,13 @@ class FCom_Catalog_Migrate extends BClass
 
 
         BDb::ddlTableColumns($tProduct, null, array('uniq_id'=>'(`uniq_id`)'));
+    }
+
+    public function upgrade_0_1_6()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            ALTER TABLE ".$tProduct." CHANGE `uniq_id` `unique_id` varchar(255) NOT NULL default '' after id
+        ");
     }
 }
