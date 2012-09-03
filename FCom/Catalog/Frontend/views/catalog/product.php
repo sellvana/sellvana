@@ -21,7 +21,7 @@ $cat = $this->category;
                             <span class="price">$<?=number_format($prod->base_price, 2)?></span>
                         </div>-->
                         <div class="add-to-cart-line">
-                            <?=$this->view('cart/add2cart', array('prod' => $prod))?>
+                            <?=$this->view('checkout/cart/add2cart', array('prod' => $prod))?>
                             <?=$this->view('wishlist/add2wishlist', array('prod' => $prod))?>
                             <label for="compare-<?=$prod->id?>" class="checkbox-line"><input type="checkbox" name="compare" id="compare-<?=$prod->id?>" value="<?=$prod->id?>"> <?= BLocale::_("Compare") ?></label>
                             <label for="wishlist-<?=$prod->id?>" class="checkbox-line"><input type="checkbox" name="wishlist" id="wishlist-<?=$prod->id?>" value="<?=$prod->id?>"> <?= BLocale::_("Wishlist") ?></label>
