@@ -19,4 +19,4 @@ while($row = fgetcsv($handle, 1024, "\t", '"')) {
 $config = array();
 $config['import_actions'] = 'create_or_update';
 $config['import_categories'] = true;
-FCom_Catalog_Model_Product::import($data, $config);
+FCom_Catalog_Model_Product::i()->import($data, $config);
