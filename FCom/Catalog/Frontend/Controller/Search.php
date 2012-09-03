@@ -38,6 +38,13 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
 
+        BLayout::i()->layout(array(
+            '/catalog/category'=>array(
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
+                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar'))
+            ),
+         ));
+
         FCom_Core::lastNav(true);
 
         $this->layout('/catalog/category');
