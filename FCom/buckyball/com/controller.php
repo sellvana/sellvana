@@ -1863,6 +1863,16 @@ class BActionController extends BClass
         BResponse::i()->output();
     }
 
+    public function getAction()
+    {
+        return $this->_action;
+    }
+
+    public function getController()
+    {
+        return self::origClass();
+    }
+
     /**
     * Translate string within controller action
     *
