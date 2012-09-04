@@ -8,16 +8,13 @@ $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
     </td>
     <td>
         <span class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></span>
-        <div class="price-box">
-        	<span class="price">$<?=$this->q(number_format($p->base_price,0))?></span>
-        </div>
         <span class="rating">
             <span class="rating-out"><span class="rating-in" style="width:35px"></span></span>
             3.5 of 5 (<a href="#">16 reviews</a>)
         </span>
         <div class="price-box">
-        	<div class="old-price"><span class="title">Was:</span><span class="price">$399.99</span></div>
-        	<div class="new-price"><span class="title">Now:</span><span class="price">$399.99</span></div>
+        	<div class="old-price"><span class="title">Was:</span><span class="price">$<?=$this->q(number_format($p->base_price,2))?></span></div>
+        	<div class="new-price"><span class="title">Now:</span><span class="price">$<?=$this->q(number_format($p->base_price,2))?></span></div>
         </div>
         <div class="product-description">
         	<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap.</p>
