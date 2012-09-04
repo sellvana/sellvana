@@ -6,6 +6,11 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
     protected $_permission;
     protected $_authorizeActions = array();
 
+    public function __construct() {
+        parent::__construct();
+        BResponse::i()->contentType('application/json');
+    }
+
     public function authenticate($args=array())
     {
         $res = FCom_Admin_Model_User::i()->isLoggedIn();
@@ -30,7 +35,7 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
         if (false == in_array($this->getAction(), $authorizeActions)) {
             return true;
         }
-        
+
         $password = BRequest::i()->headers('PHP_AUTH_PW');
         $username = BRequest::i()->headers('PHP_AUTH_USER');
         $user = FCom_Admin_Model_User::i()->sessionUser();
