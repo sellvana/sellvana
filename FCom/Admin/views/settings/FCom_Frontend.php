@@ -35,7 +35,9 @@
                         </select>
                     </td></tr>
                 <tr><td>Root id cms</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_cms]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_cms'))?>"/></td></tr>
-                <tr><td>Root id categories</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_category]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_category'))?>"/></td></tr>
+<!--
+<tr><td>Root id categories</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_category]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_category'))?>"/></td></tr>
+-->
             </table>
         </div>
     </div>
