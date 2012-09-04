@@ -31,13 +31,13 @@
                         <select name="config[modules][FCom_Frontend][nav_top][type]">
                             <option value="">Select an option</option>
                             <option value="cms" <?=$c->get('modules/FCom_Frontend/nav_top/type') == 'cms'?'selected':''?>>CMS menu</option>
-                            <option value="categories" <?=$c->get('modules/FCom_Frontend/nav_top/type') == 'categories'?'selected':''?>>Categories menu</option>
+                            <option value="categories_root" <?=$c->get('modules/FCom_Frontend/nav_top/type') == 'categories_root'?'selected':''?>>Categories menu by root id</option>
+                            <option value="categories_custom" <?=$c->get('modules/FCom_Frontend/nav_top/type') == 'categories_custom'?'selected':''?>>Categories menu by custom selection</option>
                         </select>
                     </td></tr>
                 <tr><td>Root id cms</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_cms]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_cms'))?>"/></td></tr>
-<!--
-<tr><td>Root id categories</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_category]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_category'))?>"/></td></tr>
--->
+                <tr><td>Root id categories</td><td><input type="text" name="config[modules][FCom_Frontend][nav_top][root_category]" value="<?php echo $this->q($c->get('modules/FCom_Frontend/nav_top/root_category'))?>"/></td></tr>
+
             </table>
         </div>
     </div>
