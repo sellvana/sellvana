@@ -1378,7 +1378,7 @@ class BDebug extends BClass
     {
         $e = error_get_last();
         if ($e && ($e['type']===E_ERROR || $e['type']===E_PARSE || $e['type']===E_COMPILE_ERROR || $e['type']===E_COMPILE_WARNING)) {
-            static::trigger(self::CRITICAL, $e['message'], 1);
+            static::trigger(self::CRITICAL, $e['file'].':'.$e['line'].': '.$e['message'], 1);
         }
     }
 
