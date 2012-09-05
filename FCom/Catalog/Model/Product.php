@@ -168,8 +168,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //import images - default true
-        if (!isset($config['import']['images'])) {
-            $config['import']['images'] = true;
+        if (!isset($config['import']['images']['import'])) {
+            $config['import']['images']['import'] = true;
         }
 
         //reatain image subfolders - default false
@@ -178,8 +178,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //import categories - default true
-        if (!isset($config['import']['categories'])) {
-            $config['import']['categories'] = true;
+        if (!isset($config['import']['categories']['import'])) {
+            $config['import']['categories']['import'] = true;
+        }
+
+        //include in menu
+        if (!isset($config['import']['categories']['menu'])) {
+            $config['import']['categories']['menu'] = true;
         }
 
         //create missing categories - default true
@@ -188,8 +193,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //import custom fields - default true
-        if (!isset($config['import']['custom_fields'])) {
-            $config['import']['custom_fields'] = true;
+        if (!isset($config['import']['custom_fields']['import'])) {
+            $config['import']['custom_fields']['import'] = true;
         }
 
         //create missing options for custom fields
@@ -201,13 +206,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $errors = array();
         foreach($data as $d) {
             $categoriesPath = array();
-            if ($config['import']['categories'] && !empty($d['categories'])) {
+            if ($config['import']['categories']['import'] && !empty($d['categories'])) {
                 $categoriesPath = explode($config['format']['multivalue_separator'], $d['categories']);
                 unset($d['categories']);
             }
 
             $imagesNames = array();
-            if ($config['import']['images'] && !empty($d['images'])) {
+            if ($config['import']['images']['import'] && !empty($d['images'])) {
                 $imagesNames = explode($config['format']['multivalue_separator'], $d['images']);
                 unset($d['images']);
             }
@@ -235,7 +240,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $p->save();
 
             //HANDLE CUSTOM FIELDS
-            if ($config['import']['custom_fields']) {
+            if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
                 $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
                 $cfKeys = array_keys($cfFields);
@@ -316,6 +321,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             }
                             $parent = $category;
                             $categories[$catpath] = $category;
+                        }
+
+                        if ($config['import']['categories']['menu']) {
+                            $categories[$catpath]->setInMenu(true);
                         }
                     }
 

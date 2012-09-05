@@ -7,7 +7,6 @@ require_once __DIR_.'/../shell/index.php';
 $config = array();
 $config['file']['filename'] = FULLERON_ROOT_DIR.'/storage/products.csv';
 $config['import']['actions'] = 'create_or_update';
-$config['import']['categories'] = true;
 $config['format']['encoding'] = 'UTF-8';
 $config['format']['delimiter'] = "\t";
 $config['format']['enclosure'] = '"';
