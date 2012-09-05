@@ -152,7 +152,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         foreach ($this->descendants() as $c) {
             $c->set(array(
-                'id_path' => $this->id_path.'/'.$c->id,
+                'id_path' => $this->id_path .'/'.$c->id,
                 'full_name' => $this->full_name.static::$_separator.$c->node_name,
             ));
             if ($resetUrl) $c->set('url_path', null);
@@ -256,8 +256,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function descendants($sort='sort_order')
     {
         $desc = array();
-        $path = $this->id_path.'/';
 
+        if ($this->is_dirty('id_path')) {
+            $path = $this->old_values('id_path').'/';
+        } else {
+            $path = $this->id_path.'/';
+        }
         if (($cache = $this->cacheFetch())) {
             foreach ($cache as $c) {
                 if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;

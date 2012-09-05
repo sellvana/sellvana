@@ -105,4 +105,14 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     {
         return FCom_Catalog_Model_Product::i()->orm('p')->where_not_null($this->field_code)->find_many();
     }
+
+    public function getListAssoc()
+    {
+        $result=array();
+        $cfList = $this->orm()->find_many();
+        foreach($cfList as $cffield) {
+            $result[$cffield->field_code] = $cffield;
+        }
+        return $result;
+    }
 }

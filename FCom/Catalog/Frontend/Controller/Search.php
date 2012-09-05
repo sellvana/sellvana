@@ -37,6 +37,14 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
+        $rowsView->products = $productsData['rows'];
+
+        BLayout::i()->layout(array(
+            '/catalog/category'=>array(
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
+                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar'))
+            ),
+         ));
 
         FCom_Core::lastNav(true);
 
@@ -69,6 +77,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
+        $rowsView->products = $productsData['rows'];
 
         FCom_Core::lastNav(true);
         $this->layout('/catalog/search');

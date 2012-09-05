@@ -15,9 +15,7 @@
 <script>
 $(function() { // let all checkboxes to load first
     $('.block-compare').data('compare', new FCom.CompareBlock({thumbContainer:'.block-compare', prodContainerPrefix:'#tr-product-', checkbox:'.compare-checkbox', img:'.product-img'}));
-});
-$(function() {
-    $("a[rel]").overlay({mask:{color:'#000',loadSpeed:0,opacity:0.3}, effect:'default', speed:0, onBeforeLoad: function() {
+    $("#compare-trigger").overlay({mask:{color:'#000',loadSpeed:0,opacity:0.3}, effect:'default', speed:0, onBeforeLoad: function() {
         this.getOverlay().find(".contentWrap").load(this.getTrigger().attr("href"));
     }});
 });

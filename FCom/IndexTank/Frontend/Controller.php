@@ -55,6 +55,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
+        $rowsView->products = $productsData['rows'];
 
         $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
@@ -98,6 +99,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
+        $rowsView->products = $productsData['rows'];
 
         $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];

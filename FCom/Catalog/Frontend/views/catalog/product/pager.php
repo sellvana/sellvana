@@ -2,10 +2,8 @@
 $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 
-$psOptions = array(25, 50, 100, 500, 30000);
+$psOptions = array(25, 50, 100, 500);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
-    '' => 'Sort...',
-    'relevance' => 'Relevance',
     'product_name|asc' => 'Product Name (A-Z)',
     'product_name|desc' => 'Product Name (Z-A)',
     'manuf_sku|asc' => 'Manuf SKU (A-Z)',
@@ -57,8 +55,13 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     </div>
     <div class="pager-layout">
 	    <span class="options-select">
-	    	<a href="#" class="option grid active"><span class="icon"></span><?= BLocale::_("View as Grid") ?></a>
-	    	<a href="#" class="option list"><span class="icon"></span><?= BLocale::_("View as List") ?></a>
+                <?php if('grid' == BRequest::get('view')): ?>
+                    <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('view' => 'grid'))?>" class="option grid active"><span class="icon"></span><?= BLocale::_("View as Grid") ?></a>
+                    <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('view' => 'list'))?>" class="option list"><span class="icon"></span><?= BLocale::_("View as List") ?></a>
+                <?php else: ?>
+                    <a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('view' => 'grid'))?>" class="option grid"><span class="icon"></span><?= BLocale::_("View as Grid") ?></a>
+	    	<a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('view' => 'list'))?>" class="option list active"><span class="icon"></span><?= BLocale::_("View as List") ?></a>
+                <?php endif; ?>
 	    </span>
 	</div>
     </form>
