@@ -7,6 +7,7 @@ class FCom_Admin_Migrate extends BClass
         BMigrate::install('0.1.2', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
         BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -100,6 +101,23 @@ class FCom_Admin_Migrate extends BClass
         try {
             BDb::run("
                 ALTER TABLE {$tUser} ADD COLUMN `token_dt` DATETIME NULL AFTER `token`;
+            ");
+        } catch (Exception $e) { }
+    }
+
+    public function upgrade_0_1_3()
+    {
+        $tUser = FCom_Admin_Model_User::table();
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo($tUser, 'api_username')) {
+            return;
+        }
+        try {
+            BDb::run("
+                ALTER TABLE {$tUser}
+                ADD COLUMN `api_username` varchar(100) DEFAULT '' NOT NULL,
+                ADD COLUMN `api_password` varchar(40) DEFAULT '' NOT NULL
+                ;
             ");
         } catch (Exception $e) { }
     }
