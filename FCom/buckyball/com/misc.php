@@ -1617,6 +1617,7 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
+            $e['msg'] = wordwrap($e['msg'], 70, "\n");
             echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
