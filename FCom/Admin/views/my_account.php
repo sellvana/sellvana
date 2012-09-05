@@ -34,5 +34,13 @@
                 <?php echo $this->optionsHtml($hlp->fieldOptions('status'), $m->status) ?>
             </select>
         </li>
+        <li>
+            <h4 class="label">API username</h4>
+            <input type="text" id="model-lastname" name="model[api_username]" value="<?php echo $this->q($m->api_username) ?>"/>
+        </li>
+        <li>
+            <h4 class="label">API password</h4>
+            <input type="text" id="model-lastname" name="model[api_password]" value="<?php echo $this->q($m->api_password) ?>"/>
+        </li>
     </ul>
 </fieldset>

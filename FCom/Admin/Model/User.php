@@ -123,6 +123,22 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    static public function authenticateApi($username, $password)
+    {
+        if (empty($username) || empty($password)) {
+            return false;
+        }
+        /** @var FCom_Admin_Model_User */
+        $user = static::i()->orm()
+            ->where('api_username', $username)
+            ->where('api_password', $password)
+            ->find_one();
+        if (!$user) {
+            return false;
+        }
+        return $user;
+    }
+
     public function login()
     {
         $this->set('last_login', BDb::now())->save();
