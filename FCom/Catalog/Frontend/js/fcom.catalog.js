@@ -6,6 +6,7 @@ FCom.CompareBlock = function(opt) {
     var added = {}; // to avoid duplicate notifications
 
     function thumb(s, i) {
+console.log(s, i);
         var a = $('<a href="#" title="'+s.alt+'"><img src="'+s.src+'" width="35" height="35" alt="'+s.alt+'"/></a>');
         a.click(function() { remove(s.id); return false});
         $(ul.children().get(i)).append(a);
