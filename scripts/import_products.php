@@ -33,8 +33,14 @@ function importProductsTask($config)
         }
 
         foreach($header as $i => $h) {
-            if ($config['format']['encoding'] != 'UTF-8') {
+            //detect and convert encoding if necessary
+            if (strtoupper($config['format']['encoding']) != 'UTF-8') {
                 $row[$i] = mb_convert_encoding($row[$i], 'UTF-8', $config['format']['encoding']);
+            } else {
+                $encoding = mb_detect_encoding($row[$i], "auto");
+                if (strtoupper($encoding) != strtoupper($config['format']['encoding'])) {
+                    $row[$i] = mb_convert_encoding($row[$i], $encoding, $config['format']['encoding']);
+                }
             }
             $row[$h] = $row[$i];
             $readBytes += mb_strlen($row[$i]);
