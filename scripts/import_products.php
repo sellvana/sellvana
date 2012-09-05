@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR_.'/../tests/index.php';
+require_once __DIR_.'/../shell/index.php';
 
 $handle = fopen(FULLERON_ROOT_DIR.'/storage/products.csv', 'r');
 $data = array();
@@ -16,6 +16,7 @@ while($row = fgetcsv($handle, 1024, "\t", '"')) {
     }
     $data[] = $row;
 }
-print_r($data);
-
-FCom_Catalog_Model_Product::import($data);
+$config = array();
+$config['import_actions'] = 'create_or_update';
+$config['import_categories'] = true;
+FCom_Catalog_Model_Product::i()->import($data, $config);

@@ -30,7 +30,7 @@ class FCom_Catalog_Frontend extends BClass
             )),
             '/catalog/category'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('catalog/category'))
+                array('hook', 'main', 'views'=>array('catalog/category')),
             ),
 
             '/catalog/product'=>array(

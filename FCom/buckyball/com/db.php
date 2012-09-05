@@ -1145,6 +1145,14 @@ exit;
         return $this->_dirty_fields;
     }
 
+    public function old_values($property='')
+    {
+        if ($property && isset($this->_old_values[$property])) {
+            return $this->_old_values[$property];
+        }
+        return $this->_old_values;
+    }
+
     /**
      * Delete this record from the database
      *
@@ -1808,6 +1816,16 @@ class BModel extends Model
      */
     public function is_dirty($property=null) {
         return $this->orm->is_dirty($property);
+    }
+
+    /**
+     * Return old value(s) of modified field
+     * @param type $property
+     * @return type
+     */
+    public function old_values($property='')
+    {
+        return $this->orm->old_values($property);
     }
 
     /**

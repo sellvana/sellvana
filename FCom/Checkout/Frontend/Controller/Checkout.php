@@ -82,7 +82,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->guest = $guestCheckout;
+        $layout->view('checkout/checkout')->guest_checkout = $guestCheckout;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $layout->view('checkout/checkout')->billingAddressObject = $billAddress;

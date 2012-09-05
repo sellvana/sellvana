@@ -4,7 +4,7 @@
 		Responsive, mobile-ready, bullet-proof code</div>
 	</div>
 </div>
-<div class="page-main-wrapper">
+<div class="page-main-wrapper page-home">
 	<div class="page-main">
 		<section class="block block-home-featured">
 			<header class="block-title"><strong class="title">Featured Products</strong></header>
