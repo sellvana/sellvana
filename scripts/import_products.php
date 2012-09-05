@@ -13,7 +13,7 @@ $config['format']['delimiter'] = "\t";
 $config['format']['enclosure'] = '"';
 $config['format']['multivalue_separator'] = ';';
 $config['format']['nesting_separator'] = '>';
-$config['data']['batch_size'] = 1024*4; //100K
+$config['data']['batch_size'] = 1024*100; //100K
 
 importProductsTask($config);
 
@@ -33,6 +33,9 @@ function importProductsTask($config)
         }
 
         foreach($header as $i => $h) {
+            if ($config['format']['encoding'] != 'UTF-8') {
+                $row[$i] = mb_convert_encoding($row[$i], 'UTF-8', $config['format']['encoding']);
+            }
             $row[$h] = $row[$i];
             $readBytes += mb_strlen($row[$i]);
             unset($row[$i]);
