@@ -682,23 +682,14 @@ class BUtil extends BClass
     }
 
     /**
-     * Deprecated. See BUtil::maskFields
+     * See BUtil::maskFields
      * @param type $array
      * @param type $fields
      * @return type
      */
     static public function arrayMask($array, $fields)
     {
-        if (is_string($fields)) {
-            $fields = explode(',', $fields);
-        }
-        $result = array();
-        foreach ($fields as $f) {
-            if (array_key_exists($f, $array)) {
-                $result[$f] = $array[$f];
-            }
-        }
-        return $result;
+        return self::maskFields($array, $fields);
     }
 
     /**
