@@ -453,19 +453,7 @@ class BUtil extends BClass
         return $result;
     }
 
-    static public function arrayMask($array, $fields)
-    {
-        if (is_string($fields)) {
-            $fields = explode(',', $fields);
-        }
-        $result = array();
-        foreach ($fields as $f) {
-            if (array_key_exists($f, $array)) {
-                $result[$f] = $array[$f];
-            }
-        }
-        return $result;
-    }
+
 
     /**
     * Create IV for mcrypt operations
@@ -689,6 +677,26 @@ class BUtil extends BClass
             foreach ($fields as $k) $result[$k] = isset($source[$k]) ? $source[$k] : null;
         } else {
             foreach ($source as $k=>$v) if (!in_array($k, $fields)) $result[$k] = $v;
+        }
+        return $result;
+    }
+
+    /**
+     * Deprecated. See BUtil::maskFields
+     * @param type $array
+     * @param type $fields
+     * @return type
+     */
+    static public function arrayMask($array, $fields)
+    {
+        if (is_string($fields)) {
+            $fields = explode(',', $fields);
+        }
+        $result = array();
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $array)) {
+                $result[$f] = $array[$f];
+            }
         }
         return $result;
     }
