@@ -11,63 +11,31 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'market';
-    //protected $_modelClass = '';
+    protected $_modelClass = 'FCom_Market_Model_Modules';
     //protected $_mainTableAlias = '';
 
     public function gridConfig()
     {
         $formUrl = BApp::href($this->_gridHref.'/form');
-        $config = array();
+        $config = parent::gridConfig();
         $columns = array(
             'mod_name'=>array('label'=>'Code', 'width'=>250, 'editable'=>true),
-            'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
+            'name'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
+            'version' => array('label'=>'Local Version', 'width'=>250, 'editable'=>true),
+            'latest_version' => array('label'=>'Latest Version', 'width'=>250, 'editable'=>true, 'sortable'=>false),
             'description' => array('label'=>'Description', 'width'=>250, 'editable'=>true),
-            'version' => array('label'=>'Version', 'width'=>250, 'editable'=>true),
-            'local_version' => array('label'=>'Local Version', 'width'=>250, 'editable'=>true),
-            'notice' => array('label'=>'Notice', 'width'=>250, 'editable'=>true)
+            'notice' => array('label'=>'Notice', 'width'=>250, 'editable'=>true, 'sortable'=>false)
         );
 
-        $config['grid']['id'] = 'modules';
+        $config['grid']['id'] = __CLASS__;
         $config['grid']['autowidth'] = false;
         $config['grid']['caption'] = 'All modules';
         $config['grid']['multiselect'] = false;
         $config['grid']['height'] = '100%';
         $config['grid']['columns'] = $columns;
         $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>false);
-        $config['grid']['datatype'] = 'local';
-        $config['grid']['editurl'] = '';
-        $config['grid']['url'] = '';
         $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
 
-        //$data = BLocale::getTranslations();
-        //print_r($data);exit;
-        $modules = FCom_Market_MarketApi::i()->getMyModules();
-        $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
-
-        $data = array();
-        if (!empty($modules)) {
-            foreach($modules as $module){
-                $notice = 'Get module';
-                $localVersion = '';
-                if (!empty($modulesInstalled[$module['mod_name']])) {
-                    $notice = version_compare($module['version'], $modulesInstalled[$module['mod_name']]->version) > 0 ? 'Need upgrade!' : 'Downloaded';
-                    $localVersion = $modulesInstalled[$module['mod_name']]->version;
-                }
-                $data[] = array(
-                    'id' => $module['id'],
-                    'mod_name' => $module['mod_name'],
-                    'module' => $module['name'],
-                    'version' => $module['version'],
-                    'local_version' => $localVersion,
-                    'description' => $module['short_description'],
-                    'notice' => $notice
-                );
-
-            }
-        }
-        //print_r($data);exit;
-        //exit;
-        $config['grid']['data'] = $data;
         return $config;
     }
 
