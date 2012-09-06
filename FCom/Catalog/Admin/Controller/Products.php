@@ -25,7 +25,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['id'] = 'products';
+        $config['grid']['id'] = __CLASS__;
         $config['grid']['columns'] = $this->gridColumns();
         return $config;
     }
@@ -282,7 +282,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processMediaPost($model, $data)
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
-        
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
             $typeName = 'product_'.$typeName;
             if (!empty($data['grid'][$typeName]['del'])) {

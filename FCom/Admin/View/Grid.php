@@ -430,7 +430,7 @@ return [true, 'Testing error'];
         if ($forceRequest) {
             $r = array_replace_recursive($r, $forceRequest);
         }
-#print_r($r); exit;
+//print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
 #print_r($r); exit;
         if (!empty($r['filters'])) {
@@ -447,8 +447,9 @@ return [true, 'Testing error'];
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BPubSub::i()->fire($method.'.data', array('data'=>$data));
+            BPubSub::i()->fire($method.'.data', array('data'=>&$data));
         }
+
         return $data;
     }
 

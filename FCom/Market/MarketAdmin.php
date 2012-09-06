@@ -5,7 +5,8 @@ class FCom_Market_Admin extends BClass
     static public function bootstrap()
     {
         BLayout::i()->addAllViews('Admin/views');
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout');
+        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout')
+        ->on('FCom_Market_Admin_Controller::action_grid_data.data', 'FCom_Market_Model_Modules::jqGridData');
 
         BFrontController::i()
             ->route('GET /market', 'FCom_Market_Admin_Controller.index')
