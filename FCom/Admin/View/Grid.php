@@ -423,6 +423,7 @@ return [true, 'Testing error'];
         } elseif (!empty($r['filters'])) {
             $r['filters'] = BUtil::fromJson($r['filters']);
         }
+
         if ($stateKey) {
             $sess =& BSession::i()->dataToUpdate();
             $sess['grid_state'][$stateKey] = $r;

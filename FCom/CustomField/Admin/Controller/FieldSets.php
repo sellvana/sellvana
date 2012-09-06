@@ -6,7 +6,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $config = array(
             'grid' => array(
-                'id'      => 'fieldsets',
+                'id'      => __CLASS__,
                 'caption' => 'Field Sets',
                 'url'     => BApp::href('customfields/fieldsets/grid_data'),
                 'editurl' => BApp::href('customfields/fieldsets/grid_data'),
