@@ -3,11 +3,11 @@ $s = $this->s;
 ?>
 <section class="block-sub">
 	<header class="block-sub-title"><span class="title"><?= BLocale::_("Categories") ?></span></header>
-	<a href="<?=BApp::href('catalog/search').'?'.BRequest::rawGet()?>"><?= BLocale::_("All categories") ?></a>
+	<a href="<?=BApp::href('catalog/search').'?'.BRequest::rawGet()?>">&lt; <?= BLocale::_("All categories") ?></a>
 	<?php foreach($s['available_categories'] as $data):?>
 		<ul>
 	    <?php foreach ($data as $obj):            ?>
-	        <li style="padding-left:<?=$obj->level*20?>px;">
+	        <li style="padding-left:<?=$obj->level*10?>px;">
 	            <?php if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
 	                <strong><?=$obj->name?> <?=$obj->show_count ? '<span class="count">('.$obj->count.')</span>':''?></strong>
 	            <?php else:?>
