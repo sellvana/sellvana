@@ -29,7 +29,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function fieldsGridConfig()
     {
         $config = FCom_CustomField_Admin_Controller_FieldSets::i()->fieldsGridConfig();
-        $config['grid']['id'] = 'product_fields';
+        $config['grid']['id'] = __CLASS__;
         $config['grid']['hiddengrid'] = true;
         $config[] = array('navButtonAdd', 'caption'=>'Add', 'buttonicon'=>'ui-icon-plus', 'position'=>'first',
             'title'=>'Add fields to product', 'onClickButton'=>'function() { return addCustomFields.call(this) }');
