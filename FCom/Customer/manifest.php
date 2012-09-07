@@ -5,7 +5,7 @@
             'version' => '0.1.2',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",
             'migrate' => 'FCom_Customer_Migrate',

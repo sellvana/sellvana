@@ -87,7 +87,7 @@ class FCom_Cms_Model_Page extends FCom_Core_Model_Abstract
             'version' => $this->version,
             'comments' => $this->version_comments ? $this->version_comments : '',
             'ts' => BDb::now(),
-            'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(),
+            'data' => BUtil::toJson(BUtil::maskFields($this->as_array(),
                 'handle,title,content,layout_update,meta_title,meta_description,meta_keywords')),
         ))->save();
     }

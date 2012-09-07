@@ -30,6 +30,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->create($data)->save();
     }
 
+    public function update($data)
+    {
+        BPubSub::i()->fire(__CLASS__.'.update', array('order'=>$data));
+        return $this->set($data)->save();
+    }
+
     public function paid()
     {
         $this->set('status', 'paid')->save();

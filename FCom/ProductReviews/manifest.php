@@ -2,10 +2,10 @@
     'modules' => array(
         // product reviews
         'FCom_ProductReviews' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.5',
             'root_dir' => '',
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'tests' => "FCom_ProductReviews_Tests_AllTests",
             'description' => "Product reviews by customers",
             'bootstrap' => array('file'=>'ProductReviewsFrontend.php', 'callback'=>'FCom_ProductReviews_Frontend::bootstrap'),

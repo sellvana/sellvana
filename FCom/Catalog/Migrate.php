@@ -7,6 +7,11 @@ class FCom_Catalog_Migrate extends BClass
         BMigrate::install('0.1.1', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.2', array($this, 'upgrade_0_1_2'));
         BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
+        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
+        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
+        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
+        BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
+        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
     }
 
     public function install()
@@ -168,4 +173,48 @@ class FCom_Catalog_Migrate extends BClass
         ");
     }
 
+    public function upgrade_0_1_4()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlClearCache();
+        if (BDb::ddlFieldInfo($tProduct, 'uniq_id')) {
+            return;
+        }
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `uniq_id` varchar(255) NOT NULL default '' after id
+        ");
+    }
+
+    public function upgrade_0_1_5()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            UPDATE ".$tProduct." SET uniq_id = id ;
+        ");
+
+
+        BDb::ddlTableColumns($tProduct, null, array('uniq_id'=>'(`uniq_id`)'));
+    }
+
+    public function upgrade_0_1_6()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            ALTER TABLE ".$tProduct." CHANGE `uniq_id` `unique_id` varchar(255) NOT NULL default '' after id
+        ");
+    }
+
+    public function upgrade_0_1_7()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::run("
+            ALTER TABLE ".$tCategory." ADD `top_menu` tinyint(1) NOT NULL default 0
+        ");
+    }
+
+    public function upgrade_0_1_8()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableColumns($tCategory, null, array('top_menu'=>'(`top_menu`)'));
+    }
 }

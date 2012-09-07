@@ -18,8 +18,11 @@ class FCom_IndexTank_Admin extends BClass
             ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
 
             //api function
-            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexAll')
-            ->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
+            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexStart')
+            ->route('GET /indextank/products/index-pause', 'FCom_IndexTank_Admin::productsIndexPause')
+            ->route('GET /indextank/products/index-resume', 'FCom_IndexTank_Admin::productsIndexResume')
+            ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
+            //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
         BLayout::i()->addAllViews('Admin/views');
@@ -27,12 +30,14 @@ class FCom_IndexTank_Admin extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
 
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
+
             if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
                 BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
                         ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                         //for categories
-                        ->on('FCom_Catalog_Admin_Controller_Categories::::action_tree_data__POST.move_node', 'FCom_IndexTank_Admin::onCategoryMove')
+                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
+                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
                         ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
                         ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
                         ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
@@ -41,14 +46,18 @@ class FCom_IndexTank_Admin extends BClass
                         ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
-            //for API init
-            BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
+
         }
+        //on update settings create new index if index was changed
+        BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 
     static public function onSaveAdminSettings($post)
     {
+
         if (empty($post['post']['config']['modules']['FCom_IndexTank']['api_url'])) {
             return false;
         }
@@ -78,16 +87,44 @@ class FCom_IndexTank_Admin extends BClass
     /**
      * Mark all product for re-index
      */
-    static public function productsIndexAll()
+    static public function productsIndexStart()
     {
-        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "1");
+        FCom_Catalog_Model_Product::i()->update_many(array('indextank_indexed' => '0'), "indextank_indexed != 0");
+
+        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+    }
+
+    static public function productsIndexPause()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('pause');
+    }
+
+    static public function productsIndexResume()
+    {
+        FCom_IndexTank_Model_IndexingStatus::i()->setIndexingStatus('start');
     }
 
     /**
      * Mark all product for re-index
      */
-    static public function productsStopIndexAll()
+    static public function productsIndexingStatus()
     {
+        // disable caching
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: Mon, 26 Jul 1991 05:00:00 GMT');  // disable IE caching
+        header('Content-Type: text/plain; charset=utf-8');
+
+        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        $res = array(
+            'index_size' => $indexingStatus->index_size,
+            'to_index' => $indexingStatus->to_index,
+            'percent' => ceil($indexingStatus->percent),
+            'status' => $indexingStatus->status
+                );
+        echo BUtil::toJson($res);
+        exit;
     }
 
     /**
@@ -117,18 +154,65 @@ class FCom_IndexTank_Admin extends BClass
      *Catch move category
      * @param type $args
      */
-
-    static public function onCategoryMove($args)
+    static public function onCategoryMoveAfter($args)
     {
-        $category = $args['model'];
-        $products = $category->products();
-        $productIds = array();
-        foreach ($products as $product) {
-            $productIds[] = $product->id();
+        if (empty($args['id'])) {
+            return;
         }
-        FCom_Catalog_Model_Product::i()->update_many(
+        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $catIds = explode("/", $categoryMoving->id_path);
+
+        if (empty($catIds)) {
+            return;
+        }
+        $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+        foreach($categories as $category) {
+            $products = $category->products();
+            if (!$products) {
+                continue;
+            }
+            $productIds = array();
+            foreach ($products as $product) {
+                $productIds[] = $product->id();
+            }
+            if (!$productIds) {
+                continue;
+            }
+            FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
                     "id in (".implode(",", $productIds).")");
+        }
+    }
+    static public function onCategoryMoveBefore($args)
+    {
+        if (empty($args['id'])) {
+            return;
+        }
+        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $catIds = explode("/", $categoryMoving->id_path);
+
+        if (empty($catIds)) {
+            return;
+        }
+        $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+        foreach($categories as $category) {
+            $products = $category->products();
+            if (!$products) {
+                continue;
+            }
+            $productIds = array();
+            foreach ($products as $product) {
+                //delete source categories for products
+                FCom_IndexTank_Index_Product::i()->deleteCategories($product, $category);
+                $productIds[] = $product->id();
+            }
+            if (!$productIds) {
+                continue;
+            }
+            FCom_Catalog_Model_Product::i()->update_many(
+                    array("indextank_indexed" => 0),
+                    "id in (".implode(",", $productIds).")");
+        }
     }
 
     static public function onCategoryProductAfterSave($args)
@@ -148,9 +232,15 @@ class FCom_IndexTank_Admin extends BClass
     {
         $category = $args['model'];
         $products = $category->products();
+        if (!$products) {
+            return;
+        }
         $productIds = array();
         foreach ($products as $product) {
             $productIds[] = $product->id();
+        }
+        if (!$productIds) {
+            return;
         }
         FCom_Catalog_Model_Product::i()->update_many(
                     array("indextank_indexed" => 0),
@@ -189,14 +279,17 @@ class FCom_IndexTank_Admin extends BClass
             $doc->search            = 0;
             $doc->source_type       = 'product';
             $doc->source_value      = $cfModel->field_code;
-
             $doc->save();
+
         } elseif ('product' == $doc->source_type && $doc->source_value != $cfModel->field_code) {
             $doc->source_value      = $cfModel->field_code;
             $doc->save();
         }
 
         $products = $cfModel->products();
+        if (!$products) {
+            return;
+        }
         foreach ($products as $product) {
             FCom_IndexTank_Index_Product::i()->updateCategories($product);
         }
@@ -228,7 +321,6 @@ class FCom_IndexTank_Admin extends BClass
             }
         }
         $doc->delete();
-
     }
 
 

@@ -1,4 +1,5 @@
-<footer class="footer">
+<footer class="footer-wrapper">
+	<div class="footer">
     <div class="col4-set">
         <dl class="col first">
             <dt class="title">Customer Service</dt>
@@ -32,5 +33,6 @@
         </div>
     </div>
     <p class="copyright">&copy; 2012 Fulleron Inc. <a href="#">Sitemap</a> <a href="#">Privacy</a> <a href="#">Terms of Use</a></p>
+    </div>
 </footer>
 

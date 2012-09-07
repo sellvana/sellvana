@@ -57,7 +57,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->layout('/checkout/address');
     }
 
-    public function action_address_post()
+    public function action_address__POST()
     {
         $r = BRequest::i()->post();
 

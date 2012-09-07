@@ -5,7 +5,7 @@
             'version' => '0.1.0',
             'root_dir' => '',
             'depends' => array('FCom_Core', 'BPHPTAL'),
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'description' => "CMS for custom pages and forms",
             'bootstrap' => array('file'=>'CmsFrontend.php', 'callback'=>'FCom_Cms_Frontend::bootstrap'),
             'migrate' => 'FCom_Cms_Migrate',

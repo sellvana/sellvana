@@ -42,6 +42,11 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(BApp::href('settings'));
+        if (!empty($post['current_tab'])) {
+            $tab = $post['current_tab'];
+        } else {
+            $tab = 'FCom_Admin';
+        }
+        BResponse::i()->redirect(BApp::href('settings').'?tab='.$tab);
     }
 }

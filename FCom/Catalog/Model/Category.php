@@ -34,4 +34,14 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         static::i()->cacheSaveDirty();
         return true;
     }
+
+    /**
+     * Add category to top menu
+     * @param type $set
+     */
+    public function setInMenu($set=true)
+    {
+        $this->top_menu = $set;
+        $this->save();
+    }
 }

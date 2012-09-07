@@ -6,29 +6,20 @@ class FCom_Checkout_Frontend extends BClass
     {
 
         BFrontController::i()
-            ->route( 'GET /cart', 'FCom_Checkout_Frontend_Controller.cart')
-            ->route('POST /cart', 'FCom_Checkout_Frontend_Controller.cart_post')
-
+            //cart
+            ->route('GET|POST /cart', 'FCom_Checkout_Frontend_Controller.cart')
             //checkout
-            ->route( 'GET /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
-            ->route( 'POST /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_post')
-            ->route( 'GET /checkout/login', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_login')
+            ->route('GET|POST /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
+            //login
+            ->route('GET /checkout/login', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_login')
             //payment
-            ->route( 'GET /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
-            ->route( 'POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment_post')
-
-            //payment
-            ->route( 'GET /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
-            ->route( 'POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping_post')
-
+            ->route('GET|POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
+            //shipping
+            ->route('GET|POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
             //checkout finish page
-            ->route( 'GET /checkout/success', 'FCom_Checkout_Frontend_Controller_Checkout.success')
-
+            ->route('GET /checkout/success', 'FCom_Checkout_Frontend_Controller_Checkout.success')
             //shipping address
-            ->route( 'GET /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
-            ->route('POST /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address_post')
-
-
+            ->route('GET|POST /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
         ;
 
         //merge cart sessions after user login

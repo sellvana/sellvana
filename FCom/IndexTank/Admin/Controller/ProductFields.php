@@ -9,12 +9,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function gridConfig()
     {
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", "index_all_new")->find_one();
-        if ($indexingStatus) {
-            BLayout::i()->view('indextank/product_fields')->set('indexing_status', $indexingStatus->info);
-        } else {
-            BLayout::i()->view('indextank/product_fields')->set('indexing_status', "N/A");
-        }
         try {
             $status = FCom_IndexTank_Index_Product::i()->status();
             BLayout::i()->view('indextank/product_fields')->set('status', $status);
@@ -43,7 +37,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function formViewBefore($args)
     {
-
         parent::formViewBefore($args);
         $m = $args['model'];
         $args['view']->set(array(
@@ -53,10 +46,6 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
 
     public function formPostAfter($args)
     {
-        if ($args['do']==='DELETE') {
-            FCom_IndexTank_Admin::productsIndexAll();
-        }
-
         $model = $args['model'];
         if ($model) {
             if ( $model->scoring && ($model->var_number == -1 || !isset($model->var_number)) ) {

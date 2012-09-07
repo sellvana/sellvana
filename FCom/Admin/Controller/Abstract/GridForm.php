@@ -75,6 +75,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function action_grid_data()
     {
         $mc = $this->_modelClass;
+
         $orm = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
         $this->gridOrmConfig($orm);
 
@@ -82,11 +83,17 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         $oc = static::$_origClass;
 
+        $gridConfig = $oc::i()->gridConfig();
+        $gridId = $gridConfig['grid']['id'];
+        if (!$gridId) {
+            $gridId = $oc;
+        }
+
         $grid = FCom_Admin_View_Grid::i();
         if ($export) {
             $grid->set('config', $this->gridConfig())->export($orm, $oc);
         } else {
-            $data = $grid->processORM($orm, $oc.'::action_grid_data', $oc);
+            $data = $grid->processORM($orm, $oc.'::action_grid_data', $gridId);
             BResponse::i()->json($data);
         }
     }
