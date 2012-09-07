@@ -22,9 +22,10 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             'mod_name'=>array('label'=>'Code', 'width'=>250, 'editable'=>true),
             'name'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
             'version' => array('label'=>'Local Version', 'width'=>250, 'editable'=>true),
-            'latest_version' => array('label'=>'Latest Version', 'width'=>250, 'editable'=>true, 'sortable'=>false),
+            'market_version' => array('label'=>'Market Version', 'width'=>250, 'editable'=>true, 'sortable'=>true),
             'description' => array('label'=>'Description', 'width'=>250, 'editable'=>true),
-            'notice' => array('label'=>'Notice', 'width'=>250, 'editable'=>true, 'sortable'=>false)
+            'need_upgrade' => array('label'=>'Notice', 'width'=>250, 'editable'=>true, 'sortable'=>true,
+                'options'=>array('1'=>'Need upgrade!', '0'=>'Latest version'))
         );
 
         $config['grid']['id'] = __CLASS__;
