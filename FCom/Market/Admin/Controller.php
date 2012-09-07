@@ -55,9 +55,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     public function action_form()
     {
         $moduleId = BRequest::i()->params('id', true);
+        $modName = FCom_Market_Model_Modules::load($moduleId)->mod_name;
+
+        //echo $moduleId;exit;
 
         try {
-            $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+            $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
+            $module = $modules[$modName];
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market"), 'error');
@@ -105,9 +109,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     public function action_install()
     {
         $moduleId = BRequest::i()->params('id', true);
+        $modName = FCom_Market_Model_Modules::load($moduleId)->mod_name;
 
         try {
-            $module = FCom_Market_MarketApi::i()->getModuleById($moduleId);
+            $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
+            $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');

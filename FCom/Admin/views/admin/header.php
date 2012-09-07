@@ -1,5 +1,9 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
+    $modulesToUpdate = false;
+    if (class_exists('FCom_Market_Model_Modules')) {
+        $modulesToUpdate = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
+    }
 ?>
 <div class="ui-layout-north">
     <header class="adm-topbar">
@@ -40,15 +44,16 @@
                     </ul>
                 </li>
 <?php endif ?>
-                <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a>
-                    <ul class="sub-section" style="width:200px">
-                        <li><a href="#">Module update 1</a></li>
-                        <li><a href="#">Module update 2</a></li>
-                        <li><a href="#">Workflow update 1</a></li>
-                        <li><a href="#">Workflow update 2</a></li>
-                    </ul>
 
+<?php if ($modulesToUpdate): ?>
+                <li class="sup-updates"><a href="<?=BApp::href('market/index')?>"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count"><?= count($modulesToUpdate)?></em></span></a>
+                    <ul class="sub-section" style="width:200px">
+                        <?php foreach($modulesToUpdate as $mod): ?>
+                        <li><a href="<?=BApp::href('market/form')?>?id=<?=$mod->id?>"><?=$mod->mod_name?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </li>
+<?php endif; ?>
                 <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
                     <ul class="sub-section">
                         <li><img src="<?=BUtil::gravatar($user->email)?>" style="margin:3px 13px"/></li>
