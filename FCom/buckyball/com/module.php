@@ -58,7 +58,7 @@ class BModuleRegistry extends BClass
 
     public static function isLoaded($modName)
     {
-        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_level===BModule::LOADED;
+        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_status===BModule::LOADED;
     }
 
     /**
@@ -159,6 +159,7 @@ class BModuleRegistry extends BClass
                 case 'json':
                     $json = file_get_contents($file);
                     $manifest = BUtil::fromJson($json);
+
                     break;
                 default:
                     BDebug::error(BLocale::_("Unknown manifest file format: %s", $file));
@@ -964,6 +965,7 @@ class BMigrate extends BClass
                 try {
                     BDb::transaction();
                 */
+                    BDb::ddlClearCache(); // clear DDL cache before each migration step
                     BDebug::debug('DB.MIGRATE '.$script);
                     if (is_callable($script)) {
                         $result = call_user_func($script);

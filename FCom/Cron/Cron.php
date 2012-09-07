@@ -81,14 +81,17 @@ class FCom_Cron extends BClass
                 if (!is_null($handles) && !isset($handles[$h])) {
                     continue;
                 }
+                // check whether to skip already existing tasks
+                if (!$force && !empty($dbTasks[$h])) {
                 // skip pending and already running tasks
-                if (!empty($dbTasks[$h]) && in_array($dbTasks[$h]->status, array('pending', 'running'))) {
-                    continue;
-                }
-                // skip tasks that started within last minute if not specified $force flag
-                if (!$force && !empty($dbTasks[$h]) && $dbTasks[$h]->last_start_time > $thresholdTime) {
-#echo $dbTasks[$h]->last_start_time.', '.$thresholdTime.', '.date('Y-m-d H:i:s', $dbTasks[$h]->last_start_time).', '.date('Y-m-d H:i:s', $thresholdTime).'<hr>';
-                    continue;
+                    if (in_array($dbTasks[$h]->status, array('pending', 'running'))) {
+                        continue;
+                    }
+                    // skip tasks that started within last minute if not specified $force flag
+                    if ($dbTasks[$h]->last_start_time > $thresholdTime) {
+    #echo $dbTasks[$h]->last_start_time.', '.$thresholdTime.', '.date('Y-m-d H:i:s', $dbTasks[$h]->last_start_time).', '.date('Y-m-d H:i:s', $thresholdTime).'<hr>';
+                        continue;
+                    }
                 }
                 // skip not matching tasks
                 if (!$this->matchCronExpression($task['cron_expr_arr'], $date)) {

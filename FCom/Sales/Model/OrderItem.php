@@ -23,6 +23,12 @@ class FCom_Sales_Model_OrderItem extends FCom_Core_Model_Abstract
         return $this->create($data)->save();
     }
 
+    public function update($data)
+    {
+        BPubSub::i()->fire(__CLASS__.'.update', array('orderItem'=>$data));
+        return $this->set($data)->save();
+    }
+
     public function isItemExist($orderId, $product_id)
     {
         return $this->orm()->where("order_id", $orderId)

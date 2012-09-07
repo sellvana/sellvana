@@ -47,6 +47,7 @@ console.log(ui.item[0].id);
 });
 </script>
 <form id="settings-form" action="<?php echo $formUrl ?>" method="post">
+    <input type="hidden" value="FCom_Admin" name="current_tab" id="current_tab"/>
     <header class="adm-page-title">
         <span class="title">Settings</span>
         <div class="btns-set">
@@ -60,7 +61,9 @@ console.log(ui.item[0].id);
 	            <ul>
 	<?php foreach ($this->tabs as $k=>$tab): if (!empty($tab['disabled'])) continue; ?>
 	                <li id="settings-tab-<?php echo $this->q($k) ?>" <?php if ($k===$this->cur_tab): ?>class="active"<?php endif ?>>
-	                    <a href="#tab-<?php echo $this->q($k) ?>"><span class="icon"></span><?php echo $this->q($tab['label']) ?></a>
+	                    <a href="#tab-<?php echo $this->q($k) ?>" onclick="$('#current_tab').val('<?php echo $this->q($k) ?>')">
+                                <span class="icon"></span><?php echo $this->q($tab['label']) ?>
+                            </a>
 	                </li>
 	<?php endforeach ?>
 	            </ul>

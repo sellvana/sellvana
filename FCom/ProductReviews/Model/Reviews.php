@@ -14,8 +14,16 @@ class FCom_ProductReviews_Model_Reviews extends FCom_Core_Model_Abstract
             'title' => $dataInput['title'],
             'rating' => $dataInput['rating']
         );
-        $review = self::create($data);
+        $review = static::create($data);
         $review->save();
+        $rating = static::i()->orm()->where('product_id', $productId)
+                ->select('(avg(rating))', 'avg')
+                ->select('(count(1))', 'num')
+                ->find_one();
+        FCom_Catalog_Model_Product::i()->load($productId)
+                ->set('avg_rating', $rating->avg)
+                ->set('num_reviews', $rating->num)
+                ->save();
         return $review;
     }
 

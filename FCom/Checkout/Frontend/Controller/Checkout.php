@@ -82,7 +82,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->guest = $guestCheckout;
+        $layout->view('checkout/checkout')->guest_checkout = $guestCheckout;
         $layout->view('checkout/checkout')->shippingAddress = FCom_Checkout_Model_Address::as_html($shipAddress);
         $layout->view('checkout/checkout')->billingAddress = FCom_Checkout_Model_Address::as_html($billAddress);
         $layout->view('checkout/checkout')->billingAddressObject = $billAddress;
@@ -92,7 +92,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/checkout');
     }
 
-    public function action_checkout_post()
+    public function action_checkout__POST()
     {
         $post = BRequest::i()->post();
 
@@ -147,16 +147,15 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['total_json'] = $cart->total_json;
             $orderData['balance'] = $cart->calc_balance;
 
+            //create sales order
             $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
-            if (!$salesOrder) {
+            if ($salesOrder) {
+                $salesOrder->update($orderData);
+            } else {
                 $salesOrder = FCom_Sales_Model_Order::i()->add($orderData);
             }
-
+            //copy order items
             foreach ($cart->items() as $item) {
-                $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($salesOrder->id(), $item->product_id);
-                if ($testItem) {
-                    continue;
-                }
                 $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
                 if (!$product) {
                     continue;
@@ -167,7 +166,23 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 $orderItem['qty'] = $item->qty;
                 $orderItem['total'] = $item->price;
                 $orderItem['product_info'] = BUtil::toJson($product->as_array());
-                FCom_Sales_Model_OrderItem::i()->add($orderItem);
+
+                $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($salesOrder->id(), $item->product_id);
+                if ($testItem) {
+                    $testItem->update($orderItem);
+                } else {
+                    FCom_Sales_Model_OrderItem::i()->add($orderItem);
+                }
+            }
+
+            //copy addresses
+            $shippingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id, 'shipping');
+            if ($shippingAddress) {
+                FCom_Sales_Model_Address::i()->newAddress($salesOrder->id(), $shippingAddress);
+            }
+            $billingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id, 'billing');
+            if ($billingAddress) {
+                FCom_Sales_Model_Address::i()->newAddress($salesOrder->id(), $billingAddress);
             }
 
             //Made payment
@@ -197,7 +212,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/payment');
     }
 
-    public function action_payment_post()
+    public function action_payment__POST()
     {
         $post = BRequest::i()->post();
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
@@ -228,7 +243,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->layout('/checkout/shipping');
     }
 
-    public function action_shipping_post()
+    public function action_shipping__POST()
     {
         $href = BApp::href('checkout/payment');
         BResponse::i()->redirect($href);

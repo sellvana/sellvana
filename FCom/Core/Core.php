@@ -77,6 +77,11 @@ class FCom_Core extends BClass
             $config->set('fs/media_dir', $mediaDir);
         }
 
+        $imageFolder = $config->get('fs/image_folder');
+        if (!$imageFolder) {
+            $config->set('fs/image_folder', 'media/product/image');
+        }
+
         $storageDir = $config->get('fs/storage_dir');
         if (!$storageDir) {
             $storageDir = $rootDir.'/storage';
@@ -153,8 +158,13 @@ class FCom_Core extends BClass
         $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
         if ($modeByIp) {
             $ipModes = array();
+            $ipPatterns = array();
             foreach (explode("\n", $modeByIp) as $line) {
                 $a = explode(':', $line);
+                if (strpos($a[0], '*')>0) {
+                    $ipPatterns[trim($a[0])] = strtoupper(trim($a[1]));
+                    continue;
+                }
                 if (empty($a[1])) {
                     $a = array('*', $a[0]);
                 }
@@ -163,9 +173,22 @@ class FCom_Core extends BClass
             $ip = BRequest::i()->ip();
             if (PHP_SAPI==='cli' && !empty($ipModes['$'])) {
                 BDebug::mode($ipModes['$']);
-            } elseif (!empty($ipModes[$ip])) {
+                return $this;
+            }
+            if (!empty($ipModes[$ip])) {
                 BDebug::mode($ipModes[$ip]);
-            } elseif (!empty($ipModes['*'])) {
+                return $this;
+            }
+            if (!empty($ipPatterns)) {
+                foreach ($ipPatterns as $pat=>$mode) {
+                    $pat = str_replace('*', '.*', str_replace('.', '\\.', $pat));
+                    if (preg_match('#^'.$pat.'$#', $ip)) {
+                        BDebug::mode($mode);
+                        return $this;
+                    }
+                }
+            }
+            if (!empty($ipModes['*'])) {
                 BDebug::mode($ipModes['*']);
             }
         }

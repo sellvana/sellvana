@@ -7,18 +7,19 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_modelClass = 'FCom_ProductReviews_Model_Reviews';
     protected $_mainTableAlias = 'prr';
 
-    public function gridConfig($productModel=null)
+    public function gridConfig($productModel = false)
     {
         $formUrl = BApp::href("prodreviews/form");
-        $config = array();
+        $config = parent::gridConfig();
         $columns = array(
             'id'=>array('label'=>'ID', 'width'=>55),
             'title'=>array('label'=>'Title', 'width'=>250, 'editable'=>true),
             'rating'=>array('label'=>'Rating', 'width'=>60, 'editable'=>true),
-            'helpful'=>array('label'=>'Helpful', 'width'=>60, 'editable'=>true)
+            'helpful'=>array('label'=>'Helpful', 'width'=>60, 'editable'=>true),
+            'approved'=>array('label'=>'Approved', 'editable'=>true, 'options' => array('1' => 'Yes','0' => 'No'))
         );
 
-        $config['grid']['id'] = 'productreview';
+        $config['grid']['id'] = __CLASS__;
         $config['grid']['autowidth'] = false;
         $config['grid']['caption'] = 'All review';
         $config['grid']['multiselect'] = false;
@@ -27,34 +28,30 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-            $config['grid']['editurl'] = BApp::href('prodreviews/grid_data');
-            $config['grid']['url'] = BApp::href('prodreviews/grid_data');
-            $config['custom'] = array('personalize'=>true);
-        } else {
+            $config['grid']['id'] = 'products_reviews';
+            $config['grid']['columns']['product_name']=array('label'=>'Product name', 'width'=>250, 'editable'=>false);
             $config['grid']['datatype'] = 'local';
             $config['grid']['editurl'] = '';
             $config['grid']['url'] = '';
-            $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
-        }
+            $config['custom'] = array('personalize'=>true);
+            $orm = FCom_ProductReviews_Model_Reviews::orm('pr')->where('product_id', $productModel->id())
+                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+                ->select('pr.*')->select('p.product_name');
 
-        if ($productModel) {
-            $orm = FCom_ProductReviews_Model_Reviews::i()->orm()->where('product_id', $productModel->id());
-        } else {
-            $orm = FCom_ProductReviews_Model_Reviews::i()->orm();
-        }
-        $data = BDb::many_as_array($orm->find_many());
-
-        //unset unused columns
-        $columnKeys = array_keys($config['grid']['columns']);
-        foreach($data as &$prod){
-            foreach($prod as $k => $p) {
-                if (!in_array($k, $columnKeys)) {
-                    unset($prod[$k]);
+            $data = BDb::many_as_array($orm->find_many());
+            $columnKeys = array_keys($config['grid']['columns']);
+            foreach($data as &$prod){
+                foreach($prod as $k => $p) {
+                    if (!in_array($k, $columnKeys)) {
+                        unset($prod[$k]);
+                    }
                 }
             }
+            //print_r($data);
+            $config['grid']['data'] = $data;
+        } else {
+            $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
         }
-        //print_r($data);
-        $config['grid']['data'] = $data;
 
         return $config;
     }

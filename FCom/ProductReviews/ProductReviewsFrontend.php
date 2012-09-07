@@ -6,16 +6,23 @@ class FCom_ProductReviews_Frontend extends BClass
     {
         BPubSub::i()
             ->on('BLayout::theme.load.after', 'FCom_ProductReviews_Frontend::layout')
+            ->on('BLayout::hook.prodreviews-reviews', 'FCom_ProductReviews_Frontend.hookReviews')
         ;
 
         BFrontController::i()
             ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
-            ->route( 'GET /prodreviews/add', 'FCom_ProductReviews_Frontend_Controller.add')
-            ->route( 'POST /prodreviews/add', 'FCom_ProductReviews_Frontend_Controller.add_post')
-            ->route( 'POST /prodreviews/helpful', 'FCom_ProductReviews_Frontend_Controller.helpful_post')
+            ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
+    }
+
+    public function hookReviews($args)
+    {
+        $product = $args['product'];
+        $productReviews = FCom_ProductReviews_Model_Reviews::i()->orm()->where("product_id", $product->id())->find_many();
+        BLayout::i()->view('prodreviews/reviews')->product_reviews = $productReviews;
+        BLayout::i()->view('prodreviews/reviews')->product = $product;
     }
 
     public static function layout()
@@ -28,7 +35,10 @@ class FCom_ProductReviews_Frontend extends BClass
             )),
             '/prodreviews/add'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('prodreviews/add'))
+                array('hook', 'main', 'views'=>array('prodreviews/add')),
+            ),
+            '/catalog/product'=>array(
+                array('hook', 'prodreviews-reviews', 'views'=>array('prodreviews/reviews')),
             ),
         ));
     }

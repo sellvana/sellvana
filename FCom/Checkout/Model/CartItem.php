@@ -33,5 +33,13 @@ class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
     {
         return $this->qty;
     }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        return true;
+    }
 }
 

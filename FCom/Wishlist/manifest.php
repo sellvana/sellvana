@@ -4,7 +4,7 @@
             'version' => '0.1.0',
             'root_dir' => '',
             'migrate' => 'FCom_Wishlist_Migrate',
-            'translations' => array('de' => 'de.csv'),
+            'translations' => array('de' => 'de.php'),
             'depends' => array('FCom_Catalog', 'FCom_Customer'),
             'tests' => "FCom_Wishlist_Tests_AllTests",
             'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),

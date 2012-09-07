@@ -11,7 +11,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             BResponse::i()->redirect($href);
         }
 
-        if (Bapp::m('FCom_Customer') && false == FCom_Customer_Model_Customer::sessionUser()) {
+        if (BModuleRegistry::isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::sessionUser()) {
             BResponse::i()->redirect(Bapp::href("login"));
         }
 
@@ -19,7 +19,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $this->layout('/prodreviews/add');
     }
 
-    public function action_add_post()
+    public function action_add__POST()
     {
         $post = BRequest::i()->post();
 
@@ -30,7 +30,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         if (!empty($post['review'])) {
             $customerId = 0;
-            if (Bapp::m('FCom_Customer')) {
+            if (BModuleRegistry::isLoaded('FCom_Customer')) {
                 $customer = FCom_Customer_Model_Customer::sessionUser();
                 $customerId = $customer->id();
             }
@@ -40,11 +40,11 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         BResponse::i()->redirect(Bapp::href($href));
     }
 
-    public function action_helpful_post()
+    public function action_helpful__POST()
     {
         $post = BRequest::i()->post();
 
-        if (Bapp::m('FCom_Customer') && false == FCom_Customer_Model_Customer::sessionUser()) {
+        if (BModuleRegistry::isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::sessionUser()) {
             BResponse::i()->json(array('redirect' => BApp::href('login')));
         }
 
@@ -58,10 +58,43 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 BResponse::i()->json(array('error' => 'Invalid id'));
             }
             if ($post['review_helpful'] == 'yes') {
-                $review->helpful(1);
+                $mark = 1;
             } else {
-                $review->helpful(-1);
+                $mark = -1;
             }
+            $customer = FCom_Customer_Model_Customer::sessionUser();
+            $record = FCom_ProductReviews_Model_Helpful2Customer::orm()
+                    ->where('customer_id', $customer->id)
+                    ->where('review_id', $review->id)
+                    ->find_one();
+
+            if (!$record) {
+                $review->helpful($mark);
+                $data = array('customer_id' => $customer->id, 'review_id' => $review->id, 'mark' => $mark);
+                FCom_ProductReviews_Model_Helpful2Customer::orm()->create($data)->save();
+            }
+        }
+    }
+
+    public function action_offensive()
+    {
+        $rid = BRequest::i()->get('rid');
+        if (empty($rid)) {
+            $this->forward(true);
+            return;
+        }
+        $review = FCom_ProductReviews_Model_Reviews::i()->load($rid);
+
+        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $record = FCom_ProductReviews_Model_Offensive2Customer::orm()
+                    ->where('customer_id', $customer->id)
+                    ->where('review_id', $review->id)
+                    ->find_one();
+        if (!$record) {
+            $review->offensive++;
+            $review->save();
+            $data = array('customer_id' => $customer->id, 'review_id' => $review->id, 'offensive' => 1);
+            FCom_ProductReviews_Model_Offensive2Customer::orm()->create($data)->save();
         }
     }
 }

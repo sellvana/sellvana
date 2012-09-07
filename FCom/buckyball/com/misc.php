@@ -453,19 +453,7 @@ class BUtil extends BClass
         return $result;
     }
 
-    static public function arrayMask($array, $fields)
-    {
-        if (is_string($fields)) {
-            $fields = explode(',', $fields);
-        }
-        $result = array();
-        foreach ($fields as $f) {
-            if (array_key_exists($f, $array)) {
-                $result[$f] = $array[$f];
-            }
-        }
-        return $result;
-    }
+
 
     /**
     * Create IV for mcrypt operations
@@ -691,6 +679,17 @@ class BUtil extends BClass
             foreach ($source as $k=>$v) if (!in_array($k, $fields)) $result[$k] = $v;
         }
         return $result;
+    }
+
+    /**
+     * See BUtil::maskFields
+     * @param type $array
+     * @param type $fields
+     * @return type
+     */
+    static public function arrayMask($array, $fields)
+    {
+        return self::maskFields($array, $fields);
     }
 
     /**
@@ -1378,7 +1377,7 @@ class BDebug extends BClass
     {
         $e = error_get_last();
         if ($e && ($e['type']===E_ERROR || $e['type']===E_PARSE || $e['type']===E_COMPILE_ERROR || $e['type']===E_COMPILE_WARNING)) {
-            static::trigger(self::CRITICAL, $e['message'], 1);
+            static::trigger(self::CRITICAL, $e['file'].':'.$e['line'].': '.$e['message'], 1);
         }
     }
 
@@ -1617,6 +1616,7 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
+            $e['msg'] = wordwrap($e['msg'], 70, "\n");
             echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
@@ -2218,5 +2218,91 @@ class BLocale extends BClass
     static public function getTranslations()
     {
         return self::$_tr;
+    }
+}
+
+
+class BFtpClient extends BClass
+{
+    protected $_ftpDirMode = 0775;
+    protected $_ftpFileMode = 0664;
+    protected $_ftpHost = '';
+    protected $_ftpPort = 21;
+    protected $_ftpUsername = '';
+    protected $_ftpPassword = '';
+
+    public function __construct($config)
+    {
+        if (!empty($config['hostname'])) {
+            $this->_ftpHost = $config['hostname'];
+        }
+        if (!empty($config['port'])) {
+            $this->_ftpPort = $config['port'];
+        }
+        if (!empty($config['username'])) {
+            $this->_ftpUsername = $config['username'];
+        }
+        if (!empty($config['password'])) {
+            $this->_ftpPassword = $config['password'];
+        }
+    }
+
+    public function ftpUpload($from, $to)
+    {
+        if (!extension_loaded('ftp')) {
+            new BException('FTP PHP extension is not installed');
+        }
+
+        if (!($conn = ftp_connect($this->_ftpHost, $this->_ftpPort))) {
+            throw new BException('Could not connect to FTP host');
+        }
+
+        if (!@ftp_login($conn, $this->_ftpUsername, $this->_ftpPassword)) {
+            ftp_close($conn);
+            throw new BException('Could not login to FTP host');
+        }
+
+        if (!ftp_chdir($conn, $to)) {
+            ftp_close($conn);
+            throw new BException('Could not navigate to '. $to);
+        }
+
+        $errors = $this->ftpUploadDir($conn, $from.'/');
+        ftp_close($conn);
+
+        return $errors;
+    }
+
+    public function ftpUploadDir($conn, $source, $ftpPath='')
+    {
+        $errors = array();
+        $dir = opendir($source);
+        while ($file = readdir($dir)) {
+            if ($file=='.' || $file=="..") {
+                continue;
+            }
+
+            if (!is_dir($source.$file)) {
+                if (@ftp_put($conn, $file, $source.$file, FTP_BINARY)) {
+                    // all is good
+                    #ftp_chmod($conn, $this->_ftpFileMode, $file);
+                } else {
+                    $errors[] = ftp_pwd($conn).'/'.$file;
+                }
+                continue;
+            }
+            if (@ftp_chdir($conn, $file)) {
+                // all is good
+            } elseif (@ftp_mkdir($conn, $file)) {
+                ftp_chmod($conn, $this->_ftpDirMode, $file);
+                ftp_chdir($conn, $file);
+            } else {
+                $errors[] = ftp_pwd($conn).'/'.$file.'/';
+                continue;
+            }
+            $errors += $this->ftpUploadDir($conn, $source.$file.'/', $ftpPath.$file.'/');
+            ftp_chdir($conn, '..');
+        }
+        return $errors;
     }
 }
