@@ -34,6 +34,7 @@ class FCom_Customer_Frontend extends BClass
         BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Customer_Model_Customer::onAddProductToCart');
 
         BLayout::i()->addAllViews('Frontend/views');
+#echo '*FCom_Customer_Frontend*';
     }
 
     public static function layout()
