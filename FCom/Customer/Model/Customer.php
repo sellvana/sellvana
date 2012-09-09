@@ -17,7 +17,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function recoverPassword()
     {
-        $this->set(array('token'=>BUtil::randomString()))->save();
+        $this->set(array('token'=>BUtil::randomString(20)))->save();
         BLayout::i()->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }

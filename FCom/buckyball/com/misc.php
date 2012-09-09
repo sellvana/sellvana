@@ -531,27 +531,6 @@ class BUtil extends BClass
     }
 
     /**
-    * Set or retrieve current hash algorithm
-    *
-    * @param string $algo
-    */
-    public static function hashAlgo($algo=null)
-    {
-        if (is_null($algo)) {
-            return static::$_hashAlgo;
-        }
-        static::$_hashAlgo = $algo;
-    }
-
-    public static function hashIter($iter=null)
-    {
-        if (is_null($iter)) {
-            return static::$_hashIter;
-        }
-        static::$iter = $iter;
-    }
-
-    /**
     * Generate random string
     *
     * @param int $strLen length of resulting string
@@ -592,22 +571,51 @@ class BUtil extends BClass
     /**
     * Create or verify password hash using bcrypt
     *
+    * @see http://bcrypt.sourceforge.net/
     * @param string $plain
     * @param string $hash
     * @return boolean|string if $hash is null, return hash, otherwise return verification flag
     */
     public static function bcrypt($plain, $hash=null)
     {
+        $plain = substr($plain, 0, 55);
         if (is_null($hash)) {
-            return crypt($plain, '$2a$09$'.static::randomString(20).'$');
+            $prefix = version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a';
+            $cost = '10';
+            // speed up a bit salt generation, instead of:
+            // $salt = static::randomString(22);
+            $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 22);
+            return crypt($plain, '$'.$prefix.'$'.$cost.'$'.$salt.'$');
         } else {
-            return crypt($plain, substr($hash, 0, 28)) === $hash;
+            return crypt($plain, $hash) === $hash;
         }
+    }
+
+    /**
+    * Set or retrieve current hash algorithm
+    *
+    * @param string $algo
+    */
+    public static function hashAlgo($algo=null)
+    {
+        if (is_null($algo)) {
+            return static::$_hashAlgo;
+        }
+        static::$_hashAlgo = $algo;
+    }
+
+    public static function hashIter($iter=null)
+    {
+        if (is_null($iter)) {
+            return static::$_hashIter;
+        }
+        static::$iter = $iter;
     }
 
     /**
     * Generate salted hash
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string original text
     * @param mixed $salt
     * @param mixed $algo
@@ -624,6 +632,7 @@ class BUtil extends BClass
     *
     * Ex: $sha512$2$<salt1>$<salt2>$<double-hashed-string-here>
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string
     * @param string $salt
     * @param string $algo
@@ -649,12 +658,13 @@ class BUtil extends BClass
     /**
     * Validate salted hash against original text
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string original text
     * @param string $storedHash fully composed salted hash
     */
     public static function validateSaltedHash($string, $storedHash)
     {
-        if (strpos($storedHash, '$2a$')===0) {
+        if (strpos($storedHash, '$2a$')===0 || strpos($storedHash, '$2y$')===0) {
             return static::bcrypt($string, $storedHash);
         }
         $sep = $storedHash[0];
