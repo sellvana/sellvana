@@ -502,7 +502,7 @@ class BDb
             $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
             $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
             BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-                ENGINE={$engine} DEFAULT CHARSET={$charset}", array());
+                ENGINE={$engine} DEFAULT CHARSET={$charset}", array())->execute();
         }
         return true;
     }
@@ -543,11 +543,11 @@ class BDb
             $tableIndexes = static::ddlIndexInfo($fullTableName);
             foreach ($indexes as $idx=>$def) {
                 if ($def==='DROP') {
-                    if (!empty($tableFKs[$idx])) {
+                    if (!empty($tableIndexes[$idx])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
                 } else {
-                    if (!empty($tableFKs[$idx])) {
+                    if (!empty($tableIndexes[$idx])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD KEY `{$idx}` {$def}";
@@ -573,10 +573,10 @@ class BDb
                 }
             }
             if (!empty($dropArr)) {
-                BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $dropArr), array());
+                BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $dropArr), array())->execute();
             }
         }
-        return BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array());
+        return BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array())->execute();
     }
 
     /**
@@ -1035,7 +1035,7 @@ exit;
             $key = $this->_get_id_column_name();
         }
         foreach ($objects as $r) {
-            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::arrayMask($r, $labelColumn) : $r->get($labelColumn));
+            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::maskFields($r, $labelColumn) : $r->get($labelColumn));
             if (!is_array($key)) { // save on performance for 1D keys
                 $v = $r->get($key);
                 if (!empty($options['key_lower'])) $v = strtolower($v);

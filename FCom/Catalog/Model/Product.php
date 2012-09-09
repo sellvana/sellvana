@@ -151,65 +151,81 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         //HANDLE CONFIG
 
+        //multi value separator used to separate values in one column like for images
+        //For example: image.png; image2.png; image3.png
+        if (!isset($config['format']['multivalue_separator'])) {
+            $config['format']['multivalue_separator'] = ';';
+        }
+
+        //nesting level separator used to separate nesting of categories
+        //For example: Category1 > Category2; Category3 > Category4 > Category5;
+        if (!isset($config['format']['nesting_separator'])) {
+            $config['format']['nesting_separator'] = '>';
+        }
         //product import actions: create, update, create_or_update
-        if (!isset($config['import_actions'])) {
-            $config['import_actions'] = 'create_or_update';
+        if (!isset($config['import']['actions'])) {
+            $config['import']['actions'] = 'create_or_update';
         }
 
         //import images - default true
-        if (!isset($config['import_images'])) {
-            $config['import_images'] = true;
+        if (!isset($config['import']['images']['import'])) {
+            $config['import']['images']['import'] = true;
         }
 
         //reatain image subfolders - default false
-        if (!isset($config['images_with_subfolders'])) {
-            $config['images_with_subfolders'] = true;
+        if (!isset($config['import']['images']['with_subfolders'])) {
+            $config['import']['images']['with_subfolders'] = true;
         }
 
         //import categories - default true
-        if (!isset($config['import_categories'])) {
-            $config['import_categories'] = true;
+        if (!isset($config['import']['categories']['import'])) {
+            $config['import']['categories']['import'] = true;
+        }
+
+        //include in menu
+        if (!isset($config['import']['categories']['menu'])) {
+            $config['import']['categories']['menu'] = true;
         }
 
         //create missing categories - default true
-        if (!isset($config['create_categories'])) {
-            $config['create_categories'] = true;
+        if (!isset($config['import']['categories']['create'])) {
+            $config['import']['categories']['create'] = true;
         }
 
         //import custom fields - default true
-        if (!isset($config['import_custom_fields'])) {
-            $config['import_custom_fields'] = true;
+        if (!isset($config['import']['custom_fields']['import'])) {
+            $config['import']['custom_fields']['import'] = true;
         }
 
         //create missing options for custom fields
-        if (!isset($config['create_missing_custom_field_options'])) {
-            $config['create_missing_custom_field_options'] = true;
+        if (!isset($config['import']['custom_fields']['create_missing_options'])) {
+            $config['import']['custom_fields']['create_missing_options'] = true;
         }
 
         //HANDLE IMPORT
         $errors = array();
         foreach($data as $d) {
             $categoriesPath = array();
-            if ($config['import_categories'] && !empty($d['categories'])) {
-                $categoriesPath = explode(";", $d['categories']);
+            if ($config['import']['categories']['import'] && !empty($d['categories'])) {
+                $categoriesPath = explode($config['format']['multivalue_separator'], $d['categories']);
                 unset($d['categories']);
             }
 
             $imagesNames = array();
-            if ($config['import_images'] && !empty($d['images'])) {
-                $imagesNames = explode(";", $d['images']);
+            if ($config['import']['images']['import'] && !empty($d['images'])) {
+                $imagesNames = explode($config['format']['multivalue_separator'], $d['images']);
                 unset($d['images']);
             }
 
             //HANDLE PRODUCT
-            if ('create_or_update' == $config['import_actions'] ||
-                    'update' == $config['import_actions']
+            if ('create_or_update' == $config['import']['actions'] ||
+                    'update' == $config['import']['actions']
                     ) {
                 if (isset($d['unique_id'])) {
                     $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
                 }
             }
-            if (!$p && 'update' == $config['import_actions']) {
+            if (!$p && 'update' == $config['import']['actions']) {
                 continue;
             } elseif (!$p) {
                 try {
@@ -224,7 +240,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $p->save();
 
             //HANDLE CUSTOM FIELDS
-            if ($config['import_custom_fields']) {
+            if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
                 $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
                 $cfKeys = array_keys($cfFields);
@@ -237,7 +253,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 foreach($cfIntersection as $cfk) {
                     $field = $cfFields[$cfk];
                     $dataValue = $d[$cfk];
-                    if ($config['create_missing_custom_field_options']) {
+                    if ($config['import']['custom_fields']['create_missing_options']) {
                         //create missing custom field option
                         $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id());
                         if($options) {
@@ -287,13 +303,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $categories = array();
                     foreach($categoriesPath as $catpath) {
                         $parent = $topParentCategory;
-                        $catNodes = explode(">", $catpath);
+                        $catNodes = explode($config['format']['nesting_separator'], $catpath);
                         foreach($catNodes as $catnode) {
                             $category = FCom_Catalog_Model_Category::orm()
                                         ->where('parent_id', $parent->id())
                                         ->where("node_name", $catnode)
                                         ->find_one();
-                            if ($config['create_categories'] && !$category) {
+                            if ($config['import']['categories']['create'] && !$category) {
                                 try {
                                     $category = $parent->createChild($catnode);
                                 } catch (Exception $e) {
@@ -305,6 +321,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             }
                             $parent = $category;
                             $categories[$catpath] = $category;
+                        }
+
+                        if ($config['import']['categories']['menu']) {
+                            $categories[$catpath]->setInMenu(true);
                         }
                     }
 
@@ -336,44 +356,41 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $productMedia = FCom_Catalog_Model_ProductMedia::i();
                 $imageFolder = BConfig::i()->get('fs/image_folder');
 
-                foreach($imagesNames as $imagesString) {
-                    $images = explode(">", $imagesString);
-                    foreach($images as $fileName) {
-                        $att = $mediaLib->load(array('folder'=>$imageFolder, 'file_name'=>$fileName));
-                        if (!$att) {
-                            $fullPathToFile = FULLERON_ROOT_DIR.'/'.$imageFolder.'/'.$fileName;
-                            $size = 0;
-                            if (file_exists($fullPathToFile)) {
-                                $size = filesize($fullPathToFile);
-                            }
-                            $pathinfo = pathinfo($fileName);
-                            $subfolder = null;
-                            if ($config['images_with_subfolders']) {
-                                $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
-                            }
-                            try {
-                                $att = $mediaLib->create(array(
+                foreach($imagesNames as $fileName) {
+                    $att = $mediaLib->load(array('folder'=>$imageFolder, 'file_name'=>$fileName));
+                    if (!$att) {
+                        $fullPathToFile = FULLERON_ROOT_DIR.'/'.$imageFolder.'/'.$fileName;
+                        $size = 0;
+                        if (file_exists($fullPathToFile)) {
+                            $size = filesize($fullPathToFile);
+                        }
+                        $pathinfo = pathinfo($fileName);
+                        $subfolder = null;
+                        if ($config['import']['images']['with_subfolders']) {
+                            $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
+                        }
+                        try {
+                            $att = $mediaLib->create(array(
                                     'folder'    => $imageFolder,
                                     'subfolder' => $subfolder,
                                     'file_name' => $pathinfo['basename'],
                                     'file_size' => $size,
-                                ))->save();
-                            } catch(Exception $e) {
-                                $errors[] = $e->getMessage();
-                            }
+                            ))->save();
+                        } catch(Exception $e) {
+                            $errors[] = $e->getMessage();
                         }
-                        $fileId = $productMedia->orm()->where('product_id', $p->id())
+                    }
+                    $fileId = $productMedia->orm()->where('product_id', $p->id())
                                 ->where('file_id', $att->id())->find_one();
-                        if (!$fileId) {
-                            try {
-                                $fileId = $productMedia->create(array(
+                    if (!$fileId) {
+                        try {
+                            $fileId = $productMedia->create(array(
                                     'product_id' => $p->id(),
                                     'media_type' => 'images',
                                     'file_id' => $att->id(),
-                                ))->save();
-                            } catch (Exception $e) {
-                                $errors[] = $e->getMessage();
-                            }
+                            ))->save();
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
                         }
                     }
                 }
