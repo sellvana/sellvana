@@ -42,7 +42,7 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
         if ($user) {
             return true;
         }
-        $user = FCom_Admin_Model_User::i()->authenticate($username, $password);
+        $user = FCom_Admin_Model_User::i()->authenticateApi($username, $password);
         if ($user) {
             $user->login();
             return true;
