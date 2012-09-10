@@ -57,7 +57,7 @@ class FCom_Market_MarketApi extends BClass
     public function download($moduleName)
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') .
-                '/market/api/download?modid='.$moduleName.'&'.$this->getTokenUrl();
+                '/market/api/download?mod_name='.$moduleName.'&'.$this->getTokenUrl();
 
         $storage = BConfig::i()->get('fs/storage_dir');
         $response = $this->apiCall("GET", $fulleronUrl);
