@@ -14,13 +14,13 @@ class FCom_Market_Cron extends BClass
 
         $localModules = BModuleRegistry::i()->debug();
         $remoteModules = FCom_Market_MarketApi::i()->getModules(array_keys($localModules));
-        
+
 
         $modulesMarket = FCom_Market_Model_Modules::i();
         foreach ($localModules as $name => $local) {
             $remote = $remoteModules[$name];
+            $local->upgrade = false;
             if ($remote) {
-                $local->upgrade = false;
                 if (version_compare($remote['version'], $local->version) > 0) {
                     $local->upgrade = true;
                 }
