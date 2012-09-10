@@ -453,7 +453,19 @@ class BUtil extends BClass
         return $result;
     }
 
-
+    static public function arrayMask($array, $fields)
+    {
+        if (is_string($fields)) {
+            $fields = explode(',', $fields);
+        }
+        $result = array();
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $array)) {
+                $result[$f] = $array[$f];
+            }
+        }
+        return $result;
+    }
 
     /**
     * Create IV for mcrypt operations
@@ -689,17 +701,6 @@ class BUtil extends BClass
             foreach ($source as $k=>$v) if (!in_array($k, $fields)) $result[$k] = $v;
         }
         return $result;
-    }
-
-    /**
-     * See BUtil::maskFields
-     * @param type $array
-     * @param type $fields
-     * @return type
-     */
-    static public function arrayMask($array, $fields)
-    {
-        return self::maskFields($array, $fields);
     }
 
     /**
@@ -1110,7 +1111,7 @@ class BUser extends BModel
     {
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()
-            ->where_complex(array('OR'=>array(
+            ->where(array('OR'=>array(
                 'username'=>$username,
                 'email'=>$username)))
             ->find_one();
@@ -1626,7 +1627,6 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
-            $e['msg'] = wordwrap($e['msg'], 70, "\n");
             echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
