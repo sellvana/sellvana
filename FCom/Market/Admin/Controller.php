@@ -54,8 +54,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_form()
     {
-        $moduleId = BRequest::i()->params('id', true);
-        $modName = FCom_Market_Model_Modules::load($moduleId)->mod_name;
+        $modName = BRequest::i()->params('mod_name', true);
 
         //echo $moduleId;exit;
 
@@ -68,7 +67,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         $model = new stdClass();
-        $model->id = $moduleId;
+        $model->id = $modName;
         $model->module = $module;
 
         $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
@@ -108,15 +107,14 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_install()
     {
-        $moduleId = BRequest::i()->params('id', true);
-        $modName = FCom_Market_Model_Modules::load($moduleId)->mod_name;
+        $modName = BRequest::i()->params('mod_name', true);
 
         try {
             $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
         }
         $moduleName = $module['mod_name'];
 
@@ -124,12 +122,12 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
         }
 
         if (!$moduleFile) {
             BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
+            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}");
         }
 
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
@@ -141,7 +139,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             //copy modulePath by FTP to marketPath
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
             }
             $conf = BConfig::i()->get('modules/FCom_Market/ftp');
             $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
@@ -151,7 +149,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);
                 }
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'error');
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
             }
 
         } else {
@@ -163,7 +161,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 } else {
                     BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');
                 }
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}");
+                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}");
             }
         }
 
