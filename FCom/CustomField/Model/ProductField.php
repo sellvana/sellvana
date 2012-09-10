@@ -50,7 +50,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if (!$where) {
             $fields = array();
         } else {
-            $fields = FCom_CustomField_Model_Field::i()->orm('f')->where_complex($where)->find_many_assoc();
+            $fields = FCom_CustomField_Model_Field::i()->orm('f')->where($where)->find_many_assoc();
         }
         return $fields;
     }

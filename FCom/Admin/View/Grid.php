@@ -436,7 +436,7 @@ return [true, 'Testing error'];
 #print_r($r); exit;
         if (!empty($r['filters'])) {
             $where = $this->_processFilters($r['filters']);
-            $orm->where_complex($where);
+            $orm->where($where);
         }
         if (!is_null($method)) {
             //BPubSub::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
@@ -469,7 +469,7 @@ return [true, 'Testing error'];
         }
         if (!empty($r['filters'])) {
             $where = $this->_processFilters($r['filters']);
-            $orm->where_complex($where);
+            $orm->where($where);
         }
         if (!empty($r['s'])) {
             $orm->{'order_by_'.$r['sd']}($r['s']);

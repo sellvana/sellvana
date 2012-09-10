@@ -929,7 +929,7 @@ class BMigrate extends BClass
             BDb::connect($connectionName); // switch connection
             BDbModule::init(); // Ensure modules table in current connection
             // collect module db schema versions
-            $dbModules = BDbModule::i()->factory()->find_many();
+            $dbModules = BDbModule::i()->orm()->find_many();
             foreach ($dbModules as $m) {
                 if ($m->last_status==='INSTALLING') { // error during last installation
                     $m->delete();
