@@ -61,7 +61,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         }
         $and = array();
         foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
-        $productsORM = FCom_Catalog_Model_Product::i()->factory()->where_complex(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+        $productsORM = FCom_Catalog_Model_Product::i()->orm()->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsORM));
         $productsData = $productsORM->paginate(null, array('ps'=>25));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));

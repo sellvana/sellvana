@@ -28,7 +28,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function items($refresh=false)
     {
-        $this->items = FCom_Wishlist_Model_WishlistItem::factory()->where('wishlist_id', $this->id)->find_many_assoc();
+        $this->items = FCom_Wishlist_Model_WishlistItem::i()->orm()->where('wishlist_id', $this->id)->find_many_assoc();
         return $this->items;
     }
 
