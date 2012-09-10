@@ -8,8 +8,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function productsORM()
     {
-        return FCom_Catalog_Model_Product::i()->factory()->table_alias('p')
-            ->join(FCom_Catalog_Model_CategoryProduct::table(), array('pc.product_id','=','p.id'), 'pc')
+        return FCom_Catalog_Model_Product::i()->orm('p')
+            ->join('FCom_Catalog_Model_CategoryProduct', array('pc.product_id','=','p.id'), 'pc')
             ->where('pc.category_id', $this->id);
     }
 
