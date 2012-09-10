@@ -1741,7 +1741,7 @@ class BActionController extends BClass
         try {
             $this->$actionMethod($args);
         } catch (Exception $e) {
-            BDebug::exceptionHandler($e);
+            //BDebug::exceptionHandler($e);
             $this->sendError($e->getMessage());
         }
         return $this;

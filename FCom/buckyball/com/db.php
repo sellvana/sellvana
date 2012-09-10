@@ -1464,11 +1464,22 @@ class BModel extends Model
     */
     public static function orm($alias=null)
     {
-        $orm = static::i()->factory();
+        $orm = static::factory();
         if ($alias) {
             $orm->table_alias($alias);
         }
+        static::_findOrm($orm);
         return $orm;
+    }
+
+    /**
+    * Placeholder for class specific ORM augmentation
+    *
+    * @param BORM $orm
+    */
+    protected static function _findOrm($orm)
+    {
+
     }
 
     /**
@@ -1533,7 +1544,7 @@ class BModel extends Model
     */
     public static function create($data=null)
     {
-        $record = static::i()->factory()->create($data);
+        $record = static::factory()->create($data);
         $record->afterCreate();
         return $record;
     }
@@ -1660,7 +1671,7 @@ class BModel extends Model
     */
     public function cachePreload($where=null, $field=null, $sort=null)
     {
-        $orm = $this->factory();
+        $orm = static::factory();
         $class = $this->_origClass();
         if (is_null($field)) {
             $field = static::_get_id_column_name($class);
