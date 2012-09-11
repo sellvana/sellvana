@@ -55,6 +55,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     public function action_form()
     {
         $modName = BRequest::i()->params('mod_name', true);
+        if (!$modName) {
+            $modid = BRequest::i()->params('id', true);
+            $mod = FCom_Market_Model_Modules::load($modid);
+            if($mod) {
+                $modName = $mod->mod_name;
+            }
+        }
 
         //echo $moduleId;exit;
 
@@ -108,6 +115,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     public function action_install()
     {
         $modName = BRequest::i()->params('mod_name', true);
+        if (!$modName) {
+            $modid = BRequest::i()->params('id', true);
+            $mod = FCom_Market_Model_Modules::load($modid);
+            if($mod) {
+                $modName = $mod->mod_name;
+            }
+        }
 
         try {
             $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
