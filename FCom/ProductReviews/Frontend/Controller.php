@@ -36,8 +36,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             FCom_ProductReviews_Model_Reviews::i()->add($customerId, $product->id(), $post['review']);
         }
-        $href = $product->url_key;
-        BResponse::i()->redirect(Bapp::href($href));
+        BResponse::i()->redirect($product->url());
     }
 
     public function action_helpful__POST()
