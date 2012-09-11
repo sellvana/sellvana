@@ -128,32 +128,31 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
         }
-        $moduleName = $module['mod_name'];
 
         try {
-            $moduleFile = FCom_Market_MarketApi::i()->download($module['mod_name']);
+            $moduleFile = FCom_Market_MarketApi::i()->download($modName);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
+            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
         }
 
         if (!$moduleFile) {
             BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}");
+            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
         }
 
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
         if ($ftpenabled) {
-            $modulePath = dirname($moduleFile).'/'.$moduleName;
+            $modulePath = dirname($moduleFile).'/'.$modName;
             $res = FCom_Market_MarketApi::i()->extract($moduleFile, $modulePath);
             //copy modulePath by FTP to marketPath
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
+                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
             }
             $conf = BConfig::i()->get('modules/FCom_Market/ftp');
             $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
@@ -163,7 +162,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);
                 }
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'error');
+                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
             }
 
         } else {
@@ -175,24 +174,24 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 } else {
                     BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');
                 }
-                BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}");
+                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
             }
         }
 
         if ($res) {
-            $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
+            $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $modName)->find_one();
             if ($modExist) {
                 $modExist->version = $module['version'];
                 $modExist->description = $module['short_description'];
                 $modExist->save();
             } else {
-                $data = array('name' => $module['name'], 'mod_name' => $module['mod_name'],
+                $data = array('name' => $module['name'], 'mod_name' => $modName,
                     'version' => $module['version'], 'description' => $module['short_description']);
                 FCom_Market_Model_Modules::orm()->create($data)->save();
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'info');
+        BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'info');
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }
