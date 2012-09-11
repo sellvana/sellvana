@@ -15,7 +15,7 @@ if (empty($_GET['f']) || empty($_GET['s'])
     #|| strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])===false
     || strpos($_GET['f'], '..')!==false
     || $_GET['f'][0]=='/' && strpos($_GET['f'], dirname(__FILE__))!==0
-    || !is_file($_GET['f'])
+    #|| !is_file($_GET['f'])
 ) {
     header('Cache-Control: private, no-store, no-cache');
     header('Content-type: image/gif');

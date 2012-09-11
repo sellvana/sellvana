@@ -77,6 +77,12 @@ class FCom_Core extends BClass
             $config->set('fs/media_dir', $mediaDir);
         }
 
+        if (!$config->get('web/media_dir')) {
+            $mediaUrl = rtrim($baseHref,'/');
+            $mediaUrl .= str_replace($rootDir, '', $mediaDir);
+            $config->set('web/media_dir', $mediaUrl);
+        }
+
         $imageFolder = $config->get('fs/image_folder');
         if (!$imageFolder) {
             $config->set('fs/image_folder', 'media/product/image');
