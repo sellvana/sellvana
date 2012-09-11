@@ -16,14 +16,14 @@
     <br/>
     <?php if($m->local_version): ?>
         Local version is: <?= $m->local_version ?> <br/>
-        <a href="<?=BApp::href('market/install')?>?id=<?=$m->id?>">Re-upload</a>
+        <a href="<?=BApp::href('market/install')?>?mod_name=<?=$m->id?>">Re-upload</a>
     <?php else:?>
-        <a href="<?=BApp::href('market/install')?>?id=<?=$m->id?>">Install</a>
+        <a href="<?=BApp::href('market/install')?>?mod_name=<?=$m->id?>">Install</a>
     <?php endif; ?>
 
     <?php if ($m->need_upgrade):?>
         <br/>
-        <a href="<?=BApp::href('market/install')?>?id=<?=$m->id?>">Upgrade</a>
+        <a href="<?=BApp::href('market/install')?>?mod_name=<?=$m->id?>">Upgrade</a>
     <?php endif; ?>
 
 <script>
