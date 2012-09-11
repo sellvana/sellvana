@@ -179,7 +179,6 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
         }
 
-
         if ($res) {
             $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $moduleName)->find_one();
             if ($modExist) {
@@ -193,7 +192,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("market/form")."?id={$moduleId}", 'info');
+        BResponse::i()->redirect(BApp::href("market/form")."?id={$modName}", 'info');
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }
