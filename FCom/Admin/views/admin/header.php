@@ -1,7 +1,7 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
     $modulesToUpdate = false;
-    if (class_exists('FCom_Market_Model_Modules')) {
+    if (BModuleRegistry::i()->isLoaded('FCom_Market')) {
         $modulesToUpdate = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
     }
 ?>
