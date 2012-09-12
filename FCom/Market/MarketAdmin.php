@@ -20,7 +20,12 @@ class FCom_Market_Admin extends BClass
     public function hookFindModules($args)
     {
         $modulesToUpdate = &$args['modulesToUpdate'];
-        $modulesToUpdate += FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
+        try {
+            $res = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
+        } catch (Exception $e) {
+            return;
+        }
+        $modulesToUpdate += $res;
     }
 
     static public function layout()
