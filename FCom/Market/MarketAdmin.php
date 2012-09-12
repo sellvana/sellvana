@@ -5,13 +5,22 @@ class FCom_Market_Admin extends BClass
     static public function bootstrap()
     {
         BLayout::i()->addAllViews('Admin/views');
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout');
+        BPubSub::i()
+                ->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout')
+                ->on('BLayout::hook.find_modules_to_update', 'FCom_Market_Admin.hookFindModules')
+                ;
 
         BFrontController::i()
             ->route('GET /market', 'FCom_Market_Admin_Controller.index')
             ->route('GET|POST /market/.action', 'FCom_Market_Admin_Controller')
 
         ;
+    }
+
+    public function hookFindModules($args)
+    {
+        $modulesToUpdate = &$args['modulesToUpdate'];
+        $modulesToUpdate += FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
     }
 
     static public function layout()
