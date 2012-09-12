@@ -78,8 +78,7 @@ class FCom_Core extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            $mediaUrl = rtrim($baseHref,'/');
-            $mediaUrl .= str_replace($rootDir, '', $mediaDir);
+            $mediaUrl = str_replace($rootDir, '', $mediaDir);
             $config->set('web/media_dir', $mediaUrl);
         }
 
