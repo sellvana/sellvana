@@ -21,6 +21,9 @@ class FCom_Market_Admin extends BClass
     {
         $modulesToUpdate = &$args['modulesToUpdate'];
         try {
+            if (!BDb::ddlFieldInfo(FCom_Market_Model_Modules::table(), 'need_upgrade')) {
+                return;
+            }
             $res = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
         } catch (Exception $e) {
             return;
