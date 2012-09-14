@@ -1,9 +1,7 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
-    $modulesToUpdate = false;
-    if (class_exists('FCom_Market_Model_Modules')) {
-        $modulesToUpdate = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
-    }
+    $modulesToUpdate = array();
+    $this->hook('find_modules_to_update', array('modulesToUpdate' => &$modulesToUpdate));
 ?>
 <div class="ui-layout-north">
     <header class="adm-topbar">
