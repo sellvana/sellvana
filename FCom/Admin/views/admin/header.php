@@ -1,7 +1,7 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
-    $modulesToUpdate = array();
-    $this->hook('find_modules_to_update', array('modulesToUpdate' => &$modulesToUpdate));
+    $modulesNotification = array();
+    $this->hook('hook_modules_notification', array('modulesNotification' => &$modulesNotification));
 ?>
 <div class="ui-layout-north">
     <header class="adm-topbar">
@@ -43,12 +43,20 @@
                 </li>
 <?php endif ?>
 
-<?php if ($modulesToUpdate): ?>
-                <li class="sup-updates"><a href="<?=BApp::href('market/index')?>"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count"><?= count($modulesToUpdate)?></em></span></a>
+<?php if ($modulesNotification): ?>
+                <li class="sup-updates"><a href="<?=BApp::href('market/index')?>"><span class="icon"></span><span class="title">Notifications &nbsp;<em class="count"><?= count($modulesNotification)?></em></span></a>
                     <ul class="sub-section" style="width:200px">
-                        <?php foreach($modulesToUpdate as $mod): ?>
-                        <li><a href="<?=BApp::href('market/form')?>?id=<?=$mod->id?>"><?=$mod->mod_name?></a></li>
-                        <?php endforeach; ?>
+                    <?php foreach($modulesNotification as $notifyTitle => $notifications): ?>
+                            <li><a style="text-decoration: none; font-weight: bold; color:black;"><?=  strtoupper($notifyTitle)?></a></li>
+
+                            <?php foreach($notifications as $notify): ?>
+                                <?php if ($notify->url): ?>
+                                    <li><a href="<?=BApp::href($notify->url)?>" title="<?=$notify->text?>"><?=$notify->module?></a></li>
+                                <?php else:?>
+                                    <li><?=$notify->module?>></li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                    <?php endforeach; ?>
                     </ul>
                 </li>
 <?php endif; ?>
