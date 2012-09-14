@@ -144,6 +144,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
+        $modNameParts = explode("_", $modName);
+        if (count($modNameParts) == 2) {
+            $marketPath .= '/'.$modNameParts[0];
+            if (!file_exists($marketPath)) {
+                mkdir($marketPath);
+            }
+        }
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
         if ($ftpenabled) {
