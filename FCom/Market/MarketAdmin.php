@@ -7,7 +7,7 @@ class FCom_Market_Admin extends BClass
         BLayout::i()->addAllViews('Admin/views');
         BPubSub::i()
                 ->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout')
-                ->on('BLayout::hook.find_modules_to_update', 'FCom_Market_Admin.hookFindModules')
+                ->on('BLayout::hook.hook_modules_notification', 'FCom_Market_Admin.hookFindModulesForUpdates')
                 ;
 
         BFrontController::i()
@@ -17,9 +17,10 @@ class FCom_Market_Admin extends BClass
         ;
     }
 
-    public function hookFindModules($args)
+    public function hookFindModulesForUpdates($args)
     {
-        $modulesToUpdate = &$args['modulesToUpdate'];
+        $modulesNotification = &$args['modulesNotification'];
+        //find modules which have updates
         try {
             if (!BDb::ddlFieldInfo(FCom_Market_Model_Modules::table(), 'need_upgrade')) {
                 return;
@@ -28,7 +29,37 @@ class FCom_Market_Admin extends BClass
         } catch (Exception $e) {
             return;
         }
-        $modulesToUpdate += $res;
+        $data = array();
+        foreach($res as $r) {
+            $obj = new stdClass();
+            $obj->url = 'market/form?id='.$r->id;
+            $obj->module = $r->mod_name;
+            $obj->text = $r->mod_name . ' have a new version';
+            $data[] = $obj;
+        }
+        if (!empty($data)) {
+            $modulesNotification['Updates'] = $data;
+        }
+
+        // find modules with dependencies errors
+        //todo: probably need to move this code somewhere else
+        $modules = BModuleRegistry::i()->debug();
+        $data = array();
+        foreach($modules as $modName => $mod) {
+            if (!empty($mod->errors)) {
+                foreach($mod->errors as $error) {
+                    $obj = new stdClass();
+                    $obj->url = 'modules';
+                    $obj->module = $modName;
+                    $obj->text = $modName .' have '.$error['type'].' conflict with '.$error['mod'];
+                    $data[] = $obj;
+                }
+            }
+        }
+        if (!empty($data)) {
+            $modulesNotification['Errors'] = $data;
+        }
+
     }
 
     static public function layout()
