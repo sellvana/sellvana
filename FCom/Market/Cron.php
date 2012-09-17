@@ -23,7 +23,6 @@ class FCom_Market_Cron extends BClass
             }
             $local = $localModules[$name];
 
-            $local->upgrade = false;
             if (version_compare($remote['version'], $local->version) > 0) {
                 $local->upgrade = true;
             }
