@@ -450,12 +450,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $facetsData = array();
         if ($facets) {
-            $cmp = function($a, $b)
-            {
-                return strnatcmp($a->name, $b->name);
-            };
 
             $facetsFields = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
+
+            //todo: think how to sort custom fields
+            //$facetCustomFieldsSorted = FCom_IndexTank_Model_ProductField::i()->getCustomFieldsSorted();
 
             //get categories
             foreach ($facets as $fname => $fvalues) {
@@ -477,9 +476,16 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     }
                 }
             }
+
+            $cmp = function($a, $b)
+            {
+                return strnatcmp($a->name, $b->name);
+            };
+
             foreach ($facetsData as &$values) {
                 usort($values, $cmp);
             }
+
         }
         return $facetsData;
     }
@@ -598,6 +604,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
             switch ($field->source_type) {
                 case 'product':
+                case 'custom_field':
                     //get value of product object
                     $value = $product->{$field->source_value};
                     if ('variables' == $type && false == is_numeric($value)) {

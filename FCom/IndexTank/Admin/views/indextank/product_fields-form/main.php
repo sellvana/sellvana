@@ -55,12 +55,15 @@
             <h4 class="label">Source type</h4>
             <select name="model[source_type]">
                 <option <?=('product' == $m->source_type)?'selected':''?> value="product">Product field</option>
+                <option <?=('custom_field' == $m->source_type)?'selected':''?> value="custom_field">Custom field</option>
                 <option <?=('function' == $m->source_type)?'selected':''?> value="function">Function</option>
             </select>
             <?php if ('function' == $m->source_type):?>
                 of FCom_IndexTank_Index_Product class
             <?php elseif('product' == $m->source_type):?>
                 of fcom_product table
+            <?php elseif('custom_field' == $m->source_type):?>
+                of fcom_product_custom table
             <?php endif; ?>
         </li>
         <li>
