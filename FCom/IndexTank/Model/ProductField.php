@@ -42,7 +42,8 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     public function getFacetsList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
-                ->where('facets', 1)->find_many();
+                ->where('facets', 1)
+                ->find_many();
         $result = array();
         foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
@@ -79,6 +80,31 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         $result = array();
         foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
+        }
+        return $result;
+    }
+
+    public function getCustomFieldsSorted()
+    {
+        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
+                ->where('facets', 1)
+                ->where('source_type', 'custom_field')
+                ->find_many();
+
+        $fieldNames = array();
+        foreach ($productFields as $p) {
+            $fieldNames[] = $p->source_value;
+        }
+
+        $fields = FCom_CustomField_Model_Field::orm('f')
+                ->join(FCom_CustomField_Model_SetField::table(), "sf.field_id = f.id", "sf")
+                ->where_in("f.field_code", $fieldNames)
+                ->order_by_asc('sf.position')
+                ->find_many();
+
+        $result = array();
+        foreach($fields as $f) {
+            $result[$f->field_code] = $f->position;
         }
         return $result;
     }

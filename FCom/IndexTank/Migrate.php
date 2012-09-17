@@ -286,7 +286,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $doc->field_type        = $type;
                 $doc->facets            = 1;
                 $doc->search            = 0;
-                $doc->source_type       = 'product';
+                $doc->source_type       = 'custom_field';
                 $doc->source_value      = $f->field_code;
 
                 $doc->save();
