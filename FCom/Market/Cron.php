@@ -20,13 +20,14 @@ class FCom_Market_Cron extends BClass
         foreach ($localModules as $name => $local) {
             $remote = $remoteModules[$name];
             $local->upgrade = false;
-            if ($remote) {
-                if (version_compare($remote['version'], $local->version) > 0) {
-                    $local->upgrade = true;
-                }
-                $local->market_version = $remote['version'];
+            if (false == $remote) {
+                continue;
             }
 
+            if (version_compare($remote['version'], $local->version) > 0) {
+                $local->upgrade = true;
+            }
+            $local->market_version = $remote['version'];
 
             $modulesMarket->addModule($local);
         }
