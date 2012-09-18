@@ -456,23 +456,20 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //todo: think how to sort custom fields
             //$facetCustomFieldsSorted = FCom_IndexTank_Model_ProductField::i()->getCustomFieldsSorted();
 
-            //get categories
-            foreach ($facets as $fname => $fvalues) {
-                //get other fields
-                if (isset($facetsFields[$fname])) {
-                    foreach ($fvalues as $fvalue => $fcount) {
+            foreach($facetsFields as $fname => $field) {
+                if (isset($facets[$fname])) {
+                    foreach ($facets[$fname] as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
                         $obj->key = $fname;
                         $obj->category = false;
-                        if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
+                        if ('inclusive' == $field->filter || empty($field->filter)) {
                             $obj->param = "f[{$obj->key}][{$obj->name}]";
-                            //$obj->param = "f[{$obj->key}][]";
                         } else {
                             $obj->param = "f[{$obj->key}][]";
                         }
-                        $facetsData[$facetsFields[$fname]->field_nice_name][] = $obj;
+                        $facetsData[$field->field_nice_name][] = $obj;
                     }
                 }
             }

@@ -44,6 +44,11 @@
             (Default 1)
         </li>
 
+        <li>
+            <h4 class="label">Sort order</h4>
+            <input type="text" size="3" id="main-content" name="model[sort_order]" value="<?php echo $this->q($m->sort_order) ?>">
+        </li>
+
 
 
         <li>
