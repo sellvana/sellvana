@@ -5,6 +5,7 @@
             'version' => '0.1.8',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
+            'categories' => array('Catalog', 'Products'),
             'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Catalog_Tests_AllTests",
             'description' => "Categories and products management, admin and frontend",
