@@ -398,38 +398,8 @@ class BModuleRegistry extends BClass
                 continue;
             }
             // normalize require format
-            foreach ($mod->require as $reqType => &$req) {
-                if (is_string($req)) {
-                    if (is_numeric($reqType)) {
-                        $mod->require['module'] = array(array('name' => $req));
-                        unset($mod->require[$reqType]);
-                    } else {
-                        $mod->require[$reqType] = array(array('name' => $req));
-                    }
-                } else if (is_array($req)) {
-                    foreach($req as $reqMod => &$reqVer) {
-                        if (is_numeric($reqMod)) {
-                            $reqVer = array('name' => $reqVer);
-                        } else {
-                            $from = '';
-                            $to = '';
-                            @list($from, $to) = explode(";", $reqVer);
-                            if (!$to) {
-                                $to = 999999999;
-                            }
-                            if (!empty($from) && !empty($to)) {
-                                $reqVer = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
-                            } else {
-                                $reqVer = array('name' => $reqMod);
-                            }
-                        }
+            $mod->require = $this->normalizeManifestRequireFormat($mod->require);
 
-                    }
-                }
-
-            }
-            unset($reqVer);
-            unset($req);
             // is currently iterated module required?
             if ($mod->run_level===BModule::REQUIRED) {
                 $mod->run_status = BModule::PENDING; // only 2 options: PENDING or ERROR
@@ -491,6 +461,41 @@ class BModuleRegistry extends BClass
         }
         //print_r(static::$_modules);exit;
         return $this;
+    }
+
+    public function normalizeManifestRequireFormat($require)
+    {
+        // normalize require format
+            foreach ($require as $reqType => &$req) {
+                if (is_string($req)) {
+                    if (is_numeric($reqType)) {
+                        $require['module'] = array(array('name' => $req));
+                        unset($require[$reqType]);
+                    } else {
+                        $require[$reqType] = array(array('name' => $req));
+                    }
+                } else if (is_array($req)) {
+                    foreach($req as $reqMod => &$reqVer) {
+                        if (is_numeric($reqMod)) {
+                            $reqVer = array('name' => $reqVer);
+                        } else {
+                            $from = '';
+                            $to = '';
+                            @list($from, $to) = explode(";", $reqVer);
+                            if (!$to) {
+                                $to = 999999999;
+                            }
+                            if (!empty($from) && !empty($to)) {
+                                $reqVer = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
+                            } else {
+                                $reqVer = array('name' => $reqMod);
+                            }
+                        }
+
+                    }
+                }
+            }
+            return $require;
     }
 
     /**
