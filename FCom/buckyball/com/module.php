@@ -482,10 +482,7 @@ class BModuleRegistry extends BClass
                             $from = '';
                             $to = '';
                             @list($from, $to) = explode(";", $reqVer);
-                            if (!$to) {
-                                $to = 999999999;
-                            }
-                            if (!empty($from) && !empty($to)) {
+                            if (!empty($from)) {
                                 $reqVer = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
                             } else {
                                 $reqVer = array('name' => $reqMod);
