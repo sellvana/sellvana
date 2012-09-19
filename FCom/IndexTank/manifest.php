@@ -24,9 +24,9 @@
                 )
             ),
             "require" => array(
-                "module" => array("FCom_Core" => "1.10.0;2.0.0"),
+                "module" => array("FCom_Core" => "0.1.0"),
                 "class" => array("PHPUnit"),
-                "phpext" => array("curl"),
+                "phpext" => "curl",
             ),
         ),
 

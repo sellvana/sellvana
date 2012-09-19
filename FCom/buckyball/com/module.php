@@ -392,6 +392,7 @@ class BModuleRegistry extends BClass
             }
         }
         // scan for require
+
         foreach (static::$_modules as $modName=>$mod) {
             if (!isset($mod->require)) {
                 continue;
@@ -400,24 +401,35 @@ class BModuleRegistry extends BClass
             foreach ($mod->require as $reqType => &$req) {
                 if (is_string($req)) {
                     if (is_numeric($reqType)) {
-                        $mod->require['module'] = array('name' => $req);
+                        $mod->require['module'] = array(array('name' => $req));
                         unset($mod->require[$reqType]);
                     } else {
-                        $mod->require[$reqType] = array('name' => $req);
+                        $mod->require[$reqType] = array(array('name' => $req));
                     }
                 } else if (is_array($req)) {
-                    foreach($req as $reqMod => $reqVer) {
+                    foreach($req as $reqMod => &$reqVer) {
                         if (is_numeric($reqMod)) {
-                            $req[$reqMod] = array('name' => $reqVer);
+                            $reqVer = array('name' => $reqVer);
                         } else {
+                            $from = '';
+                            $to = '';
                             @list($from, $to) = explode(";", $reqVer);
-                            $req[$reqMod] = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
+                            if (!$to) {
+                                $to = 999999999;
+                            }
+                            if (!empty($from) && !empty($to)) {
+                                $reqVer = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
+                            } else {
+                                $reqVer = array('name' => $reqMod);
+                            }
                         }
+
                     }
                 }
-            }
-            unset($req);
 
+            }
+            unset($reqVer);
+            unset($req);
             // is currently iterated module required?
             if ($mod->run_level===BModule::REQUIRED) {
                 $mod->run_status = BModule::PENDING; // only 2 options: PENDING or ERROR
@@ -464,6 +476,7 @@ class BModuleRegistry extends BClass
                 $mod->run_status = BModule::PENDING;
             }
         }
+
         foreach (static::$_modules as $modName=>$mod) {
             if (!is_object($mod)) {
                 var_dump($mod); exit;
@@ -476,6 +489,7 @@ class BModuleRegistry extends BClass
                 $this->propagateDepends($mod);
             }
         }
+        //print_r(static::$_modules);exit;
         return $this;
     }
 
