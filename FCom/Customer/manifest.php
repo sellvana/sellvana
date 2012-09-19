@@ -21,6 +21,11 @@
                     'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
                 ),
             ),
+            "require" => array(
+                "module" => "FCom_Core",
+                "class" => "PHPUnit",
+                "phpext" => "curl",
+                ),
         ),
 
 
