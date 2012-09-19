@@ -23,6 +23,11 @@
                     "bootstrap" => array("file" => "Cron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")
                 )
             ),
+            "require" => array(
+                "module" => array("FCom_Core" => "1.10.0;2.0.0"),
+                "class" => array("PHPUnit"),
+                "phpext" => array("curl"),
+            ),
         ),
 
 
