@@ -68,6 +68,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         try {
             $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
             $module = $modules[$modName];
+            if (!empty($module['require'])) {
+                $module['require'] = BUtil::fromJson($module['require']);
+            }
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market"), 'error');
