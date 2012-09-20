@@ -30,6 +30,10 @@ $children = $category->children();
             </ul>
 
    </section>
+
+    <?=$this->hook('custom-fields-filters', array('category' => $category));?>
+
+
 </form>
 </section>
 
