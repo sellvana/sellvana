@@ -4,16 +4,36 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 {
     public function action_category()
     {
+        $q = BRequest::i()->get('q');
+        $filter = BRequest::i()->get('f');
+        $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
+
         $layout = BLayout::i();
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
             $this->forward(true);
             return $this;
+            //$category = FCom_Catalog_Model_Category::orm()->where_null('parent_id')->find_one();
+            //$productsORM = FCom_Catalog_Model_Product::i()->orm();
         }
 
         $productsORM = $category->productsORM();
+
+        $and = array();
+        if ($qs) {
+            foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
+            $productsORM->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+        }
+
+        if (!empty($filter)){
+            foreach($filter as $field => $fieldVal) {
+                $productsORM->where($field, $fieldVal);
+            }
+        }
+
+        //$productsORM = $category->productsORM();
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsORM));
-        $productsData = $category->productsORM()->paginate(null, array('ps'=>25));
+        $productsData = $productsORM->paginate(null, array('ps'=>25));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_data', array('data'=>&$productsData));
 
         BApp::i()
@@ -56,13 +76,16 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
-        if (!$qs) {
-            BResponse::i()->redirect(BApp::baseUrl());
-        }
+
         $and = array();
-        foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
+        if ($qs) {
+            foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
+        }
+
         $productsORM = FCom_Catalog_Model_Product::i()->orm()->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsORM));
+
+
         $productsData = $productsORM->paginate(null, array('ps'=>25));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
 

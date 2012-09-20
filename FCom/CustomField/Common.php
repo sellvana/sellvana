@@ -46,5 +46,65 @@ class FCom_CustomField_Common extends BClass
         }
         // not deleting to preserve meta info about fields
     }
+
+    public function hookCustomFieldFilters($args)
+    {
+        $category = false;
+        if (is_object($args['category'])) {
+            $category = $args['category'];
+        }
+
+        $customFields = FCom_CustomField_Model_Field::orm()->where('frontend_show', 1)->find_many();
+        if (!$customFields) {
+            return;
+        }
+
+        $filter = BRequest::get('f');
+        $currentFilter = array();
+        $excludeFilters = array();
+        if (!empty($filter)) {
+            foreach($filter as $fkey => $fval) {
+                $fkey = urldecode($fkey);
+                $field = FCom_CustomField_Model_Field::orm()->where('field_code', $fkey)->find_one();
+                $currentFilter[$field->frontend_label][] = array('key' => $field->field_code, 'value' => $fval);
+                $excludeFilters[$field->frontend_label] = $fval;
+            }
+        }
+
+
+        $groups = array();
+        foreach($customFields as $cf) {
+            if ($category) {
+                $productOrm = $category->productsORM();
+            } else {
+                $productOrm = FCom_Catalog_Model_Product::orm();
+            }
+            $products = $productOrm->where_not_equal($cf->field_code, '')->group_by($cf->field_code)->find_many();
+            if (empty($products)) {
+                continue;
+            }
+            $values = array();
+            foreach($products as $p) {
+                if (isset($excludeFilters[$cf->frontend_label]) &&
+                        $p->{$cf->field_code} == $excludeFilters[$cf->frontend_label]
+                ) {
+                    continue;
+                }
+                $values[] = $p->{$cf->field_code};
+            }
+            if (empty($values)) {
+                continue;
+            }
+            $groups[$cf->frontend_label] = array('key'=>$cf->field_code, 'values' => $values);
+        }
+
+
+        if (empty($groups) && empty($currentFilter)) {
+            return;
+        }
+        BLayout::i()->view('customfields/filters')->selected_filters = $currentFilter;
+        BLayout::i()->view('customfields/filters')->groups = $groups;
+        return BLayout::i()->view('customfields/filters')->render();
+    }
 }
 
