@@ -11,10 +11,21 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     'base_price|asc' => 'Price (Lower first)',
     'base_price|desc' => 'Price (Higher first)',
 );
+$filters = $this->filters ? $this->filters : array();
 
 ?>
 <div class="pager">
     <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
+        <?php if (!empty($this->query)):?>
+            <input type="hidden" name="q" value="<?=$this->query?>" />
+        <?php endif; ?>
+
+        <?php if (!empty($filters)):?>
+            <?php foreach($filters as $fkey => $fval):?>
+                <input type="hidden" name="f[<?=$fkey?>]" value="<?=$fval?>" />
+            <?php endforeach; ?>
+        <?php endif; ?>
+
         <?php if (!empty($s['available_facets'])): ?>
             <?php foreach($s['available_facets'] as $label => $data):?>
                 <?php foreach ($data as $obj): ?>

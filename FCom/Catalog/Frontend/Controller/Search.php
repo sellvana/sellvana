@@ -42,6 +42,9 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
+        $layout->view('catalog/product/pager')->query = $q;
+        $layout->view('catalog/product/pager')->filters = $filter;
+
         BLayout::i()->layout(array(
             '/catalog/category'=>array(
                 array('view', 'root', 'set'=>array('show_left_col'=>true)),
@@ -79,6 +82,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;
+        $layout->view('catalog/product/pager')->filters = $filter;
+        $layout->view('catalog/product/pager')->query = $q;
 
         BLayout::i()->layout(array(
             '/catalog/search'=>array(
