@@ -54,7 +54,10 @@ class FCom_CustomField_Common extends BClass
             $category = $args['category'];
         }
 
-        $customFields = FCom_CustomField_Model_Field::orm()->where('frontend_show', 1)->find_many();
+        $customFields = FCom_CustomField_Model_Field::orm()
+                ->where('frontend_show', 1)
+                ->order_by_asc('sort_order')
+                ->find_many();
         if (!$customFields) {
             return;
         }

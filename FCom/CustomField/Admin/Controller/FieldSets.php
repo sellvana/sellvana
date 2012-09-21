@@ -94,6 +94,8 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'frontend_label' => array('label'=>'Frontend Label', 'width'=>200, 'editable'=>true),
                     'frontend_show' => array('label'=>'Show on frontend', 'width'=>50, 'editable'=>true,
                         'options'=>$fld->fieldOptions('frontend_show')),
+                    'sort_order' => array('label'=>'Sort order', 'width'=>50, 'editable'=>true,
+                        'options'=>range(0,20)),
                     'table_field_type' => array('label'=>'DB Type', 'width'=>80, 'editable'=>true,
                         'options'=>$fld->fieldOptions('table_field_type')),
                     'admin_input_type' => array('label'=>'Input Type', 'width'=>80, 'editable'=>true,

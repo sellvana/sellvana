@@ -6,6 +6,7 @@ class FCom_CustomField_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function install()
@@ -90,5 +91,11 @@ class FCom_CustomField_Migrate extends BClass
             return false;
         }
         BDb::run( " ALTER TABLE {$tField} ADD {$fieldName} tinyint(1) not null default 1; ");
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $tField = FCom_CustomField_Model_Field::table();
+        BDb::run( " ALTER TABLE {$tField} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 }
