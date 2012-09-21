@@ -24,10 +24,9 @@
             "require" => array(
                 "module" => "FCom_Core",
                 "class" => "PHPUnit",
-                "phpext" => "curl",
                 ),
 
- 
+
         ),
 
     ),

@@ -15,8 +15,8 @@
             ),
 
             "require" => array(
-                "module" => array("FCom_Core" => "0.1.0", "FCom_PayPal"),
-                "class" => array("PHPUnit", "BDb"),
+                "module" => array("FCom_Core" => "0.1.0"),
+                "class" => array("PHPUnit"),
                 "phpext" => array("curl"),
             ),
 
