@@ -129,6 +129,30 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function searchProductOrm($q='', $filter='', $category = null)
+    {
+        $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
+
+        if ($category && is_object($category)) {
+            $productsORM = $category->productsORM();
+        } else {
+            $productsORM = $this->orm();
+        }
+
+        $and = array();
+        if ($qs) {
+            foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
+            $productsORM->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+        }
+
+        if (!empty($filter)){
+            foreach($filter as $field => $fieldVal) {
+                $productsORM->where($field, $fieldVal);
+            }
+        }
+        return $productsORM;
+    }
+
 
     public function mediaORM($type)
     {
