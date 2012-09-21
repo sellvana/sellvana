@@ -96,6 +96,8 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                         'options'=>$fld->fieldOptions('frontend_show')),
                     'sort_order' => array('label'=>'Sort order', 'width'=>50, 'editable'=>true,
                         'options'=>range(0,20)),
+                    'facet_select' => array('label'=>'Facet', 'width'=>200, 'editable'=>true,
+                        'options'=>array('No' => 'No', 'Exclusive' => 'Exclusive', 'Inclusive' => 'Inclusive')),
                     'table_field_type' => array('label'=>'DB Type', 'width'=>80, 'editable'=>true,
                         'options'=>$fld->fieldOptions('table_field_type')),
                     'admin_input_type' => array('label'=>'Input Type', 'width'=>80, 'editable'=>true,

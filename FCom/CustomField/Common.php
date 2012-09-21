@@ -55,6 +55,7 @@ class FCom_CustomField_Common extends BClass
         }
 
         $customFields = FCom_CustomField_Model_Field::orm()
+                ->where_in('facet_select', array('Inclusive','Exclusive'))
                 ->where('frontend_show', 1)
                 ->order_by_asc('sort_order')
                 ->find_many();
