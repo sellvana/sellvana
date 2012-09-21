@@ -1,7 +1,12 @@
 <?php
 $category = $this->category ? $this->category : BApp::i()->get('current_category');
-$parent = FCom_Catalog_Model_Category::load($category->parent_id);
-$siblings = $category->siblings();
+$parent = false;
+$siblings = false;
+if ($category->parent_id) {
+    $parent = FCom_Catalog_Model_Category::load($category->parent_id);
+    $siblings = $category->siblings();
+}
+
 $children = $category->children();
 ?>
 
@@ -22,11 +27,13 @@ $children = $category->children();
                                 <a href="<?=$this->q($c->url().'?'.BRequest::rawGet())?>"><?=$this->q($c->node_name)?></a>
                             </li>
                         <?php endforeach; ?>
-                    <?php foreach ($siblings as $c): ?>
+                    <?php if($siblings) :?>
+                        <?php foreach ($siblings as $c): ?>
                             <li style="padding-left: 20px;">
                                 <a href="<?=$this->q($c->url().'?'.BRequest::rawGet())?>"><?=$this->q($c->node_name)?></a>
                             </li>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
             </ul>
 
    </section>
