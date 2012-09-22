@@ -6,7 +6,13 @@
         <b><?=$label?></b>
         <ul>
             <?php foreach($filterGroup as $filter):?>
-            <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$filter['key'].']' => ''))?>"> - <?=$filter['value']?></a></li>
+                <?php if(is_array($filter['value'])):?>
+                    <?php foreach($filter['value'] as $fval):?>
+                        <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$filter['key'].']['.$fval.']' => ''))?>"> - <?=$fval?></a></li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$filter['key'].']' => ''))?>"> - <?=$filter['value']?></a></li>
+                <?php endif; ?>
             <?php endforeach; ?>
         </ul>
 
@@ -21,7 +27,11 @@
         <b><?=$label?></b>
         <ul>
             <?php foreach($groupValues['values'] as $gv):?>
-                <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$groupValues['key'].']' => $gv))?>"><?=$gv?></a></li>
+                <?php if('Inclusive' == $groupValues['facet_select']):?>
+                    <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$groupValues['key'].']['.$gv.']' => $gv))?>"><?=$gv?></a></li>
+                <?php else: ?>
+                    <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array('f['.$groupValues['key'].']' => $gv))?>"><?=$gv?></a></li>
+                <?php endif; ?>
             <?php endforeach; ?>
         </ul>
 

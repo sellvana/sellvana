@@ -22,7 +22,13 @@ $filters = $this->filters ? $this->filters : array();
 
         <?php if (!empty($filters)):?>
             <?php foreach($filters as $fkey => $fval):?>
-                <input type="hidden" name="f[<?=$fkey?>]" value="<?=$fval?>" />
+                <?php if (is_array($fval)):?>
+                    <?php foreach($fval as $fvalsingle):?>
+                        <input type="hidden" name="f[<?=$fkey?>][<?=$fvalsingle?>]" value="<?=$fvalsingle?>" />
+                    <?php endforeach; ?>
+                <?php else:?>
+                    <input type="hidden" name="f[<?=$fkey?>]" value="<?=$fval?>" />
+                <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>
 
