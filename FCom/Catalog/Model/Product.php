@@ -147,7 +147,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         if (!empty($filter)){
             foreach($filter as $field => $fieldVal) {
-                $productsORM->where($field, $fieldVal);
+                if (is_array($fieldVal)) {
+                    $productsORM->where_in($field, array_values($fieldVal));
+                } else {
+                    $productsORM->where($field, $fieldVal);
+                }
             }
         }
         return $productsORM;
