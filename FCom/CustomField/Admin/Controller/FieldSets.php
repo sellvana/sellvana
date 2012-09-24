@@ -103,6 +103,8 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'admin_input_type' => array('label'=>'Input Type', 'width'=>80, 'editable'=>true,
                         'options'=>$fld->fieldOptions('admin_input_type')),
                     'num_options' => array('label' => 'Options', 'width'=>30),
+                    'system' => array('label'=>'System field', 'width'=>50, 'editable'=>true,
+                        'options'=>array('0' => 'No', '1' => 'Yes')),
                 ),
                 'multiselect' => true,
             ),
