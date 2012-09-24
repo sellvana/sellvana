@@ -93,6 +93,23 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
                     }
                 }
+                // 2. check for classes
+                if (!empty($module['require']['class'])) {
+                    foreach($module['require']['class'] as &$modreq) {
+                        if (!class_exists($modreq['name'])) {
+                            $modreq['error'] = 'Required class not exist';
+                        }
+                    }
+                }
+
+                // 3. check for php extensions
+                if (!empty($module['require']['phpext'])) {
+                    foreach($module['require']['phpext'] as &$modreq) {
+                        if (!extension_loaded($modreq['name'])) {
+                            $modreq['error'] = 'Required PHP extension not loaded';
+                        }
+                    }
+                }
             }
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
