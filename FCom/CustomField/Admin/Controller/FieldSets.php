@@ -24,6 +24,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'id' => array('label'=>'ID', 'hidden'=>true, 'width'=>30),
                         'field_code' => array('label'=>'Field', 'width'=>200),
                         'field_name' => array('label'=>'Name', 'width'=>200),
+                        'position' => array('label'=>'Position', 'width'=>30, 'editable' => true),
                     ),
                     'multiselect' => true,
                     'autowidth' => false,
@@ -149,7 +150,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
     {
         $orm = FCom_CustomField_Model_SetField::i()->orm('sf')
             ->join('FCom_CustomField_Model_Field', array('f.id','=','sf.field_id'), 'f')
-            ->select(array('f.id', 'f.field_name', 'f.field_code'))
+            ->select(array('f.id', 'f.field_name', 'f.field_code', 'sf.position'))
             ->where('sf.set_id', BRequest::i()->get('set_id'));
         $data = $this->view('jqgrid')->processORM($orm, __METHOD__);
         BResponse::i()->json($data);
