@@ -2,7 +2,7 @@
     'modules' => array(
         // catalog views and controllers
         'FCom_CustomField' => array(
-            'version' => '0.1.3',
+            'version' => '0.1.4',
             'root_dir' => '',
             'bootstrap' => array('file'=>'CustomField.php', 'callback'=>'FCom_CustomField::bootstrap'),
             'tests' => "FCom_CustomField_Tests_AllTests",

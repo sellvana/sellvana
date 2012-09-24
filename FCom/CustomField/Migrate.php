@@ -8,6 +8,7 @@ class FCom_CustomField_Migrate extends BClass
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
         BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
         BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
+        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
     }
 
     public function install()
@@ -68,20 +69,6 @@ class FCom_CustomField_Migrate extends BClass
             CONSTRAINT `FK_{$tSetField}_set` FOREIGN KEY (`set_id`) REFERENCES {$tSet} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
         ");
-
-        $tProductField = FCom_CustomField_Model_ProductField::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tProductField} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `product_id` int(10) unsigned NOT NULL,
-            `_fieldset_ids` text,
-            `_add_field_ids` text,
-            `_hide_field_ids` text,
-            PRIMARY KEY (`id`),
-            CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
     }
 
     public function upgrade_0_1_1()
@@ -104,5 +91,11 @@ class FCom_CustomField_Migrate extends BClass
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run( " ALTER TABLE {$tField} ADD `facet_select` enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'");
+    }
+
+    public function upgrade_0_1_4()
+    {
+        $tField = FCom_CustomField_Model_Field::table();
+        BDb::run( " ALTER TABLE {$tField} ADD `system` tinyint(1) NOT NULL DEFAULT '0'");
     }
 }
