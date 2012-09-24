@@ -70,6 +70,29 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             $module = $modules[$modName];
             if (!empty($module['require'])) {
                 $module['require'] = BUtil::fromJson($module['require']);
+                //check requirements with current state
+                //1. check modules
+                if (!empty($module['require']['module'])) {
+                    $installedmodules = BModuleRegistry::i()->debug();
+                    foreach($module['require']['module'] as &$modreq) {
+                        if (!isset($installedmodules[$modreq['name']])) {
+                            $modreq['error'] = 'Required module not exist';
+                            continue;
+                        } else {
+                            if (!empty($modreq['version']['from'])  &&
+                                    version_compare($modreq['version']['from'], $installedmodules[$modreq['name']]->version, '>')) {
+                                $modreq['error'] = 'Installed module version too low';
+                                continue;
+                            }
+                            if (!empty($modreq['version']['to'])  &&
+                                    version_compare($modreq['version']['to'], $installedmodules[$modreq['name']]->version, '<')) {
+                                $modreq['error'] = 'Installed module version too high';
+                                continue;
+                            }
+                        }
+
+                    }
+                }
             }
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
