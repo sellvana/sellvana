@@ -18,16 +18,24 @@
             <b><?=$reqType?>:</b>
             <ul>
             <?php foreach($reqModules as $reqMod):?>
-                <li>
+                <?php if (!empty($reqMod['error'])):?>
+                <li style="color:red">
+                <?php else:?>
+                <li >
+                <?php endif; ?>
                     <?=$reqMod['name']?>
-                    <?=!empty($reqMod['version']['from'])?'>'.$reqMod['version']['from']:''?>
-                    <?=!empty($reqMod['version']['to'])?'<'.$reqMod['version']['to']:''?>
+                    <?=!empty($reqMod['version'])?'version':''?>
+                    <?=!empty($reqMod['version']['from'])?'> '.$reqMod['version']['from']:''?>
+                    <?=!empty($reqMod['version']['to'])?'< '.$reqMod['version']['to']:''?>
+                    <?=!empty($reqMod['error'])?'('.$reqMod['error'].')':''?>
+
                 </li>
             <?php endforeach; ?>
             </ul>
         <?php endforeach; ?>
             <br/>
     <?php endif; ?>
+
     <h3>Description</h3>
     <?= $m->module['description']; ?>
     <br/>
