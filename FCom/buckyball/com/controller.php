@@ -1243,9 +1243,11 @@ class BFrontController extends BClass
         if (is_null($requestRoute)) {
             $requestRoute = BRequest::i()->rawPath();
         }
+
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
+
         if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
             BDebug::debug('DIRECT ROUTE: '.$requestRoute);
             return $this->_routes[$requestRoute];
@@ -1617,9 +1619,18 @@ class BRouteObserver
                 }
             }
         }
-        $controllerName = $this->callback[0];
-        $node->controller_name = $controllerName;
-        $actionName = $this->callback[1];
+
+        $actionName = '';
+        $controllerName = '';
+        if (is_array($this->callback)) {
+            $controllerName = $this->callback[0];
+            $node->controller_name = $controllerName;
+            $actionName = $this->callback[1];
+        } else {
+            $actionName = strtolower(BRequest::method());
+            $controllerName = $this->callback;
+            $node->controller_name = $controllerName;
+        }
         /** @var BActionController */
         $controller = BClassRegistry::i()->instance($controllerName, array(), true);
         return $controller->dispatch($actionName, $this->args);
@@ -1734,6 +1745,7 @@ class BActionController extends BClass
                 $actionMethod = $tmpMethod;
             }
         }
+        //echo $actionMethod;exit;
         if (!method_exists($this, $actionMethod)) {
             $this->forward(true);
             return $this;

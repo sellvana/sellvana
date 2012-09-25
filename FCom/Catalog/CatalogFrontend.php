@@ -14,6 +14,10 @@ class FCom_Catalog_Frontend extends BClass
             ->route( 'POST /:product', 'FCom_Catalog_Frontend_Controller.product_post')
             ->route( 'GET /*category/:product', 'FCom_Catalog_Frontend_Controller.product')
             ->route( 'GET /catalog/compare', 'FCom_Catalog_Frontend_Controller.compare')
+
+            //api route for category
+            ->route( 'GET|POST /v1/catalog/category', 'FCom_Catalog_ApiServer_V1_Category')
+            ->route( 'GET|POST|DELETE|PUT /v1/catalog/category/:id', 'FCom_Catalog_ApiServer_V1_Category')
         ;
 
         BLayout::i()->addAllViews('Frontend/views')
