@@ -371,7 +371,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
-        if (BRequest::i()->csrf()) {
+        if (BRequest::i()->csrf() && false == static::i()->isApiCall()) {
             BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
         }
 
@@ -441,6 +441,11 @@ class FCom_Core_Controller_Abstract extends BActionController
         }
         BLayout::i()->hookView('main', $viewPrefix.$page);
         return $page;
+    }
+
+    public function isApiCall()
+    {
+        return false;
     }
 }
 

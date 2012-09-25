@@ -23,7 +23,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return false;
     }
 
-    public function createChild($name, $params=array())
+    public function createChild($name, $params=array(), $saveObjects = array())
     {
         $sep = static::$_separator;
 
@@ -50,6 +50,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             foreach ($this->ascendants() as $c) {
                 $c->num_descendants++;
                 $saveObjects[$c->id] = $c;
+            }
+        }
+        if ($saveObjects) {
+            foreach ($saveObjects as $saveObj) {
+                $saveObj->save();
             }
         }
 
