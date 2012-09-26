@@ -80,6 +80,28 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo
     }
 
+    public function prepareApiData($products, $includeCategories=false)
+    {
+        $result = array();
+        foreach($products as $i => $product) {
+            $result[$i] = array(
+                'id' => $product->id,
+                'product_name' => $product->product_name,
+                'sku'  => $product->manuf_sku,
+                'price'  => $product->base_price,
+                'url'   => $product->url_key,
+                'weight'  => $product->weight,
+                'short_description'  => $product->short_description,
+                'description'  => $product->description,
+            );
+            if ($includeCategories) {
+                $categories = $product->categories();
+                $result[$i]['categories'] = FCom_Catalog_Model_Category::i()->prepareApiData($categories);
+            }
+        }
+        return $result;
+    }
+
     /**
      * Find all categories which belong to product
      * @return type

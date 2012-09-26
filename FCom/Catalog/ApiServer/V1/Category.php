@@ -8,26 +8,23 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
     {
         $id = BRequest::i()->param('id');
         $len = BRequest::i()->get('len');
+        if (!$len) {
+            $len = 10;
+        }
         $start = BRequest::i()->get('start');
+        if (!$start) {
+            $start = 0;
+        }
 
         if ($id) {
-            $data[] = FCom_Catalog_Model_Category::load($id);
+            $categories[] = FCom_Catalog_Model_Category::load($id);
         } else {
-            $data = FCom_Catalog_Model_Category::orm()->limit($len, $start)->find_many();
+            $categories = FCom_Catalog_Model_Category::orm()->limit($len, $start)->find_many();
         }
-        if (empty($data)) {
-            BResponse::i()->json(array());
+        if (empty($categories)) {
+            $this->ok();
         }
-        $result = array();
-        foreach($data as $d) {
-            $result[] = array(
-                'id' => $d->id,
-                'parent_id' => $d->parent_id,
-                'name'  => $d->node_name,
-                'path'  => $d->id_path,
-                'children'  => $d->num_children
-            );
-        }
+        $result = FCom_Catalog_Model_Category::i()->prepareApiData($categories);
         $this->ok($result);
     }
 
