@@ -44,4 +44,20 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $this->top_menu = $set;
         $this->save();
     }
+
+    public function prepareApiData($categories)
+    {
+        $result = array();
+        foreach($categories as $category) {
+            $result[] = array(
+                'id' => $category->id,
+                'parent_id' => $category->parent_id,
+                'name'  => $category->node_name,
+                'url'   => $category->url_key,
+                'path'  => $category->id_path,
+                'children'  => $category->num_children
+            );
+        }
+        return $result;
+    }
 }

@@ -53,6 +53,12 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
         BResponse::i()->status(400);
     }
 
+    public function internalError($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(500);
+    }
+
     public function isApiCall()
     {
         return true;
