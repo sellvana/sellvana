@@ -40,6 +40,28 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function prepareApiData($customerAddress)
+    {
+        $result = array();
+        foreach($customerAddress as $address) {
+            $result[] = array(
+                'id' => $address->id,
+                'customer_id'       => $address->customer_id,
+                'firstname'         => $address->firstname,
+                'lastname'          => $address->lastname,
+                'street1'           => $address->street1,
+                'street2'           => $address->street2,
+                'city'              => $address->city,
+                'state'             => $address->state,
+                'zip'               => $address->zip,
+                'country_code'      => $address->country,
+                'phone'             => $address->phone,
+                'fax'               => $address->fax,
+                );
+        }
+        return $result;
+    }
+
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;
