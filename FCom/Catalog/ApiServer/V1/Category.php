@@ -28,7 +28,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
                 'children'  => $d->num_children
             );
         }
-        BResponse::i()->json($result);
+        $this->ok($result);
     }
 
     public function action_post()
@@ -85,6 +85,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
             }
         }
         $category->cacheSaveDirty();
+        $this->ok();
     }
 
     public function action_delete()
@@ -108,6 +109,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         } catch (Exception $e) {
             $this->badRequest($e->getMessage());
         }
+        $this->ok();
     }
 
 

@@ -7,16 +7,13 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
     protected $_authorizeActions = array('put', 'post', 'delete');
     protected $_authorizeActionsWhitelist = array();
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         foreach ($this->_authorizeActionsWhitelist as &$action) {
             $action = strtolower($action);
         }
         BResponse::i()->contentType('application/json');
-    }
-
-    public function afterDispatch() {
-        BResponse::i()->status(200);
     }
 
 
@@ -33,22 +30,27 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
     {
     }
 
+    public function ok($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(200);
+    }
     public function created($msg = null)
     {
-        if (!is_string($msg)) {
-            $msg = BUtil::toJson($msg);
-        }
-        BResponse::i()->status(201, null, $msg);
+        BResponse::i()->set($msg);
+        BResponse::i()->status(201);
     }
 
     public function notFound($msg = null)
     {
-        BResponse::i()->status(404, null, $msg);
+        BResponse::i()->set($msg);
+        BResponse::i()->status(404);
     }
 
     public function badRequest($msg = null)
     {
-        BResponse::i()->status(400, null, $msg);
+        BResponse::i()->set($msg);
+        BResponse::i()->status(400);
     }
 
     public function isApiCall()
