@@ -285,6 +285,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $counter = 0;
         $documents = array();
         foreach ($products as $i => $product) {
+            if ($product->disabled) {
+                continue;
+            }
             $categories     = $this->_prepareCategories($product);
             $variables      = $this->_prepareVariables($product);
             $fields         = $this->_prepareFields($product);

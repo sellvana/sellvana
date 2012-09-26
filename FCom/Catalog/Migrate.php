@@ -12,6 +12,7 @@ class FCom_Catalog_Migrate extends BClass
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
     }
 
     public function install()
@@ -230,5 +231,14 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = FCom_Catalog_Model_Category::table();
         BDb::ddlTableColumns($tCategory, null, array('top_menu'=>'(`top_menu`)'));
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `disabled` tinyint(1) NOT NULL default 0,
+                ADD INDEX (disabled)
+        ");
     }
 }
