@@ -102,6 +102,30 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function formatApiPost($post)
+    {
+        $data = array();
+        if (!empty($post['product_name'])) {
+            $data['product_name'] = $post['product_name'];
+        }
+        if (!empty($post['sku'])) {
+            $data['manuf_sku'] = $post['sku'];
+        }
+        if (!empty($post['price'])) {
+            $data['base_price'] = $post['price'];
+        }
+        if (!empty($post['weight'])) {
+            $data['weight'] = $post['weight'];
+        }
+        if (!empty($post['short_description'])) {
+            $data['short_description'] = $post['short_description'];
+        }
+        if (!empty($post['description'])) {
+            $data['description'] = $post['description'];
+        }
+        return $data;
+    }
+
     /**
      * Find all categories which belong to product
      * @return type

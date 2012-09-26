@@ -62,6 +62,43 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function formatApiPost($post)
+    {
+        $data = array();
+
+        if (!empty($post['firstname'])) {
+            $data['firstname'] = $post['firstname'];
+        }
+        if (!empty($post['lastname'])) {
+            $data['lastname'] = $post['lastname'];
+        }
+        if (!empty($post['street1'])) {
+            $data['street1'] = $post['street1'];
+        }
+        if (!empty($post['street2'])) {
+            $data['street2'] = $post['street2'];
+        }
+        if (!empty($post['city'])) {
+            $data['city'] = $post['city'];
+        }
+        if (!empty($post['state'])) {
+            $data['state'] = $post['state'];
+        }
+        if (!empty($post['zip'])) {
+            $data['zip'] = $post['zip'];
+        }
+        if (!empty($post['country_code'])) {
+            $data['country'] = $post['country_code'];
+        }
+        if (!empty($post['phone'])) {
+            $data['phone'] = $post['phone'];
+        }
+        if (!empty($post['fax'])) {
+            $data['fax'] = $post['fax'];
+        }
+        return $data;
+    }
+
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;

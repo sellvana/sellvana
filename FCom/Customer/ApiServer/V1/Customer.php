@@ -43,19 +43,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
             $this->badRequest("Lastname is required");
         }
 
-
-        $data = array();
-        $data['email'] = $post['email'];
-        $data['password'] = $post['password'];
-        $data['firstname'] = $post['firstname'];
-        $data['lastname'] = $post['lastname'];
-
-        if (!empty($post['shipping_address'])) {
-            $data['shipping_address_id'] = $post['shipping_address'];
-        }
-        if (!empty($post['billing_address_id'])) {
-            $data['billing_address_id'] = $post['billing_address_id'];
-        }
+        $data = FCom_Customer_Model_Customer::i()->formatApiPost($post);
 
         $customer = FCom_Customer_Model_Customer::orm()->create($data)->save();
 
@@ -75,27 +63,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
             $this->badRequest("Customer id is required");
         }
 
-        $data = array();
-
-        if (!empty($post['email'])) {
-            $data['email'] = $post['email'];
-        }
-        if (!empty($post['password'])) {
-            $data['password'] = $post['password'];
-        }
-        if (!empty($post['firstname'])) {
-            $data['firstname'] = $post['firstname'];
-        }
-        if (!empty($post['lastname'])) {
-            $data['lastname'] = $post['lastname'];
-        }
-        if (!empty($post['shipping_address'])) {
-            $data['shipping_address_id'] = $post['shipping_address'];
-        }
-        if (!empty($post['billing_address_id'])) {
-            $data['billing_address_id'] = $post['billing_address_id'];
-        }
-
+        $data = FCom_Customer_Model_Customer::i()->formatApiPost($post);
 
         $customer = FCom_Customer_Model_Customer::load($id);
         if (!$customer) {
