@@ -64,6 +64,31 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function formatApiPost($post)
+    {
+        $data = array();
+
+        if (!empty($post['email'])) {
+            $data['email'] = $post['email'];
+        }
+        if (!empty($post['password'])) {
+            $data['password'] = $post['password'];
+        }
+        if (!empty($post['firstname'])) {
+            $data['firstname'] = $post['firstname'];
+        }
+        if (!empty($post['lastname'])) {
+            $data['lastname'] = $post['lastname'];
+        }
+        if (!empty($post['shipping_address'])) {
+            $data['shipping_address_id'] = $post['shipping_address'];
+        }
+        if (!empty($post['billing_address_id'])) {
+            $data['billing_address_id'] = $post['billing_address_id'];
+        }
+        return $data;
+    }
+
     public function getData()
     {
         $data = $this->as_array();
