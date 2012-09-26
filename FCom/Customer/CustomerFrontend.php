@@ -29,6 +29,14 @@ class FCom_Customer_Frontend extends BClass
             ->route('GET /customer/address/.action', 'FCom_Customer_Frontend_Controller_Address')
             //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
 
+            //api route for customer
+            ->route( 'GET|POST /v1/customer/customer', 'FCom_Customer_ApiServer_V1_Customer')
+            ->route( 'GET|POST|DELETE|PUT /v1/customer/customer/:id', 'FCom_Customer_ApiServer_V1_Customer')
+
+            //api route for customer address
+            ->route( 'GET|POST /v1/customer/address', 'FCom_Customer_ApiServer_V1_Address')
+            ->route( 'GET|POST|DELETE|PUT /v1/customer/address/:id', 'FCom_Customer_ApiServer_V1_Address')
+
         ;
 
         BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Customer_Model_Customer::onAddProductToCart');
