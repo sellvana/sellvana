@@ -71,7 +71,64 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         $this->created(array('id' => $product->id));
     }
 
-    
+    public function action_put()
+    {
+        $id = BRequest::i()->param('id');
+        $post = BUtil::fromJson(BRequest::i()->rawPost());
+
+        if (empty($id)) {
+            $this->badRequest("Product id is required");
+        }
+
+
+
+        $data = array();
+
+        if (!empty($post['product_name'])) {
+            $data['product_name'] = $post['product_name'];
+        }
+        if (!empty($post['sku'])) {
+            $data['manuf_sku'] = $post['sku'];
+        }
+        if (!empty($post['price'])) {
+            $data['base_price'] = $post['price'];
+        }
+        if (!empty($post['weight'])) {
+            $data['weight'] = $post['weight'];
+        }
+        if (!empty($post['short_description'])) {
+            $data['short_description'] = $post['short_description'];
+        }
+        if (!empty($post['description'])) {
+            $data['description'] = $post['description'];
+        }
+
+
+        $product = FCom_Catalog_Model_Product::load($id);
+        if (!$product) {
+            $this->notFound("Product id #{$id} not found");
+        }
+
+        $product->set($data)->save();
+        $this->ok();
+    }
+
+    public function action_delete()
+    {
+        $id = BRequest::i()->param('id');
+
+        if (empty($id)) {
+            $this->notFound("Product id is required");
+        }
+
+        $product = FCom_Catalog_Model_Product::load($id);
+        if (!$product) {
+            $this->notFound("Product id #{$id} not found");
+        }
+
+        $product->delete();
+        $this->ok();
+    }
 
 
 }
