@@ -48,6 +48,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         static::$_sessionUser = $this;
     }
 
+    public function prepareApiData($customers)
+    {
+        $result = array();
+        foreach($customers as $customer) {
+            $result[] = array(
+                'id'                => $customer->id,
+                'email'             => $customer->email,
+                'firstname'         => $customer->firstname,
+                'lastname'          => $customer->lastname,
+                'shipping_address_id'  => $customer->default_shipping_id,
+                'billing_address_id'   => $customer->default_billing_id
+            );
+        }
+        return $result;
+    }
+
     public function getData()
     {
         $data = $this->as_array();

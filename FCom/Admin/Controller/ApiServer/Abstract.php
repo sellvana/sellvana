@@ -4,7 +4,7 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
 {
     protected static $_origClass;
     protected $_permission;
-    protected $_authorizeActions = array('put', 'post', 'delete');
+    protected $_authorizeActions = array('get','put', 'post', 'delete');
     protected $_authorizeActionsWhitelist = array();
 
     public function __construct()

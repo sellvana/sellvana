@@ -85,14 +85,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $result = array();
         foreach($products as $i => $product) {
             $result[$i] = array(
-                'id' => $product->id,
-                'product_name' => $product->product_name,
-                'sku'  => $product->manuf_sku,
-                'price'  => $product->base_price,
-                'url'   => $product->url_key,
-                'weight'  => $product->weight,
-                'short_description'  => $product->short_description,
-                'description'  => $product->description,
+                'id'                => $product->id,
+                'product_name'      => $product->product_name,
+                'sku'               => $product->manuf_sku,
+                'price'             => $product->base_price,
+                'url'               => $product->url_key,
+                'weight'            => $product->weight,
+                'short_description' => $product->short_description,
+                'description'       => $product->description,
             );
             if ($includeCategories) {
                 $categories = $product->categories();
