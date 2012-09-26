@@ -481,7 +481,14 @@ class BModuleRegistry extends BClass
                         } else {
                             $from = '';
                             $to = '';
-                            @list($from, $to) = explode(";", $reqVer);
+
+                            $reqVerAr = explode(";", $reqVer);
+                            if (!empty($reqVerAr[0])) {
+                                $from = $reqVerAr[0];
+                            }
+                            if (!empty($reqVerAr[1])) {
+                                $to = $reqVerAr[1];
+                            }
                             if (!empty($from)) {
                                 $reqVer = array('name' => $reqMod, 'version' => array('from' => $from, 'to' => $to));
                             } else {

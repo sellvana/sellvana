@@ -1003,15 +1003,23 @@ class BResponse extends BClass
         //BSession::i()->close();
         header('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
         if ($this->_contentType=='application/json') {
-            $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);
+            if (!empty($this->_content)) {
+                $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);
+            }
         } elseif (is_null($this->_content)) {
             $this->_content = BLayout::i()->render();
         }
         BPubSub::i()->fire('BResponse::output.before', array('content'=>&$this->_content));
 
-        echo $this->_contentPrefix;
-        print_r($this->_content);
-        echo $this->_contentSuffix;
+        if ($this->_contentPrefix) {
+            echo $this->_contentPrefix;
+        }
+        if ($this->_content) {
+            echo $this->_content;
+        }
+        if ($this->_contentSuffix) {
+            echo $this->_contentSuffix;
+        }
 
         BPubSub::i()->fire('BResponse::output.after', array('content'=>$this->_content));
 
