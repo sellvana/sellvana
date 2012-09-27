@@ -77,7 +77,15 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
             $this->notFound("Product id #{$id} not found");
         }
 
-        $product->set($data)->save();
+        try {
+            $product->set($data)->save();
+        } catch (Exception $e) {
+            if (23000 == $e->getCode()) {
+                $this->internalError("Duplicate product name");
+            } else {
+                $this->internalError("Can't update a product");
+            }
+        }
         $this->ok();
     }
 

@@ -57,8 +57,8 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
             $this->notFound("Category id is required");
         }
 
-        if (empty($post['action']) || !in_array($post['action'], array('move','rename'))) {
-            $this->notFound("'action' parameter is missing. Allowed actions: move and rename");
+        if (empty($post['parent_id']) && empty($post['name'])) {
+            $this->badRequest("Missing parameters. Use any of the following parameters: parent_id or name to move or rename category");
         }
 
         $category = FCom_Catalog_Model_Category::load($id);
@@ -66,19 +66,14 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
             $this->notFound("Category id #{$id} not found");
         }
 
-        if ('rename' == $post['action']) {
-            if (empty($post['name'])) {
-                $this->notFound("Rename category required a new 'name' parameter");
-            }
+        if (!empty($post['name']) && $category->node_name != $post['name']) {
             $category->rename($post['name']);
-        } else if ('move' == $post['action']) {
-            if (empty($post['parent_id'])) {
-                $this->notFound("Parameter parent_id is required to move category");
-            }
+        }
+        if (!empty($post['parent_id']) && $category->parent_id != $post['parent_id']) {
             try {
                 $category->move($post['parent_id']);
             } catch (Exception $e) {
-                $this->badRequest($e->getMessage());
+                $this->internalError($e->getMessage());
             }
         }
         $category->cacheSaveDirty();
