@@ -1634,10 +1634,6 @@ class BRouteObserver
             $controllerName = $this->callback[0];
             $node->controller_name = $controllerName;
             $actionName = $this->callback[1];
-        } else {
-            $actionName = strtolower(BRequest::method());
-            $controllerName = $this->callback;
-            $node->controller_name = $controllerName;
         }
         /** @var BActionController */
         $controller = BClassRegistry::i()->instance($controllerName, array(), true);

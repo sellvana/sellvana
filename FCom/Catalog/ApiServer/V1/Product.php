@@ -2,7 +2,7 @@
 
 class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_Abstract
 {
-    public function action_get()
+    public function action_index__get()
     {
         $id = BRequest::i()->param('id');
         $len = BRequest::i()->get('len');
@@ -26,7 +26,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         $this->ok($result);
     }
 
-    public function action_post()
+    public function action_index__post()
     {
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
@@ -36,7 +36,15 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
 
         $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
 
-        $product = FCom_Catalog_Model_Product::orm()->create($data)->save();
+        try {
+            $product = FCom_Catalog_Model_Product::orm()->create($data)->save();
+        } catch (Exception $e) {
+            if (23000 == $e->getCode()) {
+                $this->internalError("Duplicate product name");
+            } else {
+                $this->internalError("Can't create a product");
+            }
+        }
         if (!$product) {
             $this->internalError("Can't create a product");
         }
@@ -53,7 +61,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         $this->created(array('id' => $product->id));
     }
 
-    public function action_put()
+    public function action_index__put()
     {
         $id = BRequest::i()->param('id');
         $post = BUtil::fromJson(BRequest::i()->rawPost());
@@ -73,7 +81,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         $this->ok();
     }
 
-    public function action_delete()
+    public function action_index__delete()
     {
         $id = BRequest::i()->param('id');
 

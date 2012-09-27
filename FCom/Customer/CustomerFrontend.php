@@ -30,12 +30,12 @@ class FCom_Customer_Frontend extends BClass
             //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
 
             //api route for customer
-            ->route( 'GET|POST /v1/customer/customer', 'FCom_Customer_ApiServer_V1_Customer')
-            ->route( 'GET|POST|DELETE|PUT /v1/customer/customer/:id', 'FCom_Customer_ApiServer_V1_Customer')
+            ->route( 'GET|POST /v1/customer/customer', 'FCom_Customer_ApiServer_V1_Customer.index')
+            ->route( 'GET|POST|DELETE|PUT /v1/customer/customer/:id', 'FCom_Customer_ApiServer_V1_Customer.index')
 
             //api route for customer address
-            ->route( 'GET|POST /v1/customer/address', 'FCom_Customer_ApiServer_V1_Address')
-            ->route( 'GET|POST|DELETE|PUT /v1/customer/address/:id', 'FCom_Customer_ApiServer_V1_Address')
+            ->route( 'GET|POST /v1/customer/address', 'FCom_Customer_ApiServer_V1_Address.index')
+            ->route( 'GET|POST|DELETE|PUT /v1/customer/address/:id', 'FCom_Customer_ApiServer_V1_Address.index')
 
         ;
 

@@ -4,7 +4,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
 {
     //protected $_authorizeActionsWhitelist = array('Put');
 
-    public function action_get()
+    public function action_index()
     {
         $id = BRequest::i()->param('id');
         $len = BRequest::i()->get('len');
@@ -28,7 +28,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         $this->ok($result);
     }
 
-    public function action_post()
+    public function action_index__post()
     {
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
@@ -48,7 +48,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         $this->created(array('id' => $res->id));
     }
 
-    public function action_put()
+    public function action_index__put()
     {
         $id = BRequest::i()->param('id');
         $post = BUtil::fromJson(BRequest::i()->rawPost());
@@ -85,7 +85,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         $this->ok();
     }
 
-    public function action_delete()
+    public function action_index__delete()
     {
         $id = BRequest::i()->param('id');
 

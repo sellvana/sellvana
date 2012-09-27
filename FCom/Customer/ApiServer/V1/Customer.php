@@ -2,7 +2,7 @@
 
 class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServer_Abstract
 {
-    public function action_get()
+    public function action_index()
     {
         $id = BRequest::i()->param('id');
         $len = BRequest::i()->get('len');
@@ -26,7 +26,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
         $this->ok($result);
     }
 
-    public function action_post()
+    public function action_index__post()
     {
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
@@ -54,7 +54,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
         $this->created(array('id' => $customer->id));
     }
 
-    public function action_put()
+    public function action_index__put()
     {
         $id = BRequest::i()->param('id');
         $post = BUtil::fromJson(BRequest::i()->rawPost());
@@ -74,7 +74,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
         $this->ok();
     }
 
-    public function action_delete()
+    public function action_index__delete()
     {
         $id = BRequest::i()->param('id');
 
