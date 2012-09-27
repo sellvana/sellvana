@@ -2,7 +2,7 @@
 
 class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_Abstract
 {
-    public function action_index__get()
+    public function action_index()
     {
         $id = BRequest::i()->param('id');
         $len = BRequest::i()->get('len');

@@ -82,6 +82,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function prepareApiData($products, $includeCategories=false)
     {
+        if (!is_array($products)) {
+            $products = array($products);
+        }
         $result = array();
         foreach($products as $i => $product) {
             $result[$i] = array(
@@ -91,7 +94,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 'price'             => $product->base_price,
                 'url'               => $product->url_key,
                 'weight'            => $product->weight,
-                'short_description' => $product->short_description,
+                'short_description' => !empty($product->short_description) ? $product->short_description : '',
                 'description'       => $product->description,
             );
             if ($includeCategories) {
