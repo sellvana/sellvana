@@ -16,20 +16,6 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
         BResponse::i()->contentType('application/json');
     }
 
-
-    public function action_get()
-    {
-    }
-    public function action_post()
-    {
-    }
-    public function action_put()
-    {
-    }
-    public function action_delete()
-    {
-    }
-
     public function ok($msg = null)
     {
         BResponse::i()->set($msg);
