@@ -71,7 +71,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
             $orderItem['order_id'] = $order->id();
             $orderItem['product_id'] = $item['product_id'];
             $orderItem['qty'] = $item['qty'];
-            $orderItem['total'] = $item['price'];
+            $orderItem['total'] = $item['total'];
             $orderItem['product_info'] = BUtil::toJson($product->as_array());
 
             FCom_Sales_Model_OrderItem::i()->add($orderItem);
@@ -118,7 +118,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
                 $orderItem['order_id'] = $order->id();
                 $orderItem['product_id'] = $item['product_id'];
                 $orderItem['qty'] = $item['qty'];
-                $orderItem['total'] = $item['price'];
+                $orderItem['total'] = $item['total'];
                 $orderItem['product_info'] = BUtil::toJson($product->as_array());
 
                 $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($order->id(), $item['product_id']);
