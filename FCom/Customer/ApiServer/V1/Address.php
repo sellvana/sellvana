@@ -2,7 +2,7 @@
 
 class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer_Abstract
 {
-    public function action_get()
+    public function action_index()
     {
         $id = BRequest::i()->param('id');
         $customerId = BRequest::i()->param('customer_id');
@@ -29,7 +29,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
         $this->ok($result);
     }
 
-    public function action_post()
+    public function action_index__POST()
     {
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
@@ -39,7 +39,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
 
         $data = FCom_Customer_Model_Address::i()->formatApiPost($post);
         $data['customer_id'] = $post['customer_id'];
-        
+
         $address = FCom_Customer_Model_Address::orm()->create($data)->save();
 
         if (!$address) {
@@ -49,7 +49,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
         $this->created(array('id' => $address->id));
     }
 
-    public function action_put()
+    public function action_index__PUT()
     {
         $id = BRequest::i()->param('id');
         $post = BUtil::fromJson(BRequest::i()->rawPost());
@@ -69,7 +69,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
         $this->ok();
     }
 
-    public function action_delete()
+    public function action_index__DELETE()
     {
         $id = BRequest::i()->param('id');
 
