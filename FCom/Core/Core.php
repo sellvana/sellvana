@@ -152,11 +152,8 @@ class FCom_Core extends BClass
 
         $config = BConfig::i();
         // Initialize debugging mode and levels
-        if (is_writable($config->get('fs/log_dir'))) {
-            BDebug::logDir($config->get('fs/log_dir'));
-        } else {
-            BDebug::i()->collectError("Write permissions denied for: ".$config->get('fs/log_dir'));
-        }
+        BDebug::logDir($config->get('fs/log_dir'));
+
         BDebug::adminEmail($config->get('admin_email'));
 
         $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
@@ -283,6 +280,7 @@ class FCom_Core extends BClass
     {
         $c = BConfig::i()->get(null, true);
         unset($c['db']);
+        $c['modules']['FCom_Cron']['mode_by_ip'] = '127.0.0.1';
         BConfig::i()->writeFile('local.php', $c);
         return $this;
     }
