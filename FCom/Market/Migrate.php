@@ -5,6 +5,9 @@ class FCom_Market_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -22,4 +25,21 @@ class FCom_Market_Migrate extends BClass
         ");
     }
 
+    public function upgrade_0_1_1()
+    {
+        $pModules = FCom_Market_Model_Modules::table();
+        BDb::run( " ALTER TABLE {$pModules} ADD `need_upgrade` tinyint(1) NOT NULL DEFAULT '0'");
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $pModules = FCom_Market_Model_Modules::table();
+        BDb::run( " ALTER TABLE {$pModules} MODIFY `description` text DEFAULT NULL");
+    }
+
+    public function upgrade_0_1_3()
+    {
+        $pModules = FCom_Market_Model_Modules::table();
+        BDb::run( " ALTER TABLE {$pModules} ADD `market_version` varchar(50) DEFAULT NULL");
+    }
 }

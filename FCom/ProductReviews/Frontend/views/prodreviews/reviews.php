@@ -3,10 +3,10 @@ $prod = $this->product;
 $reviews = $this->product_reviews;
 $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
 ?>
-<h4 id="reviews"><?= BLocale::_("Reviews") ?></h4>
 <?php if (!$reviews) :?>
     <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Be the first to review this product") ?></a><br/><br/>
 <?php else:?>
+    <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Review the product") ?></a><br/><br/>
     Total reviews: <?=$prod->num_reviews?><br/>
     <?php foreach ($reviews as $review) :?>
         <div style="border:1 px solid black;">

@@ -50,7 +50,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
-        if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))) {
+        if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token===$token) {
             $this->messages('customer/password-reset');
             $this->layout('/customer/password/reset');
         } else {

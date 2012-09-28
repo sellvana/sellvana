@@ -497,25 +497,8 @@ class BConfig extends BClass
                 $contents = "<?php return ".var_export($config, 1).';';
 
                 // Additional check for allowed tokens
-                $tokens = token_get_all($contents);
-                $t1 = array();
-                $allowed = array(T_OPEN_TAG=>1, T_RETURN=>1, T_WHITESPACE=>1,
-                    T_ARRAY=>1, T_CONSTANT_ENCAPSED_STRING=>1, T_DOUBLE_ARROW=>1,
-                    T_DNUMBER=>1, T_LNUMBER=>1, T_STRING=>1,
-                    '('=>1, ','=>1, ')'=>1, ';'=>1);
-                $denied = array();
-#echo "<pre>"; print_r($tokens); echo "</pre>"; exit;
-                foreach ($tokens as $t) {
-                    #$t1[token_name($t[0])] = 1;
-                    #$t1[$t[0]] = 1;
-                    if (is_string($t) && !isset($t)) {
-                        $denied[] = $t;
-                    } elseif (is_array($t) && !isset($allowed[$t[0]])) {
-                        $denied[] = token_name($t[0]).': '.$t[1]
-                            .(!empty($t[2]) ? ' ('.$t[2].')':'');
-                    }
-                }
-                if ($denied) {
+
+                if ($this->invalidManifestPHP($contents)) {
                     throw new BException('Invalid tokens in configuration found');
                 }
 
@@ -541,6 +524,28 @@ class BConfig extends BClass
     public function unsetConfig()
     {
         $this->_config = array();
+    }
+
+    public function invalidManifestPHP($contents)
+    {
+        $tokens = token_get_all($contents);
+        $allowed = array(T_OPEN_TAG=>1, T_RETURN=>1, T_WHITESPACE=>1, T_COMMENT=>1,
+                    T_ARRAY=>1, T_CONSTANT_ENCAPSED_STRING=>1, T_DOUBLE_ARROW=>1,
+                    T_DNUMBER=>1, T_LNUMBER=>1, T_STRING=>1,
+                    '('=>1, ','=>1, ')'=>1, ';'=>1);
+        $denied = array();
+        foreach ($tokens as $t) {
+            if (is_string($t) && !isset($t)) {
+                $denied[] = $t;
+            } elseif (is_array($t) && !isset($allowed[$t[0]])) {
+                $denied[] = token_name($t[0]).': '.$t[1]
+                    .(!empty($t[2]) ? ' ('.$t[2].')':'');
+            }
+        }
+        if (count($denied)) {
+            return $denied;
+        }
+        return false;
     }
 }
 

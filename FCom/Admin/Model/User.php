@@ -113,7 +113,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()
-            ->where_complex(array('OR'=>array(
+            ->where(array('OR'=>array(
                 'username'=>$username,
                 'email'=>$username)))
             ->find_one();

@@ -40,6 +40,65 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function prepareApiData($customerAddress)
+    {
+        $result = array();
+        foreach($customerAddress as $address) {
+            $result[] = array(
+                'id' => $address->id,
+                'customer_id'       => $address->customer_id,
+                'firstname'         => $address->firstname,
+                'lastname'          => $address->lastname,
+                'street1'           => $address->street1,
+                'street2'           => $address->street2,
+                'city'              => $address->city,
+                'state'             => $address->state,
+                'zip'               => $address->zip,
+                'country_code'      => $address->country,
+                'phone'             => $address->phone,
+                'fax'               => $address->fax,
+                );
+        }
+        return $result;
+    }
+
+    public function formatApiPost($post)
+    {
+        $data = array();
+
+        if (!empty($post['firstname'])) {
+            $data['firstname'] = $post['firstname'];
+        }
+        if (!empty($post['lastname'])) {
+            $data['lastname'] = $post['lastname'];
+        }
+        if (!empty($post['street1'])) {
+            $data['street1'] = $post['street1'];
+        }
+        if (!empty($post['street2'])) {
+            $data['street2'] = $post['street2'];
+        }
+        if (!empty($post['city'])) {
+            $data['city'] = $post['city'];
+        }
+        if (!empty($post['state'])) {
+            $data['state'] = $post['state'];
+        }
+        if (!empty($post['zip'])) {
+            $data['zip'] = $post['zip'];
+        }
+        if (!empty($post['country_code'])) {
+            $data['country'] = $post['country_code'];
+        }
+        if (!empty($post['phone'])) {
+            $data['phone'] = $post['phone'];
+        }
+        if (!empty($post['fax'])) {
+            $data['fax'] = $post['fax'];
+        }
+        return $data;
+    }
+
     public function beforeSave()
     {
         if (!parent::beforeSave()) return false;
