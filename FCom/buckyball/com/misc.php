@@ -1330,6 +1330,8 @@ class BDebug extends BClass
 
     static protected $_verboseBacktrace = array();
 
+    static protected $_collectedErrors = array();
+
     /**
     * Contructor, remember script start time for delta timestamps
     *
@@ -1567,6 +1569,16 @@ class BDebug extends BClass
     public static function info($msg, $stackPop=0)
     {
         return self::trigger(self::INFO, $msg, $stackPop+1);
+    }
+
+    public function collectError($msg, $type=self::ERROR)
+    {
+        self::$_collectedErrors[$type][] = $msg;
+    }
+
+    public function getCollectedErrors($type=self::ERROR)
+    {
+        return self::$_collectedErrors[$type];
     }
 
     public static function debug($msg, $stackPop=0)
