@@ -2,6 +2,7 @@
 $s = $this->s;
 ?>
 <section class="block-sub">
+    <?php if (!empty($s['available_categories'])): ?>
 	<header class="block-sub-title"><span class="title"><?= BLocale::_("Categories") ?></span></header>
 	<a href="<?=BApp::href('catalog/search').'?'.BRequest::rawGet()?>">&lt; <?= BLocale::_("All categories") ?></a>
 	<?php foreach($s['available_categories'] as $data):?>
@@ -18,5 +19,6 @@ $s = $this->s;
 	    <?php endforeach ?>
 	    </ul>
 	<?php endforeach; ?>
-        <a href="<?=BApp::href('indextank/search').'?q='.$this->q(BRequest::i()->get('q'))?>"><?= BLocale::_("Clear filters") ?></a>
+    <?php endif; ?>
+    <a href="<?=BApp::href('indextank/search').'?q='.$this->q(BRequest::i()->get('q'))?>"><?= BLocale::_("Clear filters") ?></a>
 </section>

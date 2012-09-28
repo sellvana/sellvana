@@ -12,6 +12,7 @@ class FCom_Catalog_Migrate extends BClass
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
     }
 
     public function install()
@@ -147,6 +148,20 @@ class FCom_Catalog_Migrate extends BClass
             CONSTRAINT `FK_{$tCategoryProduct}_product` FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=INNODB DEFAULT CHARSET=utf8;
         ");
+
+        $tProductField = FCom_CustomField_Model_ProductField::table();
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tProductField} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `product_id` int(10) unsigned NOT NULL,
+            `_fieldset_ids` text,
+            `_add_field_ids` text,
+            `_hide_field_ids` text,
+            PRIMARY KEY (`id`),
+            CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
     public function upgrade_0_1_2()
@@ -216,5 +231,14 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = FCom_Catalog_Model_Category::table();
         BDb::ddlTableColumns($tCategory, null, array('top_menu'=>'(`top_menu`)'));
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            ALTER TABLE ".$tProduct." ADD `disabled` tinyint(1) NOT NULL default 0,
+                ADD INDEX (disabled)
+        ");
     }
 }

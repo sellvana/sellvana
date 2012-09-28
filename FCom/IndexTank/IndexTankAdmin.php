@@ -135,7 +135,11 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductAfterSave($args)
     {
         $product = $args['model'];
-        FCom_IndexTank_Index_Product::i()->add($product);
+        if ($product->disabled == 1) {
+            FCom_IndexTank_Index_Product::i()->deleteProducts($product);
+        } else {
+            FCom_IndexTank_Index_Product::i()->add($product);
+        }
     }
 
     /**

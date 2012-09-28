@@ -13,10 +13,13 @@
                     'bootstrap' => array('file'=>'PaymentCCFrontend.php', 'callback'=>'FCom_PaymentCC_Frontend::bootstrap'),
                 ),
             ),
+
+            "require" => array(
+                "module" => array("FCom_Core" => "0.1.0"),
+                "class" => array("PHPUnit"),
+                "phpext" => array("curl"),
+            ),
+
         ),
-
-
-
-
     ),
 );

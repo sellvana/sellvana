@@ -37,7 +37,10 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
 
     public function updateInfoStatus()
     {
-        $countNotIndexed = FCom_Catalog_Model_Product::orm()->where('indextank_indexed', 0)->count();
+        $countNotIndexed = FCom_Catalog_Model_Product::orm()
+                ->where('disabled', 0)
+                ->where('indextank_indexed', 0)
+                ->count();
         $countTotal = FCom_Catalog_Model_Product::orm()->count();
         $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
         $indexed = $countTotal - $countNotIndexed;

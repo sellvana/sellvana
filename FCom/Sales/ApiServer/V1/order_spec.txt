@@ -1,0 +1,101 @@
+Sales API
+
+Orders management
+
+GET /v1/sales/order
+GET /v1/sales/order/:id
+    Retrive orders or concrete order from the database
+
+    The query string could contain:
+
+    Optional:
+    "len" - how many results to return (default: 10)
+    "start" - for paging, the first position to return
+
+    HTTP Response codes
+    200 OK
+    The response body will contain JSON map with the fields:
+    'id'
+    'customer_id'
+    'status'
+    'item_qty'
+    'subtotal'
+    'balance'
+    'tax'
+    'shipping_method'
+    'shipping_service'
+    'payment_method'
+    'discount_code'
+
+    'items'  - order items collection which consist of following fields:
+        'product_id'
+        'qty'
+        'total'
+        'product_info' - is an product object, see product api for field product details
+
+POST /v1/sales/order
+    Adds an order and order items
+
+    The request body should contain a JSON object with:
+    'customer_id'
+    'status'
+    'item_qty'
+    'items' - collection, see above
+
+    Optional:
+    subtotal'
+    'balance'
+    'tax'
+    'shipping_method'
+    'shipping_service'
+    'payment_method'
+    'discount_code'
+
+    HTTP Response codes
+    201 Created - an order created
+    The response body will contain id of the new product.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+PUT /v1/sales/order/:id
+    Update an order or order items specified by id
+
+    The request body could contain a JSON object with any of following fields:
+    'customer_id'
+    'status'
+    'item_qty'
+    'subtotal'
+    'balance'
+    'tax'
+    'shipping_method'
+    'shipping_service'
+    'payment_method'
+    'discount_code'
+    'items'
+
+    HTTP Response codes
+    200 OK - order updated
+    The response body will be empty.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    404 No product existed for the given id
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+DELETE /v1/sales/order/:id
+    Removes an order with order items from the database.
+
+    HTTP Response codes
+    200 OK - order deleted
+    The response body will be empty.
+
+    404 No product existed for the given id
+    A descriptive error message will be found in the body.
