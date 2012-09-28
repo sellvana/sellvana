@@ -831,7 +831,10 @@ class BUtil extends BClass
             return;
         }
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            @$res = mkdir($dir, 0777, true);
+            if (!$res) {
+                BDebug::warning("Can't create directory: ".$dir);
+            }
         }
     }
 
@@ -1543,31 +1546,37 @@ class BDebug extends BClass
 
     public static function alert($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::ALERT, $msg, $stackPop+1);
     }
 
     public static function critical($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::CRITICAL, $msg, $stackPop+1);
     }
 
     public static function error($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::ERROR, $msg, $stackPop+1);
     }
 
     public static function warning($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::WARNING, $msg, $stackPop+1);
     }
 
     public static function notice($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::NOTICE, $msg, $stackPop+1);
     }
 
     public static function info($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::INFO, $msg, $stackPop+1);
     }
 
@@ -1578,7 +1587,9 @@ class BDebug extends BClass
 
     public function getCollectedErrors($type=self::ERROR)
     {
-        return self::$_collectedErrors[$type];
+        if (!empty(self::$_collectedErrors[$type])) {
+            return self::$_collectedErrors[$type];
+        }
     }
 
     public static function debug($msg, $stackPop=0)
