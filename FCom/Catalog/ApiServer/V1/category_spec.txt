@@ -1,0 +1,74 @@
+Catalog API
+
+Categories management
+
+GET /v1/catalog/category
+GET /v1/catalog/category/:id
+    Retrive categories or concrete category from the database
+
+    The query string could contain:
+
+    Optional:
+    "len" - how many results to return (default: 10)
+    "start" - for paging, the first position to return
+
+    HTTP Response codes
+    200 OK
+    The response body will contain JSON map with the fields:
+    'id'
+    'parent_id'
+    'name'
+    'url'
+    'path'
+    'children'
+
+POST /v1/catalog/category
+    Adds a category to the database
+
+    The request body should contain a JSON object with any of following fields (Optional):
+    'parent_id'
+    'name'
+    'url'
+    'path'
+    'children'
+
+    HTTP Response codes
+    201 Created - category created
+    The response body will contain id of the new product.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+PUT /v1/catalog/category/:id
+    Update a category specified by id in the database
+
+    The request body should contain a JSON object with any of following fields (Optional):
+    'parent_id' - where to move category
+    'name' - new name for category
+
+
+    HTTP Response codes
+    200 OK - category updated
+    The response body will be empty.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    404 No category existed for the given id
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+DELETE /v1/catalog/category/:id
+    Removes a category from the database.
+
+    HTTP Response codes
+    200 OK - category deleted
+    The response body will be empty.
+
+    404 No category existed for the given id
+    A descriptive error message will be found in the body.

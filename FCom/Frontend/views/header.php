@@ -29,9 +29,9 @@
                     <?=$this->view('nav')?>
                 </ul>
             </nav>
-            <form class="site-search">
+                <form class="site-search" action="<?=BApp::href('catalog/search')?>">
             	<fieldset>
-            		<input type="text" placeholder="Search entire store"/><button class="icon-button"><span>Search</span></button>
+            		<input type="text" placeholder="Search entire store" name="q"/><button class="icon-button"><span>Search</span></button>
             	</fieldset>
             </form>
 	    </div>

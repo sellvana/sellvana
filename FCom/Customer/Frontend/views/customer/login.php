@@ -20,7 +20,7 @@
 					<a href="#">Forgot your password?</a>
 				</div>
 				<div class="divider"></div>
-				<p>No Account? <strong><a href="<?php echo BApp::href('customer/password/recover')?>"><?= BLocale::_("Checkout as a Guest") ?> &raquo;</strong></a></p>
+				<p>No Account? <strong><a href="<?php echo BApp::href('customer/register')?>"><?= BLocale::_("Sign up now") ?> &raquo;</strong></a></p>
 			</fieldset>
 		</form>
 	</div>

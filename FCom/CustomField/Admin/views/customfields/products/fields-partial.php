@@ -45,8 +45,11 @@ $m = $this->model;
                 <?= (!empty($m->{$field->field_code}))?'checked':''?> />
 
         <?php endif; ?>
+
+        <?php if (0 ==$field->system) :?>
             <br/>
-        <a href="javascript:void(0);" onclick="cf_field_remove(<?=$field->id?>)">remove</a>
+            <a href="javascript:void(0);" onclick="cf_field_remove(<?=$field->id?>)">remove</a>
+        <?php endif; ?>
     </div>
     <?php endforeach; ?>
 <?php endif; ?>

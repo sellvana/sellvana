@@ -80,6 +80,55 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo
     }
 
+    public function prepareApiData($products, $includeCategories=false)
+    {
+        if (!is_array($products)) {
+            $products = array($products);
+        }
+        $result = array();
+        foreach($products as $i => $product) {
+            $result[$i] = array(
+                'id'                => $product->id,
+                'product_name'      => $product->product_name,
+                'sku'               => $product->manuf_sku,
+                'price'             => $product->base_price,
+                'url'               => $product->url_key,
+                'weight'            => $product->weight,
+                'short_description' => !empty($product->short_description) ? $product->short_description : '',
+                'description'       => $product->description,
+            );
+            if ($includeCategories) {
+                $categories = $product->categories();
+                $result[$i]['categories'] = FCom_Catalog_Model_Category::i()->prepareApiData($categories);
+            }
+        }
+        return $result;
+    }
+
+    public function formatApiPost($post)
+    {
+        $data = array();
+        if (!empty($post['product_name'])) {
+            $data['product_name'] = $post['product_name'];
+        }
+        if (!empty($post['sku'])) {
+            $data['manuf_sku'] = $post['sku'];
+        }
+        if (!empty($post['price'])) {
+            $data['base_price'] = $post['price'];
+        }
+        if (!empty($post['weight'])) {
+            $data['weight'] = $post['weight'];
+        }
+        if (!empty($post['short_description'])) {
+            $data['short_description'] = $post['short_description'];
+        }
+        if (!empty($post['description'])) {
+            $data['description'] = $post['description'];
+        }
+        return $data;
+    }
+
     /**
      * Find all categories which belong to product
      * @return type
@@ -127,6 +176,34 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
         }
         return $result;
+    }
+
+    public function searchProductOrm($q='', $filter='', $category = null)
+    {
+        $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
+
+        if ($category && is_object($category)) {
+            $productsORM = $category->productsORM();
+        } else {
+            $productsORM = $this->orm();
+        }
+
+        $and = array();
+        if ($qs) {
+            foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
+            $productsORM->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+        }
+
+        if (!empty($filter)){
+            foreach($filter as $field => $fieldVal) {
+                if (is_array($fieldVal)) {
+                    $productsORM->where_in($field, array_values($fieldVal));
+                } else {
+                    $productsORM->where($field, $fieldVal);
+                }
+            }
+        }
+        return $productsORM;
     }
 
 

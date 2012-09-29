@@ -15,6 +15,7 @@ class FCom_IndexTank_Migrate extends BClass
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
         BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
         BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
+        BMigrate::upgrade('0.2.0', '0.2.1', array($this, 'upgrade_0_2_1'));
     }
 
     public function uninstall()
@@ -33,7 +34,6 @@ class FCom_IndexTank_Migrate extends BClass
         BDb::run( " DROP TABLE {$pFunctionsTable}; ");
 
     }
-
 
     public function upgrade_0_1_1()
     {
@@ -124,6 +124,12 @@ class FCom_IndexTank_Migrate extends BClass
             'sort_order' => "enum('asc','desc') NOT NULL DEFAULT 'asc'",
             'use_custom_formula' => "tinyint(1) NOT NULL DEFAULT 0",
         ));
+    }
+
+    public function upgrade_0_2_1()
+    {
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 
 
@@ -286,7 +292,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $doc->field_type        = $type;
                 $doc->facets            = 1;
                 $doc->search            = 0;
-                $doc->source_type       = 'product';
+                $doc->source_type       = 'custom_field';
                 $doc->source_value      = $f->field_code;
 
                 $doc->save();

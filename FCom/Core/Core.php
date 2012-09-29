@@ -120,6 +120,7 @@ class FCom_Core extends BClass
             $config->set('fs/log_dir', $logDir);
         }
 
+
         // DB configuration is separate to gitignore
         // used as indication that app is already installed and setup
         $configFileStatus = true;
@@ -140,6 +141,13 @@ class FCom_Core extends BClass
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
         }
+
+        //migration
+        $implicitMigration = $config->get('db/implicit_migration');
+        if (null === $implicitMigration) {
+            $config->set('db/implicit_migration', 1);
+        }
+
 #echo "<Pre>"; print_r($config->get()); exit;
         // add area module
         BApp::i()->set('area', $area, true);
@@ -363,7 +371,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
-        if (BRequest::i()->csrf()) {
+        if (BRequest::i()->csrf() && false == static::i()->isApiCall()) {
             BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
         }
 
@@ -433,6 +441,11 @@ class FCom_Core_Controller_Abstract extends BActionController
         }
         BLayout::i()->hookView('main', $viewPrefix.$page);
         return $page;
+    }
+
+    public function isApiCall()
+    {
+        return false;
     }
 }
 

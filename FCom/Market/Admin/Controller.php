@@ -68,6 +68,49 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         try {
             $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
             $module = $modules[$modName];
+            if (!empty($module['require'])) {
+                $module['require'] = BUtil::fromJson($module['require']);
+                //check requirements with current state
+                //1. check modules
+                if (!empty($module['require']['module'])) {
+                    $installedmodules = BModuleRegistry::i()->debug();
+                    foreach($module['require']['module'] as &$modreq) {
+                        if (!isset($installedmodules[$modreq['name']])) {
+                            $modreq['error'] = 'Required module not exist';
+                            continue;
+                        } else {
+                            if (!empty($modreq['version']['from'])  &&
+                                    version_compare($modreq['version']['from'], $installedmodules[$modreq['name']]->version, '>')) {
+                                $modreq['error'] = 'Installed module version too low';
+                                continue;
+                            }
+                            if (!empty($modreq['version']['to'])  &&
+                                    version_compare($modreq['version']['to'], $installedmodules[$modreq['name']]->version, '<')) {
+                                $modreq['error'] = 'Installed module version too high';
+                                continue;
+                            }
+                        }
+
+                    }
+                }
+                // 2. check for classes
+                if (!empty($module['require']['class'])) {
+                    foreach($module['require']['class'] as &$modreq) {
+                        if (!class_exists($modreq['name'])) {
+                            $modreq['error'] = 'Required class not exist';
+                        }
+                    }
+                }
+
+                // 3. check for php extensions
+                if (!empty($module['require']['phpext'])) {
+                    foreach($module['require']['phpext'] as &$modreq) {
+                        if (!extension_loaded($modreq['name'])) {
+                            $modreq['error'] = 'Required PHP extension not loaded';
+                        }
+                    }
+                }
+            }
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market"), 'error');
@@ -144,6 +187,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         $marketPath = BConfig::i()->get('fs/market_modules_dir');
+        $modNameParts = explode("_", $modName);
+        if (count($modNameParts) == 2) {
+            $marketPath .= '/'.$modNameParts[0];
+            if (!file_exists($marketPath)) {
+                mkdir($marketPath);
+            }
+        }
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
         if ($ftpenabled) {
