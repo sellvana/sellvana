@@ -1929,23 +1929,23 @@ class BModel extends Model
 
     public function delete()
     {
-        if (!$this->beforeDelete()) {
-            return $this;
-        }
         try {
-            $this->beforeDelete();
+            if (!$this->beforeDelete()) {
+                return $this;
+            }
             BPubSub::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
         } catch(BModelException $e) {
             return $this;
         }
 
         if (($cache =& static::$_cache[$this->_origClass()])) {
-            foreach ($cache as $k=>$cache) {
+            foreach ($cache as $k=>$c) {
                 $keyValue = $this->get($k);
                 if (!empty(static::$_cacheFlags[$k]['key_lower'])) $keyValue = strtolower($keyValue);
                 unset($cache[$k][$keyValue]);
             }
         }
+
         parent::delete();
 
         $this->afterDelete();

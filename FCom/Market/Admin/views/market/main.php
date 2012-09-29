@@ -11,7 +11,32 @@
 <?php endif; ?>
 
 <h2><?=$m->module['name']?> (<?=$m->module['mod_name']?>)</h2>
-    Version: <?=$m->module['version']?><br/>
+    <h3>Version</h3> <?=$m->module['version']?><br/><br/>
+    <?php if (!empty($m->module['require'])):?>
+        <h3>Require</h3>
+        <?php foreach($m->module['require'] as $reqType => $reqModules):?>
+            <b><?=$reqType?>:</b>
+            <ul>
+            <?php foreach($reqModules as $reqMod):?>
+                <?php if (!empty($reqMod['error'])):?>
+                <li style="color:red">
+                <?php else:?>
+                <li >
+                <?php endif; ?>
+                    <?=$reqMod['name']?>
+                    <?=!empty($reqMod['version'])?'version':''?>
+                    <?=!empty($reqMod['version']['from'])?'> '.$reqMod['version']['from']:''?>
+                    <?=!empty($reqMod['version']['to'])?'< '.$reqMod['version']['to']:''?>
+                    <?=!empty($reqMod['error'])?'('.$reqMod['error'].')':''?>
+
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        <?php endforeach; ?>
+            <br/>
+    <?php endif; ?>
+
+    <h3>Description</h3>
     <?= $m->module['description']; ?>
     <br/>
     <?php if($m->local_version): ?>

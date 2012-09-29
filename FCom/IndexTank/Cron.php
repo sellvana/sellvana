@@ -25,7 +25,10 @@ class FCom_IndexTank_Cron extends BClass
 
     protected function indexAllNotIndexed()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where_in("indextank_indexed", array(1,0));
+        $orm = FCom_Catalog_Model_Product::orm('p')->select('p.*')
+                ->where('disabled', 0)
+                ->where_in("indextank_indexed", array(1,0));
+        
         $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
         if (!$batchSize) {
             $batchSize = 500;
