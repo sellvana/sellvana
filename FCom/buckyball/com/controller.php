@@ -76,6 +76,16 @@ class BRequest extends BClass
     {
         return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
     }
+    
+    /**
+    * Origin host name from request headers
+    *
+    * @return string
+    */
+    public static function httpOrigin()
+    {
+        return !empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null;
+    }
 
     /**
     * Whether request is SSL
@@ -1054,6 +1064,36 @@ class BResponse extends BClass
     public function httpSTS()
     {
         header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        return $this;
+    }
+    
+    /**
+    * Enable CORS (Cross-Origin Resource Sharing)
+    * 
+    * @param array $options
+    * @return BResponse
+    */
+    public function cors($options=array())
+    {
+        if (empty($options['origin'])) {
+            $options['origin'] = BRequest::i()->httpOrigin();
+        }
+        header('Access-Control-Allow-Origin: '.$options['origin']);
+        if (!empty($options['methods'])) {
+            header('Access-Control-Allow-Methods: '.$options['methods']);
+        }
+        if (!empty($options['credentials'])) {
+            header('Access-Control-Allow-Credentials: true');
+        }
+        if (!empty($options['headers'])) {
+            header('Access-Control-Allow-Headers: '.$options['headers']);
+        }
+        if (!empty($options['expose-headers'])) {
+            header('Access-Control-Expose-Headers: '.$options['expose-headers']);
+        }
+        if (!empty($options['age'])) {
+            header('Access-Control-Max-Age: '.$options['age']);
+        }
         return $this;
     }
 
