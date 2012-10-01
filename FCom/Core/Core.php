@@ -143,8 +143,7 @@ class FCom_Core extends BClass
         }
 
         //migration
-        $implicitMigration = $config->get('db/implicit_migration');
-        if (null === $implicitMigration) {
+        if ($config->get('db') && null === $config->get('db/implicit_migration')) {
             $config->set('db/implicit_migration', 1);
         }
 
