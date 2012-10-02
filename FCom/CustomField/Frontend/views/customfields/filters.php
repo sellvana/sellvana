@@ -1,7 +1,7 @@
 <?php if (!empty($this->selected_filters)):?>
     <section class="block-sub">
             <header class="block-sub-title"><span class="title"><?= BLocale::_("Selected filters") ?></span></header>
-            <a href="<?=BRequest::rawPath()?>"><?= BLocale::_("Clear filters") ?></a> <br/>
+            <a href="<?=BRequest::baseUrl().BRequest::rawPath()?>"><?= BLocale::_("Clear filters") ?></a> <br/>
     <?php foreach($this->selected_filters as $label => $filterGroup):?>
         <b><?=$label?></b>
         <ul>
