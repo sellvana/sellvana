@@ -166,6 +166,7 @@ class FCom_Core extends BClass
         $config = BConfig::i();
         // Initialize debugging mode and levels
         BDebug::logDir($config->get('fs/log_dir'));
+
         BDebug::adminEmail($config->get('admin_email'));
 
         $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
@@ -292,6 +293,30 @@ class FCom_Core extends BClass
     {
         $c = BConfig::i()->get(null, true);
         unset($c['db']);
+        $c['modules']['FCom_Cron']['mode_by_ip'] = '127.0.0.1';
+        $c['modules']['FCom_Admin'] = array (
+            'module_run_level' => array (
+            ),
+            'mode_by_ip' => 'DEBUG',
+            'recovery_modules' => '',
+            'add_js' => '',
+            'add_css' => '',
+            'theme' => 'FCom_Admin_DefaultTheme',
+        );
+        $c['modules']['FCom_Frontend'] = array (
+            'module_run_level' => array (
+            ),
+            'mode_by_ip' => 'DEBUG',
+            'recovery_modules' => '',
+            'theme' => 'FCom_Frontend_DefaultTheme',
+            'add_js' => '',
+            'add_css' => '',
+            'nav_top' => array (
+                'root_cms' => '1',
+                'root_category' => '1',
+                'type' => 'categories_root',
+            ),
+        );
         BConfig::i()->writeFile('local.php', $c);
         return $this;
     }
