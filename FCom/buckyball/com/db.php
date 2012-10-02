@@ -489,6 +489,7 @@ class BDb
     * @param array $options
     *   - engine (default InnoDB)
     *   - charset (default utf8)
+    *   - collate (default utf8_general_ci)
     */
     public static function ddlTable($fullTableName, $fields, $options=null)
     {
@@ -501,8 +502,9 @@ class BDb
             }
             $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
             $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+            $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
             BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-                ENGINE={$engine} DEFAULT CHARSET={$charset}", array())->execute();
+                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
         }
         return true;
     }
@@ -1068,6 +1070,9 @@ exit;
      * database when save() is called.
      */
     public function set($key, $value) {
+        if (!is_scalar($key)) {
+            throw new BException('Key not scalar');
+        }
         if (!array_key_exists($key, $this->_data)
             || is_null($this->_data[$key]) && !is_null($value)
             || !is_null($this->_data[$key]) && is_null($value)
@@ -1518,7 +1523,7 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (!is_null($flag) || is_null($this->get($key))) {
+            if (is_scalar($key) && (!is_null($flag) || is_null($this->get($key)))) {
                 parent::set($key, $value);
             }
         }
@@ -1584,6 +1589,7 @@ class BModel extends Model
     *
     * @param int|string|array $id
     * @param string $field
+    * @param boolean $cache
     * @return BModel
     */
     public static function load($id, $field=null, $cache=false)
@@ -1593,7 +1599,13 @@ class BModel extends Model
             $field = static::_get_id_column_name($class);
         }
 
-        $keyValue = $id;
+        if (is_array($id)) {
+            ksort($id);
+            $field = join(',', array_keys($id));
+            $keyValue = join(',', array_values($id));
+        } else {
+            $keyValue = $id;
+        }
         if (!empty(static::$_cacheFlags[$field]['key_lower'])) {
             $keyValue = strtolower($keyValue);
         }
@@ -1612,6 +1624,7 @@ class BModel extends Model
             }
             $orm->where($field, $id);
         }
+        /** @var BModel $record */
         $record = $orm->find_one();
         if ($record) {
             $record->afterLoad();
@@ -1696,24 +1709,24 @@ class BModel extends Model
     {
         if (!$collection) return $this;
         $class = $this->_origClass();
-        $keys = array();
+        $keyValues = array();
         $keyLower = !empty(static::$_cacheFlags[$lk]['key_lower']);
         foreach ($collection as $r) {
             $key = null;
             if (is_object($r)) {
-                $key = $r->get($fk);
+                $keyValue = $r->get($fk);
             } elseif (is_array($r)) {
-                $key = isset($r[$fk]) ? $r[$fk] : null;
+                $keyValue = isset($r[$fk]) ? $r[$fk] : null;
             } elseif (is_scalar($r)) {
-                $key = $r;
+                $keyValue = $r;
             }
-            if (empty($key)) continue;
-            if ($keyLower) $key = strtolower($key);
-            if (!empty(static::$_cache[$class][$lk][$key])) continue;
-            $keys[$key] = 1;
+            if (empty($keyValue)) continue;
+            if ($keyLower) $keyValue = strtolower($keyValue);
+            if (!empty(static::$_cache[$class][$lk][$keyValue])) continue;
+            $keyValues[$keyValue] = 1;
         }
         $field = (strpos($lk, '.')===false ? '_main.' : '').$lk; //TODO: table alias flexibility
-        if ($keys) $this->cachePreload(array($field=>array_keys($keys)), $lk);
+        if ($keyValues) $this->cachePreload(array($field=>array_keys($keyValues)), $lk);
         return $this;
     }
 
@@ -1729,9 +1742,9 @@ class BModel extends Model
         $cache =& static::$_cache[$this->_origClass()];
         $lower = !empty(static::$_cacheFlags[$toKey]['key_lower']);
         foreach ($cache[$fromKey] as $r) {
-            $key = $r->get($toKey);
-            if ($lower) $key = strtolower($key);
-            $cache[$toKey][$key] = $r;
+            $keyValue = $r->get($toKey);
+            if ($lower) $keyValue = strtolower($keyValue);
+            $cache[$toKey][$keyValue] = $r;
         }
         return $this;
     }
@@ -1761,15 +1774,15 @@ class BModel extends Model
     * @param string $key
     * @return array|BModel
     */
-    public function cacheFetch($field='id', $key=null)
+    public function cacheFetch($field='id', $keyValue=null)
     {
         $class = $this->_origClass();
         if (empty(static::$_cache[$class])) return null;
         $cache = static::$_cache[$class];
         if (empty($cache[$field])) return null;
-        if (is_null($key)) return $cache[$field];
-        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $key = strtolower($key);
-        return !empty($cache[$field][$key]) ? $cache[$field][$key] : null;
+        if (is_null($keyValue)) return $cache[$field];
+        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $keyValue = strtolower($keyValue);
+        return !empty($cache[$field][$keyValue]) ? $cache[$field][$keyValue] : null;
     }
 
     /**
@@ -1796,9 +1809,17 @@ class BModel extends Model
             }
             return $this;
         }
-        $key = $this->get($field);
-        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $key = strtolower($key);
-        $cache[$field][$key] = $this;
+        if (strpos($field, ',')) {
+            $keyValueArr = array();
+            foreach (explode(',', $field) as $k) {
+                $keyValueArr[] = $this->get($k);
+            }
+            $keyValue = join(',', $keyValueArr);
+        } else {
+            $keyValue = $this->get($field);
+        }
+        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $keyValue = strtolower($keyValue);
+        $cache[$field][$keyValue] = $this;
         return $this;
     }
 
@@ -1919,9 +1940,9 @@ class BModel extends Model
 
         if (($cache =& static::$_cache[$this->_origClass()])) {
             foreach ($cache as $k=>$c) {
-                $key = $this->get($k);
-                if (!empty(static::$_cacheFlags[$k]['key_lower'])) $key = strtolower($key);
-                unset($cache[$k][$key]);
+                $keyValue = $this->get($k);
+                if (!empty(static::$_cacheFlags[$k]['key_lower'])) $keyValue = strtolower($keyValue);
+                unset($cache[$k][$keyValue]);
             }
         }
 
