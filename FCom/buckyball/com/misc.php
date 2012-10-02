@@ -39,6 +39,16 @@ class BUtil extends BClass
     * @var string
     */
     protected static $_hashSep = '$';
+    
+    /**
+    * Default character pool for random and sequence strings
+    * 
+    * Chars "c", "C" are ommited to avoid accidental obcene language
+    * Chars "0", "1", "I" are removed to avoid leading 0 and ambiguity in print
+    * 
+    * @var string
+    */
+    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -595,8 +605,11 @@ class BUtil extends BClass
     * @param int $strLen length of resulting string
     * @param string $chars allowed characters to be used
     */
-    public static function randomString($strLen=8, $chars='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ23456789')
+    public static function randomString($strLen=8, $chars=null)
     {
+        if (is_null($chars)) {
+            $chars = static::$_defaultCharPool;
+        }
         $charsLen = strlen($chars)-1;
         $str = '';
         for ($i=0; $i<$strLen; $i++) {
@@ -626,6 +639,29 @@ class BUtil extends BClass
         }
         return $pattern;
     }
+    
+    public static function nextStringValue($string='', $chars=null)
+    {
+        if (is_null($chars)) {
+            $chars = static::$_defaultCharPool; // avoid leading 0
+        }
+        $pos = strlen($string);
+        $lastChar = substr($chars, -1);
+        while (--$pos>=-1) {
+            if ($pos==-1) {
+                $string = $chars[0];
+                return $string;
+            } elseif ($string[$pos]===$lastChar) {
+                $string[$pos] = $chars[0];
+                continue;
+            } else {
+                $string[$pos] = $chars[strpos($chars, $string[$pos])+1];
+                return $string;
+            }
+        }
+        // should never get here
+        return $string;
+    }
 
     /**
     * Create or verify password hash using bcrypt
@@ -633,14 +669,15 @@ class BUtil extends BClass
     * @see http://bcrypt.sourceforge.net/
     * @param string $plain
     * @param string $hash
+    * @param string $prefix - 5 (SHA256) or 6 (SHA512)
     * @return boolean|string if $hash is null, return hash, otherwise return verification flag
     */
-    public static function bcrypt($plain, $hash=null)
+    public static function bcrypt($plain, $hash=null, $prefix=null)
     {
         $plain = substr($plain, 0, 55);
         if (is_null($hash)) {
-            $prefix = version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a';
-            $cost = '10';
+            $prefix = !empty($prefix) ? $prefix : (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a');
+            $cost = ($prefix=='5' || $prefix=='6') ? 'rounds=5000' : '10';
             // speed up a bit salt generation, instead of:
             // $salt = static::randomString(22);
             $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 22);
@@ -771,7 +808,7 @@ class BUtil extends BClass
     */
     public static function remoteHttp($method, $url, $data=array())
     {
-        $request = http_build_query($data);
+        $request = is_array($data) ? http_build_query($data) : $data;
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
@@ -1053,6 +1090,38 @@ class BUtil extends BClass
         }
         return $source;
     }
+    
+    public static function timeAgo($ptime, $now=null)
+    {
+        if (!is_numeric($ptime)) {
+            $ptime = strtotime($ptime);
+        }
+        if (!$now) {
+            $now = time();
+        } elseif (!is_numeric($now)) {
+            $now = strtotime($now);
+        }  
+        $etime = $now - $ptime;
+        if ($etime < 1) {
+            return 'less than 1 second';
+        }
+        $a = array( 
+            12 * 30 * 24 * 60 * 60  =>  'year',
+            30 * 24 * 60 * 60       =>  'month',
+            24 * 60 * 60            =>  'day',
+            60 * 60                 =>  'hour',
+            60                      =>  'minute',
+            1                       =>  'second'
+        );
+        
+        foreach ($a as $secs => $str) {
+            $d = $etime / $secs;
+            if ($d >= 1) {
+                $r = round($d);
+                return $r . ' ' . $str . ($r > 1 ? 's' : '');
+            }
+        }
+    }
 }
 
 /**
@@ -1136,47 +1205,60 @@ class BData extends BClass implements ArrayAccess
 /**
 * Basic user authentication and authorization class
 */
-class BUser extends BModel
+class BModelUser extends BModel
 {
     protected static $_sessionUser;
+    protected static $_sessionUserNamespace = 'user';
 
-    public function sessionUserId()
+    public static function sessionUserId()
     {
-        $userId = BSession::i()->data('user_id');
+        $userId = BSession::i()->data(static::$_sessionUserNamespace.'_id');
         return $userId ? $userId : false;
     }
 
-    public function sessionUser($reset=false)
+    public static function sessionUser($reset=false)
     {
         if (!static::isLoggedIn()) {
             return false;
         }
         $session = BSession::i();
         if ($reset || !static::$_sessionUser) {
-            static::$_sessionUser = $this->load($this->sessionUserId());
+            static::$_sessionUser = static::load(static::sessionUserId());
         }
         return static::$_sessionUser;
     }
 
-    public function isLoggedIn()
+    public static function isLoggedIn()
     {
-        return $this->sessionUserId() ? true : false;
+        return static::sessionUserId() ? true : false;
     }
 
-    public function password($password)
+    public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
         return $this;
     }
 
+    public function validatePassword($password)
+    {
+        return BUtil::validateSaltedHash($password, $this->password_hash);
+    }
+    
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        if ($this->password) {
+            $this->password_hash = BUtil::fullSaltedHash($this->password);
+        }
+        return true;
+    }
+
     static public function authenticate($username, $password)
     {
         /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where(array('OR'=>array(
-                'username'=>$username,
-                'email'=>$username)))
-            ->find_one();
+        $user = static::orm()->where(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
@@ -1187,7 +1269,10 @@ class BUser extends BModel
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('user', serialize($this));
+        BSession::i()->data(array(
+            static::$_sessionUserNamespace.'_id' => $this->id,
+            static::$_sessionUserNamespace => serialize($this->as_array()),
+        ));
         static::$_sessionUser = $this;
 
         if ($this->locale) {
@@ -1196,7 +1281,7 @@ class BUser extends BModel
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire('BUser::login.after', array('user'=>$user));
+        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$user));
         return $this;
     }
 
@@ -1210,12 +1295,50 @@ class BUser extends BModel
         return $this;
     }
 
-    public function logout()
+    public static function logout()
     {
-        BSession::i()->data('user_id', false);
+        BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
         static::$_sessionUser = null;
-        BPubSub::i()->fire('BUser::login.after');
+        BPubSub::i()->fire(__METHOD__.'.after');
+    }
+    
+    public function recoverPassword($emailView='email/user-password-recover')
+    {
+        $this->set(array('token'=>BUtil::randomString(20)))->save();
+        if (($view = BLayout::i()->view($emailView))) {
+            $view->set('user', $this)->email();
+        }
         return $this;
+    }
+
+    public function resetPassword($password, $emailView='email/user-password-reset')
+    {
+        $this->set(array('token'=>null))->setPassword($password)->save()->login();
+        if (($view = BLayout::i()->view($emailView))) {
+            $view->set('user', $this)->email();
+        }
+        return $this;
+    }
+
+    public static function signup($r)
+    {
+        $r = (array)$r;
+        if (empty($r['email'])
+            || empty($r['password']) || empty($r['password_confirm'])
+            || $r['password']!=$r['password_confirm']
+        ) {
+            throw new Exception('Incomplete or invalid form data.');
+        }
+
+        $r = BUtil::maskFields($r, 'email,password');
+        $user = static::create($r)->save();
+        if (($view = BLayout::i()->view('email/user-new-user'))) {
+            $view->set('user', $user)->email();
+        }
+        if (($view = BLayout::i()->view('email/admin-new-user'))) {
+            $view->set('user', $user)->email();
+        }
+        return $user;
     }
 }
 
