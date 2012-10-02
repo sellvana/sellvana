@@ -895,7 +895,25 @@ class BORM extends ORMWrapper
         }
         return $fragment;
     }
+    
+    protected function _add_result_column($expr, $alias=null) {
+        if (!is_null($alias)) {
+            $expr .= " AS " . $this->_quote_identifier($alias);
+        }
+        // ADDED TO AVOID DUPLICATE FIELDS
+        if (in_array($expr, $this->_result_columns)) {
+            return $this;
+        }
 
+        if ($this->_using_default_result_columns) {
+            $this->_result_columns = array($expr);
+            $this->_using_default_result_columns = false;
+        } else {
+            $this->_result_columns[] = $expr;
+        }
+        return $this;
+    }
+    
     /**
     * Return select sql statement built from the ORM object
     *
