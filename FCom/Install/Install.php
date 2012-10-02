@@ -35,6 +35,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index()
     {
+        $errors = BDebug::i()->getCollectedErrors();
+        BLayout::i()->view('index')->errors = $errors;
+        
         $this->messages('index', 'install');
         BLayout::i()->hookView('main', 'index');
     }
