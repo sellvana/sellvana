@@ -146,7 +146,7 @@
 		    </div>
 			<?php endif; ?>
            	<ul class="checkout-btns">
-				<li><button type="submit" name="place_order" class="button btn-sz2"><span><?= BLocale::_("Place your order") ?></span></button></li>
+				<li><button type="submit" name="place_order" value="new_order" class="button btn-sz2"><span><?= BLocale::_("Place your order") ?></span></button></li>
 			</ul>
 		</div>
 		<!-- .col-checkout-right ends -->
