@@ -190,9 +190,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             if (is_object($paymentMethods[$cart->payment_method])) {
                 $paymentMethods[$cart->payment_method]->processPayment();
             }
-
         }
-
 
         $href = BApp::href('checkout');
         BResponse::i()->redirect($href);
