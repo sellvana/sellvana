@@ -38,6 +38,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function paid()
     {
+        $this->set('purchased_dt', date("Y-m-d H:i:s"))->save();
         $this->set('status', 'paid')->save();
     }
 
