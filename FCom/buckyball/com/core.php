@@ -1766,6 +1766,11 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         //$this->setDirty();
         return $this;
     }
+    
+    public function destroy()
+    {
+        session_destroy();
+    }
 
     /**
     * Get session ID
