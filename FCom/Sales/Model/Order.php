@@ -41,6 +41,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->set('status', 'paid')->save();
     }
 
+    public function pending()
+    {
+        $this->set('status', 'pending')->save();
+    }
+
     /**
      * Return total UNIQUE number of items in the order
      * @param boolean $assoc
@@ -83,7 +88,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                         'product_id'    => $item->product_id,
                         'qty'    => $item->qty,
                         'total'    => $item->total,
-                        //get product info as object and prepare data for api 
+                        //get product info as object and prepare data for api
                         'product_info'    => FCom_Catalog_Model_Product::i()->prepareApiData(BUtil::fromJson($item->product_info, true)),
                     );
                 }

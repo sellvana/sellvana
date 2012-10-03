@@ -5,6 +5,9 @@ class FCom_Sales_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
+        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
     }
 
     public function install()
@@ -75,6 +78,31 @@ class FCom_Sales_Migrate extends BClass
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ");
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $tOrder = FCom_Sales_Model_Order::table();
+        BDb::run("
+            ALTER TABLE {$tOrder} ADD COLUMN created_dt datetime NULL,
+            ADD COLUMN purchased_dt datetime NULL;
+        ");
+    }
+
+    public function upgrade_0_1_3()
+    {
+        $tOrder = FCom_Sales_Model_Order::table();
+        BDb::run("
+            ALTER TABLE {$tOrder} ADD COLUMN gt_base decimal(10,2) NOT NULL;
+        ");
+    }
+
+    public function upgrade_0_1_4()
+    {
+        $tOrder = FCom_Sales_Model_Order::table();
+        BDb::run("
+            ALTER TABLE {$tOrder} MODIFY `status` enum('new', 'paid', 'pending') not null default 'new'
         ");
     }
 }

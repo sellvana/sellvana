@@ -2,7 +2,7 @@
     'modules' => array(
 
         'FCom_Sales' => array(
-            'version' => '0.1.1',
+            'version' => '0.1.4',
             'root_dir' => '',
             'migrate' => 'FCom_Sales_Migrate',
             'tests' => "FCom_Sales_Tests_AllTests",
@@ -17,10 +17,5 @@
             ),
             'description' => "Sales module",
         ),
-
-
-
-
-
     ),
 );
