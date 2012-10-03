@@ -614,6 +614,13 @@ class BModule extends BClass
     * @var array
     */
     static protected $_env = array();
+    
+    /**
+    * Default module run_level
+    * 
+    * @var string
+    */
+    static protected $_defaultRunLevel = 'ONDEMAND';
 
     /**
     * Manifest files cache
@@ -683,6 +690,16 @@ class BModule extends BClass
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
+    
+    /**
+    * Set default run_level which new modules should initialize with
+    * 
+    * @param string $runLevel
+    */
+    public static function defaultRunLevel($runLevel)
+    {
+        static::$_defaultRunLevel = $runLevel;
+    }
 
     /**
     * Assign arguments as module parameters
@@ -713,7 +730,7 @@ class BModule extends BClass
             //$this->root_dir = BUtil::normalizePath($this->root_dir);
             //echo $this->root_dir."\n";
         }
-        $this->run_level = static::ONDEMAND; // disallow declaring run_level in manifest
+        $this->run_level = static::$_defaultRunLevel; // disallow declaring run_level in manifest
         /*
         if (!isset($this->run_level)) {
             $runLevel = BConfig::i()->get('request/module_run_level/'.$this->name);
@@ -939,11 +956,13 @@ class BModule extends BClass
             BDebug::debug('MODULE.BOOTSTRAP '.$includeFile);
             require_once ($includeFile);
         }
-        $start = BDebug::debug(BLocale::_('Start bootstrap for %s', array($this->name)));
-        call_user_func($this->bootstrap['callback']);
-        #$mod->run_status = BModule::LOADED;
-        BDebug::profile($start);
-        BDebug::debug(BLocale::_('End bootstrap for %s', array($this->name)));
+        if (!empty($this->bootstrap['callback'])) {
+            $start = BDebug::debug(BLocale::_('Start bootstrap for %s', array($this->name)));
+            call_user_func($this->bootstrap['callback']);
+            #$mod->run_status = BModule::LOADED;
+            BDebug::profile($start);
+            BDebug::debug(BLocale::_('End bootstrap for %s', array($this->name)));
+        }
         $this->run_status = BModule::LOADED;
         return $this;
     }
