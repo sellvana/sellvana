@@ -145,7 +145,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['discount_code'] = $cart->discount_code;
             $orderData['tax'] = $cart->tax;
             $orderData['total_json'] = $cart->total_json;
-            $orderData['balance'] = $cart->calc_balance;
+            $orderData['balance'] = $cart->calc_balance; //grand total minus discount, which have to be paid
+            $orderData['gt_base'] = $cart->calc_balance; //full grand total
 
             //create sales order
             $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
@@ -260,7 +261,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
-        $salesOrder->paid();
 
         BLayout::i()->view('email/new-bill')->set('order', $salesOrder)->email();
         $this->view('breadcrumbs')->crumbs = array(

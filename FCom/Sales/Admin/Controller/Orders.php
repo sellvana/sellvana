@@ -13,15 +13,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $config = parent::gridConfig();
         $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
-            'id' => array('index'=>'o.id'),
-            'firstname' => array('label'=>'First Name', 'index'=>'c.firstname'),
-            'lastname' => array('label'=>'Last Name', 'index'=>'c.lastname'),
-            'email' => array('label'=>'Email', 'index'=>'c.email'),
-            'item_qty' => array('label'=>'Item quantity', 'index'=>'o.item_qty'),
-            'subtotal' => array('label'=>'Subtotal', 'index'=>'o.subtotal'),
-            'balance' => array('label'=>'Grand total', 'index'=>'o.balance'),
-            'shipping_method' => array('label'=>'Shipping Method', 'index'=>'o.shipping_method'),
-            'payment_method' => array('label'=>'Payment Method', 'index'=>'o.payment_method'),
+            'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70),
+            'purchased_dt' => array('index'=>'o.purchased_dt', 'label' => 'Purchased on'),
+            'billing_name' => array('label'=>'Bill to Name', 'index'=>'ab.billing_name'),
+            'shipping_name' => array('label'=>'Ship to Name', 'index'=>'as.shipping_name'),
+            'gt_base' => array('label'=>'GT (base)', 'index'=>'o.gt_base'),
+            'balance' => array('label'=>'GT (paid)', 'index'=>'o.balance'),
+            'discount' => array('label'=>'Discount', 'index'=>'o.discount_code'),
             'status' => array('label'=>'Status', 'index'=>'o.status'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('orders/form/?id=');
@@ -33,8 +31,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','o.user_id'), 'c')
-            ->select(array('c.firstname', 'c.lastname', 'c.email'))
+        $orm->left_outer_join('FCom_Sales_Model_Address', 'o.id = ab.order_id and ab.atype="billing"', 'ab') //array('o.id','=','a.order_id')
+            ->select_expr('CONCAT_WS(" ", ab.firstname,ab.lastname)','billing_name')
+        ;
+        $orm->left_outer_join('FCom_Sales_Model_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
+            ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
         ;
     }
 
