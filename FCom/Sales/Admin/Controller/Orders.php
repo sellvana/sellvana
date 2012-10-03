@@ -48,4 +48,37 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ),
         ));
     }
+
+    public function action_form()
+    {
+        $orderId = BRequest::i()->params('id', true);
+
+        $order = FCom_Sales_Model_Order::load($orderId);
+        $shipping = FCom_Sales_Model_Address::i()->findByOrder($orderId,'shipping');
+        $billing = FCom_Sales_Model_Address::i()->findByOrder($orderId,'billing');
+        if ($shipping) {
+            $order->shipping_address = FCom_Sales_Model_Address::i()->as_html($shipping);
+        }
+        if ($billing) {
+            $order->billing_address = FCom_Sales_Model_Address::i()->as_html($billing);
+        }
+
+        if ($order->user_id) {
+            $customer = FCom_Customer_Model_Customer::load($order->user_id);
+            $customer->guest = false;
+        } else {
+            $customer = new stdClass();
+            $customer->guest = true;
+        }
+        $order->items = $order->items();
+        $order->customer = $customer;
+
+        $model = $order;
+
+        $view = $this->view($this->_formViewName)->set('model', $model);
+        $this->formViewBefore(array('view'=>$view, 'model'=>$model));
+
+        $this->layout($this->_formLayoutName);
+        $this->processFormTabs($view, $model, 'edit');
+    }
 }

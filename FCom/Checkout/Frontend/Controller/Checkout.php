@@ -131,6 +131,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart->save();
 
         if (!empty($post['place_order'])) {
+            $shippingMethod = FCom_Checkout_Model_Cart::i()->getShippingMethod($cart->shipping_method);
+            $shippingServiceTitle = '';
+            if (is_object($shippingMethod)) {
+                $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
+            }
             //todo: create order
             //redirect to payment page
             $orderData = array();
@@ -140,6 +145,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['subtotal']  = $cart->subtotal;
             $orderData['shipping_method'] = $cart->shipping_method;
             $orderData['shipping_service'] = $cart->shipping_service;
+            $orderData['shipping_service_title'] = $shippingServiceTitle;
             $orderData['payment_method'] = $cart->payment_method;
             $orderData['payment_details'] = $cart->payment_details;
             $orderData['discount_code'] = $cart->discount_code;
@@ -147,6 +153,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['total_json'] = $cart->total_json;
             $orderData['balance'] = $cart->calc_balance; //grand total minus discount, which have to be paid
             $orderData['gt_base'] = $cart->calc_balance; //full grand total
+            $orderData['created_dt'] = date("Y-m-d H:i:s");
 
             //create sales order
             $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
