@@ -88,7 +88,7 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
-                        array('addNav', 'catalog/products/import', array('label'=>'Import Products',
+                        array('addNav', 'catalog/products_import', array('label'=>'Products Import',
                             'href'=>BApp::href('catalog/products/import/index'))),
                         array('addQuickSearch', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addShortcut', 'catalog/products', array('label'=>'New Product', 'href'=>$baseHref.'/products/form/')),
