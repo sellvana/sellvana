@@ -17,6 +17,8 @@ class FCom_Catalog_Admin extends BClass
             ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
             ->route('GET|POST /catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
 
+            ->route('GET|POST /catalog/products/import/.action', 'FCom_Catalog_Admin_Controller_ProductsImport')
+
         ;
 
         BLayout::i()
@@ -61,6 +63,7 @@ class FCom_Catalog_Admin extends BClass
         FCom_Admin_Controller_MediaLibrary::i()
             ->allowFolder('media/product/image')
             ->allowFolder('media/product/attachment')
+            ->allowFolder('storage/import/products')
         ;
 
         FCom_Admin_Model_Role::i()->createPermission(array(
@@ -69,6 +72,8 @@ class FCom_Catalog_Admin extends BClass
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
         ));
+
+
 
     }
 
@@ -83,8 +88,11 @@ class FCom_Catalog_Admin extends BClass
                         array('addNav', 'catalog/categories', array('label'=>'Categories', 'href'=>$baseHref.'/categories')),
                         array('addNav', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addNav', 'catalog/families', array('label'=>'Product Families', 'href'=>$baseHref.'/families')),
+                        array('addNav', 'catalog/products/import', array('label'=>'Import Products',
+                            'href'=>BApp::href('catalog/products/import/index'))),
                         array('addQuickSearch', 'catalog/products', array('label'=>'Products', 'href'=>$baseHref.'/products')),
                         array('addShortcut', 'catalog/products', array('label'=>'New Product', 'href'=>$baseHref.'/products/form/')),
+
                     )),
                 ),
                 'catalog_product_form_tabs'=>array(
@@ -113,6 +121,14 @@ class FCom_Catalog_Admin extends BClass
                     array('layout', 'form'),
                     array('layout', 'catalog_product_form_tabs'),
                 ),
+
+                '/catalog/products/import'=>array(
+                    array('layout', 'base'),
+                    array('layout', 'form'),
+                    array('hook', 'main', 'views'=>array('catalog/products/import')),
+                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/products/import'))),
+                ),
+
                 '/catalog/categories'=>array(
                     array('layout', 'base'),
                     array('layout', 'form'),
