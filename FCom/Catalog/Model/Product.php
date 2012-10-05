@@ -279,6 +279,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!isset($config['import']['custom_fields']['create_missing_options'])) {
             $config['import']['custom_fields']['create_missing_options'] = true;
         }
+        $result = array();
+        $result['status'] = '';
 
         //HANDLE IMPORT
         $errors = array();
@@ -306,15 +308,20 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
                 }
             }
+
             if (!$p && 'update' == $config['import']['actions']) {
                 continue;
             } elseif (!$p) {
                 try {
                     $p = $this->orm()->create($d)->save();
+                    $result['status'] = 'created';
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
+                    $result['status'] = 'error';
                     continue;
                 }
+            } else {
+                $result['status'] = 'updated';
             }
 
             $p->set($d);

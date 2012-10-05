@@ -139,8 +139,9 @@ class BImport extends BClass
                 $status['rows_skipped']++;
             }
         }
-
+$ci = 0;
         while (($r = fgetcsv($fp, 4096, $config['delim']))) {
+            echo $ci++."<br>";
             if (count($r) != count($config['columns']) ) {
                 continue;
             }
