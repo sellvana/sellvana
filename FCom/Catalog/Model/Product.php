@@ -485,7 +485,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
         }
         $this->_importErrors = $errors;
-        return count($this->_importErrors) == 0 ? true : false;
+        return $result;
     }
 }
 
