@@ -296,11 +296,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
 
             //HANDLE PRODUCT
+            $p = false;
             if ('create_or_update' == $config['import']['actions'] ||
                     'update' == $config['import']['actions']
                     ) {
                 if (isset($d['unique_id'])) {
                     $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
+                } else if (isset($d['product_name'])) {
+                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
                 }
             }
             if (!$p && 'update' == $config['import']['actions']) {
