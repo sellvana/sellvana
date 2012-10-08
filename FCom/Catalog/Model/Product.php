@@ -6,6 +6,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_product';
 
     private $_importErrors = null;
+    private $_dataImport = array();
 
     public static function stockStatusOptions($onlyAvailable=false)
     {
@@ -280,9 +281,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $config['import']['custom_fields']['create_missing_options'] = true;
         }
         $result = array();
-        $result['status'] = '';
+        //$result['status'] = '';
+
+
 
         //HANDLE IMPORT
+        static $cfIntersection = '';
+        $productIds = array();
         $errors = array();
         foreach($data as $d) {
             $categoriesPath = array();
@@ -314,76 +319,76 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             } elseif (!$p) {
                 try {
                     $p = $this->orm()->create($d)->save();
-                    $result['status'] = 'created';
+                    $result[]['status'] = 'created';
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
-                    $result['status'] = 'error';
+                    $result[]['status'] = 'error';
                     continue;
                 }
             } else {
-                $result['status'] = 'updated';
+                $result[]['status'] = 'updated';
             }
-
+            //$memstart = memory_get_usage();
+            //echo $memstart/1024 . "kb<br>";
             $p->set($d);
-            $p->save();
+            if ($p->is_dirty()) {
+                $p->save();
+            }
+            //echo memory_get_usage()/1024 . "kb<br>";
+            //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
 
-            //HANDLE CUSTOM FIELDS
+
+           //HANDLE CUSTOM FIELDS
             if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
-                $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
-                $cfKeys = array_keys($cfFields);
-                $dataKeys = array_keys($d);
-                $cfIntersection = array_intersect($cfKeys, $dataKeys);
+                if ('' === $cfIntersection) {
+                    $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
+                    $cfKeys = array_keys($cfFields);
+                    $dataKeys = array_keys($d);
+                    $cfIntersection = array_intersect($cfKeys, $dataKeys);
 
-                //get custom fields values from data
-                $customFields = array();
-                $fieldIds = array();
-                foreach($cfIntersection as $cfk) {
-                    $field = $cfFields[$cfk];
-                    $dataValue = $d[$cfk];
-                    if ($config['import']['custom_fields']['create_missing_options']) {
-                        //create missing custom field option
-                        $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id());
-                        if($options) {
-                            if (!isset($options[$dataValue])) {
-                                try {
-                                    FCom_CustomField_Model_FieldOption::orm()
-                                            ->create(array('field_id' => $field->id(), 'label'=>$dataValue))
-                                            ->save();
-                                } catch (Exception $e) {
-                                    $errors[] = $e->getMessage();
+                    if ($cfIntersection) {
+                        //get custom fields values from data
+                        foreach($cfIntersection as $cfk) {
+                            $field = $cfFields[$cfk];
+                            $dataValue = $d[$cfk];
+                            if ($config['import']['custom_fields']['create_missing_options']) {
+                                //create missing custom field option
+                                $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id());
+                                if($options) {
+                                    if (!isset($options[$dataValue])) {
+                                        try {
+                                            FCom_CustomField_Model_FieldOption::orm()
+                                                    ->create(array('field_id' => $field->id(), 'label'=>$dataValue))
+                                                    ->save();
+                                        } catch (Exception $e) {
+                                            $errors[] = $e->getMessage();
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    $customFields[$cfk] = $dataValue;
-                    $fieldIds[] = $field->id();
                 }
-
-                //get or create product custom field
-                $custom = FCom_CustomField_Model_ProductField::orm()->where("product_id", $p->id)->find_one();
-                if (!$custom) {
-                    $custom = FCom_CustomField_Model_ProductField::i()->create();
-                }
-                $customFields['_add_field_ids'] = implode(",",$fieldIds);
-                $customFields['product_id'] = $p->id();
-                $custom->set($customFields);
-                $custom->save();
             }
-
 
             //HANDLE CATEGORIES
             if (!empty($categoriesPath)) {
                 //check if parent category exist
-                $topParentCategory = FCom_Catalog_Model_Category::orm()->where_null("parent_id")->find_one();
+                static $topParentCategory = '';
+                static $categoriesList = array();
                 if (!$topParentCategory) {
-                    try {
-                        $topParentCategory = FCom_Catalog_Model_Category::orm()
-                                ->create(array('parent_id'=>null))
-                                ->save();
-                    } catch (Exception $e) {
-                        $errors[] = $e->getMessage();
+                    $topParentCategory = FCom_Catalog_Model_Category::orm()->where_null("parent_id")->find_one();
+                    if (!$topParentCategory) {
+                        try {
+                            $topParentCategory = FCom_Catalog_Model_Category::orm()
+                                    ->create(array('parent_id'=>null))
+                                    ->save();
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
+                        }
                     }
+                    $categoriesList = FCom_Catalog_Model_Category::i()->parentNodeList();
                 }
                 if ($topParentCategory) {
                     //check if categories exists
@@ -393,10 +398,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                         $parent = $topParentCategory;
                         $catNodes = explode($config['format']['nesting_separator'], $catpath);
                         foreach($catNodes as $catnode) {
-                            $category = FCom_Catalog_Model_Category::orm()
+                    /*        $category = FCom_Catalog_Model_Category::orm()
                                         ->where('parent_id', $parent->id())
                                         ->where("node_name", $catnode)
                                         ->find_one();
+                     *
+                     */
+                            $category = false;
+                            if (!empty($categoriesList[$parent->id()][$catnode])) {
+                                $category = $categoriesList[$parent->id()][$catnode];
+                            }
                             if ($config['import']['categories']['create'] && !$category) {
                                 try {
                                     $category = $parent->createChild($catnode);
@@ -411,7 +422,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             $categories[$catpath] = $category;
                         }
 
-                        if ($config['import']['categories']['menu']) {
+                        if ($config['import']['categories']['menu'] && $categories[$catpath]->inMenu() == false) {
                             $categories[$catpath]->setInMenu(true);
                         }
                     }
@@ -432,8 +443,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                                     $errors[] = $e->getMessage();
                                 }
                             }
+                            unset($catProduct);
                         }
                     }
+                    unset($categories);
+                    unset($category);
                 }
             }
 
@@ -483,7 +497,37 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     }
                 }
             }
+
+            $productIds[] = $p;
+            unset($fileId);
+            unset($att);
         }
+        //HANDLE CUSTOM FIELDS to product relations
+        if ($config['import']['custom_fields']['import'] && !empty($cfIntersection) && !empty($productIds)) {
+            //get custom fields values from data
+            $customFields = array();
+            $fieldIds = array();
+            foreach($cfIntersection as $cfk) {
+                $field = $cfFields[$cfk];
+                $customFields[$cfk] = $d[$cfk];
+                $fieldIds[] = $field->id();
+            }
+
+            //get or create product custom field
+            $customs = FCom_CustomField_Model_ProductField::orm()->where_in("product_id", $productIds)->find_one();
+            foreach($customs as $custom) {
+                if (!$custom) {
+                    $custom = FCom_CustomField_Model_ProductField::i()->create();
+                }
+                $customFields['_add_field_ids'] = implode(",",$fieldIds);
+                $customFields['product_id'] = $p->id();
+                $custom->set($customFields);
+                $custom->save();
+                unset($custom);
+            }
+            unset($customFields);
+        }
+        unset($data);
         $this->_importErrors = $errors;
         return $result;
     }
