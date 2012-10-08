@@ -60,4 +60,23 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         return $result;
     }
+
+    public function parentNodeList()
+    {
+        $categories = self::orm()->find_many();
+        $result = array();
+        if (empty($categories)) {
+            return $result;
+        }
+
+        foreach($categories as $cat) {
+            $result[$cat->parent_id][$cat->node_name] = $cat;
+        }
+        return $result;
+    }
+
+    public function inMenu()
+    {
+        return $this->top_menu;
+    }
 }

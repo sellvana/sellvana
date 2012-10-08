@@ -139,7 +139,8 @@ class BImport extends BClass
                 $status['rows_skipped']++;
             }
         }
-
+        $statusUpdate = 50;
+        $dataBatch = array();
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
             if (count($r) != count($config['columns']) ) {
                 continue;
@@ -160,13 +161,30 @@ class BImport extends BClass
                 $data[$f[0]][$f[1]] = $v;
             }
 
-            $result = $model->import($data);
-            //$result = array('status'=>'skipped');
-            if (isset($status['rows_'.$result['status']])) {
-                $status['rows_'.$result['status']]++;
+
+            if ($config['batch_size'] && !empty($data)) {
+                $dataBatch[] = array_pop($data);
+                if (count($dataBatch) % $config['batch_size'] === 0) {
+                    $resultBatch = $model->import($dataBatch);
+                    foreach($resultBatch as $result) {
+                        if (isset($status['rows_'.$result['status']])) {
+                            $status['rows_'.$result['status']]++;
+                        }
+                    }
+                    $dataBatch = array();
+                }
+                $statusUpdate = $config['batch_size'];
+            } else {
+                $result = $model->import($data);
+                if (isset($status['rows_'.$result['status']])) {
+                    $status['rows_'.$result['status']]++;
+                }
             }
 
-            if (++$status['rows_processed'] % 50 === 0) {
+            //$result = array('status'=>'skipped');
+
+
+            if (++$status['rows_processed'] % $statusUpdate === 0) {
                 //gc_collect_cycles();
                 $update = $this->config();
                 if (!$update || $update['status']!=='running' || $update['start_time']!==$status['start_time']) {
@@ -178,6 +196,20 @@ class BImport extends BClass
             }
         }
         fclose($fp);
+
+        //upload last data
+        if ($config['batch_size'] && !empty($dataBatch)) {
+            $resultBatch = $model->import($dataBatch);
+
+            foreach($resultBatch as $result) {
+                if (isset($status['rows_'.$result['status']])) {
+                    $status['rows_'.$result['status']]++;
+                }
+            }
+            $status['memory_usage'] = memory_get_usage();
+            $status['run_time'] = microtime(true)-$timer;
+            $this->config($status, true);
+        }
 
         $status['memory_usage'] = memory_get_usage();
         $status['run_time'] = microtime(true)-$timer;
