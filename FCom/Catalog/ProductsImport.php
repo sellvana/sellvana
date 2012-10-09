@@ -27,9 +27,9 @@ class FCom_Catalog_ProductsImport extends BImport
         $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
         $cfKeys = array_keys($cfFields);
         $dataKeys = $info['first_row'];
-        $cfIntersection = array_intersect($cfKeys, $dataKeys);
-        if ($cfIntersection) {
-            foreach ($cfIntersection as $f) {
+        //$cfIntersection = array_intersect($cfKeys, $dataKeys);
+        if ($dataKeys) {
+            foreach ($dataKeys as $f) {
                 if (!isset($this->fields['product.'.$f])) {
                     $this->fields['product.'.$f] = array('pattern' => $f);
                 }
