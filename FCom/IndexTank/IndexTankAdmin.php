@@ -135,11 +135,7 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductAfterSave($args)
     {
         $product = $args['model'];
-        if ($product->disabled == 1) {
-            FCom_IndexTank_Index_Product::i()->deleteProducts($product);
-        } else {
-            FCom_IndexTank_Index_Product::i()->add($product);
-        }
+        FCom_IndexTank_Cron::i()->setProductsStatus(0, $product);
     }
 
     /**
@@ -150,7 +146,7 @@ class FCom_IndexTank_Admin extends BClass
     static public function onProductBeforeDelete($args)
     {
         $product = $args['model'];
-        FCom_IndexTank_Index_Product::i()->deleteProducts($product);
+        FCom_IndexTank_Cron::i()->setProductsStatus(0, $product);
     }
 
 
@@ -175,16 +171,7 @@ class FCom_IndexTank_Admin extends BClass
             if (!$products) {
                 continue;
             }
-            $productIds = array();
-            foreach ($products as $product) {
-                $productIds[] = $product->id();
-            }
-            if (!$productIds) {
-                continue;
-            }
-            FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 0),
-                    "id in (".implode(",", $productIds).")");
+            FCom_IndexTank_Cron::i()->setProductsStatus(0, $products);
         }
     }
     static public function onCategoryMoveBefore($args)
@@ -204,18 +191,11 @@ class FCom_IndexTank_Admin extends BClass
             if (!$products) {
                 continue;
             }
-            $productIds = array();
             foreach ($products as $product) {
                 //delete source categories for products
                 FCom_IndexTank_Index_Product::i()->deleteCategories($product, $category);
-                $productIds[] = $product->id();
             }
-            if (!$productIds) {
-                continue;
-            }
-            FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 0),
-                    "id in (".implode(",", $productIds).")");
+            FCom_IndexTank_Cron::i()->setProductsStatus(0, $products);
         }
     }
 
@@ -239,16 +219,7 @@ class FCom_IndexTank_Admin extends BClass
         if (!$products) {
             return;
         }
-        $productIds = array();
-        foreach ($products as $product) {
-            $productIds[] = $product->id();
-        }
-        if (!$productIds) {
-            return;
-        }
-        FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 0),
-                    "id in (".implode(",", $productIds).")");
+        FCom_IndexTank_Cron::i()->setProductsStatus(0, $products);
     }
 
     static public function onCategoryProductBeforeDelete($args)
@@ -294,9 +265,7 @@ class FCom_IndexTank_Admin extends BClass
         if (!$products) {
             return;
         }
-        foreach ($products as $product) {
-            FCom_IndexTank_Index_Product::i()->updateCategories($product);
-        }
+        FCom_IndexTank_Cron::i()->setProductsStatus(0, $products);
     }
 
     /**
