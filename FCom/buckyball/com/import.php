@@ -26,6 +26,11 @@ class BImport extends BClass
         return FCom_Core::i()->dir('storage/import/'.$this->dir);
     }
 
+    public function updateFieldsDueToInfo($info)
+    {
+        //use in child classes
+    }
+
     public function getFileInfo($file)
     {
         // assume we know nothing about the file
@@ -49,6 +54,7 @@ class BImport extends BClass
         // save first row data
         $info['first_row'] = $row;
         // find likely column names
+        $this->updateFieldsDueToInfo($info);
         $fields = $this->getFieldData();
         foreach ($row as $i=>$v) {
             foreach ($fields as $f=>$fd) {
@@ -139,7 +145,12 @@ class BImport extends BClass
                 $status['rows_skipped']++;
             }
         }
+
         $statusUpdate = 50;
+        if ($config['batch_size']) {
+            $statusUpdate = $config['batch_size'];
+        }
+
         $dataBatch = array();
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
             if (count($r) != count($config['columns']) ) {
@@ -173,7 +184,6 @@ class BImport extends BClass
                     }
                     $dataBatch = array();
                 }
-                $statusUpdate = $config['batch_size'];
             } else {
                 $result = $model->import($data);
                 if (isset($status['rows_'.$result['status']])) {
