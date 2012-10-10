@@ -365,6 +365,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             if ($p->is_dirty()) {
                 $p->save();
             }
+            
             //echo memory_get_usage()/1024 . "kb<br>";
             //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
 

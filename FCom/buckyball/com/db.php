@@ -895,7 +895,7 @@ class BORM extends ORMWrapper
         }
         return $fragment;
     }
-    
+
     protected function _add_result_column($expr, $alias=null) {
         if (!is_null($alias)) {
             $expr .= " AS " . $this->_quote_identifier($alias);
@@ -913,7 +913,7 @@ class BORM extends ORMWrapper
         }
         return $this;
     }
-    
+
     /**
     * Return select sql statement built from the ORM object
     *
