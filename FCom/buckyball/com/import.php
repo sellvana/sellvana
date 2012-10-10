@@ -109,6 +109,10 @@ class BImport extends BClass
         //gc_enable();
         BDb::connect();
 
+        //disable debug
+        $oldDebugMode = BDebug::i()->mode();
+        BDebug::i()->mode('DISABLED');
+
         $timer = microtime(true);
 
         if (empty($this->model)) {
@@ -227,6 +231,7 @@ class BImport extends BClass
         $status['rows_processed'] = $status['rows_total'];
         $this->config($status, true);
 
+        BDebug::i()->mode($oldDebugMode);
         return true;
     }
 }
