@@ -65,6 +65,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     }
 
+    public function addresses()
+    {
+        return FCom_Sales_Model_Address::i()->orm('a')->where('order_id', $this->id)->find_many();
+    }
+
     public function prepareApiData($orders, $includeItems=false)
     {
         $result = array();
