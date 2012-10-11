@@ -9,6 +9,10 @@ class FCom_Sales_Migrate extends BClass
         BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
         BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
+        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
+        BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
+        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
     }
 
     public function install()
@@ -112,6 +116,45 @@ class FCom_Sales_Migrate extends BClass
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
             ALTER TABLE {$tOrder} ADD `shipping_service_title` varchar(100) not null default ''
+        ");
+    }
+
+    public function upgrade_0_1_6()
+    {
+        $tStatus = FCom_Sales_Model_OrderStatus::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tStatus} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `name` varchar(50) NOT NULL DEFAULT '' ,
+            `code` varchar(50) NOT NULL DEFAULT '',
+            PRIMARY KEY (`id`)
+            )
+        ");
+    }
+
+    public function upgrade_0_1_7()
+    {
+        $tStatus = FCom_Sales_Model_OrderStatus::table();
+        BDb::run("
+            insert into {$tStatus}(id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
+        ");
+    }
+
+    public function upgrade_0_1_8()
+    {
+        $tOrder = FCom_Sales_Model_Order::table();
+        BDb::run("
+            ALTER TABLE {$tOrder} ADD `status_id` int(11) not null default 0
+        ");
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $tOrder = FCom_Sales_Model_Order::table();
+        BDb::run("
+            UPDATE  {$tOrder} SET `status_id` = 1 where status = 'new';
+            UPDATE  {$tOrder} SET `status_id` = 2 where status = 'pending';
+            UPDATE  {$tOrder} SET `status_id` = 3 where status = 'paid';
         ");
     }
 }

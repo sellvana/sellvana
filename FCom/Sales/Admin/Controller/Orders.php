@@ -22,7 +22,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'gt_base' => array('label'=>'GT (base)', 'index'=>'o.gt_base'),
             'balance' => array('label'=>'GT (paid)', 'index'=>'o.balance'),
             'discount' => array('label'=>'Discount', 'index'=>'o.discount_code'),
-            'status' => array('label'=>'Status', 'index'=>'o.status'),
+            'os_name' => array('label'=>'Status', 'index'=>'os.name'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('orders/form/?id=');
 
@@ -40,6 +40,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $orm->left_outer_join('FCom_Sales_Model_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
             ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address')
+        ;
+        $orm->left_outer_join('FCom_Sales_Model_OrderStatus', 'o.status_id = os.id', 'os')
+            ->select(array('os_name' => 'os.name'))
         ;
     }
 
