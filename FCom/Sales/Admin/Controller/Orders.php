@@ -64,10 +64,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         if ($shipping) {
             $order->shipping_name = $shipping->firstname.' '.$shipping->lastname;
             $order->shipping_address = FCom_Sales_Model_Address::i()->as_html($shipping);
+            $order->shipping = $shipping;
         }
         if ($billing) {
             $order->billing_name = $billing->firstname.' '.$billing->lastname;
             $order->billing_address = FCom_Sales_Model_Address::i()->as_html($billing);
+            $order->billing = $billing;
         }
 
         if ($order->user_id) {
@@ -113,5 +115,47 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'actions' => $actions,
         ));
         BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
+    }
+
+    public function formPostAfter($args)
+    {
+        parent::formPostAfter($args);
+        if ($args['do']!=='DELETE') {
+            $order = $args['model'];
+            $addrPost = BRequest::i()->post('address');
+            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
+                $oldModels = FCom_Sales_Model_Address::i()->orm('a')->where('order_id', $order->id)->find_many_assoc();
+                foreach ($newData as $data) {
+                    if (empty($data['id'])) {
+                        continue;
+                    }
+                    if (!empty($oldModels[$data['id']])) {
+                        $addr = $oldModels[$data['id']];
+                        $addr->set($data)->save();
+                    } elseif ($data['id']<0) {
+                        unset($data['id']);
+                        $addr = FCom_Sales_Model_Address::i()->newAddress($order->id(), $data);
+                    }
+                }
+            }
+            if (($del = BUtil::fromJson($addrPost['del_json']))) {
+                FCom_Sales_Model_Address::i()->delete_many(array('id'=>$del, 'order_id'=>$order->id));
+            }
+
+            $modelPost = BRequest::i()->post('model');
+            $items = $modelPost['items'];
+            if ($items) {
+                $oldItems = FCom_Sales_Model_OrderItem::i()->orm('i')->where('order_id', $order->id)->find_many_assoc();
+                foreach ($items as $id => $itemData) {
+                    if (empty($id)) {
+                        continue;
+                    }
+                    if (!empty($oldItems[$id])) {
+                        $item = $oldItems[$id];
+                        $item->set($itemData)->save();
+                    }
+                }
+            }
+        }
     }
 }

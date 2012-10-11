@@ -1,10 +1,46 @@
 <?php $m = $this->model; ?>
 <?php if('edit' == $m->act):
-
+    $countries = FCom_Geo_Model_Country::i()->options();
     /**
      * Edit
      * **/?>
+
+<script>
+    //var custModule = angular.module('custModule', []);
+
+    function CustomerAddressesCtrl($scope) {
+        $scope.addresses = <?=BUtil::toJson(BDb::many_as_array($m->addresses()))?>;
+        $scope.countries = <?=BUtil::toJson(FCom_Geo_Model_Country::options())?>;
+        $scope.regions = <?=BUtil::toJson(FCom_Geo_Model_Region::allOptions())?>;
+
+        $scope.del_ids = [];
+        $scope.newId = 0;
+
+        $scope.addAddress = function() {
+            $scope.addresses.push({edit_mode:true, id:--$scope.newId});
+        }
+
+        $scope.delAddress = function(addr) {
+            for (var i = 0, ii = $scope.addresses.length; i<ii; i++) {
+                if (addr === $scope.addresses[i]) {
+                    $scope.addresses.splice(i, 1);
+                }
+            }
+            if (addr.id>0) {
+                $scope.del_ids.push(addr.id);
+            }
+        }
+    }
+
+    function CustomerAddressCtrl($scope) {
+
+    }
+</script>
+<div ng-app ng-controller="CustomerAddressesCtrl">
+    <header class="adm-main-header">Order Info</header>
+    <div class="col-customer-info">
     <fieldset class="adm-section-group">
+        <h3 class="form-group-title">Order Information</h3>
         <ul class="form-list">
             <li>
                 <h4 class="label">Order: <?=$m->id?> </h4>
@@ -41,42 +77,14 @@
         </ul>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <ul class="form-list">
-            <li>
-                <h4 class="label">Billing info </h4>
-            </li>
-            <li>
-                <?=$m->billing_name?>
-            </li>
-            <li>
-                <?=$m->billing_address?>
-            </li>
-        </ul>
-    </fieldset>
-
-
-    <fieldset class="adm-section-group">
-        <ul class="form-list">
-            <li>
-                <h4 class="label">Shipping info </h4>
-            </li>
-            <li>
-                <?=$m->shipping_name?>
-            </li>
-            <li>
-                <?=$m->shipping_address?>
-            </li>
-        </ul>
-    </fieldset>
-
-    <fieldset class="adm-section-group">
+        <fieldset class="adm-section-group">
         <ul class="form-list">
             <li>
                 <h4 class="label">Payment info </h4>
             </li>
             <li>
-                Payment method: <?=$m->payment_method?>
+                Payment method: <br/>
+                <input type="text" name="model[payment_method]" value="<?=$m->payment_method?>">
             </li>
             <?php if(BUtil::fromJson($m->payment_details)):?>
                 <?php foreach(BUtil::fromJson($m->payment_details) as $paymentKey => $paymentValue):?>
@@ -93,10 +101,13 @@
                 <h4 class="label">Shipping &amp; Handling information </h4>
             </li>
             <li>
-                Shipping method: <?=$m->shipping_method?>
+                Shipping method: <br/>
+                <input type="text" name="model[shipping_method]" value="<?=$m->shipping_method?>">
             </li>
             <li>
                 Shipping service: <?=$m->shipping_service_title?>
+
+                <input type="text" name="model[shipping_service_title]" value="<?=$m->shipping_service_title?>">
             </li>
         </ul>
     </fieldset>
@@ -113,13 +124,73 @@
                     <li>Product: <?=$product['product_name']?></li>
                     <li>SKU: <?=$product['manuf_sku']?></li>
                     <li>Price: <?=$product['base_price']?></li>
-                    <li>Qty: <?=$item->qty?></li>
-                    <li>Total: <?=$item->total?></li>
+                    <li>Qty:
+                        <input type="text" name="model[items][<?=$item->id?>][qty]" value="<?=$item->qty?>" onkeyup="$('#total_<?=$item->id?>').val(<?=$product['base_price']?>*this.value)">
+                    </li>
+                    <li>Total:
+                            <input type="text" name="model[items][<?=$item->id?>][total]" value="<?=$item->total?>" id="total_<?=$item->id?>">
+                    </li>
                     <li>---------------------------</li>
                 <?php endforeach; ?>
             <?php endif; ?>
         </ul>
     </fieldset>
+</div>
+
+<div class="col-customer-address" ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none">
+        <h3 class="form-group-title">Addresses</h3>
+        <div ng-repeat="a in addresses">
+            <h4>{{a.atype }} address</h4>
+            <label><input type="checkbox" ng-model="a.edit_mode"/> Edit</label>
+
+            <div class="adr">
+                <div class="street-address">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street1"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street1" placeholder="Street 1"></span>
+                </div>
+                <div class="extended-address" ng-show="a.street2 || a.edit_mode">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street2" placeholder="Street 2"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street2"></span>
+                </div>
+                <div class="extended-address" ng-show="a.street3 || a.edit_mode">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street3" placeholder="Street 3"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street3"></span>
+                </div>
+                <span class="locality">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.city" placeholder="City"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.city"></span>
+                </span>,
+                <span class="region">
+                    <select ng-show="a.edit_mode && regions[a.country]" ng-options="name for (key,name) in regions[a.country]" ng-model="a.state"><option></option></select>
+                    <input ng-show="a.edit_mode && !regions[a.country]" type="text" ng-model="a.state" placeholder="Region/State"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.state"></span>
+                </span>
+                <span class="postal-code">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.zip" size="6" placeholder="Zip"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.zip"></span>
+                </span>
+                <div class="country-name">
+                    <select ng-show="a.edit_mode" ng-options="key as name for (key,name) in countries" ng-model="a.country"><option></option></select>
+                    <span ng-hide="a.edit_mode" ng-bind="countries[a.country]"></span>
+                </div>
+                <div class="phone">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.phone" placeholder="Phone"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.phone"></span>
+                </div>
+                <div class="fax">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.fax" placeholder="Fax"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.fax"></span>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="address[data_json]" value="{{addresses}}"/>
+        <input type="hidden" name="address[del_json]" value="{{del_ids}}"/>
+    </div>
+
+
+
+
+</div>
 
 <?php else:
     /**
