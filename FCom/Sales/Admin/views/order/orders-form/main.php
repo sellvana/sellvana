@@ -130,6 +130,9 @@
                     <li>Total:
                             <input type="text" name="model[items][<?=$item->id?>][total]" value="<?=$item->total?>" id="total_<?=$item->id?>">
                     </li>
+                    <li>Delete:
+                            <input type="checkbox" name="model[items][<?=$item->id?>][delete]" value="1" >
+                    </li>
                     <li>---------------------------</li>
                 <?php endforeach; ?>
             <?php endif; ?>
