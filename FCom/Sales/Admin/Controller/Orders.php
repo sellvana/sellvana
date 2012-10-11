@@ -150,7 +150,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                     if (empty($id)) {
                         continue;
                     }
-                    if (!empty($oldItems[$id])) {
+
+                    if (!empty($itemData['delete'])) {
+                        $item = $oldItems[$id];
+                        $item->delete();
+                    } else if (!empty($oldItems[$id])) {
                         $item = $oldItems[$id];
                         $item->set($itemData)->save();
                     }
