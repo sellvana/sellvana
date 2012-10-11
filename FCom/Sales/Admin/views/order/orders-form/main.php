@@ -51,10 +51,12 @@
             </li>
             <li>
                 <h4 class="label">Order Status</h4>
-                <select name="model[status]">
-                    <option value="new" <?='new'==$m->status?'selected':''?>>New</option>
-                    <option value="paid"<?='paid'==$m->status?'selected':''?>>Paid</option>
-                    <option value="pending"<?='pending'==$m->status?'selected':''?>>Pending</option>
+                <select name="model[status_id]">
+                    <?php
+                    $status = $m->status() ? $m->status()->code : $m->status;
+                    foreach(FCom_Sales_Model_OrderStatus::i()->statusList() as $stobj):?>
+                        <option value="<?=$stobj->id?>" <?=$stobj->code==$status?'selected':''?>><?=$stobj->name?></option>
+                    <?php endforeach; ?>
                 </select>
             </li>
         </ul>
@@ -210,7 +212,7 @@
                 <h4 class="label">Order Date: <?=$m->purchased_dt?> </h4>
             </li>
             <li>
-                <h4 class="label">Order Status: <?=$m->status?> </h4>
+                <h4 class="label">Order Status: <?=$m->status() ? $m->status()->name : $m->status?> </h4>
             </li>
         </ul>
     </fieldset>

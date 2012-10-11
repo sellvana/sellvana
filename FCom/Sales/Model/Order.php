@@ -25,7 +25,9 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function add($data)
     {
-        $data['status'] = 'new';
+        $status = FCom_Sales_Model_OrderStatus::i()->statusNew();
+        $data['status'] = $status->name;
+        $data['status_id'] = $status->id;
         BPubSub::i()->fire(__CLASS__.'.add', array('order'=>$data));
         return $this->create($data)->save();
     }
@@ -38,14 +40,28 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function paid()
     {
-        $this->set('purchased_dt', date("Y-m-d H:i:s"))->save();
-        $this->set('status', 'paid')->save();
+        $status = FCom_Sales_Model_OrderStatus::i()->statusPaid();
+        $data = array();
+        $data['status'] = $status->name;
+        $data['status_id'] = $status->id;
+        $data['purchased_dt'] = date("Y-m-d H:i:s");
+        $this->set($data)->save();
     }
 
     public function pending()
     {
-        $this->set('status', 'pending')->save();
+        $status = FCom_Sales_Model_OrderStatus::i()->statusPending();
+        $data = array();
+        $data['status'] = $status->name;
+        $data['status_id'] = $status->id;
+        $this->set($data)->save();
     }
+
+    public function status()
+    {
+        return FCom_Sales_Model_OrderStatus::i()->orm()->where('id', $this->status_id)->find_one();
+    }
+    
 
     /**
      * Return total UNIQUE number of items in the order
