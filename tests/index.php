@@ -20,4 +20,5 @@ BConfig::i()->add(array(
 //BApp::set('area', 'FCom_Frontend', true);
 BModuleRegistry::i()->bootstrap();
 
+BMigrate::migrateModules();
 //FCom_Test_AllTests::suite();
