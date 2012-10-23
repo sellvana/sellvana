@@ -147,7 +147,11 @@ class FCom_Checkout_Migrate extends BClass
     {
         $tCart = FCom_Checkout_Model_Cart::table();
         $tCartItem = FCom_Checkout_Model_CartItem::table();
-        if (BDb::ddlFieldInfo($tCartItem, "rowtotal")){
+        if (BDb::ddlFieldInfo($tCartItem, "rowtotal") || BDb::ddlFieldInfo($tCartItem, "create_dt"
+                || BDb::ddlFieldInfo($tCartItem, "update_dt"))) {
+            return;
+        }
+        if (BDb::ddlFieldInfo($tCart, "create_dt") || BDb::ddlFieldInfo($tCart, "update_dt")) {
             return;
         }
         BDb::run("
