@@ -4,7 +4,7 @@
 
 require_once dirname(__DIR__).'/FCom/Core/Core.php';
 
-//BDebug::mode(BDebug::MODE_STAGING, false);
+//BDebug::mode(BDebug::MODE_DEBUG, false);
 
 
 BConfig::i()->set('fs/root_dir', dirname(__DIR__));

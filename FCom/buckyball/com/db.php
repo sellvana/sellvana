@@ -404,6 +404,12 @@ class BDb
                 static::$_tables[$dbName][$t->$field] = array();
             }
         }
+        if (!isset(static::$_tables[$dbName][$tableName])) {
+            $tableExist = BORM::i()->raw_query("SHOW TABLES LIKE :table", array('table' => $tableName))->find_one();
+            if ($tableExist) {
+                static::$_tables[$dbName][$tableName] = array();
+            }
+        }
         return isset(static::$_tables[$dbName][$tableName]);
     }
 
