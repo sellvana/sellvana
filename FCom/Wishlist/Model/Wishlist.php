@@ -28,7 +28,16 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function items($refresh=false)
     {
-        $this->items = FCom_Wishlist_Model_WishlistItem::i()->orm()->where('wishlist_id', $this->id)->find_many_assoc();
+        if (!$this->items || $refresh) {
+            $items = FCom_Wishlist_Model_WishlistItem::i()->orm()->where('wishlist_id', $this->id)->find_many_assoc();
+            foreach($items as $ik => $item) {
+                if (!$item->product()) {
+                    $this->removeItem($item);
+                    unset($items[$ik]);
+                }
+            }
+            $this->items = $items;
+        }
         return $this->items;
     }
 
