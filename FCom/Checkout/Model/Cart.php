@@ -360,7 +360,7 @@ throw new Exception("Invalid cart_id: ".$cId);
         $this->subtotal = 0;
         foreach ($this->items() as $item) {
             if (!$item->product()) {
-                continue;
+                $this->removeProduct($item->product_id);
             }
             $this->item_num++;
             $this->item_qty += $item->qty;
