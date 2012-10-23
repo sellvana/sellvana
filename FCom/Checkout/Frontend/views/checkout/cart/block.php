@@ -15,14 +15,14 @@ $items = $cart->recentItems();
             <span class="title"><?=$this->_('Recently Added')?></span>
         </header>
         <ol>
-<?php foreach ($items as $item):  ?>
+<?php foreach ($items as $item): $p = $item->product() ?>
             <li>
-                <a href="<?=$item->url?>">
-                    <img src="<?=$item->thumb_url?>" width="50" height="50" alt="" class="product-image"/>
-                    <span class="product-name"><?=$this->q($item->product_name)?>Product Name</span>
-                    <span class="info"><?=$this->_('Qty')?> <?=$item->qty?></span>
+                <a href="<?=$p->url()?>">
+                    <img src="<?=$p->thumb_url?>" width="50" height="50" alt="" class="product-image"/>
+                    <span class="product-name"><?=$this->q($p->product_name)?></span>
+                    <span class="info"><?=$this->_('Qty')?> <?=number_format($item->qty,0)?></span>
                     <div class="price-box">
-                        <span class="price-range">$<?=number_format($item->qty*$item->price,2)?></span>
+                        <span class="price-range">$<?=number_format($item->price,2)?></span>
                     </div>
                 </a>
             </li>
