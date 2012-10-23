@@ -44,8 +44,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         parent::afterSave();
 
-        BSession::i()->data('customer_user', serialize($this));
-        static::$_sessionUser = $this;
+        if (self::sessionUser()) {
+            BSession::i()->data('customer_user', serialize($this));
+            static::$_sessionUser = $this;
+        }
     }
 
     public function prepareApiData($customers)

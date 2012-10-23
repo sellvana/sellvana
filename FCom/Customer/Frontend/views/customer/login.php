@@ -17,7 +17,7 @@
 				</p>
 				<div class="buttons-set">
 					<button class="button" type="submit"><span>Login</span></button>
-					<a href="#">Forgot your password?</a>
+					<a href="<?php echo BApp::href('customer/password/recover')?>">Forgot your password?</a></a>
 				</div>
 				<div class="divider"></div>
 				<p>No Account? <strong><a href="<?php echo BApp::href('customer/register')?>"><?= BLocale::_("Sign up now") ?> &raquo;</strong></a></p>
