@@ -80,7 +80,7 @@
 			            </tr>
 			        </thead>
 			        <tbody>
-			<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
+			<?php foreach ($this->cart->items() as $item): $p = $item->product(); if (!$p) continue; ?>
 			            <tr id="tr-product-<?=$p->id?>">
 			                <td class="a-left">
 			                    <span class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></span>

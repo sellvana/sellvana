@@ -359,6 +359,9 @@ throw new Exception("Invalid cart_id: ".$cId);
         $this->item_qty = 0;
         $this->subtotal = 0;
         foreach ($this->items() as $item) {
+            if (!$item->product()) {
+                continue;
+            }
             $this->item_num++;
             $this->item_qty += $item->qty;
             $this->subtotal += $item->price;
