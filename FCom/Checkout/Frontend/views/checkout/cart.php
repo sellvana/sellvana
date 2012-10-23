@@ -26,7 +26,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                </tr>
 		            </thead>
 		            <tbody>
-		<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
+		<?php foreach ($this->cart->items() as $item): $p = $item->product(); if (!$p) continue; ?>
 		                <tr id="tr-product-<?=$p->id?>">
 		                	<td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="<?=$item->id?>"></label></td>
 		                    <td>
