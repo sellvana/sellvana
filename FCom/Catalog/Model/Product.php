@@ -246,6 +246,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!isset($config['format']['nesting_separator'])) {
             $config['format']['nesting_separator'] = '>';
         }
+        
         //product import actions: create, update, create_or_update
         if (!isset($config['import']['actions'])) {
             $config['import']['actions'] = 'create_or_update';
@@ -345,8 +346,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     ) {
                 if (isset($d['unique_id'])) {
                     $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
-                } else if (isset($d['product_name'])) {
+                }
+                if (!$p && isset($d['product_name'])) {
                     $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
+                }
+                if (!$p && isset($d['url_key'])) {
+                    $p = $this->orm()->where("url_key", $d['url_key'])->find_one();
                 }
             }
 
@@ -364,21 +369,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             } else {
                 $result[]['status'] = 'updated';
             }
+
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
             $p->set($d);
             if ($p->is_dirty()) {
                 $p->save();
             }
-
             //echo memory_get_usage()/1024 . "kb<br>";
             //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
 
-
-
-
             //HANDLE CATEGORIES
             if (!empty($categoriesPath)) {
+
                 //check if parent category exist
                 static $topParentCategory = '';
                 static $categoriesList = array();
@@ -402,6 +405,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     foreach($categoriesPath as $catpath) {
                         $parent = $topParentCategory;
                         $catNodes = explode($config['format']['nesting_separator'], $catpath);
+                        /*print_r($catpath);
+                        echo "\n";
+                        print_r($config['format']['nesting_separator']);
+                        echo "\n";
+                        print_r($catNodes);
+                         *
+                         */
                         foreach($catNodes as $catnode) {
                     /*        $category = FCom_Catalog_Model_Category::orm()
                                         ->where('parent_id', $parent->id())
@@ -507,6 +517,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             unset($fileId);
             unset($att);
         }
+
         //HANDLE CUSTOM FIELDS to product relations
         if ($config['import']['custom_fields']['import'] && !empty($cfIntersection) && !empty($productIds)) {
             //get custom fields values from data
@@ -540,7 +551,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         unset($data);
         $this->_importErrors = $errors;
+        if ($errors) {
+            $result['errors'] = $errors;
+        }
         return $result;
     }
+
 }
 

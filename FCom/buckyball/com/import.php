@@ -140,6 +140,7 @@ class BImport extends BClass
             'rows_updated' => 0,
             'memory_usage' => memory_get_usage(),
             'run_time' => 0,
+            'errors' => ''
         );
         $this->config($status, true);
         $fp = fopen($filename, 'r');
@@ -150,9 +151,17 @@ class BImport extends BClass
             }
         }
 
+        $importConfig = array();
+
         $statusUpdate = 50;
         if ($config['batch_size']) {
             $statusUpdate = $config['batch_size'];
+        }
+        if ($config['multivalue_separator']) {
+            $importConfig['format']['multivalue_separator'] = $config['multivalue_separator'];
+        }
+        if ($config['nesting_separator']) {
+            $importConfig['format']['nesting_separator'] = $config['nesting_separator'];
         }
 
         $dataBatch = array();
@@ -180,7 +189,10 @@ class BImport extends BClass
             if ($config['batch_size'] && !empty($data)) {
                 $dataBatch[] = array_pop($data);
                 if (count($dataBatch) % $config['batch_size'] === 0) {
-                    $resultBatch = $model->import($dataBatch);
+                    $resultBatch = $model->import($dataBatch, $importConfig);
+                    if (!empty($resultBatch['errors'])) {
+                        $status['errors'] = $resultBatch['errors'];
+                    }
                     foreach($resultBatch as $result) {
                         if (isset($status['rows_'.$result['status']])) {
                             $status['rows_'.$result['status']]++;
@@ -189,7 +201,10 @@ class BImport extends BClass
                     $dataBatch = array();
                 }
             } else {
-                $result = $model->import($data);
+                $result = $model->import($data, $importConfig);
+                if (!empty($result['errors'])) {
+                    $status['errors'] = $result['errors'];
+                }
                 if (isset($status['rows_'.$result['status']])) {
                     $status['rows_'.$result['status']]++;
                 }
@@ -213,8 +228,10 @@ class BImport extends BClass
 
         //upload last data
         if ($config['batch_size'] && !empty($dataBatch)) {
-            $resultBatch = $model->import($dataBatch);
-
+            $resultBatch = $model->import($dataBatch, $importConfig);
+            if (!empty($resultBatch['errors'])) {
+                $status['errors'] = $resultBatch['errors'];
+            }
             foreach($resultBatch as $result) {
                 if (isset($status['rows_'.$result['status']])) {
                     $status['rows_'.$result['status']]++;
