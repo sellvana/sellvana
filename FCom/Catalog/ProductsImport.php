@@ -28,6 +28,12 @@ class FCom_Catalog_ProductsImport extends BImport
         $cfKeys = array_keys($cfFields);
         $dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);
+        foreach($cfKeys as $key) {
+            if (!isset($this->fields['product.'.$key])) {
+                $this->fields['product.'.$key] = array('pattern' => $key);
+            }
+        }
+        /*
         if ($dataKeys) {
             foreach ($dataKeys as $f) {
                 if (!isset($this->fields['product.'.$f])) {
@@ -35,5 +41,7 @@ class FCom_Catalog_ProductsImport extends BImport
                 }
             }
         }
+         *
+         */
     }
 }

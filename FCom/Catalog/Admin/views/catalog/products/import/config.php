@@ -9,7 +9,9 @@ $info = $hlp->getFileInfo($this->dir.'/'.$this->file);
     <table>
     	<tr><td>Field Delimiter:</td><td><input type="text" name="config[delim]" value="<?=$this->q($info['delim'])?>"/></td></tr>
      	<tr><td>Skip First Lines:</td><td><input type="text" name="config[skip_first]" value="<?=$this->q($info['skip_first'])?>"/></td></tr>
-        <tr><td>Batch size:</td><td><input type="text" name="config[batch_size]" value="100"/></td></tr>
+        <tr><td>Batch Size:</td><td><input type="text" name="config[batch_size]" value="100"/></td></tr>
+        <tr><td>Multi Value Delimiter:</td><td><input type="text" name="config[multivalue_separator]" value=";"/></td></tr>
+        <tr><td>Nesting Level Delimiter:</td><td><input type="text" name="config[nesting_separator]" value="&gt;"/></td></tr>
 	</table><br/>
     <table>
 	    <tr>

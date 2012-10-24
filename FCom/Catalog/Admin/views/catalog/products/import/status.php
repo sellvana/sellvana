@@ -1,4 +1,4 @@
-<?php $c = FCom_Catalog_ProductsImport::i()->config(); $start = BRequest::i()->get('start') ?>
+<?php $c = FCom_Catalog_ProductsImport::i()->config(); $start = BRequest::i()->get('start');  ?>
 
 <?php if ($start || $c['status']==='running'): ?>
 
@@ -81,5 +81,15 @@ setTimeout(function() {
 		<th>Run Time</th>
 		<td><?=number_format($c['run_time'], 4)?> sec</td>
 	</tr>
+        <?php if (!empty($c['errors'])):?>
+        <tr>
+            <th>Errors</th>
+            <td>
+            <?php foreach($c['errors'] as $error):?>
+                <?=$error?><br/>
+            <?php endforeach;?>
+            </td>
+        </tr>
+        <?php endif;?>
 </table>
 <?php endif ?>
