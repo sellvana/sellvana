@@ -246,7 +246,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!isset($config['format']['nesting_separator'])) {
             $config['format']['nesting_separator'] = '>';
         }
-        
+
         //product import actions: create, update, create_or_update
         if (!isset($config['import']['actions'])) {
             $config['import']['actions'] = 'create_or_update';
@@ -292,10 +292,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $customFieldsOptions = FCom_CustomField_Model_FieldOption::i()->getListAssoc();
 
         //HANDLE IMPORT
-        //static $cfIntersection = '';
+        static $cfIntersection = '';
+        $customFields = array();
         $productIds = array();
         $errors = array();
         foreach($data as $d) {
+            //if must have fields not defined then skip the record
+            if (empty($d['product_name']) && empty($d['unique_id']) && empty($d['url_key'])) {
+                continue;
+            }
+
             $categoriesPath = array();
             if ($config['import']['categories']['import'] && !empty($d['categories'])) {
                 $categoriesPath = explode($config['format']['multivalue_separator'], $d['categories']);
@@ -372,9 +378,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
+
             $p->set($d);
             if ($p->is_dirty()) {
                 $p->save();
+            }
+
+            //set custom fields for product
+            if (!empty($cfIntersection)) {
+                foreach($cfIntersection as $cfk) {
+                    $customFields[$p->id()][$cfk] = $d[$cfk];
+                }
             }
             //echo memory_get_usage()/1024 . "kb<br>";
             //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
@@ -434,11 +448,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                                 break;
                             }
                             $parent = $category;
-                            $categories[$catpath] = $category;
+                            $categories[$category->id()] = $category;
                         }
 
-                        if ($config['import']['categories']['menu'] && $categories[$catpath]->inMenu() == false) {
-                            $categories[$catpath]->setInMenu(true);
+                        if ($config['import']['categories']['menu'] && $categories[$category->id()]->inMenu() == false) {
+                            $categories[$category->id()]->setInMenu(true);
                         }
                     }
 
@@ -474,14 +488,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $imageFolder = BConfig::i()->get('fs/image_folder');
 
                 foreach($imagesNames as $fileName) {
-                    $att = $mediaLib->load(array('folder'=>$imageFolder, 'file_name'=>$fileName));
+                    $pathinfo = pathinfo($fileName);
+                    $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
+                    $att = $mediaLib->load(array('folder'=>$imageFolder, 'subfolder' => $subfolder, 'file_name'=>$pathinfo['basename']));
                     if (!$att) {
                         $fullPathToFile = FULLERON_ROOT_DIR.'/'.$imageFolder.'/'.$fileName;
                         $size = 0;
                         if (file_exists($fullPathToFile)) {
                             $size = filesize($fullPathToFile);
                         }
-                        $pathinfo = pathinfo($fileName);
+
                         $subfolder = null;
                         if ($config['import']['images']['with_subfolders']) {
                             $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
@@ -521,11 +537,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //HANDLE CUSTOM FIELDS to product relations
         if ($config['import']['custom_fields']['import'] && !empty($cfIntersection) && !empty($productIds)) {
             //get custom fields values from data
-            $customFields = array();
             $fieldIds = array();
             foreach($cfIntersection as $cfk) {
                 $field = $cfFields[$cfk];
-                $customFields[$cfk] = $d[$cfk];
                 $fieldIds[] = $field->id();
             }
 
@@ -534,15 +548,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             foreach($customsResult as $cus) {
                 $customsResult[$cus->product_id] = $cus;
             }
+            $productCustomFields = array();
             foreach($productIds as $pId) {
+                if (!empty($customFields[$pId])) {
+                    $productCustomFields = $customFields[$pId];
+                }
+                $productCustomFields['_add_field_ids'] = implode(",",$fieldIds);
+                $productCustomFields['product_id'] = $pId;
                 if (!empty($customsResult[$pId])) {
                     $custom = $customsResult[$pId];
                 } else {
                     $custom = FCom_CustomField_Model_ProductField::i()->create();
                 }
-                $customFields['_add_field_ids'] = implode(",",$fieldIds);
-                $customFields['product_id'] = $pId;
-                $custom->set($customFields);
+                $custom->set($productCustomFields);
                 $custom->save();
                 unset($custom);
             }
