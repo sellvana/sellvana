@@ -128,6 +128,14 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         }
         $addr->save();
 
+        if (!empty($data['address']['default_billing'])) {
+            $atype = 'billing';
+        }
+
+        if (!empty($data['address']['default_shipping'])) {
+            $atype = 'shipping';
+        }
+
         if (!$cust->default_billing_id && 'billing' == $atype) {
             $cust->set('default_billing_id', $addr->id);
         }
