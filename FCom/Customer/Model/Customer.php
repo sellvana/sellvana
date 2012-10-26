@@ -9,6 +9,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected $defaultShipping = null;
     protected $defaultBilling = null;
 
+    private static $lastImportedCustomer = 0;
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
@@ -187,24 +189,34 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (!empty($data['customer']['id'])) {
             $cust = static::load($data['customer']['id']);
         }
+        $result['status'] = '';
         if (empty($cust)) {
             if (empty($data['customer']['email'])) {
-                $result = array('status'=>'error', 'message'=>'Missing email address');
-                return $result;
+                if (self::$lastImportedCustomer) {
+                    $cust = self::$lastImportedCustomer;
+                    $result['status'] = 'updated';
+                } else {
+                    $result = array('status'=>'error', 'message'=>'Missing email address');
+                    return $result;
+                }
+            } else {
+                $cust = static::load($data['customer']['email'], 'email');
             }
-            $cust = static::load($data['customer']['email'], 'email');
         }
-        $result['status'] = '';
         if (!$cust) {
             $cust = static::create();
             $result['status'] = 'created';
         }
         $result['model'] = $cust;
-        $cust->set($data['customer']);
-        if ($cust->is_dirty()) {
-            if (!$result['status']) $result['status'] = 'updated';
-            $cust->save();
+        if (!empty($data['customer']['email'])) {
+            $cust->set($data['customer']);
+            if ($cust->is_dirty()) {
+                if (!$result['status']) $result['status'] = 'updated';
+                $cust->save();
+            }
         }
+
+        self::$lastImportedCustomer = $cust;
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
