@@ -847,7 +847,13 @@ $.widget('ui.fcom_autocomplete', {
                 lastXhr = $.getJSON(url, request, function(data, status, xhr) {
                     cache[term] = data;
                     if (xhr === lastXhr) {
-                        response(data);
+                        //response(data);
+                        response($.map( data, function( item ) {
+                            return {
+                                label: item.id,//item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+                                value: item.id
+                            }
+                        }));
                     }
                 });
             },
