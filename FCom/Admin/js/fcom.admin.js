@@ -850,8 +850,8 @@ $.widget('ui.fcom_autocomplete', {
                         //response(data);
                         response($.map( data, function( item ) {
                             return {
-                                label: item.id,//item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
-                                value: item.id
+                                //label: item.name,//item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+                                value: item.name
                             }
                         }));
                     }
