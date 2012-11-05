@@ -117,6 +117,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
                 'username'=>$username,
                 'email'=>$username)))
             ->find_one();
+
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }

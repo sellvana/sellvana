@@ -769,6 +769,7 @@ class BUtil extends BClass
         $algo = array_shift($arr);
         $iter = array_shift($arr);
         $verifyHash = $string;
+
         for ($i=0; $i<$iter; $i++) {
             $salt = array_shift($arr);
             $verifyHash = static::saltedHash($verifyHash, $salt, $algo);

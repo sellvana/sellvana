@@ -1,0 +1,77 @@
+<?php
+
+class FCom_Promo_Migrate extends BClass
+{
+    public function run()
+    {
+        BMigrate::install('0.1.0', array($this, 'install'));
+    }
+
+    public function install()
+    {
+        $tPromo = FCom_Promo_Model_Promo::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tPromo}(
+    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+    `description` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
+    `details` TEXT COLLATE utf8_general_ci NULL  ,
+    `manuf_vendor_id` INT(10) UNSIGNED NOT NULL  ,
+    `from_date` DATE NULL  ,
+    `to_date` DATE NULL  ,
+    `status` ENUM('template','pending','active','expired') COLLATE utf8_general_ci NOT NULL  DEFAULT 'pending' ,
+    `buy_type` ENUM('qty','$') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
+    `buy_group` ENUM('one','any','all') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one' ,
+    `buy_amount` INT(11) NULL  ,
+    `get_type` ENUM('qty','$','%','text','choice') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
+    `get_group` ENUM('same_prod','same_group','any_group','diff_group') COLLATE utf8_general_ci NOT NULL  DEFAULT 'same_prod' ,
+    `get_amount` INT(11) NULL  ,
+    `originator` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
+    `fulfillment` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
+    `create_dt` DATETIME NOT NULL  ,
+    `update_dt` DATETIME NULL  ,
+    PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
+
+        $tGroup = FCom_Promo_Model_Group::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tGroup}(
+    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+    `promo_id` INT(10) UNSIGNED NOT NULL  ,
+    `group_type` ENUM('buy','get') COLLATE utf8_general_ci NOT NULL  ,
+    `group_name` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
+    PRIMARY KEY (`id`) ,
+    KEY `FK_promo_group_promo`(`promo_id`)
+) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
+
+        $tMedia = FCom_Promo_Model_Media::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS $tMedia(
+    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+    `promo_id` INT(10) UNSIGNED NULL  ,
+    `file_id` INT(11) UNSIGNED NOT NULL  ,
+    `manuf_vendor_id` INT(11) UNSIGNED NULL  ,
+    `promo_status` CHAR(1) COLLATE utf8_general_ci NOT NULL  DEFAULT 'A' ,
+    PRIMARY KEY (`id`) ,
+    KEY `FK_promo_media_file`(`file_id`) ,
+    KEY `FK_promo_media_promo`(`promo_id`)
+) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
+
+        $tProduct = FCom_Promo_Model_Product::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS $tProduct(
+    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+    `promo_id` INT(10) UNSIGNED NOT NULL  ,
+    `group_id` INT(10) UNSIGNED NOT NULL  ,
+    `product_id` INT(11) UNSIGNED NOT NULL  ,
+    `qty` TINYINT(3) UNSIGNED NULL  ,
+    PRIMARY KEY (`id`) ,
+    KEY `FK_promo_product_promo`(`promo_id`) ,
+    KEY `FK_promo_product_product`(`product_id`) ,
+    KEY `FK_promo_product_group`(`group_id`)
+) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
+    }
+}
