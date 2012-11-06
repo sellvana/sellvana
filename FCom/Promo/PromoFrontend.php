@@ -8,6 +8,9 @@ class FCom_Promo_Frontend extends BClass
         BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct',
                 'FCom_Promo_Frontend::onAddToCart');
 
+        BPubSub::i()->on('FCom_Checkout_Model_Cart::removeProduct',
+                'FCom_Promo_Frontend::onRemoveFromCart');
+
     }
 
     public static function onAddToCart($args)
@@ -17,7 +20,7 @@ class FCom_Promo_Frontend extends BClass
         $items = $cart->items();
 
         /**
-         * todo:
+         * todo: validate promo cache table
          * 1. For each Promo
          * 2. Calculate promo formula like: BUY 	Quantity 	FROM 	Single Group 	GET 	Quantity 	OF 	Any Group
          *  Formula:
@@ -30,5 +33,10 @@ class FCom_Promo_Frontend extends BClass
          *
          */
 
+    }
+
+    public static function onRemoveFromCart($args)
+    {
+        $this->onAddToCart($args);
     }
 }
