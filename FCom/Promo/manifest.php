@@ -10,6 +10,9 @@
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'PromoAdmin.php', 'callback'=>'FCom_Promo_Admin::bootstrap'),
                 ),
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file'=>'PromoFrontend.php', 'callback'=>'FCom_Promo_Frontend::bootstrap'),
+                ),
             )
         ),
     ),

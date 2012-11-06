@@ -36,7 +36,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
     </div>
     <div class="ui-layout-center">
         <div class="group-container">
-            <?=$this->view('jqgrid')->set('config', FCom_Catalog_Admin_Controller_Products::i()->productLibraryGridConfig()) ?>
+            <?=$this->view('jqgrid')->set('config', FCom_Catalog_Admin_Controller_Products::i()->productLibraryGridConfig('productLibrary')) ?>
         </div>
     </div>
 </div>
@@ -58,7 +58,7 @@ head(function() {
     $(window).resize(function(ev) { $('#details-layout').height($('.adm-wrapper').height()); });
 
     $('#details-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
-        new FCom.Admin.TargetGrid({source:'#products', target:el});
+        new FCom.Admin.TargetGrid({source:'#productLibrary', target:el});
     });
 
     (function() {

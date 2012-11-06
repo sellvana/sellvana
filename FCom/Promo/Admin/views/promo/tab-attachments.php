@@ -12,12 +12,10 @@ $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => BDb::many_as_array($m->mediaORM()->select('a.id')->select('a.file_name')->find_many()),
+                'data' => BDb::many_as_array($m->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => array(
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400, 'formatter'=>"function(val,opt,obj) {
-                        return val+'<input type=\"hidden\" name=\"attachments[]\" value=\"'+obj.id+'\"/>';
-                    }"),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
                 ),
                 'multiselect' => true,
                 'multiselectWidth' => 30,
@@ -36,7 +34,7 @@ $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
 </div>
 <script>
 head(function() {
-    var layout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+    attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,
         west__spacing_open:20,
@@ -49,9 +47,9 @@ head(function() {
         }
     });
 
-    var attachmentsGrid = new FCom.Admin.MediaLibrary({
+    attachmentsGrid = new FCom.Admin.MediaLibrary({
         grid:'#all_attachments',
-        url:'<?=BApp::url('FCom_Admin', '/media/grid')?>',
+        url:'<?=BApp::href('media/grid')?>',
         folder:'media/promo'
     });
 

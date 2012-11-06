@@ -297,6 +297,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->items();
         $this->removeItem($this->childById('items', $productId, 'product_id'));
+        BPubSub::i()->fire(__CLASS__.'::'.__METHOD__, array('model'=>$this));
         return $this;
     }
 

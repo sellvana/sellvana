@@ -201,7 +201,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
         }
         $groupName = $model ? htmlspecialchars($groups[$model->id][$groupId]->group_name) : 'Group '.abs($groupId);
-        $promoId = $model ? $model->id : BRequest::i()->params('id');
         $gridId = 'promo_products_'.$type.$groupId;
         $config = array(
             'grid' => array(
@@ -230,11 +229,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
             array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
             array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
-            array('navButtonAdd', 'caption' => 'Columns', 'title' => 'Reorder Columns', 'onClickButton' => "function() {
-                jQuery('#$gridId').jqGrid('columnChooser');
-            }"),
             'js' => array(
-                "if (typeof productLibrary !== 'undefined') productLibrary.initTargetGrid('#$gridId');",
+                "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
             ),
         );
 
