@@ -120,7 +120,6 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             //ob_implicit_flush();
             //ignore_user_abort(true);
             $uploads = $_FILES['upload'];
-
             foreach ($uploads['name'] as $i=>$fileName) {
 
                 if (!$fileName) {
@@ -150,7 +149,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
+                //$row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
                 //echo BUtil::toJson($row);
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
                 // TODO: properly refresh grid after file upload
