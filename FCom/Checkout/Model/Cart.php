@@ -258,12 +258,12 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['price']) || !is_numeric($options['price'])) {
             $options['price'] = 0;
         } else {
-            $options['price'] = $options['price'] * $options['qty'];
+            $options['price'] = $options['price']; //$options['price'] * $options['qty'];
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item) {
             $item->add('qty', $options['qty']);
-            $item->add('price', $options['price']);
+            $item->set('price', $options['price']);
         } else {
             $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId,
                 'qty'=>$options['qty'], 'price' => $options['price']));
@@ -365,8 +365,9 @@ throw new Exception("Invalid cart_id: ".$cId);
             }
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->price;
+            $this->subtotal += $item->price*$item->qty;
         }
+        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
         return $this;
     }
 /*

@@ -5,21 +5,25 @@ class FCom_Promo_Frontend extends BClass
     static public function bootstrap()
     {
         //add product to cart
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct',
-                'FCom_Promo_Frontend::onAddToCart');
-
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::removeProduct',
-                'FCom_Promo_Frontend::onRemoveFromCart');
+        BPubSub::i()->on('FCom_Checkout_Model_Cart::calcTotals',
+                'FCom_Promo_Frontend::onPromoCartValidate');
 
 
 
     }
 
-    public static function onAddToCart($args)
+    public static function onPromoCartValidate($args)
     {
         $cart = $args['model'];
 
         $items = $cart->items();
+        if (!$items) {
+            $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
+            foreach($allCartPromo as $cartPromo) {
+                $cartPromo->delete();
+            }
+            return;
+        }
 
         $productIds = array();
         foreach($items as $item) {
@@ -27,14 +31,18 @@ class FCom_Promo_Frontend extends BClass
         }
 
         $activePromo = array();
+        $activePromoIds = array();
         $promoList = FCom_Promo_Model_Promo::i()->getActive();
+        if (!$promoList) {
+            return;
+        }
         foreach($promoList as $promo) {
             $promoProductsInGroup = FCom_Promo_Model_Product::orm()
                             ->where('promo_id', $promo->id)
                             ->where_in('product_id', array_keys($productIds))
                             ->find_many();
 
-            if (empty($promoProductsInGroup)) {
+            if (!$promoProductsInGroup) {
                 continue;
             }
 
@@ -52,6 +60,7 @@ class FCom_Promo_Frontend extends BClass
                     foreach ($groupProducts as $productQty) {
                         if ($promo->buy_amount <= $productQty ) {
                             $activePromo[] = $promo;
+                            $activePromoIds[] = $promo->id;
                         }
                     }
                 }
@@ -64,6 +73,7 @@ class FCom_Promo_Frontend extends BClass
                     }
                     if ($promo->buy_amount <= $productQty ) {
                         $activePromo[] = $promo;
+                        $activePromoIds[] = $promo->id;
                     }
                 }
             }
@@ -75,12 +85,13 @@ class FCom_Promo_Frontend extends BClass
                             $groupProducts[$product->group_id] = 0;
                         }
                         if (!empty($productIds[$product->product_id])) {
-                            $groupProducts[$product->group_id] += $productIds[$product->product_id]->price;
+                            $groupProducts[$product->group_id] += $productIds[$product->product_id]->price*$productIds[$product->product_id]->qty;
                         }
                     }
                     foreach ($groupProducts as $productPrice) {
                         if ($promo->buy_amount <= $productPrice ) {
                             $activePromo[] = $promo;
+                            $activePromoIds[] = $promo->id;
                         }
                     }
                 }
@@ -88,16 +99,24 @@ class FCom_Promo_Frontend extends BClass
                     $productPrice = 0;
                     foreach($promoProductsInGroup as $product) {
                         if (!empty($productIds[$product->product_id])) {
-                            $productPrice += $productIds[$product->product_id]->price;
+                            $productPrice += $productIds[$product->product_id]->price*$productIds[$product->product_id]->qty;
                         }
                     }
+                    
                     if ($promo->buy_amount <= $productPrice ) {
                         $activePromo[] = $promo;
+                        $activePromoIds[] = $promo->id;
                     }
                 }
             }
         }
 
+        $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
+        foreach($allCartPromo as $cartPromo) {
+            if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->updated_dt) + 3600) {
+                $cartPromo->delete();
+            }
+        }
         if (!empty($activePromo)) {
             foreach($activePromo as $promo) {
                 $promoCart = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)
@@ -125,10 +144,5 @@ class FCom_Promo_Frontend extends BClass
          *
          */
 
-    }
-
-    public static function onRemoveFromCart($args)
-    {
-        $this->onAddToCart($args);
     }
 }

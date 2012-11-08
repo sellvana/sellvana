@@ -172,7 +172,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 $orderItem['order_id'] = $salesOrder->id();
                 $orderItem['product_id'] = $item->product_id;
                 $orderItem['qty'] = $item->qty;
-                $orderItem['total'] = $item->price;
+                $orderItem['total'] = $item->rowTotal();
                 $orderItem['product_info'] = BUtil::toJson($product->as_array());
 
                 $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($salesOrder->id(), $item->product_id);
