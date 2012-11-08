@@ -45,7 +45,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                    </td>
 		                    <td class="a-right">
 		                    	<div class="price-box">
-		                        	<div class=""><span class="price">$<?=number_format($item->rowTotal(), 2)?></span></div>
+		                        	<div class=""><span class="price"><?=number_format($item->rowTotal(), 2)?></span></div>
 		                        </div>
 		                    </td>
 		                </tr>

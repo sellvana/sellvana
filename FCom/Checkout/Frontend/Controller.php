@@ -67,7 +67,9 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             if (!empty($post['qty'])) {
                 foreach ($post['qty'] as $id=>$qty) {
                     $item = $cart->childById('items', $id);
-                    if ($item) $item->set('qty', $qty)->save();
+                    if ($item) {
+                        $item->set('qty', $qty)->save();
+                    }
                 }
             }
             if (!empty($post['postcode'])) {

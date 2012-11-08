@@ -22,7 +22,7 @@ $items = $cart->recentItems();
                     <span class="product-name"><?=$this->q($p->product_name)?></span>
                     <span class="info"><?=$this->_('Qty')?> <?=number_format($item->qty,0)?></span>
                     <div class="price-box">
-                        <span class="price-range">$<?=number_format($item->price,2)?></span>
+                        <span class="price-range">$<?=number_format($item->rowTotal(),2)?></span>
                     </div>
                 </a>
             </li>
