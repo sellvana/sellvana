@@ -5,6 +5,8 @@ class FCom_Promo_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
     }
 
     public function install()
@@ -73,5 +75,26 @@ class FCom_Promo_Migrate extends BClass
     KEY `FK_promo_product_group`(`group_id`)
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
         ");
+
+
+    }
+
+    public function upgrade_0_1_1()
+    {
+        $tCart = FCom_Promo_Model_Cart::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS $tCart(
+            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+            `cart_id` INT(10) UNSIGNED NOT NULL  ,
+            `promo_id` INT(10) UNSIGNED NOT NULL  ,
+            PRIMARY KEY (`id`)
+        ) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
+    }
+
+    public function upgrade_0_1_2()
+    {
+        $tCart = FCom_Promo_Model_Cart::table();
+        BDb::run( " ALTER TABLE {$tCart} ADD `updated_dt` datetime");
     }
 }

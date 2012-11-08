@@ -1,7 +1,7 @@
 <?php return array(
     'modules' => array(
         'FCom_Promo' => array(
-            'version' => '0.1.0',
+            'version' => '0.1.2',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
             'description' => "Promotions module",

@@ -135,4 +135,9 @@ class FCom_Promo_Model_Promo extends BModel
             FCom_Promo_Model_Group::i()->delete_many(array('id'=>$delete));
         }
     }
+
+    public function getActive()
+    {
+        return self::orm()->where('status', 'active')->find_many();
+    }
 }
