@@ -33,6 +33,16 @@ class FCom_Promo_Model_Promo extends BModel
         ),
     );
 
+    public function getPromosByCart($cartId)
+    {
+        return self::orm('p')
+                ->join(FCom_Promo_Model_Cart::table(), "p.id = pc.promo_id", "pc")
+                ->where('cart_id', $cartId)
+                ->select('p.id')
+                ->select('p.description')
+                ->find_many();
+    }
+
     public function manuf()
     {
         //todo: load vendors here
@@ -48,16 +58,15 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function mediaORM()
     {
-        return FCom_Promo_Model_Media::i()->orm()->table_alias('pa')
-            ->where('pa.promo_id', $this->id)
-            ->select(array('pa.manuf_vendor_id', 'pa.promo_status'))
-            ->join('FCom_Core_Model_MediaLibrary', array('a.id','=','pa.file_id'), 'a')
-            ->select(array('a.id', 'a.file_name', 'a.file_size'));
+        return FCom_Promo_Model_Media::i()->orm('pa')
+            ->join(FCom_Core_Model_MediaLibrary::table(), array('a.id','=','pa.file_id'), 'a')
+            ->select('a.id')->select('a.file_name')->select('a.folder')
+            ->where('pa.promo_id', $this->id);
     }
 
     public function media()
     {
-        return $this->mediaORM()->find_many_assoc();
+        return $this->mediaORM()->find_many();
     }
 
     public function createClone()
