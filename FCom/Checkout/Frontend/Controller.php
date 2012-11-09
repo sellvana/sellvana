@@ -18,7 +18,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
         BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
 
-        $promoList = FCom_Promo_Model_Cart::i()->getPromos($cart->id);
+        $promoList = FCom_Promo_Model_Promo::i()->getPromosByCart($cart->id);
         $layout->view('checkout/cart')->promoList = $promoList;
         $shippingEstimate = BSession::i()->data('shipping_estimate');
         $layout->view('checkout/cart')->cart = $cart;

@@ -85,9 +85,13 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 	    	</section>
             <?php if(!empty($this->promoList)): ?>
                 <section class="col2-set sub-cart">
-                    <h2>Promo</h2>
+                    <h2>Promotions</h2>
 		    	<?php foreach($this->promoList as $promo):?>
                             <?=$promo->description?><br/>
+                            <?php foreach($promo->media() as $promoMedia): ?>
+                                <img src="/<?=$promoMedia->folder.'/'.$promoMedia->file_name?>">
+                                <div style="clear:both;">
+                            <?php endforeach; ?>
                         <?php endforeach; ?>
 	    	</section>
             <?php endif; ?>
