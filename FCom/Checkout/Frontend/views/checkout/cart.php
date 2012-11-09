@@ -83,6 +83,14 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		            	<input type="text" size="4" name="postcode" value="" style="width:150px;"/><button type="submit" class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
 		    	</form>
 	    	</section>
+            <?php if(!empty($this->promoList)): ?>
+                <section class="col2-set sub-cart">
+                    <h2>Promo</h2>
+		    	<?php foreach($this->promoList as $promo):?>
+                            <?=$promo->description?><br/>
+                        <?php endforeach; ?>
+	    	</section>
+            <?php endif; ?>
     	</div>
     	<div class="col-cart-right">
     		<div class="cart-totals">
