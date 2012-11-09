@@ -20,8 +20,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     throw new Exception('Invalid email or password.');
                 }
             }
-
-            $url = BSession::i()->data('login_orig_url');
+            if (BRequest::i()->post('backroute')) {
+                $url = BApp::href(BRequest::i()->post('backroute'));
+            } else {
+                $url = BSession::i()->data('login_orig_url');
+            }
             BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
         } catch (Exception $e) {
             BDebug::logException($e);
