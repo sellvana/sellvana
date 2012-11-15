@@ -11,6 +11,7 @@ class FCom_Checkout_Migrate extends BClass
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
+        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
     }
 
     public function install()
@@ -162,6 +163,24 @@ class FCom_Checkout_Migrate extends BClass
                 ADD COLUMN `create_dt` DATETIME NOT NULL AFTER `rowtotal`,
                 ADD COLUMN `update_dt` DATETIME NOT NULL AFTER `create_dt`;
         ");
+    }
+
+    public function upgrade_0_1_8()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_id_buy")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_id_buy` INT(10) UNSIGNED NOT NULL "
+            );
+        }
+
+
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_id_get")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_id_get` INT(10) UNSIGNED NOT NULL "
+            );
+        }
+
     }
 
 }
