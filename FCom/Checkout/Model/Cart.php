@@ -273,7 +273,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->calcTotals()->save();
         }
 
-        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
+        BPubSub::i()->fire(__METHOD__, array('model'=>$this, 'item' => $item));
 
         static::sessionCartId($this->id);
         return $this;

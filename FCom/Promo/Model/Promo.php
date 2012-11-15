@@ -147,6 +147,8 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function getActive()
     {
-        return self::orm()->where('status', 'active')->find_many();
+        return self::orm()->where('status', 'active')
+                ->order_by_desc('buy_amount')
+                ->find_many();
     }
 }

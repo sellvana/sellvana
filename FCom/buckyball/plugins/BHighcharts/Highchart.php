@@ -13,6 +13,12 @@ class BHighcharts_Loader
 {
     static public function bootstrap()
     {
+        /*
+        if (($head = BLayout::i()->view('head'))) {
+            $head->js("{FCom_Admin}/js/highcharts/highcharts.js");
+        }
+         * 
+         */
     }
 }
 
