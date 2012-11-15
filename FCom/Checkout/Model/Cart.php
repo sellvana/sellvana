@@ -261,7 +261,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $options['price'] = $options['price']; //$options['price'] * $options['qty'];
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
-        if ($item) {
+        if ($item && $item->promo_id_get == 0) {
             $item->add('qty', $options['qty']);
             $item->set('price', $options['price']);
         } else {

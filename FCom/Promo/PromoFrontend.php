@@ -187,6 +187,9 @@ class FCom_Promo_Frontend extends BClass
     {
         $cart = $args['model'];
         $currentItem = $args['item'];
+        if ($currentItem->promo_id_get) {
+            return;
+        }
 
         $items = $cart->items();
         if (!$items) {
@@ -207,25 +210,40 @@ class FCom_Promo_Frontend extends BClass
 
         if ($promo->get_type == 'qty') {
             if ($promo->get_group == 'any_group') {
-                $itemQtyLeft = $currentItem->qty - $promo->buy_amount;
+                $itemQtyTotal = 0;
+                $promoItemQtyTotal = 0;
+                foreach($items as $item) {
+                    $itemQtyTotal += $item->qty;
+                    if ($item->promo_id_get) {
+                        $promoItemQtyTotal += $item->qty;
+                    }
+                }
+                $itemQtyLeft = $itemQtyTotal - $promo->buy_amount;
+
                 if ($itemQtyLeft > 0) {
 
                     $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
-                    if ($item && $promo->get_amount < $item->qty) {
+                    if ($item && $promo->get_amount > $promoItemQtyTotal) {
                         $item->qty += 1;
                     } elseif (!$item) {
+                        if ($currentItem->qty == 1) {
+                            $item = $currentItem;
+                            $item->promo_id_get = $promo->id;
+                            $item->price = 0;
+                        } else {
+                            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
-                        $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
-                            'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
+                            $currentItem->qty -= 1;
+                            $currentItem->save();
+                        }
                     } else {
                         return;
                     }
                     $item->save();
 
-                    $currentItem->qty -= 1;
 
-                    $currentItem->save();
 
                 }
             }
