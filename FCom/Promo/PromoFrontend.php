@@ -46,7 +46,16 @@ class FCom_Promo_Frontend extends BClass
 
         $productIds = array();
         foreach($items as $item) {
+            if ($item->price == 0) {
+                continue;
+            }
+            $item->promo_qty_used = 0;
+            $item->promo_id_buy = '';
+            $item->save();
             $productIds[$item->product_id] = $item;
+        }
+        if (!$productIds) {
+            return;
         }
 
         $activePromo = array();
@@ -55,6 +64,7 @@ class FCom_Promo_Frontend extends BClass
         if (!$promoList) {
             return;
         }
+
         foreach($promoList as $promo) {
             $promoProductsInGroup = FCom_Promo_Model_Product::orm()
                             ->where('promo_id', $promo->id)
@@ -78,17 +88,37 @@ class FCom_Promo_Frontend extends BClass
                         }
                         if (!empty($productIds[$product->product_id])) {
                             $groupProducts[$product->group_id][] = $productIds[$product->product_id];
-                            $groupQty[$product->group_id] += $productIds[$product->product_id]->qty;
+                            $groupQty[$product->group_id] += ($productIds[$product->product_id]->qty - $productIds[$product->product_id]->promo_qty_used);
                         }
                         if ($promo->buy_amount <= $groupQty[$product->group_id] ) {
+                            //save how many
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
+                            $promoBuyAmount = $promo->buy_amount;
                             foreach($groupProducts[$product->group_id] as $groupItem) {
-                                $groupItem->promo_id_buy = $promo->id;
+                                if (!empty($groupItem->promo_id_buy)) {
+                                    $promoIds = explode(",", $groupItem->promo_id_buy);
+                                    if(!in_array($promo->id, $promoIds)){
+                                        $promoIds[] = $promo->id;
+                                    }
+                                    $groupItem->promo_id_buy = implode(",", $promoIds);
+                                } else {
+                                    $groupItem->promo_id_buy = $promo->id;
+                                }
+                                if ($promoBuyAmount > 0) {
+                                    $qtyUsed = $groupItem->qty - $promoBuyAmount;
+                                    if ($qtyUsed <= 0) {
+                                        $groupItem->promo_qty_used += $groupItem->qty;
+                                    } else {
+                                        $groupItem->promo_qty_used += $promoBuyAmount;
+                                    }
+                                    $promoBuyAmount -= $groupItem->qty;
+                                }
                                 $groupItem->save();
                             }
+
                             //only one promo per cart available
-                            break 2;
+                            //break 2;
                         }
                     }
                 }
@@ -99,17 +129,35 @@ class FCom_Promo_Frontend extends BClass
                     foreach($promoProductsInGroup as $product) {
                         if (!empty($productIds[$product->product_id])) {
                             $groupItems[] = $productIds[$product->product_id];
-                            $productQty += $productIds[$product->product_id]->qty;
+                            $productQty += ($productIds[$product->product_id]->qty - $productIds[$product->product_id]->promo_qty_used);
                         }
                         if ($promo->buy_amount <= $productQty ) {
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
+                            $promoBuyAmount = $promo->buy_amount;
                             foreach($groupItems as $groupItem) {
-                                $groupItem->promo_id_buy = $promo->id;
+                                if (!empty($groupItem->promo_id_buy)) {
+                                    $promoIds = explode(",", $groupItem->promo_id_buy);
+                                    if(!in_array($promo->id, $promoIds)){
+                                        $promoIds[] = $promo->id;
+                                    }
+                                    $groupItem->promo_id_buy = implode(",", $promoIds);
+                                } else {
+                                    $groupItem->promo_id_buy = $promo->id;
+                                }
+                                if ($promoBuyAmount > 0) {
+                                    $qtyUsed = $groupItem->qty - $promoBuyAmount;
+                                    if ($qtyUsed <= 0) {
+                                        $groupItem->promo_qty_used = $groupItem->qty;
+                                    } else {
+                                        $groupItem->promo_qty_used = $promoBuyAmount;
+                                    }
+                                    $promoBuyAmount -= $groupItem->qty;
+                                }
                                 $groupItem->save();
                             }
                             //only one promo per cart available
-                            break 2;
+                            //break 2;
                         }
                     }
                 }
