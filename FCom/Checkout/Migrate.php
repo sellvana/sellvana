@@ -12,6 +12,8 @@ class FCom_Checkout_Migrate extends BClass
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
+        BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
     }
 
     public function install()
@@ -181,6 +183,24 @@ class FCom_Checkout_Migrate extends BClass
             );
         }
 
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_qty_used")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_qty_used` decimal(12,4) DEFAULT NULL "
+            );
+        }
+    }
+
+    public function upgrade_0_2_0()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        BDb::run("
+            ALTER TABLE {$tCartItem} MODIFY `promo_id_buy` varchar(50) DEFAULT NULL "
+        );
     }
 
 }
