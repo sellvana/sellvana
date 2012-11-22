@@ -5,8 +5,7 @@ class FCom_Promo_Frontend extends BClass
     static public function bootstrap()
     {
         //add product to cart
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::calcTotals',
-                'FCom_Promo_Frontend::onPromoCartValidate');
+        BPubSub::i()->on('FCom_Checkout_Model_Cart::calcTotals', 'FCom_Promo_Frontend::onPromoCartValidate');
         BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Promo_Frontend::onPromoCartAddProduct');
 
         BPubSub::i()
@@ -46,7 +45,7 @@ class FCom_Promo_Frontend extends BClass
 
         $productIds = array();
         foreach($items as $item) {
-            if ($item->price == 0) {
+            if ($item->promo_id_get) {
                 continue;
             }
             $item->promo_qty_used = 0;
@@ -205,7 +204,6 @@ class FCom_Promo_Frontend extends BClass
         }
 
         //check cart promos
-
         $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
         foreach($allCartPromo as $cartPromo) {
             if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->updated_dt) + 3600) {
@@ -224,21 +222,6 @@ class FCom_Promo_Frontend extends BClass
                 $promoCart->save();
             }
         }
-
-        /**
-         * todo: validate promo cache table
-         * 1. For each Promo
-         * 2. Calculate promo formula like: BUY 	Quantity 	FROM 	Single Group 	GET 	Quantity 	OF 	Any Group
-         *  Formula:
-         *  IF number of products in the cart FROM Single Group > BUY Quantity
-         *  THEN suggest Quantity of products OF Any Group
-         * 3. Display suggestions in tooltip on 'Add product' button
-         * 4. Display suggestions in the cart
-         * 5. Save suggestions in special cache table
-         * 6. Validate suggestions in the cache table each day
-         *
-         */
-
     }
 
     public static function onPromoCartAddProduct($args)
@@ -259,9 +242,12 @@ class FCom_Promo_Frontend extends BClass
             if (!$item->promo_id_buy) {
                 continue;
             }
+            if ($item->qty - $item->promo_qty_used == 0) {
+                continue;
+            }
             $promoIds = explode(",", $item->promo_id_buy);
             foreach($promoIds as $promoId) {
-                $promoList[] = FCom_Promo_Model_Promo::load($promoId);
+                $promoList[$promoId] = FCom_Promo_Model_Promo::load($promoId);
             }
         }
 
@@ -270,30 +256,87 @@ class FCom_Promo_Frontend extends BClass
         }
 
         foreach($promoList as $promo) {
+            //GET QTY
             if ($promo->get_type == 'qty') {
+                //FROM Any Group
                 if ($promo->get_group == 'any_group') {
-                    $itemQtyTotal = 0;
                     $promoItemQtyTotal = 0;
                     foreach($items as $item) {
-                        $itemQtyTotal += $item->qty;
-                        if ($item->promo_id_get) {
+                        if ($item->promo_id_get == $promo->id) {
                             $promoItemQtyTotal += $item->qty;
                         }
                     }
-                    $itemQtyLeft = $itemQtyTotal - $promo->buy_amount;
 
-                    if ($itemQtyLeft > 0) {
+                    $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
-                        $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+                    //IF GET QTY < Item Qty then add 1
+                    if ($item && $promo->get_amount > $promoItemQtyTotal) {
+                        $item->qty += 1;
+                    } elseif (!$item) {
+                        //if it is single item of product then mark it as promo
+                        if ($currentItem->qty == 1) {
+                            $item = $currentItem;
+                            $item->promo_id_get = $promo->id;
+                            $item->promo_id_buy = '';
+                            $item->price = 0;
+                        } else {
+                            //if not then add new promo item and decrase qty of current item
+                            $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
+                            $currentItem->qty -= 1;
+                            $currentItem->save();
+                        }
+                    } else {
+                        continue;
+                    }
+                    $item->save();
+                }
+                //FROM Same Group
+                if ($promo->get_group == 'same_group') {
+
+                    $promoItemQtyTotal = 0;
+                    foreach($items as $item) {
+                        if ($item->promo_id_get == $promo->id) {
+                            $promoItemQtyTotal += $item->qty;
+                        }
+                    }
+
+                    $productId = $currentItem->product_id;
+
+                    $groupProduct = FCom_Promo_Model_Product::orm()->where('promo_id', $promo->id())
+                            ->where('product_id', $productId)->find_one();
+                    if (!$groupProduct) {
+                        continue;
+                    }
+                    $sameGroup = false;
+                    foreach($items as $item) {
+                        if ($item->promo_id_get) {
+                            continue;
+                        }
+                        $groupProductItem = FCom_Promo_Model_Product::orm()->where('promo_id', $promo->id())
+                            ->where('product_id', $item->product_id)
+                                ->where('group_id', $groupProduct->group_id)->find_one();
+                        if ($groupProductItem) {
+                            $sameGroup = true;
+                            break;
+                        }
+                    }
+                    if ($sameGroup) {
+                         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+
+                        //IF GET QTY < Item Qty then add 1
                         if ($item && $promo->get_amount > $promoItemQtyTotal) {
                             $item->qty += 1;
                         } elseif (!$item) {
+                            //if it is single item of product then mark it as promo
                             if ($currentItem->qty == 1) {
                                 $item = $currentItem;
                                 $item->promo_id_get = $promo->id;
+                                $item->promo_id_buy = '';
                                 $item->price = 0;
                             } else {
+                                //if not then add new promo item and decrase qty of current item
                                 $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                     'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
@@ -304,9 +347,43 @@ class FCom_Promo_Frontend extends BClass
                             continue;
                         }
                         $item->save();
+                    }
 
+                }
+                if ($promo->get_group == 'same_prod') {
+                    $promoItemQtyTotal = 0;
+                    foreach($items as $item) {
+                        if ($item->promo_id_get == $promo->id) {
+                            $promoItemQtyTotal += $item->qty;
+                        }
+                    }
 
+                    if ($currentItem->qty > 1 && $promo->get_amount > $promoItemQtyTotal) {
+                         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
+                        //IF GET QTY < Item Qty then add 1
+                        if ($item) {
+                            $item->qty += 1;
+                        } elseif (!$item) {
+                            //if it is single item of product then mark it as promo
+                            if ($currentItem->qty == 1) {
+                                $item = $currentItem;
+                                $item->promo_id_get = $promo->id;
+                                $item->promo_id_buy = '';
+                                $item->price = 0;
+                            } else {
+                                //file_put_contents("/tmp/data",print_r($currentItem,1));exit;
+                                //if not then add new promo item and decrase qty of current item
+                                $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                    'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
+
+                                $currentItem->qty -= 1;
+                                $currentItem->save();
+                            }
+                        } else {
+                            continue;
+                        }
+                        $item->save();
                     }
                 }
             }
