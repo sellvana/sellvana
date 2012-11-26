@@ -500,6 +500,26 @@ class FCom_Promo_Frontend extends BClass
                     }
                 }
             }
+
+            //GET AMT
+            if ($promo->get_type == '$') {
+                //FROM Any Group
+                if ($promo->get_group == 'any_group') {
+                    $promoItemAmtTotal = 0;
+                    foreach($items as $item) {
+                        if ($item->promo_id_get == $promo->id) {
+                            $promoItemAmtTotal += $item->qty*$item->price;
+                        }
+                        //IF GET AMT < Item AMT total then accept discount
+                        if ($promo->get_amount > $promoItemAmtTotal) {
+                            //add discount for $promo->get_amt
+                            //$cart->
+                            break;
+
+                        }
+                    }
+                }
+            }
         }
     }
 
