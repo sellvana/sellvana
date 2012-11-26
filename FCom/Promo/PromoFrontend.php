@@ -122,7 +122,7 @@ class FCom_Promo_Frontend extends BClass
                     }
                 }
                 //FROM All Group
-                if ('all' == $promo->buy_group) {
+                if ('all' == $promo->buy_group || 'any' == $promo->buy_group) {
                     $groupItems = array();
                     $productQty = 0;
                     foreach($promoProductsInGroup as $product) {
@@ -179,7 +179,7 @@ class FCom_Promo_Frontend extends BClass
                         }
                     }
                 }
-                if ('all' == $promo->buy_group) {
+                if ('all' == $promo->buy_group || 'any' == $promo->buy_group) {
                     $productPrice = 0;
                     foreach($promoProductsInGroup as $product) {
                         if (!empty($productIds[$product->product_id])) {
@@ -270,7 +270,7 @@ class FCom_Promo_Frontend extends BClass
                     $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                     //IF GET QTY < Item Qty then add 1
-                    if ($item && $promo->get_amount > $promoItemQtyTotal) {
+                    if ($item && $promo->get_amount > $item->qty) {
                         $item->qty += 1;
                     } elseif (!$item) {
                         //if it is single item of product then mark it as promo
@@ -326,7 +326,7 @@ class FCom_Promo_Frontend extends BClass
                          $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                         //IF GET QTY < Item Qty then add 1
-                        if ($item && $promo->get_amount > $promoItemQtyTotal) {
+                        if ($item && $promo->get_amount > $item->qty) {
                             $item->qty += 1;
                         } elseif (!$item) {
                             //if it is single item of product then mark it as promo
@@ -373,6 +373,62 @@ class FCom_Promo_Frontend extends BClass
                                 $item->price = 0;
                             } else {
                                 //file_put_contents("/tmp/data",print_r($currentItem,1));exit;
+                                //if not then add new promo item and decrase qty of current item
+                                $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                    'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
+
+                                $currentItem->qty -= 1;
+                                $currentItem->save();
+                            }
+                        } else {
+                            continue;
+                        }
+                        $item->save();
+                    }
+                }
+
+                //from different group
+                if ('diff_group' == $promo->get_group) {
+                    $groupIds = array();
+                    foreach($items as $item) {
+
+                        $groupProductsBuy = FCom_Promo_Model_Product::orm('p')
+                                ->select('p.group_id')
+                                ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
+                                ->where('p.promo_id', $promo->id())
+                                ->where('p.product_id', $item->product_id)
+                                ->where('g.group_type', 'buy')
+                                ->find_many();
+                        if ($groupProductsBuy) {
+                            foreach($groupProductsBuy as $gp) {
+                                $groupIds[$gp->group_id] = $gp->group_id;
+                            }
+                        }
+                    }
+
+                    $groupProductGet = FCom_Promo_Model_Product::orm('p')
+                            ->select('p.group_id')
+                            ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
+                            ->where('p.promo_id', $promo->id())
+                            ->where('p.product_id', $currentItem->product_id)
+                            ->where_not_in("p.group_id", $groupIds)
+                            ->where('g.group_type', 'get')
+                            ->find_many();
+
+                    if ($groupProductGet) {
+                        $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+
+                        //IF GET QTY < Item Qty then add 1
+                        if ($item && $promo->get_amount > $item->qty) {
+                            $item->qty += 1;
+                        } elseif (!$item) {
+                            //if it is single item of product then mark it as promo
+                            if ($currentItem->qty == 1) {
+                                $item = $currentItem;
+                                $item->promo_id_get = $promo->id;
+                                $item->promo_id_buy = '';
+                                $item->price = 0;
+                            } else {
                                 //if not then add new promo item and decrase qty of current item
                                 $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                     'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
