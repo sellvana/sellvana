@@ -1,4 +1,5 @@
 <?php
+/*
 if (class_exists('Highchart')) {
     $chart = new Highchart();
     $chart->title = array('text' => 'Monthly Average Temperature', 'x' => -20);
@@ -6,8 +7,10 @@ if (class_exists('Highchart')) {
     $chart->chart->renderTo = 'chart';
 
 }
-?>
-
+ *
+ */
+/*
+ *
 <script type="text/javascript" src="<?=BApp::baseUrl()?>FCom/Core/js/lib/jquery.min.js" ></script>
 <script type="text/javascript" src="<?=BApp::baseUrl()?>FCom/Admin/js/highcharts/highcharts.js" ></script>
 
@@ -16,6 +19,10 @@ if (class_exists('Highchart')) {
 <script type="text/javascript">
     <?= $chart->render("chart"); ?>
 </script>
+
+ */
+?>
+
 
 
 <?=$this->messagesHtml('admin');?>
