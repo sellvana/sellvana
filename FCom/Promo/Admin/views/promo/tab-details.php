@@ -30,7 +30,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
             <?=$this->view('jqgrid')->set('config', $promoCtrl->productGridConfig($m, $g->group_type, $g->id)) ?>
 <?php endforeach ?>
         </div>
-        <!--<button type="button" class="st1 sz2 btn" id="add-group-get">Add GET Group</button>-->
+        <button type="button" class="st1 sz2 btn" id="add-group-get">Add GET Group</button>
 <?php endif ?>
 
     </div>

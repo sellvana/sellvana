@@ -169,18 +169,42 @@ class FCom_Promo_Frontend extends BClass
             if ('$' == $promo->buy_type) {
                 if ('one' == $promo->buy_group) {
                     $groupProducts = array();
+                    $groupQty = array();
+
                     foreach($promoProductsInGroup as $product) {
                         if (!isset($groupProducts[$product->group_id])) {
-                            $groupProducts[$product->group_id] = 0;
+                            $groupProducts[$product->group_id] = array();
+                            $groupAmt[$product->group_id] = 0;
                         }
                         if (!empty($productIds[$product->product_id])) {
-                            $groupProducts[$product->group_id] += $productIds[$product->product_id]->price*$productIds[$product->product_id]->qty;
+                            $groupProducts[$product->group_id][] = $productIds[$product->product_id];
+                            $groupAmt[$product->group_id] += ($productIds[$product->product_id]->qty*$productIds[$product->product_id]->price - $productIds[$product->product_id]->promo_amt_used);
                         }
-                    }
-                    foreach ($groupProducts as $productPrice) {
-                        if ($promo->buy_amount <= $productPrice ) {
+                        if ($promo->buy_amount <= $groupAmt[$product->group_id] ) {
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
+                            $promoBuyAmount = $promo->buy_amount;
+                            foreach($groupProducts[$product->group_id] as $groupItem) {
+                                if (!empty($groupItem->promo_id_buy)) {
+                                    $promoIds = explode(",", $groupItem->promo_id_buy);
+                                    if(!in_array($promo->id, $promoIds)){
+                                        $promoIds[] = $promo->id;
+                                    }
+                                    $groupItem->promo_id_buy = implode(",", $promoIds);
+                                } else {
+                                    $groupItem->promo_id_buy = $promo->id;
+                                }
+                                if ($promoBuyAmount > 0) {
+                                    $amtUsed = $groupItem->qty*$groupItem->price - $promoBuyAmount;
+                                    if ($amtUsed <= 0) {
+                                        $groupItem->promo_amt_used = $groupItem->qty*$groupItem->price;
+                                    } else {
+                                        $groupItem->promo_amt_used = $promoBuyAmount;
+                                    }
+                                    $promoBuyAmount -= $groupItem->qty*$groupItem->price;
+                                }
+                                $groupItem->save();
+                            }
                         }
                     }
                 }
