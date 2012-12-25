@@ -258,12 +258,12 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['price']) || !is_numeric($options['price'])) {
             $options['price'] = 0;
         } else {
-            $options['price'] = $options['price'] * $options['qty'];
+            $options['price'] = $options['price']; //$options['price'] * $options['qty'];
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
-        if ($item) {
+        if ($item && $item->promo_id_get == 0) {
             $item->add('qty', $options['qty']);
-            $item->add('price', $options['price']);
+            $item->set('price', $options['price']);
         } else {
             $item = FCom_Checkout_Model_CartItem::create(array('cart_id'=>$this->id, 'product_id'=>$productId,
                 'qty'=>$options['qty'], 'price' => $options['price']));
@@ -273,7 +273,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->calcTotals()->save();
         }
 
-        BPubSub::i()->fire(__CLASS__.'::'.__METHOD__, array('model'=>$this));
+        BPubSub::i()->fire(__METHOD__, array('model'=>$this, 'item' => $item));
 
         static::sessionCartId($this->id);
         return $this;
@@ -297,6 +297,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->items();
         $this->removeItem($this->childById('items', $productId, 'product_id'));
+        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
         return $this;
     }
 
@@ -359,10 +360,14 @@ throw new Exception("Invalid cart_id: ".$cId);
         $this->item_qty = 0;
         $this->subtotal = 0;
         foreach ($this->items() as $item) {
+            if (!$item->product()) {
+                $this->removeProduct($item->product_id);
+            }
             $this->item_num++;
             $this->item_qty += $item->qty;
-            $this->subtotal += $item->price;
+            $this->subtotal += $item->price*$item->qty;
         }
+        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
         return $this;
     }
 /*

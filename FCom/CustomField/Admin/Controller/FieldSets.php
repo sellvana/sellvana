@@ -24,6 +24,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'id' => array('label'=>'ID', 'hidden'=>true, 'width'=>30),
                         'field_code' => array('label'=>'Field', 'width'=>200),
                         'field_name' => array('label'=>'Name', 'width'=>200),
+                        'position' => array('label'=>'Position', 'width'=>30, 'editable' => true),
                     ),
                     'multiselect' => true,
                     'autowidth' => false,
@@ -94,11 +95,17 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'frontend_label' => array('label'=>'Frontend Label', 'width'=>200, 'editable'=>true),
                     'frontend_show' => array('label'=>'Show on frontend', 'width'=>50, 'editable'=>true,
                         'options'=>$fld->fieldOptions('frontend_show')),
+                    'sort_order' => array('label'=>'Sort order', 'width'=>50, 'editable'=>true,
+                        'options'=>range(0,20)),
+                    'facet_select' => array('label'=>'Facet', 'width'=>200, 'editable'=>true,
+                        'options'=>array('No' => 'No', 'Exclusive' => 'Exclusive', 'Inclusive' => 'Inclusive')),
                     'table_field_type' => array('label'=>'DB Type', 'width'=>80, 'editable'=>true,
                         'options'=>$fld->fieldOptions('table_field_type')),
                     'admin_input_type' => array('label'=>'Input Type', 'width'=>80, 'editable'=>true,
                         'options'=>$fld->fieldOptions('admin_input_type')),
                     'num_options' => array('label' => 'Options', 'width'=>30),
+                    'system' => array('label'=>'System field', 'width'=>50, 'editable'=>true,
+                        'options'=>array('0' => 'No', '1' => 'Yes')),
                 ),
                 'multiselect' => true,
             ),
@@ -143,7 +150,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
     {
         $orm = FCom_CustomField_Model_SetField::i()->orm('sf')
             ->join('FCom_CustomField_Model_Field', array('f.id','=','sf.field_id'), 'f')
-            ->select(array('f.id', 'f.field_name', 'f.field_code'))
+            ->select(array('f.id', 'f.field_name', 'f.field_code', 'sf.position'))
             ->where('sf.set_id', BRequest::i()->get('set_id'));
         $data = $this->view('jqgrid')->processORM($orm, __METHOD__);
         BResponse::i()->json($data);

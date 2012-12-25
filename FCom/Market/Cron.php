@@ -17,16 +17,16 @@ class FCom_Market_Cron extends BClass
 
 
         $modulesMarket = FCom_Market_Model_Modules::i();
-        foreach ($localModules as $name => $local) {
-            $remote = $remoteModules[$name];
-            $local->upgrade = false;
-            if ($remote) {
-                if (version_compare($remote['version'], $local->version) > 0) {
-                    $local->upgrade = true;
-                }
-                $local->market_version = $remote['version'];
+        foreach ($remoteModules as $name => $remote) {
+            if (empty($localModules[$name])) {
+                continue;
             }
+            $local = $localModules[$name];
 
+            if (version_compare($remote['version'], $local->version) > 0) {
+                $local->upgrade = true;
+            }
+            $local->market_version = $remote['version'];
 
             $modulesMarket->addModule($local);
         }

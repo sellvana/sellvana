@@ -15,7 +15,6 @@ class BMarkdown_Extra_Loader
 {
     static public function bootstrap()
     {
-
     }
 }
 

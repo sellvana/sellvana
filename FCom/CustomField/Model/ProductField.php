@@ -50,7 +50,12 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         if (!$where) {
             $fields = array();
         } else {
-            $fields = FCom_CustomField_Model_Field::i()->orm('f')->where($where)->find_many_assoc();
+            $fields = FCom_CustomField_Model_Field::i()->orm('f')
+                    ->select("f.*")
+                    ->left_outer_join(FCom_CustomField_Model_SetField::table(), 'f.id = sf.field_id', 'sf')
+                    ->where($where)
+                    ->order_by_asc('sf.position')
+                    ->find_many_assoc();
         }
         return $fields;
     }

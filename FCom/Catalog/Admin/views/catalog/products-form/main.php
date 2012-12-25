@@ -64,6 +64,11 @@ head(function() {
                 <h4 class="label">Shipping Weight</h4>
                 <input type="text" name="model[weight]" value="<?php echo $this->q($m->weight) ?>"/>
             </li>
+            <li>
+                <h4 class="label">Disable product</h4>
+                <input type="hidden" name="model[disabled]" value="0"/>
+                <input type="checkbox" name="model[disabled]" value="1" <?= 1 == $m->disabled ? 'checked' : '' ?>/>
+            </li>
         </ul>
     </fieldset>
     <script>

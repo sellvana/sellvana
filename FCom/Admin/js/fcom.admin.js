@@ -848,6 +848,13 @@ $.widget('ui.fcom_autocomplete', {
                     cache[term] = data;
                     if (xhr === lastXhr) {
                         response(data);
+                        /*response($.map( data, function( item ) {
+                            return {
+                                //label: item.name,//item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+                                value: item.name,
+                                id: item.id
+                            }
+                        }));*/
                     }
                 });
             },

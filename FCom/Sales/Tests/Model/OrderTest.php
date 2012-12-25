@@ -24,7 +24,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $order = FCom_Sales_Model_Order::load(2);
         $order->paid();
 
-        $this->assertEquals('paid', $order->status);
+        $this->assertEquals('paid', $order->status()->code);
     }
 
     public function testAddItems()
