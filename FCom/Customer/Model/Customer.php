@@ -9,6 +9,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected $defaultShipping = null;
     protected $defaultBilling = null;
 
+    private static $lastImportedCustomer = 0;
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
@@ -44,8 +46,51 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         parent::afterSave();
 
-        BSession::i()->data('customer_user', serialize($this));
-        static::$_sessionUser = $this;
+        if (self::sessionUser()) {
+            BSession::i()->data('customer_user', serialize($this));
+            static::$_sessionUser = $this;
+        }
+    }
+
+    public function prepareApiData($customers)
+    {
+        $result = array();
+        foreach($customers as $customer) {
+            $result[] = array(
+                'id'                => $customer->id,
+                'email'             => $customer->email,
+                'firstname'         => $customer->firstname,
+                'lastname'          => $customer->lastname,
+                'shipping_address_id'  => $customer->default_shipping_id,
+                'billing_address_id'   => $customer->default_billing_id
+            );
+        }
+        return $result;
+    }
+
+    public function formatApiPost($post)
+    {
+        $data = array();
+
+        if (!empty($post['email'])) {
+            $data['email'] = $post['email'];
+        }
+        if (!empty($post['password'])) {
+            $data['password'] = $post['password'];
+        }
+        if (!empty($post['firstname'])) {
+            $data['firstname'] = $post['firstname'];
+        }
+        if (!empty($post['lastname'])) {
+            $data['lastname'] = $post['lastname'];
+        }
+        if (!empty($post['shipping_address'])) {
+            $data['shipping_address_id'] = $post['shipping_address'];
+        }
+        if (!empty($post['billing_address_id'])) {
+            $data['billing_address_id'] = $post['billing_address_id'];
+        }
+        return $data;
     }
 
     public function getData()
@@ -144,24 +189,34 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (!empty($data['customer']['id'])) {
             $cust = static::load($data['customer']['id']);
         }
+        $result['status'] = '';
         if (empty($cust)) {
             if (empty($data['customer']['email'])) {
-                $result = array('status'=>'error', 'message'=>'Missing email address');
-                return $result;
+                if (self::$lastImportedCustomer) {
+                    $cust = self::$lastImportedCustomer;
+                    $result['status'] = 'updated';
+                } else {
+                    $result = array('status'=>'error', 'message'=>'Missing email address');
+                    return $result;
+                }
+            } else {
+                $cust = static::load($data['customer']['email'], 'email');
             }
-            $cust = static::load($data['customer']['email'], 'email');
         }
-        $result['status'] = '';
         if (!$cust) {
             $cust = static::create();
             $result['status'] = 'created';
         }
         $result['model'] = $cust;
-        $cust->set($data['customer']);
-        if ($cust->is_dirty()) {
-            if (!$result['status']) $result['status'] = 'updated';
-            $cust->save();
+        if (!empty($data['customer']['email'])) {
+            $cust->set($data['customer']);
+            if ($cust->is_dirty()) {
+                if (!$result['status']) $result['status'] = 'updated';
+                $cust->save();
+            }
         }
+
+        self::$lastImportedCustomer = $cust;
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 

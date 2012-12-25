@@ -14,4 +14,13 @@ class FCom_CustomField_Model_FieldOption extends FCom_Core_Model_Abstract
         }
         return $result;
     }
+    public function getListAssoc()
+    {
+        $result = array();
+        $options = $this->orm()->find_many();
+        foreach($options as $o) {
+            $result[$o->field_id][] = $o->label;
+        }
+        return $result;
+    }
 }

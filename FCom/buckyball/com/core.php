@@ -249,26 +249,30 @@ class BApp extends BClass
             /** @var BRequest */
             $r = BRequest::i();
             $c = BConfig::i();
-            $scriptPath = pathinfo($r->scriptName());
+            $scriptPath = pathinfo($r->scriptName());			
             switch ($method) {
                 case 1:
                     $url = $c->get('web/base_href');
                     if (!$url) {
-                        $url = $scriptPath['dirname'];
+                        $url = $scriptPath['dirname'];						
                     }
                     break;
                 case 2:
                     $url = $scriptPath['dirname'];
                     break;
             }
+			
             if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
+				$url = rtrim($url, "\\"); //for windows installation 
                 $url = rtrim($url, '/').'/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
             }
+			
             $baseUrl[$key] = rtrim($url, '/').'/';
         }
+		
         return $baseUrl[$key];
     }
 
@@ -1570,7 +1574,6 @@ class BSession extends BClass
         $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         $path = !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot();
         $domain = !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost();
-
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
             $class::i()->register($ttl);
@@ -1583,6 +1586,7 @@ class BSession extends BClass
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
+            session_set_cookie_params($ttl, $path, $domain);
             session_start();
             // update session cookie expiration to reflect current visit
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
@@ -1596,7 +1600,9 @@ class BSession extends BClass
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip']!==$ip) {
-                BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
+                session_destroy();
+                session_start();
+                //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
             }
         }
 
@@ -1684,6 +1690,12 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         if (is_null($key)) {
             return $this->data;
         }
+        if (is_array($key)) {
+            foreach ($key as $k=>$v) {
+                $this->data($k, $v);   
+            }
+            return $this;
+        }
         if (BNULL===$value) {
             return isset($this->data[$key]) ? $this->data[$key] : null;
         }
@@ -1753,6 +1765,11 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         $this->_phpSessionOpen = false;
         //$this->setDirty();
         return $this;
+    }
+    
+    public function destroy()
+    {
+        session_destroy();
     }
 
     /**

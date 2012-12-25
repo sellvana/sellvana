@@ -76,6 +76,16 @@ class BRequest extends BClass
     {
         return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
     }
+    
+    /**
+    * Origin host name from request headers
+    *
+    * @return string
+    */
+    public static function httpOrigin()
+    {
+        return !empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null;
+    }
 
     /**
     * Whether request is SSL
@@ -483,7 +493,37 @@ class BRequest extends BClass
         }
         return false; // not csrf
     }
+    
+    /**
+    * Verify that HTTP_HOST or HTTP_ORIGIN
+    * 
+    * @param string $method (HOST|ORIGIN|OR|AND)
+    * @param string $explicitHost
+    * @return boolean
+    */
+    public static function verifyOriginHostIp($method='OR', $host=null)
+    {
+        $ip = static::ip();
+        if (!$host) {
+            $host = static::httpHost();
+        }
+        $origin = static::httpOrigin();
+        $hostMatches = $host && $method!='ORIGIN' ? in_array((array)gethostbynamel($host), $ip) : false;
+        $originMatches = $origin && $method!='HOST' ? in_array((array)gethostbynamel($origin), $ip) : false;
+        switch ($method) {
+            case 'HOST': return $hostMatches;
+            case 'ORIGIN': return $originMatches;
+            case 'AND': return $hostMatches && $originMatches;
+            case 'OR': return $hostMatches || $originMatches;
+        }
+        return false;
+    }
 
+    /**
+    * Get current request URL
+    * 
+    * @return string
+    */
     public static function currentUrl()
     {
         $webroot = rtrim(static::webRoot(), '/');
@@ -1003,15 +1043,23 @@ class BResponse extends BClass
         //BSession::i()->close();
         header('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
         if ($this->_contentType=='application/json') {
-            $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);
+            if (!empty($this->_content)) {
+                $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);
+            }
         } elseif (is_null($this->_content)) {
             $this->_content = BLayout::i()->render();
         }
         BPubSub::i()->fire('BResponse::output.before', array('content'=>&$this->_content));
 
-        echo $this->_contentPrefix;
-        print_r($this->_content);
-        echo $this->_contentSuffix;
+        if ($this->_contentPrefix) {
+            echo $this->_contentPrefix;
+        }
+        if ($this->_content) {
+            echo $this->_content;
+        }
+        if ($this->_contentSuffix) {
+            echo $this->_contentSuffix;
+        }
 
         BPubSub::i()->fire('BResponse::output.after', array('content'=>$this->_content));
 
@@ -1054,6 +1102,36 @@ class BResponse extends BClass
     public function httpSTS()
     {
         header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        return $this;
+    }
+    
+    /**
+    * Enable CORS (Cross-Origin Resource Sharing)
+    * 
+    * @param array $options
+    * @return BResponse
+    */
+    public function cors($options=array())
+    {
+        if (empty($options['origin'])) {
+            $options['origin'] = BRequest::i()->httpOrigin();
+        }
+        header('Access-Control-Allow-Origin: '.$options['origin']);
+        if (!empty($options['methods'])) {
+            header('Access-Control-Allow-Methods: '.$options['methods']);
+        }
+        if (!empty($options['credentials'])) {
+            header('Access-Control-Allow-Credentials: true');
+        }
+        if (!empty($options['headers'])) {
+            header('Access-Control-Allow-Headers: '.$options['headers']);
+        }
+        if (!empty($options['expose-headers'])) {
+            header('Access-Control-Expose-Headers: '.$options['expose-headers']);
+        }
+        if (!empty($options['age'])) {
+            header('Access-Control-Max-Age: '.$options['age']);
+        }
         return $this;
     }
 
@@ -1243,9 +1321,11 @@ class BFrontController extends BClass
         if (is_null($requestRoute)) {
             $requestRoute = BRequest::i()->rawPath();
         }
+
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
+
         if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
             BDebug::debug('DIRECT ROUTE: '.$requestRoute);
             return $this->_routes[$requestRoute];
@@ -1617,9 +1697,14 @@ class BRouteObserver
                 }
             }
         }
-        $controllerName = $this->callback[0];
-        $node->controller_name = $controllerName;
-        $actionName = $this->callback[1];
+
+        $actionName = '';
+        $controllerName = '';
+        if (is_array($this->callback)) {
+            $controllerName = $this->callback[0];
+            $node->controller_name = $controllerName;
+            $actionName = $this->callback[1];
+        }
         /** @var BActionController */
         $controller = BClassRegistry::i()->instance($controllerName, array(), true);
         return $controller->dispatch($actionName, $this->args);
@@ -1734,6 +1819,7 @@ class BActionController extends BClass
                 $actionMethod = $tmpMethod;
             }
         }
+        //echo $actionMethod;exit;
         if (!method_exists($this, $actionMethod)) {
             $this->forward(true);
             return $this;

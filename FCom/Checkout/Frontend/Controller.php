@@ -17,6 +17,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
         $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
         BPubSub::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
+
         $shippingEstimate = BSession::i()->data('shipping_estimate');
         $layout->view('checkout/cart')->cart = $cart;
         $layout->view('checkout/cart')->shipping_esitmate = $shippingEstimate;
@@ -67,7 +68,9 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             if (!empty($post['qty'])) {
                 foreach ($post['qty'] as $id=>$qty) {
                     $item = $cart->childById('items', $id);
-                    if ($item) $item->set('qty', $qty)->save();
+                    if ($item) {
+                        $item->set('qty', $qty)->save();
+                    }
                 }
             }
             if (!empty($post['postcode'])) {

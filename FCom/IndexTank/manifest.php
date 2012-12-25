@@ -2,7 +2,7 @@
     'modules' => array(
         // IndexTank integration
         'FCom_IndexTank' => array(
-            'version' => '0.2.0',
+            'version' => '0.2.1',
             'root_dir' => '',
             'depends' => array('FCom_Core'),
             'translations' => array('de' => 'de.php'),
@@ -22,6 +22,11 @@
                 "FCom_Cron" => array(
                     "bootstrap" => array("file" => "Cron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")
                 )
+            ),
+            "require" => array(
+                "module" => array("FCom_Core" => "0.1.0"),
+                "class" => array("PHPUnit"),
+                "phpext" => "curl",
             ),
         ),
 

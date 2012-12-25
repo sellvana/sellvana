@@ -36,6 +36,7 @@ require $comDir.'module.php';
 require $comDir.'controller.php';
 require $comDir.'layout.php';
 require $comDir.'misc.php';
+require $comDir.'import.php';
 
 /**
 * Minify all components into 1 compact file.

@@ -18,7 +18,7 @@ class FCom_Market_Model_Modules extends FCom_Core_Model_Abstract
         }
         $mod->version = $module->version;
         $mod->mod_name = $modName;
-        $mod->need_upgrade = $module->upgrade;
+        $mod->need_upgrade = !empty($module->upgrade) ? 1 : 0;
         $mod->market_version = $module->market_version;
         $mod->name = $modName;
         $mod->description = $module->description ? $module->description : $modName;
