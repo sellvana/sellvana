@@ -44,7 +44,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
     {
         $config = BConfig::i()->get('modules/FCom_Market');
         $timestamp = time();
-        $token = sha1($config['id'].$config['salt'].$timestamp);
+        if (!empty($config['id']) && !empty($config['salt'])) {
+            $token = sha1($config['id'].$config['salt'].$timestamp);
+        } else {
+            $token = null;
+        }
 
         $this->view('market/market')->token = $token;
         $this->view('market/market')->timestamp = $timestamp;
@@ -190,9 +194,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $modNameParts = explode("_", $modName);
         if (count($modNameParts) == 2) {
             $marketPath .= '/'.$modNameParts[0];
-            if (!file_exists($marketPath)) {
-                mkdir($marketPath);
-            }
+            BUtil::ensureDir($marketPath);
         }
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
