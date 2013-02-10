@@ -15,6 +15,9 @@ class FCom_Market_Admin extends BClass
             ->route('GET|POST /market/.action', 'FCom_Market_Admin_Controller')
 
         ;
+        if (!BConfig::i()->get('modules/FCom_Market/market_url')) {
+            BConfig::i()->set('modules/FCom_Market/market_url', 'http://fulleron.com');
+        }
     }
 
     public function hookFindModulesForUpdates($args)
