@@ -26,7 +26,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                </tr>
 		            </thead>
 		            <tbody>
-		<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
+		<?php foreach ($this->cart->items() as $item): $p = $item->product(); if (!$p) continue; ?>
 		                <tr id="tr-product-<?=$p->id?>">
 		                	<td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="<?=$item->id?>"></label></td>
 		                    <td>
@@ -45,7 +45,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		                    </td>
 		                    <td class="a-right">
 		                    	<div class="price-box">
-		                        	<div class=""><span class="price">$<?=number_format($item->rowTotal(), 2)?></span></div>
+		                        	<div class=""><span class="price"><?=number_format($item->rowTotal(), 2)?></span></div>
 		                        </div>
 		                    </td>
 		                </tr>
@@ -83,6 +83,7 @@ $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 		            	<input type="text" size="4" name="postcode" value="" style="width:150px;"/><button type="submit" class="button btn-aux"><span><?= BLocale::_("Submit") ?></span></button></p>
 		    	</form>
 	    	</section>
+            <?=$this->hook('promotions') ?>
     	</div>
     	<div class="col-cart-right">
     		<div class="cart-totals">

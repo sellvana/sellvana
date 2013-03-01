@@ -24,11 +24,11 @@ class FCom_CustomField_Tests_Model_SetTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(0, $this->getConnection()->getRowCount('fcom_fieldset_field'), "Pre-Condition");
 
-        $data = array('set_id' => 3,
+        $data = array('set_id' => 2,
             'field_id' => 1,
             'position' => "10");
 
-        FCom_CustomField_Model_SetField::create($data)->save();
+        FCom_CustomField_Model_SetField::orm()->create($data)->save();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_fieldset_field'), "Insert failed");
     }

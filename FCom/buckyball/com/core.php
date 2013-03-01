@@ -1,4 +1,25 @@
 <?php
+/**
+* Copyright 2011 Unirgy LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* @package BuckyBall
+* @link http://github.com/unirgy/buckyball
+* @author Boris Gurvich <boris@unirgy.com>
+* @copyright (c) 2010-2012 Boris Gurvich
+* @license http://www.apache.org/licenses/LICENSE-2.0.html
+*/
 
 define('BNULL', '!@BNULL#$');
 
@@ -261,14 +282,18 @@ class BApp extends BClass
                     $url = $scriptPath['dirname'];
                     break;
             }
+
             if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
+				$url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/').'/'.$scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
             }
+
             $baseUrl[$key] = rtrim($url, '/').'/';
         }
+
         return $baseUrl[$key];
     }
 
@@ -497,25 +522,8 @@ class BConfig extends BClass
                 $contents = "<?php return ".var_export($config, 1).';';
 
                 // Additional check for allowed tokens
-                $tokens = token_get_all($contents);
-                $t1 = array();
-                $allowed = array(T_OPEN_TAG=>1, T_RETURN=>1, T_WHITESPACE=>1,
-                    T_ARRAY=>1, T_CONSTANT_ENCAPSED_STRING=>1, T_DOUBLE_ARROW=>1,
-                    T_DNUMBER=>1, T_LNUMBER=>1, T_STRING=>1,
-                    '('=>1, ','=>1, ')'=>1, ';'=>1);
-                $denied = array();
-#echo "<pre>"; print_r($tokens); echo "</pre>"; exit;
-                foreach ($tokens as $t) {
-                    #$t1[token_name($t[0])] = 1;
-                    #$t1[$t[0]] = 1;
-                    if (is_string($t) && !isset($t)) {
-                        $denied[] = $t;
-                    } elseif (is_array($t) && !isset($allowed[$t[0]])) {
-                        $denied[] = token_name($t[0]).': '.$t[1]
-                            .(!empty($t[2]) ? ' ('.$t[2].')':'');
-                    }
-                }
-                if ($denied) {
+
+                if ($this->invalidManifestPHP($contents)) {
                     throw new BException('Invalid tokens in configuration found');
                 }
 
@@ -541,6 +549,28 @@ class BConfig extends BClass
     public function unsetConfig()
     {
         $this->_config = array();
+    }
+
+    public function invalidManifestPHP($contents)
+    {
+        $tokens = token_get_all($contents);
+        $allowed = array(T_OPEN_TAG=>1, T_RETURN=>1, T_WHITESPACE=>1, T_COMMENT=>1,
+                    T_ARRAY=>1, T_CONSTANT_ENCAPSED_STRING=>1, T_DOUBLE_ARROW=>1,
+                    T_DNUMBER=>1, T_LNUMBER=>1, T_STRING=>1,
+                    '('=>1, ','=>1, ')'=>1, ';'=>1);
+        $denied = array();
+        foreach ($tokens as $t) {
+            if (is_string($t) && !isset($t)) {
+                $denied[] = $t;
+            } elseif (is_array($t) && !isset($allowed[$t[0]])) {
+                $denied[] = token_name($t[0]).': '.$t[1]
+                    .(!empty($t[2]) ? ' ('.$t[2].')':'');
+            }
+        }
+        if (count($denied)) {
+            return $denied;
+        }
+        return false;
     }
 }
 
@@ -1565,7 +1595,6 @@ class BSession extends BClass
         $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         $path = !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot();
         $domain = !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost();
-
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
             $class::i()->register($ttl);
@@ -1578,6 +1607,7 @@ class BSession extends BClass
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
+            session_set_cookie_params($ttl, $path, $domain);
             session_start();
             // update session cookie expiration to reflect current visit
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
@@ -1591,7 +1621,9 @@ class BSession extends BClass
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip']!==$ip) {
-                BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
+                session_destroy();
+                session_start();
+                //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
             }
         }
 
@@ -1679,6 +1711,12 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         if (is_null($key)) {
             return $this->data;
         }
+        if (is_array($key)) {
+            foreach ($key as $k=>$v) {
+                $this->data($k, $v);
+            }
+            return $this;
+        }
         if (BNULL===$value) {
             return isset($this->data[$key]) ? $this->data[$key] : null;
         }
@@ -1748,6 +1786,11 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         $this->_phpSessionOpen = false;
         //$this->setDirty();
         return $this;
+    }
+
+    public function destroy()
+    {
+        session_destroy();
     }
 
     /**

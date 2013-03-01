@@ -2,6 +2,15 @@
 
 abstract class FCom_Checkout_Model_Shipping_Abstract extends BClass
 {
+    public function getService($serviceKey)
+    {
+        $services = $this->getServices();
+        if (!empty($services[$serviceKey])) {
+            return $services[$serviceKey];
+        }
+        return false;
+    }
+
     /**
      * Return available shipping services codes and description
      */

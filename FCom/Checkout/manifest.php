@@ -3,7 +3,7 @@
 
         // cart, checkout and customer account views and controllers
         'FCom_Checkout' => array(
-            'version' => '0.1.7',
+            'version' => '0.2.0',
             'root_dir' => '',
             'migrate' => 'FCom_Checkout_Migrate',
             'depends' => array('FCom_Catalog'),

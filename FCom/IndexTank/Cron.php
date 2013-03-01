@@ -20,12 +20,65 @@ class FCom_IndexTank_Cron extends BClass
             return;
         }
 
-        $this->indexAllNotIndexed();
+        $this->indexActiveProducts();
+        $this->removeDisabledProducts();
     }
 
-    protected function indexAllNotIndexed()
+    protected function indexActiveProducts()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')->select('p.*')->where_in("indextank_indexed", array(1,0));
+        $products = $this->gerProducts(0);
+        if (!$products) {
+            return;
+        }
+        //before index
+        $this->setProductsStatus(1, $products);
+        //index
+        try {
+            FCom_IndexTank_Index_Product::i()->add($products);
+        } catch(Exception $e) {
+            //do not update products index status because of exception
+            return true;
+        }
+        //after index
+        $this->setProductsStatus(2, $products);
+
+        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+    }
+
+    protected function removeDisabledProducts()
+    {
+        $products = $this->gerProducts(1);
+        if (!$products) {
+            return;
+        }
+        //before index
+        $this->setProductsStatus(1, $products);
+        //index
+        try {
+            FCom_IndexTank_Index_Product::i()->deleteProducts($products);
+        } catch(Exception $e) {
+            //do not update products index status because of exception
+            return true;
+        }
+        //after index
+        $this->setProductsStatus(2, $products);
+
+        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+    }
+
+    /**
+     * Return products list for indexing
+     * @param type $disabled -
+     * if 1 then disabled product will deleted
+     * if 0 then active product will be updated
+     * @return array
+     */
+    protected function gerProducts($disabled)
+    {
+        $orm = FCom_Catalog_Model_Product::orm('p')->select('p.*')
+                ->where('disabled', $disabled)
+                ->where_in("indextank_indexed", array(1,0));
+
         $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
         if (!$batchSize) {
             $batchSize = 500;
@@ -35,26 +88,32 @@ class FCom_IndexTank_Cron extends BClass
         if (!$products) {
             return;
         }
+        return $products;
+    }
+
+    /**
+     * Set status for list of products before/after indexing
+     * @param type $status -
+     * if 1 - indexing status
+     * if 2 - indexed status
+     * @param Array $products - list of products objects
+     */
+    public function setProductsStatus($status, $products)
+    {
+        if (!is_array($products)) {
+            $products = array($products);
+        }
         $productIds = array();
         foreach ($products as $p) {
             $productIds[] = $p->id();
         }
-        //before index
-        FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 1, "indextank_indexed_at" => date("Y-m-d H:i:s")),
-                    "id in (".implode(",", $productIds).")");
-        //index
-        try {
-            FCom_IndexTank_Index_Product::i()->add($products, $batchSize);
-        } catch(Exception $e) {
-            //do not update products index status because of exception
-            return true;
+        $updateQuery = array();
+        if ($status) {
+            $updateQuery = array("indextank_indexed" => $status, "indextank_indexed_at" => date("Y-m-d H:i:s"));
+        } else {
+            $updateQuery = array("indextank_indexed" => $status);
         }
-        //after index
-        FCom_Catalog_Model_Product::i()->update_many(
-                    array("indextank_indexed" => 2, "indextank_indexed_at" => date("Y-m-d H:i:s")),
+        FCom_Catalog_Model_Product::i()->update_many( $updateQuery,
                     "id in (".implode(",", $productIds).")");
-
-        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
     }
 }

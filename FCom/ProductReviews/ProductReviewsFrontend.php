@@ -23,6 +23,7 @@ class FCom_ProductReviews_Frontend extends BClass
         $productReviews = FCom_ProductReviews_Model_Reviews::i()->orm()->where("product_id", $product->id())->find_many();
         BLayout::i()->view('prodreviews/reviews')->product_reviews = $productReviews;
         BLayout::i()->view('prodreviews/reviews')->product = $product;
+        return BLayout::i()->view('prodreviews/reviews')->render();
     }
 
     public static function layout()
@@ -36,9 +37,6 @@ class FCom_ProductReviews_Frontend extends BClass
             '/prodreviews/add'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('prodreviews/add')),
-            ),
-            '/catalog/product'=>array(
-                array('hook', 'prodreviews-reviews', 'views'=>array('prodreviews/reviews')),
             ),
         ));
     }

@@ -9,14 +9,20 @@ class FCom_Market_MarketApi extends BClass
         //BConfig::i()->get('FCom_Market/market_url');
     }
 
-    private function getTokenUrl()
+    public function getModules($modules)
     {
-        $config = BConfig::i()->get('modules/FCom_Market');
-        $timestamp = time();
-        $token = sha1($config['id'].$config['salt'].$timestamp);
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
+                . '/market/api/list'.'?'.$this->getTokenUrl();
+        if (empty($fulleronUrl)) {
+            return false;
+        }
+        if (!empty($modules)) {
+            $fulleronUrl .= "&modules=".BUtil::toJson($modules);
+        }
 
-        $str = 'id='.$config['id'].'&token='.$token.'&ts='.$timestamp;
-        return $str;
+        $response = $this->apiCall("GET", $fulleronUrl);
+
+        return BUtil::fromJson($response->response);
     }
 
     public function getMyModules()
@@ -51,7 +57,7 @@ class FCom_Market_MarketApi extends BClass
     public function download($moduleName)
     {
         $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') .
-                '/market/api/download?modid='.$moduleName.'&'.$this->getTokenUrl();
+                '/market/api/download?mod_name='.$moduleName.'&'.$this->getTokenUrl();
 
         $storage = BConfig::i()->get('fs/storage_dir');
         $response = $this->apiCall("GET", $fulleronUrl);
@@ -112,8 +118,7 @@ class FCom_Market_MarketApi extends BClass
             }
             $args = '';
         } else {
-            $args = json_encode($params);
-
+            $args = BUtil::toJson($params);
         }
 
         $session = curl_init($url);
@@ -141,5 +146,15 @@ class FCom_Market_MarketApi extends BClass
         //echo $http_code;
         //echo $response;
         throw new Exception($response, $http_code);
+    }
+
+    private function getTokenUrl()
+    {
+        $config = BConfig::i()->get('modules/FCom_Market');
+        $timestamp = time();
+        $token = sha1($config['id'].$config['salt'].$timestamp);
+
+        $str = 'id='.$config['id'].'&token='.$token.'&ts='.$timestamp;
+        return $str;
     }
 }

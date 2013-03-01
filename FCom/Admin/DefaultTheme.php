@@ -34,6 +34,8 @@ class FCom_Admin_DefaultTheme extends BClass
                         array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
                         array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
                         array('css', '{FCom_Core}/js/lib/css/jquery.pnotify.default.css'),
+                        //highcharts
+                        //array('js', '{FCom_Admin}/js/highcharts/highcharts.js'),
                     )),
                     array('layout', 'jqgrid'),
                     array('layout', 'jstree'),

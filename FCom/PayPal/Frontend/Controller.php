@@ -142,6 +142,9 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $sData['last_order']['id'] = $salesOrder->id();
 
+        //set sales order as paid
+        $salesOrder->paid();
+
         //unset cart
         $cart->status = 'finished';
         $cart->save();

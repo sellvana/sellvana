@@ -8,8 +8,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function productsORM()
     {
-        return FCom_Catalog_Model_Product::i()->factory()->table_alias('p')
-            ->join(FCom_Catalog_Model_CategoryProduct::table(), array('pc.product_id','=','p.id'), 'pc')
+        return FCom_Catalog_Model_Product::i()->orm('p')
+            ->join('FCom_Catalog_Model_CategoryProduct', array('pc.product_id','=','p.id'), 'pc')
             ->where('pc.category_id', $this->id);
     }
 
@@ -43,5 +43,40 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     {
         $this->top_menu = $set;
         $this->save();
+    }
+
+    public function prepareApiData($categories)
+    {
+        $result = array();
+        foreach($categories as $category) {
+            $result[] = array(
+                'id' => $category->id,
+                'parent_id' => $category->parent_id,
+                'name'  => $category->node_name,
+                'url'   => $category->url_key,
+                'path'  => $category->id_path,
+                'children'  => $category->num_children
+            );
+        }
+        return $result;
+    }
+
+    public function parentNodeList()
+    {
+        $categories = self::orm()->find_many();
+        $result = array();
+        if (empty($categories)) {
+            return $result;
+        }
+
+        foreach($categories as $cat) {
+            $result[$cat->parent_id][$cat->node_name] = $cat;
+        }
+        return $result;
+    }
+
+    public function inMenu()
+    {
+        return $this->top_menu;
     }
 }

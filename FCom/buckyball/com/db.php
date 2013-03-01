@@ -1,4 +1,25 @@
 <?php
+/**
+* Copyright 2011 Unirgy LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* @package BuckyBall
+* @link http://github.com/unirgy/buckyball
+* @author Boris Gurvich <boris@unirgy.com>
+* @copyright (c) 2010-2012 Boris Gurvich
+* @license http://www.apache.org/licenses/LICENSE-2.0.html
+*/
 
 /**
 * Wrapper for idiorm/paris
@@ -374,13 +395,47 @@ class BDb
         return !empty(static::$_config['dbname']) ? static::$_config['dbname'] : null;
     }
 
+    public static function ddlStart()
+    {
+        BDb::run(<<<EOT
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+EOT
+        );
+    }
+
+    public static function ddlFinish()
+    {
+        BDb::run(<<<EOT
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+EOT
+        );
+    }
+
     /**
     * Clear DDL cache
     *
     */
-    public static function ddlClearCache()
+    public static function ddlClearCache($fullTableName=null)
     {
-        static::$_tables = array();
+        if ($fullTableName) {
+            if (!static::dbName()) {
+                static::connect(static::$_defaultConnectionName);
+            }
+            $a = explode('.', $fullTableName);
+            $dbName = empty($a[1]) ? static::dbName() : $a[0];
+            $tableName = empty($a[1]) ? $fullTableName : $a[1];
+            static::$_tables[$dbName][$tableName] = null;
+        } else {
+            static::$_tables = array();
+        }
     }
 
     /**
@@ -480,6 +535,45 @@ class BDb
         $res = static::$_tables[$dbName][$tableName]['fks'];
         return is_null($fkName) ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
     }
+    
+    /**
+    * Create or update table
+    * 
+    * @deprecates ddlTable and ddlTableColumns
+    * @param string $fullTableName
+    * @param array $def
+    */
+    public static function ddlTableDef($fullTableName, $def)
+    {
+        $fields = !empty($def['COLUMNS']) ? $def['COLUMNS'] : null;
+        $primary = !empty($def['PRIMARY']) ? $def['PRIMARY'] : null;
+        $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;
+        $fks = !empty($def['CONSTRAINTS']) ? $def['CONSTRAINTS'] : null;
+        $options = !empty($def['OPTIONS']) ? $def['OPTIONS'] : null;
+        
+        if (!static::ddlTableExists($fullTableName)) {
+            if (!$fields) {
+                throw new BException('Missing fields definition for new table');
+            }
+            // temporary code duplication with ddlTable, until the other one is removed
+            $fieldsArr = array();
+            foreach ($fields as $f=>$def) {
+                $fieldsArr[] = $f.' '.$def;
+            }
+            $fields = null; // reset before update step
+            if ($primary) {
+                $fieldsArr[] = "PRIMARY KEY ".$primary;
+                $primary = null; // reset before update step
+            }
+            $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
+            $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+            $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
+            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
+                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
+            static::ddlClearCache();
+        }
+        return static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
+    }
 
     /**
     * Create or update table
@@ -489,20 +583,26 @@ class BDb
     * @param array $options
     *   - engine (default InnoDB)
     *   - charset (default utf8)
+    *   - collate (default utf8_general_ci)
     */
     public static function ddlTable($fullTableName, $fields, $options=null)
     {
         if (static::ddlTableExists($fullTableName)) {
-            static::ddlTableColumns($fullTableName, $fields);
+            static::ddlTableColumns($fullTableName, $fields, null, null, $options); // altering options is not implemented
         } else {
             $fieldsArr = array();
             foreach ($fields as $f=>$def) {
                 $fieldsArr[] = $f.' '.$def;
             }
+            if (!empty($options['primary'])) {
+                $fieldsArr[] = "PRIMARY KEY ".$options['primary'];
+            }
             $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
             $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
+            $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
             BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-                ENGINE={$engine} DEFAULT CHARSET={$charset}", array())->execute();
+                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
+            static::ddlClearCache();
         }
         return true;
     }
@@ -550,7 +650,16 @@ class BDb
                     if (!empty($tableIndexes[$idx])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
-                    $alterArr[] = "ADD KEY `{$idx}` {$def}";
+                    if (strpos($def, 'PRIMARY')===0) {
+                        $alterArr[] = "DROP PRIMARY KEY";
+                        $def = substr($def, 7);
+                        $alterArr[] = "ADD PRIMARY KEY `{$idx}` {$def}";
+                    } elseif (strpos($def, 'UNIQUE')===0) {
+                        $def = substr($def, 6);
+                        $alterArr[] = "ADD UNIQUE KEY `{$idx}` {$def}";
+                    } else {
+                        $alterArr[] = "ADD KEY `{$idx}` {$def}";
+                    }
                 }
             }
         }
@@ -560,7 +669,7 @@ class BDb
             // You cannot add a foreign key and drop a foreign key in separate clauses of a single ALTER TABLE statement.
             // Separate statements are required.
             $dropArr = array();
-            foreach ($indexes as $idx=>$def) {
+            foreach ($fks as $idx=>$def) {
                 if ($def==='DROP') {
                     if (!empty($tableFKs[$idx])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
@@ -574,9 +683,15 @@ class BDb
             }
             if (!empty($dropArr)) {
                 BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $dropArr), array())->execute();
+                static::ddlClearCache();
             }
         }
-        return BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array())->execute();
+        $result = null;
+        if ($alterArr) {
+            $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array())->execute();
+            static::ddlClearCache();
+        }
+        return $result;
     }
 
     /**
@@ -767,7 +882,8 @@ class BORM extends ORMWrapper
      * Set up the database connection used by the class.
      * Use BPDO for nested transactions
      */
-    protected static function _setup_db() {
+    protected static function _setup_db()
+    {
         if (!is_object(static::$_db)) {
             $connection_string = static::$_config['connection_string'];
             $username = static::$_config['username'];
@@ -776,7 +892,15 @@ class BORM extends ORMWrapper
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
                 $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
             }
-            $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED
+            try { //ADDED: hide connection details from the error if not in DEBUG mode
+                $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED
+            } catch (PDOException $e) {
+                if (BDebug::is('DEBUG')) {
+                    throw $e;
+                } else {
+                    throw new PDOException('Could not connect to database');
+                }
+            }
             $db->setAttribute(PDO::ATTR_ERRMODE, static::$_config['error_mode']);
             static::set_db($db);
         }
@@ -787,7 +911,8 @@ class BORM extends ORMWrapper
      * This is public in case the ORM should use a ready-instantiated
      * PDO object as its database connection.
      */
-    public static function set_db($db, $config=null) {
+    public static function set_db($db, $config=null)
+    {
         if (!is_null($config)) {
             static::$_config = array_merge(static::$_config, $config);
         }
@@ -892,6 +1017,24 @@ class BORM extends ORMWrapper
             $fragment .= ' '.$idx['type'].' INDEX ('.$idx['index'].') ';
         }
         return $fragment;
+    }
+
+    protected function _add_result_column($expr, $alias=null) {
+        if (!is_null($alias)) {
+            $expr .= " AS " . $this->_quote_identifier($alias);
+        }
+        // ADDED TO AVOID DUPLICATE FIELDS
+        if (in_array($expr, $this->_result_columns)) {
+            return $this;
+        }
+
+        if ($this->_using_default_result_columns) {
+            $this->_result_columns = array($expr);
+            $this->_using_default_result_columns = false;
+        } else {
+            $this->_result_columns[] = $expr;
+        }
+        return $this;
     }
 
     /**
@@ -1068,6 +1211,9 @@ exit;
      * database when save() is called.
      */
     public function set($key, $value) {
+        if (!is_scalar($key)) {
+            throw new BException('Key not scalar');
+        }
         if (!array_key_exists($key, $this->_data)
             || is_null($this->_data[$key]) && !is_null($value)
             || !is_null($this->_data[$key]) && is_null($value)
@@ -1464,11 +1610,22 @@ class BModel extends Model
     */
     public static function orm($alias=null)
     {
-        $orm = static::i()->factory();
+        $orm = static::factory();
         if ($alias) {
             $orm->table_alias($alias);
         }
+        static::_findOrm($orm);
         return $orm;
+    }
+
+    /**
+    * Placeholder for class specific ORM augmentation
+    *
+    * @param BORM $orm
+    */
+    protected static function _findOrm($orm)
+    {
+
     }
 
     /**
@@ -1507,7 +1664,7 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (!is_null($flag) || is_null($this->get($key))) {
+            if (is_scalar($key) && (!is_null($flag) || is_null($this->get($key)))) {
                 parent::set($key, $value);
             }
         }
@@ -1533,7 +1690,7 @@ class BModel extends Model
     */
     public static function create($data=null)
     {
-        $record = static::i()->factory()->create($data);
+        $record = static::factory()->create($data);
         $record->afterCreate();
         return $record;
     }
@@ -1573,6 +1730,7 @@ class BModel extends Model
     *
     * @param int|string|array $id
     * @param string $field
+    * @param boolean $cache
     * @return BModel
     */
     public static function load($id, $field=null, $cache=false)
@@ -1582,7 +1740,13 @@ class BModel extends Model
             $field = static::_get_id_column_name($class);
         }
 
-        $keyValue = $id;
+        if (is_array($id)) {
+            ksort($id);
+            $field = join(',', array_keys($id));
+            $keyValue = join(',', array_values($id));
+        } else {
+            $keyValue = $id;
+        }
         if (!empty(static::$_cacheFlags[$field]['key_lower'])) {
             $keyValue = strtolower($keyValue);
         }
@@ -1601,6 +1765,7 @@ class BModel extends Model
             }
             $orm->where($field, $id);
         }
+        /** @var BModel $record */
         $record = $orm->find_one();
         if ($record) {
             $record->afterLoad();
@@ -1660,7 +1825,7 @@ class BModel extends Model
     */
     public function cachePreload($where=null, $field=null, $sort=null)
     {
-        $orm = $this->factory();
+        $orm = static::factory();
         $class = $this->_origClass();
         if (is_null($field)) {
             $field = static::_get_id_column_name($class);
@@ -1685,24 +1850,24 @@ class BModel extends Model
     {
         if (!$collection) return $this;
         $class = $this->_origClass();
-        $keys = array();
+        $keyValues = array();
         $keyLower = !empty(static::$_cacheFlags[$lk]['key_lower']);
         foreach ($collection as $r) {
             $key = null;
             if (is_object($r)) {
-                $key = $r->get($fk);
+                $keyValue = $r->get($fk);
             } elseif (is_array($r)) {
-                $key = isset($r[$fk]) ? $r[$fk] : null;
+                $keyValue = isset($r[$fk]) ? $r[$fk] : null;
             } elseif (is_scalar($r)) {
-                $key = $r;
+                $keyValue = $r;
             }
-            if (empty($key)) continue;
-            if ($keyLower) $key = strtolower($key);
-            if (!empty(static::$_cache[$class][$lk][$key])) continue;
-            $keys[$key] = 1;
+            if (empty($keyValue)) continue;
+            if ($keyLower) $keyValue = strtolower($keyValue);
+            if (!empty(static::$_cache[$class][$lk][$keyValue])) continue;
+            $keyValues[$keyValue] = 1;
         }
         $field = (strpos($lk, '.')===false ? '_main.' : '').$lk; //TODO: table alias flexibility
-        if ($keys) $this->cachePreload(array($field=>array_keys($keys)), $lk);
+        if ($keyValues) $this->cachePreload(array($field=>array_keys($keyValues)), $lk);
         return $this;
     }
 
@@ -1718,9 +1883,9 @@ class BModel extends Model
         $cache =& static::$_cache[$this->_origClass()];
         $lower = !empty(static::$_cacheFlags[$toKey]['key_lower']);
         foreach ($cache[$fromKey] as $r) {
-            $key = $r->get($toKey);
-            if ($lower) $key = strtolower($key);
-            $cache[$toKey][$key] = $r;
+            $keyValue = $r->get($toKey);
+            if ($lower) $keyValue = strtolower($keyValue);
+            $cache[$toKey][$keyValue] = $r;
         }
         return $this;
     }
@@ -1750,15 +1915,15 @@ class BModel extends Model
     * @param string $key
     * @return array|BModel
     */
-    public function cacheFetch($field='id', $key=null)
+    public function cacheFetch($field='id', $keyValue=null)
     {
         $class = $this->_origClass();
         if (empty(static::$_cache[$class])) return null;
         $cache = static::$_cache[$class];
         if (empty($cache[$field])) return null;
-        if (is_null($key)) return $cache[$field];
-        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $key = strtolower($key);
-        return !empty($cache[$field][$key]) ? $cache[$field][$key] : null;
+        if (is_null($keyValue)) return $cache[$field];
+        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $keyValue = strtolower($keyValue);
+        return !empty($cache[$field][$keyValue]) ? $cache[$field][$keyValue] : null;
     }
 
     /**
@@ -1785,9 +1950,17 @@ class BModel extends Model
             }
             return $this;
         }
-        $key = $this->get($field);
-        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $key = strtolower($key);
-        $cache[$field][$key] = $this;
+        if (strpos($field, ',')) {
+            $keyValueArr = array();
+            foreach (explode(',', $field) as $k) {
+                $keyValueArr[] = $this->get($k);
+            }
+            $keyValue = join(',', $keyValueArr);
+        } else {
+            $keyValue = $this->get($field);
+        }
+        if (!empty(static::$_cacheFlags[$field]['key_lower'])) $keyValue = strtolower($keyValue);
+        $cache[$field][$keyValue] = $this;
         return $this;
     }
 
@@ -1897,23 +2070,23 @@ class BModel extends Model
 
     public function delete()
     {
-        if (!$this->beforeDelete()) {
-            return $this;
-        }
         try {
-            $this->beforeDelete();
+            if (!$this->beforeDelete()) {
+                return $this;
+            }
             BPubSub::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
         } catch(BModelException $e) {
             return $this;
         }
 
         if (($cache =& static::$_cache[$this->_origClass()])) {
-            foreach ($cache as $k=>$cache) {
-                $key = $this->get($k);
-                if (!empty(static::$_cacheFlags[$k]['key_lower'])) $key = strtolower($key);
-                unset($cache[$k][$key]);
+            foreach ($cache as $k=>$c) {
+                $keyValue = $this->get($k);
+                if (!empty(static::$_cacheFlags[$k]['key_lower'])) $keyValue = strtolower($keyValue);
+                unset($cache[$k][$keyValue]);
             }
         }
+
         parent::delete();
 
         $this->afterDelete();

@@ -16,7 +16,7 @@ class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
 
     public function rowTotal()
     {
-        return $this->price;
+        return $this->price*$this->qty;
     }
 
     public function isGroupAble()
@@ -26,7 +26,11 @@ class FCom_Checkout_Model_CartItem extends FCom_Core_Model_Abstract
 
     public function getWeight()
     {
-        return $this->product()->weight;
+        $p = $this->product();
+        if (!$p) {
+            return false;
+        }
+        return $p->weight;
     }
 
     public function getQty()

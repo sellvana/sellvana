@@ -59,12 +59,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return BUtil::toJson($result);
     }
 
-    public function productLibraryGridConfig($gridId='products')
+    public function productLibraryGridConfig($gridId=false)
     {
         $columns = $this->gridColumns();
         unset($columns['product_name']['formatter'], $columns['product_name']['formatoptions']);
         $columns['create_dt']['hidden'] = true;
         $config = $this->gridConfig();
+        if ($gridId) {
+            $config['grid']['id'] = $gridId;
+        }
         $config['grid']['autowidth'] = false;
         $config['grid']['caption'] = 'All products';
         $config['grid']['multiselect'] = true;

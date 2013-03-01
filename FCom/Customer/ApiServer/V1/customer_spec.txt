@@ -1,0 +1,80 @@
+Customer API
+
+Customer management
+
+GET /v1/customer/customer
+GET /v1/customer/customer/:id
+    Retrive customers or concrete customer from the database
+
+    The query string could contain:
+
+    Optional:
+    "len" - how many results to return (default: 10)
+    "start" - for paging, the first position to return
+
+    HTTP Response codes
+    200 OK
+    The response body will contain JSON map with the fields:
+    'id'
+    'email'
+    'firstname'
+    'lastname'
+    'shipping_address_id'
+    'billing_address_id'
+
+POST /v1/customer/customer
+    Adds a customer to the database
+
+    The request body should contain a JSON object with:
+    'email'
+    'password'
+    'firstname'
+    'lastname'
+
+    Optional:
+    'shipping_address_id'
+    'billing_address_id'
+
+    HTTP Response codes
+    201 Created - customer created
+    The response body will contain id of the new product.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+PUT /v1/customer/customer/:id
+    Update a customer specified by id in the database
+
+    The request body could contain a JSON object with any of following fields:
+    'email'
+    'password'
+    'firstname'
+    'lastname'
+    'shipping_address_id'
+    'billing_address_id'
+
+    HTTP Response codes
+    200 OK - customer updated
+    The response body will be empty.
+
+    400 Invalid or missing argument
+    A descriptive error message will be found in the body.
+
+    404 No product existed for the given id
+    A descriptive error message will be found in the body.
+
+    503 Service Unavailable
+    A descriptive error message will be found in the body.
+
+DELETE /v1/customer/customer/:id
+    Removes a customer from the database.
+
+    HTTP Response codes
+    200 OK - customer deleted
+    The response body will be empty.
+
+    404 No product existed for the given id
+    A descriptive error message will be found in the body.
