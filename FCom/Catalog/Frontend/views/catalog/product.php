@@ -103,7 +103,6 @@ $cat = $this->category;
                     <div class="tab-content tab-reviews">
                     	<header><?= BLocale::_("Reviews") ?></header>
                         <?php echo $this->hook('prodreviews-reviews', array('product' => $prod)) ?>
-                        <?//=$this->view('prodreviews/reviews', array('prod' => $prod, 'reviews' => $this->product_reviews))?>
                     </div>
             	</div>
 <script>

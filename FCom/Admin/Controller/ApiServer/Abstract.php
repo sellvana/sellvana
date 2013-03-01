@@ -4,11 +4,50 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
 {
     protected static $_origClass;
     protected $_permission;
-    protected $_authorizeActions = array();
+    protected $_authorizeActions = array('get','put', 'post', 'delete');
+    protected $_authorizeActionsWhitelist = array();
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
+        foreach ($this->_authorizeActionsWhitelist as &$action) {
+            $action = strtolower($action);
+        }
         BResponse::i()->contentType('application/json');
+    }
+
+    public function ok($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(200);
+    }
+    public function created($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(201);
+    }
+
+    public function notFound($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(404);
+    }
+
+    public function badRequest($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(400);
+    }
+
+    public function internalError($msg = null)
+    {
+        BResponse::i()->set($msg);
+        BResponse::i()->status(503);
+    }
+
+    public function isApiCall()
+    {
+        return true;
     }
 
     public function authenticate($args=array())
@@ -30,6 +69,10 @@ class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abs
 
         if (!is_array($authorizeActions)) {
             $authorizeActions = array($authorizeActions);
+        }
+
+        if (!empty($this->_authorizeActionsWhitelist)) {
+            $authorizeActions = array_diff($authorizeActions, $this->_authorizeActionsWhitelist);
         }
 
         if (false == in_array($this->getAction(), $authorizeActions)) {

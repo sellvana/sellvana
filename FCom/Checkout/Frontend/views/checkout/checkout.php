@@ -80,7 +80,7 @@
 			            </tr>
 			        </thead>
 			        <tbody>
-			<?php foreach ($this->cart->items() as $item): $p = $item->product() ?>
+			<?php foreach ($this->cart->items() as $item): $p = $item->product(); if (!$p) continue; ?>
 			            <tr id="tr-product-<?=$p->id?>">
 			                <td class="a-left">
 			                    <span class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></span>
@@ -146,7 +146,7 @@
 		    </div>
 			<?php endif; ?>
            	<ul class="checkout-btns">
-				<li><button type="submit" name="place_order" class="button btn-sz2"><span><?= BLocale::_("Place your order") ?></span></button></li>
+				<li><button type="submit" name="place_order" value="new_order" class="button btn-sz2"><span><?= BLocale::_("Place your order") ?></span></button></li>
 			</ul>
 		</div>
 		<!-- .col-checkout-right ends -->

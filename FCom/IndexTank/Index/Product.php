@@ -276,7 +276,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * Collect all data (text fields, categoreis, variables) for $product and add it to the index
      * @param array $products of FCom_Catalog_Model_Product objects
      */
-    public function add($products, $limit = 500)
+    public function add($products, $limit = 0)
     {
         if (!is_array($products)){
             $products = array($products);
@@ -285,6 +285,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $counter = 0;
         $documents = array();
         foreach ($products as $i => $product) {
+            if ($product->disabled) {
+                continue;
+            }
             $categories     = $this->_prepareCategories($product);
             $variables      = $this->_prepareVariables($product);
             $fields         = $this->_prepareFields($product);
@@ -299,7 +302,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
 
             //submit every N products to IndexDen - this protect from network overloading
-            if ( 0 == ++$counter % $limit ) {
+            if ( $limit && 0 == ++$counter % $limit ) {
                 BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
                 $this->model()->add_documents($documents);
                 $documents = array();
@@ -450,36 +453,39 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         $facetsData = array();
         if ($facets) {
-            $cmp = function($a, $b)
-            {
-                return strnatcmp($a->name, $b->name);
-            };
 
             $facetsFields = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
 
-            //get categories
-            foreach ($facets as $fname => $fvalues) {
-                //get other fields
-                if (isset($facetsFields[$fname])) {
-                    foreach ($fvalues as $fvalue => $fcount) {
+            //todo: think how to sort custom fields
+            //$facetCustomFieldsSorted = FCom_IndexTank_Model_ProductField::i()->getCustomFieldsSorted();
+
+            foreach($facetsFields as $fname => $field) {
+                if (isset($facets[$fname])) {
+                    foreach ($facets[$fname] as $fvalue => $fcount) {
                         $obj = new stdClass();
                         $obj->name = $fvalue;
                         $obj->count = $fcount;
                         $obj->key = $fname;
                         $obj->category = false;
-                        if ('inclusive' == $facetsFields[$fname]->filter || empty($facetsFields[$fname]->filter)) {
+                        if ('inclusive' == $field->filter || empty($field->filter)) {
                             $obj->param = "f[{$obj->key}][{$obj->name}]";
-                            //$obj->param = "f[{$obj->key}][]";
                         } else {
                             $obj->param = "f[{$obj->key}][]";
                         }
-                        $facetsData[$facetsFields[$fname]->field_nice_name][] = $obj;
+                        $facetsData[$field->field_nice_name][] = $obj;
                     }
                 }
             }
+
+            $cmp = function($a, $b)
+            {
+                return strnatcmp($a->name, $b->name);
+            };
+
             foreach ($facetsData as &$values) {
                 usort($values, $cmp);
             }
+
         }
         return $facetsData;
     }
@@ -598,6 +604,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             }
             switch ($field->source_type) {
                 case 'product':
+                case 'custom_field':
                     //get value of product object
                     $value = $product->{$field->source_value};
                     if ('variables' == $type && false == is_numeric($value)) {

@@ -7,7 +7,7 @@
 
 <?php if(!$this->status):?>
     <h3>Warning: IndexDen API URL isn't set</h3>
-    <h3>Please visit <a href="<?=BApp::href('settings')?>#tab-FCom_IndexTank">setting page</a> to setup API URL</h3>
+    <h3>Please visit <a href="<?=BApp::href('settings')?>?tab=FCom_IndexTank">setting page</a> to setup API URL</h3>
 <?php endif; ?>
 
 <?php echo $this->view('jqgrid') ?>

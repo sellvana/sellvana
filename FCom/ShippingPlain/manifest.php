@@ -16,6 +16,7 @@
                     'bootstrap' => array('file'=>'ShippingPlain.php', 'callback'=>'FCom_ShippingPlain::bootstrap'),
                 ),
             ),
+            "require" => array("FCom_Checkout"),
         ),
     ),
 );

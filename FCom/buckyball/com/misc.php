@@ -1,4 +1,25 @@
 <?php
+/**
+* Copyright 2011 Unirgy LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* @package BuckyBall
+* @link http://github.com/unirgy/buckyball
+* @author Boris Gurvich <boris@unirgy.com>
+* @copyright (c) 2010-2012 Boris Gurvich
+* @license http://www.apache.org/licenses/LICENSE-2.0.html
+*/
 
 /**
 * Utility class to parse and construct strings and data structures
@@ -41,6 +62,16 @@ class BUtil extends BClass
     protected static $_hashSep = '$';
 
     /**
+    * Default character pool for random and sequence strings
+    *
+    * Chars "c", "C" are ommited to avoid accidental obscene language
+    * Chars "0", "1", "I" are removed to avoid leading 0 and ambiguity in print
+    *
+    * @var string
+    */
+    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
+
+    /**
     * Shortcut to help with IDE autocompletion
     *
     * @return BUtil
@@ -77,6 +108,65 @@ class BUtil extends BClass
     {
         $obj = json_decode($json);
         return $asObject ? $obj : static::objectToArray($obj);
+    }
+
+    /**
+    * Indents a flat JSON string to make it more human-readable.
+    *
+    * @param string $json The original JSON string to process.
+    *
+    * @return string Indented version of the original JSON string.
+    */
+    public static function jsonIndent($json)
+    {
+
+        $result      = '';
+        $pos         = 0;
+        $strLen      = strlen($json);
+        $indentStr   = '  ';
+        $newLine     = "\n";
+        $prevChar    = '';
+        $outOfQuotes = true;
+
+        for ($i=0; $i<=$strLen; $i++) {
+
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
+
+            // Are we inside a quoted string?
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+
+            // If this character is the end of an element,
+            // output a new line and indent the next line.
+            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine;
+                $pos --;
+                for ($j=0; $j<$pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            // Add the character to the result string.
+            $result .= $char;
+
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine;
+                if ($char == '{' || $char == '[') {
+                    $pos ++;
+                }
+
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            $prevChar = $char;
+        }
+
+        return $result;
     }
 
     /**
@@ -118,6 +208,30 @@ class BUtil extends BClass
             }
         }
         return '"UNSUPPORTED TYPE"';
+    }
+
+    public static function toRss($data)
+    {
+        $lang = !empty($data['language']) ? $data['language'] : 'en-us';
+        $ttl = !empty($data['ttl']) ? (int)$data['ttl'] : 40;
+        $descr = !empty($data['description']) ? $data['description'] : $data['title'];
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
+.'<title><![CDATA['.$data['title'].']]></title><link><![CDATA['.$data['link'].']]></link>'
+.'<description><![CDATA['.$descr.']]></description><language><![CDATA['.$lang.']]></language><ttl>'.$ttl.'</ttl>';
+        foreach ($data['items'] as $item) {
+            if (!is_numeric($item['pubDate'])) {
+                $item['pubDate'] =  strtotime($item['pubDate']);
+            }
+            if (empty($item['guid'])) {
+                $item['guid'] = $item['link'];
+            }
+            $xml .= '<item><title><![CDATA['.$item['title'].']]></title>'
+.'<description><![CDATA['.$item['description'].']]></description>'
+.'<pubDate>'.date('r', $item['pubDate']).'</pubDate>'
+.'<guid><![CDATA['.$item['guid'].']]></guid><link><![CDATA['.$item['link'].']]></link></item>';
+        }
+        $xml .= '</channel></rss>';
+        return $xml;
     }
 
     /**
@@ -359,7 +473,6 @@ class BUtil extends BClass
     *   - key.(before|after)
     *   - obj.(before|after).$object_property==$key
     *   - arr.(before|after).$item_array_key==$key
-    * @param mixed $key
     * @return array resulting array
     */
     static public function arrayInsert($array, $items, $where)
@@ -453,7 +566,19 @@ class BUtil extends BClass
         return $result;
     }
 
-
+    static public function arrayMask($array, $fields)
+    {
+        if (is_string($fields)) {
+            $fields = explode(',', $fields);
+        }
+        $result = array();
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $array)) {
+                $result[$f] = $array[$f];
+            }
+        }
+        return $result;
+    }
 
     /**
     * Create IV for mcrypt operations
@@ -519,34 +644,16 @@ class BUtil extends BClass
     }
 
     /**
-    * Set or retrieve current hash algorithm
-    *
-    * @param string $algo
-    */
-    public static function hashAlgo($algo=null)
-    {
-        if (is_null($algo)) {
-            return static::$_hashAlgo;
-        }
-        static::$_hashAlgo = $algo;
-    }
-
-    public static function hashIter($iter=null)
-    {
-        if (is_null($iter)) {
-            return static::$_hashIter;
-        }
-        static::$iter = $iter;
-    }
-
-    /**
     * Generate random string
     *
     * @param int $strLen length of resulting string
     * @param string $chars allowed characters to be used
     */
-    public static function randomString($strLen=8, $chars='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ23456789')
+    public static function randomString($strLen=8, $chars=null)
     {
+        if (is_null($chars)) {
+            $chars = static::$_defaultCharPool;
+        }
         $charsLen = strlen($chars)-1;
         $str = '';
         for ($i=0; $i<$strLen; $i++) {
@@ -577,25 +684,78 @@ class BUtil extends BClass
         return $pattern;
     }
 
+    public static function nextStringValue($string='', $chars=null)
+    {
+        if (is_null($chars)) {
+            $chars = static::$_defaultCharPool; // avoid leading 0
+        }
+        $pos = strlen($string);
+        $lastChar = substr($chars, -1);
+        while (--$pos>=-1) {
+            if ($pos==-1) {
+                $string = $chars[0].$string;
+                return $string;
+            } elseif ($string[$pos]===$lastChar) {
+                $string[$pos] = $chars[0];
+                continue;
+            } else {
+                $string[$pos] = $chars[strpos($chars, $string[$pos])+1];
+                return $string;
+            }
+        }
+        // should never get here
+        return $string;
+    }
+
     /**
     * Create or verify password hash using bcrypt
     *
+    * @see http://bcrypt.sourceforge.net/
     * @param string $plain
     * @param string $hash
+    * @param string $prefix - 5 (SHA256) or 6 (SHA512)
     * @return boolean|string if $hash is null, return hash, otherwise return verification flag
     */
-    public static function bcrypt($plain, $hash=null)
+    public static function bcrypt($plain, $hash=null, $prefix=null)
     {
+        $plain = substr($plain, 0, 55);
         if (is_null($hash)) {
-            return crypt($plain, '$2a$09$'.static::randomString(20).'$');
+            $prefix = !empty($prefix) ? $prefix : (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a');
+            $cost = ($prefix=='5' || $prefix=='6') ? 'rounds=5000' : '10';
+            // speed up a bit salt generation, instead of:
+            // $salt = static::randomString(22);
+            $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 22);
+            return crypt($plain, '$'.$prefix.'$'.$cost.'$'.$salt.'$');
         } else {
-            return crypt($plain, substr($hash, 0, 28)) === $hash;
+            return crypt($plain, $hash) === $hash;
         }
+    }
+
+    /**
+    * Set or retrieve current hash algorithm
+    *
+    * @param string $algo
+    */
+    public static function hashAlgo($algo=null)
+    {
+        if (is_null($algo)) {
+            return static::$_hashAlgo;
+        }
+        static::$_hashAlgo = $algo;
+    }
+
+    public static function hashIter($iter=null)
+    {
+        if (is_null($iter)) {
+            return static::$_hashIter;
+        }
+        static::$iter = $iter;
     }
 
     /**
     * Generate salted hash
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string original text
     * @param mixed $salt
     * @param mixed $algo
@@ -612,6 +772,7 @@ class BUtil extends BClass
     *
     * Ex: $sha512$2$<salt1>$<salt2>$<double-hashed-string-here>
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string
     * @param string $salt
     * @param string $algo
@@ -637,12 +798,13 @@ class BUtil extends BClass
     /**
     * Validate salted hash against original text
     *
+    * @deprecated by BUtil::bcrypt()
     * @param string $string original text
     * @param string $storedHash fully composed salted hash
     */
     public static function validateSaltedHash($string, $storedHash)
     {
-        if (strpos($storedHash, '$2a$')===0) {
+        if (strpos($storedHash, '$2a$')===0 || strpos($storedHash, '$2y$')===0) {
             return static::bcrypt($string, $storedHash);
         }
         $sep = $storedHash[0];
@@ -659,37 +821,40 @@ class BUtil extends BClass
         return $verifyHash===$knownHash;
     }
 
+    public static function sha512base64($str)
+    {
+        return base64_encode(pack('H*', hash('sha512', $str)));
+    }
+
     /**
     * Return only specific fields from source array
     *
     * @param array $source
     * @param array|string $fields
     * @param boolean $inverse if true, will return anything NOT in $fields
+    * @param boolean $setNulls fill missing fields with nulls
     * @result array
     */
-    public static function maskFields($source, $fields, $inverse=false)
+    public static function maskFields($source, $fields, $inverse=false, $setNulls=true)
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
         }
         $result = array();
         if (!$inverse) {
-            foreach ($fields as $k) $result[$k] = isset($source[$k]) ? $source[$k] : null;
+            foreach ($fields as $k) {
+                if (isset($source[$k])) {
+                    $result[$k] = $source[$k];
+                } elseif ($setNulls) {
+                    $result[$k] = null;
+                }
+            }
         } else {
-            foreach ($source as $k=>$v) if (!in_array($k, $fields)) $result[$k] = $v;
+            foreach ($source as $k=>$v) {
+                if (!in_array($k, $fields)) $result[$k] = $v;
+            }
         }
         return $result;
-    }
-
-    /**
-     * See BUtil::maskFields
-     * @param type $array
-     * @param type $fields
-     * @return type
-     */
-    static public function arrayMask($array, $fields)
-    {
-        return self::maskFields($array, $fields);
     }
 
     /**
@@ -701,7 +866,7 @@ class BUtil extends BClass
     */
     public static function remoteHttp($method, $url, $data=array())
     {
-        $request = http_build_query($data);
+        $request = is_array($data) ? http_build_query($data) : $data;
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
@@ -709,8 +874,7 @@ class BUtil extends BClass
         }
 
         if (function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt_array($ch, array(
+            $curlOpt = array(
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => '',
@@ -721,23 +885,30 @@ class BUtil extends BClass
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-            ));
+            );
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = BConfig::i()->get('fs/storage_dir').'/cache';
                 BUtil::ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
-                curl_setopt_array($ch, array(
+                $curlOpt += array(
                     CURLOPT_COOKIEJAR => $cookie,
                     CURLOPT_FOLLOWLOCATION => true,
-                ));
+                );
             }
-            if ($method==='POST' || $method==='PUT') {
-                curl_setopt_array($ch, array(
+
+            if ($method==='POST') {
+                $curlOpt += array(
                     CURLOPT_POSTFIELDS => $request,
-                    CURLOPT_POST => $method==='POST',
-                    CURLOPT_PUT => $method==='PUT',
-                ));
+                    CURLOPT_POST => 1,
+                );
+            } elseif ($method==='PUT') {
+                $curlOpt += array(
+                    CURLOPT_POSTFIELDS => $request,
+                    CURLOPT_PUT => 1,
+                );
             }
+            $ch = curl_init();
+            curl_setopt_array($ch, $curlOpt);
             $content = curl_exec($ch);
             //$response = curl_getinfo($ch);
             $response = array();
@@ -808,13 +979,13 @@ class BUtil extends BClass
     public static function globRecursive($pattern, $flags=0)
     {
         $files = glob($pattern, $flags);
-    if (!$files) $files = array();
-    $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-    if ($dirs) {
-        foreach ($dirs as $dir) {
-            $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+        if (!$files) $files = array();
+        $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
+        if ($dirs) {
+            foreach ($dirs as $dir) {
+                $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+            }
         }
-    }
         return $files;
     }
 
@@ -831,7 +1002,10 @@ class BUtil extends BClass
             return;
         }
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            @$res = mkdir($dir, 0777, true);
+            if (!$res) {
+                BDebug::warning("Can't create directory: ".$dir);
+            }
         }
     }
 
@@ -937,17 +1111,17 @@ class BUtil extends BClass
         if (empty($params['default'])) {
             $params['default'] = 'identicon';
         }
-        return 'http://www.gravatar.com/avatar/'.md5(strtolower($email))
+        return BRequest::i()->scheme().'://www.gravatar.com/avatar/'.md5(strtolower($email))
             .($params ? '?'.http_build_query($params) : '');
     }
 
     public static function extCallback($callback)
     {
         if (is_string($callback)) {
-            if (($c = explode('.', $callback))) {
-                list($class, $method) = $c;
-            } elseif (($c = explode('->', $callback))) {
-                list($class, $method) = $c;
+            if (strpos($callback, '.')!==false) {
+                list($class, $method) = explode('.', $callback);
+            } elseif (strpos($callback, '->')) {
+                list($class, $method) = explode('->', $callback);
             }
             if (!empty($class)) {
                 $callback = array($class::i(), $method);
@@ -979,6 +1153,38 @@ class BUtil extends BClass
             }
         }
         return $source;
+    }
+
+    public static function timeAgo($ptime, $now=null, $long=false)
+    {
+        if (!is_numeric($ptime)) {
+            $ptime = strtotime($ptime);
+        }
+        if (!$now) {
+            $now = time();
+        } elseif (!is_numeric($now)) {
+            $now = strtotime($now);
+        }
+        $etime = $now - $ptime;
+        if ($etime < 1) {
+            return $long ? 'less than 1 second' : '0s';
+        }
+        $a = array(
+            12 * 30 * 24 * 60 * 60  =>  array('year', 'y'),
+            30 * 24 * 60 * 60       =>  array('month', 'mon'),
+            24 * 60 * 60            =>  array('day', 'd'),
+            60 * 60                 =>  array('hour', 'h'),
+            60                      =>  array('minute', 'm'),
+            1                       =>  array('second', 's'),
+        );
+
+        foreach ($a as $secs => $sa) {
+            $d = $etime / $secs;
+            if ($d >= 1) {
+                $r = round($d);
+                return $r . ($long ? ' ' . $sa[0] . ($r > 1 ? 's' : '') : $sa[1]);
+            }
+        }
     }
 }
 
@@ -1063,47 +1269,60 @@ class BData extends BClass implements ArrayAccess
 /**
 * Basic user authentication and authorization class
 */
-class BUser extends BModel
+class BModelUser extends BModel
 {
     protected static $_sessionUser;
+    protected static $_sessionUserNamespace = 'user';
 
-    public function sessionUserId()
+    public static function sessionUserId()
     {
-        $userId = BSession::i()->data('user_id');
+        $userId = BSession::i()->data(static::$_sessionUserNamespace.'_id');
         return $userId ? $userId : false;
     }
 
-    public function sessionUser($reset=false)
+    public static function sessionUser($reset=false)
     {
         if (!static::isLoggedIn()) {
             return false;
         }
         $session = BSession::i();
         if ($reset || !static::$_sessionUser) {
-            static::$_sessionUser = $this->load($this->sessionUserId());
+            static::$_sessionUser = static::load(static::sessionUserId());
         }
         return static::$_sessionUser;
     }
 
-    public function isLoggedIn()
+    public static function isLoggedIn()
     {
-        return $this->sessionUserId() ? true : false;
+        return static::sessionUserId() ? true : false;
     }
 
-    public function password($password)
+    public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
         return $this;
     }
 
+    public function validatePassword($password)
+    {
+        return BUtil::validateSaltedHash($password, $this->password_hash);
+    }
+
+    public function beforeSave()
+    {
+        if (!parent::beforeSave()) return false;
+        if (!$this->create_dt) $this->create_dt = BDb::now();
+        $this->update_dt = BDb::now();
+        if ($this->password) {
+            $this->password_hash = BUtil::fullSaltedHash($this->password);
+        }
+        return true;
+    }
+
     static public function authenticate($username, $password)
     {
         /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where_complex(array('OR'=>array(
-                'username'=>$username,
-                'email'=>$username)))
-            ->find_one();
+        $user = static::orm()->where(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
@@ -1114,7 +1333,10 @@ class BUser extends BModel
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('user', serialize($this));
+        BSession::i()->data(array(
+            static::$_sessionUserNamespace.'_id' => $this->id,
+            static::$_sessionUserNamespace => serialize($this->as_array()),
+        ));
         static::$_sessionUser = $this;
 
         if ($this->locale) {
@@ -1123,7 +1345,7 @@ class BUser extends BModel
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire('BUser::login.after', array('user'=>$user));
+        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$this));
         return $this;
     }
 
@@ -1137,12 +1359,50 @@ class BUser extends BModel
         return $this;
     }
 
-    public function logout()
+    public static function logout()
     {
-        BSession::i()->data('user_id', false);
+        BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
         static::$_sessionUser = null;
-        BPubSub::i()->fire('BUser::login.after');
+        BPubSub::i()->fire(__METHOD__.'.after');
+    }
+
+    public function recoverPassword($emailView='email/user-password-recover')
+    {
+        $this->set(array('password_nonce'=>BUtil::randomString(20)))->save();
+        if (($view = BLayout::i()->view($emailView))) {
+            $view->set('user', $this)->email();
+        }
         return $this;
+    }
+
+    public function resetPassword($password, $emailView='email/user-password-reset')
+    {
+        $this->set(array('password_nonce'=>null))->setPassword($password)->save()->login();
+        if (($view = BLayout::i()->view($emailView))) {
+            $view->set('user', $this)->email();
+        }
+        return $this;
+    }
+
+    public static function signup($r)
+    {
+        $r = (array)$r;
+        if (empty($r['email'])
+            || empty($r['password']) || empty($r['password_confirm'])
+            || $r['password']!=$r['password_confirm']
+        ) {
+            throw new Exception('Incomplete or invalid form data.');
+        }
+
+        $r = BUtil::maskFields($r, 'email,password');
+        $user = static::create($r)->save();
+        if (($view = BLayout::i()->view('email/user-new-user'))) {
+            $view->set('user', $user)->email();
+        }
+        if (($view = BLayout::i()->view('email/admin-new-user'))) {
+            $view->set('user', $user)->email();
+        }
+        return $user;
     }
 }
 
@@ -1329,6 +1589,8 @@ class BDebug extends BClass
     );
 
     static protected $_verboseBacktrace = array();
+
+    static protected $_collectedErrors = array();
 
     /**
     * Contructor, remember script start time for delta timestamps
@@ -1541,32 +1803,50 @@ class BDebug extends BClass
 
     public static function alert($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::ALERT, $msg, $stackPop+1);
     }
 
     public static function critical($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::CRITICAL, $msg, $stackPop+1);
     }
 
     public static function error($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::ERROR, $msg, $stackPop+1);
     }
 
     public static function warning($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::WARNING, $msg, $stackPop+1);
     }
 
     public static function notice($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::NOTICE, $msg, $stackPop+1);
     }
 
     public static function info($msg, $stackPop=0)
     {
+        self::i()->collectError($msg);
         return self::trigger(self::INFO, $msg, $stackPop+1);
+    }
+
+    public function collectError($msg, $type=self::ERROR)
+    {
+        self::$_collectedErrors[$type][] = $msg;
+    }
+
+    public function getCollectedErrors($type=self::ERROR)
+    {
+        if (!empty(self::$_collectedErrors[$type])) {
+            return self::$_collectedErrors[$type];
+        }
     }
 
     public static function debug($msg, $stackPop=0)
@@ -1616,7 +1896,6 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
-            $e['msg'] = wordwrap($e['msg'], 70, "\n");
             echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
@@ -1656,31 +1935,6 @@ class BDebug extends BClass
     {
         static::dumpLog();
         //$args['content'] = str_replace('</body>', static::dumpLog(true).'</body>', $args['content']);
-    }
-}
-
-/**
-* Stub for cache class
-*/
-class BCache extends BClass
-{
-    /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BCache
-    */
-    public static function i($new=false, array $args=array())
-    {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
-    }
-
-    /**
-    * Stub
-    *
-    */
-    public function init()
-    {
-
     }
 }
 
@@ -1974,9 +2228,9 @@ class BLocale extends BClass
             if (!empty($code)) {
                 $code .= ','."\n";
             }
-            $code .= "'$k' => '$v'";
+            $code .= "'{$k}' => '".addslashes($v)."'";
         }
-        $code = "<?php return array($code);";
+        $code = "<?php return array({$code});";
         file_put_contents($targetFile, $code);
     }
 
@@ -2304,5 +2558,27 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+/** @see http://www.php.net/manual/en/function.htmlentities.php#106535 */
+if( !function_exists( 'xmlentities' ) ) {
+    function xmlentities( $string ) {
+        $not_in_list = "A-Z0-9a-z\s_-";
+        return preg_replace_callback( "/[^{$not_in_list}]/" , 'get_xml_entity_at_index_0' , $string );
+    }
+    function get_xml_entity_at_index_0( $CHAR ) {
+        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+            die( "function: 'get_xml_entity_at_index_0' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
+        }
+        switch( $CHAR[0] ) {
+            case "'":    case '"':    case '&':    case '<':    case '>':
+                return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
+            default:
+                return numeric_entity_4_char($CHAR[0]);                break;
+        }
+    }
+    function numeric_entity_4_char( $char ) {
+        return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
     }
 }

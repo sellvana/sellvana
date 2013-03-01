@@ -1,5 +1,7 @@
 <?php
     $user = FCom_Admin_Model_User::sessionUser();
+    $modulesNotification = array();
+    $this->hook('hook_modules_notification', array('modulesNotification' => &$modulesNotification));
 ?>
 <div class="ui-layout-north">
     <header class="adm-topbar">
@@ -40,15 +42,24 @@
                     </ul>
                 </li>
 <?php endif ?>
-                <li class="sup-updates"><a href="#"><span class="icon"></span><span class="title">Updates &nbsp;<em class="count">10</em></span></a>
-                    <ul class="sub-section" style="width:200px">
-                        <li><a href="#">Module update 1</a></li>
-                        <li><a href="#">Module update 2</a></li>
-                        <li><a href="#">Workflow update 1</a></li>
-                        <li><a href="#">Workflow update 2</a></li>
-                    </ul>
 
+<?php if ($modulesNotification): ?>
+                <li class="sup-updates"><a href="<?=BApp::href('market/index')?>"><span class="icon"></span><span class="title">Notifications &nbsp;<em class="count"><?= count($modulesNotification)?></em></span></a>
+                    <ul class="sub-section" style="width:200px">
+                    <?php foreach($modulesNotification as $notifyTitle => $notifications): ?>
+                            <li><a style="text-decoration: none; font-weight: bold; color:black;"><?=  strtoupper($notifyTitle)?></a></li>
+
+                            <?php foreach($notifications as $notify): ?>
+                                <?php if ($notify->url): ?>
+                                    <li><a href="<?=BApp::href($notify->url)?>" title="<?=$notify->text?>"><?=$notify->module?></a></li>
+                                <?php else:?>
+                                    <li><?=$notify->module?>></li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                    <?php endforeach; ?>
+                    </ul>
                 </li>
+<?php endif; ?>
                 <li class="sup-account"><a href="#"><span class="icon"></span><span class="title"><?php echo $this->q($user->fullname()) ?></span></a>
                     <ul class="sub-section">
                         <li><img src="<?=BUtil::gravatar($user->email)?>" style="margin:3px 13px"/></li>

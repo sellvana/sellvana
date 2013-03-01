@@ -11,6 +11,10 @@ class FCom_Checkout_Migrate extends BClass
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
         BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
+        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
+        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
+        BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
+        BMigrate::upgrade('0.2.0', '0.2.1', array($this, 'upgrade_0_2_1'));
     }
 
     public function install()
@@ -147,7 +151,11 @@ class FCom_Checkout_Migrate extends BClass
     {
         $tCart = FCom_Checkout_Model_Cart::table();
         $tCartItem = FCom_Checkout_Model_CartItem::table();
-        if (BDb::ddlFieldInfo($tCartItem, "rowtotal")){
+        if (BDb::ddlFieldInfo($tCartItem, "rowtotal") || BDb::ddlFieldInfo($tCartItem, "create_dt"
+                || BDb::ddlFieldInfo($tCartItem, "update_dt"))) {
+            return;
+        }
+        if (BDb::ddlFieldInfo($tCart, "create_dt") || BDb::ddlFieldInfo($tCart, "update_dt")) {
             return;
         }
         BDb::run("
@@ -158,6 +166,52 @@ class FCom_Checkout_Migrate extends BClass
                 ADD COLUMN `create_dt` DATETIME NOT NULL AFTER `rowtotal`,
                 ADD COLUMN `update_dt` DATETIME NOT NULL AFTER `create_dt`;
         ");
+    }
+
+    public function upgrade_0_1_8()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_id_buy")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_id_buy` INT(10) UNSIGNED NOT NULL "
+            );
+        }
+
+
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_id_get")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_id_get` INT(10) UNSIGNED NOT NULL "
+            );
+        }
+
+    }
+
+    public function upgrade_0_1_9()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_qty_used")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_qty_used` decimal(12,4) DEFAULT NULL "
+            );
+        }
+    }
+
+    public function upgrade_0_2_0()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        BDb::run("
+            ALTER TABLE {$tCartItem} MODIFY `promo_id_buy` varchar(50) DEFAULT NULL "
+        );
+    }
+
+    public function upgrade_0_2_1()
+    {
+        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        if (!BDb::ddlFieldInfo($tCartItem, "promo_amt_used")){
+            BDb::run("
+                ALTER TABLE {$tCartItem} ADD `promo_amt_used` decimal(12,4) DEFAULT NULL "
+            );
+        }
     }
 
 }

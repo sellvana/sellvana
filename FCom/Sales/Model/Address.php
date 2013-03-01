@@ -36,15 +36,21 @@ class FCom_Sales_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function newAddress($orderId, $cartAddress)
+    public function newAddress($orderId, $newAddress)
     {
-        $cartData = $cartAddress->as_array();
-        unset($cartData['id']);
-        if (empty($cartData['atype'])) {
-            $cartData['atype'] = 'shipping';
+        if (is_object($newAddress)) {
+            $data = $newAddress->as_array();
+        } else {
+            $data = $newAddress;
+        }
+        if (isset($data['id'])){
+            unset($data['id']);
+        }
+        if (empty($data['atype'])) {
+            $data['atype'] = 'shipping';
         }
 
-        $address = $cartData;
+        $address = $data;
         $address['order_id'] = $orderId;
 
         $newAddress = $this->findByOrder($orderId, $address['atype']);
