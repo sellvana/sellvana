@@ -376,6 +376,9 @@ class FCom_Core_Controller_Abstract extends BActionController
     public function layout($name)
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
+        if (!$theme) {
+            $theme = BLayout::i()->getDefaultTheme();
+        }
         $layout = BLayout::i();
         if ($theme) {
             $layout->applyTheme($theme);
