@@ -62,7 +62,7 @@
                 <li class="label-l">
                 <label for="model-status">Status</label>
                 <select id="model-status" name="model[status]">
-                <?//=$this->optionsHtml($m->fieldOptions('status'), $m->status)?>
+                <?php //=$this->optionsHtml($m->fieldOptions('status'), $m->status)?>
                 </select>
                 </li>
                 -->
