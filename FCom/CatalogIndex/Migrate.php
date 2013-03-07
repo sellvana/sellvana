@@ -1,5 +1,5 @@
 <?php
-class FCom_Checkout_Migrate extends BClass
+class FCom_CatalogIndex_Migrate extends BClass
 {
     public function run()
     {
@@ -23,7 +23,7 @@ class FCom_Checkout_Migrate extends BClass
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
-                'UNIQUE IDX_term (term)',
+                'IDX_term' => 'UNIQUE (term)',
             ),
         ));
         BDb::ddlTableDef($tIdxField, array(

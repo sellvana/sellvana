@@ -23,12 +23,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 ->where('cart_id', $this->cart_id)->where('atype', 'billing')->find_one();
     }
 
-    public function add($data)
+    public function addNew($data)
     {
         $status = FCom_Sales_Model_OrderStatus::i()->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        BPubSub::i()->fire(__CLASS__.'.add', array('order'=>$data));
+        BPubSub::i()->fire(__CLASS__.'.addNew', array('order'=>$data));
         return $this->create($data)->save();
     }
 
