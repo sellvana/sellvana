@@ -47,6 +47,10 @@ class FCom_Market_Migrate extends BClass
     public function upgrade_0_1_4()
     {
         $pModules = FCom_Market_Model_Modules::table();
-        BDb::run( " ALTER TABLE {$pModules} ADD `mod_name` varchar(255) NOT NULL AFTER `id`");
+        BDb::ddlTableDef($pModules, array(
+            'COLUMNS' => array(
+                'mod_name' => "varchar(255) NOT NULL AFTER `id`",
+            ),
+        ));
     }
 }

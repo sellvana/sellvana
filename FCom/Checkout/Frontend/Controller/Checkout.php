@@ -160,7 +160,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             if ($salesOrder) {
                 $salesOrder->update($orderData);
             } else {
-                $salesOrder = FCom_Sales_Model_Order::i()->add($orderData);
+                $salesOrder = FCom_Sales_Model_Order::i()->addNew($orderData);
             }
             //copy order items
             foreach ($cart->items() as $item) {
@@ -179,7 +179,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 if ($testItem) {
                     $testItem->update($orderItem);
                 } else {
-                    FCom_Sales_Model_OrderItem::i()->add($orderItem);
+                    FCom_Sales_Model_OrderItem::i()->addNew($orderItem);
                 }
             }
 

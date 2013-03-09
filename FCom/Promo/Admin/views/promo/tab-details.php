@@ -1,5 +1,5 @@
 <?php
-$m = $this->model;
+$m = $this->model; 
 $promoCtrl = FCom_Promo_Admin_Controller::i();
 ?>
 <div id="details-layout">
@@ -7,7 +7,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
         <input type="hidden" name="_del_group_ids" value=""/>
         <h2>BUY
             <input type="text" name="model[buy_amount]" value="<?=$m->buy_amount?>" style="width:50px"/>
-            <?=$m->fieldOptions('buy_type', $m->buy_type)?>
+            <?=$m->buy_type ? $m->fieldOptions('buy_type', $m->buy_type) : ''?>
         </h2>
 
         <div id="group-container-buy" class="group-container">
@@ -22,7 +22,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
 
         <h2>GET
             <input type="text" name="model[get_amount]" value="<?=$m->get_amount?>" style="width:50px"/>
-            <?=$m->fieldOptions('get_type', $m->get_type)?>
+            <?=$m->get_type ? $m->fieldOptions('get_type', $m->get_type) : ''?>
         </h2>
 <?php if ($m->get_group==='diff_group'): ?>
         <div id="group-container-get" class="group-container">

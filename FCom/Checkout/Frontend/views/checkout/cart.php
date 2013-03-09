@@ -1,4 +1,4 @@
-<?
+<?php
 $loggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
 ?>
 <?php if (!$this->cart->items()): ?>

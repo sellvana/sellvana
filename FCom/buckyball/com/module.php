@@ -29,6 +29,7 @@ class BModuleRegistry extends BClass
     /**
     * Local cache for BApp::i()->get('area');
     *
+    * @todo make sure handling is case insensitive
     * @var mixed
     */
     protected $_area;
