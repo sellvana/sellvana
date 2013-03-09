@@ -96,16 +96,8 @@ class UpsRate {
 		</Shipment>
         </RatingServiceSelectionRequest>";
 
-	$ch = curl_init($this->rateApiUrl);
-
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch,CURLOPT_POST,1);
-	curl_setopt($ch,CURLOPT_TIMEOUT, 60);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
-	$result=curl_exec ($ch);
+        list($result,) = BUtil::remoteHttp('POST', $this->rateApiUrl, $data);
+        
         //echo '<!-- '. $result. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
         $ratings = new SimpleXMLElement($result);
         $this->response = $ratings;
