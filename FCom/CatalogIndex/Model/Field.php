@@ -7,10 +7,14 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     
     protected static $_indexedFields;
     
-    static public function getFields($context='all')
+    static public function getFields($context='all', $where=null)
     {
         if (!static::$_indexedFields) {
-            $fields = static::orm()->find_many();
+            $orm = static::orm();
+            if ($where) {
+                $orm->where($where);
+            }
+            $fields = $orm->find_many();
             foreach ($fields as $f) {
                 $k = $f->field_name;
                 static::$_indexedFields['all'][$k] = $f;
