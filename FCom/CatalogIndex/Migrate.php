@@ -32,7 +32,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'field_name' => 'varchar(50) not null',
                 'field_type' => "enum('int','decimal','varchar','text','category') not null",
                 'weight' => 'int not null',
-                'fcom_field_id' => 'int unsigned default null',
+                'fcom_field_id' => 'int(10) unsigned default null',
             ),
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => array(
