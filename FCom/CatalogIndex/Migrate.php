@@ -36,13 +36,12 @@ class FCom_CatalogIndex_Migrate extends BClass
             ),
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => array(
-                'FK_fcom_index_field_field' => "FOREIGN KEY (`fcom_field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tIdxField}_field" => "FOREIGN KEY (`fcom_field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
         BDb::ddlTableDef($tIdxDoc, array(
             'COLUMNS' => array(
-                'id' => 'int unsigned not null auto_increment',
-                'product_id' => 'int unsigned not null',
+                'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
                 'sort_name' => 'varchar(50)',
                 'sort_price' => 'decimal(12,2)',
@@ -56,7 +55,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'IDX_sort_rating' => '(sort_rating)',
             ),
             'CONSTRAINTS' => array(
-                'FK_fcom_index_doc_product' => "FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tIdxDoc}_product" => "FOREIGN KEY (`id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
         BDb::ddlTableDef($tIdxDocTerm, array(
@@ -69,9 +68,9 @@ class FCom_CatalogIndex_Migrate extends BClass
             ),
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => array(
-                'FK_fcom_index_doc_term_doc' => "FOREIGN KEY (`doc_id`) REFERENCES {$tIdxDoc} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                'FK_fcom_index_doc_term_field' => "FOREIGN KEY (`field_id`) REFERENCES {$tIdxField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                'FK_fcom_index_doc_term_term' => "FOREIGN KEY (`term_id`) REFERENCES {$tIdxTerm} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tIdxDocTerm}_doc" => "FOREIGN KEY (`doc_id`) REFERENCES {$tIdxDoc} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tIdxDocTerm}_field" => "FOREIGN KEY (`field_id`) REFERENCES {$tIdxField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tIdxDocTerm}_term" => "FOREIGN KEY (`term_id`) REFERENCES {$tIdxTerm} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
     }
