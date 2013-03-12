@@ -1162,11 +1162,14 @@ class BMigrate extends BClass
     }
 
     /**
-    * Run module DB installation scripts and set module db scheme version
-    *
-    * @param string $version
-    * @param mixed $callback SQL string, callback or file name
-    */
+     * Run module DB installation scripts and set module db scheme version
+     *
+     * @param string $version
+     * @param mixed  $callback SQL string, callback or file name
+     * @return bool
+     * @throws Exception
+     * @return bool
+     */
     public static function install($version, $callback)
     {
         $mod =& static::$_migratingModule;
@@ -1211,12 +1214,16 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
     }
 
     /**
-    * Run module DB upgrade scripts for specific version difference
-    *
-    * @param string $fromVersion
-    * @param string $toVersion
-    * @param mixed $callback SQL string, callback or file name
-    */
+     * Run module DB upgrade scripts for specific version difference
+     *
+     * @param string $fromVersion
+     * @param string $toVersion
+     * @param mixed  $callback SQL string, callback or file name
+     * @return bool
+     * @throws BException
+     * @throws Exception
+     * @return bool
+     */
     public static function upgrade($fromVersion, $toVersion, $callback)
     {
         $mod =& static::$_migratingModule;

@@ -141,20 +141,22 @@ class BApp extends BClass
     }
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @todo Run multiple applications within the same script
-    *       This requires to decide which registries should be app specific
-    *
-    * @return BApp
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @todo Run multiple applications within the same script
+     *       This requires to decide which registries should be app specific
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BApp
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
 
     /**
-    * Application contructor
+    * Application constructor
     *
     * Starts debugging session for timing
     *
@@ -166,10 +168,11 @@ class BApp extends BClass
     }
 
     /**
-    * Shortcut to add configuration, used mostly from bootstrap index file
-    *
-    * @param array|string $config If string will load configuration from file
-    */
+     * Shortcut to add configuration, used mostly from bootstrap index file
+     *
+     * @param array|string $config If string will load configuration from file
+     * @return $this
+     */
     public function config($config)
     {
         if (is_array($config)) {
@@ -183,10 +186,11 @@ class BApp extends BClass
     }
 
     /**
-    * Shortcut to scan folders for module manifest files
-    *
-    * @param string|array $folders Relative path(s) to manifests. May include wildcards.
-    */
+     * Shortcut to scan folders for module manifest files
+     *
+     * @param string|array $folders Relative path(s) to manifests. May include wildcards.
+     * @return $this
+     */
     public function load($folders='.')
     {
 #echo "<pre>"; print_r(debug_backtrace()); echo "</pre>";
@@ -201,11 +205,11 @@ class BApp extends BClass
     }
 
     /**
-    * The last method to be ran in bootstrap index file.
-    *
-    * Performs necessary initializations and dispatches requested action.
-    *
-    */
+     * The last method to be ran in bootstrap index file.
+     *
+     * Performs necessary initializations and dispatches requested action.
+     *
+     */
     public function run()
     {
         // load session variables
@@ -214,7 +218,7 @@ class BApp extends BClass
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
-        // run module migration scripts if neccessary
+        // run module migration scripts if necessary
         if (BConfig::i()->get('db/implicit_migration')) {
             BMigrate::i()->migrateModules(true);
         }
@@ -253,14 +257,14 @@ class BApp extends BClass
     }
 
     /**
-    * Shortcut for base URL to use in views and controllers
-    *
-    * @param $full whether the URL should include schema and host
-    * @param $method
-    *   1 : use config for full url
-    *   2 : use entry point for full url
-    * @return string
-    */
+     * Shortcut for base URL to use in views and controllers
+     *
+     * @param bool $full whether the URL should include schema and host
+     * @param int  $method
+     *   1 : use config for full url
+     *   2 : use entry point for full url
+     * @return string
+     */
     public static function baseUrl($full=true, $method=1)
     {
         static $baseUrl = array();
@@ -749,7 +753,7 @@ class BClassRegistry extends BClass
     /**
     * Dynamically augment class method result
     *
-    * Allows to change result of a method for every invokation.
+    * Allows to change result of a method for every invocation.
     * Syntax similar to overrideMethod()
     *
     * Callback method example (original method had 2 arguments):
@@ -1305,10 +1309,12 @@ class BPubSub extends BClass
     protected $_events = array();
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BPubSub
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BPubSub
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
