@@ -4,7 +4,7 @@ class FCom_CatalogIndex_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
-        //BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
     }
 
     public function install()
@@ -15,7 +15,7 @@ class FCom_CatalogIndex_Migrate extends BClass
         $tIdxDoc = FCom_CatalogIndex_Model_Doc::table();
         $tProduct = FCom_Catalog_Model_Product::table();
         $tIdxDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-        
+
         BDb::ddlTableDef($tIdxTerm, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
@@ -73,6 +73,12 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tIdxDocTerm}_term" => "FOREIGN KEY (`term_id`) REFERENCES {$tIdxTerm} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
+    }
+
+    public function upgrade_0_1_1()
+    {
+        //TODO: rename `doc` fields: sort_name -> sort_product_name (update key)
+        //TODO: add `field` columns: filter_multivalue tinyint, filter_show_empty tinyint
     }
 
 }
