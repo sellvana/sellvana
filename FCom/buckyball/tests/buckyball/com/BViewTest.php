@@ -107,21 +107,59 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testRenderRawText()
     {
         $view = BView::factory('my', array());
-
         $view->setParam('raw_text', 'Test');
-
         $this->assertEquals('Test', $view->render());
     }
 
-    //@todo add render tests for the other render branches
+    public function testRenderTemplate()
+    {
+        $view = $this->getLayoutView();
+        $result = $view->render(array('query' => 'RtestR'));
+        $this->assertNotEmpty($result);
+        $this->assertContains('RtestR', $result);
+    }
 
+    public function testRenderCustomRenderer()
+    {
+        $view = $this->getLayoutView();
+        $view->setParam('renderer', function ($view) {
+            return sprintf("Test renderer %s", $view->query);
+        });
+
+        $result = $view->render(array('query' => 'VtestV'));
+        $this->assertNotEmpty($result);
+        $this->assertContains('VtestV', $result);
+    }
+
+    /**
+     * @return BView|null
+     */
+    public function getLayoutView()
+    {
+        $path = realpath('../../Catalog/Frontend/views/');
+        BLayout::i()
+            ->addAllViews($path)
+            ->addLayout(array(
+                             'base' => array(
+                                 array(
+                                     'view', 'cms/nav',
+                                     'do' => array(
+                                         array('addNav', '/module', 'Sample module'),
+                                     )
+                                 )
+                             )
+                        )
+            );
+
+        $view = BLayout::i()->getView('catalog/search');
+
+        return $view;
+    }
 
     public function testToStringIsSameAsRender()
     {
         $view = BView::factory('my', array());
-
         $view->setParam('raw_text', 'Test');
-
         $this->assertEquals((string) $view, $view->render());
     }
 
