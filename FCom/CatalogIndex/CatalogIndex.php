@@ -57,7 +57,7 @@ class FCom_CatalogIndex extends BClass
                     $value = $p->$method($field);
                     break;
                 case 'callback':
-                    $value = BUtil::extCallback($field->source_callback, array($p, $field), true);
+                    $value = BUtil::call($field->source_callback, array($p, $field), true);
                     break;
                 default:
                     throw new BException('Invalid source type');
@@ -89,17 +89,22 @@ class FCom_CatalogIndex extends BClass
         foreach (static::$_indexData as $pId=>$pData) {
             foreach ($filterFields as $fName=>$field) {
                 $fId = $field->id;
-                $v = $pData[$fName];
-                if (empty(static::$_filterValues[$fId][$v])) {
-                    $tuple = array('field_id'=>$fId, 'val'=>$v);
-                    $fieldValue = $fieldValueHlp->load($tuple);
-                    if (!$fieldValue) {
-                        $fieldValue = $fieldValueHlp->create($tuple)->save();
-                    }
-                    static::$_filterValues[$fId][$v] = $fieldValue->id;
+                $value = $pData[$fName];
+                if (is_null($value) || $value==='' || $value===array()) {
+                    continue;
                 }
-                $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'value_id'=>static::$_filterValues[$fId][$v]);
-                $docValueHlp->create($row)->save();
+                foreach ((array)$value as $v) {
+                    if (empty(static::$_filterValues[$fId][$v])) {
+                        $tuple = array('field_id'=>$fId, 'val'=>$v);
+                        $fieldValue = $fieldValueHlp->load($tuple);
+                        if (!$fieldValue) {
+                            $fieldValue = $fieldValueHlp->create($tuple)->save();
+                        }
+                        static::$_filterValues[$fId][$v] = $fieldValue->id;
+                    }
+                    $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'value_id'=>static::$_filterValues[$fId][$v]);
+                    $docValueHlp->create($row)->save();
+                }
             }
         }
     }
@@ -179,10 +184,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
         $facets = array();
         $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
-            ->where_in('field_id', array_keys($filterFields))->find_many_assoc('id');
+            ->where_in('field_id', array_keys($filterFieldsById))->find_many_assoc('id');
         foreach ($filterValues as $vId=>$v) {
             $field = $filterFieldsById[$v->field_id];
-            $facets[$fName]['values'][$v->val] = array('cnt'=>0);
+            $facets[$field->field_name]['values'][$v->val] = array('cnt'=>0);
         }
 
         if ($search) {
