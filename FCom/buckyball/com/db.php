@@ -1037,6 +1037,12 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    public function clear_columns()
+    {
+        $this->_result_columns = array();
+        return $this;
+    }
+
     /**
     * Return select sql statement built from the ORM object
     *

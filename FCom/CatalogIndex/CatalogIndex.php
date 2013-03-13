@@ -153,6 +153,11 @@ class FCom_CatalogIndex extends BClass
         }
     }
 
+    static public function reindexField($field)
+    {
+        //TODO: implement 1 field reindexing for all affected products
+    }
+
     static public function indexCleanMemory($all=false)
     {
         static::$_indexData = null;
@@ -174,32 +179,38 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
     static public function findProducts($search=null, $filters=null, $sort=null)
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm('p')
+        // base products ORM object
+        $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
 
+        // retrieve facet field information
         $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
         $filterFieldsById = array();
         foreach ($filterFields as $fName=>$field) {
             $filterFieldsById[$field->id] = $field;
         }
-        $facets = array();
-        $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
-            ->where_in('field_id', array_keys($filterFieldsById))->find_many_assoc('id');
-        foreach ($filterValues as $vId=>$v) {
-            $field = $filterFieldsById[$v->field_id];
-            $facets[$field->field_name]['values'][$v->val] = array('cnt'=>0);
-        }
 
+        // apply term search
         if ($search) {
             $terms = static::_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
             $tDocTerm = $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
             $tTerm = FCom_CatalogIndex_Model_Term::table();
-            $orm->where(array(
-                array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt INNER JOIN {$tTerm} t ON dt.term_id=t.id WHERE t.term IN (?)))", $terms),
+            $productsOrm->where(array(
+                array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt INNER JOIN {$tTerm} t ON dt.term_id=t.id
+                    WHERE t.term IN (?)))", $terms),
             ));
         }
 
+        $facets = array();
+        $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
+            ->where_in('field_id', array_keys($filterFieldsById))->find_many_assoc('id');
+        $filterValuesByVal = array();
+        foreach ($filterValues as $vId=>$v) {
+            $filterValuesByVal[$v->val] = $vId;
+        }
+
+        // apply facet filters
         if ($filters) {
             $where = array();
             $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
@@ -212,30 +223,77 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     BDebug::warning('Invalid filter field: '.$fName);
                     continue;
                 }
-                $fId = $filterFields[$fName]->id;
+                $field = $filterFields[$fName];
                 $fValues = (array)$fValues;
-                $orm->where(array(
+                $productsOrm->where(array(
                     array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv INNER JOIN {$tFieldValue} fv ON dv.value_id=fv.id
-                        WHERE fv.field_id={$fId} AND fv.val IN (".str_pad('', sizeof($fValues)*2-1, '?,').')))', $fValues),
+                        WHERE fv.field_id={$field->id} AND fv.val IN (?)))", $fValues),
                 ));
+                foreach ($fValues as $v) {
+                    unset($filterValues[$filterValuesByVal[$v]]); // don't calculate counts for selected facet values
+                    $facets[$field->field_name]['values'][$v]['selected'] = 1;
+                }
             }
         }
 
+        // calculate facet counts
+        $singleValueIds = array();
+        $multiValueIds = array();
+        // set empty value counts where needed
+        foreach ($filterValues as $vId=>$v) {
+            $field = $filterFieldsById[$v->field_id];
+            if ($field->filter_show_empty) {
+                $facets[$field->field_name]['values'][$v->val]['cnt'] = 0;
+            }
+            if (!$field->filter_multivalue) {
+                $singleValueIds[$v->id] = $v->id;
+            } else {
+                $multiValueIds[$v->id] = $v->id;
+            }
+        }
+
+        if (BModuleRegistry::isLoaded('FCom_CustomField')) {
+            FCom_CustomField_Common::i()->disable(true);
+        }
+        $singleFacetOrm = clone $productsOrm;
+        $singleFacetOrm->join('FCom_CatalogIndex_Model_DocValue', array('dv.doc_id','=','p.id'), 'dv');
+        $multiFacetOrm = clone $singleFacetOrm;
+        // count all single value fields counts vertically, should be faster than horizontally (TODO:test benchmarks)
+        if (!empty($singleValueIds)) {
+            $counts = $singleFacetOrm->select('dv.field_id')->select('dv.value_id')->select_expr('COUNT(*)', 'cnt')
+                ->where_in('dv.value_id', $singleValueIds) //TODO: maybe filter by field_id? preferred index conflict?
+                ->group_by('dv.value_id')->find_many();
+            foreach ($counts as $c) {
+                $field = $filterFieldsById[$c->field_id];
+                $value = $filterValues[$c->value_id];
+                $facets[$field->field_name]['values'][$value->val]['cnt'] = $c->cnt;
+            }
+        }
+        // count all multivalue field counts horizontally (can be used also for single value)
+        if (!empty($multiValueIds)) {
+            $multiFacetOrm->where_in('dv.value_id', $multiValueIds);
+            foreach ($multiValueIds as $vId) {
+                $value = $filterValues[$vId];
+                $multiFacetOrm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
+            }
+            $counts = $multiFacetOrm->find_one()->as_array();
+            foreach ($counts as $vId=>$cnt) {
+                $value = $filterValues[$vId];
+                $field = $filterFieldsById[$value->field_id];
+                $facets[$field->field_name]['values'][$value->val]['cnt'] = $c->cnt;
+            }
+        }
+        if (BModuleRegistry::isLoaded('FCom_CustomField')) {
+            FCom_CustomField_Common::i()->disable(false);
+        }
+
+        // apply sorting
         if ($sort) {
             list($field, $dir) = is_string($sort) ? explode(' ', $sort)+array('','') : $sort;
             $method = 'order_by_'.(strtolower($dir)=='desc' ? 'desc' : 'asc');
-            $orm->$method('sort_'.$field);
+            $productsOrm->$method('sort_'.$field);
         }
 
-        // pagination outside
-            /*'facets' => array(
-                'field1' => array(
-                    'values' => array(
-                        'Value1' => array('cnt'=>12, 'selected'=>true),
-                        'Value2' => array('cnt'=>2),
-                    ),
-                ),
-            ),*/
-        return array('orm'=>$orm, 'facets'=>$facets);
+        return array('orm'=>$productsOrm, 'facets'=>$facets);
     }
 }
