@@ -345,7 +345,7 @@ class BDb
                         } else {
                             if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
                                 $v = $v[0];
-                                $sql = str_replace('(?)', "(".str_pad('', sizeof($v)*2-1, '?,')."))", $sql);
+                                $sql = str_replace('(?)', '('.str_pad('', sizeof($v)*2-1, '?,').')', $sql);
                             }
                             $where[] = '('.$sql.')';
                             $params = array_merge($params, $v);
@@ -535,10 +535,10 @@ EOT
         $res = static::$_tables[$dbName][$tableName]['fks'];
         return is_null($fkName) ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
     }
-    
+
     /**
     * Create or update table
-    * 
+    *
     * @deprecates ddlTable and ddlTableColumns
     * @param string $fullTableName
     * @param array $def
@@ -550,7 +550,7 @@ EOT
         $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;
         $fks = !empty($def['CONSTRAINTS']) ? $def['CONSTRAINTS'] : null;
         $options = !empty($def['OPTIONS']) ? $def['OPTIONS'] : null;
-        
+
         if (!static::ddlTableExists($fullTableName)) {
             if (!$fields) {
                 throw new BException('Missing fields definition for new table');
