@@ -4,12 +4,12 @@ class FCom_CatalogIndex extends BClass
 {
     protected static $_indexData;
     protected static $_filterValues;
-    
+
     static public function bootstrap()
     {
-        
+
     }
-    
+
     static public function indexProducts($products)
     {
         if ($products===true) {
@@ -22,7 +22,7 @@ class FCom_CatalogIndex extends BClass
             }
             static::indexDropDocs($pIds);
         }
-        
+
         //TODO: for less memory usage chunk the products data
         static::_indexFetchProductsData($products);
         unset($products);
@@ -31,8 +31,8 @@ class FCom_CatalogIndex extends BClass
         static::_indexSaveSearchData();
         static::indexCleanMemory();
     }
-    
-    static public function indexDropDocs($pIds) 
+
+    static public function indexDropDocs($pIds)
     {
         if ($pIds===true) {
             return BDb::run("DELETE FROM ".FCom_CatalogIndex_Model_Doc::table());
@@ -40,7 +40,7 @@ class FCom_CatalogIndex extends BClass
             return FCom_CatalogIndex_Model_Doc::i()->delete_many($pIds);
         }
     }
-    
+
     static protected function _indexFetchProductsData($products)
     {
         $fields = FCom_CatalogIndex_Model_Field::i()->getFields();
@@ -48,7 +48,7 @@ class FCom_CatalogIndex extends BClass
         foreach ($products as $p) {
             foreach ($fields as $fName=>$field) {
                 switch ($field->source_type) {
-                case 'field': 
+                case 'field':
                     $fieldName = $field->source_callback ? $field->source_callback : $fName;
                     $value = $p->get($fieldName);
                     break;
@@ -66,9 +66,9 @@ class FCom_CatalogIndex extends BClass
             }
         }
     }
-    
+
     static protected function _indexSaveDocs()
-    {   
+    {
         $docHlp = FCom_CatalogIndex_Model_Doc::i();
         $now = BDB::now();
         $sortFields = FCom_CatalogIndex_Model_Field::i()->getFields('sort');
@@ -80,7 +80,7 @@ class FCom_CatalogIndex extends BClass
             $docHlp->create($row)->save();
         }
     }
-    
+
     static protected function _indexSaveFilterData()
     {
         $fieldValueHlp = FCom_CatalogIndex_Model_FieldValue::i();
@@ -103,15 +103,15 @@ class FCom_CatalogIndex extends BClass
             }
         }
     }
-    
-    
+
+
     static protected function _retrieveTerms($string)
     {
         $string = strtolower(strip_tags($string));
         $string = preg_replace('#[^a-z0-9 \t\n\r]#', '', $string);
         return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
     }
-    
+
     static protected function _indexSaveSearchData()
     {
         $termHlp = FCom_CatalogIndex_Model_Term::i();
@@ -147,31 +147,31 @@ class FCom_CatalogIndex extends BClass
             }
         }
     }
-    
+
     static public function indexCleanMemory($all=false)
     {
         static::$_indexData = null;
         static::$_filterValues = null;
     }
-    
+
     static public function indexGC()
     {
         $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
         $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
         $tTerm = FCom_CatalogIndex_Model_Term::table();
         $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-        
+
         BDb::run("
 DELETE FROM {$tFieldValue} WHERE id NOT IN (SELECT value_id FROM {$tDocValue});
 DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         ");
     }
-    
+
     static public function findProducts($search=null, $filters=null, $sort=null)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
-        
+
         $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
         $filterFieldsById = array();
         foreach ($filterFields as $fName=>$field) {
@@ -184,7 +184,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $field = $filterFieldsById[$v->field_id];
             $facets[$fName]['values'][$v->val] = array('cnt'=>0);
         }
-        
+
         if ($search) {
             $terms = static::_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
@@ -194,11 +194,13 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt INNER JOIN {$tTerm} t ON dt.term_id=t.id WHERE t.term IN (?)))", $terms),
             ));
         }
-        
+
         if ($filters) {
             $where = array();
             $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
+            $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
             $valueWhere = array();
+            $valueParams = array();
             foreach ($filters as $fName=>$fValues) {
                 if (empty($filterFields[$fName]) || $filterFields[$fName]->filter_type=='none') {
                     //TODO: throw error?
@@ -206,20 +208,20 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     continue;
                 }
                 $fId = $filterFields[$fName]->id;
-                $valueWhere[$fId] = array("field_id={$fId} AND val IN (?)", (array)$fValues);
+                $fValues = (array)$fValues;
+                $orm->where(array(
+                    array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv INNER JOIN {$tFieldValue} fv ON dv.value_id=fv.id
+                        WHERE fv.field_id={$fId} AND fv.val IN (".str_pad('', sizeof($fValues)*2-1, '?,').')))', $fValues),
+                ));
             }
-            $valueIds = FCom_CatalogIndex_Model_FieldValue::i()->orm()->where($valueWhere)->find_many_assoc('id');
-            $orm->where(array(
-                array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE value_id in (?)))", array_keys($valueIds)),
-            ));
         }
-        
+
         if ($sort) {
-            list($field, $dir) = is_string($sort) ? explode(' ', $sort) : $sort;
+            list($field, $dir) = is_string($sort) ? explode(' ', $sort)+array('','') : $sort;
             $method = 'order_by_'.(strtolower($dir)=='desc' ? 'desc' : 'asc');
             $orm->$method('sort_'.$field);
         }
-        
+
         // pagination outside
             /*'facets' => array(
                 'field1' => array(
