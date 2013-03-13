@@ -1029,14 +1029,14 @@ class BView extends BClass
     /**
      * Collect output from subscribers of a layout event
      *
-     * @param string $hookname
+     * @param string $hookName
      * @param array  $args
      * @return string
      */
-    public function hook($hookname, $args = array())
+    public function hook($hookName, $args = array())
     {
         $args['_viewname'] = $this->param('view_name');
-        $result            = BPubSub::i()->fire('BLayout::hook.' . $hookname, $args);
+        $result            = BPubSub::i()->fire('BLayout::hook.' . $hookName, $args);
 
         return join('', $result);
     }
@@ -1324,6 +1324,8 @@ class BView extends BClass
     }
 
     /**
+     * Add email attachment
+     *
      * @param $files
      * @param $mailheaders
      * @param $body
@@ -1371,6 +1373,7 @@ class BView extends BClass
      * @param string $string
      * @param array  $params
      * @param string $module if null, try to get current view module
+     * @return \false|string
      */
     public function _($string, $params = array(), $module = null)
     {
@@ -1458,7 +1461,7 @@ class BViewHead extends BView
     /**
      * @param      $from
      * @param null $to
-     * @return $this|mixed
+     * @return $this|string
      */
     public function subst($from, $to = null)
     {
@@ -1471,6 +1474,8 @@ class BViewHead extends BView
     }
 
     /**
+     * Enable/disable head js
+     *
      * @param bool $enable
      * @return $this
      */
@@ -1482,10 +1487,11 @@ class BViewHead extends BView
     }
 
     /**
-     * Alis for addTitle($title)
+     * Alias for addTitle($title)
      *
      * @deprecated
      * @param mixed $title
+     * @param bool  $start
      * @return BViewHead
      */
     public function title($title, $start = false)
@@ -1514,6 +1520,7 @@ class BViewHead extends BView
     }
 
     /**
+     * Add canonical link
      * @param $href
      * @return $this
      */
@@ -1525,6 +1532,8 @@ class BViewHead extends BView
     }
 
     /**
+     * Add rss link
+     *
      * @param $href
      */
     public function rss($href)
@@ -1537,6 +1546,7 @@ class BViewHead extends BView
      *
      * @param string $name
      * @param array  $args
+     * @return mixed
      */
     public function __call($name, $args)
     {
@@ -1587,6 +1597,7 @@ class BViewHead extends BView
      *   - file: resource file src or href
      *   - module_name: Optional: module where the resource is declared
      *   - if: IE <!--[if]--> context
+     * @throws BException
      * @return BViewHead|array|string
      */
     public function item($type = null, $name = null, $args = null)
@@ -1605,6 +1616,9 @@ class BViewHead extends BView
     }
 
     /**
+     * Set title
+     * This will replace any current title
+     *
      * @param $title
      * @return $this
      */
@@ -1616,6 +1630,9 @@ class BViewHead extends BView
     }
 
     /**
+     * Add title
+     * Add title to be appended to current titles
+     *
      * @param      $title
      * @param bool $start
      * @return $this
@@ -1632,6 +1649,9 @@ class BViewHead extends BView
     }
 
     /**
+     * Set title separator
+     * Set character or string to be used to separate title values.
+     *
      * @param $sep
      * @return $this
      */
@@ -1643,6 +1663,8 @@ class BViewHead extends BView
     }
 
     /**
+     * Should title be composed in reverse order
+     *
      * @param $reverse
      * @return $this
      */
@@ -1654,6 +1676,9 @@ class BViewHead extends BView
     }
 
     /**
+     * Compose and return title
+     * Title is composed by all elements in $_title object field separated by _titleSeparator
+     *
      * @return string
      */
     public function getTitle()
@@ -1669,6 +1694,10 @@ class BViewHead extends BView
     }
 
     /**
+     * Get meta tags
+     * If name is null, returns all meta tags joined
+     * else returns named meta tag or null if name is not in _meta array
+     *
      * @param null $name
      * @return null|string
      */
@@ -1682,6 +1711,8 @@ class BViewHead extends BView
     }
 
     /**
+     * Add meta tag
+     *
      * @param      $name
      * @param      $content
      * @param bool $httpEquiv
@@ -1699,6 +1730,7 @@ class BViewHead extends BView
     }
 
     /**
+     * Add element
      * @param       $type
      * @param       $name
      * @param array $args
