@@ -11,7 +11,6 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testViewIsInstanceOfOtherView()
     {
         $class = 'stdClass';
-
         $view = BView::factory('my', array('view_class' => $class));
         $this->assertInstanceOf($class, $view, sprintf("Expected instance is %s, but got %s", $class, get_class($view)));
     }
@@ -19,7 +18,6 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testViewFactory()
     {
         $view = BView::factory('my', array('key' => 'value'));
-
         $this->assertEquals('value', $view->param('key'));
     }
 
@@ -27,16 +25,12 @@ class BView_Test extends PHPUnit_Framework_TestCase
     {
         $view = BView::factory('my', array('key' => 'value'));
         $this->assertTrue(null == $view->param('key10000'));
-
-
     }
 
     public function testCircularReferenceException()
     {
         $view = BView::factory('my', array('key' => 'value'));
-
         $this->setExpectedException('BException');
-
         $view->view('my');
     }
 
@@ -46,7 +40,6 @@ class BView_Test extends PHPUnit_Framework_TestCase
         $view = BView::factory('my', array('key' => 'value'));
         BLayout::i()->addView('new', array('key' => 'newValue')); // have to have it in layout to get it.
         $viewNew = $view->view('new', array('new' => 'value'));
-
         $this->assertEquals('value', $viewNew->get('new'));
     }
 
@@ -81,4 +74,71 @@ class BView_Test extends PHPUnit_Framework_TestCase
         $view->test =  'value';
         $this->assertEquals('value', $view->test);
     }
+
+    public function testGetAllArgs()
+    {
+        $view = BView::factory('my', array());
+        $this->assertEmpty($view->getAllArgs());
+        $view->set('test', 'value');
+        $view->set('test2', 'value2');
+        $args = $view->getAllArgs();
+        $this->assertTrue(is_array($args));
+        $this->assertNotEmpty($args);
+        $this->assertTrue(isset($args['test'], $args['test2']));
+        $this->assertEquals($args['test'], $view->get('test'));
+        $this->assertEquals($args['test2'], $view->get('test2'));
+    }
+
+    public function testHook()
+    {
+        $view = BView::factory('my', array());
+        $result = $view->hook('testEvent', array('test' => 'value'));
+        $this->assertTrue(is_string($result)); // how to setup actually a hook to get content?
+    }
+
+    public function testGetTemplateFileName()
+    {
+        $view = BView::factory('my', array('template' => 'test.php'));
+        $this->assertEquals(BLayout::i()->getViewRootDir() . '/test.php', $view->getTemplateFileName('.php'));
+        $view->setParam('template', null);
+        $this->assertEquals(BLayout::i()->getViewRootDir() . '/my.php', $view->getTemplateFileName('.php'));
+    }
+
+    public function testRenderRawText()
+    {
+        $view = BView::factory('my', array());
+
+        $view->setParam('raw_text', 'Test');
+
+        $this->assertEquals('Test', $view->render());
+    }
+
+    //@todo add render tests for the other render branches
+
+
+    public function testToStringIsSameAsRender()
+    {
+        $view = BView::factory('my', array());
+
+        $view->setParam('raw_text', 'Test');
+
+        $this->assertEquals((string) $view, $view->render());
+    }
+
+    public function testStringEscape()
+    {
+        $view = BView::factory('my', array());
+
+        $this->assertEquals('', $view->q(null));
+        $this->assertEquals(' ** ERROR ** ', $view->q(array('test')));
+        $this->assertEquals('&lt;pre&gt;Test&lt;/pre&gt;', $view->q('<pre>Test</pre>'));
+    }
+
+    public function testStripTags()
+    {
+        $view = BView::factory('my', array());
+        $this->assertEquals('<b>Test</b>', $view->s('<pre><b>Test</b></pre>', '<b>'));
+    }
+
+    //@todo test email, addAttachment, optionsHtml, translate
 }
