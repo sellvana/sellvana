@@ -1852,6 +1852,7 @@ class BViewHead extends BView
      * Start/Stop IE if context
      *
      * @param mixed $context
+     * @return $this
      */
     public function ifContext($context = null)
     {
@@ -1866,6 +1867,7 @@ class BViewHead extends BView
      * If param['template'] is not specified, return meta+css+js tags
      *
      * @param array $args
+     * @param bool  $retrieveMetaData
      * @return string
      */
     public function render(array $args = array(), $retrieveMetaData = true)
