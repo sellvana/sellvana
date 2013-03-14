@@ -306,7 +306,7 @@ class BLayout extends BClass
      * @return $this
      * @throws BException
      */
-    public function addView($viewName, $params, $reset = false)
+    public function addView($viewName, $params = array(), $reset = false)
     {
         if (is_array($viewName)) {
             foreach ($viewName as $i => $view) {
@@ -338,13 +338,13 @@ class BLayout extends BClass
             }
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
             BPubSub::i()->fire('BLayout::view.add: ' . $viewAlias, array(
-                                                                        'view' => $this->_views[$viewAlias],
-                                                                   ));
+                'view' => $this->_views[$viewAlias],
+            ));
         } else {
             $this->_views[$viewAlias]->setParam($params);
             BPubSub::i()->fire('BLayout::view.update: ' . $viewAlias, array(
-                                                                           'view' => $this->_views[$viewAlias],
-                                                                      ));
+                'view' => $this->_views[$viewAlias],
+            ));
         }
 
         return $this;
@@ -422,7 +422,7 @@ class BLayout extends BClass
     {
         if (BNULL === $to) $to = $from . '-copy';
         $this->_views[$to]            = clone $this->_views[$from];
-        $this->_views[$to]->view_name = $to;
+        $this->_views[$to]->setParam('view_name', $to);
 
         return $this->_views[$to];
     }
@@ -446,7 +446,6 @@ class BLayout extends BClass
      * Register a view as call back to a hook
      * $viewName should either be a string with a name of view,
      * or an array in which first field is view name and the rest are view parameters.
-     * Either way view should be
      *
      * @param string $hookName
      * @param string|array $viewName
@@ -572,7 +571,7 @@ class BLayout extends BClass
     }
 
     /**
-     * @param $d
+     * @param array $d
      */
     public function metaDirectiveRootCallback($d)
     {
@@ -580,7 +579,7 @@ class BLayout extends BClass
     }
 
     /**
-     * @param $d
+     * @param array $d
      */
     public function metaDirectiveHookCallback($d)
     {
@@ -738,6 +737,7 @@ class BLayout extends BClass
     }
 
     /**
+     * Shortcut for event registration
      * @param $callback
      * @return $this
      */
@@ -804,7 +804,7 @@ class BLayout extends BClass
     }
 
     /**
-     *
+     * @return void
      */
     public function debugPrintViews()
     {
@@ -1560,7 +1560,6 @@ class BViewHead extends BView
     {
         if (!empty($this->_defaultTag[$name])) {
             array_unshift($args, $name);
-
             return call_user_func_array(array($this, 'item'), $args);
         } else {
             BDebug::error('Invalid method: ' . $name);
@@ -1633,7 +1632,6 @@ class BViewHead extends BView
     public function setTitle($title)
     {
         $this->_title = array($title);
-
         return $this;
     }
 
@@ -1666,7 +1664,6 @@ class BViewHead extends BView
     public function setTitleSeparator($sep)
     {
         $this->_titleSeparator = $sep;
-
         return $this;
     }
 
@@ -1679,7 +1676,6 @@ class BViewHead extends BView
     public function setTitleReverse($reverse)
     {
         $this->_titleReverse = $reverse;
-
         return $this;
     }
 
