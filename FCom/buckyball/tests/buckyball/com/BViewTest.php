@@ -178,5 +178,16 @@ class BView_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('<b>Test</b>', $view->s('<pre><b>Test</b></pre>', '<b>'));
     }
 
-    //@todo test email, addAttachment, optionsHtml, translate
+    public function testEmailData()
+    {
+        $view = $this->getLayoutView();
+        BPubSub::i()->on('BView::email', function($event) use ($view) {
+            $ed = $event['email_data'];
+            $this->assertArrayHasKey('body', $ed);
+            $this->assertEquals($ed['body'], $view->render());
+            $this->assertEquals($ed['to'], 'test@test.com');
+        });
+        $view->email('test@test.com');
+    }
+    //@todo test addAttachment, optionsHtml, translate
 }
