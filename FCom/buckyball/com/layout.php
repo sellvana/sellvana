@@ -1320,6 +1320,14 @@ class BView extends BClass
             $this->addAttachment($files, $headers, $body);
         }
 
+        BPubSub::i()->fire("BView::email", array('email_data' => array(
+            'to' => $to,
+            'subject' => $subject,
+            'body' => trim($body),
+            'headers' => $headers,
+            'params' => $params,
+        )));
+
         return mail($to, $subject, trim($body), join("\r\n", $headers), join(' ', $params));
     }
 
