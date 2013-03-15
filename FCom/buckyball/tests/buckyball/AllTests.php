@@ -14,6 +14,7 @@ require_once __DIR__.'/com/BLayoutTest.php';
 require_once __DIR__.'/com/BViewTest.php';
 require_once __DIR__.'/com/BViewHeadTest.php';
 require_once __DIR__.'/com/BClassDecoratorTest.php';
+require_once __DIR__.'/com/BDbTest.php';
 
 class BAllTests
 {
@@ -42,6 +43,7 @@ class BAllTests
         $suite->addTestSuite('BView_Test');
         $suite->addTestSuite('BViewHead_Test');
         $suite->addTestSuite('BClassDecorator_Test');
+        $suite->addTestSuite('BDb_Test');
 
 
         return $suite;

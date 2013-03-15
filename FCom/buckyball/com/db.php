@@ -72,7 +72,8 @@ class BDb
 
     /**
     * Shortcut to help with IDE autocompletion
-    *
+    * @param bool  $new
+    * @param array $args
     * @return BDb
     */
     public static function i($new=false, array $args=array())
@@ -105,6 +106,8 @@ class BDb
     *  }
     *
     * @param string $name
+    * @throws BException
+    * @return PDO
     */
     public static function connect($name=null)
     {
@@ -191,6 +194,8 @@ class BDb
     * @param array $params
     * @param array $options
     *   - echo - echo all queries as they run
+    * @throws Exception
+    * @return array
     */
     public static function run($sql, $params=null, $options=array())
     {
@@ -266,6 +271,7 @@ class BDb
     * Convenient within strings and heredocs as {$this->t(...)}
     *
     * @param string $tableName
+    * @return string
     */
     public static function t($tableName)
     {
@@ -311,7 +317,7 @@ class BDb
     * // (f1=5) AND (f2 LIKE '%text%'):
     * $w = BDb::where(array('f1'=>5, array('f2 LIKE ?', '%text%')));
     *
-    * // (f1!=5) OR f2 BETWEEN 10 AND 20:
+    * // ((f1!=5) OR (f2 BETWEEN 10 AND 20)):
     * $w = BDb::where(array('OR'=>array(array('f1!=?', 5), array('f2 BETWEEN ? AND ?', 10, 20))));
     *
     * // (f1 IN (1,2,3)) AND NOT ((f2 IS NULL) OR (f2=10))
@@ -322,6 +328,7 @@ class BDb
     *
     * @param array $conds
     * @param boolean $or
+    * @throws BException
     * @return array (query, params)
     */
     public static function where($conds, $or=false)
@@ -467,6 +474,7 @@ EOT
     *
     * @param string $fullTableName
     * @param string $fieldName if null return all fields
+    * @throws BException
     * @return mixed
     */
     public static function ddlFieldInfo($fullTableName, $fieldName=null)
@@ -491,6 +499,7 @@ EOT
     *
     * @param string $fullTableName
     * @param string $indexName
+    * @throws BException
     * @return array|null
     */
     public static function ddlIndexInfo($fullTableName, $indexName=null)
@@ -516,7 +525,8 @@ EOT
     *
     * @param string $fullTableName
     * @param string $fkName
-    * @result array|null
+    * @throws BException
+    * @return array|null
     */
     public static function ddlForeignKeyInfo($fullTableName, $fkName=null)
     {
@@ -542,6 +552,8 @@ EOT
     * @deprecates ddlTable and ddlTableColumns
     * @param string $fullTableName
     * @param array $def
+    * @throws BException
+    * @return array
     */
     public static function ddlTableDef($fullTableName, $def)
     {
@@ -584,6 +596,7 @@ EOT
     *   - engine (default InnoDB)
     *   - charset (default utf8)
     *   - collate (default utf8_general_ci)
+    * @return bool
     */
     public static function ddlTable($fullTableName, $fields, $options=null)
     {
@@ -697,6 +710,7 @@ EOT
     /**
     * Clean array or object fields based on table columns and return an array
     *
+    * @param string $table
     * @param array|object $data
     * @return array
     */
@@ -845,7 +859,8 @@ class BORM extends ORMWrapper
     /**
     * Shortcut factory for generic instance
     *
-    * @return BConfig
+    * @param bool $new
+    * @return BORM
     */
     public static function i($new=false)
     {
@@ -1327,16 +1342,18 @@ exit;
      }
 
     /**
-     * Perform a raw query. The query should contain placeholders,
-     * in either named or question mark style, and the parameters
-     * should be an array of values which will be bound to the
-     * placeholders in the query. If this method is called, all
-     * other query building methods will be ignored.
-     *
-     * Connection will be set to write, if query is not SELECT or SHOW
-     *
-     * @return BORMWrapper
-     */
+    * Perform a raw query. The query should contain placeholders,
+    * in either named or question mark style, and the parameters
+    * should be an array of values which will be bound to the
+    * placeholders in the query. If this method is called, all
+    * other query building methods will be ignored.
+    *
+    * Connection will be set to write, if query is not SELECT or SHOW
+    *
+    * @param       $query
+    * @param array $parameters
+    * @return BORM
+    */
     public function raw_query($query, $parameters=array())
     {
         if (preg_match('#^\s*(SELECT|SHOW)#i', $query)) {
