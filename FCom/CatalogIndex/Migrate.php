@@ -79,6 +79,8 @@ class FCom_CatalogIndex_Migrate extends BClass
     {
         //TODO: rename `doc` fields: sort_name -> sort_product_name (update key)
         //TODO: add `field` columns: filter_multivalue tinyint, filter_show_empty tinyint
+        //TODO: doc_value: add unique doc_id,field_id,value_id
+        //TODO: field_value: make val not null, add display varchar(100) null
     }
 
 }
