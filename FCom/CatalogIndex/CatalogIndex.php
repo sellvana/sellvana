@@ -45,24 +45,28 @@ class FCom_CatalogIndex extends BClass
     {
         $fields = FCom_CatalogIndex_Model_Field::i()->getFields();
         static::$_indexData = array();
-        foreach ($products as $p) {
-            foreach ($fields as $fName=>$field) {
-                switch ($field->source_type) {
-                case 'field':
-                    $fieldName = $field->source_callback ? $field->source_callback : $fName;
-                    $value = $p->get($fieldName);
-                    break;
-                case 'method':
-                    $method = $field->source_callback ? $field->source_callback : $fName;
-                    $value = $p->$method($field);
-                    break;
-                case 'callback':
-                    $value = BUtil::call($field->source_callback, array($p, $field), true);
-                    break;
-                default:
-                    throw new BException('Invalid source type');
+
+        foreach ($fields as $fName=>$field) {
+            $source = $field->source_callback ? $field->source_callback : $fName;
+            switch ($field->source_type) {
+            case 'field':
+                foreach ($products as $p) {
+                    static::$_indexData[$p->id][$fName] = $p->get($source);
                 }
-                static::$_indexData[$p->id][$fName] = $value;
+                break;
+            case 'method':
+                foreach ($products as $p) {
+                    static::$_indexData[$p->id][$fName] = $p->$source($field);
+                }
+                break;
+            case 'callback':
+                $fieldData = BUtil::call($source, array($products, $field), true);
+                foreach ($fieldData as $pId=>$value) {
+                    static::$_indexData[$pId][$fName] = $value;
+                }
+                break;
+            default:
+                throw new BException('Invalid source type');
             }
         }
     }
@@ -93,16 +97,22 @@ class FCom_CatalogIndex extends BClass
                 if (is_null($value) || $value==='' || $value===array()) {
                     continue;
                 }
-                foreach ((array)$value as $v) {
-                    if (empty(static::$_filterValues[$fId][$v])) {
-                        $tuple = array('field_id'=>$fId, 'val'=>$v);
-                        $fieldValue = $fieldValueHlp->load($tuple);
+                foreach ((array)$value as $vKey=>$v) {
+                    $v1 = explode('==>', $v, 2);
+                    $vVal = strtolower(trim($v1[0]));
+                    $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
+                    if (empty(static::$_filterValues[$fId][$vVal])) {
+                        $fieldValue = $fieldValueHlp->load(array('field_id'=>$fId, 'val'=>$vVal));
                         if (!$fieldValue) {
-                            $fieldValue = $fieldValueHlp->create($tuple)->save();
+                            $fieldValue = $fieldValueHlp->create(array(
+                                'field_id'=>$fId,
+                                'val' => $vVal,
+                                'display' => $vDisplay!=='' ? $vDisplay : null,
+                            ))->save();
                         }
-                        static::$_filterValues[$fId][$v] = $fieldValue->id;
+                        static::$_filterValues[$fId][$vVal] = $fieldValue->id;
                     }
-                    $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'value_id'=>static::$_filterValues[$fId][$v]);
+                    $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'value_id'=>static::$_filterValues[$fId][$vVal]);
                     $docValueHlp->create($row)->save();
                 }
             }
@@ -183,11 +193,14 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
 
+        $facets = array();
+
         // retrieve facet field information
         $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
         $filterFieldsById = array();
         foreach ($filterFields as $fName=>$field) {
             $filterFieldsById[$field->id] = $field;
+            $facets[$fName] = array(); // init for sorting
         }
 
         // apply term search
@@ -202,11 +215,20 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             ));
         }
 
-        $facets = array();
         $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
             ->where_in('field_id', array_keys($filterFieldsById))->find_many_assoc('id');
         $filterValuesByVal = array();
         foreach ($filterValues as $vId=>$v) {
+            $field = $filterFieldsById[$v->field_id];
+            if ($field->field_type == 'category') {
+                $lvl = sizeof(explode('/', $v->val));
+                if (empty($filters[$field->field_name]) && $lvl > 1) {
+                    unset($filterValues[$vId]); // show only top level categories if no category selected
+                    continue;
+                }
+                $v->category_level = $lvl;
+            }
+            // $v->field = $field;
             $filterValuesByVal[$v->val] = $vId;
         }
 
@@ -230,8 +252,35 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                         WHERE fv.field_id={$field->id} AND fv.val IN (?)))", $fValues),
                 ));
                 foreach ($fValues as $v) {
-                    unset($filterValues[$filterValuesByVal[$v]]); // don't calculate counts for selected facet values
-                    $facets[$field->field_name]['values'][$v]['selected'] = 1;
+                    $v = strtolower($v);
+                    $vId = $filterValuesByVal[$v];
+                    $value = $filterValues[$vId];
+                    $display = $value->display ? $value->display : $v;
+                    $fName = $field->field_name;
+                    $facets[$fName]['values'][$v]['display'] = $display;
+                    $facets[$fName]['values'][$v]['selected'] = 1;
+                    unset($filterValues[$vId]); // don't calculate counts for selected facet values
+
+                    if ($field->field_type=='category') {
+                        $curLevel = sizeof(explode('/', $v));
+                        $facets[$fName]['values'][$v]['level'] = $value->category_level;
+                        foreach ($filterValues as $vId1=>$value1) {
+                            $vVal = $value1->val;
+                            if (!$value1->category_level || $vId === $vId1) {
+                                continue; // skip other fields or same category value
+                            }
+                            if ($value1->category_level > $curLevel + 1) { // grand-children - don't show at all, TODO: configuration?
+                                unset($filterValues[$value1->id]);
+                            } elseif (strpos($v, $vVal.'/')===0) { // parent categories
+                                $facets[$fName]['values'][$vVal]['display'] = $value1->display;
+                                $facets[$fName]['values'][$vVal]['selected'] = 1;
+                                $facets[$fName]['values'][$vVal]['level'] = $value1->category_level;
+                                unset($filterValues[$value1->id]); // don't calculate counts for selected facet values
+                            } elseif (strpos($vVal.'/', $v.'/')!==0) { // lower level categories outside of current
+                                unset($filterValues[$value1->id]);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -243,6 +292,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         foreach ($filterValues as $vId=>$v) {
             $field = $filterFieldsById[$v->field_id];
             if ($field->filter_show_empty) {
+                $facets[$field->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
                 $facets[$field->field_name]['values'][$v->val]['cnt'] = 0;
             }
             if (!$field->filter_multivalue) {
@@ -264,9 +314,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 ->where_in('dv.value_id', $singleValueIds) //TODO: maybe filter by field_id? preferred index conflict?
                 ->group_by('dv.value_id')->find_many();
             foreach ($counts as $c) {
-                $field = $filterFieldsById[$c->field_id];
-                $value = $filterValues[$c->value_id];
-                $facets[$field->field_name]['values'][$value->val]['cnt'] = $c->cnt;
+                $v = $filterValues[$c->value_id];
+                $f = $filterFieldsById[$c->field_id];
+                $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
+                $facets[$f->field_name]['values'][$v->val]['cnt'] = $c->cnt;
             }
         }
         // count all multivalue field counts horizontally (can be used also for single value)
@@ -278,13 +329,20 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
             $counts = $multiFacetOrm->find_one()->as_array();
             foreach ($counts as $vId=>$cnt) {
-                $value = $filterValues[$vId];
-                $field = $filterFieldsById[$value->field_id];
-                $facets[$field->field_name]['values'][$value->val]['cnt'] = $c->cnt;
+                $v = $filterValues[$vId];
+                $f = $filterFieldsById[$v->field_id];
+                $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
+                $facets[$f->field_name]['values'][$v->val]['cnt'] = $c->cnt;
             }
         }
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
             FCom_CustomField_Common::i()->disable(false);
+        }
+
+        foreach ($filterFields as $fName=>$field) {
+            if ($field->field_type=='category') {
+                ksort($facets[$field->field_name]['values']);
+            }
         }
 
         // apply sorting
@@ -295,5 +353,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         return array('orm'=>$productsOrm, 'facets'=>$facets);
+    }
+
+    static public function getSortingArray()
+    {
+
     }
 }

@@ -336,58 +336,58 @@ class BDb
         if (is_string($conds)) {
             return array($conds, array());
         }
+        if (!is_array($conds)) {
+            throw new BException("Invalid where parameter");
+        }
         $where = array();
         $params = array();
-        if (is_array($conds)) {
-            foreach ($conds as $f=>$v) {
-                if (is_int($f)) {
-                    if (is_string($v)) { // freeform
-                        $where[] = '('.$v.')';
+        foreach ($conds as $f=>$v) {
+            if (is_int($f)) {
+                if (is_string($v)) { // freeform
+                    $where[] = '('.$v.')';
+                    continue;
+                }
+                if (is_array($v)) { // [freeform|arguments]
+                    $sql = array_shift($v);
+                    if ('AND'===$sql || 'OR'===$sql || 'NOT'===$sql) {
+                        $f = $sql;
+                    } else {
+                        if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
+                            $v = $v[0];
+                            $sql = str_replace('(?)', '('.str_pad('', sizeof($v)*2-1, '?,').')', $sql);
+                        }
+                        $where[] = '('.$sql.')';
+                        $params = array_merge($params, $v);
                         continue;
                     }
-                    if (is_array($v)) { // [freeform|arguments]
-                        $sql = array_shift($v);
-                        if ('AND'===$sql || 'OR'===$sql || 'NOT'===$sql) {
-                            $f = $sql;
-                        } else {
-                            if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
-                                $v = $v[0];
-                                $sql = str_replace('(?)', '('.str_pad('', sizeof($v)*2-1, '?,').')', $sql);
-                            }
-                            $where[] = '('.$sql.')';
-                            $params = array_merge($params, $v);
-                            continue;
-                        }
-                    } else {
-                        throw new BException('Invalid token: '.print_r($v,1));
-                    }
-                }
-                if ('AND'===$f) {
-                    list($w, $p) = static::where($v);
-                    $where[] = '('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif ('OR'===$f) {
-                    list($w, $p) = static::where($v, true);
-                    $where[] = '('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif ('NOT'===$f) {
-                    list($w, $p) = static::where($v);
-                    $where[] = 'NOT ('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif (is_array($v)) {
-                    $where[] = "({$f} IN (".str_pad('', sizeof($v)*2-1, '?,')."))";
-                    $params = array_merge($params, $v);
-                } elseif (is_null($v)) {
-                    $where[] = "({$f} IS NULL)";
                 } else {
-                    $where[] = "({$f}=?)";
-                    $params[] = $v;
+                    throw new BException('Invalid token: '.print_r($v,1));
                 }
             }
-#print_r($where); print_r($params);
-            return array(join($or ? " OR " : " AND ", $where), $params);
+            if ('AND'===$f) {
+                list($w, $p) = static::where($v);
+                $where[] = '('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif ('OR'===$f) {
+                list($w, $p) = static::where($v, true);
+                $where[] = '('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif ('NOT'===$f) {
+                list($w, $p) = static::where($v);
+                $where[] = 'NOT ('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif (is_array($v)) {
+                $where[] = "({$f} IN (".str_pad('', sizeof($v)*2-1, '?,')."))";
+                $params = array_merge($params, $v);
+            } elseif (is_null($v)) {
+                $where[] = "({$f} IS NULL)";
+            } else {
+                $where[] = "({$f}=?)";
+                $params[] = $v;
+            }
         }
-        throw new BException("Invalid where parameter");
+#print_r($where); print_r($params);
+        return array(join($or ? " OR " : " AND ", $where), $params);
     }
 
     /**
