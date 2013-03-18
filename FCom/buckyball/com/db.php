@@ -584,7 +584,7 @@ EOT
                 ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
         }
         static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
-        static::ddlClearCache($fullTableName);
+        static::ddlClearCache();
     }
 
     /**
@@ -652,8 +652,10 @@ EOT
                         $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
                         $colName = $a[1];
                         $def = $a[2];
+                    } else {
+                        $colName = $f;
                     }
-                    $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
+                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
                 }
             }
         }
