@@ -177,11 +177,9 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         }
         $this->assertTrue($db->ddlTableExists($vo->table));
         $this->assertTrue($db->ddlTableExists('fulleron_test.' . $vo->table));
-
-        $db->ddlTableDef($vo->table, $vo->tableFields);
     }
 
-    public function testDdlCanUpdateTable()
+    public function testDdlCanDropColumnAndIndex()
     {
         $db = BDb::i();
 
@@ -197,6 +195,14 @@ class BDb_Test extends PHPUnit_Framework_TestCase
                 'test_char' => 'DROP'
             ),
         );
+
+        $db->ddlTableDef($vo->table, $update);
+
+        $columns = $db->ddlFieldInfo($vo->table);
+        $indexes = $db->ddlIndexInfo($vo->table);
+
+        $this->assertNotContains('test_char', array_keys($columns));
+        $this->assertNotContains('test_char', array_keys($indexes));
     }
 
     protected function setUp()
@@ -205,6 +211,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db = BDb::i();
         $vo = new Entity();
         $db->run("DROP TABLE IF EXISTS {$vo->table}, {$vo->fTable}");
+        $db->ddlClearCache();
     }
 }
 
