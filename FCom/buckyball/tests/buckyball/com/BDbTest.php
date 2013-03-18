@@ -153,4 +153,120 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($result));
         $this->assertNotEmpty($result);
     }
+
+    public function testDdlTableDefCanCreateTable()
+    {
+        $db = BDb::i();
+
+        $vo = new Entity();
+        $this->assertFalse($db->ddlTableExists($vo->table));
+        $this->assertFalse($db->ddlTableExists('fulleron_test.' . $vo->table));
+
+        $db->ddlTableDef($vo->table, $vo->tableFields);
+
+        $this->assertTrue($db->ddlTableExists($vo->table));
+        $this->assertTrue($db->ddlTableExists('fulleron_test.' . $vo->table));
+    }
+
+    public function testDdlCanCheckTableExists()
+    {
+        $db = BDb::i();
+        $vo = new Entity();
+        if (!$db->ddlTableExists($vo->table)) {
+            $db->ddlTableDef($vo->table, $vo->tableFields);
+        }
+        $this->assertTrue($db->ddlTableExists($vo->table));
+        $this->assertTrue($db->ddlTableExists('fulleron_test.' . $vo->table));
+
+        $db->ddlTableDef($vo->table, $vo->tableFields);
+    }
+
+    public function testDdlCanUpdateTable()
+    {
+        $db = BDb::i();
+
+        $vo = new Entity();
+        if (!$db->ddlTableExists($vo->table)) {
+            $db->ddlTableDef($vo->table, $vo->tableFields);
+        }
+        $update = array(
+            'COLUMNS' => array(
+                'test_char' => 'DROP'
+            ),
+            'KEYS' => array(
+                'test_char' => 'DROP'
+            ),
+        );
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $db = BDb::i();
+        $vo = new Entity();
+        $db->run("DROP TABLE IF EXISTS {$vo->table}, {$vo->fTable}");
+    }
 }
+
+
+class Entity
+{
+    public $table = 'test_table';
+    public $fTable = 'fk_test_table';
+
+    public $tableFields = array(
+        'COLUMNS' => array(
+            'test_id' => 'int(10) not null',
+            'test_fk_id' => 'int(10) not null',
+            'test_varchar' => 'varchar(100) null',
+            'test_char' => 'char(10) null',
+            'test_text' => 'text null',
+        ),
+        'PRIMARY' => '(test_id)', // at the moment this HAS to be IN parenthesis or wrong SQL is generated
+        'KEYS' => array(
+            'test_id' => 'PRIMARY(test_id)',
+            'test_fk_id' => 'UNIQUE(test_fk_id)',
+            'test_char' => '(test_char)',
+            'test_varchar' => '(test_varchar)',
+        ),
+        'CONSTRAINTS' => array(),
+//        'OPTIONS' => array(
+//            'engine' => 'InnoDB',
+//            'charset' => 'latin1',
+//            'collate' => 'latin1',// what will happen if they do not match?
+//        ),
+    );
+    public $fkTableFields = array(
+        'COLUMNS' => array(
+            'fk_test_id' => 'int(10) not null',
+            'fk_test_fk_id' => 'int(10) not null',
+        ),
+        'PRIMARY' => '(fk_test_id)',
+        'KEYS' => array(
+            'fk_test_id' => 'PRIMARY(fk_test_id)',
+            'fk_test_fk_id' => 'UNIQUE(fk_test_fk_id)',
+        ),
+        'CONSTRAINTS' => array(
+            'Ffk_test_fk_idK' => '(fk_test_fk_id) REFERENCES test_table.test_fk_id ON DELETE CASCADE ON UPDATE CASCADE'
+        ),
+        'OPTIONS' => array(
+            'engine' => 'InnoDB',
+            'charset' => 'latin1',
+            'collate' => 'latin1',// what will happen if they do not match?
+        ),
+    );
+}
+
+/*
+ * CREATE TABLE test_table
+(
+test_id int(10) not null,
+test_fk_id int(10) not null,
+test_varchar varchar(100) null,
+test_char char(10) null,
+test_text text null,
+PRIMARY KEY test_id
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+
+ALTER TABLE test_table DROP PRIMARY KEY, ADD PRIMARY KEY `test_id` (test_id), ADD UNIQUE KEY `test_fk_id` (test_fk_id), ADD KEY `test_char` ("test_char"), ADD KEY `test_varchar` ("test_varchar")
+ */

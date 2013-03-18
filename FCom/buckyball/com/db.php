@@ -449,7 +449,7 @@ EOT
     * Check whether table exists
     *
     * @param string $fullTableName
-    * @return BDb
+    * @return bool
     */
     public static function ddlTableExists($fullTableName)
     {
@@ -689,6 +689,7 @@ EOT
                     }
                 } else {
                     if (!empty($tableFKs[$idx])) {
+                    // what if it is not foreign key constraint we do not doe anything to check for UNIQUE and PRIMARY constraint
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
