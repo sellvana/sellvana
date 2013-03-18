@@ -25,6 +25,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
             $data = $r->post();
             $id = $r->params('id', true);
 
+            $model = false;
             if ($r->xhr()) {
                 $model = $hlp->load($data['model']['family_name'], 'family_name');
             }
@@ -41,11 +42,11 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
                 exit;
             }
 
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            BSession::i()->addMessage('Product Family has been saved', 'success', 'admin');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
         }
-        BResponse::i()->redirect(BApp::href('catalog/families/form/?id='.$model->id));
+        BResponse::i()->redirect(BApp::href('catalog/families/form/?id='.($model ? $model->id : '')));
     }
 
     public function action_autocomplete()

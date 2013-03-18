@@ -861,8 +861,8 @@ class BClassRegistry extends BClass
         }
         if (!empty($this->_methods[$method][$static][$type]['implements'])) {
             $implements = class_implements($class);
-            foreach ($this->_methods[$method][$static][$type]['implements'] as $i) {
-                if (isset($implements[$p])) {
+            foreach ($this->_methods[$method][$static][$type]['implements'] as $i=>$v) {
+                if (isset($implements[$i])) {
                     $this->_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }

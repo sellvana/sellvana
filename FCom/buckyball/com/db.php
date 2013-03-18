@@ -2035,7 +2035,7 @@ class BModel extends Model
     {
         if ($beforeAfter) {
             if (!$this->beforeSave()) {
-                return this;
+                return $this;
             }
             try {
                 $this->beforeSave();
@@ -2266,7 +2266,7 @@ class BModel extends Model
     * @param boolean $autoCreate if record doesn't exist yet, create a new object
     * @result BModel
     */
-    public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null)
+    public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null, $foreignIdField='id')
     {
         $cacheKey = $cacheKey ? $cacheKey : $modelClass;
         $model = $this->loadInstanceCache($cacheKey);

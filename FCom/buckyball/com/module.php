@@ -1292,6 +1292,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         if (empty($mod['schema_version'])) {
             return true;
         }
+        $callback = $mod->uninstall_callback; //TODO: implement
         // call uninstall migration script
         if (is_callable($callback)) {
             call_user_func($callback);

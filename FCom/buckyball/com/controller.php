@@ -410,7 +410,6 @@ class BRequest extends BClass
         $domain = !is_null($domain) ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost());
 
         setcookie($name, $value, time()+$lifespan, $path, $domain);
-        return $this;
     }
 
     /**
@@ -1061,7 +1060,7 @@ class BResponse extends BClass
     public function output($type=null)
     {
         if (!is_null($type)) {
-            $this->contentType($type);
+            $this->setContentType($type);
         }
         //BSession::i()->close();
         header('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);

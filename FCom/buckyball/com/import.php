@@ -40,6 +40,7 @@ class BImport extends BClass
         // get first line in the file
         $r = fgets($fp);
         fclose($fp);
+        $row = array();
         foreach (array("\t", ',', ';', '|') as $chr) {
             $row = str_getcsv($r, $chr);
             if (sizeof($row)>1) {
