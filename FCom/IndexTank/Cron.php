@@ -28,7 +28,7 @@ class FCom_IndexTank_Cron extends BClass
     {
         $products = $this->gerProducts(0);
         if (!$products) {
-            return;
+            return null;
         }
         //before index
         $this->setProductsStatus(1, $products);
@@ -43,13 +43,14 @@ class FCom_IndexTank_Cron extends BClass
         $this->setProductsStatus(2, $products);
 
         FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+        return true;
     }
 
     protected function removeDisabledProducts()
     {
         $products = $this->gerProducts(1);
         if (!$products) {
-            return;
+            return false;
         }
         //before index
         $this->setProductsStatus(1, $products);
@@ -64,6 +65,7 @@ class FCom_IndexTank_Cron extends BClass
         $this->setProductsStatus(2, $products);
 
         FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+        return true;
     }
 
     /**

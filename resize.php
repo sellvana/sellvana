@@ -31,6 +31,10 @@ if (empty($_GET['f']) || empty($_GET['s'])
     exit;
 }
 
+if (!is_file($f)) {
+    $f = !empty($_GET['d']) ? $_GET['d'] : __DIR__.'/media/image-not-found.jpg';
+}
+
 $imgSize = getimagesize($f);
 $imgType = $imgSize[2];//exif_imagetype($f);//requires php_exif module
 switch ($imgType) {

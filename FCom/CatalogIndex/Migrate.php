@@ -4,7 +4,7 @@ class FCom_CatalogIndex_Migrate extends BClass
     public function run()
     {
         BMigrate::install('0.1.0', array($this, 'install'));
-        //BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
     }
 
     public function install()
@@ -15,7 +15,7 @@ class FCom_CatalogIndex_Migrate extends BClass
         $tIdxDoc = FCom_CatalogIndex_Model_Doc::table();
         $tProduct = FCom_Catalog_Model_Product::table();
         $tIdxDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-        
+
         BDb::ddlTableDef($tIdxTerm, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
@@ -32,7 +32,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'field_name' => 'varchar(50) not null',
                 'field_type' => "enum('int','decimal','varchar','text','category') not null",
                 'weight' => 'int not null',
-                'fcom_field_id' => 'int unsigned default null',
+                'fcom_field_id' => 'int(10) unsigned default null',
             ),
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => array(
@@ -74,5 +74,37 @@ class FCom_CatalogIndex_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade_0_1_1()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multivalue' => 'tinyint after filter_type',
+                'filter_show_empty' => 'tinyint after filter_multivalue',
+                'filter_custom_view' => 'varchar(255) after filter_order',
+                'sort_label' => 'varchar(255) after sort_type',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_FieldValue::table(), array(
+            'COLUMNS' => array(
+                'val' => 'varchar(100) not null',
+                'display' => 'varchar(100) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+            'COLUMNS' => array(
+                'sort_name' => 'RENAME sort_product_name varchar(50) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_DocValue::table(), array(
+            'KEYS' => array(
+                'UNQ_doc_field_value' => 'UNIQUE (doc_id,field_id,value_id)',
+            )
+        ));
+        FCom_CatalogIndex_Model_Field::i()->update_many(
+            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
+            array('field_name' => 'category')
+        );
+   }
 
 }
