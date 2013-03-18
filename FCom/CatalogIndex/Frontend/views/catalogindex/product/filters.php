@@ -1,29 +1,38 @@
 <?php
-$s = $this->state;
+$facets = $this->products_data['facets'];
+$s = $this->products_data['state'];
+$hlp = FCom_CatalogIndex::i();
 ?>
 <section class="block block-filter">
-	<header class="block-title"><span class="title">Narrow Results</span></header>
+    <header class="block-title"><span class="title">Narrow Results</span></header>
     <form class="block-content" method="get" action="">
-        <?=$this->view('catalogindex/product/_pager_categories')->set('s', $s)?>
-    <?php if (!empty($s['available_facets'])): ?>
-        <?php foreach($s['available_facets'] as $label => $data):?>
-            <section class="block-sub block-attribute">
-                            <header class="block-sub-title"><span class="title"><?=$label?></header>
-                            <ul>
-                    <?php foreach ($data as $obj): ?>
-                        <?php if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                            <li><a class="active" href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array($obj->param => ''))?>"><span class="icon"></span><?=$obj->name?> <span class="count">(<?=$obj->count?>)</span></a></li>
-                            <?php if(true == $s['save_filter']):?>
-                                <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
-                            <?php endif; ?>
-                        <?php else:?>
-                            <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), array($obj->param => $obj->name))?>"><span class="icon"></span><?=$obj->name?> <span class="count">(<?=$obj->count?>)</span></a></li>
-                        <?php endif; ?>
-                    <?php endforeach ?>
-                    </ul>
+        <?php if (!empty($facets)): ?>
+            <?php foreach ($facets as $fKey => $facet): ?>
+                <?php if (!empty($facet['custom_view'])): ?>
+                    <?=$this->view($facet['custom_view'])->set('facet_key', $fKey)->set('facet', $facet)
+                            ->set('products_data', $this->products_data) ?>
+                <?php elseif (!empty($facet['values'])): ?>
+                    <section class="block-sub block-attribute">
+                        <header class="block-sub-title"><span class="title"><?=$facet['display']?></header>
+                        <ul>
+                            <?php foreach ($facet['values'] as $vKey => $value): ?>
+                                <?php if (!empty($value['selected'])): ?>
+                                    <li><a class="active" href="<?= $hlp->getUrl(null, array($fKey => $vKey)) ?>">
+                                        <span class="icon"></span><?=$value['display']?></a></li>
+                                    <?php if (!empty($s['save_filter'])): ?>
+                                        <input type="hidden" name="<?= $fKey ?>" value="<?= $vKey ?>"/>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <li><a href="<?= $hlp->getUrl(array($fKey => $vKey)) ?>">
+                                         <span class="icon"></span><?=$value['display']?>
+                                         <span class="count">(<?=$value['cnt']?>)</span></a></li>
+                                <?php endif; ?>
+                            <?php endforeach ?>
+                        </ul>
                     </section>
-        <?php endforeach; ?>
-    <?php endif; ?>
+                <?php endif ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </form>
 </section>
 
