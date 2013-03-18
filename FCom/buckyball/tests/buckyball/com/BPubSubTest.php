@@ -7,13 +7,9 @@ class BPubSub_Test extends PHPUnit_Framework_TestCase
         $eventName = 'testEvent';
         BPubSub::i()->event($eventName);
         BPubSub::i()->on($eventName, 'BPubSub_Test_Callback::callback');
-        BPubSub::i()->fire($eventName);
+        $result = BPubSub::i()->fire($eventName);
 
-        //todo: write good test
-
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertContains(10, $result);
     }
 }
 

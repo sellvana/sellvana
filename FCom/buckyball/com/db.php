@@ -72,7 +72,8 @@ class BDb
 
     /**
     * Shortcut to help with IDE autocompletion
-    *
+    * @param bool  $new
+    * @param array $args
     * @return BDb
     */
     public static function i($new=false, array $args=array())
@@ -105,6 +106,8 @@ class BDb
     *  }
     *
     * @param string $name
+    * @throws BException
+    * @return PDO
     */
     public static function connect($name=null)
     {
@@ -191,6 +194,8 @@ class BDb
     * @param array $params
     * @param array $options
     *   - echo - echo all queries as they run
+    * @throws Exception
+    * @return array
     */
     public static function run($sql, $params=null, $options=array())
     {
@@ -266,6 +271,7 @@ class BDb
     * Convenient within strings and heredocs as {$this->t(...)}
     *
     * @param string $tableName
+    * @return string
     */
     public static function t($tableName)
     {
@@ -311,7 +317,7 @@ class BDb
     * // (f1=5) AND (f2 LIKE '%text%'):
     * $w = BDb::where(array('f1'=>5, array('f2 LIKE ?', '%text%')));
     *
-    * // (f1!=5) OR f2 BETWEEN 10 AND 20:
+    * // ((f1!=5) OR (f2 BETWEEN 10 AND 20)):
     * $w = BDb::where(array('OR'=>array(array('f1!=?', 5), array('f2 BETWEEN ? AND ?', 10, 20))));
     *
     * // (f1 IN (1,2,3)) AND NOT ((f2 IS NULL) OR (f2=10))
@@ -322,6 +328,7 @@ class BDb
     *
     * @param array $conds
     * @param boolean $or
+    * @throws BException
     * @return array (query, params)
     */
     public static function where($conds, $or=false)
@@ -329,58 +336,58 @@ class BDb
         if (is_string($conds)) {
             return array($conds, array());
         }
+        if (!is_array($conds)) {
+            throw new BException("Invalid where parameter");
+        }
         $where = array();
         $params = array();
-        if (is_array($conds)) {
-            foreach ($conds as $f=>$v) {
-                if (is_int($f)) {
-                    if (is_string($v)) { // freeform
-                        $where[] = '('.$v.')';
+        foreach ($conds as $f=>$v) {
+            if (is_int($f)) {
+                if (is_string($v)) { // freeform
+                    $where[] = '('.$v.')';
+                    continue;
+                }
+                if (is_array($v)) { // [freeform|arguments]
+                    $sql = array_shift($v);
+                    if ('AND'===$sql || 'OR'===$sql || 'NOT'===$sql) {
+                        $f = $sql;
+                    } else {
+                        if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
+                            $v = $v[0];
+                            $sql = str_replace('(?)', '('.str_pad('', sizeof($v)*2-1, '?,').')', $sql);
+                        }
+                        $where[] = '('.$sql.')';
+                        $params = array_merge($params, $v);
                         continue;
                     }
-                    if (is_array($v)) { // [freeform|arguments]
-                        $sql = array_shift($v);
-                        if ('AND'===$sql || 'OR'===$sql || 'NOT'===$sql) {
-                            $f = $sql;
-                        } else {
-                            if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
-                                $v = $v[0];
-                                $sql = str_replace('(?)', "(".str_pad('', sizeof($v)*2-1, '?,')."))", $sql);
-                            }
-                            $where[] = $sql;
-                            $params = array_merge($params, $v);
-                            continue;
-                        }
-                    } else {
-                        throw new BException('Invalid token: '.print_r($v,1));
-                    }
-                }
-                if ('AND'===$f) {
-                    list($w, $p) = static::where($v);
-                    $where[] = '('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif ('OR'===$f) {
-                    list($w, $p) = static::where($v, true);
-                    $where[] = '('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif ('NOT'===$f) {
-                    list($w, $p) = static::where($v);
-                    $where[] = 'NOT ('.$w.')';
-                    $params = array_merge($params, $p);
-                } elseif (is_array($v)) {
-                    $where[] = "({$f} IN (".str_pad('', sizeof($v)*2-1, '?,')."))";
-                    $params = array_merge($params, $v);
-                } elseif (is_null($v)) {
-                    $where[] = "({$f} IS NULL)";
                 } else {
-                    $where[] = "({$f}=?)";
-                    $params[] = $v;
+                    throw new BException('Invalid token: '.print_r($v,1));
                 }
             }
-#print_r($where); print_r($params);
-            return array(join($or ? " OR " : " AND ", $where), $params);
+            if ('AND'===$f) {
+                list($w, $p) = static::where($v);
+                $where[] = '('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif ('OR'===$f) {
+                list($w, $p) = static::where($v, true);
+                $where[] = '('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif ('NOT'===$f) {
+                list($w, $p) = static::where($v);
+                $where[] = 'NOT ('.$w.')';
+                $params = array_merge($params, $p);
+            } elseif (is_array($v)) {
+                $where[] = "({$f} IN (".str_pad('', sizeof($v)*2-1, '?,')."))";
+                $params = array_merge($params, $v);
+            } elseif (is_null($v)) {
+                $where[] = "({$f} IS NULL)";
+            } else {
+                $where[] = "({$f}=?)";
+                $params[] = $v;
+            }
         }
-        throw new BException("Invalid where parameter");
+#print_r($where); print_r($params);
+        return array(join($or ? " OR " : " AND ", $where), $params);
     }
 
     /**
@@ -467,6 +474,7 @@ EOT
     *
     * @param string $fullTableName
     * @param string $fieldName if null return all fields
+    * @throws BException
     * @return mixed
     */
     public static function ddlFieldInfo($fullTableName, $fieldName=null)
@@ -491,6 +499,7 @@ EOT
     *
     * @param string $fullTableName
     * @param string $indexName
+    * @throws BException
     * @return array|null
     */
     public static function ddlIndexInfo($fullTableName, $indexName=null)
@@ -516,7 +525,8 @@ EOT
     *
     * @param string $fullTableName
     * @param string $fkName
-    * @result array|null
+    * @throws BException
+    * @return array|null
     */
     public static function ddlForeignKeyInfo($fullTableName, $fkName=null)
     {
@@ -535,13 +545,15 @@ EOT
         $res = static::$_tables[$dbName][$tableName]['fks'];
         return is_null($fkName) ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
     }
-    
+
     /**
     * Create or update table
-    * 
+    *
     * @deprecates ddlTable and ddlTableColumns
     * @param string $fullTableName
     * @param array $def
+    * @throws BException
+    * @return array
     */
     public static function ddlTableDef($fullTableName, $def)
     {
@@ -550,7 +562,7 @@ EOT
         $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;
         $fks = !empty($def['CONSTRAINTS']) ? $def['CONSTRAINTS'] : null;
         $options = !empty($def['OPTIONS']) ? $def['OPTIONS'] : null;
-        
+
         if (!static::ddlTableExists($fullTableName)) {
             if (!$fields) {
                 throw new BException('Missing fields definition for new table');
@@ -570,9 +582,9 @@ EOT
             $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
             BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
                 ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
-            static::ddlClearCache();
         }
-        return static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
+        static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
+        static::ddlClearCache();
     }
 
     /**
@@ -584,6 +596,7 @@ EOT
     *   - engine (default InnoDB)
     *   - charset (default utf8)
     *   - collate (default utf8_general_ci)
+    * @return bool
     */
     public static function ddlTable($fullTableName, $fields, $options=null)
     {
@@ -635,7 +648,14 @@ EOT
                 } elseif (empty($tableFields[$f])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {
-                    $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
+                    if (strpos($def, 'RENAME')===0) {
+                        $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
+                        $colName = $a[1];
+                        $def = $a[2];
+                    } else {
+                        $colName = $f;
+                    }
+                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
                 }
             }
         }
@@ -697,6 +717,7 @@ EOT
     /**
     * Clean array or object fields based on table columns and return an array
     *
+    * @param string $table
     * @param array|object $data
     * @return array
     */
@@ -845,7 +866,8 @@ class BORM extends ORMWrapper
     /**
     * Shortcut factory for generic instance
     *
-    * @return BConfig
+    * @param bool $new
+    * @return BORM
     */
     public static function i($new=false)
     {
@@ -1034,6 +1056,12 @@ class BORM extends ORMWrapper
         } else {
             $this->_result_columns[] = $expr;
         }
+        return $this;
+    }
+
+    public function clear_columns()
+    {
+        $this->_result_columns = array();
         return $this;
     }
 
@@ -1321,16 +1349,18 @@ exit;
      }
 
     /**
-     * Perform a raw query. The query should contain placeholders,
-     * in either named or question mark style, and the parameters
-     * should be an array of values which will be bound to the
-     * placeholders in the query. If this method is called, all
-     * other query building methods will be ignored.
-     *
-     * Connection will be set to write, if query is not SELECT or SHOW
-     *
-     * @return BORMWrapper
-     */
+    * Perform a raw query. The query should contain placeholders,
+    * in either named or question mark style, and the parameters
+    * should be an array of values which will be bound to the
+    * placeholders in the query. If this method is called, all
+    * other query building methods will be ignored.
+    *
+    * Connection will be set to write, if query is not SELECT or SHOW
+    *
+    * @param       $query
+    * @param array $parameters
+    * @return BORM
+    */
     public function raw_query($query, $parameters=array())
     {
         if (preg_match('#^\s*(SELECT|SHOW)#i', $query)) {
@@ -2012,7 +2042,7 @@ class BModel extends Model
     {
         if ($beforeAfter) {
             if (!$this->beforeSave()) {
-                return this;
+                return $this;
             }
             try {
                 $this->beforeSave();
@@ -2243,7 +2273,7 @@ class BModel extends Model
     * @param boolean $autoCreate if record doesn't exist yet, create a new object
     * @result BModel
     */
-    public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null)
+    public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null, $foreignIdField='id')
     {
         $cacheKey = $cacheKey ? $cacheKey : $modelClass;
         $model = $this->loadInstanceCache($cacheKey);
