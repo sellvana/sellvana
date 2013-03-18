@@ -102,7 +102,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             )
         ));
         FCom_CatalogIndex_Model_Field::i()->update_many(
-            array('filter_custom_view' => 'catalogindex/product/_pager_categories'),
+            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
             array('field_name' => 'category')
         );
    }
