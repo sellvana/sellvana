@@ -30,7 +30,6 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $sc = BRequest::i()->get('sc');
-        $f = BRequest::i()->get('f');
         $v = BRequest::i()->get('v');
         $s = BRequest::i()->get('s');
         $page = BRequest::i()->get('p');
@@ -41,7 +40,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 //            $f['category'] = $categoryKey. ":".$category->node_name;
 //        }
 
-        $productsData = FCom_CatalogIndex::i()->findProducts($q, $f, $s);
+        $productsData = FCom_CatalogIndex::i()->findProducts($q, null, $s, array('category'=>$category));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
@@ -52,7 +51,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core::i()->lastNav(true);
 
         $head = $this->view('head');
         $crumbs = array('home');
@@ -77,9 +76,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
-        $layout->view('catalogindex/product/filters')->state = $productsData['state'];
-
+        $layout->view('catalog/product/pager')->sort_options = FCom_CatalogIndex_Model_Field::i()->getSortingArray();
+        $layout->view('catalogindex/product/filters')->products_data = $productsData;
 
         $this->layout('/catalog/category');
     }
@@ -121,7 +119,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
+        $layout->view('catalog/product/pager')->sort_options = FCom_CatalogIndex_Model_Field::i()->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
         $this->layout('/catalog/search');

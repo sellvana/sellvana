@@ -2,12 +2,63 @@
 
 class FCom_CatalogIndex extends BClass
 {
+    protected static $_filterParams;
     protected static $_indexData;
     protected static $_filterValues;
 
     static public function bootstrap()
     {
+        static::parseUrl();
+    }
 
+    static public function parseUrl()
+    {
+        if (($getFilters = BRequest::i()->get('filters'))) {
+            $getFiltersArr = explode('.', $getFilters);
+            static::$_filterParams = array();
+            foreach ($getFiltersArr as $filterStr) {
+                if ($filterStr==='') {
+                    continue;
+                }
+                $filterArr = explode('-', $filterStr, 2);
+                if (empty($filterArr[1])) {
+                    continue;
+                }
+                $valueArr = explode(' ', $filterArr[1]);
+                foreach ($valueArr as $v) {
+                    if ($v==='') {
+                        continue;
+                    }
+                    static::$_filterParams[$filterArr[0]][$v] = $v;
+                }
+            }
+        }
+    }
+
+    static public function getUrl($add=array(), $remove=array())
+    {
+        $filters = array();
+        $params = static::$_filterParams;
+        if ($add) {
+            foreach ($add as $fKey=>$fValues) {
+                foreach ((array)$fValues as $v) {
+                    $params[$fKey][$v] = $v;
+                }
+            }
+        }
+        if ($remove) {
+            foreach ($remove as $fKey=>$fValues) {
+                foreach ((array)$fValues as $v) {
+                    unset($params[$fKey][$v]);
+                }
+            }
+        }
+        foreach ($params as $fKey=>$fValues) {
+            if ($fValues) {
+                $filters[] = $fKey.'-'.join(' ', (array)$fValues);
+            }
+        }
+        return BUtil::setUrlQuery(BRequest::currentUrl(), array('filters'=>join('.', $filters)));
     }
 
     static public function indexProducts($products)
@@ -187,21 +238,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         ");
     }
 
-    static public function findProducts($search=null, $filters=null, $sort=null)
+    static public function findProducts($search=null, $filters=null, $sort=null, $options=array())
     {
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
-
-        $facets = array();
-
-        // retrieve facet field information
-        $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
-        $filterFieldsById = array();
-        foreach ($filterFields as $fName=>$field) {
-            $filterFieldsById[$field->id] = $field;
-            $facets[$fName] = array(); // init for sorting
-        }
 
         // apply term search
         if ($search) {
@@ -213,6 +254,26 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt INNER JOIN {$tTerm} t ON dt.term_id=t.id
                     WHERE t.term IN (?)))", $terms),
             ));
+        }
+
+        if (is_null($filters)) {
+            $filters = static::$_filterParams;
+        }
+
+        $facets = array();
+
+        // retrieve facet field information
+        $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
+        $filterFieldsById = array();
+        foreach ($filterFields as $fName=>$field) {
+            $filterFieldsById[$field->id] = $field;
+            $facets[$fName] = array(
+                'display' => $field->field_label,
+                'custom_view' => $field->filter_custom_view ? $field->filter_custom_view : null,
+            ); // init for sorting
+            if (!empty($options['category']) && $field->field_type=='category') {
+                $filters[$fName] = $options['category']->url_path;
+            }
         }
 
         $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
@@ -229,7 +290,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 $v->category_level = $lvl;
             }
             // $v->field = $field;
-            $filterValuesByVal[$v->val] = $vId;
+            $filterValuesByVal[$v->field_id][$v->val] = $vId;
         }
 
         // apply facet filters
@@ -249,11 +310,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 $fValues = (array)$fValues;
                 $productsOrm->where(array(
                     array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv INNER JOIN {$tFieldValue} fv ON dv.value_id=fv.id
-                        WHERE fv.field_id={$field->id} AND fv.val IN (?)))", $fValues),
+                        WHERE fv.field_id={$field->id} AND fv.val IN (?)))", array_values($fValues)),
                 ));
                 foreach ($fValues as $v) {
                     $v = strtolower($v);
-                    $vId = $filterValuesByVal[$v];
+                    $vId = $filterValuesByVal[$field->id][$v];
                     $value = $filterValues[$vId];
                     $display = $value->display ? $value->display : $v;
                     $fName = $field->field_name;
@@ -273,7 +334,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                                 unset($filterValues[$value1->id]);
                             } elseif (strpos($v, $vVal.'/')===0) { // parent categories
                                 $facets[$fName]['values'][$vVal]['display'] = $value1->display;
-                                $facets[$fName]['values'][$vVal]['selected'] = 1;
+                                $facets[$fName]['values'][$vVal]['parent'] = 1;
                                 $facets[$fName]['values'][$vVal]['level'] = $value1->category_level;
                                 unset($filterValues[$value1->id]); // don't calculate counts for selected facet values
                             } elseif (strpos($vVal.'/', $v.'/')!==0) { // lower level categories outside of current
@@ -328,11 +389,13 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 $multiFacetOrm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
             }
             $counts = $multiFacetOrm->find_one()->as_array();
-            foreach ($counts as $vId=>$cnt) {
-                $v = $filterValues[$vId];
-                $f = $filterFieldsById[$v->field_id];
-                $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
-                $facets[$f->field_name]['values'][$v->val]['cnt'] = $c->cnt;
+            if ($counts) {
+                foreach ($counts as $vId=>$cnt) {
+                    $v = $filterValues[$vId];
+                    $f = $filterFieldsById[$v->field_id];
+                    $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
+                    $facets[$f->field_name]['values'][$v->val]['cnt'] = $cnt;
+                }
             }
         }
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
@@ -342,6 +405,13 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         foreach ($filterFields as $fName=>$field) {
             if ($field->field_type=='category') {
                 ksort($facets[$field->field_name]['values']);
+                foreach ($facets[$field->field_name]['values'] as $vKey=>&$fValue) {
+                    $vId = $filterValuesByVal[$field->id][$vKey];
+                    if (!empty($filterValues[$vId])) {
+                        $fValue['level'] = $filterValues[$vId]->category_level;
+                    }
+                }
+                unset($value);
             }
         }
 
@@ -351,12 +421,6 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $method = 'order_by_'.(strtolower($dir)=='desc' ? 'desc' : 'asc');
             $productsOrm->$method('sort_'.$field);
         }
-
         return array('orm'=>$productsOrm, 'facets'=>$facets);
-    }
-
-    static public function getSortingArray()
-    {
-
     }
 }

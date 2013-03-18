@@ -77,10 +77,32 @@ class FCom_CatalogIndex_Migrate extends BClass
 
     public function upgrade_0_1_1()
     {
-        //TODO: rename `doc` fields: sort_name -> sort_product_name (update key)
-        //TODO: add `field` columns: filter_multivalue tinyint, filter_show_empty tinyint
-        //TODO: doc_value: add unique doc_id,field_id,value_id
-        //TODO: field_value: make val not null, add display varchar(100) null
-    }
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multivalue' => 'tinyint after filter_type',
+                'filter_show_empty' => 'tinyint after filter_multivalue',
+                'filter_custom_view' => 'varchar(255) after filter_order',
+                'sort_label' => 'varchar(255) after sort_type',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_FieldValue::table(), array(
+            'COLUMNS' => array(
+                'val' => 'varchar(100) not null',
+                'display' => 'varchar(100) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+            'COLUMNS' => array(
+                'sort_name' => 'RENAME sort_product_name varchar(50) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_DocValue::table(), array(
+            'KEYS' => array(
+                'UNQ_doc_field_value' => 'UNIQUE (doc_id,field_id,value_id)',
+            )
+        ));
+        BDb::run("update ".FCom_CatalogIndex_Model_Field::table()."
+            set filter_custom_view='catalogindex/product/_pager_categories' where field_name='category'");
+   }
 
 }

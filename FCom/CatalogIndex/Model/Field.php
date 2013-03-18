@@ -6,6 +6,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_index_field';
 
     protected static $_indexedFields;
+    protected static $_sortingArray;
 
     static public function getFields($context='all', $where=null)
     {
@@ -32,6 +33,28 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return static::$_indexedFields[$context];
     }
 
+    static public function getSortingArray()
+    {
+        if (!static::$_sortingArray) {
+            static::$_sortingArray = array();
+            $sortFields = static::getFields('sort');
+            foreach ($sortFields as $fName=>$field) {
+                $sortType = $field->sort_type;
+                $labels = explode('||', $field->sort_label);
+                $l1 = !empty($labels[0]) ? trim($labels[0]) : $field->field_label;
+                $l2 = !empty($labels[1]) ? trim($labels[1]) : null;
+                $sortBoth = $sortType=='both';
+                if ($sortType=='asc' || $sortBoth) {
+                    static::$_sortingArray[$field->field_name.' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
+                }
+                if ($sortType=='desc' || $sortBoth) {
+                    static::$_sortingArray[$field->field_name.' desc'] = $sortBoth ? (empty($l2) ? $l1.' (Desc)' : $l2) : $l1;
+                }
+            }
+        }
+        return static::$_sortingArray;
+    }
+
     static public function indexCategory($products, $field)
     {
         // TODO: prefetch categories
@@ -40,8 +63,13 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             $categories = $p->categories();
             foreach ((array)$p->categories() as $c) {
                 $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
-                foreach ((array)$c->category()->ascendants() as $c1) { //TODO: configuration?
-                    $data[$p->id][$c1->url_path] = $c1->url_path.' ==> '.$c1->node_name;
+                if (($ascendants = $c->category()->ascendants())) {
+                    foreach ($ascendants as $c1) { //TODO: configuration?
+                        if (!$c1->parent_id) {
+                            continue;
+                        }
+                        $data[$p->id][$c1->url_path] = $c1->url_path.' ==> '.$c1->node_name;
+                    }
                 }
             }
         }

@@ -8,6 +8,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     private $_importErrors = null;
     private $_dataImport = array();
 
+    /**
+     * Shortcut to help with IDE autocompletion
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_Catalog_Model_Product
+     */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
     public static function stockStatusOptions($onlyAvailable=false)
     {
         $options = array(

@@ -582,9 +582,9 @@ EOT
             $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
             BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
                 ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
-            static::ddlClearCache();
         }
-        return static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
+        static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
+        static::ddlClearCache($fullTableName);
     }
 
     /**
@@ -648,6 +648,11 @@ EOT
                 } elseif (empty($tableFields[$f])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {
+                    if (strpos($def, 'RENAME')===0) {
+                        $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
+                        $colName = $a[1];
+                        $def = $a[2];
+                    }
                     $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
                 }
             }
