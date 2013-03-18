@@ -101,8 +101,10 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'UNQ_doc_field_value' => 'UNIQUE (doc_id,field_id,value_id)',
             )
         ));
-        BDb::run("update ".FCom_CatalogIndex_Model_Field::table()."
-            set filter_custom_view='catalogindex/product/_pager_categories' where field_name='category'");
+        FCom_CatalogIndex_Model_Field::i()->update_many(
+            array('filter_custom_view' => 'catalogindex/product/_pager_categories'),
+            array('field_name' => 'category')
+        );
    }
 
 }
