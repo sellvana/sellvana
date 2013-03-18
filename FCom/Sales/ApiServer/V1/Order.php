@@ -54,7 +54,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
         }
 
         $data = FCom_Sales_Model_Order::i()->formatApiPost($post);
-
+        $order = false;
         try {
             $order = FCom_Sales_Model_Order::orm()->create($data)->save();
         } catch (Exception $e) {

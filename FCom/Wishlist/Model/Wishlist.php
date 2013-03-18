@@ -11,8 +11,8 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     public function wishlist()
     {
         $user = FCom_Customer_Model_Customer::sessionUser();
-        if(!$user){
-            return;
+        if (!$user){
+            return false;
         }
         if (!$this->wishlist) {
             $wishlist = static::i()->load(array("user_id", $user->id));

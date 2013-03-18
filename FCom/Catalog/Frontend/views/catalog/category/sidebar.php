@@ -1,7 +1,7 @@
 <?php
 $category = $this->category ? $this->category : BApp::i()->get('current_category');
 $parent = false;
-$siblings = false;
+$siblings = array();
 if ($category->parent_id) {
     $parent = FCom_Catalog_Model_Category::load($category->parent_id);
     $siblings = $category->siblings();

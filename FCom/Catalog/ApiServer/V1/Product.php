@@ -35,7 +35,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         }
 
         $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
-
+        $product = false;
         try {
             $product = FCom_Catalog_Model_Product::orm()->create($data)->save();
         } catch (Exception $e) {

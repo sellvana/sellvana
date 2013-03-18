@@ -258,7 +258,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($options['price']) || !is_numeric($options['price'])) {
             $options['price'] = 0;
         } else {
-            $options['price'] = $options['price']; //$options['price'] * $options['qty'];
+            $options['price'] = $options['price']; //$options['price'] * $options['qty']; // ??
         }
         $item = FCom_Checkout_Model_CartItem::load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item && $item->promo_id_get == 0) {
@@ -323,8 +323,9 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             foreach ($newCarts as $cId=>$c) {
                 unset($c->id);
                 if ($cId<0) {
-                    unset($data['id']);
+                    unset($c['id']);
                     $cart = static::create($c)->save();
+                    $cId = $cart->id;
                 } else {
                     if (empty($oldCarts[$cId])) {
 throw new Exception("Invalid cart_id: ".$cId);

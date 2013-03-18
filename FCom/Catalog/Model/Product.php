@@ -184,7 +184,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function searchProductOrm($q='', $filter='', $category = null)
+    public function searchProductOrm($q='', $filter=array(), $category = null)
     {
         $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
 

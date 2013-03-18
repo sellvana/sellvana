@@ -31,6 +31,7 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
 
         //$data = BLocale::getTranslations();
         //print_r($data);exit;
+        $data = array();
         $modules = BModuleRegistry::getAllModules();
         foreach($modules as $module){
             if (!empty($module->translations)) {
