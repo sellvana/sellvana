@@ -163,6 +163,8 @@ class FCom_Catalog_Migrate extends BClass
             CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+
+        BDb::run("REPLACE INTO {$tCategory} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade_0_1_2()
