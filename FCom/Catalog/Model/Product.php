@@ -8,6 +8,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     private $_importErrors = null;
     private $_dataImport = array();
 
+    /**
+     * Shortcut to help with IDE autocompletion
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_Catalog_Model_Product
+     */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
     public static function stockStatusOptions($onlyAvailable=false)
     {
         $options = array(
@@ -184,7 +195,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function searchProductOrm($q='', $filter='', $category = null)
+    public function searchProductOrm($q='', $filter=array(), $category = null)
     {
         $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
 
@@ -575,5 +586,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function addToCategories($categoryIds)
+    {
+        $hlp = FCom_Catalog_Model_CategoryProduct::i();
+        foreach ((array)$categoryIds as $cId) {
+            $hlp->create(array('product_id'=>$this->id, 'category_id'=>$cId))->save();
+        }
+        return $this;
+    }
+
+    public function removeFromCategories($categoryIds)
+    {
+        FCom_Catalog_Model_CategoryProduct::i()->delete_many(array('product_id'=>$this->id, 'category_id'=>$categoryIds));
+        return $this;
+    }
 }
 

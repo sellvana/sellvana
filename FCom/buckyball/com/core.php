@@ -861,8 +861,8 @@ class BClassRegistry extends BClass
         }
         if (!empty($this->_methods[$method][$static][$type]['implements'])) {
             $implements = class_implements($class);
-            foreach ($this->_methods[$method][$static][$type]['implements'] as $i) {
-                if (isset($implements[$p])) {
+            foreach ($this->_methods[$method][$static][$type]['implements'] as $i=>$v) {
+                if (isset($implements[$i])) {
                     $this->_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }
@@ -1369,7 +1369,7 @@ class BPubSub extends BClass
         }
         //TODO: create named observers
         $this->_events[$eventName]['observers'][] = $observer;
-        BDebug::debug('SUBSCRIBE '.$eventName.': '.var_export($callback, 1), 1);
+        BDebug::debug('SUBSCRIBE '.$eventName.': '.substr(var_export($callback, 1), 0, 100), 1);
         return $this;
     }
 

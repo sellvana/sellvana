@@ -808,7 +808,6 @@ class BModule extends BClass
         } else {
             static::$_env['root_dir'] = str_replace('\\', '/', $r->scriptDir());
         }
-
         if (($baseSrc = $c->get('web/base_src'))) {
             static::$_env['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_env['http_host'].$baseSrc;
         } else {
@@ -819,6 +818,7 @@ class BModule extends BClass
         } else {
             static::$_env['base_href'] = static::$_env['web_root'];
         }
+#echo "<pre>"; var_dump(static::$_env, $_SERVER); echo "</pre>"; exit;
         foreach (static::$_manifestCache as &$m) {
 			//    $m['base_src'] = static::$_env['base_src'].str_replace(static::$_env['root_dir'], '', $m['root_dir']);
 			$m['base_src'] = rtrim(static::$_env['base_src'], '/').str_replace(static::$_env['root_dir'], '', $m['root_dir']);
@@ -1292,6 +1292,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         if (empty($mod['schema_version'])) {
             return true;
         }
+        $callback = $mod->uninstall_callback; //TODO: implement
         // call uninstall migration script
         if (is_callable($callback)) {
             call_user_func($callback);

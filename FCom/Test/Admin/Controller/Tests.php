@@ -35,7 +35,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         ini_set('html_errors', 0);
         $suite->run($result);
         $results = ob_get_contents();
-        ini_set('html_errors', $html_errors);
+        ini_set('html_errors', $html_errors); //TODO: what suppose to be $html_errors?
         ob_end_clean();
         $textPrinter = new PHPUnit_TextUI_ResultPrinter;
         ob_start();

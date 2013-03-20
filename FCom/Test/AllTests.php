@@ -39,5 +39,5 @@ class FCom_Test_AllTests {
 }
 
 if (PHPUnit_MAIN_METHOD == 'FCom_Test_AllTests::suite') {
-    FCom_Test_AllTests::suite;
+    FCom_Test_AllTests::suite();
 }

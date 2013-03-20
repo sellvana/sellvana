@@ -38,7 +38,9 @@ class FCom_Catalog_Frontend extends BClass
             )),
             '/catalog/category'=>array(
                 array('layout', 'base'),
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
                 array('hook', 'main', 'views'=>array('catalog/category')),
+                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar')),
             ),
 
             '/catalog/product'=>array(
@@ -48,7 +50,9 @@ class FCom_Catalog_Frontend extends BClass
 
             '/catalog/search'=>array(
                 array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('catalog/search'))
+                array('view', 'root', 'set'=>array('show_left_col'=>true)),
+                array('hook', 'main', 'views'=>array('catalog/search')),
+                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar')),
             ),
 
             '/catalog/review/add'=>array(
