@@ -1794,10 +1794,10 @@ class BDebug extends BClass
         $l = self::$_level[self::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            ob_start();
+            //ob_start();
             echo $message."\n";
             debug_print_backtrace();
-            echo ob_get_clean();
+            //echo ob_get_clean();
             echo '</xmp>';
         }
 /*

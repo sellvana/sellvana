@@ -571,8 +571,14 @@ class BRequest extends BClass
     public static function currentUrl()
     {
         $webroot = rtrim(static::webRoot(), '/');
-        return static::scheme().'://'.static::httpHost().$webroot
-            .static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
+        $url = static::scheme().'://'.static::httpHost();
+        if (!BConfig::i()->get('web/hide_script_name')) {
+            $url .= '/'.static::scriptName();
+        } else {
+            $url .= $webroot;
+        }
+        $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
+        return $url;
     }
 
     /**
