@@ -133,7 +133,7 @@ class BDb
         }
         if (!empty($config['use'])) { //TODO: Prevent circular reference
             static::connect($config['use']);
-            return;
+            return BORM::get_db();
         }
         if (!empty($config['dsn'])) {
             $dsn = $config['dsn'];
