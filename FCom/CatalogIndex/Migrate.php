@@ -5,6 +5,8 @@ class FCom_CatalogIndex_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -77,8 +79,54 @@ class FCom_CatalogIndex_Migrate extends BClass
 
     public function upgrade_0_1_1()
     {
-        //TODO: rename `doc` fields: sort_name -> sort_product_name (update key)
-        //TODO: add `field` columns: filter_multivalue tinyint, filter_show_empty tinyint
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multivalue' => 'tinyint after filter_type',
+                'filter_show_empty' => 'tinyint after filter_multivalue',
+                'filter_custom_view' => 'varchar(255) after filter_order',
+                'sort_label' => 'varchar(255) after sort_type',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_FieldValue::table(), array(
+            'COLUMNS' => array(
+                'val' => 'varchar(100) not null',
+                'display' => 'varchar(100) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+            'COLUMNS' => array(
+                'sort_name' => 'RENAME sort_product_name varchar(50) null',
+            )
+        ));
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_DocValue::table(), array(
+            'KEYS' => array(
+                'UNQ_doc_field_value' => 'UNIQUE (doc_id,field_id,value_id)',
+            )
+        ));
+        FCom_CatalogIndex_Model_Field::i()->update_many(
+            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
+            array('field_name' => 'category')
+        );
+   }
+
+    public function upgrade_0_1_2()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multiselect' => 'tinyint after filter_type',
+            )
+        ));
     }
 
+    public function upgrade_0_1_3()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_FieldValue::table(), array(
+            'COLUMNS' => array(
+                'sort_order' => 'smallint not null default 0',
+            ),
+            'KEYS' => array(
+                'IDX_sort_order' => '(field_id, sort_order)',
+            )
+        ));
+    }
 }

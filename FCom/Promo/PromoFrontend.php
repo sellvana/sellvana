@@ -176,6 +176,7 @@ class FCom_Promo_Frontend extends BClass
                             $groupProducts[$product->group_id] = array();
                             $groupAmt[$product->group_id] = 0;
                         }
+                        //TODO: validate that the logic is correct (!empty)
                         if (!empty($productIds[$product->product_id])) {
                             $groupProducts[$product->group_id][] = $productIds[$product->product_id];
                             $groupAmt[$product->group_id] += ($productIds[$product->product_id]->qty*$productIds[$product->product_id]->price - $productIds[$product->product_id]->promo_amt_used);
@@ -291,7 +292,7 @@ class FCom_Promo_Frontend extends BClass
             return;
         }
 
-        $promoList = false;
+        $promoList = array();
         foreach($items as $item) {
             if (!$item->promo_id_buy) {
                 continue;
