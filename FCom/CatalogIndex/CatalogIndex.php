@@ -5,7 +5,7 @@ class FCom_CatalogIndex extends BClass
     protected static $_filterParams;
     protected static $_indexData;
     protected static $_filterValues;
-    protected static $_maxChunkSize = 10000;
+    protected static $_maxChunkSize = 1000;
 
     static public function bootstrap()
     {

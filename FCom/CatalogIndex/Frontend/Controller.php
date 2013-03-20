@@ -8,10 +8,16 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // create categories / subcategories
         if (false) {
+            $root = FCom_Catalog_Model_Category::i()->load(1);
+            for ($i=1; $i<=20; $i++) {
+                $root->createChild('Category '.$i);
+            }
+        }
+        if (false) {
             //$root = FCom_Catalog_Model_Category::i()->load(1);
             $cats = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
             foreach ($cats as $c) {
-                for ($i=1; $i<5; $i++) {
+                for ($i=1; $i<=5; $i++) {
                     $c->createChild('Subcategory '.$c->id.'-'.$i);
                 }
             }
@@ -21,15 +27,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $products = true;
         if (false) {
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
-            $sizes = explode(',', 'Extra Small, Small, Medium, Large, Extra Large');
+            $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
             FCom_CustomField_Common::i()->disable(true);
             $max = FCom_Catalog_Model_Product::i()->orm()->select_expr('(max(id))', 'id')->find_one();
             FCom_CustomField_Common::i()->disable(false);
             $maxId = $max->id;
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw('id>23')->find_many_assoc('id', 'url_path');
-            $catIds = array_keys($categories);
+//            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = array();
-            for ($i=0; $i<33000; $i++) {
+            for ($i=0; $i<100000; $i++) {
                 ++$maxId;
                 $product = FCom_Catalog_Model_Product::i()->create(array(
                     'product_name' => 'Product '.$maxId,
@@ -39,29 +44,30 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     'color' => $colors[rand(0, sizeof($colors)-1)],
                     'size' => $sizes[rand(0, sizeof($sizes)-1)],
                 ))->save();
-                $pId = $product->id;
-                $exists = array();
-                for ($i=0; $i<5; $i++) {
-                    do {
-                        $cId = $catIds[rand(0, sizeof($catIds)-1)];
-                    } while (!empty($exists[$pId.'-'.$cId]));
-                    $product->addToCategories($cId);
-                    $exists[$pId.'-'.$cId] = true;
-                }
-                $products[] = $product;
+//                $pId = $product->id;
+//                $exists = array();
+//                for ($i=0; $i<5; $i++) {
+//                    do {
+//                        $cId = $categories[rand(0, sizeof($categories)-1)]->id;
+//                    } while (!empty($exists[$pId.'-'.$cId]));
+//                    $product->addToCategories($cId);
+//                    $exists[$pId.'-'.$cId] = true;
+//                }
+//                $products[] = $product;
             }
         }
 
         // assign products to categories
         if (false) {
             BDb::run("TRUNCATE fcom_category_product");
-            $products = FCom_Catalog_Model_Product::i()->orm()->find_many_assoc('id', 'id');
-            $prodIds = array_keys($products);
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw('id>23')->find_many_assoc('id', 'url_path');
+            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
             $hlp = FCom_Catalog_Model_CategoryProduct::i();
-            $exists = array();
-            foreach ($prodIds as $pId) {
+
+            FCom_CustomField_Common::disable(true);
+            FCom_Catalog_Model_Product::i()->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
+                $pId = $row->id;
+                $exists = array();
                 for ($i=0; $i<5; $i++) {
                     do {
                         $cId = $catIds[rand(0, sizeof($catIds)-1)];
@@ -69,7 +75,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     $hlp->create(array('product_id'=>$pId, 'category_id'=>$cId))->save();
                     $exists[$pId.'-'.$cId] = true;
                 }
-            }
+            });
+            FCom_CustomField_Common::disable(false);
         }
 
         // reindex products
