@@ -88,6 +88,21 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals($table, $dbi->t($table));
     }
 
+    public function testGetTableNameWithPrefix()
+    {
+        $table = 'test_table';
+        $config = BConfig::i()->get('db');
+        $this->assertEquals($config['table_prefix'] . $table, BDb::t($table));
+    }
+
+    public function testGetTableNameWithPrefixFromInstance()
+    {
+        $table = 'test_table';
+        $dbi = BDb::i(true);
+        $config = BConfig::i()->get('db');
+        $this->assertEquals($config['table_prefix'] . $table, $dbi->t($table));
+    }
+
     public function testVariousWhereConditions()
     {
         $expected = "f1 is null";
