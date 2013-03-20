@@ -11,7 +11,6 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     'base_price|asc' => 'Price (Lower first)',
     'base_price|desc' => 'Price (Higher first)',
 );
-$filters = $this->filters ? $this->filters : array();
 
 ?>
 <div class="pager">
@@ -19,28 +18,8 @@ $filters = $this->filters ? $this->filters : array();
         <?php if (!empty($this->query)):?>
             <input type="hidden" name="q" value="<?=$this->query?>" />
         <?php endif; ?>
+        <?=$this->hook('catalog/product/pager.fields', array('pager_view'=>$this))?>
 
-        <?php if (!empty($filters)):?>
-            <?php foreach($filters as $fkey => $fval):?>
-                <?php if (is_array($fval)):?>
-                    <?php foreach($fval as $fvalsingle):?>
-                        <input type="hidden" name="f[<?=$fkey?>][<?=$fvalsingle?>]" value="<?=$fvalsingle?>" />
-                    <?php endforeach; ?>
-                <?php else:?>
-                    <input type="hidden" name="f[<?=$fkey?>]" value="<?=$fval?>" />
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php endif; ?>
-
-        <?php if (!empty($s['available_facets'])): ?>
-            <?php foreach($s['available_facets'] as $label => $data):?>
-                <?php foreach ($data as $obj): ?>
-                        <?php if(!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                            <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
-                        <?php endif; ?>
-                <?php endforeach ?>
-            <?php endforeach; ?>
-        <?php endif; ?>
 	    <div class="pager-count">
 		    <strong class="count"> <?= BLocale::_("Found") ?>: <?=!empty($s['c'])?$s['c']:0?></strong>.&nbsp;&nbsp;
 		    <label><?= BLocale::_("Page") ?>:</label>
@@ -63,10 +42,10 @@ $filters = $this->filters ? $this->filters : array();
 	    </select>
 	</div>
     <div class="pager-sort">
-    	<label><?= BLocale::_("Sort") ?>:</label>
+    	<label><?= BLocale::_("Sort") ?>:</label> <?=$s['sc']?>
     	<select name="sc" onchange="this.form.submit()" class="select2">
 <?php foreach ($sortOptions as $k=>$v): ?>
-        	<option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=$v?></option>
+        	<option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=BLocale::_($v)?></option>
 <?php endforeach ?>
     	</select>
     </div>

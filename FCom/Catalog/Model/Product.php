@@ -586,5 +586,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function addToCategories($categoryIds)
+    {
+        $hlp = FCom_Catalog_Model_CategoryProduct::i();
+        foreach ((array)$categoryIds as $cId) {
+            $hlp->create(array('product_id'=>$this->id, 'category_id'=>$cId))->save();
+        }
+        return $this;
+    }
+
+    public function removeFromCategories($categoryIds)
+    {
+        FCom_Catalog_Model_CategoryProduct::i()->delete_many(array('product_id'=>$this->id, 'category_id'=>$categoryIds));
+        return $this;
+    }
 }
 

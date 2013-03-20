@@ -1369,7 +1369,7 @@ class BPubSub extends BClass
         }
         //TODO: create named observers
         $this->_events[$eventName]['observers'][] = $observer;
-        BDebug::debug('SUBSCRIBE '.$eventName.': '.var_export($callback, 1), 1);
+        BDebug::debug('SUBSCRIBE '.$eventName.': '.substr(var_export($callback, 1), 0, 100), 1);
         return $this;
     }
 

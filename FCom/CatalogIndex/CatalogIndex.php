@@ -5,6 +5,7 @@ class FCom_CatalogIndex extends BClass
     protected static $_filterParams;
     protected static $_indexData;
     protected static $_filterValues;
+    protected static $_maxChunkSize = 10000;
 
     static public function bootstrap()
     {
@@ -65,13 +66,32 @@ class FCom_CatalogIndex extends BClass
     {
         if ($products===true) {
             static::indexDropDocs(true);
-            $products = FCom_Catalog_Model_Product::i()->orm()->find_many();
+            $start = 0;
+            $i = 0;
+            $t = time();
+            do {
+                $products = FCom_Catalog_Model_Product::i()->orm()->limit(static::$_maxChunkSize)
+                    ->offset($start)->find_many();
+                static::indexProducts($products);
+                echo 'DONE CHUNK '.($i++).': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).' - '.(time()-$t).'<hr>';
+                $t = time();
+                $start += static::$_maxChunkSize;
+            } while (sizeof($products)==static::$_maxChunkSize);
+            return;
         } else {
             $pIds = array();
             foreach ($products as $p) {
                 $pIds[] = $p->id;
             }
             static::indexDropDocs($pIds);
+        }
+        if (sizeof($products)>static::$_maxChunkSize) {
+            $chunks = array_chunk($products, static::$_maxChunkSize);
+            foreach ($chunks as $i=>$chunk) {
+                static::indexProducts($chunk);
+                echo 'DONE CHUNK '.$i.': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).'<hr>';
+            }
+            return;
         }
 
         //TODO: for less memory usage chunk the products data
@@ -88,7 +108,7 @@ class FCom_CatalogIndex extends BClass
         if ($pIds===true) {
             return BDb::run("DELETE FROM ".FCom_CatalogIndex_Model_Doc::table());
         } else {
-            return FCom_CatalogIndex_Model_Doc::i()->delete_many($pIds);
+            return FCom_CatalogIndex_Model_Doc::i()->delete_many(array('id'=>$pIds));
         }
     }
 
@@ -144,13 +164,13 @@ class FCom_CatalogIndex extends BClass
         foreach (static::$_indexData as $pId=>$pData) {
             foreach ($filterFields as $fName=>$field) {
                 $fId = $field->id;
-                $value = $pData[$fName];
+                $value = !empty($pData[$fName]) ? $pData[$fName] : null;
                 if (is_null($value) || $value==='' || $value===array()) {
                     continue;
                 }
                 foreach ((array)$value as $vKey=>$v) {
                     $v1 = explode('==>', $v, 2);
-                    $vVal = strtolower(trim($v1[0]));
+                    $vVal = BUtil::simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
                     $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
                     if (empty(static::$_filterValues[$fId][$vVal])) {
                         $fieldValue = $fieldValueHlp->load(array('field_id'=>$fId, 'val'=>$vVal));
@@ -223,6 +243,7 @@ class FCom_CatalogIndex extends BClass
     {
         static::$_indexData = null;
         static::$_filterValues = null;
+        gc_collect_cycles();
     }
 
     static public function indexGC()
@@ -244,7 +265,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
 
+        $req = BRequest::i();
         // apply term search
+        if (is_null($search)) {
+            $search = $req->get('q');
+        }
         if ($search) {
             $terms = static::_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
@@ -314,6 +339,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 ));
                 foreach ($fValues as $v) {
                     $v = strtolower($v);
+                    if (empty($filterValuesByVal[$field->id][$v])) {
+                        continue;
+                    }
                     $vId = $filterValuesByVal[$field->id][$v];
                     $value = $filterValues[$vId];
                     $display = $value->display ? $value->display : $v;
@@ -416,6 +444,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         // apply sorting
+        if (is_null($sort)) {
+            if (!($sort = trim($req->get('sc')))) {
+                $sort = trim($req->get('s').' '.$req->get('sd'));
+            }
+        }
         if ($sort) {
             list($field, $dir) = is_string($sort) ? explode(' ', $sort)+array('','') : $sort;
             $method = 'order_by_'.(strtolower($dir)=='desc' ? 'desc' : 'asc');

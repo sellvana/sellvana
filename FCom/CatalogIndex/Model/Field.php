@@ -59,8 +59,8 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     {
         // TODO: prefetch categories
         $data = array();
+        /*
         foreach ($products as $p) {
-            $categories = $p->categories();
             foreach ((array)$p->categories() as $c) {
                 $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
                 if (($ascendants = $c->category()->ascendants())) {
@@ -71,6 +71,42 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                         $data[$p->id][$c1->url_path] = $c1->url_path.' ==> '.$c1->node_name;
                     }
                 }
+            }
+        }
+        */
+        $pIds = array();
+        foreach ($products as $p) {
+            $pIds[] = $p->id;
+        }
+        // fetch category - product associations
+        $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+            ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+            ->select(array('category_id', 'product_id', 'id_path'))
+            ->where_in('product_id', $pIds)
+            ->find_many();
+        // find ascendant ids of associated categories
+        $catIds = array();
+        $prodCatIds = array();
+        foreach ($catProds as $cp) {
+            $idPath = explode('/', $cp->id_path);
+            for ($i=sizeof($idPath)-1; $i>0; $i--) {
+                $prodCatIds[$cp->product_id][] = $idPath[$i];
+                $catIds[$idPath[$i]] = $idPath[$i];
+            }
+        }
+        // fetch ascendants category names
+        $categories = FCom_Catalog_Model_Category::i()->orm('c')
+            ->select(array('id', 'url_path', 'node_name'))
+            ->where_in('id', $catIds)
+            ->find_many_assoc('id');
+        // fill index data
+        foreach ($products as $p) {
+            if (empty($prodCatIds[$p->id])) {
+                continue;
+            }
+            foreach ($prodCatIds[$p->id] as $cId) {
+                $c = $categories[$cId];
+                $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
             }
         }
         return $data;

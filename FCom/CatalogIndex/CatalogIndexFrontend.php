@@ -12,7 +12,8 @@ class FCom_CatalogIndex_Frontend extends BClass
         FCom_CatalogIndex::bootstrap();
 
         BFrontController::i()
-            ->route( 'GET /catalogindex/search', 'FCom_CatalogIndex_Frontend_Controller.search')
+            ->route('GET /catalogindex/search', 'FCom_CatalogIndex_Frontend_Controller.search')
+            ->route('^GET /([a-z0-9/-]+)/filters=([a-z0-9+.-]+)$', 'FCom_CatalogIndex_Frontend_Controller.category')
             ->route('GET /index-test', 'FCom_CatalogIndex_Frontend_Controller.test')
         ;
 
@@ -24,7 +25,7 @@ class FCom_CatalogIndex_Frontend extends BClass
     }
 
     /**
-     * Itialized base layout, navigation links and page views scripts
+     * Initialized base layout, navigation links and page views scripts
      */
     static public function layout()
     {
@@ -35,16 +36,11 @@ class FCom_CatalogIndex_Frontend extends BClass
                 )
             )),
             '/catalog/category'=>array(
-                array('layout', 'base'),
-                array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('catalogindex/product/filters'))
+                array('hook', 'catalog/product/pager.fields', 'views'=>array('catalog/category/_pager_fields')),
             ),
             '/catalog/search'=>array(
-                array('layout', 'base'),
-                array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('catalogindex/product/filters'))
+                array('hook', 'catalog/product/pager.fields', 'views'=>array('catalog/category/_pager_fields')),
             ),
-
         ));
     }
 }
