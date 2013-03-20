@@ -38,6 +38,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
     public function testCommitAfterTransaction()
     {
+        $this->markTestSkipped("Todo: implement run tests");
         BDb::transaction();
         /* @var PDO $conn */
         $conn = BORM::get_db();
