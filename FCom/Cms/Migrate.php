@@ -97,5 +97,8 @@ class FCom_Cms_Migrate extends BClass
             CONSTRAINT `FK_{$tBlockHistory}_block` FOREIGN KEY (`block_id`) REFERENCES {$tBlock} (`id`) ON UPDATE CASCADE ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
+
+        BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
+
     }
 }

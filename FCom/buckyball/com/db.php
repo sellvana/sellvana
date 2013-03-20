@@ -465,6 +465,11 @@ EOT
             foreach ($tables as $t) {
                 static::$_tables[$dbName][$t->$field] = array();
             }
+        } elseif (!isset(static::$_tables[$dbName][$tableName])) {
+            $table = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}` LIKE ?", array($tableName))->find_one();
+            if ($table) {
+                static::$_tables[$dbName][$tableName] = array();
+            }
         }
         return isset(static::$_tables[$dbName][$tableName]);
     }
