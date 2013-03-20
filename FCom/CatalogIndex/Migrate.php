@@ -5,6 +5,8 @@ class FCom_CatalogIndex_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
+        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -107,4 +109,24 @@ class FCom_CatalogIndex_Migrate extends BClass
         );
    }
 
+    public function upgrade_0_1_2()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multiselect' => 'tinyint after filter_type',
+            )
+        ));
+    }
+
+    public function upgrade_0_1_3()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_FieldValue::table(), array(
+            'COLUMNS' => array(
+                'sort_order' => 'smallint not null default 0',
+            ),
+            'KEYS' => array(
+                'IDX_sort_order' => '(field_id, sort_order)',
+            )
+        ));
+    }
 }

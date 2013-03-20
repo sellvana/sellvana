@@ -1191,6 +1191,19 @@ class BUtil extends BClass
             }
         }
     }
+
+    /**
+     * Simplify string to allowed characters only
+     *
+     * @param string $str input string
+     * @param string $pattern RegEx pattern to specify not allowed characters
+     * @param string $filler character to replace not allowed characters with
+     * @return string
+     */
+    static public function simplifyString($str, $pattern='#[^a-z0-9-]+#', $filler='-')
+    {
+        return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
+    }
 }
 
 /**

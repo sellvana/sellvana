@@ -1410,7 +1410,7 @@ exit;
         }
         $d = (array)$d; // make sure it's array
         if (!empty($r['sc']) && empty($r['s']) && empty($r['sd'])) { // sort and dir combined
-            list($r['s'], $r['sd']) = explode('|', $r['sc']);
+            list($r['s'], $r['sd']) = preg_split('#[| ]#', trim($r['sc']));
         }
         if (!empty($r['s']) && !empty($d['s']) && is_array($d['s'])) { // limit by these values only
             if (!in_array($r['s'], $d['s'])) $r['s'] = null;
@@ -1430,7 +1430,7 @@ exit;
             'c'  => !empty($d['c'])  ? $d['c'] : null, //total found
         );
 #print_r($r); print_r($d); print_r($s); exit;
-        $s['sc'] = $s['s'].'|'.$s['sd']; // sort combined for state
+        $s['sc'] = $s['s'].' '.$s['sd']; // sort combined for state
 
         #$s['c'] = 600000;
         if (empty($s['c'])){
@@ -2041,11 +2041,10 @@ class BModel extends Model
     public function save($beforeAfter=true)
     {
         if ($beforeAfter) {
-            if (!$this->beforeSave()) {
-                return $this;
-            }
             try {
-                $this->beforeSave();
+                if (!$this->beforeSave()) {
+                     $this->beforeSave();
+                }
                 BPubSub::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
                 BPubSub::i()->fire('BModel::beforeSave', array('model'=>$this));
             } catch (BModelException $e) {

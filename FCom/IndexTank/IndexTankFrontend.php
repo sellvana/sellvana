@@ -35,12 +35,14 @@ class FCom_IndexTank_Frontend extends BClass
             '/catalog/category'=>array(
                 array('layout', 'base'),
                 array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters'))
+                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters')),
+                array('hook', 'catalog/product/pager.fields', 'views'=>array('indextank/product/_pager_fields')),
             ),
             '/catalog/search'=>array(
                 array('layout', 'base'),
                 array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters'))
+                array('hook', 'sidebar-left', 'views'=>array('indextank/product/filters')),
+                array('hook', 'catalog/product/pager.fields', 'views'=>array('indextank/product/_pager_fields')),
             ),
 
         ));

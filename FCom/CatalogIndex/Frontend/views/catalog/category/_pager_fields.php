@@ -1,0 +1,1 @@
+<input type="hidden" name="filters" value="<?=$this->q(BRequest::i()->get('filters'))?>"/>
