@@ -142,6 +142,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function action_form__POST()
     {
         $r = BRequest::i();
+        $args = array();
         try {
             $class = $this->_modelClass;
             $id = $r->params('id', true);

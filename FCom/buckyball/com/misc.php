@@ -469,8 +469,8 @@ class BUtil extends BClass
     * @param string $where
     *   - start
     *   - end
-    *   - offset
-    *   - key.(before|after)
+    *   - offset==$key
+    *   - key.(before|after)==$key
     *   - obj.(before|after).$object_property==$key
     *   - arr.(before|after).$item_array_key==$key
     * @return array resulting array
@@ -482,11 +482,16 @@ class BUtil extends BClass
         $w2 = explode('.', $w1[0], 3);
 
         switch ($w2[0]) {
-        case 'start': $result = array_merge($items, $array); break;
+        case 'start':
+            $result = array_merge($items, $array);
+            break;
 
-        case 'end': $result = array_merge($array, $items); break;
+        case 'end':
+            $result = array_merge($array, $items);
+            break;
 
         case 'offset': // for associative only
+            $key = $w1[1];
             $i = 0;
             foreach ($array as $k=>$v) {
                 if ($key===$i++) {
@@ -522,8 +527,8 @@ class BUtil extends BClass
             $rel = $w2[1];
             $f = $w2[2];
             $key = $w1[1];
-            foreach ($array as $k=>$obj) {
-                if ($key===$obj->$f) {
+            foreach ($array as $k=>$v) {
+                if ($key===$v->$f) {
                     if ($rel==='after') {
                         $result[$k] = $v;
                     }
@@ -543,8 +548,8 @@ class BUtil extends BClass
             $rel = $w2[1];
             $f = $w2[2];
             $key = $w1[1];
-            foreach ($array as $k=>$a) {
-                if ($key===$a[$f]) {
+            foreach ($array as $k=>$v) {
+                if ($key===$v[$f]) {
                     if ($rel==='after') {
                         $result[$k] = $v;
                     }
@@ -1186,6 +1191,19 @@ class BUtil extends BClass
             }
         }
     }
+
+    /**
+     * Simplify string to allowed characters only
+     *
+     * @param string $str input string
+     * @param string $pattern RegEx pattern to specify not allowed characters
+     * @param string $filler character to replace not allowed characters with
+     * @return string
+     */
+    static public function simplifyString($str, $pattern='#[^a-z0-9-]+#', $filler='-')
+    {
+        return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
+    }
 }
 
 /**
@@ -1776,10 +1794,10 @@ class BDebug extends BClass
         $l = self::$_level[self::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            ob_start();
+            //ob_start();
             echo $message."\n";
             debug_print_backtrace();
-            echo ob_get_clean();
+            //echo ob_get_clean();
             echo '</xmp>';
         }
 /*

@@ -218,7 +218,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
         }
         $this->layout('/customfields/fieldsets/form');
         $view = BLayout::i()->view('customfields/fieldsets/form');
-        $this->initFormTabs($view, $model, $model->id ? 'view' : 'create', $promo->id ? null : 'main');
+        $this->initFormTabs($view, $model, $model->id ? 'view' : 'create', $model->id ? null : 'main');
     }
 
     public function action_form_tab()

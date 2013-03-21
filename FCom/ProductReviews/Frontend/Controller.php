@@ -8,7 +8,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         $product = FCom_Catalog_Model_Product::i()->load($r['pid']);
         if (!$product) {
-            BResponse::i()->redirect($href);
+            //TODO: add notification
+            BResponse::i()->redirect(BApp::href());
         }
 
         if (BModuleRegistry::isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::sessionUser()) {

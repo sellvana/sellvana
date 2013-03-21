@@ -3,6 +3,7 @@
 class FCom_CustomField_Common extends BClass
 {
     protected $_types;
+    protected $_disabled;
 
     public static function bootstrap()
     {
@@ -15,8 +16,17 @@ class FCom_CustomField_Common extends BClass
         ;
     }
 
+    public function disable($flag)
+    {
+        $this->_disabled = $flag;
+        return $this;
+    }
+
     public function productFindORM($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         $tP = $args['orm']->table_alias();
         $args['orm']
             ->select($tP.'.*')

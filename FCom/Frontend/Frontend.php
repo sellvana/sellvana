@@ -50,7 +50,7 @@ class FCom_Frontend extends BClass
                 }
             }
             if (!empty($config['add_css'])) {
-                foreach (explode("\n", $config['add_css']) as $js) {
+                foreach (explode("\n", $config['add_css']) as $css) {
                     $head->css($css);
                 }
             }

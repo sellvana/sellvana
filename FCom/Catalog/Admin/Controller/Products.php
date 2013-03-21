@@ -116,6 +116,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 .'<input type="hidden" id="family-manuf-id" name="manuf_id" value="'.$vendorId.'"/>'
 ;
             break;
+        default:
+            $caption = '';
         }
 
 
