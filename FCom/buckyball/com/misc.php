@@ -1,4 +1,25 @@
 <?php
+/**
+* Copyright 2011 Unirgy LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* @package BuckyBall
+* @link http://github.com/unirgy/buckyball
+* @author Boris Gurvich <boris@unirgy.com>
+* @copyright (c) 2010-2012 Boris Gurvich
+* @license http://www.apache.org/licenses/LICENSE-2.0.html
+*/
 
 /**
 * Utility class to parse and construct strings and data structures
@@ -43,7 +64,7 @@ class BUtil extends BClass
     /**
     * Default character pool for random and sequence strings
     *
-    * Chars "c", "C" are ommited to avoid accidental obcene language
+    * Chars "c", "C" are ommited to avoid accidental obscene language
     * Chars "0", "1", "I" are removed to avoid leading 0 and ambiguity in print
     *
     * @var string
@@ -187,6 +208,30 @@ class BUtil extends BClass
             }
         }
         return '"UNSUPPORTED TYPE"';
+    }
+
+    public static function toRss($data)
+    {
+        $lang = !empty($data['language']) ? $data['language'] : 'en-us';
+        $ttl = !empty($data['ttl']) ? (int)$data['ttl'] : 40;
+        $descr = !empty($data['description']) ? $data['description'] : $data['title'];
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
+.'<title><![CDATA['.$data['title'].']]></title><link><![CDATA['.$data['link'].']]></link>'
+.'<description><![CDATA['.$descr.']]></description><language><![CDATA['.$lang.']]></language><ttl>'.$ttl.'</ttl>';
+        foreach ($data['items'] as $item) {
+            if (!is_numeric($item['pubDate'])) {
+                $item['pubDate'] =  strtotime($item['pubDate']);
+            }
+            if (empty($item['guid'])) {
+                $item['guid'] = $item['link'];
+            }
+            $xml .= '<item><title><![CDATA['.$item['title'].']]></title>'
+.'<description><![CDATA['.$item['description'].']]></description>'
+.'<pubDate>'.date('r', $item['pubDate']).'</pubDate>'
+.'<guid><![CDATA['.$item['guid'].']]></guid><link><![CDATA['.$item['link'].']]></link></item>';
+        }
+        $xml .= '</channel></rss>';
+        return $xml;
     }
 
     /**
@@ -428,7 +473,6 @@ class BUtil extends BClass
     *   - key.(before|after)
     *   - obj.(before|after).$object_property==$key
     *   - arr.(before|after).$item_array_key==$key
-    * @param mixed $key
     * @return array resulting array
     */
     static public function arrayInsert($array, $items, $where)
@@ -649,7 +693,7 @@ class BUtil extends BClass
         $lastChar = substr($chars, -1);
         while (--$pos>=-1) {
             if ($pos==-1) {
-                $string = $chars[0];
+                $string = $chars[0].$string;
                 return $string;
             } elseif ($string[$pos]===$lastChar) {
                 $string[$pos] = $chars[0];
@@ -769,7 +813,6 @@ class BUtil extends BClass
         $algo = array_shift($arr);
         $iter = array_shift($arr);
         $verifyHash = $string;
-
         for ($i=0; $i<$iter; $i++) {
             $salt = array_shift($arr);
             $verifyHash = static::saltedHash($verifyHash, $salt, $algo);
@@ -778,24 +821,38 @@ class BUtil extends BClass
         return $verifyHash===$knownHash;
     }
 
+    public static function sha512base64($str)
+    {
+        return base64_encode(pack('H*', hash('sha512', $str)));
+    }
+
     /**
     * Return only specific fields from source array
     *
     * @param array $source
     * @param array|string $fields
     * @param boolean $inverse if true, will return anything NOT in $fields
+    * @param boolean $setNulls fill missing fields with nulls
     * @result array
     */
-    public static function maskFields($source, $fields, $inverse=false)
+    public static function maskFields($source, $fields, $inverse=false, $setNulls=true)
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
         }
         $result = array();
         if (!$inverse) {
-            foreach ($fields as $k) $result[$k] = isset($source[$k]) ? $source[$k] : null;
+            foreach ($fields as $k) {
+                if (isset($source[$k])) {
+                    $result[$k] = $source[$k];
+                } elseif ($setNulls) {
+                    $result[$k] = null;
+                }
+            }
         } else {
-            foreach ($source as $k=>$v) if (!in_array($k, $fields)) $result[$k] = $v;
+            foreach ($source as $k=>$v) {
+                if (!in_array($k, $fields)) $result[$k] = $v;
+            }
         }
         return $result;
     }
@@ -817,8 +874,7 @@ class BUtil extends BClass
         }
 
         if (function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt_array($ch, array(
+            $curlOpt = array(
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => '',
@@ -829,23 +885,30 @@ class BUtil extends BClass
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-            ));
+            );
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = BConfig::i()->get('fs/storage_dir').'/cache';
                 BUtil::ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
-                curl_setopt_array($ch, array(
+                $curlOpt += array(
                     CURLOPT_COOKIEJAR => $cookie,
                     CURLOPT_FOLLOWLOCATION => true,
-                ));
+                );
             }
-            if ($method==='POST' || $method==='PUT') {
-                curl_setopt_array($ch, array(
+
+            if ($method==='POST') {
+                $curlOpt += array(
                     CURLOPT_POSTFIELDS => $request,
-                    CURLOPT_POST => $method==='POST',
-                    CURLOPT_PUT => $method==='PUT',
-                ));
+                    CURLOPT_POST => 1,
+                );
+            } elseif ($method==='PUT') {
+                $curlOpt += array(
+                    CURLOPT_POSTFIELDS => $request,
+                    CURLOPT_PUT => 1,
+                );
             }
+            $ch = curl_init();
+            curl_setopt_array($ch, $curlOpt);
             $content = curl_exec($ch);
             //$response = curl_getinfo($ch);
             $response = array();
@@ -916,13 +979,13 @@ class BUtil extends BClass
     public static function globRecursive($pattern, $flags=0)
     {
         $files = glob($pattern, $flags);
-    if (!$files) $files = array();
-    $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-    if ($dirs) {
-        foreach ($dirs as $dir) {
-            $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+        if (!$files) $files = array();
+        $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
+        if ($dirs) {
+            foreach ($dirs as $dir) {
+                $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+            }
         }
-    }
         return $files;
     }
 
@@ -1048,17 +1111,17 @@ class BUtil extends BClass
         if (empty($params['default'])) {
             $params['default'] = 'identicon';
         }
-        return 'http://www.gravatar.com/avatar/'.md5(strtolower($email))
+        return BRequest::i()->scheme().'://www.gravatar.com/avatar/'.md5(strtolower($email))
             .($params ? '?'.http_build_query($params) : '');
     }
 
     public static function extCallback($callback)
     {
         if (is_string($callback)) {
-            if (($c = explode('.', $callback))) {
-                list($class, $method) = $c;
-            } elseif (($c = explode('->', $callback))) {
-                list($class, $method) = $c;
+            if (strpos($callback, '.')!==false) {
+                list($class, $method) = explode('.', $callback);
+            } elseif (strpos($callback, '->')) {
+                list($class, $method) = explode('->', $callback);
             }
             if (!empty($class)) {
                 $callback = array($class::i(), $method);
@@ -1104,22 +1167,22 @@ class BUtil extends BClass
         }
         $etime = $now - $ptime;
         if ($etime < 1) {
-            return 'less than 1 second';
+            return $long ? 'less than 1 second' : '0s';
         }
         $a = array(
-            12 * 30 * 24 * 60 * 60  =>  'year',
-            30 * 24 * 60 * 60       =>  'month',
-            24 * 60 * 60            =>  'day',
-            60 * 60                 =>  'hour',
-            60                      =>  'minute',
-            1                       =>  'second'
+            12 * 30 * 24 * 60 * 60  =>  array('year', 'y'),
+            30 * 24 * 60 * 60       =>  array('month', 'mon'),
+            24 * 60 * 60            =>  array('day', 'd'),
+            60 * 60                 =>  array('hour', 'h'),
+            60                      =>  array('minute', 'm'),
+            1                       =>  array('second', 's'),
         );
 
-        foreach ($a as $secs => $str) {
+        foreach ($a as $secs => $sa) {
             $d = $etime / $secs;
             if ($d >= 1) {
                 $r = round($d);
-                return $r . ($long ? ' ' . $str . ($r > 1 ? 's' : '') : $str[0]);
+                return $r . ($long ? ' ' . $sa[0] . ($r > 1 ? 's' : '') : $sa[1]);
             }
         }
     }
@@ -1305,7 +1368,7 @@ class BModelUser extends BModel
 
     public function recoverPassword($emailView='email/user-password-recover')
     {
-        $this->set(array('token'=>BUtil::randomString(20)))->save();
+        $this->set(array('password_nonce'=>BUtil::randomString(20)))->save();
         if (($view = BLayout::i()->view($emailView))) {
             $view->set('user', $this)->email();
         }
@@ -1314,7 +1377,7 @@ class BModelUser extends BModel
 
     public function resetPassword($password, $emailView='email/user-password-reset')
     {
-        $this->set(array('token'=>null))->setPassword($password)->save()->login();
+        $this->set(array('password_nonce'=>null))->setPassword($password)->save()->login();
         if (($view = BLayout::i()->view($emailView))) {
             $view->set('user', $this)->email();
         }
@@ -1876,31 +1939,6 @@ class BDebug extends BClass
 }
 
 /**
-* Stub for cache class
-*/
-class BCache extends BClass
-{
-    /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BCache
-    */
-    public static function i($new=false, array $args=array())
-    {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
-    }
-
-    /**
-    * Stub
-    *
-    */
-    public function init()
-    {
-
-    }
-}
-
-/**
 * Facility to handle l10n and i18n
 */
 class BLocale extends BClass
@@ -2190,9 +2228,9 @@ class BLocale extends BClass
             if (!empty($code)) {
                 $code .= ','."\n";
             }
-            $code .= "'$k' => '$v'";
+            $code .= "'{$k}' => '".addslashes($v)."'";
         }
-        $code = "<?php return array($code);";
+        $code = "<?php return array({$code});";
         file_put_contents($targetFile, $code);
     }
 
@@ -2520,5 +2558,27 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+/** @see http://www.php.net/manual/en/function.htmlentities.php#106535 */
+if( !function_exists( 'xmlentities' ) ) {
+    function xmlentities( $string ) {
+        $not_in_list = "A-Z0-9a-z\s_-";
+        return preg_replace_callback( "/[^{$not_in_list}]/" , 'get_xml_entity_at_index_0' , $string );
+    }
+    function get_xml_entity_at_index_0( $CHAR ) {
+        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+            die( "function: 'get_xml_entity_at_index_0' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
+        }
+        switch( $CHAR[0] ) {
+            case "'":    case '"':    case '&':    case '<':    case '>':
+                return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
+            default:
+                return numeric_entity_4_char($CHAR[0]);                break;
+        }
+    }
+    function numeric_entity_4_char( $char ) {
+        return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
     }
 }

@@ -51,7 +51,9 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
             array('label'=>$breadCrumbLabel, 'active'=>true));
-        $layout->view('geo/embed')->countries = $countriesList;
+        if ($layout->view('geo/embed')) {
+            $layout->view('geo/embed')->countries = $countriesList;
+        }
         $layout->view('checkout/address')->address = $address;
         $layout->view('checkout/address')->address_type = $atype;
         $this->layout('/checkout/address');

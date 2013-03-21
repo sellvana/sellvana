@@ -34,7 +34,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 $customer = FCom_Customer_Model_Customer::sessionUser();
                 $customerId = $customer->id();
             }
-            FCom_ProductReviews_Model_Reviews::i()->add($customerId, $product->id(), $post['review']);
+            FCom_ProductReviews_Model_Reviews::i()->addNew($customerId, $product->id(), $post['review']);
         }
         BResponse::i()->redirect($product->url());
     }

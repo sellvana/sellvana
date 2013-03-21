@@ -5,7 +5,7 @@ class FCom_ProductReviews_Model_Reviews extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_product_review';
     protected static $_origClass = __CLASS__;
 
-    public function add($customerId, $productId, $dataInput)
+    public function addNew($customerId, $productId, $dataInput)
     {
         $data = array(
             'customer_id' => $customerId,
