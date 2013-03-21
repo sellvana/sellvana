@@ -165,6 +165,7 @@ class BApp extends BClass
     public function __construct()
     {
         BDebug::i();
+        umask(0);
     }
 
     /**
@@ -1562,6 +1563,7 @@ class BSession extends BClass
 
     protected $_availableHandlers = array();
 
+    protected $_defaultSessionCookieName = 'buckyball';
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -1600,14 +1602,22 @@ class BSession extends BClass
         }
 
         $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
-        $path = !empty($config['path']) ? $config['path'] : BRequest::i()->webRoot();
+        $path = !empty($config['path']) ? $config['path'] : BConfig::i()->get('web/base_href');
+        if (empty($path)) $path = BRequest::i()->webRoot();
+        
         $domain = !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost();
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
             $class::i()->register($ttl);
         }
         //session_set_cookie_params($ttl, $path, $domain);
-        session_name(!empty($config['name']) ? $config['name'] : 'buckyball');
+        session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
+        if (($dir = BConfig::i()->get('fs/storage_dir'))) {
+            $dir .= '/session';
+            BUtil::ensureDir($dir);
+            session_save_path($dir);
+        }
+        
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
         }
