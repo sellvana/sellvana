@@ -431,7 +431,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         foreach ($filterFields as $fName=>$field) {
-            if ($field->field_type=='category') {
+            if ($field->field_type=='category' && !empty($facets[$field->field_name]['values'])) {
                 ksort($facets[$field->field_name]['values']);
                 foreach ($facets[$field->field_name]['values'] as $vKey=>&$fValue) {
                     $vId = $filterValuesByVal[$field->id][$vKey];

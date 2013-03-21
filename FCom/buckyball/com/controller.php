@@ -573,9 +573,9 @@ class BRequest extends BClass
         $webroot = rtrim(static::webRoot(), '/');
         $url = static::scheme().'://'.static::httpHost();
         if (!BConfig::i()->get('web/hide_script_name')) {
-            $url .= '/'.static::scriptName();
+            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
         } else {
-            $url .= $webroot;
+            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
         }
         $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
         return $url;
@@ -1135,7 +1135,7 @@ class BResponse extends BClass
     {
         BSession::i()->close();
         $this->status($status, null, false);
-        header("Location: {$url}");
+        header("Location: {$url}", null, $status);
         $this->shutdown(__METHOD__);
     }
 
