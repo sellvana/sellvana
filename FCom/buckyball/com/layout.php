@@ -1637,7 +1637,7 @@ class BViewHead extends BView
 
     /**
      * Add title
-     * Add title to be appended to current titles
+     * Add title to be appended to or replace current titles
      *
      * @param      $title
      * @param bool $start
