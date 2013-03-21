@@ -49,7 +49,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         BDb::i(true)->connect('bogus');
     }
 
-    public function testConnectingMoreThanOnceWithSameNameReturnsSameConnection()
+    public function testWhenUseClauseIsPresentShouldSetCurrentConnectionToUse()
     {
 
         BConfig::i()->add(
@@ -72,9 +72,32 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         BConfig::i()->set('db/named/test/use', null);
     }
 
+    public function testSwitchingConnections()
+    {
+        BDbDouble::resetConnections();
+        BConfig::i()->add(
+            array(
+                 'db' => array(
+                     'named' => array(
+                         'test' => $this->dbConfig
+                     )
+                 )
+            )
+        );
+
+
+        $connOne = BDbDouble::connect('test');
+        $connTwo = BDbDouble::connect('DEFAULT');
+        $connThree = BDbDouble::connect('test');
+        $connFour = BDbDouble::connect('DEFAULT');
+
+        $this->assertSame($connOne, $connThree);
+        $this->assertSame($connTwo, $connFour);
+    }
+
     public function testConnectWithoutDbnameThrowsException()
     {
-
+        BDbDouble::resetConnections();
         BConfig::i()->add(
             array(
                  'db' => array(
@@ -92,7 +115,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
     public function testConnectWithNonSupportedDbEngineThrowsException()
     {
-
+        BDbDouble::resetConnections();
         BConfig::i()->add(
             array(
                  'db' => array(
@@ -103,7 +126,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             )
         );
 
-        BConfig::i()->set('db/named/test/engine', 'postgres');
+        BConfig::i()->set('db/named/test/engine', 'pgsql');
         $this->setExpectedException('BException');
         BDb::connect('test');
     }
@@ -126,7 +149,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('BPDO', BDb::connect('test'));
     }
 
-    public function testWhenUseClauseIsPresentShouldSetCurrentConnectionToUse()
+    public function testConnectingMoreThanOnceWithSameNameReturnsSameConnection()
     {
         BConfig::i()->add(
             array(
@@ -161,19 +184,33 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
-        $result = $db->run("SHOW TABLES");
+        $sql = "CREATE TABLE IF NOT EXISTS `test_table_2`(
+        id int(10) not null auto_increment primary key,
+        test varchar(100) null
+        )";
+        $result = $db->run($sql);
 
         $this->assertTrue(is_array($result));
         $this->assertNotEmpty($result);
+    }
+
+    public function testRunQueryWithParamsReturnsAffectedRows()
+    {
+        BDbDouble::resetConnections();
+        $db = BDbDouble::i();
+        $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
+        $result = $db->run($query, array(2,3));
+
+        $this->assertTrue($result[0]);
     }
 
     public function testRunOptionEchoEchoesOutput()
     {
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
-        $query = "SHOW TABLES";
+        $query = "DROP TABLE IF EXISTS `test_table_2`";
         ob_start();
-        $db->run($query, array('echo' => true));
+        $db->run($query, null, array('echo' => true));
         $echo = ob_get_clean();
 
         $this->assertEquals('<hr><pre>' . $query . '<pre>', $echo);
@@ -183,9 +220,9 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
-        $query = "SHOW TABL";
+        $query = "DROP TABLE IF EXISTS ";
         ob_start();
-        $db->run($query, array('try' => true));
+        $db->run($query, null, array('try' => true));
         $echo = ob_get_clean();
         $this->assertContains('<hr>', $echo);
     }
@@ -194,9 +231,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
-        $query = "SHOW TABL";
+        $query = "DROP TABLE IF EXISTS ";
+        ob_start();
         $this->setExpectedException('Exception');
-        $db->run($query, array('try' => true));
+        $echo = ob_get_clean();
+        $db->run($query);
+        $this->assertContains('<hr>', $echo);
     }
 
     public function testTransactionPutsDbObjectInTransaction()
@@ -205,6 +245,51 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertTrue(BORM::get_db()->inTransaction() == 1);
     }
 
+    public function testTransactionPutsDbObjectInTransactionWithConnection()
+    {
+        BDb::transaction('test');
+        $this->assertTrue(BORM::get_db()->inTransaction() == 1);
+    }
+
+    public function testCommitWithConnection()
+    {
+        BDb::commit('test');
+        $this->assertTrue(BORM::get_db()->inTransaction() == 0);
+    }
+
+    public function testRollBackInTransaction()
+    {
+        BDb::transaction('test');
+
+        $sql = "CREATE TABLE IF NOT EXISTS `test_table_2`(
+        id int(10) not null auto_increment primary key,
+        test varchar(100) null
+        )";
+        BDb::run($sql);
+        $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
+        BDb::run($query, array(2,3));
+        BDb::rollback('test');
+        $this->assertTrue(BORM::get_db()->inTransaction() == 0);
+    }
+
+    public function testCleanForTableReturnsCorrectArray()
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS `test_table_2`(
+        id int(10) not null auto_increment primary key,
+        test varchar(100) null
+        )";
+        BDb::run($sql);
+
+        $orig = array(
+            'id' => 1,
+            'test' => 'test'
+        );
+
+        $dirty = $orig + array('test2' => 'test', 2,3,4);
+        $result = BDb::cleanForTable('test_table_2', $dirty);
+
+        $this->assertEquals($orig, $result);
+    }
     public function testCommitAfterTransaction()
     {
         $this->markTestSkipped("Todo: implement run tests");
@@ -397,6 +482,24 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
         $this->assertNotContains('test_char', array_keys($columns));
         $this->assertNotContains('test_char', array_keys($indexes));
+    }
+
+    public function testFindManyAsArray()
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS `test_table_2`(
+        id int(10) not null auto_increment primary key,
+        test varchar(100) null
+        )";
+        BDb::run($sql);
+        $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
+        BDb::run($query, array(2,3));
+
+        $result = BORM::i()->for_table('test_table_2')->select('test')->limit(2)->find_many();
+
+        $asArray = BDb::many_as_array($result);
+
+        $this->assertTrue(is_array($asArray));
+        $this->assertTrue(count($asArray) == 2);
     }
 }
 
