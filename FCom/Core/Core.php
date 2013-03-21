@@ -330,7 +330,7 @@ class FCom_Core extends BClass
     {
         static $url;
         if (!$url) {
-            $url = BApp::href('resize.php', 1, 1);
+            $url = BConfig::i()->get('web/base_href').'/resize.php';
         }
         return $url;
     }
@@ -419,6 +419,9 @@ class FCom_Core_Controller_Abstract extends BActionController
     public function layout($name)
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
+        if (!$theme) {
+            $theme = BLayout::i()->getDefaultTheme();
+        }
         $layout = BLayout::i();
         if ($theme) {
             $layout->applyTheme($theme);

@@ -1,4 +1,4 @@
-<?
+<?php
 $loggedIn = FCom_Customer_Model_Customer::isLoggedIn();
 ?>
 <?php foreach ($this->products as $p): ?>

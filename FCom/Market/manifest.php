@@ -3,7 +3,7 @@
 
         // FCom_Market description here
         'FCom_Market' => array(
-            'version' => '0.1.3',
+            'version' => '0.1.4',
             'root_dir' => '',
             'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_MarketApi::bootstrap'),
             'depends' => array('FCom_Core'),
