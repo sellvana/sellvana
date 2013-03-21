@@ -14,8 +14,8 @@ BConfig::i()->add(array(
    'db'=>array(
     'host' => 'localhost',
     'dbname' => 'fulleron_test',
-    'username' => 'root',
-    'password' => '',),
+    'username' => 'pp',
+    'password' => '111111',),
 ));
 //BApp::set('area', 'FCom_Frontend', true);
 BModuleRegistry::i()->bootstrap();

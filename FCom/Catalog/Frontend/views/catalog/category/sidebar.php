@@ -7,7 +7,6 @@ if ($category) {
         $parent = FCom_Catalog_Model_Category::load($category->parent_id);
         $siblings = $category->siblings();
     }
-
     $children = $category->children();
 }
 ?>

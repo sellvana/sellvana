@@ -21,6 +21,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         BApp::i()
             ->set('current_category', $category)
+            ->set('current_query', $q)
             ->set('products_data', $productsData);
 
         $head = $this->view('head');
@@ -44,13 +45,6 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $layout->view('catalog/product/pager')->query = $q;
         $layout->view('catalog/product/pager')->filters = $filter;
-
-        BLayout::i()->layout(array(
-            '/catalog/category'=>array(
-                array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar'))
-            ),
-         ));
 
         FCom_Core::lastNav(true);
 
@@ -84,13 +78,6 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/product/pager')->filters = $filter;
         $layout->view('catalog/product/pager')->query = $q;
-
-        BLayout::i()->layout(array(
-            '/catalog/search'=>array(
-                array('view', 'root', 'set'=>array('show_left_col'=>true)),
-                array('hook', 'sidebar-left', 'views'=>array('catalog/category/sidebar'))
-            ),
-         ));
 
         FCom_Core::lastNav(true);
         $this->layout('/catalog/search');

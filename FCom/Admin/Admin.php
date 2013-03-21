@@ -20,12 +20,10 @@ class FCom_Admin extends BClass
             'system/settings' => 'Update Settings',
             'system/modules' => 'Manage Modules',
         ));
-
         BPubSub::i()
             //->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
             ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
         ;
-
     }
 
     public function bootstrapUI()
@@ -105,7 +103,7 @@ class FCom_Admin extends BClass
                 }
             }
             if (!empty($config['add_css'])) {
-                foreach (explode("\n", $config['add_css']) as $js) {
+                foreach (explode("\n", $config['add_css']) as $css) {
                     $head->css($css);
                 }
             }

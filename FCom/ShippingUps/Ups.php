@@ -28,7 +28,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
         $this->rate = new UpsRate($rateApiUrl);
         $this->rate->setUpsParams($accessKey,$account, $password, $shipNumber);
         $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
-
+        return true;
     }
 
     public function getEstimate()
