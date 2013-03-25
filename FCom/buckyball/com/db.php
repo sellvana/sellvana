@@ -463,7 +463,7 @@ EOT
             $tables = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}`", array())->find_many();
             $field = "Tables_in_{$dbName}";
             foreach ($tables as $t) {
-                static::$_tables[$dbName][$t->$field] = array();
+                 static::$_tables[$dbName][$t->$field] = array();
             }
         } elseif (!isset(static::$_tables[$dbName][$tableName])) {
             $table = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}` LIKE ?", array($tableName))->find_one();
@@ -484,9 +484,7 @@ EOT
     */
     public static function ddlFieldInfo($fullTableName, $fieldName=null)
     {
-        if (!static::ddlTableExists($fullTableName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
-        }
+        self::checkTable($fullTableName);
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
@@ -497,6 +495,17 @@ EOT
         }
         $res = static::$_tables[$dbName][$tableName]['fields'];
         return is_null($fieldName) ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
+    }
+
+    /**
+     * @param string $fullTableName
+     * @throws BException
+     */
+    protected static function checkTable($fullTableName)
+    {
+        if (!static::ddlTableExists($fullTableName)) {
+            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+        }
     }
 
     /**
