@@ -7,7 +7,8 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         parent::setUp();
         $db = BDb::i();
         $vo = new Entity();
-        $db->run("DROP TABLE IF EXISTS {$vo->table}, {$vo->fTable}");
+        $db->run("DROP TABLE IF EXISTS {$vo->fTable}");
+        $db->run("DROP TABLE IF EXISTS {$vo->table}");
         $db->ddlClearCache();
         BConfig::i()->add(
         // config is being reset in its tests, so we have to load default config used to be able to test
@@ -567,6 +568,17 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
     /**
      * @covers BDb::ddlTableDef
+     */
+    public function testDdlTableDefNewTableWithNoFieldsShouldThrowException()
+    {
+        BDbDouble::resetConnections();
+        BDbDouble::connect();
+        $this->setExpectedException('BException', 'Missing fields definition for new table');
+        BDbDouble::ddlTableDef('non_existing', array());
+    }
+
+    /**
+     * @covers BDb::ddlTableDef
      * @covers BDb::ddlTableExists
      * @covers BDb::ddlFieldInfo
      * @covers BDb::ddlIndexInfo
@@ -576,6 +588,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db = BDb::i();
 
         $vo = new Entity();
+        BDbDouble::resetConnections();
         if (!$db->ddlTableExists($vo->table)) {
             $db->ddlTableDef($vo->table, $vo->tableFields);
         }
@@ -595,6 +608,29 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
         $this->assertNotContains('test_char', array_keys($columns));
         $this->assertNotContains('test_char', array_keys($indexes));
+    }
+
+    /**
+     * @covers BDb::ddlTableDef
+     * @covers BDb::ddlTableExists
+     */
+    public function testDdlTableDefForeignKeyCreation()
+    {
+        $db = BDb::i();
+        $vo = new Entity();
+        BDbDouble::resetConnections();
+        if (!$db->ddlTableExists($vo->table)) {
+            $db->ddlTableDef($vo->table, $vo->tableFields);
+        }
+
+        $db->ddlTableDef($vo->fTable, $vo->fkTableFields);
+        $db->ddlClearCache($vo->fTable);
+        $this->assertTrue($db->ddlTableExists($vo->fTable));
+        $fks = $db->ddlForeignKeyInfo($vo->fTable);
+        $this->assertNotContains('Ffk_test_fk_idK', $fks);
+        $db->ddlTableColumns($vo->fTable, null, null, $vo->constraints);
+        $fks = $db->ddlForeignKeyInfo($vo->fTable);
+        $this->assertArrayHasKey('Ffk_test_fk_idK', $fks);
     }
 
     /**
@@ -633,11 +669,10 @@ class BDbDouble extends BDb
     public static function resetConnections()
     {
         static::$_currentConnectionName = null;
-        static::$_config                = null;
+        static::$_config                = array('dbname' => null);
         static::$_namedConnections      = array();
         static::$_namedConnectionConfig = array();
     }
-
 }
 
 /**
@@ -681,14 +716,15 @@ class Entity
             'fk_test_id'    => 'PRIMARY(fk_test_id)',
             'fk_test_fk_id' => 'UNIQUE(fk_test_fk_id)',
         ),
-        'CONSTRAINTS' => array(
-            'Ffk_test_fk_idK' => '(fk_test_fk_id) REFERENCES test_table.test_fk_id ON DELETE CASCADE ON UPDATE CASCADE'
-        ),
-        'OPTIONS'     => array(
-            'engine'  => 'InnoDB',
-            'charset' => 'latin1',
-            'collate' => 'latin1', // what will happen if they do not match?
-        ),
+//        'OPTIONS'     => array(
+//            'engine'  => 'InnoDB',
+//            'charset' => 'latin1',
+//            'collate' => 'latin1_swedish_ci', // what will happen if they do not match?
+//        ),
+    );
+
+    public $constraints = array(
+        'Ffk_test_fk_idK' => 'FOREIGN KEY (fk_test_fk_id) REFERENCES test_table(test_fk_id) ON DELETE CASCADE ON UPDATE CASCADE'
     );
 }
 

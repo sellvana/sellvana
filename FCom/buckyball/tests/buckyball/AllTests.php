@@ -15,6 +15,14 @@ require_once __DIR__.'/com/BViewTest.php';
 require_once __DIR__.'/com/BViewHeadTest.php';
 require_once __DIR__.'/com/BClassDecoratorTest.php';
 require_once __DIR__.'/com/BDbTest.php';
+require_once __DIR__.'/com/BValueTest.php';
+
+$testFiles = glob(__DIR__.'/com/*Test.php');
+foreach ($testFiles as $test) {
+    if(is_readable(file($test)) && !is_dir($test)){
+        require_once $test;
+    }
+}
 
 class BAllTests
 {
@@ -44,7 +52,7 @@ class BAllTests
         $suite->addTestSuite('BViewHead_Test');
         $suite->addTestSuite('BClassDecorator_Test');
         $suite->addTestSuite('BDb_Test');
-
+        $suite->addTestSuite('BValueTest');
 
         return $suite;
     }
