@@ -19,11 +19,11 @@ require_once __DIR__.'/com/BValueTest.php';
 
 $testFiles = glob(__DIR__.'/com/*Test.php');
 foreach ($testFiles as $test) {
-    if(is_readable(file($test)) && !is_dir($test)){
+    if(is_readable($test) && !is_dir($test)){
         require_once $test;
     }
 }
-
+//print_r($testFiles);
 class BAllTests
 {
     public static function main()
@@ -53,6 +53,7 @@ class BAllTests
         $suite->addTestSuite('BClassDecorator_Test');
         $suite->addTestSuite('BDb_Test');
         $suite->addTestSuite('BValueTest');
+        $suite->addTestSuite('BClassTest');
 
         return $suite;
     }
