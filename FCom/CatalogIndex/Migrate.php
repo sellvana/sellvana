@@ -131,7 +131,7 @@ class FCom_CatalogIndex_Migrate extends BClass
 
     public function upgrade_0_1_4()
     {
-        $this->install();
+        //$this->install();
         BDb::run("
 replace  into `fcom_index_field`
 (`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multiselect`,`filter_multivalue`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
