@@ -1242,6 +1242,9 @@ class BData extends BClass implements ArrayAccess
 
     public function __construct($data)
     {
+        if(!is_array($data)){
+            $data = array(); // not sure for here, should we try to convert data to array or do empty array???
+        }
         $this->_data = $data;
     }
 
