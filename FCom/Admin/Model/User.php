@@ -117,7 +117,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
                 'username'=>$username,
                 'email'=>$username)))
             ->find_one();
-
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
@@ -154,12 +153,13 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             date_default_timezone_set($this->timezone);
         }
         BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$this));
+
         return $this;
     }
 
     static public function logout()
     {
-        BSession::i()->data('admin_user', false);
+        BSession::i()->data('admin_user', null);
         static::$_sessionUser = null;
     }
 
