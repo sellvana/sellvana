@@ -95,4 +95,15 @@ class BDataTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(4, $this->object->offsetGet('four'));
         $this->assertEquals('three', $this->object->offsetGet(2));
     }
+
+    public function testInitWithNonArray()
+    {
+        $obj = new BData(1);
+
+        $this->assertInstanceOf('BData', $obj);
+
+        $this->assertNull($obj[0]);
+        $obj[0] = 1;
+        $this->assertNotNull($obj[0]);
+    }
 }
