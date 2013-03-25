@@ -55,6 +55,7 @@ class BAllTests
         $suite->addTestSuite('BValueTest');
         $suite->addTestSuite('BClassTest');
         $suite->addTestSuite('BDataTest');
+        $suite->addTestSuite('BFtpClientTest');
 
         return $suite;
     }

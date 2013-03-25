@@ -1490,7 +1490,7 @@ class BDebug extends BClass
     /**
     * Trigger levels for different actions
     *
-    * - memory: remember in immedicate script memory
+    * - memory: remember in immediate script memory
     * - file: write to debug log file
     * - email: send email notification to admin
     * - output: display error in output
@@ -1614,7 +1614,7 @@ class BDebug extends BClass
     static protected $_collectedErrors = array();
 
     /**
-    * Contructor, remember script start time for delta timestamps
+    * Constructor, remember script start time for delta timestamps
     *
     * @return BDebug
     */
@@ -1625,10 +1625,12 @@ class BDebug extends BClass
     }
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BDebug
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BDebug
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
