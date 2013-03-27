@@ -259,7 +259,16 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         ");
     }
 
-    static public function findProducts($search=null, $filters=null, $sort=null, $options=array())
+    /**
+     * Search for products, facets and facet counts in index
+     *
+     * @param string $search
+     * @param array $filters
+     * @param string $sort
+     * @param array $options
+     * @return array ['orm'=>$orm, 'facets'=>$facets]
+     */
+    static public function searchProducts($search=null, $filters=null, $sort=null, $options=array())
     {
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
@@ -267,6 +276,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         $req = BRequest::i();
         // apply term search
+
         if (is_null($search)) {
             $search = $req->get('q');
         }
@@ -274,10 +284,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $terms = static::_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
             $tDocTerm = $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-            $tTerm = FCom_CatalogIndex_Model_Term::table();
+            $termIds = FCom_CatalogIndex_Model_Term::i()->orm()->where_in('term', $terms)->find_many_assoc('term', 'id');
             $productsOrm->where(array(
-                array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt INNER JOIN {$tTerm} t ON dt.term_id=t.id
-                    WHERE t.term IN (?)))", $terms),
+                array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values($termIds)),
             ));
         }
 
@@ -285,144 +294,210 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $filters = static::$_filterParams;
         }
 
+        // result for facet counts
         $facets = array();
 
         // retrieve facet field information
-        $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
-        $filterFieldsById = array();
+        $filterFields = BDb::many_as_array(FCom_CatalogIndex_Model_Field::i()->getFields('filter'));
+        $filterFieldNamesById = array();
         foreach ($filterFields as $fName=>$field) {
-            $filterFieldsById[$field->id] = $field;
-            $facets[$fName] = array(
-                'display' => $field->field_label,
-                'custom_view' => $field->filter_custom_view ? $field->filter_custom_view : null,
-            ); // init for sorting
-            if (!empty($options['category']) && $field->field_type=='category') {
+            $filterFieldNamesById[$field['id']] = $fName;
+            $facets[$fName] = array( // init for sorting
+                'display' => $field['field_label'],
+                'custom_view' => !empty($field['filter_custom_view']) ? $field['filter_custom_view'] : null,
+            );
+            $filterFields[$fName]['values'] = array();
+            $filterFields[$fName]['value_ids'] = array();
+            // take category filter from options if available
+            if (!empty($options['category']) && $field['field_type']=='category') {
                 $filters[$fName] = $options['category']->url_path;
             }
         }
 
-        $filterValues = FCom_CatalogIndex_Model_FieldValue::i()->orm()
-            ->where_in('field_id', array_keys($filterFieldsById))->find_many_assoc('id');
-        $filterValuesByVal = array();
+        // retrieve facet field values information
+        $filterValues = BDb::many_as_array(FCom_CatalogIndex_Model_FieldValue::i()->orm()
+            ->where_in('field_id', array_keys($filterFieldNamesById))->find_many_assoc('id'));
+        $filterValueIdsByVal = array();
         foreach ($filterValues as $vId=>$v) {
-            $field = $filterFieldsById[$v->field_id];
-            if ($field->field_type == 'category') {
-                $lvl = sizeof(explode('/', $v->val));
-                if (empty($filters[$field->field_name]) && $lvl > 1) {
+            $fName = $filterFieldNamesById[$v['field_id']];
+            $field = $filterFields[$fName];
+            if ($field['field_type'] == 'category') {
+                $lvl = sizeof(explode('/', $v['val']));
+                if (empty($filters[$field['field_name']]) && $lvl > 1) {
                     unset($filterValues[$vId]); // show only top level categories if no category selected
                     continue;
                 }
-                $v->category_level = $lvl;
+                $filterValues[$vId]['category_level'] = $lvl;
             }
-            // $v->field = $field;
-            $filterValuesByVal[$v->field_id][$v->val] = $vId;
+            $filterFields[$fName]['values'][$vId] = $v;
+            $filterFields[$fName]['value_ids'][$vId] = $vId;
+            $filterValueIdsByVal[$v['field_id']][$v['val']] = $vId;
         }
 
+
         // apply facet filters
-        if ($filters) {
-            $where = array();
-            $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
-            $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
-            $valueWhere = array();
-            $valueParams = array();
-            foreach ($filters as $fName=>$fValues) {
-                if (empty($filterFields[$fName]) || $filterFields[$fName]->filter_type=='none') {
-                    //TODO: throw error?
-                    BDebug::warning('Invalid filter field: '.$fName);
-                    continue;
-                }
-                $field = $filterFields[$fName];
-                $fValues = (array)$fValues;
-                $productsOrm->where(array(
-                    array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv INNER JOIN {$tFieldValue} fv ON dv.value_id=fv.id
-                        WHERE fv.field_id={$field->id} AND fv.val IN (?)))", array_values($fValues)),
-                ));
-                foreach ($fValues as $v) {
-                    $v = strtolower($v);
-                    if (empty($filterValuesByVal[$field->id][$v])) {
+        $facetFilters = array();
+        $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
+        $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
+        foreach ($filterFields as $fName=>$field) {
+            $fReqValues = !empty($filters[$fName]) ? (array)$filters[$fName] : null;
+            if (!empty($fReqValues)) { // request has filter by this field
+                $fReqValueIds = array();
+                foreach ($fReqValues as $v) {
+                    if (empty($filterValueIdsByVal[$field['id']][$v])) {
+                        //TODO: error on invalid filter requested value?
                         continue;
                     }
-                    $vId = $filterValuesByVal[$field->id][$v];
+                    $fReqValueIds[] = $filterValueIdsByVal[$field['id']][$v];
+                }
+                $whereArr = array(
+                    array("(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE dv.value_id IN (?)))", $fReqValueIds),
+                );
+                // order of following actions is important!
+                // 1. add filter condition to already created filter ORMs
+                foreach ($facetFilters as $ff) {
+                    if ($ff['orm']!==true) {
+                        $ff['orm']->where($whereArr);
+                    }
+                }
+                // 2. clone filter facets condition before adding current filter
+                if ($field['filter_multiselect'] || $field['filter_multivalue']) {
+                    $facetFilters[$fName] = array(
+                        'orm'        => clone $productsOrm,
+                        'multivalue' => $field['filter_multivalue'],
+                        'field_ids'  => array($field['id']),
+                        'skip_value_ids' => array(),
+                    );
+                }
+                // 3. add filter condition to products ORM
+                $productsOrm->where($whereArr);
+
+                foreach ($fReqValues as $v) {
+                    $v = strtolower($v);
+                    if (empty($filterValueIdsByVal[$field['id']][$v])) {
+                        continue;
+                    }
+                    $vId = $filterValueIdsByVal[$field['id']][$v];
                     $value = $filterValues[$vId];
-                    $display = $value->display ? $value->display : $v;
-                    $fName = $field->field_name;
+                    $display = !empty($value['display']) ? $value['display'] : $v;
+                    $fName = $field['field_name'];
                     $facets[$fName]['values'][$v]['display'] = $display;
                     $facets[$fName]['values'][$v]['selected'] = 1;
-                    unset($filterValues[$vId]); // don't calculate counts for selected facet values
 
-                    if ($field->field_type=='category') {
+                    if ($field['field_type']=='category') {
                         $curLevel = sizeof(explode('/', $v));
-                        $facets[$fName]['values'][$v]['level'] = $value->category_level;
+                        $facets[$fName]['values'][$v]['level'] = $value['category_level'];
+                        $countValueIds = array();
                         foreach ($filterValues as $vId1=>$value1) {
-                            $vVal = $value1->val;
-                            if (!$value1->category_level || $vId === $vId1) {
+                            $vVal = $value1['val'];
+                            if (empty($value1['category_level']) || $vId === $vId1) {
                                 continue; // skip other fields or same category value
                             }
-                            if ($value1->category_level > $curLevel + 1) { // grand-children - don't show at all, TODO: configuration?
-                                unset($filterValues[$value1->id]);
-                            } elseif (strpos($v, $vVal.'/')===0) { // parent categories
-                                $facets[$fName]['values'][$vVal]['display'] = $value1->display;
+                            if ($value1['category_level'] == $curLevel + 1 && strpos($vVal.'/', $v.'/')===0) { // count only children
+                                $facetFilters[$fName]['count_value_ids'][$value1['id']] = $value1['id'];
+                                $facets[$fName]['values'][$vVal]['display'] = $value1['display'];
+                                $facets[$fName]['values'][$vVal]['level'] = $value1['category_level'];
+                            } elseif (strpos($v, $vVal.'/')===0) { // display parent categories
+                                $facets[$fName]['values'][$vVal]['display'] = $value1['display'];
                                 $facets[$fName]['values'][$vVal]['parent'] = 1;
-                                $facets[$fName]['values'][$vVal]['level'] = $value1->category_level;
-                                unset($filterValues[$value1->id]); // don't calculate counts for selected facet values
-                            } elseif (strpos($vVal.'/', $v.'/')!==0) { // lower level categories outside of current
-                                unset($filterValues[$value1->id]);
+                                $facets[$fName]['values'][$vVal]['level'] = $value1['category_level'];
                             }
+                        }
+                        if (empty($facetFilters[$fName]['count_value_ids'])) {
+                            $facetFilters[$fName]['skip_value_ids'] = true;
+                        }
+                    } else {
+                        // don't calculate counts for selected facet values
+                        if (!empty($facetFilters[$fName])) {
+                            $facetFilters[$fName]['skip_value_ids'][$vId] = $vId;
                         }
                     }
                 }
+            } else { // not filtered by this field
+                if ($field['filter_multivalue']) {
+                    if (empty($facetFilters['_multivalue'])) {
+                        $facetFilters['_multivalue'] = array('orm'=>true, 'multivalue'=>true, 'field_ids'=>array());
+                    }
+                    $facetFilters['_multivalue']['field_ids'][] = $field['id'];
+                } else {
+                    $facetFilters[$fName] = array('orm'=>true, 'field_ids'=>array($field['id']));
+                }
+            }
+            if ($field['filter_show_empty']) {
+                foreach ($field['values'] as $vId=>$v) {
+                    if (empty($facets[$field['field_name']]['values'][$v['val']])) {
+                        $facets[$field['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
+                        $facets[$field['field_name']]['values'][$v['val']]['cnt'] = 0;
+                    }
+                }
             }
         }
-
-        // calculate facet counts
-        $singleValueIds = array();
-        $multiValueIds = array();
-        // set empty value counts where needed
-        foreach ($filterValues as $vId=>$v) {
-            $field = $filterFieldsById[$v->field_id];
-            if ($field->filter_show_empty) {
-                $facets[$field->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
-                $facets[$field->field_name]['values'][$v->val]['cnt'] = 0;
-            }
-            if (!$field->filter_multivalue) {
-                $singleValueIds[$v->id] = $v->id;
-            } else {
-                $multiValueIds[$v->id] = $v->id;
-            }
-        }
-
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
             FCom_CustomField_Common::i()->disable(true);
         }
-        $singleFacetOrm = clone $productsOrm;
-        $singleFacetOrm->join('FCom_CatalogIndex_Model_DocValue', array('dv.doc_id','=','p.id'), 'dv');
-        $multiFacetOrm = clone $singleFacetOrm;
-        // count all single value fields counts vertically, should be faster than horizontally (TODO:test benchmarks)
-        if (!empty($singleValueIds)) {
-            $counts = $singleFacetOrm->select('dv.field_id')->select('dv.value_id')->select_expr('COUNT(*)', 'cnt')
-                ->where_in('dv.value_id', $singleValueIds) //TODO: maybe filter by field_id? preferred index conflict?
-                ->group_by('dv.value_id')->find_many();
-            foreach ($counts as $c) {
-                $v = $filterValues[$c->value_id];
-                $f = $filterFieldsById[$c->field_id];
-                $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
-                $facets[$f->field_name]['values'][$v->val]['cnt'] = $c->cnt;
+        // calculate facet value counts
+        foreach ($facetFilters as $fName=>$ff) {
+            $orm = $ff['orm']===true ? clone $productsOrm : $ff['orm'];
+            $orm->join('FCom_CatalogIndex_Model_DocValue', array('dv.doc_id','=','p.id'), 'dv');
+
+            if (!empty($ff['count_value_ids'])) {
+                $orm->where_in('dv.value_id', array_values($ff['count_value_ids']));
+            } elseif (!empty($ff['skip_value_ids'])) {
+                if (true===$ff['skip_value_ids']) {
+                    continue;
+                } elseif (!empty($filterFields[$fName])) {
+                    $includeValueIds = $filterFields[$fName]['value_ids'];
+                    $sizeofSkip = !empty($ff['skip_value_ids']) ? sizeof($ff['skip_value_ids']) : 0;
+                    $sizeofInclude = !empty($includeValueIds) ? sizeof($includeValueIds) : 0;
+                    if ($sizeofSkip == $sizeofInclude) {
+                        continue;
+                    } elseif ($sizeofSkip > $sizeofInclude/2) {
+                        foreach ($ff['skip_value_ids'] as $vId) {
+                            unset($includeValueIds[$vId]);
+                        }
+                        $orm->where_in('dv.value_id', $includeValueIds);
+                    } else {
+                        $orm->where_not_in('dv.value_id', array_values($ff['skip_value_ids']));
+                    }
+                } else {
+                    $orm->where_not_in('dv.value_id', array_values($ff['skip_value_ids']));
+                }
             }
-        }
-        // count all multivalue field counts horizontally (can be used also for single value)
-        if (!empty($multiValueIds)) {
-            $multiFacetOrm->where_in('dv.value_id', $multiValueIds);
-            foreach ($multiValueIds as $vId) {
-                $value = $filterValues[$vId];
-                $multiFacetOrm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
-            }
-            $counts = $multiFacetOrm->find_one()->as_array();
-            if ($counts) {
-                foreach ($counts as $vId=>$cnt) {
-                    $v = $filterValues[$vId];
-                    $f = $filterFieldsById[$v->field_id];
-                    $facets[$f->field_name]['values'][$v->val]['display'] = $v->display ? $v->display : $v->val;
-                    $facets[$f->field_name]['values'][$v->val]['cnt'] = $cnt;
+            if (!empty($ff['multivalue'])) {
+                $orm->where_in('dv.field_id', $ff['field_ids']);
+                foreach ($ff['field_ids'] as $fId) {
+                    $field = $filterFields[$filterFieldNamesById[$fId]];
+                    foreach ($field['values'] as $vId=>$value) {
+                        if (!empty($ff['count_value_ids'])) {
+                            if (empty($ff['count_value_ids'][$vId])) {
+                                continue;
+                            }
+                        } elseif (!empty($ff['skip_value_ids'][$vId])) {
+                            continue;
+                        }
+                        $orm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
+                    }
+                }
+                $counts = $orm->find_one()->as_array();
+                if ($counts) {
+                    foreach ($counts as $vId=>$cnt) {
+                        $v = $filterValues[$vId];
+                        $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
+                        $facets[$f['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
+                        $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $cnt;
+                    }
+                }
+            } else { // TODO: benchmark whether vertical count is faster than horizontal
+                $fName = $filterFieldNamesById[$ff['field_ids'][0]]; // single value fields always separate (1 field per facet query)
+                $field = $filterFields[$fName];
+                $counts = $orm->select('dv.value_id')->select_expr('COUNT(*)', 'cnt')
+                    ->where_in('dv.field_id', $ff['field_ids']) //TODO: maybe filter by value_id? preferred index conflict?
+                    ->group_by('dv.value_id')->find_many();
+                foreach ($counts as $c) {
+                    $v = $filterValues[$c->value_id];
+                    $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
+                    $facets[$f['field_name']]['values'][$v['val']]['display'] = $v['display'] ? $v['display'] : $v['val'];
+                    $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $c->cnt;
                 }
             }
         }
@@ -430,13 +505,14 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             FCom_CustomField_Common::i()->disable(false);
         }
 
+        // format categories facet result
         foreach ($filterFields as $fName=>$field) {
-            if ($field->field_type=='category' && !empty($facets[$field->field_name]['values'])) {
-                ksort($facets[$field->field_name]['values']);
-                foreach ($facets[$field->field_name]['values'] as $vKey=>&$fValue) {
-                    $vId = $filterValuesByVal[$field->id][$vKey];
+            if ($field['field_type']=='category' && !empty($facets[$field['field_name']]['values'])) {
+                ksort($facets[$field['field_name']]['values']);
+                foreach ($facets[$field['field_name']]['values'] as $vKey=>&$fValue) {
+                    $vId = $filterValueIdsByVal[$field['id']][$vKey];
                     if (!empty($filterValues[$vId])) {
-                        $fValue['level'] = $filterValues[$vId]->category_level;
+                        $fValue['level'] = $filterValues[$vId]['category_level'];
                     }
                 }
                 unset($value);
@@ -456,4 +532,5 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
         return array('orm'=>$productsOrm, 'facets'=>$facets);
     }
+
 }
