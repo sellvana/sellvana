@@ -33,8 +33,10 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        $title = $m->id ? 'Edit Customer Group: '.$m->title : 'Create New Customer Group';
+        $this->addTitle($title);
         $args['view']->set(array(
-                                'title' => $m->id ? 'Edit Customer Group: '.$m->title : 'Create New Customer Group',
+                                'title' => $title,
                            ));
     }
     public function formPostAfter($args)
@@ -66,10 +68,16 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
 
     public function action_index()
     {
-        $v = $this->view('head');
-        if($v){
-            $v->addTitle($this->_gridTitle);
-        }
+        $this->addTitle($this->_gridTitle);
         parent::action_index();
+    }
+
+    public function addTitle($title = '')
+    {
+        /* @var $v BViewHead */
+        $v = $this->view('head');
+        if ($v) {
+            $v->addTitle($title);
+        }
     }
 }
