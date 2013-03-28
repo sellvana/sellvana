@@ -87,7 +87,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // show sample search result
         if (false) {
-            $result = FCom_CatalogIndex::i()->findProducts('lorem', array(
+            $result = FCom_CatalogIndex::i()->searchProducts('lorem', array(
                 'category' => 'category-1/subcategory-1-1',
                 'color'=>'Green',
                 'size'=>'Medium',
@@ -113,9 +113,11 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex::i()->findProducts(null, null, null, array('category'=>$category));
+        $productsData = FCom_CatalogIndex::i()->searchProducts(null, null, null, array('category'=>$category));
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsData['orm']));
-        $paginated = $productsData['orm']->paginate(array('sc'=>''));
+        $r = BRequest::i()->get();
+        $r['sc'] = '';
+        $paginated = $productsData['orm']->paginate($r);
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
@@ -164,7 +166,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex::i()->findProducts();
+        $productsData = FCom_CatalogIndex::i()->searchProducts();
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsData['orm']));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];

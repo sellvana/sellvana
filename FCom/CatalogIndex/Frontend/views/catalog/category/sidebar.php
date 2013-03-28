@@ -25,7 +25,8 @@ $hlp = FCom_CatalogIndex::i();
                                 <?php else: ?>
                                     <li><a href="<?= $hlp->getUrl(array($fKey => $vKey)) ?>">
                                          <span class="icon"></span><?=$value['display']?>
-                                         <span class="count">(<?=$value['cnt']?>)</span></a></li>
+                                         <?php if (!empty($value['cnt'])):?><span class="count">(<?=$value['cnt']?>)</span><?php endif ?>
+                                         </a></li>
                                 <?php endif; ?>
                             <?php endforeach ?>
                         </ul>
