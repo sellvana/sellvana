@@ -11,5 +11,6 @@ class FCom_CatalogIndex_Admin extends BClass
         BFrontController::i()
             ->route('GET /index-test', 'FCom_CatalogIndex_Admin_Controller.test')
         ;
+        BLayout::i()->addAllViews('Admin/views');
     }
 }
