@@ -5,6 +5,7 @@ class FCom_CatalogIndex_Migrate extends BClass
     {
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
+        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
     }
 
     public function install()
@@ -144,5 +145,14 @@ values
 (7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',NULL,0,0,3,NULL,'none','none',NULL,NULL),
 (8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',NULL,0,0,4,NULL,'none','none',NULL,NULL),(9,'price','Price','decimal',0,NULL,'field',NULL,'none',NULL,0,0,NULL,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
         ");
+    }
+    
+    public function upgrade_0_1_5()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
+            ),
+        ));
     }
 }

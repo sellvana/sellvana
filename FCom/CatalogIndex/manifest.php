@@ -3,7 +3,7 @@
 
         // cart, checkout and customer account views and controllers
         'FCom_CatalogIndex' => array(
-            'version' => '0.1.4',
+            'version' => '0.1.5',
             'root_dir' => '',
             'migrate' => 'FCom_CatalogIndex_Migrate',
             'depends' => array('FCom_Catalog', 'FCom_CustomField'),

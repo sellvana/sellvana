@@ -437,6 +437,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
         // calculate facet value counts
         foreach ($facetFilters as $fName=>$ff) {
+            $field = $filterFields[$fName];
+            if (!$field['filter_counts']) {
+                continue;
+            }
             $orm = $ff['orm']===true ? clone $productsOrm : $ff['orm'];
             $orm->join('FCom_CatalogIndex_Model_DocValue', array('dv.doc_id','=','p.id'), 'dv');
 

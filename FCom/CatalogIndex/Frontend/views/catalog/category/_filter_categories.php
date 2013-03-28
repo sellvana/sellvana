@@ -16,7 +16,7 @@ $s = $this->products_data['state'];
                     <strong><a href="<?=BApp::href($vKey).'?'.BRequest::rawGet()?>"><?=$value['display']?></a></strong>
 	            <?php else: ?>
 	                <a href="<?=BApp::href($vKey).'?'.BRequest::rawGet()?>"><?=$value['display']?>
-	                    <?=$value['cnt'] ? '<span class="count">('.$value['cnt'].')</span>':''?></a>
+	                    <?=!empty($value['cnt']) ? '<span class="count">('.$value['cnt'].')</span>':''?></a>
 	            <?php endif; ?>
 	        </li>
 	    <?php endforeach ?>
