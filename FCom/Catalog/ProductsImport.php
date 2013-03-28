@@ -26,7 +26,7 @@ class FCom_Catalog_ProductsImport extends BImport
     {
         $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
         $cfKeys = array_keys($cfFields);
-        $dataKeys = $info['first_row'];
+//        $dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);
         foreach($cfKeys as $key) {
             if (!isset($this->fields['product.'.$key])) {

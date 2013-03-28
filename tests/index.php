@@ -11,6 +11,9 @@ BConfig::i()->set('fs/root_dir', dirname(__DIR__));
 FCom_Core::i()->init('FCom_Test');
 //print_r(BDebug::mode()); exit;
 BConfig::i()->add(array(
+   'fs' =>array(
+       'root_dir' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..')
+   ),
    'db'=>array(
     'host' => 'localhost',
     'dbname' => 'fulleron_test',
