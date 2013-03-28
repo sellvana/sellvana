@@ -32,7 +32,18 @@ class FCom_CustomerGroups_CustomerGroups
                  '/customer-groups' => array(
                      array('layout', 'base'),
                      array('hook', 'main', 'views'=>array('admin/grid')),
-                     array('view', 'admin/header', 'do'=>array(array('setNav', 'customer-groups'))),
+                     array('view', 'admin/header', 'do'=>array(array('setNav', 'customer/customer-groups'))),
+                 ),
+                 '/customer-groups/form'=>array(
+                     array('layout', 'base'),
+                     array('layout', 'form'),
+                     array('hook', 'main', 'views'=>array('admin/form')),
+                     array('view', 'admin/header', 'do'=>array(array('setNav', 'customer/customer-groups'))),
+                     array('view', 'admin/form', 'set'=>array(
+                         'tab_view_prefix' => 'customer-groups/form/',
+                     ), 'do'=>array(
+                         array('addTab', 'main', array('label'=>'Customer Group', 'pos'=>10)),
+                     )),
                  ),
             )
         );

@@ -63,4 +63,13 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
             }
         }
     }
+
+    public function action_index()
+    {
+        $v = $this->view('head');
+        if($v){
+            $v->addTitle($this->_gridTitle);
+        }
+        parent::action_index();
+    }
 }
