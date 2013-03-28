@@ -262,7 +262,7 @@ class BRequest extends BClass
             $len = sizeof($arr)-$parentDepth;
             $root = $len>1 ? join('/', array_slice($arr, 0, $len)) : '/';
         }
-        return $root;
+        return $root ? $root : '/';
     }
 
     /**
