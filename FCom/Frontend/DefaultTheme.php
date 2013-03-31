@@ -21,7 +21,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
-                        array('icon', BApp::href().'favicon.ico'),
+                        array('icon', BRequest::webRoot().'/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('js', '{FCom_Core}/js/lib/es5-shim.min.js', array('if'=>'lt IE 9')),
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),
