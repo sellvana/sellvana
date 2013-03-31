@@ -73,6 +73,11 @@ class BImport extends BClass
         return $info;
     }
 
+    /**
+     * @param null|false|array $config
+     * @param bool $update
+     * @return array|bool|mixed
+     */
     public function config($config=null, $update=false)
     {
         $dir = FCom_Core::i()->dir('storage/run/'.$this->dir);
@@ -131,7 +136,7 @@ class BImport extends BClass
         $status = array(
             'start_time' => time(),
             'status' => 'running',
-            'rows_total' => sizeof(file($filename)),
+            'rows_total' => sizeof(file($filename)), // file() will load entire file in memory, may be not good idea???
             'rows_processed' => 0,
             'rows_skipped' => 0,
             'rows_warning' => 0,
