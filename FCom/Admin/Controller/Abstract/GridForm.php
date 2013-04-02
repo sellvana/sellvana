@@ -15,6 +15,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
     protected $_formViewName = 'admin/form';
+    protected $_formTitle;# = 'Record';
     protected $_mainTableAlias = 'main';
 
     public function __construct()
@@ -56,6 +57,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function action_index()
     {
         $this->view('jqgrid')->config = $this->gridConfig();
+        if (($head = $this->view('head'))) {
+            $head->addTitle($this->_gridTitle);
+        }
         $view = $this->view($this->_gridViewName);
         $this->gridViewBefore(array('view'=>$view));
         $this->layout($this->_gridLayoutName);
@@ -122,6 +126,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
         $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
+        if ($this->_formTitle && ($head = $this->view('head'))) {
+            $head->addTitle($this->_formTitle);
+        }
     }
 
     public function formViewBefore($args)

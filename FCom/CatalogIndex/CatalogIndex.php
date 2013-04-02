@@ -361,7 +361,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     }
                 }
                 // 2. clone filter facets condition before adding current filter
-                if ($field['filter_multiselect'] || $field['filter_multivalue']) {
+                if ($field['filter_type']=='checkbox' || $field['filter_multivalue']) {
                     $facetFilters[$fName] = array(
                         'orm'        => clone $productsOrm,
                         'multivalue' => $field['filter_multivalue'],
@@ -435,6 +435,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
             FCom_CustomField_Common::i()->disable(true);
         }
+
         // calculate facet value counts
         foreach ($facetFilters as $fName=>$ff) {
             $field = $filterFields[$fName];

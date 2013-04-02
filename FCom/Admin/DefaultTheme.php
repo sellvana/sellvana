@@ -20,7 +20,7 @@ class FCom_Admin_DefaultTheme extends BClass
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
-                        array('icon', BRequest::webRoot().'/favicon.ico'),
+                        array('icon', BConfig::i()->get('web/base_src').'/favicon.ico'),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('js', '{FCom_Core}/js/lib/es5-shim.min.js', array('if'=>'lt IE 9')),
                         array('js', '{FCom_Core}/js/lib/json2.js'),

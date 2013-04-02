@@ -66,12 +66,6 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
         }
     }
 
-    public function action_index()
-    {
-        $this->addTitle($this->_gridTitle);
-        parent::action_index();
-    }
-
     public function addTitle($title = '')
     {
         /* @var $v BViewHead */

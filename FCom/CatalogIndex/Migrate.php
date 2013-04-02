@@ -3,9 +3,10 @@ class FCom_CatalogIndex_Migrate extends BClass
 {
     public function run()
     {
-        BMigrate::install('0.1.0', array($this, 'install'));
+        BMigrate::install('0.1.6', array($this, 'install'));
         BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
         BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
+        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
     }
 
     public function install()
@@ -40,9 +41,10 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'fcom_field_id' => 'int(10) unsigned default null',
                 'source_type' => "enum('field','method','callback') not null default 'field'",
                 'source_callback' => 'varchar(255) null',
-                'filter_type' => "enum('none','inclusive','exclusive','range') not null",
-                'filter_multiselect' => 'tinyint not null default 0',
+                'filter_type' => "ENUM('none','exclusive','inclusive','range') NOT NULL DEFAULT 'none'",
+                //'filter_multiselect' => 'tinyint not null default 0',
                 'filter_multivalue' => 'tinyint not null default 0',
+                'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
                 'filter_show_empty' => 'tinyint not null default 0',
                 'filter_order' => 'smallint unsigned',
                 'filter_custom_view' => 'varchar(255)',
@@ -124,10 +126,8 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDocValue}_value" => "FOREIGN KEY (`value_id`) REFERENCES {$tFieldValue} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
-        FCom_CatalogIndex_Model_Field::i()->update_many(
-            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
-            array('field_name' => 'category')
-        );
+
+        $this->upgrade_0_1_4();
     }
 
     public function upgrade_0_1_4()
@@ -152,6 +152,20 @@ values
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
+            ),
+        ));
+        
+        FCom_CatalogIndex_Model_Field::i()->update_many(
+            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
+            array('field_name' => 'category')
+        );        
+    }
+    
+    public function upgrade_0_1_6()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+            'COLUMNS' => array(
+                'filter_multiselect' => 'DROP',
             ),
         ));
     }
