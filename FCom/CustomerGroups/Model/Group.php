@@ -19,4 +19,20 @@ class FCom_CustomerGroups_Model_Group
     {
         return parent::i($new, $args); // auto completion helper
     }
+
+    /**
+     * Get groups in format suitable for select drop down list
+     * @return array
+     */
+    public static function groupsOptions()
+    {
+        $groupModels = static::orm()->find_many();
+        $groups = array();
+        foreach ($groupModels as $model) {
+            $key = $model->id;
+            $groups[$key] = $model->title;
+        }
+
+        return $groups;
+    }
 }
