@@ -13,10 +13,15 @@ return array(
             'tests'        => "FCom_CustomerGroups_Tests_AllTests",
             'description'  => "Customer Groups Management",
             'migrate'      => 'FCom_CustomerGroups_Migrate',
-            'bootstrap'    => array('file' => 'CustomerGroups.php', 'callback' => 'FCom_CustomerGroups_CustomerGroups::bootstrap'),
+            'bootstrap'    => array('file' => 'CustomerGroups.php', 'callback' => 'FCom_CustomerGroups::bootstrap'),
             "require"      => array(
                 "module" => "FCom_Core",
                 "class"  => "PHPUnit",
+            ),
+            'areas'        => array(
+                'FCom_Admin' => array(
+                    'bootstrap' => array('file' => 'CustomerGroupsAdmin.php', 'callback' => 'FCom_CustomerGroups_Admin::bootstrap'),
+                ),
             ),
         ),
     )
