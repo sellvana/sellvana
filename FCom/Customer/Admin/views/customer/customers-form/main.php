@@ -1,4 +1,10 @@
-<?php $m = $this->model ?>
+<?php
+$m = $this->model;
+$customerGroups = null;
+if(BModuleRegistry::i()->module("FCom_CustomerGroups")->runStatus(BNULL) == BModule::LOADED) {
+    $customerGroups = FCom_CustomerGroups_Model_Group::groupsOptions();
+}
+?>
 <script>
     //var custModule = angular.module('custModule', []);
 
@@ -48,6 +54,14 @@
                     <label for="model-email">Email</label>
                     <input type="text" id="model-email" name="model[email]" value="<?=$this->q($m->email)?>"/>
                 </li>
+                <?php if(isset($customerGroups)):?>
+                <li class="label-l">
+                    <label for="model-group"><?=BLocale::_("Customer group");?></label>
+                    <select id="model-group" name="model[customer_group]">
+                        <?=$this->optionsHtml($customerGroups, $m->customer_group)?>
+                    </select>
+                </li>
+                <?php endif;?>
                 <!--
                 <li class="label-l">
                     <label for="model-phone">Daytime Phone</label>

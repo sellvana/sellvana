@@ -809,6 +809,7 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 
 /* Customer */
 .col-customer-info { float:left; width:330px; }
+.col-customer-info select {width: 294px; padding: 4px 0; margin: 3px 0;}
 .col-customer-address { margin-left:355px; }
 .col-customer-address .ng-scope { 
 	float:left; 
