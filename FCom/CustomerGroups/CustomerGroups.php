@@ -16,6 +16,12 @@ class FCom_CustomerGroups_CustomerGroups
         BFrontController::i()
             ->route('GET /customer-groups', 'FCom_CustomerGroups_Admin_Controller_CustomerGroups.index') // list groups
             ->route('GET|POST /customer-groups/.action', 'FCom_CustomerGroups_Admin_Controller_CustomerGroups'); // add, edit groups
+
+        FCom_Admin_Model_Role::i()->createPermission(
+            array(
+                 'customer_groups' => "Customer Groups"
+            )
+        );
     }
 
     public static function layout()

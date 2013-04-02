@@ -39,32 +39,6 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
                                 'title' => $title,
                            ));
     }
-    public function formPostAfter($args)
-    {
-        parent::formPostAfter($args);
-        if ($args['do']!=='DELETE') {
-            $customerGroup = $args['model'];
-            $addrPost = BRequest::i()->post('address');
-            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_CustomerGroups_Model_Group::i()->orm('a')->where('customer_id', $customerGroup->id)->find_many_assoc();
-                foreach ($newData as $id=>$data) {
-                    if (empty($data['id'])) {
-                        continue;
-                    }
-                    if (!empty($oldModels[$data['id']])) {
-                        $addr = $oldModels[$data['id']];
-                        $addr->set($data)->save();
-                    } elseif ($data['id']<0) {
-                        unset($data['id']);
-                        $addr = FCom_Customer_Model_Address::i()->newBilling($data, $cust);
-                    }
-                }
-            }
-            if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Customer_Model_Address::i()->delete_many(array('id'=>$del, 'customer_id'=>$customerGroup->id));
-            }
-        }
-    }
 
     public function action_index()
     {
