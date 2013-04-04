@@ -64,33 +64,35 @@ class FCom_CustomerGroups_Migrate
                     'sale_price' => 'decimal(12,4) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ),
-//                'KEYS' => array(), // should we add unique key from product_id + group_id + qty ???
+                'KEYS' => array(
+                    'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
+                ), // should we add unique key from product_id + group_id + qty ???
                 'CONSTRAINTS' => array(
                     'fk_tier_product_id' => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
                     'fk_tier_group_id' => "FOREIGN KEY (group_id) REFERENCES {$tableCustGroups}(id) ON DELETE CASCADE ON UPDATE CASCADE"
                 ),
             )
         );
-        $conn = BDb::connect();
-
-        /*
-         * If we use tier prices, we should probably populate them?
-         */
-        $st = $conn->query("SELECT p.id, p.base_price FROM {$tableProduct}");
-        $gid = FCom_CustomerGroups_Model_Group::orm()->where('code', 'guest')->find_one()->id;
-        $ins = $conn->prepare("INSERT INTO `$tableTierPrices`
-        (product_id, group_id, base_price, sale_price, qty)
-        VALUES(?, ?, ?, ?)");
-        foreach ($st as $row) {
-            $data = array(
-                $row['id'],
-                $gid,
-                $row['base_price,'],
-                $row['base_price,'],
-                1
-            );
-            $ins->execute($data);
-        }
-        $conn->commit();
+//        $conn = BDb::connect();
+//
+//        /*
+//         * If we use tier prices, we should probably populate them?
+//         */
+//        $st = $conn->query("SELECT p.id, p.base_price FROM {$tableProduct}");
+//        $gid = FCom_CustomerGroups_Model_Group::orm()->where('code', 'guest')->find_one()->id;
+//        $ins = $conn->prepare("INSERT INTO `$tableTierPrices`
+//        (product_id, group_id, base_price, sale_price, qty)
+//        VALUES(?, ?, ?, ?)");
+//        foreach ($st as $row) {
+//            $data = array(
+//                $row['id'],
+//                $gid,
+//                $row['base_price,'],
+//                $row['base_price,'],
+//                1
+//            );
+//            $ins->execute($data);
+//        }
+//        $conn->commit();
     }
 }

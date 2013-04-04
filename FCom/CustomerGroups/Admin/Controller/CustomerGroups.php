@@ -21,7 +21,7 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
         $config = array(
             'grid' => array(
                 'id' => $gridId,
-                'caption' => 'Customer Groups',
+                'caption' => BLocale::_('Customer Groups'),
                 'url' => BApp::href('customer-groups/grid_data'),
                 'editurl' => BApp::href('customer-groups/grid_data/?id='),
                 'columns' => array(
