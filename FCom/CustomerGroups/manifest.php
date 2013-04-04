@@ -7,7 +7,7 @@
 return array(
     'modules' => array(
         'FCom_CustomerGroups' => array(
-            'version'      => '0.1.0',
+            'version'      => '0.1.1',
             'depends'      => array('FCom_Customer'),
             'translations' => array('de' => 'de.php'),
             'tests'        => "FCom_CustomerGroups_Tests_AllTests",

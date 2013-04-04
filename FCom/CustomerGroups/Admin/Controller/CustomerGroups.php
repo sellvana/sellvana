@@ -17,15 +17,34 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
 
     public function gridConfig()
     {
-        $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'],
-            array(
-                 'id'    => array('index' => 'cg.id'),
-                 'title' => array('label' => 'Title', 'index' => 'cg.title'),
-                 'code'  => array('label' => 'Code', 'index' => 'cg.code'),
-            )
+        $gridId = 'customer-groups';
+        $config = array(
+            'grid' => array(
+                'id' => $gridId,
+                'caption' => BLocale::_('Customer Groups'),
+                'url' => BApp::href('customer-groups/grid_data'),
+                'editurl' => BApp::href('customer-groups/grid_data/?id='),
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'width'=>30, 'index' => 'cg.id'),
+                    'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true),
+                    'code' => array('label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
+                ),
+                'multiselect' => true,
+                'onSelectRow' => "function(id){
+                    if ( typeof lastcel2 == 'undefined')
+                       window.lastcel2 = id;
+                    if(id && id !== window.lastsel2){
+                        jQuery('#{$gridId}').restoreRow(window.lastsel2);
+                        jQuery('#{$gridId}').editRow(id,true);
+                        window.lastsel2=id;
+                    }
+                }",
+            ),
+            'navGrid' => array('add'=>true, 'addtext'=>'New', 'addtitle'=>'Create new Field', 'edit'=>true, 'del'=>true),
+            'custom' => array('personalize'=>true),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+
         );
-        $config['custom']['dblClickHref'] = BApp::href('customer-groups/form/?id=');
         return $config;
     }
 
@@ -38,32 +57,6 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
         $args['view']->set(array(
                                 'title' => $title,
                            ));
-    }
-    public function formPostAfter($args)
-    {
-        parent::formPostAfter($args);
-        if ($args['do']!=='DELETE') {
-            $customerGroup = $args['model'];
-            $addrPost = BRequest::i()->post('address');
-            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_CustomerGroups_Model_Group::i()->orm('a')->where('customer_id', $customerGroup->id)->find_many_assoc();
-                foreach ($newData as $id=>$data) {
-                    if (empty($data['id'])) {
-                        continue;
-                    }
-                    if (!empty($oldModels[$data['id']])) {
-                        $addr = $oldModels[$data['id']];
-                        $addr->set($data)->save();
-                    } elseif ($data['id']<0) {
-                        unset($data['id']);
-                        $addr = FCom_Customer_Model_Address::i()->newBilling($data, $cust);
-                    }
-                }
-            }
-            if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Customer_Model_Address::i()->delete_many(array('id'=>$del, 'customer_id'=>$customerGroup->id));
-            }
-        }
     }
 
     public function addTitle($title = '')
