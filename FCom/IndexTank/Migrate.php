@@ -38,9 +38,10 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_1_1()
     {
         $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-        ADD indextank_indexed_at datetime not null; ");
-
+        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+            ADD indextank_indexed_at datetime not null; ");
+        }
 
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
         BDb::run( "
@@ -63,16 +64,23 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_1_3()
     {
         $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
+        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            BDb::run(" ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
+        }
     }
 
     public function upgrade_0_1_4()
     {
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
-        ADD `status` enum('start','stop','pause') NOT NULL,
-        ADD `percent` BIGINT( 11 ) NOT NULL ,
-        ADD `indexed` BIGINT( 11 ) NOT NULL ; ");
+        BDb::ddlAddColumns($pIndexingStatusTable, array(
+            'status' => "enum('start','stop','pause') NOT NULL",
+            'percent' => "BIGINT( 11 ) NOT NULL",
+            'indexed' => "IGINT( 11 ) NOT NULL",
+        ));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
+//        ADD `status` enum('start','stop','pause') NOT NULL,
+//        ADD `percent` BIGINT( 11 ) NOT NULL ,
+//        ADD `indexed` BIGINT( 11 ) NOT NULL ; ");
     }
 
     public function upgrade_0_1_5()
@@ -85,19 +93,22 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_1_6()
     {
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
+        BDb::ddlAddColumns($pIndexingStatusTable, array('to_index' =>"BIGINT( 11 ) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade_0_1_7()
     {
         $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
+        BDb::ddlAddColumns($pIndexingStatusTable, array('index_size' => "BIGINT( 11 ) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade_0_1_8()
     {
         $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
+        BDb::ddlAddColumns($pPFTable, array('label' => "varchar(100) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
     }
 
     public function upgrade_0_1_9()
@@ -129,7 +140,8 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade_0_2_1()
     {
         $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
+        BDb::ddlAddColumns($pFieldsTable, array('sort_order' => "int(11) NOT NULL DEFAULT '0'"));
+//        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 
 

@@ -102,6 +102,7 @@ class FCom_Catalog_Admin extends BClass
                         ),
                         'do'=>array(
                             array('addTab', 'main', array('label'=>'General Info', 'pos'=>10)),
+                            array('addTab', 'prices', array('label'=>"Prices", 'pos'=>15)),
                             array('addTab', 'linked-products', array('label'=>'Linked Products', 'pos'=>20, 'async'=>true)),
                             array('addTab', 'categories', array('label'=>'Categories', 'pos'=>30, 'async'=>true)),
                             array('addTab', 'attachments', array('label'=>'Attachments', 'pos'=>40, 'async'=>true)),
