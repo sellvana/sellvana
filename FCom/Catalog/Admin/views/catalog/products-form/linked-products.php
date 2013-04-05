@@ -12,7 +12,7 @@ $prodCtrl = FCom_Catalog_Admin_Controller_Products::i();
         </div>
     </div>
     <div class="ui-layout-center">
-        <?=$this->view('jqgrid')->set('config', $prodCtrl->productLibraryGridConfig()) ?>
+        <?=$this->view('jqgrid')->set('config', $prodCtrl->productLibraryGridConfig('linked-products-all')) ?>
     </div>
 </div>
 
@@ -98,7 +98,7 @@ head(function() {
     });
 
     $('#linked-products-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
-        new FCom.Admin.TargetGrid({source:'#products', target:el});
+        new FCom.Admin.TargetGrid({source:'#linked-products-all', target:el});
     });
 })
 </script>
