@@ -14,7 +14,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
             ->select(array('p.id', 'p.product_name', 'p.manuf_sku'))
-            ->join('FCom_Catalog_Model_CategoryProduct', array('cp.category_id','=','p.id'), 'cp')
+            ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
 

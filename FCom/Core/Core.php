@@ -93,10 +93,10 @@ class FCom_Core extends BClass
             $config->set('fs/storage_dir', $storageDir);
         }
 
-        $marketModulesDir = $config->get('fs/market_modules_dir');
-        if (!$marketModulesDir) {
-            $marketModulesDir = $rootDir.'/market-modules';
-            $config->set('fs/market_modules_dir', $marketModulesDir);
+        $dlcDir = $config->get('fs/dlc_dir');
+        if (!$dlcDir) {
+            $dlcDir = $rootDir.'/dlc';
+            $config->set('fs/dlc_dir', $dlcDir);
         }
 
         // local configuration (db, enabled modules)
