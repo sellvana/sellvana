@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html <?php echo $this->getHtmlAttributes() ?>>
 <head>
-    <script type="text/javascript" src="<?=BApp::baseUrl()?>FCom/Core/js/lib/jquery.min.js" ></script>
-    <script type="text/javascript" src="<?=BApp::baseUrl()?>FCom/Admin/js/highcharts/highcharts.js" ></script>
     <?php echo $this->hook('head') ?>
     <script>
 window.appConfig = {
