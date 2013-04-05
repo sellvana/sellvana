@@ -9,10 +9,14 @@ class FCom_Market_MarketApi extends BClass
         //BConfig::i()->get('FCom_Market/market_url');
     }
 
+    public function getSsoUrl()
+    {
+        return BConfig::i()->get('modules/FCom_Market/market_url') . '/market/sso?'.$this->getTokenUrl();
+    }
+
     public function getModules($modules)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
-                . '/market/api/list'.'?'.$this->getTokenUrl();
+        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') . '/market/api/list?'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
@@ -123,7 +127,9 @@ class FCom_Market_MarketApi extends BClass
 
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_CUSTOMREQUEST, $method); // Tell curl to use HTTP method of choice
-        curl_setopt($session, CURLOPT_POSTFIELDS, $args); // Tell curl that this is the body of the POST
+        if ($args) {
+            curl_setopt($session, CURLOPT_POSTFIELDS, $args); // Tell curl that this is the body of the POST
+        }
         curl_setopt($session, CURLOPT_HEADER, false); // Tell curl not to return headers
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Tell curl to return the response
         curl_setopt($session, CURLOPT_HTTPHEADER, array('Expect:')); //Fixes the HTTP/1.1 417 Expectation Failed
@@ -136,15 +142,14 @@ class FCom_Market_MarketApi extends BClass
 
         $http_code = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);
-
-        if (floor($http_code / 100) == 2) {
+        if ($http_code >= 200 && $http_code < 300) {
             $objRes = new stdClass();
             $objRes->response = $response;
             $objRes->code = $http_code;
             return $objRes;
         }
-        //echo $http_code;
-        //echo $response;
+
+        var_dump($http_code, $response); exit;
         throw new Exception($response, $http_code);
     }
 
@@ -152,9 +157,14 @@ class FCom_Market_MarketApi extends BClass
     {
         $config = BConfig::i()->get('modules/FCom_Market');
         $timestamp = time();
-        $token = sha1($config['id'].$config['salt'].$timestamp);
-
+        if (!empty($config['id']) && !empty($config['salt'])) {
+            $token = sha1($config['id'].$config['salt'].$timestamp);
+        } else {
+            $token = null;
+        }
         $str = 'id='.$config['id'].'&token='.$token.'&ts='.$timestamp;
         return $str;
     }
+
+
 }

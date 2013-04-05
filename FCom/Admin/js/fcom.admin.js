@@ -110,11 +110,11 @@ console.log(sel);
         return html;
     }
 
-    $('.ui-icon-pencil', grid).live('click', function(ev) { return editAttachment(ev); });
-    $('.ui-icon-disk', grid).live('click', function(ev) { return editAttachmentSave(ev); });
-    $('.ui-icon-cancel', grid).live('click', function(ev) { return editAttachmentCancel(ev); });
-    $('.ui-icon-arrowthickstop-1-s', grid).live('click', function(ev) { return downloadAttachment(ev) });
-    $('.ui-icon-arrowreturnthick-1-e', grid).live('click', function(ev) { return downloadAttachment(ev, true) });
+    $(grid).on('click', '.ui-icon-pencil', function(ev) { return editAttachment(ev); });
+    $(grid).on('click', '.ui-icon-disk', function(ev) { return editAttachmentSave(ev); });
+    $(grid).on('click', '.ui-icon-cancel', function(ev) { return editAttachmentCancel(ev); });
+    $(grid).on('click', '.ui-icon-arrowthickstop-1-s', function(ev) { return downloadAttachment(ev) });
+    $(grid).on('click', '.ui-icon-arrowreturnthick-1-e', function(ev) { return downloadAttachment(ev, true) });
 
     var colModel = grid[0].p.colModel;
     for (var i=0; i<colModel.length; i++) {
@@ -528,7 +528,7 @@ FCom.Admin.tree = function(el, opt) {
     })*/
     ;
 
-    $('a', el).live('drop', function(e,dd) {
+    $(el).on('drop', 'a', function(e,dd) {
         if (!$(e.target).parents('.jstree').length || e.alreadyProcessed) {
             return;
         }
@@ -698,7 +698,7 @@ console.log(url_get, url_post);
         var curLi = $(options.tabs+'[class=active]');
         var curPane = $(options.panes+':not([hidden])');
 
-        $('input,textarea,select', panes).live('change', function(ev) {
+        $(panes).on('change', 'input,textarea,select', function(ev) {
             var tabId = $(ev.target).closest(options.panes).attr('id');
             $('a[href=#'+tabId+']', tabs).closest('li').addClass('dirty');
         });

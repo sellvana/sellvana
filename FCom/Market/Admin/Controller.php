@@ -42,17 +42,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_market()
     {
-        $config = BConfig::i()->get('modules/FCom_Market');
-        $timestamp = time();
-        if (!empty($config['id']) && !empty($config['salt'])) {
-            $token = sha1($config['id'].$config['salt'].$timestamp);
-        } else {
-            $token = null;
-        }
-
-        $this->view('market/market')->token = $token;
-        $this->view('market/market')->timestamp = $timestamp;
-        $this->view('market/market')->config = $config;
+        $this->view('market/market')->url = FCom_Market_MarketApi::i()->getSsoUrl();
         $this->layout('/market/market');
     }
 
@@ -190,11 +180,11 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
         }
 
-        $marketPath = BConfig::i()->get('fs/market_modules_dir');
+        $dlcPath = BConfig::i()->get('fs/dlc_dir');
         $modNameParts = explode("_", $modName);
         if (count($modNameParts) == 2) {
-            $marketPath .= '/'.$modNameParts[0];
-            BUtil::ensureDir($marketPath);
+            $dlcPath .= '/'.$modNameParts[0];
+            BUtil::ensureDir($dlcPath);
         }
 
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
@@ -209,7 +199,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             $conf = BConfig::i()->get('modules/FCom_Market/ftp');
             $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
             $ftpClient = new BFtpClient($conf);
-            $errors = $ftpClient->ftpUpload($modulePath, $marketPath);
+            $errors = $ftpClient->ftpUpload($modulePath, $dlcPath);
             if ($errors) {
                 foreach($errors as $error) {
                     BSession::i()->addMessage($error);
@@ -218,13 +208,13 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
 
         } else {
-            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $marketPath);
+            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $dlcPath);
             if (!$res) {
                 $error = FCom_Market_MarketApi::i()->getErrors();
                 if ($error) {
                     BSession::i()->addMessage($error, 'error');
                 } else {
-                    BSession::i()->addMessage("Permissions denied to write into storage dir: ".$marketPath, 'error');
+                    BSession::i()->addMessage("Permissions denied to write into storage dir: ".$dlcPath, 'error');
                 }
                 BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
             }
