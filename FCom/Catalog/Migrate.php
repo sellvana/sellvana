@@ -14,6 +14,7 @@ class FCom_Catalog_Migrate extends BClass
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
         BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
         BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
+        BMigrate::upgrade('0.2.0', '0.2.1', array($this, 'upgrade_0_2_1'));
     }
 
     public function install()
@@ -251,5 +252,17 @@ class FCom_Catalog_Migrate extends BClass
         BDb::run("
             ALTER TABLE ".$tProduct." ADD INDEX (product_name)
         ");
+    }
+
+    public function upgrade_0_2_1()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableColumns($tProduct, array(
+             'cost'       => 'decimal(12,4) null default null',
+             'msrp'       => 'decimal(12,4) null default null',
+             'map'        => 'decimal(12,4) null default null',
+             'sale_price' => 'decimal(12,4) null default null',
+            )
+        );
     }
 }
