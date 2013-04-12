@@ -9,7 +9,7 @@ $prodCtrl = FCom_Catalog_Admin_Controller_Products::i();
         </div>
     </div>
     <div class="ui-layout-center">
-        <?=$this->view('jqgrid')->set('config', FCom_Catalog_Admin_Controller_Products::i()->productLibraryGridConfig()) ?>
+        <?=$this->view('jqgrid')->set('config', FCom_Catalog_Admin_Controller_Products::i()->productLibraryGridConfig('products')) ?>
     </div>
 </div>
 

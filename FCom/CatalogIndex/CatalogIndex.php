@@ -11,7 +11,7 @@ class FCom_CatalogIndex extends BClass
     {
         static::parseUrl();
     }
-
+    
     static public function parseUrl()
     {
         if (($getFilters = BRequest::i()->get('filters'))) {
@@ -284,10 +284,18 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $terms = static::_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
             $tDocTerm = $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-            $termIds = FCom_CatalogIndex_Model_Term::i()->orm()->where_in('term', $terms)->find_many_assoc('term', 'id');
-            $productsOrm->where(array(
-                array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values($termIds)),
-            ));
+            $orm = FCom_CatalogIndex_Model_Term::i()->orm();
+            //$orm->where_in('term', $terms);
+            $orm->where_raw("term regexp '(".join('|', $terms).")'");
+            $termIds = $orm->find_many_assoc('term', 'id');
+            if ($termIds) {
+                $productsOrm->where(array(
+                    array("(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values($termIds)),
+                ));
+            } else {
+                $productsOrm->where_raw('0');
+                return array('orm' => $productsOrm, 'facets' => array());
+            }
         }
 
         if (is_null($filters)) {
@@ -361,7 +369,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     }
                 }
                 // 2. clone filter facets condition before adding current filter
-                if ($field['filter_type']=='checkbox' || $field['filter_multivalue']) {
+                if ($field['filter_type']=='inclusive' || $field['filter_multivalue']) {
                     $facetFilters[$fName] = array(
                         'orm'        => clone $productsOrm,
                         'multivalue' => $field['filter_multivalue'],
@@ -438,6 +446,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // calculate facet value counts
         foreach ($facetFilters as $fName=>$ff) {
+            if (empty($filterFields[$fName])) {
+                continue;
+            }
             $field = $filterFields[$fName];
             if (!$field['filter_counts']) {
                 continue;
@@ -456,7 +467,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     $sizeofInclude = !empty($includeValueIds) ? sizeof($includeValueIds) : 0;
                     if ($sizeofSkip == $sizeofInclude) {
                         continue;
-                    } elseif ($sizeofSkip > $sizeofInclude/2) {
+                    } elseif ($sizeofSkip > $sizeofInclude/2) { // slight optimization - inverse filter
                         foreach ($ff['skip_value_ids'] as $vId) {
                             unset($includeValueIds[$vId]);
                         }

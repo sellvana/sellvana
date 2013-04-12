@@ -6,6 +6,9 @@ $hlp = FCom_CatalogIndex::i();
 <section class="block block-filter">
     <header class="block-title"><span class="title">Narrow Results</span></header>
     <form class="block-content" method="get" action="">
+        <fieldset>
+            
+        </fieldset>
         <?php if (!empty($facets)): ?>
             <?php foreach ($facets as $fKey => $facet): ?>
                 <?php if (!empty($facet['custom_view'])): ?>
@@ -13,6 +16,7 @@ $hlp = FCom_CatalogIndex::i();
                             ->set('products_data', $this->products_data) ?>
                 <?php elseif (!empty($facet['values'])): ?>
                     <section class="block-sub block-attribute">
+                        <fieldset>
                         <header class="block-sub-title"><span class="title"><?=$facet['display']?></header>
                         <ul>
                             <?php foreach ($facet['values'] as $vKey => $value): ?>
@@ -30,6 +34,7 @@ $hlp = FCom_CatalogIndex::i();
                                 <?php endif; ?>
                             <?php endforeach ?>
                         </ul>
+                        </fieldset>
                     </section>
                 <?php endif ?>
             <?php endforeach; ?>
