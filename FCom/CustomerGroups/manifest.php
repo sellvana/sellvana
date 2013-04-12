@@ -19,6 +19,9 @@ return array(
                 "class"  => "PHPUnit",
             ),
             'areas'        => array(
+                'FCom_Frontend' => array(
+                    'bootstrap' => array('file' => 'CustomerGroupsFrontend.php', 'callback' => 'FCom_CustomerGroups_Frontend::bootstrap'),
+                ),
                 'FCom_Admin' => array(
                     'bootstrap' => array('file' => 'CustomerGroupsAdmin.php', 'callback' => 'FCom_CustomerGroups_Admin::bootstrap'),
                 ),

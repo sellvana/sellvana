@@ -4,7 +4,7 @@
  * @project fulleron
  */
 
-class FCom_CustomerGroups
+class FCom_CustomerGroups_Frontend
     extends BClass
 {
     public static function bootstrap()

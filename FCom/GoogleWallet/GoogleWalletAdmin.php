@@ -1,6 +1,6 @@
 <?php
 
-class FCom_GoogleWallet_Frontend extends BClass
+class FCom_GoogleWallet_Admin extends BClass
 {
     static public function bootstrap()
     {
