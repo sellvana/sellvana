@@ -11,7 +11,7 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
     {
         $key = $limit ? $limit : '-';
         if (empty(static::$_optionsCache[$key])) {
-            $orm = static::orm('c');
+            $orm = static::orm('c')->order_by_asc('name');
             if ($limit) {
                 $orm->where_in('iso', explode(',', $limit));
             }
