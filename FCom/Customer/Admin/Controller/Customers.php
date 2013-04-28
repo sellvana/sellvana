@@ -19,9 +19,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'email' => array('label'=>'Email', 'index'=>'c.email'),
             'street1' => array('label'=>'Address', 'index'=>'a.street1'),
             'city' => array('label'=>'City', 'index'=>'a.city'),
-            'region' => array('label'=>'Region', 'index'=>'a.state'),
-            'postcode' => array('label'=>'Postal Code', 'index'=>'a.zip'),
-            'country' => array('label'=>'Country', 'index'=>'a.country'),
+            'state' => array('label'=>'Region', 'index'=>'a.state'),
+            'zip' => array('label'=>'Postal Code', 'index'=>'a.zip'),
+            'country' => array('label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             'create_dt' => array('label'=>'Created', 'index'=>'c.create_dt', 'formatter'=>'date'),
             'update_dt' => array('label'=>'Updated', 'index'=>'c.update_dt', 'formatter'=>'date'),
         ));
