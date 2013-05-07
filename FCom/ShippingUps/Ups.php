@@ -98,7 +98,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
         }
-        $tozip = $shippingAddress->zip;
+        $tozip = $shippingAddress->postcode;
         //service
         if ($cart->shipping_method == $this->code) {
             $service = $cart->shipping_service;

@@ -16,7 +16,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
             .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
             .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
             .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->state.'</span> '
+            .'<span class="region">'.$obj->region.'</span> '
             .'<span class="postal-code">'.$obj->postcode.'</span>'
             .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
             .'</div>';
@@ -52,8 +52,8 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
                 'street1'           => $address->street1,
                 'street2'           => $address->street2,
                 'city'              => $address->city,
-                'state'             => $address->state,
-                'zip'               => $address->zip,
+                'region'            => $address->region,
+                'postcode'          => $address->postcode,
                 'country_code'      => $address->country,
                 'phone'             => $address->phone,
                 'fax'               => $address->fax,
@@ -81,11 +81,11 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (!empty($post['city'])) {
             $data['city'] = $post['city'];
         }
-        if (!empty($post['state'])) {
-            $data['state'] = $post['state'];
+        if (!empty($post['region'])) {
+            $data['region'] = $post['region'];
         }
-        if (!empty($post['zip'])) {
-            $data['zip'] = $post['zip'];
+        if (!empty($post['postcode'])) {
+            $data['postcode'] = $post['postcode'];
         }
         if (!empty($post['country_code'])) {
             $data['country'] = $post['country_code'];

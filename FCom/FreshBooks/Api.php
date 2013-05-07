@@ -48,9 +48,9 @@ class FCom_FreshBooks_Api extends BClass
             $client->pStreet1 = htmlspecialchars($order->street1);
             $client->pStreet2 = htmlspecialchars($order->street2);
             $client->pCity = $order->city;
-            $client->pState = $order->state;
+            $client->pState = $order->region;
             $client->pCountry = $order->country;
-            $client->pCode = $order->zip;
+            $client->pCode = $order->postcode;
 
             $client->create();
         }

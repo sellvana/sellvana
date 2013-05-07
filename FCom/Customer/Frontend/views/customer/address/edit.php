@@ -13,7 +13,7 @@
     <?=$this->view('geo/embed')?>
     <script>
         head(function() {
-        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->state?>'});
+        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
         })
     </script>
     <label for="#"><?= BLocale::_("Country") ?><em class="required">*</em></label>
@@ -21,13 +21,13 @@
         <option value=""><?= BLocale::_("Select an option") ?></option>
     </select>
 
-    <select class="geo-region required" name="state" >
+    <select class="geo-region required" name="region" >
         <option value=""><?= BLocale::_("Select an option") ?></option>
     </select>
-    <input type="text" class="geo-region" name="state" />
+    <input type="text" class="geo-region" name="region" />
 
     <br/>
-    <?= BLocale::_("Zip") ?>: <input type="text" name="zip" value="<?=$this->address->zip?>"><br/>
+    <?= BLocale::_("Zip") ?>: <input type="text" name="postcode" value="<?=$this->address->postcode?>"><br/>
 
 
     <input type="checkbox" name="address_default_shipping" value="1"
