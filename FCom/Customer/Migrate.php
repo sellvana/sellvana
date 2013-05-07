@@ -7,6 +7,7 @@ class FCom_Customer_Migrate extends BClass
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
         BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -93,5 +94,15 @@ class FCom_Customer_Migrate extends BClass
                     ;
             ");
         } catch (Exception $e) {}
+    }
+    
+    public function upgrade_0_1_3()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'state' => 'RENAME region varchar(50)',
+                'zip' => 'RENAME postcode varchar(20)',
+            ),
+        ));
     }
 }
