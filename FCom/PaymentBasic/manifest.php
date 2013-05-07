@@ -6,10 +6,10 @@
             'root_dir' => '',
             'translations' => array('de' => 'de.php'),
             'description' => "Basic payment methods (check/money order, purchase order)",
-            'bootstrap' => array('file'=>'PaymentBasicFrontend.php', 'callback'=>'FCom_PaymentBasic_Frontend::bootstrap'),
+            'bootstrap' => array('file'=>'PaymentBasic.php', 'callback'=>'FCom_PaymentBasic::bootstrap'),
             'areas' => array(
                 'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'PaymentBasicFrontend.php', 'callback'=>'FCom_PaymentCBasic_Frontend::bootstrap'),
+                    'bootstrap' => array('file'=>'PaymentBasicFrontend.php', 'callback'=>'FCom_PaymentBasic_Frontend::bootstrap'),
                 ),
             ),
 

@@ -530,7 +530,8 @@ class BRequest extends BClass
         }
         $p = parse_url($ref);
         $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
-        if ($p['host']!==static::httpHost() || strpos($p['path'], static::webRoot())!==0) {
+        $webRoot = static::webRoot();
+        if ($p['host']!==static::httpHost() || $webRoot && strpos($p['path'], $webRoot)!==0) {
             return true; // referrer host or doc root path do not match, high prob. csrf
         }
         return false; // not csrf

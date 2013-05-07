@@ -1,6 +1,6 @@
 <?php
 
-class FCom_PaymentCheckMO_Frontend extends BClass
+class FCom_PaymentBasic extends BClass
 {
     static public function bootstrap()
     {
