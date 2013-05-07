@@ -31,7 +31,7 @@
             </nav>
                 <form class="site-search" action="<?=BApp::href('catalog/search')?>">
             	<fieldset>
-            		<input type="text" placeholder="Search entire store" name="q"/><button class="icon-button"><span>Search</span></button>
+            		<input type="text" placeholder="Search entire store" name="q" value="<?=$this->q(BRequest::i()->get('q'))?>"/><button class="icon-button"><span>Search</span></button>
             	</fieldset>
             </form>
 	    </div>

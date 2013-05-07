@@ -4,7 +4,7 @@
  * @project fulleron
  */
 $m = $this->model;
-$multiGroup = BModuleRegistry::isLoaded('FCom_CustomerGroups');
+$multiGroup = BModuleRegistry::i()->isLoaded('FCom_CustomerGroups');
 $tierCtrl = FCom_CustomerGroups_Admin_Controller_TierPrices::i();
 // todo: add tier prices table, when you do that, populate price from each existing product
 //
