@@ -197,7 +197,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
             }
             $conf = BConfig::i()->get('modules/FCom_Market/ftp');
-            $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
+            if (empty($conf['port'])) {
+                $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
+            }
             $ftpClient = new BFtpClient($conf);
             $errors = $ftpClient->ftpUpload($modulePath, $dlcPath);
             if ($errors) {
@@ -233,7 +235,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'info');
+        BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }
