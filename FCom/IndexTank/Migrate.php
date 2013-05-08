@@ -75,7 +75,7 @@ class FCom_IndexTank_Migrate extends BClass
         BDb::ddlAddColumns($pIndexingStatusTable, array(
             'status' => "enum('start','stop','pause') NOT NULL",
             'percent' => "BIGINT( 11 ) NOT NULL",
-            'indexed' => "IGINT( 11 ) NOT NULL",
+            'indexed' => "BIGINT( 11 ) NOT NULL",
         ));
 //        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
 //        ADD `status` enum('start','stop','pause') NOT NULL,
