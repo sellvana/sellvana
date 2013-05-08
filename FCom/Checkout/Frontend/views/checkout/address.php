@@ -46,14 +46,14 @@
 				    <?=$this->view('geo/embed')?>
 				    <script>
 				        head(function() {
-				        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->state?>'});
+				        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
 				        })
 				    </script>
-		    		<label for="#"><?= BLocale::_("State") ?></label>
-		    		<select class="geo-region required" name="state"  class="required">
+		    		<label for="#"><?= BLocale::_("Region") ?></label>
+		    		<select class="geo-region required" name="region"  class="required">
 				        <option value=""><?= BLocale::_("Select an option") ?></option>
 				    </select>
-				    <input type="text" class="geo-region" name="state"  class="required"/>
+				    <input type="text" class="geo-region" name="region"  class="required"/>
 		    	</td>
 		    </tr>
     		<tr>
@@ -64,8 +64,8 @@
 		    		</select>
 		    	</td>
 		    	<td>
-		    		<label for="#"><?= BLocale::_("Zip") ?></label>
-		    		<input type="text" name="zip" value="<?=$this->address->zip?>" class="required">
+		    		<label for="#"><?= BLocale::_("Zip / Postal Code") ?></label>
+		    		<input type="text" name="postcode" value="<?=$this->address->postcode?>" class="required">
 		    	</td>
 		    </tr>
 		</table>

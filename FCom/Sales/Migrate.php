@@ -13,6 +13,7 @@ class FCom_Sales_Migrate extends BClass
         BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
         BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
         BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
+        BMigrate::upgrade('0.1.9', '0.1.10', array($this, 'upgrade_0_1_10'));
     }
 
     public function install()
@@ -156,5 +157,16 @@ class FCom_Sales_Migrate extends BClass
             UPDATE  {$tOrder} SET `status_id` = 2 where status = 'pending';
             UPDATE  {$tOrder} SET `status_id` = 3 where status = 'paid';
         ");
+    }
+    
+    
+    public function upgrade_0_1_10()
+    {
+        BDb::ddlTableDef(FCom_Sales_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'state' => 'RENAME region varchar(50)',
+                'zip' => 'RENAME postcode varchar(20)',
+            ),
+        ));
     }
 }

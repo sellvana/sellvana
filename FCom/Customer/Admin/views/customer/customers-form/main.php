@@ -119,13 +119,13 @@ if(BModuleRegistry::i()->module("FCom_CustomerGroups")->runStatus(BNULL) == BMod
                     <span ng-hide="a.edit_mode" ng-bind="a.city"></span>
                 </span>,
                 <span class="region">
-                    <select ng-show="a.edit_mode && regions[a.country]" ng-options="name for (key,name) in regions[a.country]" ng-model="a.state"><option></option></select>
-                    <input ng-show="a.edit_mode && !regions[a.country]" type="text" ng-model="a.state" placeholder="Region/State"/>
-                    <span ng-hide="a.edit_mode" ng-bind="a.state"></span>
+                    <select ng-show="a.edit_mode && regions[a.country]" ng-options="name for (key,name) in regions[a.country]" ng-model="a.region"><option></option></select>
+                    <input ng-show="a.edit_mode && !regions[a.country]" type="text" ng-model="a.region" placeholder="Region/State"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.region"></span>
                 </span>
                 <span class="postal-code">
-                    <input type="text" ng-show="a.edit_mode" ng-model="a.zip" size="6" placeholder="Zip"/>
-                    <span ng-hide="a.edit_mode" ng-bind="a.zip"></span>
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.postcode" size="6" placeholder="Zip/Postal Code"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.postcode"></span>
                 </span>
                 <div class="country-name">
                     <select ng-show="a.edit_mode" ng-options="key as name for (key,name) in countries" ng-model="a.country"><option></option></select>

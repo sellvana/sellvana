@@ -157,12 +157,14 @@ class FCom_Market_MarketApi extends BClass
     {
         $config = BConfig::i()->get('modules/FCom_Market');
         $timestamp = time();
-        if (!empty($config['id']) && !empty($config['salt'])) {
-            $token = sha1($config['id'].$config['salt'].$timestamp);
+        $id = !empty($config['id']) ? $config['id'] : null;
+        $salt = !empty($config['salt']) ? $config['salt'] : null;
+        if ($id && $salt) {
+            $token = sha1($id.$salt.$timestamp);
         } else {
             $token = null;
         }
-        $str = 'id='.$config['id'].'&token='.$token.'&ts='.$timestamp;
+        $str = 'id='.$id.'&token='.$token.'&ts='.$timestamp;
         return $str;
     }
 

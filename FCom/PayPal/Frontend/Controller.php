@@ -22,8 +22,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
                 'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
                 'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
                 'PAYMENTREQUEST_0_SHIPTOCITY' => $shippingAddress->city,
-                'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->state,
-                'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->zip,
+                'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->region,
+                'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->postcode,
                 'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
                 'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
             );
@@ -108,8 +108,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
                     'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
                     'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
                     'PAYMENTREQUEST_0_SHIPTOCITY' => $shippingAddress->city,
-                    'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->state,
-                    'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->zip,
+                    'PAYMENTREQUEST_0_SHIPTOSTATE' => $shippingAddress->region,
+                    'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->postcode,
                     'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
                     'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
                 //'BUTTONSOURCE'  => '',

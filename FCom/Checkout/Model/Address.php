@@ -20,7 +20,7 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
             .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
             .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
             .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->state.'</span> '
+            .'<span class="region">'.$obj->region.'</span> '
             .'<span class="postal-code">'.$obj->postcode.'</span>'
             .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
             .'</div>';
@@ -58,8 +58,8 @@ class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
             'street2' => $userData['street2'],
             'street3' => $userData['street3'],
             'city' => $userData['city'],
-            'state' => $userData['state'],
-            'zip' => $userData['zip'],
+            'region' => $userData['region'],
+            'postcode' => $userData['postcode'],
             'country' => $userData['country'],
             'phone' => $userData['phone'],
             'fax' => $userData['fax'],

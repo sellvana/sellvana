@@ -21,7 +21,7 @@ class FCom_Sales_Model_Address extends FCom_Core_Model_Abstract
             .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
             .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
             .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->state.'</span> '
+            .'<span class="region">'.$obj->region.'</span> '
             .'<span class="postal-code">'.$obj->postcode.'</span>'
             .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
             .'</div>';
