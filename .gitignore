@@ -16,3 +16,4 @@ user/*
 FCom/MarketServer/
 index.local.php
 .idea
+__db.php
