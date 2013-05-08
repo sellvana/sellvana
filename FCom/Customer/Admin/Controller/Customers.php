@@ -19,8 +19,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'email' => array('label'=>'Email', 'index'=>'c.email'),
             'street1' => array('label'=>'Address', 'index'=>'a.street1'),
             'city' => array('label'=>'City', 'index'=>'a.city'),
-            'state' => array('label'=>'Region', 'index'=>'a.state'),
-            'zip' => array('label'=>'Postal Code', 'index'=>'a.zip'),
+            'region' => array('label'=>'Region', 'index'=>'a.region'),
+            'postcode' => array('label'=>'Postal Code', 'index'=>'a.postcode'),
             'country' => array('label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             'create_dt' => array('label'=>'Created', 'index'=>'c.create_dt', 'formatter'=>'date'),
             'update_dt' => array('label'=>'Updated', 'index'=>'c.update_dt', 'formatter'=>'date'),
@@ -34,7 +34,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         parent::gridOrmConfig($orm);
 
         $orm->left_outer_join('FCom_Customer_Model_Address', array('a.id','=','c.default_billing_id'), 'a')
-            ->select(array('a.street1', 'a.city', 'a.state', 'a.zip', 'a.country'))
+            ->select(array('a.street1', 'a.city', 'a.region', 'a.postcode', 'a.country'))
         ;
     }
 

@@ -11,10 +11,12 @@
 
 Options +FollowSymLinks -MultiViews
 
-#php_value output_buffering Off
-#php_value zlib.output_compression Off
+<IfModule mod_php.c>
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
 
-#php_value memory_limit 2G
+    php_value memory_limit 2G
+</IfModule>
 
 <IfModule mod_rewrite.c>
     SetEnv HTTP_MOD_REWRITE On

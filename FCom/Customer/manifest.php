@@ -2,7 +2,7 @@
     'modules' => array(
         // customer account and management
         'FCom_Customer' => array(
-            'version' => '0.1.2',
+            'version' => '0.1.3',
             'root_dir' => '',
             'depends' => array('FCom_Core', 'FCom_Geo'),
             'translations' => array('de' => 'de.php'),
