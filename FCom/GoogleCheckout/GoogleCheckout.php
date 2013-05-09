@@ -10,8 +10,17 @@ class FCom_GoogleCheckout extends BClass
      * Google Checkout config
      * @var array
      */
-    public $config;
-    public $sizes;
+    protected $config;
+
+    /**
+     * @var array
+     */
+    protected $sizes;
+
+    /**
+     * @var GoogleCart
+     */
+    protected $gCart;
 
     /**
      * @param bool  $new
@@ -36,14 +45,16 @@ class FCom_GoogleCheckout extends BClass
         return $url;
     }
 
-    public function getCartValueEncrypted()
+    public function getCartValueEncoded()
     {
-        return ''; //todo
+        $gCart = $this->prepareCart();
+        return base64_encode($gCart->GetXML());
     }
 
     public function getSignatureValueEncrypted()
     {
-        return ''; //todo
+        $gCart = $this->prepareCart();
+        return base64_encode($gCart->CalcHmacSha1($gCart->GetXML()));
     }
 
     public function getButtonSrc()
@@ -63,15 +74,21 @@ class FCom_GoogleCheckout extends BClass
         return $src;
     }
 
-    public function getButtonHeight($conf)
+    public function getButtonHeight($conf = null)
     {
+        if(null == $conf){
+            $conf = $this->getConfig();
+        }
         $this->parseButtonSize($conf);
         $size = $conf['button']['size'];
         return $this->sizes[$size]['h'];
     }
 
-    public function getButtonWidth($conf)
+    public function getButtonWidth($conf = null)
     {
+        if(null == $conf){
+            $conf = $this->getConfig();
+        }
         $this->parseButtonSize($conf);
         $size = $conf['button']['size'];
         return $this->sizes[$size]['w'];
@@ -141,5 +158,55 @@ class FCom_GoogleCheckout extends BClass
             'h' => $h
         );
         return $this;
+    }
+
+    /**
+     * @return GoogleCart|null
+     */
+    protected function prepareCart()
+    {
+        if (!$this->gCart) {
+            /* @var $cart FCom_Checkout_Model_Cart */
+            $cart = FCom_Checkout_Model_Cart::sessionCart();
+            /* @var $salesOrder FCom_Sales_Model_Order */
+            $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+            if (!$salesOrder) {
+                return null;
+            }
+
+            require_once "lib/googlecart.php";
+
+            $conf = $this->getConfig();
+            $mode = $this->getMode($conf);
+            $id   = $conf[$mode]['merchant_id'];
+            $key  = $conf[$mode]['merchant_key'];
+            // todo find used currency!!!
+            $gCart    = new GoogleCart($id, $key, $mode);
+            $cartHref = BApp::href('cart');
+            $gCart->SetEditCartUrl($cartHref);
+            $gCart->SetContinueShoppingUrl(BApp::href('/'));
+
+            $items = $salesOrder->items();
+
+            if (!empty($items)) {
+                require_once "lib/googleitem.php";
+                foreach ($items as $item) {
+                    // todo add $item to $gCart
+                }
+
+            }
+
+            $shippingMethods = $cart->getShippingMethods();
+
+            if (!empty($shippingMethods)) {
+                require_once "lib/googleshipping.php";
+                foreach ($shippingMethods as $shippingMethod) {
+                    // todo add shipping methods to gcart
+                }
+            }
+            $this->gCart = $gCart;
+        }
+
+        return $this->gCart;
     }
 }
