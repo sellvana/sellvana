@@ -2,6 +2,12 @@
 
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public function action_reindex()
+    {
+        FCom_CatalogIndex::i()->indexProducts(true);
+        FCom_CatalogIndex::i()->indexGC();
+    }
+    
     public function action_test()
     {
         BResponse::i()->startLongResponse();
