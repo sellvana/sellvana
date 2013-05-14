@@ -192,6 +192,8 @@ class FCom_GoogleCheckout extends BClass
                 require_once "lib/googleitem.php";
                 foreach ($items as $item) {
                     // todo add $item to $gCart
+                    // use merchant-private-item-data and merchant_item_id
+                    // to add stuff like product sku for example
                 }
 
             }
@@ -202,6 +204,13 @@ class FCom_GoogleCheckout extends BClass
                 require_once "lib/googleshipping.php";
                 foreach ($shippingMethods as $shippingMethod) {
                     // todo add shipping methods to gcart
+                    /*
+                     * Checkout API requests may not mix a merchant-calculated shipping option with either
+                     * flat-rate shipping or pickup shipping options.
+                     * However, you may offer more than one merchant-calculated shipping option. You may also offer
+                     * flat-rate and pickup shipping options together as long as they are not combined with
+                     * merchant-calculated shipping options.
+                     */
                 }
             }
             $this->gCart = $gCart;
