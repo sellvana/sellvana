@@ -105,6 +105,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 $catIds[$idPath[$i]] = $idPath[$i];
             }
         }
+print_r($catProds);
         // fetch ascendants category names
         $categories = FCom_Catalog_Model_Category::i()->orm('c')
             ->select(array('id', 'url_path', 'node_name'))

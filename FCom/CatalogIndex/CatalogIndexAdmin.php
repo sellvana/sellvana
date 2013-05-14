@@ -12,9 +12,15 @@ class FCom_CatalogIndex_Admin extends BClass
             ->route('GET /catalogindex/fields', 'FCom_CatalogIndex_Admin_Controller_Fields.index')
             ->route('GET|POST /catalogindex/fields/.action', 'FCom_CatalogIndex_Admin_Controller_Fields')
         ;
+        
         BLayout::i()
             ->addAllViews('Admin/views')
-            ->afterTheme('FCom_CatalogIndex_Admin::layout');
+            ->afterTheme('FCom_CatalogIndex_Admin::layout')
+        ;
+            
+        BPubSub::i()
+            ->on('FCom_Catalog_Model_Product::save.after', 'FCom_CatalogIndex_Admin::onProductSaveAfter')
+        ;
     }
     
     static public function layout()
@@ -42,5 +48,10 @@ class FCom_CatalogIndex_Admin extends BClass
                      )),
                  ),
                 ));
+    }
+    
+    static public function onProductSaveAfter($args)
+    {
+        
     }
 }
