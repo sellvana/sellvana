@@ -14,14 +14,45 @@ class FCom_Frontend_DefaultTheme extends BClass
     public function layout()
     {
         $cookieConfig = BConfig::i()->get('cookie');
+
+        BLayout::i()
+            ->addLayout(array(
+                'base'=>array(
+                    array('view', 'head', 'do'=>array(
+                        array('js_raw', 'js_init', array('content'=>"
+window.less={env:'development'};
+head(function() {
+    $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+    $('.select2').select2({width:'other values', minimumResultsForSearch:20});
+});
+FCom = {};
+FCom.base_href = '".BApp::baseUrl()."';
+")),
+                    )),
+                 ),
+             ));
+
+        FCom_Core::i()->loadLayout('layout.yml');
+        //BLayout::i()->addLayout(BYAML::i()->load(__DIR__.'/layout.yml'));
+/*
         BLayout::i()
             ->layout(array(
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
-                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('icon', BConfig::i()->get('web/base_src').'/favicon.ico'),
+                        array('js_raw', 'js_init', array('content'=>"
+window.less={env:'development'};
+head(function() {
+    $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+    $('.select2').select2({width:'other values', minimumResultsForSearch:20});
+});
+FCom = {};
+FCom.base_href = '".BApp::baseUrl()."';
+")),
+
+                        array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
                         array('js', '{FCom_Core}/js/lib/head.min.js'),
                         array('js', '{FCom_Core}/js/lib/es5-shim.min.js', array('if'=>'lt IE 9')),
                         array('css', '{FCom_Frontend}/css/boilerplate_pre.css'),
@@ -32,15 +63,7 @@ class FCom_Frontend_DefaultTheme extends BClass
                         array('css', 'pnotify', array('file'=>'{FCom_Core}/js/lib/css/jquery.pnotify.default.css')),
                         array('css', 'rating', array('file'=>'{FCom_Core}/js/lib/css/jquery.rating.css')),
                         array('css', 'lightbox', array('file'=>'{FCom_Core}/js/lib/css/lightbox/lightbox.css')),
-                        array('js_raw', 'js_init', array('content'=>"
-window.less={env:'development'};
-head(function() {
-    $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
-    $('.select2').select2({width:'other values', minimumResultsForSearch:20});
-});
-FCom = {};
-FCom.base_href = '".BApp::baseUrl()."';
-")),
+
                         //array('js', 'less', array('file'=>'{FCom_Core}/js/lib/less.min.js', 'separate'=>true)),
                         array('js', '{FCom_Core}/js/lib/jquery.min.js'),
                         //array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
@@ -53,7 +76,6 @@ FCom.base_href = '".BApp::baseUrl()."';
                         array('js', '{FCom_Core}/js/lib/lightbox/lightbox.js'),
                         array('css', '{FCom_Core}/js/select2/select2.css'),
                         array('js', '{FCom_Core}/js/select2/select2.min.js'),
-                        array('js', '{FCom_Core}/js/fcom.core.js'),
                         array('js', '{FCom_Core}/js/fcom.core.js'),
 
                     )),
@@ -78,5 +100,6 @@ FCom.base_href = '".BApp::baseUrl()."';
                 ),
             ));
         ;
+*/
     }
 }

@@ -395,6 +395,23 @@ class FCom_Core extends BClass
             return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
     }
+
+    static public function loadLayout($layoutFilename)
+    {
+        $ext = pathinfo($layoutFilename, PATHINFO_EXTENSION);
+        $mod = BModuleRegistry::i()->currentModule();
+        if ($mod) {
+            $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+        }
+        switch ($ext) {
+            case 'yml': case 'yaml': $layoutData = BYAML::load($layoutFilename); break;
+            case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
+            case 'php': $layoutData = include($layoutFilename); break;
+            default: throw new BException('Unknown layout file type');
+        }
+        BLayout::i()->addLayout($layoutData);
+        return true;
+    }
 }
 
 class FCom_Core_Controller_Abstract extends BActionController
