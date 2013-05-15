@@ -4,6 +4,7 @@
         'FCom_Core'=>array(
             'version' => '0.1.0',
             'root_dir' => 'Core',
+            'depends' => array('BYAML'),
             'bootstrap' => array('file'=>'Core.php', 'callback'=>'FCom_Core::bootstrap'),
             'run_level' => 'REQUIRED',
             'migrate' => 'FCom_Core_Migrate',
