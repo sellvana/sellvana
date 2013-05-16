@@ -5,7 +5,7 @@
 # Base layout, used in most pages
 base:
     - { root: root }
-    - { hook: head, views: [ head ] }
+    - { hook: head, views: head }
 
     - view: head
         do:
