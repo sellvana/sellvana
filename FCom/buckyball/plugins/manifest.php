@@ -15,6 +15,11 @@
             "bootstrap" => array("file" =>"BTwig.php", "callback" =>"BTwig::bootstrap"),
             "version" => "1.12.4",
         ),
+        "BreCaptcha" => array(
+            "root_dir" => "BreCaptcha",
+            "bootstrap" => array("file" =>"BreCaptcha.php", "callback" =>"BreCaptcha::bootstrap"),
+            "version" => "1.0",
+        ),
         "BYAML" => array(
             "root_dir" => "BYAML",
             "bootstrap" => array("file" =>"BYAML.php", "callback" =>"BYAML::bootstrap"),

@@ -1379,7 +1379,7 @@ class BFrontController extends BClass
      */
     public function get($route, $callback = null, $args = null, $name = null, $multiple = true)
     {
-        return $this->route($route, 'get', $callback, $args, $name, $multiple);
+        return $this->_route($route, 'get', $callback, $args, $name, $multiple);
     }
 
     /**
@@ -1638,6 +1638,9 @@ class BRouteNode
             return;
         }
         $a = explode(' ', $this->route_name);
+        if (sizeof($a)<2) {
+            throw new BException('Invalid route format: '.$this->route_name);
+        }
         if ($a[1]==='/') {
             $this->regex = '#^('.$a[0].') (/)$#';
         } else {

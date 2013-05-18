@@ -71,7 +71,7 @@ class BTwig extends BClass
         $source = $view->param('source');
         $args = $view->getAllArgs();
         //TODO: add BRequest and BLayout vars?
-        $args['view'] = $view;
+        $args['THIS'] = $view;
 
         if (!$source) {
 
