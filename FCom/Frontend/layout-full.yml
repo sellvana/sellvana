@@ -1,4 +1,33 @@
-# Sample reference full theme layout file
+## Sample reference full theme layout file
+## Lines starting with # are comments
+
+## Reference:
+#
+# /layout/key:                                                      # Layout key, starts with slash for controller actions (urls)
+#
+#     - { root: root/template }                                     # Specify root template name
+#
+#     - { layout: base }                                            # Apply another layout key, in this case special "base"
+#
+#     - { hook: head, views: head }                                 # Add view "head" to hook "head"
+#
+#     - { hook: main, views: [ some/view1, another/view2 ] }        # Can add multiple views in to the same hook
+#
+#     - { view: some/view, set: { some_var: value, foo: bar } }     # Set variables on view "some/view"
+#
+#     - { view: some/view, do: [[ method_name, arg1, arg2 ]] }      # Invoke view class method, can combine with `set`
+#
+#     - view: head                                                  # Format for multi-line instructions
+#       do:
+#           - [ css, @Module_Name/path/to/file.css ]                # Add CSS file to head
+#           - [ js, @Module_Name/js/file.js, { if: lt IE 9 } ]      # Add JS file, use options to specify condition
+#           - [ icon, @Module_Name/favicon.ico ]                    # Set favicon
+#           - [ meta, Meta-Name, Meta-Value ]                       # Set meta tag in head
+#           - [ title, Page title ]                                 # Add section to page title
+#           - [ canonical, URL ]                                    # Set canonical URL
+#           - [ rss, RSS_URL.rss ]                                  # Set related RSS URL
+#           - [ less, @Module_Name/stylesheet.less ]                # LESS
+
 
 ################# FCom_Frontend:
 
