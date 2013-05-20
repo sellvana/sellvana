@@ -1238,6 +1238,14 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         }
         $schemaVersion = $mod['schema_version'];
 
+        // if module is not enable skip upgrade
+        if (!BModuleRegistry::i()->isLoaded($mod['module_name'])) {
+            return true;
+        }
+        // if code version is older than target scheme version, skip
+        if (version_compare($mod['code_version'], $toVersion, '<')) {
+            return true;
+        }
         // if schema is newer than requested FROM version, skip
         if (version_compare($schemaVersion, $fromVersion, '>')) {
             return true;
