@@ -241,7 +241,7 @@ class BLayout extends BClass
                 $this->addView($prefix . $m[2], array('template' => $file) + static::$_extRenderers[$m[3]]);
             }
         }
-        
+
         BPubSub::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
 
         return $this;
@@ -1334,13 +1334,31 @@ class BView extends BClass
             $this->addAttachment($files, $headers, $body);
         }
 
-        BPubSub::i()->fire("BView::email", array('email_data' => array(
+        $eventData = array(
             'to' => $to,
             'subject' => $subject,
             'body' => trim($body),
             'headers' => $headers,
             'params' => $params,
-        )));
+        );
+
+        try {
+            $flags = BPubSub::i()->fire("BView::email.before", array('email_data' => $eventData));
+            if ($flags===false) {
+                return false;
+            } elseif (is_array($flags)) {
+                foreach ($flags as $f) {
+                    if ($f===false) {
+                        return false;
+                    }
+                }
+            }
+        } catch (BException $e) {
+            BDebug::warning($e->getMessage());
+            return false;
+        }
+
+        BPubSub::i()->fire("BView::email", array('email_data' => $eventData));
 
         return mail($to, $subject, trim($body), join("\r\n", $headers), join(' ', $params));
     }
@@ -1578,6 +1596,13 @@ class BViewHead extends BView
         } else {
             BDebug::error('Invalid method: ' . $name);
         }
+    }
+
+    public function removeAll()
+    {
+        $this->_elements = array();
+        $this->_headJs = array();
+        return $this;
     }
 
     /**
