@@ -326,13 +326,16 @@ class FCom_Core extends BClass
         return $this;
     }
 
-    public function resizeUrl()
+    public function resizeUrl($full=false)
     {
-        static $url;
-        if (!$url) {
-            $url = rtrim(BConfig::i()->get('web/base_href'), '/').'/resize.php';
+        static $url = array();
+        if (empty($url[$full])) {
+            $url[$full] = rtrim(BConfig::i()->get('web/base_href'), '/').'/resize.php';
+            if ($full) {
+                $url[$full] = '//'.BRequest::i()->httpHost().$url[$full];
+            }
         }
-        return $url;
+        return $url[$full];
     }
 
     public function thumbSrc($module, $path, $size)
