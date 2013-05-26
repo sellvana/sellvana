@@ -32,6 +32,7 @@ require $comDir.'core.php';
 require $comDir.'lib/idiorm.php';
 require $comDir.'lib/paris.php';
 require $comDir.'db.php';
+require $comDir.'cache.php';
 require $comDir.'module.php';
 require $comDir.'controller.php';
 require $comDir.'layout.php';
@@ -47,7 +48,7 @@ require $comDir.'import.php';
 
 if (getopt('c')) {
     $minified = array();
-    foreach (array('core','lib/idiorm','lib/paris','db','module','controller','layout','misc') as $f) {
+    foreach (array('core','lib/idiorm','lib/paris','db','cache','module','controller','layout','misc') as $f) {
         list(, $minified[]) = explode(' ', php_strip_whitespace($comDir.$f.'.php'), 2);
     }
     file_put_contents('buckyball.min.php', '<?php '.join(' ', $minified));
