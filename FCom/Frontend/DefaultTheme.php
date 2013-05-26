@@ -32,7 +32,7 @@ FCom.base_href = '".BApp::baseUrl()."';
                  ),
              ));
 
-        FCom_Core::i()->loadLayout('layout.yml');
+        FCom_Core::i()->loadLayout(__DIR__.'/layout.yml');
         //BLayout::i()->addLayout(BYAML::i()->load(__DIR__.'/layout.yml'));
 /*
         BLayout::i()

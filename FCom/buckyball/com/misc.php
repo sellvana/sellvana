@@ -2142,6 +2142,8 @@ class BLocale extends BClass
     /**
     * Import translations to the tree
     *
+    * @todo make more flexible with file location
+    * @todo YAML
     * @param mixed $data array or file name string
     */
     public static function importTranslations($data, $params=array())

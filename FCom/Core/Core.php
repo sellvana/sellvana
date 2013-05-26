@@ -409,12 +409,15 @@ class FCom_Core extends BClass
     static public function loadLayout($layoutFilename)
     {
         $ext = pathinfo($layoutFilename, PATHINFO_EXTENSION);
-        $mod = BModuleRegistry::i()->currentModule();
-        if ($mod) {
-            $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+        if (!BUtil::isPathAbsolute($layoutFilename)) {
+            $mod = BModuleRegistry::i()->currentModule();
+            if ($mod) {
+                $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+            }
         }
+        BDebug::debug('LAYOUT.LOAD: '.$layoutFilename);
         switch ($ext) {
-            case 'yml': case 'yaml': $layoutData = BYAML::load($layoutFilename); break;
+            case 'yml': case 'yaml': $layoutData = BYAML::i()->load($layoutFilename); break;
             case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
             case 'php': $layoutData = include($layoutFilename); break;
             default: throw new BException('Unknown layout file type');
