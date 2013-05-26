@@ -47,7 +47,7 @@ class FCom_Customer_Frontend extends BClass
 
     public static function layout()
     {
-        BLayout::i()->layout(array(
+        BLayout::i()->addLayout(array(
             '/customer/login'=>array(
                 array('layout', 'base'),
                 array('hook', 'main', 'views'=>array('customer/login')),

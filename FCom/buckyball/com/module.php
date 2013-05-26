@@ -528,6 +528,7 @@ class BModuleRegistry extends BClass
     /**
     * Run modules bootstrap callbacks
     *
+    * @todo enable loading in runtime
     * @return BModuleRegistry
     */
     public function bootstrap()
