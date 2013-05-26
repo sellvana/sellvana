@@ -87,16 +87,16 @@ class FCom_Core extends BClass
             $config->set('fs/image_folder', 'media/product/image');
         }
 
-        $storageDir = $config->get('fs/storage_dir');
-        if (!$storageDir) {
-            $storageDir = $rootDir.'/storage';
-            $config->set('fs/storage_dir', $storageDir);
-        }
-
         $dlcDir = $config->get('fs/dlc_dir');
         if (!$dlcDir) {
             $dlcDir = $rootDir.'/dlc';
             $config->set('fs/dlc_dir', $dlcDir);
+        }
+
+        $storageDir = $config->get('fs/storage_dir');
+        if (!$storageDir) {
+            $storageDir = $rootDir.'/storage';
+            $config->set('fs/storage_dir', $storageDir);
         }
 
         // local configuration (db, enabled modules)
@@ -104,6 +104,13 @@ class FCom_Core extends BClass
         if (!$configDir) {
             $configDir = $storageDir.'/config';
             $config->set('fs/config_dir', $configDir);
+        }
+
+        // for the rest of var dirs use writable tmp if storage is not writable
+        // MD5 used to keep separate storage for each fulleron instance
+        if (!is_writable($storageDir)) {
+            $storageDir = sys_get_temp_dir().'/fulleron/'.md5(__DIR__);
+            $config->set('fs/storage_dir', $storageDir);
         }
 
         // cache files

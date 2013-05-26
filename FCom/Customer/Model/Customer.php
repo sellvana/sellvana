@@ -131,11 +131,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function authenticate($username, $password)
     {
+        BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
+            BLoginThrottle::i()->failure();
             return false;
         }
+        BLoginThrottle::i()->success();
         return $user;
     }
 

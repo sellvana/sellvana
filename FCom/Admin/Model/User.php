@@ -49,6 +49,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
+        if ($this->api_password) {
+            $this->api_password_hash = BUtil::fullSaltedHash($this->api_password);
+        }
         if (!$this->role_id) {
             $this->role_id = null;
         }
@@ -60,12 +63,13 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $data = $this->as_array();
         unset($data['password_hash']);
+        unset($data['api_password_hash']);
         return $data;
     }
 
-    public function validatePassword($password)
+    public function validatePassword($password, $field='password_hash')
     {
-        return BUtil::validateSaltedHash($password, $this->password_hash);
+        return BUtil::validateSaltedHash($password, $this->$field);
     }
 
     public static function has_role($orm, $role)
@@ -111,15 +115,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     static public function authenticate($username, $password)
     {
-        /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where(array('OR'=>array(
-                'username'=>$username,
-                'email'=>$username)))
-            ->find_one();
-        if (!$user || !$user->validatePassword($password)) {
+        if (empty($username) || empty($password)) {
             return false;
         }
+        BLoginThrottle::i()->init('FCom_Admin_Model_User', $username);
+        /** @var FCom_Admin_Model_User */
+        $user = static::i()->orm()->where(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
+        if (!$user || !$user->validatePassword($password)) {
+            BLoginThrottle::i()->failure();
+            return false;
+        }
+        BLoginThrottle::i()->success();
         return $user;
     }
 
@@ -128,14 +134,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
+        BLoginThrottle::i()->init('FCom_Admin', $username);
         /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where('api_username', $username)
-            ->where('api_password', $password)
-            ->find_one();
-        if (!$user) {
+        $user = static::i()->orm()->where('api_username', $username)->find_one();
+        if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
+            BLoginThrottle::i()->failure();
             return false;
         }
+        BLoginThrottle::i()->success();
         return $user;
     }
 

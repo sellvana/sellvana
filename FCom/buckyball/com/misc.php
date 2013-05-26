@@ -1205,6 +1205,38 @@ class BUtil extends BClass
     {
         return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
     }
+
+    /**
+    * Remove directory recursively
+    *
+    * DANGEROUS, I'm afraid to enable it
+    *
+    * @param string $dir
+    */
+    /*
+    static public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first=true)
+    {
+        if ($first) {
+            $dir = realpath($dir);
+        }
+        if (!file_exists($dir)) {
+            return true;
+        }
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            if (!static::rmdirRecursive($dir . "/" . $item, false)) {
+                chmod($dir . "/" . $item, 0777);
+                if (!static::rmdirRecursive($dir . "/" . $item, false)) return false;
+            }
+        }
+        return rmdir($dir);
+    }
+    */
 }
 
 /**
@@ -2582,6 +2614,139 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+class BLoginThrottle extends BClass
+{
+    protected $_all;
+    protected $_area;
+    protected $_username;
+    protected $_rec;
+    protected $_config;
+    protected $_blockedIPs = array();
+    protected $_cachePrefix = 'BLoginThrottle/';
+
+    /**
+    * Shortcut to help with IDE autocompletion
+    *
+    * @return BLoginThrottle
+    */
+    public static function i($new=false, array $args=array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
+    public function __construct()
+    {
+        $c = BConfig::i()->get('modules/BLoginThrottle');
+
+        if (empty($c['sleep_sec'])) $c['sleep_sec'] = 2; // lock record for 2 secs after failed login
+        if (empty($c['brute_attempts_max'])) $c['brute_attempts_max'] = 3; // after 3 fast attempts do something
+        if (empty($c['reset_time'])) $c['reset_time'] = 10; // after 10 secs reset record
+
+        $this->_config = $c;
+    }
+
+    public function config($config)
+    {
+        $this->_config = BUtil::arrayMerge($this->_config, $config);
+    }
+
+    public function init($area, $username)
+    {
+        $now = time();
+        $c = $this->_config;
+
+        $this->_area = $area;
+        $this->_username = $username;
+        $this->_rec = $this->_load();
+
+        if ($this->_rec) {
+            if ($this->_rec['status'] === 'FAILED') {
+                if (empty($this->_rec['brute_attempts_cnt'])) {
+                    $this->_rec['brute_attempts_cnt'] = 1;
+                } else {
+                    $this->_rec['brute_attempts_cnt']++;
+                }
+                $this->_save();
+                $this->_fire('init.brute');
+                if ($this->_rec['brute_attempts_cnt'] == $c['brute_attempts_max']) {
+                    $this->_fire('init.brute_max');
+                }
+                return false; // currently locked
+            }
+        }
+        return true; // init OK
+    }
+
+    public function success()
+    {
+        $this->_fire('success');
+        $this->_reset();
+        return true;
+    }
+
+    public function failure()
+    {
+        $username = $this->_username;
+        $now = time();
+        $c = $this->_config;
+
+        $this->_fire('fail.before');
+
+        if (empty($this->_rec['attempt_cnt'])) {
+            $this->_rec['attempt_cnt'] = 1;
+        } else {
+            $this->_rec['attempt_cnt']++;
+        }
+        $this->_rec['last_attempt'] = $now;
+        $this->_rec['status'] = 'FAILED';
+        $this->_save();
+        $this->_fire('fail.wait');
+
+        $this->_gc();
+        sleep($c['sleep_sec']);
+
+        $this->_rec['status'] = '';
+        $this->_save();
+        $this->_fire('fail.after');
+
+        return true; // normal response
+    }
+
+    protected function _fire($event)
+    {
+        BPubSub::i()->fire('BLoginThrottle::'.$event, array(
+            'area'     => $this->_area,
+            'username' => $this->_username,
+            'rec'      => $this->_rec,
+            'config'   => $this->_config,
+        ));
+    }
+
+    protected function _load()
+    {
+        $key = $this->_area.'/'.$this->_username;
+        return BCache::i()->load($this->_cachePrefix.$key);
+    }
+
+    protected function _save()
+    {
+        $key = $this->_area.'/'.$this->_username;
+        return BCache::i()->save($this->_cachePrefix.$key, $this->_rec, $this->_config['reset_time']);
+    }
+
+    protected function _reset()
+    {
+        $key = $this->_area.'/'.$this->_username;
+        return BCache::i()->delete($key);
+    }
+
+    protected function _gc()
+    {
+
+        return true;
     }
 }
 

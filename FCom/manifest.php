@@ -45,7 +45,7 @@
         ),
         // administration panel views and controllers
         'FCom_Admin' => array(
-            'version' => '0.1.3',
+            'version' => '0.1.4',
             'root_dir' => 'Admin',
             'bootstrap' => array('file'=>'Admin.php', 'callback'=>'FCom_Admin::bootstrap'),
             'depends' => array('FCom_Core', 'FCom_Admin_DefaultTheme'),
