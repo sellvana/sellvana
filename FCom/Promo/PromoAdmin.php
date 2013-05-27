@@ -4,7 +4,7 @@ class FCom_Promo_Admin extends BClass
 {
     static public function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
 
             ->route('GET /promo/vendors/autocomplete', 'Denteva_Admin_Controller_Vendors.autocomplete')
 

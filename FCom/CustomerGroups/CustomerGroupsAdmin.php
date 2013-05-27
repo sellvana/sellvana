@@ -13,7 +13,7 @@ class FCom_CustomerGroups_Admin
             ->addAllViews('Admin/views')
             ->afterTheme(array(__CLASS__, 'layout'));
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /customer-groups', 'FCom_CustomerGroups_Admin_Controller_CustomerGroups.index') // list groups
             ->route('GET|POST /customer-groups/.action', 'FCom_CustomerGroups_Admin_Controller_CustomerGroups') // add, edit groups
             ->route('GET|POST /tier-prices/.action', 'FCom_CustomerGroups_Admin_Controller_TierPrices'); // add, edit TP

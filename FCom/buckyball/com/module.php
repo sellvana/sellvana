@@ -616,10 +616,10 @@ echo "</pre>"; exit;
 /*
     public function onBeforeDispatch()
     {
-        $front = BFrontController::i();
+        $routing = BRouting::i();
         foreach (static::$_modules as $module) {
             if ($module->run_status===BModule::LOADED && ($prefix = $module->url_prefix)) {
-                $front->redirect('GET /'.$prefix, $prefix.'/');
+                $routing->redirect('GET /'.$prefix, $prefix.'/');
             }
         }
     }

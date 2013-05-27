@@ -4,7 +4,7 @@ class FCom_Cms_Admin extends BClass
 {
     public static function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /cms/nav', 'FCom_Cms_Admin_Controller_Nav.index')
             ->route('GET|POST /cms/nav/.action', 'FCom_Cms_Admin_Controller_Nav')
 

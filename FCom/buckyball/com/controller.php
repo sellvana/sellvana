@@ -1234,7 +1234,7 @@ class BResponse extends BClass
 /**
 * Front controller class to register and dispatch routes
 */
-class BFrontController extends BClass
+class BRouting extends BClass
 {
     /**
     * Array of routes
@@ -1276,7 +1276,7 @@ class BFrontController extends BClass
     /**
     * Shortcut to help with IDE autocompletion
     *
-    * @return BFrontController
+    * @return BRouting
     */
     public static function i($new=false, array $args=array())
     {
@@ -1602,6 +1602,13 @@ class BFrontController extends BClass
         echo "<pre>"; print_r($this->_routes); echo "</pre>";
     }
 }
+
+/**
+* Alias for BRouting for older implementations
+*
+* @deprecated by BRouting
+*/
+class BFrontController extends BRouting {}
 
 /**
 * Controller Route Node

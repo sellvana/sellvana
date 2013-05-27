@@ -28,7 +28,7 @@ class FCom_Admin extends BClass
 
     public function bootstrapUI()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route('_ /noroute', 'FCom_Admin_Controller.noroute', array(), null, false)
             ->route('GET /', 'FCom_Admin_Controller.index')
             ->route('GET /blank', 'FCom_Admin_Controller.blank')

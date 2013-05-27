@@ -9,7 +9,7 @@ class FCom_ProductReviews_Admin extends BClass
             ->on('BLayout::hook.catalog/products/tab/main', 'FCom_ProductReviews_Admin.hookProductTab')
         ;
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /prodreviews', 'FCom_ProductReviews_Admin_Controller.index')
             ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Admin_Controller')
         ;

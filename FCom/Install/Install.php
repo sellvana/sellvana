@@ -4,7 +4,7 @@ class FCom_Install extends BClass
 {
     public static function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route( 'GET /', 'FCom_Install_Controller.index')
             ->route( 'GET /install', 'FCom_Install_Controller.index')
             ->route( 'GET /install/.action', 'FCom_Install_Controller')

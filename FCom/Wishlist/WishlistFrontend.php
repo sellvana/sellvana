@@ -4,7 +4,7 @@ class FCom_Wishlist_Frontend extends BClass
 {
     public static function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route( 'GET /wishlist', 'FCom_Wishlist_Frontend_Controller.wishlist')
             ->route( 'POST /wishlist', 'FCom_Wishlist_Frontend_Controller.wishlist_post');
 

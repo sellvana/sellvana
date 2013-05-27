@@ -7,7 +7,7 @@ class FCom_Translation_Admin extends BClass
         BLayout::i()->addAllViews('Admin/views');
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Translation_Admin::layout');
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /translations', 'FCom_Translation_Admin_Controller.index')
             ->route('GET|POST /translations/.action', 'FCom_Translation_Admin_Controller')
         ;

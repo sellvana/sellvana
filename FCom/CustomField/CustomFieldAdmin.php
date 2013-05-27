@@ -7,7 +7,7 @@ class FCom_CustomField_Admin extends BClass
         FCom_CustomField_Common::bootstrap();
 
         $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets';
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /customfields/fieldsets', $ctrl.'.index')
             ->route('GET|POST /customfields/fieldsets/.action', $ctrl)
 
