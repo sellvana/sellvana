@@ -17,7 +17,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
                 } else {
                     $regex = str_replace('*', '.*', str_replace('.', '\\.', strtolower($pattern)));
                 }
-                $map[$regex] = $site->id;
+                $map[$regex] = $site->as_array();
             }
         }
         BCache::i()->save(static::$_mapCacheKey, $map);
@@ -41,24 +41,18 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         $domain = strtolower($domain);
         $map = static::i()->getDomainMap();
         $site = null;
-        foreach ($map as $pattern=>$siteId) {
+        foreach ($map as $pattern=>$siteData) {
             if (preg_match('#'.$pattern.'#', $domain)) {
-                $site = static::i()->load($siteId);
+                $site = $siteData;
                 break;
             }
         }
-        return $site;
+        return $siteData;
     }
 
     public function afterSave()
     {
         parent::afterSave();
         static::i()->createDomainMap();
-    }
-
-    public function updateEnvironment()
-    {
-        //TODO: implement relevant updates to the environment based on the current site
-        return $this;
     }
 }
