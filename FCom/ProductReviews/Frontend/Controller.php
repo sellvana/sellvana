@@ -80,7 +80,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $rid = BRequest::i()->get('rid');
         if (empty($rid)) {
-            $this->forward(true);
+            $this->forward(false);
             return;
         }
         $review = FCom_ProductReviews_Model_Reviews::i()->load($rid);

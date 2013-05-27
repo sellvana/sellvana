@@ -1357,7 +1357,6 @@ class BRouting extends BClass
             }
             return $this;
         }
-
         if (empty($args['module_name'])) {
             $args['module_name'] = BModuleRegistry::currentModuleName();
         }
@@ -1452,25 +1451,23 @@ class BRouting extends BClass
             }
             return $this;
         }
-        switch (strtolower($verb)) {
-            case 'get':
-                if (stripos($route, 'get ') !== 0) {
-                    $route = sprintf("GET %s", $route);
-                }
-                break;
-            case 'post':
-                if (stripos($route, 'post ') !== 0) {
-                    $route = sprintf("POST %s", $route);
-                }
-                break;
-            case 'put':
-                if (stripos($route, 'put ') !== 0) {
-                    $route = sprintf("PUT %s", $route);
-                }
-                break;
-            default :
-                $route = sprintf("GET|POST|DELETE|PUT|HEAD %s", $route);
-                break;
+        $verb = strtoupper($verb);
+        $isRegex = false;
+        if ($route[0]==='^') {
+            $isRegex = true;
+            $route = substr($route, 1);
+        }
+        if ($verb==='GET' || $verb==='POST' || $verb==='PUT') {
+            $route = $verb.' '.$route;
+        } else {
+            if ($isRegex) {
+                $route = '(GET|POST|DELETE|PUT|HEAD) '.$route;
+            } else {
+                $route = 'GET|POST|DELETE|PUT|HEAD '.$route;
+            }
+        }
+        if ($isRegex) {
+            $route = '^'.$route;
         }
 
         return $this->route($route, $callback, $args, $name, $multiple);
@@ -1512,13 +1509,15 @@ class BRouting extends BClass
             $b1 = $b->num_parts;
             $res = $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
             if ($res != 0) {
+#echo ' ** ('.$a->route_name.'):('.$b->route_name.'): '.$res.' ** <br>';
                 return $res;
             }
-
-            $ap = (strpos($a->route_name, '*') ? 10 : 0)+(strpos($a->route_name, '.') ? 5 : 0)+(strpos($a->route_name, ':') ? 1 : 0);
-            $bp = (strpos($b->route_name, '*') ? 10 : 0)+(strpos($b->route_name, '.') ? 5 : 0)+(strpos($b->route_name, ':') ? 1 : 0);
+            $ap = (strpos($a->route_name, '/*') ? 10 : 0)+(strpos($a->route_name, '/.') ? 5 : 0)+(strpos($a->route_name, '/:') ? 1 : 0);
+            $bp = (strpos($b->route_name, '/*') ? 10 : 0)+(strpos($b->route_name, '/.') ? 5 : 0)+(strpos($b->route_name, '/:') ? 1 : 0);
+#echo $a->route_name.' ('.$ap.'), '.$b->route_name.'('.$bp.')<br>';
             return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
+#echo "<pre>"; print_r($this->_routes); echo "</pre>";
         return $this;
     }
 
@@ -1573,16 +1572,17 @@ class BRouting extends BClass
         $this->processRoutes();
 
         $attempts = 0;
-        $forward = true; // null: no forward, true: try next route, array: forward without new route
+        $forward = false; // null: no forward, false: try next route, array: forward without new route
 #echo "<pre>"; print_r($this->_routes); exit;
-        while (($attempts++<100) && $forward) {
+        while (($attempts++<100) && (false===$forward || is_array($forward))) {
             $route = $this->findRoute($requestRoute);
+#echo "<pre>"; print_r($route); echo "</pre>";
             if (!$route) {
                 $route = $this->findRoute('_ /noroute');
             }
             $this->_currentRoute = $route;
             $forward = $route->dispatch();
-#var_dump($route); exit;
+#var_dump($forward); exit;
             if (is_array($forward)) {
                 list($actionName, $forwardCtrlName, $params) = $forward;
                 $controllerName = $forwardCtrlName ? $forwardCtrlName : $route->controller_name;
@@ -1782,17 +1782,17 @@ class BRouteNode
             $forward = $observer->dispatch();
             if (is_array($forward)) {
                 return $forward;
-            } elseif ($forward===true) {
+            } elseif ($forward===false) {
                 $observer->skip = true;
                 $observer = $this->validObserver();
             } else {
-                return false;
+                return null;
             }
         }
         if ($attempts>=100) {
             BDebug::error(BLocale::_('BRouteNode: Reached 100 route iterations: %s', print_r($observer,1)));
         }
-        return true;
+        return false;
     }
 
     public function __destruct()
@@ -1944,11 +1944,11 @@ class BActionController extends BClass
         $this->_forward = null;
 
         if (!$this->beforeDispatch($args)) {
-            return true;
-        } elseif ($this->_forward) {
+            return false;
+        }
+        if (!is_null($this->_forward)) {
             return $this->_forward;
         }
-
         $authenticated = $this->authenticate($args);
         if (!$authenticated && $actionName!=='unauthenticated') {
             $this->forward('unauthenticated');
@@ -1962,7 +1962,7 @@ class BActionController extends BClass
 
         $this->tryDispatch($actionName, $args);
 
-        if (!$this->_forward) {
+        if (is_null($this->_forward)) {
             $this->afterDispatch($args);
         }
         return $this->_forward;
@@ -1994,7 +1994,7 @@ class BActionController extends BClass
         }
         //echo $actionMethod;exit;
         if (!method_exists($this, $actionMethod)) {
-            $this->forward(true);
+            $this->forward(false);
             return $this;
         }
         try {
@@ -2016,8 +2016,8 @@ class BActionController extends BClass
     */
     public function forward($actionName=null, $controllerName=null, array $params=array())
     {
-        if (true===$actionName) {
-            $this->_forward = true;
+        if (false===$actionName) {
+            $this->_forward = false;
         } else {
             $this->_forward = array($actionName, $controllerName, $params);
         }
@@ -2140,7 +2140,7 @@ class BActionController extends BClass
             $page = $defaultView;
         }
         if (!$page || !($view = $this->view($viewPrefix.$page))) {
-            $this->forward(true);
+            $this->forward(false);
             return false;
         }
         BLayout::i()->applyLayout('view-proxy')->applyLayout($viewPrefix.$page);
