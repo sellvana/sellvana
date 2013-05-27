@@ -8,7 +8,7 @@ class FCom_Customer_Frontend extends BClass
             ->on('BLayout::theme.load.after', 'FCom_Customer_Frontend::layout')
         ;
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /login', 'FCom_Customer_Frontend_Controller.login')
             ->route('POST /login', 'FCom_Customer_Frontend_Controller.login__POST')
             ->route('GET|POST /customer/register', 'FCom_Customer_Frontend_Controller.register')

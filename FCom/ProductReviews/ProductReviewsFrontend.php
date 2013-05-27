@@ -9,7 +9,7 @@ class FCom_ProductReviews_Frontend extends BClass
             ->on('BLayout::hook.prodreviews-reviews', 'FCom_ProductReviews_Frontend.hookReviews')
         ;
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
             ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
         ;

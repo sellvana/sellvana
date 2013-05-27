@@ -5,7 +5,7 @@ class FCom_Api extends BClass
     public static function bootstrap()
     {
         /*
-        BFrontController::i()
+        BRouting::i()
             ->route('GET|POST|PUT|DELETE /v1/customers/.action', 'FCom_Customer_Api_Controller_Rest')
         ;
         */

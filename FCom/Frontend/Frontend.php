@@ -20,7 +20,7 @@ class FCom_Frontend extends BClass
 
     public function bootstrapUI()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route('_ /noroute', 'FCom_Frontend_Controller.noroute', array(), null, false)
             ->route('GET /', 'FCom_Frontend_Controller.index')
         ;

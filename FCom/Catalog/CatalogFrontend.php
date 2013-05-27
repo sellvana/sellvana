@@ -4,7 +4,7 @@ class FCom_Catalog_Frontend extends BClass
 {
     static public function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
                 //search
             ->route( 'GET /*category', 'FCom_Catalog_Frontend_Controller_Search.category')
             ->route( 'GET /catalog/search', 'FCom_Catalog_Frontend_Controller_Search.search')

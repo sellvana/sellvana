@@ -12,7 +12,7 @@ class FCom_Promo_Frontend extends BClass
             ->on('BLayout::hook.promotions', 'FCom_Promo_Frontend_Controller.hook_promotions')
         ;
 
-        BFrontController::i()
+        BRouting::i()
             ->route( 'GET /promo/media', 'FCom_Promo_Frontend_Controller.media')
         ;
 

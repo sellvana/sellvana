@@ -7,7 +7,7 @@ class FCom_Catalog_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
             ->route('GET|POST /catalog/categories/.action', 'FCom_Catalog_Admin_Controller_Categories')
 

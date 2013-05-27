@@ -10,7 +10,7 @@ class FCom_IndexTank_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
             ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
 

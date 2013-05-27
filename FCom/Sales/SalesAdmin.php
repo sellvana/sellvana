@@ -4,7 +4,7 @@ class FCom_Sales_Admin extends BClass
 {
     public static function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /orders', 'FCom_Sales_Admin_Controller_Orders.index')
             ->route('GET|POST /orders/.action', 'FCom_Sales_Admin_Controller_Orders')
 

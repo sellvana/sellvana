@@ -6,7 +6,7 @@ class FCom_Cron extends BClass
 
     static public function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /', 'FCom_Cron_Controller.run')
             ->route('GET /*task', 'FCom_Cron_Controller.run')
         ;

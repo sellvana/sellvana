@@ -10,7 +10,7 @@ class FCom_Market_Admin extends BClass
                 ->on('BLayout::hook.hook_modules_notification', 'FCom_Market_Admin.hookFindModulesForUpdates')
                 ;
 
-        BFrontController::i()
+        BRouting::i()
             ->route('GET /market', 'FCom_Market_Admin_Controller.index')
             ->route('GET|POST /market/.action', 'FCom_Market_Admin_Controller')
 

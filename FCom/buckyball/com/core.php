@@ -225,7 +225,7 @@ class BApp extends BClass
         }
 
         // dispatch requested controller action
-        BFrontController::i()->dispatch();
+        BRouting::i()->dispatch();
 
         // If session variables were changed, update session
         BSession::i()->close();

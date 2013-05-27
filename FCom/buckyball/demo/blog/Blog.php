@@ -19,7 +19,7 @@ class Blog
 {
     static public function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
         // public access
             ->route('GET /', 'Blog_Controller_Public.index')
             ->route('GET /posts/:post_id', 'Blog_Controller_Public.post')

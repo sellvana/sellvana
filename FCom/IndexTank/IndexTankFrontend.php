@@ -7,7 +7,7 @@ class FCom_IndexTank_Frontend extends BClass
      */
     static public function bootstrap()
     {
-        BFrontController::i()
+        BRouting::i()
             ->route( 'GET /indextank/search', 'FCom_IndexTank_Frontend_Controller.search')
         ;
 
