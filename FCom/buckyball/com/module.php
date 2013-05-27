@@ -208,6 +208,7 @@ class BModuleRegistry extends BClass
     /**
     * Check module dependencies
     *
+    * @deprecated by checkRequires
     * @return BModuleRegistry
     */
     public function checkDepends()
@@ -540,6 +541,10 @@ class BModuleRegistry extends BClass
         $this->checkDepends();
         $this->checkRequires();
         $this->sortDepends();
+
+        foreach (static::$_modules as $mod) {
+            $mod->beforeBootstrap();
+        }
 /*
 echo "<pre>";
 print_r(BConfig::i()->get());
@@ -659,6 +664,7 @@ class BModule extends BClass
     public $name;
     public $run_level;
     public $run_status;
+    public $before_bootstrap;
     public $bootstrap;
     public $version;
     public $db_connection_name;
@@ -966,6 +972,38 @@ class BModule extends BClass
         return $this;
     }
 
+    public function beforeBootstrap()
+    {
+        if ($this->run_status !== BModule::PENDING) {
+            return $this;
+        }
+
+        $this->_prepareModuleEnvData();
+
+        if (empty($this->before_bootstrap)) {
+            return $this;
+        }
+
+        $bb = $this->before_bootstrap;
+        if (!is_array($bb)) {
+            $bb = array('callback' => $bb);
+        }
+        if (!empty($bb['file'])) {
+            $includeFile = BUtil::normalizePath($this->root_dir.'/'.$bb['file']);
+            BDebug::debug('MODULE.BEFORE.BOOTSTRAP '.$includeFile);
+            require_once ($includeFile);
+        }
+        if (!empty($bb['callback'])) {
+            $start = BDebug::debug(BLocale::_('Start BEFORE bootstrap for %s', array($this->name)));
+            call_user_func($bb['callback']);
+            #$mod->run_status = BModule::LOADED;
+            BDebug::profile($start);
+            BDebug::debug(BLocale::_('End BEFORE bootstrap for %s', array($this->name)));
+        }
+
+        return $this;
+    }
+
     public function bootstrap($force=false)
     {
         if (empty($this->bootstrap)) {
@@ -974,10 +1012,13 @@ class BModule extends BClass
             return $this;
         }
 //echo "<hr>"; var_dump($this->bootstrap);
-        if ($this->run_status!==BModule::PENDING && !$force) {
-            return $this;
+        if ($this->run_status!==BModule::PENDING) {
+            if ($force) {
+                $this->_prepareModuleEnvData(); // prepare data missed in beforeBootstrap
+            } else {
+                return $this; // skip module bootstrap
+            }
         }
-        $this->_prepareModuleEnvData();
         if (!empty($this->bootstrap['file'])) {
             $includeFile = BUtil::normalizePath($this->root_dir.'/'.$this->bootstrap['file']);
             BDebug::debug('MODULE.BOOTSTRAP '.$includeFile);

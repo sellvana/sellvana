@@ -491,6 +491,44 @@ class BLayout extends BClass
     }
 
     /**
+    * Load layout update from file
+    *
+    * @param string $layoutFilename
+    * @return BLayout
+    */
+    public function loadLayout($layoutFilename)
+    {
+        $ext = pathinfo($layoutFilename, PATHINFO_EXTENSION);
+        if (!BUtil::isPathAbsolute($layoutFilename)) {
+            $mod = BModuleRegistry::i()->currentModule();
+            if ($mod) {
+                $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+            }
+        }
+        BDebug::debug('LAYOUT.LOAD: '.$layoutFilename);
+        switch ($ext) {
+            case 'yml': case 'yaml': $layoutData = BYAML::i()->load($layoutFilename); break;
+            case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
+            case 'php': $layoutData = include($layoutFilename); break;
+            default: throw new BException('Unknown layout file type');
+        }
+        BLayout::i()->addLayout($layoutData);
+        return $this;
+    }
+
+    /**
+    * Load layout update after theme has been initialized
+    *
+    * @param string $layoutFilename
+    * @return BLayout
+    */
+    public function loadLayoutAfterTheme($layoutFilename)
+    {
+        $this->afterTheme(function() { BLayout::i()->loadLayout($layoutFilename); });
+        return $this;
+    }
+
+    /**
      * @param      $layoutName
      * @param null $layout
      * @return $this
