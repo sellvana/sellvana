@@ -4,7 +4,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_manuf()
     {
-        $this->forward(true);
+        $this->forward(false);
         return;
         BLayout::i()->layout('/catalog/manuf');
     }
@@ -17,7 +17,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $p = array_pop($r);
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
-            $this->forward(true);
+            $this->forward(false);
             return $this;
         }
         BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
@@ -28,7 +28,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
             if (!$category) {
-                $this->forward(true);
+                $this->forward(false);
                 return $this;
             }
 

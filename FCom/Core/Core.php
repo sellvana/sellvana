@@ -394,6 +394,14 @@ class FCom_Core extends BClass
         return false;
     }
 
+    public static function frontendHref($url='')
+    {
+        $r = BRequest::i();
+        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
+        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
+    }
+
+
     static public function lastNav($save=false)
     {
         $s = BSession::i();
@@ -461,7 +469,7 @@ class FCom_Core_Controller_Abstract extends BActionController
             $page = $defaultView;
         }
         if (!$page || !($view = $this->view($viewPrefix.$page))) {
-            $this->forward(true);
+            $this->forward(false);
             return false;
         }
         $this->layout('base');

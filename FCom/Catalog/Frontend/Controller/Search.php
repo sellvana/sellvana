@@ -10,7 +10,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
-            $this->forward(true);
+            $this->forward(false);
             return $this;
         }
 

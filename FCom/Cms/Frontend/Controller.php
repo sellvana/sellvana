@@ -7,7 +7,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $handle = BRequest::i()->params('page');
         $page = FCom_Cms_Model_Page::i()->load($handle, 'handle');
         if (!$page || !$page->validate()) {
-            $this->forward(true);
+            $this->forward(false);
             return;
         }
         $this->layout('base');
@@ -19,7 +19,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $handle = BRequest::i()->params('nav');
         $nav = FCom_Cms_Model_Nav::i()->load($handle, 'url_path');
         if (!$nav || !$nav->validate()) {
-            $this->forward(true);
+            $this->forward(false);
             return;
         }
         $this->layout('base');

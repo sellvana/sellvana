@@ -5,6 +5,12 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_multisite_site';
     static protected $_mapCacheKey = 'FCom_MultiSite.domain_map';
 
+    public function afterSave()
+    {
+        parent::afterSave();
+        static::i()->createDomainMap();
+    }
+
     static public function createDomainMap()
     {
         $map = array();
@@ -48,11 +54,5 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
             }
         }
         return $siteData;
-    }
-
-    public function afterSave()
-    {
-        parent::afterSave();
-        static::i()->createDomainMap();
     }
 }

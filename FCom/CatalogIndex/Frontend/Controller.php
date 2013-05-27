@@ -112,7 +112,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 #echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
-            $this->forward(true);
+            $this->forward(false);
             return $this;
         }
 
