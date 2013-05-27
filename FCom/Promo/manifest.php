@@ -3,7 +3,7 @@
         'FCom_Promo' => array(
             'version' => '0.1.2',
             'root_dir' => '',
-            'depends' => array('FCom_Core'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
             'description' => "Promotions module",
             'migrate' => 'FCom_Promo_Migrate',
             'areas' => array(

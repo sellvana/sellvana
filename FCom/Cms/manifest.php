@@ -4,7 +4,7 @@
         'FCom_Cms' => array(
             'version' => '0.1.0',
             'root_dir' => '',
-            'depends' => array('FCom_Core', 'BTwig'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0', 'BTwig'=>'1.12.4')),
             'translations' => array('de' => 'de.php'),
             'description' => "CMS for custom pages and forms",
             'bootstrap' => array('file'=>'CmsFrontend.php', 'callback'=>'FCom_Cms_Frontend::bootstrap'),

@@ -6,7 +6,7 @@
             'version' => '0.1.4',
             'root_dir' => '',
             'bootstrap' => array('file'=>'MarketApi.php', 'callback'=>'FCom_Market_MarketApi::bootstrap'),
-            'depends' => array('FCom_Core'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
             'migrate' => 'FCom_Market_Migrate',
             'description' => "FCom_Market description here",
             'areas' => array(

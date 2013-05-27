@@ -4,7 +4,7 @@
         'FCom_Customer' => array(
             'version' => '0.1.3',
             'root_dir' => '',
-            'depends' => array('FCom_Core', 'FCom_Geo'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0', 'FCom_Geo'=>'0.1.0')),
             'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Customer_Tests_AllTests",
             'description' => "Customer Accounts and Management",

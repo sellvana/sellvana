@@ -223,6 +223,9 @@ class BModuleRegistry extends BClass
         }
         // scan for dependencies
         foreach (static::$_modules as $modName=>$mod) {
+            if (!isset($mod->depends)) {
+                continue;
+            }
             // normalize dependencies format
             foreach ($mod->depends as &$dep) {
                 if (is_string($dep)) {

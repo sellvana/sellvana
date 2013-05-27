@@ -5,7 +5,7 @@
             'root_dir' => '',
             'migrate' => 'FCom_Wishlist_Migrate',
             'translations' => array('de' => 'de.php'),
-            'depends' => array('FCom_Catalog', 'FCom_Customer'),
+            'require' => array('module'=>array('FCom_Catalog'=>'0.2.1', 'FCom_Customer'=>'0.1.3')),
             'tests' => "FCom_Wishlist_Tests_AllTests",
             'bootstrap' => array('file'=>'Wishlist.php', 'callback'=>'FCom_Wishlist::bootstrap'),
             'areas' => array(

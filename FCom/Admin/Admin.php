@@ -109,10 +109,10 @@ class FCom_Admin extends BClass
             }
         }
     }
-    
+
     public static function href($url='')
     {
-        return BApp::href($url, 1, 2);   
+        return BApp::href($url, 1, 2);
     }
 
     public static function frontendHref($url='')
@@ -122,4 +122,3 @@ class FCom_Admin extends BClass
         return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
     }
 }
-

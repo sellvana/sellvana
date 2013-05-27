@@ -4,7 +4,7 @@
         'FCom_Test' => array(
             'version' => '0.1.0',
             'root_dir' => '',
-            'depends' => array('FCom_Core'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
             'description' => "PHPUnit tests integration",
             'bootstrap' => array('file'=>'Test.php', 'callback'=>'FCom_Test::bootstrap'),
             'areas' => array(
