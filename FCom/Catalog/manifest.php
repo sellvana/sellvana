@@ -4,7 +4,7 @@
         'FCom_Catalog' => array(
             'version' => '0.2.1',
             'root_dir' => '',
-            'depends' => array('FCom_Core'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
             'categories' => array('Catalog', 'Products'),
             'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Catalog_Tests_AllTests",

@@ -8,7 +8,7 @@ return array(
     'modules' => array(
         'FCom_CustomerGroups' => array(
             'version'      => '0.1.1',
-            'depends'      => array('FCom_Customer'),
+            'require'      => array('module'=>array('FCom_Customer'=>'0.1.3')),
             'translations' => array('de' => 'de.php'),
             'tests'        => "FCom_CustomerGroups_Tests_AllTests",
             'description'  => "Customer Groups Management",

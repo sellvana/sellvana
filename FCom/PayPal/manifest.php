@@ -5,7 +5,7 @@
         'FCom_PayPal' => array(
             'version' => '0.1.0',
             'root_dir' => '',
-            'depends' => array('FCom_Core'),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
             'translations' => array('de' => 'de.php'),
             'description' => "PayPal&reg; standard payment method",
             'bootstrap' => array('file'=>'PayPalFrontend.php', 'callback'=>'FCom_PayPal_Frontend::bootstrap'),

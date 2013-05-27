@@ -5,7 +5,7 @@
             'title' => 'Shipping Plain module',
             'description' => "Plain shipping module for checkout",
             'category' => array('Shipping'),
-            'depends' => array('FCom_Checkout'),
+            'require' => array('module'=>array('FCom_Checkout'=>'0.2.1')),
             'version' => '0.1.0',
             'license'   => array('GPL3'),
 

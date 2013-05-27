@@ -6,7 +6,7 @@
             'version' => '0.1.6',
             'root_dir' => '',
             'migrate' => 'FCom_CatalogIndex_Migrate',
-            'depends' => array('FCom_Catalog', 'FCom_CustomField'),
+            'require' => array('module'=>array('FCom_Catalog'=>'0.2.1', 'FCom_CustomField'=>'0.1.4')),
             //'translations' => array('de' => 'de.php'),
             'tests' => "FCom_CatalogIndex_Tests_AllTests",
             'bootstrap' => array('file'=>'CatalogIndex.php', 'callback'=>'FCom_CatalogIndex::bootstrap'),

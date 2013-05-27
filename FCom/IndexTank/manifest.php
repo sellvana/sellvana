@@ -4,7 +4,6 @@
         'FCom_IndexTank' => array(
             'version' => '0.2.1',
             'root_dir' => '',
-            'depends' => array('FCom_Core'),
             'translations' => array('de' => 'de.php'),
             'description' => "IndexTank API integration",
             'migrate' => 'FCom_IndexTank_Migrate',
@@ -13,11 +12,11 @@
             'areas' => array(
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'IndexTankAdmin.php', 'callback'=>'FCom_IndexTank_Admin::bootstrap'),
-                    'depends' => array('BGanon'),
+                    'require' => array('module'=>array('BGanon'=>'0.5.0')),
                 ),
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'IndexTankFrontend.php', 'callback'=>'FCom_IndexTank_Frontend::bootstrap'),
-                    //'depends' => array('FCom_Frontend'),
+                    //'require' => array(array('FCom_Frontend'=>'0.1.0')),
                 ),
                 "FCom_Cron" => array(
                     "bootstrap" => array("file" => "Cron.php", "callback" => "FCom_IndexTank_Cron::bootstrap")

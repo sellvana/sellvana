@@ -6,7 +6,7 @@
             'version' => '0.2.1',
             'root_dir' => '',
             'migrate' => 'FCom_Checkout_Migrate',
-            'depends' => array('FCom_Catalog', 'FCom_Geo'),
+            'require' => array('module'=>array('FCom_Catalog'=>'0.2.1', 'FCom_Geo'=>'0.1.0')),
             'translations' => array('de' => 'de.php'),
             'tests' => "FCom_Checkout_Tests_AllTests",
             'bootstrap' => array('file'=>'Checkout.php', 'callback'=>'FCom_Checkout::bootstrap'),
