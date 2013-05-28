@@ -13,7 +13,7 @@
                     %label(for="#") = $this->_('Password')
                     %input.sz1(type="password" name="login[password]")
             .btns-set
-                %input.btn.st1.sz1(type="submit" value="{# $this->_('Login')}")
+                %input.btn.st1.sz1(type="submit" value="#{ $this->_('Login')}")
                 %p
                     %a(href="#{ BApp::href('password/recover') }") = $this->_('Recover your password')
     %p.copyright
