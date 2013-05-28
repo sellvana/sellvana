@@ -23,7 +23,6 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ';
         }
-        $output = '';
         foreach ($urls as $url) {
             if (!is_array($url)) {
                 $url = array('loc'=>$url);

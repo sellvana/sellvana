@@ -57,7 +57,7 @@
             'version' => '0.1.0',
             'root_dir' => 'Admin',
             'bootstrap' => array('file'=>'DefaultTheme.php', 'callback'=>'FCom_Admin_DefaultTheme::bootstrap'),
-            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
+            'require' => array('module'=>array('FCom_Core'=>'0.1.0', 'BHAML'=>'3.2')),
             'description' => "Default admin theme",
             'provides' => array('theme' => 'FCom_Admin_DefaultTheme'),
         ),

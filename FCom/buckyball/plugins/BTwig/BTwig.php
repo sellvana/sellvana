@@ -75,7 +75,7 @@ class BTwig extends BClass
 
         if (!$source) {
 
-            $filename = $view->getTemplateFileName(static::$_defaultFileExt);
+            //$filename = $view->getTemplateFileName(static::$_defaultFileExt);
             $modName = $view->getParam('module_name');
             $template = static::$_fileTwig->loadTemplate('@'.$modName.'/'.$viewName.static::$_defaultFileExt);
             $output = $template->render($args);

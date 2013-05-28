@@ -1,0 +1,46 @@
+!!!
+- echo '<html '.$this->getHtmlAttributes().'>'
+%head
+    - echo $this->hook('head')
+    :javascript
+        window.appConfig = {
+            baseHref: '#{BApp::href()}'
+        }
+%body(class="<#{$this->bodyClass}")
+    #top-message(style="position:fixed; top:10px; left:50%; background:#fff1b7; border:1px solid #ebc27b; border-bottom-color:#deb060; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; z-index:99999; padding:5px 15px; line-height:1.3em; box-shadow:0 2px 3px #ddd; display:none")
+        Something happened here!
+
+    - if (FCom_Admin_Model_User::i()->isLoggedIn())
+        .ui-layout-center.adm-wrapper#root-layout
+            - echo $this->view('admin/header')
+            .adm-middle.ui-layout-center#main-container
+                - echo $this->hook('main')
+
+        :javascript
+            head(function() {
+                var $main = $('.adm-content-box'), $win = $(window), $doc = $(document);
+                if ($main.length) {
+                    $win.resize(function() {
+                        var h = $win.height(); //Math.max($doc.height(), $win.height());
+                        $main.height(h-$main.offset().top);
+                    }).trigger('resize');
+                }
+
+                //$('#root-layout > .ui-layout-west').width(180).height(1000).resizable({handles:'e'});
+                //var bodyLayout = $('body').layout();
+            /*
+                var rootLayout = $('#root-layout').layout({
+                    north__spacingOpen:0,
+                    north__resizable:false,
+                    west__spacingOpen:0
+                });
+
+                $('#root-layout > .ui-layout-north')
+                    .mouseover(function() { rootLayout.allowOverflow(this); })
+                    .mouseout(function() { rootLayout.resetOverflow(this); });
+            */
+            });
+
+    - else
+        .adm-wrapper#root-layout
+            - echo $this->hook('main')

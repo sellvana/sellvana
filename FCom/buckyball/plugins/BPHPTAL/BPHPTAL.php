@@ -20,7 +20,7 @@ class BPHPTAL extends BClass
     {
         $config = BConfig::i();
 
-        static::$_phpCodeDest = $config->get('fs/storage_dir').'/phptal';
+        static::$_phpCodeDest = $config->get('fs/cache_dir').'/phptal';
         BUtil::ensureDir(static::$_phpCodeDest);
 
         static::$_forceReparse = $config->get('modules/BPHPTAL/force_reparse');
