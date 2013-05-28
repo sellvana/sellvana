@@ -25,6 +25,11 @@
             "bootstrap" => array("file" =>"BYAML.php", "callback" =>"BYAML::bootstrap"),
             "version" => "0.5",
         ),
+        "BHAML" => array(
+            "root_dir" => "BHAML",
+            "bootstrap" => array("file" =>"BHAML.php", "callback" =>"BHAML::bootstrap"),
+            "version" => "3.2",
+        ),
         "BUI" => array(
             "root_dir" => "BUI",
             "bootstrap" => array("file" =>"BUI.php", "callback" =>"BUI::bootstrap"),

@@ -53,6 +53,8 @@ class FCom_Admin extends BClass
 
             ->route('GET|POST /modules', 'FCom_Admin_Controller_Modules.index')
             ->route('POST /modules/migrate', 'FCom_Admin_Controller_Modules.migrate')
+
+            ->route('GET /test', 'FCom_Admin_Controller.test')
         ;
 
         $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');

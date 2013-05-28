@@ -10,6 +10,21 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         return parent::authenticate($args);
     }
 
+    public function action_test()
+    {
+
+        $c = BConfig::i();
+        echo $this->view('settings/FCom_Admin')->set('model', $c);
+        $timer = microtime(true);
+        echo $this->view('settings/FCom_Core')->set('model', $c);
+        echo microtime(true)-$timer.', ';
+
+        $timer = microtime(true);
+        echo $this->view('settings/FCom_Core-php')->set('model', $c);
+        echo microtime(true)-$timer.', ';
+
+    }
+
     public function action_index()
     {
         $this->layout('/');

@@ -1282,7 +1282,7 @@ class BClassAutoload extends BClass
         if ($this->filename_cb) {
             $file = call_user_func($this->filename_cb, $class);
         } else {
-            $file = str_replace('_', '/', $class).'.php';
+            $file = str_replace(array('_', '\\'), array('/', '/'), $class).'.php';
         }
         if ($file) {
             if ($file[0]!=='/' && $file[1]!==':') {

@@ -1,0 +1,11 @@
+- if (class_exists('Highchart'))
+    #chart
+    %script
+        - $chart = new Highchart()
+        - $chart->title = array('text' => 'Monthly Average Temperature', 'x' => -20)
+        - $chart->series[] = array('name' => 'Tokyo', 'data' => array(7.0, 6.9, 9.5))
+        - $chart->chart->renderTo = 'chart'
+        = $chart->render('chart')
+
+- echo $this->messagesHtml('admin')
+.home-icon = $this->_('Welcome.')

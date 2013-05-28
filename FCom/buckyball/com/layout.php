@@ -177,7 +177,7 @@ class BLayout extends BClass
         }
         static::$_extRenderers[$ext] = $params;
         static::$_extRegex           = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
-
+        BDebug::debug('ADD RENDERER: '.$ext);
         return $this;
     }
 
@@ -1119,6 +1119,25 @@ class BView extends BClass
     }
 
     /**
+    * Used by external renderers to include compiled PHP file within $this context
+    *
+    * @param mixed $file
+    */
+    public function renderFile($file)
+    {
+        ob_start();
+        include $file;
+        return ob_get_clean();
+    }
+
+    public function renderEval($source)
+    {
+        ob_start();
+        eval($source);
+        return ob_get_clean();
+    }
+
+    /**
      * View class specific rendering
      *
      * Can be overridden for different template engines (Smarty, etc)
@@ -1127,10 +1146,8 @@ class BView extends BClass
      */
     protected function _render()
     {
-        $template = $this->getTemplateFileName('.php');
         ob_start();
-        include $template;
-
+        include $this->getTemplateFileName('.php');
         return ob_get_clean();
     }
 
