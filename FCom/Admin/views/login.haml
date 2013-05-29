@@ -4,7 +4,7 @@
     %form(method="post" action="#{BApp::href('login')}")
         %fieldset
             %header.section-title = $this->_('Log into Account')
-            = $this->messagesHtml('admin')
+            - echo $this->messagesHtml('admin')
             %ul.form-list
                 %li.label-l
                     %label(for="#") = $this->_('Email/Username')

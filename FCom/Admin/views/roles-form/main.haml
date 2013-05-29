@@ -1,0 +1,32 @@
+- $m = $this->model; $hlp = FCom_Admin_Model_Role::i();
+
+%header.adm-main-header = $this->_('Permissions')
+%fieldset.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Role Name')
+            %input(type="text" id="model-role_name" name="model[role_name]" class="validate[required]" value="#{$m->role_name}")
+        %li
+            %h4.label = $this->_('Permissions')
+            #permissions
+
+:javascript
+    head(function() {
+        $('#permissions').jstree({
+            plugins: ['themes', 'json_data','ui','hotkeys','checkbox','search'],
+            json_data: {
+                data: #{ BUtil::toJson($m->getAllPermissionsTree()) }
+            },
+            checkbox: {
+                override_ui:true,
+                real_checkboxes:true,
+                real_checkboxes_names: function(n) { return ['model[permissions]['+n.attr('path')+']', 1] }
+            },
+            search: { case_insensitive:true }
+        }).bind('loaded.jstree', function(event, data) {
+            var checked = #{ BUtil::toJson($m->getPermissionIds()) };
+            for (var id in checked) {
+                data.inst.check_node('#'+id);
+            }
+        });
+    })

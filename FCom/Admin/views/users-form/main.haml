@@ -1,28 +1,38 @@
 - $m = $this->model; $hlp = FCom_Admin_Model_User::i()
+
 %fieldset.adm-section-group
     %ul.form-list
         %li
             %h4.label = $this->_('User Name')
             %input(type="text" id="model-username" name="model[username]" class="validate[required]" value="#{$m->username}")
         %li
+            %h4.label = $this->_('Super Admin')
+            %select(name="model[is_superadmin]")
+                - echo $this->optionsHtml($hlp->fieldOptions('is_superadmin'), $m->is_superadmin)
+        %li
+            %h4.label = $this->_('Role')
+            %select(name="model[role_id]")
+                %option
+                - echo $this->optionsHtml(FCom_Admin_Model_Role::options(), $m->role_id)
+        %li
+            %h4.label = $this->_('Status')
+            %select(name="model[status]")
+                - echo $this->optionsHtml($hlp->fieldOptions('status'), $m->status)
+        %li
             %h4.label = $this->_('Email')
             %input(type="text" id="model-email" name="model[email]" class="validate[required,custom[email]]" value="#{$m->email}")
         %li
             %h4.label = $this->_('Password')
-            %input(type="password" id="model-password" name="model[password]")
+            %input(type="password" id="model-password" name="model[password]" value="")
         %li
             %h4.label = $this->_('Confirm Password')
-            %input(type="password" id="model-password_confirm" name="model[password_confirm]" class="validate[equals[model-password]]")
+            %input(type="password" id="model-password_confirm" name="model[password_confirm]" class="validate[equals[model-password]]" value="")
         %li
             %h4.label = $this->_('First Name')
             %input(type="text" id="model-firstname" name="model[firstname]" class="validate[required]" value="#{$m->firstname}")
         %li
             %h4.label = $this->_('Last Name')
             %input(type="text" id="model-lastname" name="model[lastname]" class="validate[required]" value="#{$m->lastname}")
-        %li
-            %h4.label = $this->_('Status')
-            %select(name="model[status]")
-                - echo $this->optionsHtml($hlp->fieldOptions('status'), $m->status)
         %li
             %h4.label = $this->_('API Username')
             %input(type="text" id="model-api_username" name="model[api_username]" value="#{$m->api_username}")

@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * BHAML template format integration
+ *
+ * Had to make some changes to library:
+ * - Disable HTML escaping within filters (javascript/css/plain)
+ *   - MtHaml/NodeVisitor/RendererAbstract.php - lines 300-350
+ *   - MtHaml/NodeVisitor/PhpRenderer.php - line 57
+ *
+ * @uses https://github.com/arnaud-lb/MtHaml
+ *
+ */
 class BHAML extends BClass
 {
     protected static $_defaultFileExt = '.haml';
@@ -19,10 +30,8 @@ class BHAML extends BClass
             BApp::m('BHAML')->autoload(__DIR__.'/lib');
 
             $c = BConfig::i();
-//$p = BDebug::debug('********** 1');
             $options = (array)$c->get('modules/BHAML/haml');
             static::$_haml = new MtHaml\Environment('php', $options);
-//BDebug::profile($p);
             static::$_cacheDir = $c->get('fs/cache_dir').'/haml';
             BUtil::ensureDir(static::$_cacheDir);
         }
@@ -40,27 +49,13 @@ class BHAML extends BClass
         $md5 = md5($sourceFile);
         $cacheDir = static::$_cacheDir.'/'.substr($md5, 0, 2);
         $cacheFilename = $cacheDir.'/'.$md5.'.php';
-        if (!file_exists($cacheFilename) || filemtime($sourceFile) > filemtime($cacheFilename)) {
+        if (true || !file_exists($cacheFilename) || filemtime($sourceFile) > filemtime($cacheFilename)) {
             BUtil::ensureDir($cacheDir);
-            file_put_contents($cacheFilename, $haml->compileString(file_get_contents($sourceFile), $viewName));
+            file_put_contents($cacheFilename, $haml->compileString(file_get_contents($sourceFile), $sourceFile));
         }
         $output = $view->renderFile($cacheFilename);
         BDebug::profile($pId);
         return $output;
     }
 }
-/*
-class HamlTrFilter extends HamlBaseFilter
-{
-    public function run($text)
-    {
-        $text = str_replace('"', '\\"', (trim($text)));
-        $args = array();
-        $text = preg_replace_callback(HamlParser::MATCH_INTERPOLATION, function($matches) use(&$args) {
-            $args[] = stripslashes(trim($matches[1]));
-            return '%s';
-        }, $text);
-        return '<'.'?php echo BLocale::i()->_("'.$text.'"'.($args ? ', array('.join(', ', $args).')' : '').') ?'.'>';
-    }
-}
-*/
+

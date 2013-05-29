@@ -13,6 +13,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
 
     static public function createDomainMap()
     {
+        if (!BDb::ddlTableExists(static::table())) {
+            return array();
+        }
         $map = array();
         $sites = (array)static::i()->orm()->find_many();
         foreach ($sites as $site) {
@@ -53,6 +56,6 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
                 break;
             }
         }
-        return $siteData;
+        return $site;
     }
 }
