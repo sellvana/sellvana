@@ -8,31 +8,31 @@
             %div
                 %table
                     %tr
-                        %td $this->_('Host')
+                        %td = $this->_('Host')
                         %td
                             %input(type="text" name="config[db][host]" value="#{ $c->get('db/host') }")
                     %tr
-                        %td $this->_('DB Name')
+                        %td = $this->_('DB Name')
                         %td
                             %input(type="text" name="config[db][dbname]" value="#{ $c->get('db/dbname') }")
                     %tr
-                        %td $this->_('User')
+                        %td = $this->_('User')
                         %td
                             %input(type="text" name="config[db][username]" value="#{ $c->get('db/username') }")
                     %tr
-                        %td $this->_('Password')
+                        %td = $this->_('Password')
                         %td
                             %input(type="text" name="config[db][password]" value="*****")
                     %tr
-                        %td $this->_('Enable Logging')
+                        %td = $this->_('Enable Logging')
                         %td
                             %select(name="config[db][logging]")
-                                = $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
+                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
                     %tr
-                        %td $this->_('Enable Logging')
+                        %td = $this->_('Enable Logging')
                         %td
                             %select(name="config[db][implicit_migration]")
-                                = $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))
+                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))
         .group
             %h3
                 %a(href="#") = $this->_('Website')
@@ -59,7 +59,7 @@
                         %td = $this->_('Session Handler')
                         %td
                             %select(name="config[cookie][session_handler]")
-                                = $this->optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler'))
+                                - echo $this->optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler'))
                     %tr
                         %td = $this->_('Cookie Timeout')
                         %td
@@ -80,7 +80,7 @@
                         %td = $this->_('Verify Session IP')
                         %td
                             %select(name="config[cookie][session_check_ip]")
-                                = $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip'))
+                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip'))
         .group
             %h3
                 %a(href="#") = $this->_('System')
@@ -90,4 +90,4 @@
                         %td = $this->_('Hide script file name in URL')
                         %td
                             %select(name="config[web][hide_script_name]")
-                                = $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))
+                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))

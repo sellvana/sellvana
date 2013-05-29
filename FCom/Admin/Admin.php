@@ -99,13 +99,15 @@ class FCom_Admin extends BClass
     {
         if (($head = BLayout::i()->view('head'))) {
             $config = BConfig::i()->get('modules/FCom_Admin');
-            if (!empty($config['add_js'])) {
-                foreach (explode("\n", $config['add_js']) as $js) {
+            $addJs = !empty($config['add_js']) ? trim($config['add_js']) : null;
+            if (!empty($addJs)) {
+                foreach (explode("\n", $addJs) as $js) {
                     $head->js($js);
                 }
             }
-            if (!empty($config['add_css'])) {
-                foreach (explode("\n", $config['add_css']) as $css) {
+            $addCss = !empty($config['add_css']) ? trim($config['add_css']) : null;
+            if (!empty($addCss)) {
+                foreach (explode("\n", $addCss) as $css) {
                     $head->css($css);
                 }
             }

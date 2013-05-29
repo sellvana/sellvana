@@ -49,7 +49,7 @@
     %input#current_tab(type="hidden" name="current_tab" value="FCom_Admin")
 
     %header.adm-page-title
-        span.title = $this->_('Settings')
+        %span.title = $this->_('Settings')
         .btns-set
             %button.st1.sz2.btn(type="submit" onclick="return adminForm.saveAll(this)")
                 %span = $this->_('Save All')
@@ -69,7 +69,7 @@
         .adm-main
             .adm-tabs-container
                 - foreach ($this->tabs as $k=>$tab)
-                    %section.adm-tabs-content(id="tab-#{$k}" hidden="#{$k!==$this->cur_tab ? 'hidden' : ''}"
-                                                data-loaded="#{empty($tab['async']) ? 'true' : 'false'}")
+                    %section.adm-tabs-content(id="tab-#{$k}" #{$k!==$this->cur_tab ? 'hidden="hidden"' : ''}
+                                                #{empty($tab['async']) ? 'data-loaded="true"' : ''})
                         - if (empty($tab['async']))
                             - echo $this->view($tab['view'])

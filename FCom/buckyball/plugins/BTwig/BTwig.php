@@ -33,7 +33,7 @@ class BTwig extends BClass
 
             $config = BConfig::i();
 
-            $cacheDir = $config->get('fs/storage_dir').'/twig';
+            $cacheDir = $config->get('fs/cache_dir').'/twig';
             BUtil::ensureDir($cacheDir);
 
             $options = array(

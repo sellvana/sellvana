@@ -90,10 +90,10 @@ class Runtime
             if ($value instanceof AttributeInterpolation) {
                 $result .= $value->value;
             } else if (true === $value) {
-                $result .= 
+                $result .=
                     htmlspecialchars($name, ENT_QUOTES, $charset);
             } else {
-                $result .= 
+                $result .=
                     htmlspecialchars($name, ENT_QUOTES, $charset)
                     .'="'
                     . htmlspecialchars($value, ENT_QUOTES, $charset)

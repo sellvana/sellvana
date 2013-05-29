@@ -1647,7 +1647,7 @@ class BViewHead extends BView
     {
         if (!empty($this->_defaultTag[$name])) {
             array_unshift($args, $name);
-            return call_user_func_array(array($this, 'item'), $args);
+            return call_user_func_array(array($this, 'addElement'), $args);
         } else {
             BDebug::error('Invalid method: ' . $name);
         }
@@ -1681,37 +1681,6 @@ class BViewHead extends BView
                 unset($this->_elements[$k]);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Add external resource (JS or CSS), or return tag(s)
-     *
-     * @deprecated
-     *
-     * @param string        $type 'js' or 'css'
-     * @param string        $name name of the resource, if ommited, return all tags
-     * @param array|boolean $args Resource arguments, if ommited, return tag by name
-     *   if true, output html with tags of this item type
-     *   - tag: Optional, tag template
-     *   - file: resource file src or href
-     *   - module_name: Optional: module where the resource is declared
-     *   - if: IE <!--[if]--> context
-     * @throws BException
-     * @return BViewHead|array|string
-     */
-    public function item($type = null, $name = null, $args = null)
-    {
-        if (is_null($type)) {
-            return $this->getAllElements();
-        }
-        if (true === $args) {
-            return $this->getElement($type, $name);
-        } elseif (!is_null($args) && !is_array($args)) {
-            throw new BException(BLocale::_('Invalid %s args: %s', array(strtoupper($type), print_r($args, 1))));
-        }
-        $this->addElement($type, $name, $args);
 
         return $this;
     }
@@ -1836,6 +1805,8 @@ class BViewHead extends BView
      */
     public function addElement($type, $name, $args = array())
     {
+//echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+//var_dump($type, $name, $args);
         if (!empty($args['alias'])) {
             $args['file'] = trim($name);
             $name         = trim($args['alias']);

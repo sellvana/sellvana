@@ -1,0 +1,26 @@
+- $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
+
+%section.adm-login-form
+    %h3.app-logo = $storeName
+    %form#recovery-form(method="post" action="#{BApp::href('password/recover')}")
+        %fieldset
+            %header.section-title = $this->_('Password Recover')
+            - echo $this->messagesHtml('admin')
+            %ul.form-list
+                %li.label-l
+                    %label(for="#") = $this->_('Email')
+                    %input.sz1(type="text" name="email")
+            .btns-set
+                %input.btn.st1.sz1(type="submit" value="#{$this->_('Send Recovery Instructions')}")
+                %p
+                    %a(href="#{BApp::href()}")
+                        \&laquo;
+                        = $this->_('Back to Login')
+    %p.copyright
+        \&copy; #{date('Y')} #{$storeName} #{$this->_('All rights reserved.')}
+
+:javascript
+    head(function() {
+        $('#recovery-form').validate();
+        var json = #{ '{"testing":"json, ["string", "blah"]}' };
+    })
