@@ -17,7 +17,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->layout('/wishlist');
     }
 
-    public function action_wishlist_post()
+    public function action_wishlist__POST()
     {
         $wishlistHref = BApp::href('wishlist');
         $post = BRequest::i()->post();

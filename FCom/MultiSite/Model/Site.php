@@ -48,7 +48,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
             $domain = BRequest::i()->httpHost();
         }
         $domain = strtolower($domain);
-        $map = static::i()->getDomainMap();
+        $map = (array)static::i()->getDomainMap();
         $site = null;
         foreach ($map as $pattern=>$siteData) {
             if (preg_match('#'.$pattern.'#', $domain)) {

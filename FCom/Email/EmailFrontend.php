@@ -5,7 +5,7 @@ class FCom_Email_Frontend extends BClass
     public static function bootstrap()
     {
         BRouting::i()
-            ->route('GET|POST /email/pref', 'FCom_Email_Frontend_Controller.pref')
+            ->any('/email/pref', 'FCom_Email_Frontend_Controller.pref')
         ;
 
         BLayout::i()

@@ -10,8 +10,8 @@ class FCom_ProductReviews_Frontend extends BClass
         ;
 
         BRouting::i()
-            ->route('GET /prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
-            ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
+            ->get('/prodreviews', 'FCom_ProductReviews_Frontend_Controller.index')
+            ->any('/prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
         ;
 
         BLayout::i()->addAllViews('Frontend/views');

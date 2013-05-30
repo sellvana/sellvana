@@ -54,7 +54,7 @@ class PhpRenderer extends RendererAbstract
             $fmt = '<?php echo %s; ?>';
 
             //ADDED: FULLERON
-            if (!\BApp::get('BHAML/disable_escaping') && $node->getEscaping()->isEnabled()) {
+            if (!\BApp::i()->get('BHAML/disable_escaping') && $node->getEscaping()->isEnabled()) {
                 if ($node->getEscaping()->isOnce()) {
                     $fmt = "<?php echo htmlspecialchars(%s,ENT_QUOTES,'%s',false); ?>";
                 } else {

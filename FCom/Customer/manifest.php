@@ -12,7 +12,7 @@
             'bootstrap' => array('file'=>'CustomerFrontend.php', 'callback'=>'FCom_Customer_Frontend::bootstrap'),
             'areas' => array(
                 'FCom_Api' => array(
-                    'bootstrap' => array('file'=>'Api.php', 'callback'=>'FCom_Customer_Api::bootstrap'),
+                    'bootstrap' => array('file'=>'CustomerApi.php', 'callback'=>'FCom_Customer_Api::bootstrap'),
                 ),
                 'FCom_Admin' => array(
                     'bootstrap' => array('file'=>'CustomerAdmin.php', 'callback'=>'FCom_Customer_Admin::bootstrap'),

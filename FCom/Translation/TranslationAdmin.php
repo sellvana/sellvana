@@ -8,8 +8,8 @@ class FCom_Translation_Admin extends BClass
         BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Translation_Admin::layout');
 
         BRouting::i()
-            ->route('GET /translations', 'FCom_Translation_Admin_Controller.index')
-            ->route('GET|POST /translations/.action', 'FCom_Translation_Admin_Controller')
+            ->get('/translations', 'FCom_Translation_Admin_Controller.index')
+            ->any('/translations/.action', 'FCom_Translation_Admin_Controller')
         ;
     }
 

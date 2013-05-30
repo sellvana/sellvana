@@ -8,10 +8,10 @@ class FCom_CustomField_Admin extends BClass
 
         $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets';
         BRouting::i()
-            ->route('GET /customfields/fieldsets', $ctrl.'.index')
-            ->route('GET|POST /customfields/fieldsets/.action', $ctrl)
+            ->get('/customfields/fieldsets', $ctrl.'.index')
+            ->any('/customfields/fieldsets/.action', $ctrl)
 
-            ->route('GET /customfields/products/.action', 'FCom_CustomField_Admin_Controller_Products')
+            ->get('/customfields/products/.action', 'FCom_CustomField_Admin_Controller_Products')
         ;
 
         BLayout::i()

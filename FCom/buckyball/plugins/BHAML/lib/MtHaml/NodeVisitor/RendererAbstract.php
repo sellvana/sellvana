@@ -299,22 +299,22 @@ abstract class RendererAbstract extends NodeVisitorAbstract
 
         switch($node->getFilter()) {
         case 'javascript':
-            \BApp::set('BHAML/disable_escaping', true); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', true); //ADDED: FULLERON
             $this->write('<script type="text/javascript">')
                 ->write('//<![CDATA[')
                 ->indent();
             break;
         case 'css':
-            \BApp::set('BHAML/disable_escaping', true); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', true); //ADDED: FULLERON
             $this->write('<style type="text/css">')
                 ->write('/*<![CDATA[*/')
                 ->indent();
             break;
         case 'plain':
-            \BApp::set('BHAML/disable_escaping', true); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', true); //ADDED: FULLERON
             break;
         case 'preserve':
-            \BApp::set('BHAML/disable_escaping', true); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', true); //ADDED: FULLERON
             $this->savedIndent[] = $this->indent;
             $this->indent = 0;
             break;
@@ -327,22 +327,22 @@ abstract class RendererAbstract extends NodeVisitorAbstract
     {
         switch($node->getFilter()) {
         case 'javascript':
-            \BApp::set('BHAML/disable_escaping', false); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', false); //ADDED: FULLERON
             $this->undent()
                 ->write('//]]>')
                 ->write('</script>');
             break;
         case 'css':
-            \BApp::set('BHAML/disable_escaping', false); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', false); //ADDED: FULLERON
             $this->undent()
                 ->write('/*]]>*/')
                 ->write('</style>');
             break;
         case 'plain':
-            \BApp::set('BHAML/disable_escaping', false); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', false); //ADDED: FULLERON
             break;
         case 'preserve':
-            \BApp::set('BHAML/disable_escaping', false); //ADDED: FULLERON
+            \BApp::i()->set('BHAML/disable_escaping', false); //ADDED: FULLERON
             $this->indent = array_pop($this->savedIndent);
             break;
         }

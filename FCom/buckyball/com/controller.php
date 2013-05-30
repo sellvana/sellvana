@@ -1637,6 +1637,7 @@ class BRouteNode
     public $num_parts; // specificity for sorting
     public $params;
     public $params_values;
+    public $multi_method;
 
     public function __construct($args=array())
     {
@@ -1653,6 +1654,7 @@ class BRouteNode
         if (sizeof($a)<2) {
             throw new BException('Invalid route format: '.$this->route_name);
         }
+        $this->multi_method = strpos($a[0], '|') !== false;
         if ($a[1]==='/') {
             $this->regex = '#^('.$a[0].') (/)$#';
         } else {
@@ -1986,10 +1988,13 @@ class BActionController extends BClass
             return $this;
         }
         $actionMethod = $this->_actionMethodPrefix.$actionName;
-        if (($reqMethod = BRequest::i()->method())!=='GET') {
+        $reqMethod = BRequest::i()->method();
+        if ($reqMethod !== 'GET') {
             $tmpMethod = $actionMethod.'__'.$reqMethod;
             if (method_exists($this, $tmpMethod)) {
                 $actionMethod = $tmpMethod;
+            } elseif (BRouting::i()->currentRoute()->multi_method) { 
+                $this->forward(false); // If route has multiple methods, require method suffix
             }
         }
         //echo $actionMethod;exit;

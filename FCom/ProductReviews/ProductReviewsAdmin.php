@@ -10,8 +10,8 @@ class FCom_ProductReviews_Admin extends BClass
         ;
 
         BRouting::i()
-            ->route('GET /prodreviews', 'FCom_ProductReviews_Admin_Controller.index')
-            ->route('GET|POST /prodreviews/.action', 'FCom_ProductReviews_Admin_Controller')
+            ->get('/prodreviews', 'FCom_ProductReviews_Admin_Controller.index')
+            ->any('/prodreviews/.action', 'FCom_ProductReviews_Admin_Controller')
         ;
 
         BLayout::i()->addAllViews('Admin/views');

@@ -5,19 +5,19 @@ class FCom_Cms_Admin extends BClass
     public static function bootstrap()
     {
         BRouting::i()
-            ->route('GET /cms/nav', 'FCom_Cms_Admin_Controller_Nav.index')
-            ->route('GET|POST /cms/nav/.action', 'FCom_Cms_Admin_Controller_Nav')
+            ->get('/cms/nav', 'FCom_Cms_Admin_Controller_Nav.index')
+            ->any('/cms/nav/.action', 'FCom_Cms_Admin_Controller_Nav')
 
-            ->route('GET /cms/pages', 'FCom_Cms_Admin_Controller_Pages.index')
-            ->route('GET|POST /cms/pages/.action', 'FCom_Cms_Admin_Controller_Pages')
-            ->route('GET|POST /cms/pages/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Pages.history_grid_data')
+            ->get('/cms/pages', 'FCom_Cms_Admin_Controller_Pages.index')
+            ->any('/cms/pages/.action', 'FCom_Cms_Admin_Controller_Pages')
+            ->any('/cms/pages/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Pages.history_grid_data')
 
-            ->route('GET /cms/blocks', 'FCom_Cms_Admin_Controller_Blocks.index')
-            ->route('GET|POST /cms/blocks/.action', 'FCom_Cms_Admin_Controller_Blocks')
-            ->route('GET|POST /cms/blocks/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Blocks.history_grid_data')
+            ->get('/cms/blocks', 'FCom_Cms_Admin_Controller_Blocks.index')
+            ->any('/cms/blocks/.action', 'FCom_Cms_Admin_Controller_Blocks')
+            ->any('/cms/blocks/history/:id/grid_data', 'FCom_Cms_Admin_Controller_Blocks.history_grid_data')
 
-            ->route('GET|POST /cms/forms', 'FCom_Cms_Admin_Controller_Forms.index')
-            ->route('GET|POST /cms/forms/.action', 'FCom_Cms_Admin_Controller_Forms')
+            ->any('/cms/forms', 'FCom_Cms_Admin_Controller_Forms.index')
+            ->any('/cms/forms/.action', 'FCom_Cms_Admin_Controller_Forms')
         ;
 
         BLayout::i()->addAllViews('Admin/views')
