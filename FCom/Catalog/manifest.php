@@ -18,6 +18,9 @@
                 'FCom_Frontend' => array(
                     'bootstrap' => array('file'=>'CatalogFrontend.php', 'callback'=>'FCom_Catalog_Frontend::bootstrap'),
                 ),
+                'FCom_Api' => array(
+                    'bootstrap' => array('file'=>'CatalogApi.php', 'callback'=>'FCom_Catalog_Api::bootstrap'),
+                ),
             ),
         ),
 

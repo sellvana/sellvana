@@ -9,34 +9,23 @@ class FCom_Customer_Frontend extends BClass
         ;
 
         BRouting::i()
-            ->route('GET /login', 'FCom_Customer_Frontend_Controller.login')
-            ->route('POST /login', 'FCom_Customer_Frontend_Controller.login__POST')
-            ->route('GET|POST /customer/register', 'FCom_Customer_Frontend_Controller.register')
-            ->route('GET|POST /customer/password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
-            ->route('GET|POST /customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
-            ->route('GET /logout', 'FCom_Customer_Frontend_Controller.logout')
+            ->any('/login', 'FCom_Customer_Frontend_Controller.login')
+            ->any('/customer/register', 'FCom_Customer_Frontend_Controller.register')
+            ->any('/customer/password/recover', 'FCom_Customer_Frontend_Controller.password_recover')
+            ->any('/customer/password/reset', 'FCom_Customer_Frontend_Controller.password_reset')
+            ->get('/logout', 'FCom_Customer_Frontend_Controller.logout')
 
-            ->route('GET /customer/myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
-            ->route('GET|POST /customer/myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
+            ->get('/customer/myaccount', 'FCom_Customer_Frontend_Controller_Account.index')
+            ->any('/customer/myaccount/.action', 'FCom_Customer_Frontend_Controller_Account')
 
             //orders
-            ->route('GET|POST /customer/order', 'FCom_Customer_Frontend_Controller_Order.index')
-            ->route('GET /customer/order/.action', 'FCom_Customer_Frontend_Controller_Order')
+            ->any('/customer/order', 'FCom_Customer_Frontend_Controller_Order.index')
+            ->get('/customer/order/.action', 'FCom_Customer_Frontend_Controller_Order')
 
             //addresses
-            ->route('GET /customer/address', 'FCom_Customer_Frontend_Controller_Address.index')
-            ->route('POST /customer/address', 'FCom_Customer_Frontend_Controller_Address.address_post')
-            ->route('GET /customer/address/.action', 'FCom_Customer_Frontend_Controller_Address')
+            ->any('/customer/address', 'FCom_Customer_Frontend_Controller_Address.index')
+            ->get('/customer/address/.action', 'FCom_Customer_Frontend_Controller_Address')
             //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
-
-            //api route for customer
-            ->route( 'GET|POST /v1/customer/customer', 'FCom_Customer_ApiServer_V1_Customer.index')
-            ->route( 'GET|POST|DELETE|PUT /v1/customer/customer/:id', 'FCom_Customer_ApiServer_V1_Customer.index')
-
-            //api route for customer address
-            ->route( 'GET|POST /v1/customer/address', 'FCom_Customer_ApiServer_V1_Address.index')
-            ->route( 'GET|POST|DELETE|PUT /v1/customer/address/:id', 'FCom_Customer_ApiServer_V1_Address.index')
-
         ;
 
         BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Customer_Model_Customer::onAddProductToCart');

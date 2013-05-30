@@ -9,8 +9,8 @@ class FCom_CatalogIndex_Admin extends BClass
         FCom_CatalogIndex::bootstrap();
         
         BRouting::i()
-            ->route('GET /catalogindex/fields', 'FCom_CatalogIndex_Admin_Controller_Fields.index')
-            ->route('GET|POST /catalogindex/fields/.action', 'FCom_CatalogIndex_Admin_Controller_Fields')
+            ->get('/catalogindex/fields', 'FCom_CatalogIndex_Admin_Controller_Fields.index')
+            ->any('/catalogindex/fields/.action', 'FCom_CatalogIndex_Admin_Controller_Fields')
         ;
         
         BLayout::i()

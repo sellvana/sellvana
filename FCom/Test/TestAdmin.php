@@ -8,9 +8,9 @@ class FCom_Test_Admin extends BClass
     static public function bootstrap()
     {
         BRouting::i()
-            ->route('GET /tests/index', 'FCom_Test_Admin_Controller_Tests.index')
-            ->route('GET /tests/run', 'FCom_Test_Admin_Controller_Tests.run')
-            ->route('GET /tests/run2', 'FCom_Test_Admin_Controller_Tests.run2');
+            ->get('/tests/index', 'FCom_Test_Admin_Controller_Tests.index')
+            ->get('/tests/run', 'FCom_Test_Admin_Controller_Tests.run')
+            ->get('/tests/run2', 'FCom_Test_Admin_Controller_Tests.run2');
 
         BLayout::i()->addAllViews('Admin/views')->afterTheme('FCom_Test_Admin::layout');
     }

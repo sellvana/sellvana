@@ -11,8 +11,8 @@ class FCom_Market_Admin extends BClass
                 ;
 
         BRouting::i()
-            ->route('GET /market', 'FCom_Market_Admin_Controller.index')
-            ->route('GET|POST /market/.action', 'FCom_Market_Admin_Controller')
+            ->get('/market', 'FCom_Market_Admin_Controller.index')
+            ->any('/market/.action', 'FCom_Market_Admin_Controller')
 
         ;
         if (!BConfig::i()->get('modules/FCom_Market/market_url')) {

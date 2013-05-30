@@ -8,16 +8,16 @@ class FCom_Catalog_Admin extends BClass
         $module->base_src .= '/Admin';
 
         BRouting::i()
-            ->route('GET /catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
-            ->route('GET|POST /catalog/categories/.action', 'FCom_Catalog_Admin_Controller_Categories')
+            ->get('/catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
+            ->any('/catalog/categories/.action', 'FCom_Catalog_Admin_Controller_Categories')
 
-            ->route('GET /catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
-            ->route('GET|POST /catalog/products/.action', 'FCom_Catalog_Admin_Controller_Products')
+            ->get('/catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
+            ->any('/catalog/products/.action', 'FCom_Catalog_Admin_Controller_Products')
 
-            ->route('GET /catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
-            ->route('GET|POST /catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
+            ->get('/catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
+            ->any('/catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
 
-            ->route('GET|POST /catalog/products/import/.action', 'FCom_Catalog_Admin_Controller_ProductsImport')
+            ->any('/catalog/products/import/.action', 'FCom_Catalog_Admin_Controller_ProductsImport')
 
         ;
 

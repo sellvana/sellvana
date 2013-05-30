@@ -7,11 +7,11 @@ class FCom_Sales_Admin extends BClass
     public static function bootstrap()
     {
         BRouting::i()
-            ->route('GET /orders', 'FCom_Sales_Admin_Controller_Orders.index')
-            ->route('GET|POST /orders/.action', 'FCom_Sales_Admin_Controller_Orders')
+            ->get('/orders', 'FCom_Sales_Admin_Controller_Orders.index')
+            ->any('/orders/.action', 'FCom_Sales_Admin_Controller_Orders')
 
-            ->route('GET /orderstatus', 'FCom_Sales_Admin_Controller_OrderStatus.index')
-            ->route('GET|POST /orderstatus/.action', 'FCom_Sales_Admin_Controller_OrderStatus')
+            ->get('/orderstatus', 'FCom_Sales_Admin_Controller_OrderStatus.index')
+            ->any('/orderstatus/.action', 'FCom_Sales_Admin_Controller_OrderStatus')
         ;
 
         BLayout::i()->addAllViews('Admin/views')->afterTheme('FCom_Sales_Admin::layout');

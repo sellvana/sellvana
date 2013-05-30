@@ -57,7 +57,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->layout('/customer/address/edit');
     }
 
-    public function action_address_post()
+    public function action_index__POST()
     {
         $customer = FCom_Customer_Model_Customer::sessionUser();
         $r = BRequest::i()->post();

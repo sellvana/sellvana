@@ -7,33 +7,37 @@ class FCom_Checkout_Frontend extends BClass
 
         BRouting::i()
             //cart
-            ->route('GET|POST /cart', 'FCom_Checkout_Frontend_Controller.cart')
+            ->any('/cart', 'FCom_Checkout_Frontend_Controller.cart')
             //checkout
-            ->route('GET|POST /checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
+            ->any('/checkout', 'FCom_Checkout_Frontend_Controller_Checkout.checkout')
             //login
-            ->route('GET /checkout/login', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_login')
+            ->get('/checkout/login', 'FCom_Checkout_Frontend_Controller_Checkout.checkout_login')
             //payment
-            ->route('GET|POST /checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
+            ->any('/checkout/payment', 'FCom_Checkout_Frontend_Controller_Checkout.payment')
             //shipping
-            ->route('GET|POST /checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
+            ->any('/checkout/shipping', 'FCom_Checkout_Frontend_Controller_Checkout.shipping')
             //checkout finish page
-            ->route('GET /checkout/success', 'FCom_Checkout_Frontend_Controller_Checkout.success')
+            ->get('/checkout/success', 'FCom_Checkout_Frontend_Controller_Checkout.success')
             //shipping address
-            ->route('GET|POST /checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
+            ->any('/checkout/address', 'FCom_Checkout_Frontend_Controller_Address.address')
         ;
 
         //merge cart sessions after user login
-        BPubSub::i()->on('FCom_Customer_Model_Customer::login.after', 'FCom_Checkout_Model_Cart::userLogin');
-        BPubSub::i()->on('FCom_Customer_Model_Customer::logout.before', 'FCom_Checkout_Model_Cart::userLogout');
+        BPubSub::i()
+            ->on('FCom_Customer_Model_Customer::login.after', 'FCom_Checkout_Model_Cart::userLogin')
+            ->on('FCom_Customer_Model_Customer::logout.before', 'FCom_Checkout_Model_Cart::userLogout')
 
         //add to cart
-        BPubSub::i()->on('FCom_Catalog_Frontend_Controller::action_product.addToCart',
-                'FCom_Checkout_Frontend_Controller::onAddToCart');
+            ->on('FCom_Catalog_Frontend_Controller::action_product.addToCart', 
+                    'FCom_Checkout_Frontend_Controller::onAddToCart')
 
-        BPubSub::i()->on('bootstrap::after', 'FCom_Checkout_Frontend::initCartTotals');
+            ->on('bootstrap::after', 'FCom_Checkout_Frontend::initCartTotals')
+        ;
 
-        BLayout::i()->addAllViews('Frontend/views')
-                ->afterTheme('FCom_Checkout_Frontend::layout');
+        BLayout::i()
+            ->addAllViews('Frontend/views')
+            ->afterTheme('FCom_Checkout_Frontend::layout')
+        ;
     }
 
     /**

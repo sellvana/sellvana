@@ -12,10 +12,10 @@ class FCom_CatalogIndex_Frontend extends BClass
         FCom_CatalogIndex::bootstrap();
 
         BRouting::i()
-            ->route('GET /catalogindex/search', 'FCom_CatalogIndex_Frontend_Controller.search')
+            ->get('/catalogindex/search', 'FCom_CatalogIndex_Frontend_Controller.search')
             //->route('^GET /([a-z0-9/-]+)/filters=([a-z0-9+.-]+)$', 'FCom_CatalogIndex_Frontend_Controller.category')
-            ->route('GET /index-test', 'FCom_CatalogIndex_Frontend_Controller.test')
-            ->route('GET /index-reindex', 'FCom_CatalogIndex_Frontend_Controller.reindex')
+            ->get('/index-test', 'FCom_CatalogIndex_Frontend_Controller.test')
+            ->get('/index-reindex', 'FCom_CatalogIndex_Frontend_Controller.reindex')
         ;
 
         BLayout::i()

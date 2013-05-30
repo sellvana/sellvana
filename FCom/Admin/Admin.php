@@ -30,31 +30,31 @@ class FCom_Admin extends BClass
     {
         BRouting::i()
             ->route('_ /noroute', 'FCom_Admin_Controller.noroute', array(), null, false)
-            ->route('GET /', 'FCom_Admin_Controller.index')
-            ->route('GET /blank', 'FCom_Admin_Controller.blank')
-            ->route('POST /login', 'FCom_Admin_Controller.login')
-            ->route('GET|POST /password/recover', 'FCom_Admin_Controller.password_recover')
-            ->route('GET|POST /password/reset', 'FCom_Admin_Controller.password_reset')
-            ->route('GET /logout', 'FCom_Admin_Controller.logout')
+            ->get('/', 'FCom_Admin_Controller.index')
+            ->get('/blank', 'FCom_Admin_Controller.blank')
+            ->post('/login', 'FCom_Admin_Controller.login')
+            ->any('/password/recover', 'FCom_Admin_Controller.password_recover')
+            ->any('/password/reset', 'FCom_Admin_Controller.password_reset')
+            ->get('/logout', 'FCom_Admin_Controller.logout')
 
-            ->route('GET /my_account', 'FCom_Admin_Controller.my_account')
-            ->route('GET /reports', 'FCom_Admin_Controller.reports')
-            ->route('POST /my_account/personalize', 'FCom_Admin_Controller.personalize')
+            ->get('/my_account', 'FCom_Admin_Controller.my_account')
+            ->get('/reports', 'FCom_Admin_Controller.reports')
+            ->post('/my_account/personalize', 'FCom_Admin_Controller.personalize')
 
-            ->route('GET /users', 'FCom_Admin_Controller_Users.index')
-            ->route('GET|POST /users/.action', 'FCom_Admin_Controller_Users')
+            ->get('/users', 'FCom_Admin_Controller_Users.index')
+            ->any('/users/.action', 'FCom_Admin_Controller_Users')
 
-            ->route('GET /roles', 'FCom_Admin_Controller_Roles.index')
-            ->route('GET|POST /roles/.action', 'FCom_Admin_Controller_Roles')
+            ->get('/roles', 'FCom_Admin_Controller_Roles.index')
+            ->any('/roles/.action', 'FCom_Admin_Controller_Roles')
 
-            ->route('GET|POST /media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_data')
+            ->any('/media/grid/:do', 'FCom_Admin_Controller_MediaLibrary.grid_data')
 
-            ->route('GET|POST /settings', 'FCom_Admin_Controller_Settings.index')
+            ->any('/settings', 'FCom_Admin_Controller_Settings.index')
 
-            ->route('GET|POST /modules', 'FCom_Admin_Controller_Modules.index')
-            ->route('POST /modules/migrate', 'FCom_Admin_Controller_Modules.migrate')
+            ->any('/modules', 'FCom_Admin_Controller_Modules.index')
+            ->post('/modules/migrate', 'FCom_Admin_Controller_Modules.migrate')
 
-            ->route('GET /test', 'FCom_Admin_Controller.test')
+            ->get('/test', 'FCom_Admin_Controller.test')
         ;
 
         $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');

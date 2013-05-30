@@ -8,6 +8,8 @@ class FCom_Ogone_Frontend extends BClass
     {
         FCom_Ogone::i()->bootstrap();
 
+        BRouting::i()->any('/ogone/.action', 'FCom_Ogone_Frontend_Controller');
+
         BLayout::i()->addAllViews('Frontend/views');
     }
 }

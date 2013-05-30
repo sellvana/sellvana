@@ -49,7 +49,7 @@ class BHAML extends BClass
         $md5 = md5($sourceFile);
         $cacheDir = static::$_cacheDir.'/'.substr($md5, 0, 2);
         $cacheFilename = $cacheDir.'/'.$md5.'.php';
-        if (true || !file_exists($cacheFilename) || filemtime($sourceFile) > filemtime($cacheFilename)) {
+        if (!file_exists($cacheFilename) || filemtime($sourceFile) > filemtime($cacheFilename)) {
             BUtil::ensureDir($cacheDir);
             file_put_contents($cacheFilename, $haml->compileString(file_get_contents($sourceFile), $sourceFile));
         }
