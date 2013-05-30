@@ -70,7 +70,7 @@ class FCom_Catalog_Admin_Controller_Families extends FCom_Admin_Controller_Abstr
             ->join('FCom_Catalog_Model_Product', array('p.id','=','pf.product_id'), 'p')
             ->select(array('p.id', 'p.product_name', 'p.manuf_sku'));
 
-        BPubSub::i()->fire(__METHOD__, array('orm'=>$orm));
+        BEvents::i()->fire(__METHOD__, array('orm'=>$orm));
 
         BResponse::i()->json(BDb::many_as_array($orm->find_many()));
     }

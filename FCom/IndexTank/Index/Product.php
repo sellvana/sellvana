@@ -303,14 +303,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
             //submit every N products to IndexDen - this protect from network overloading
             if ( $limit && 0 == ++$counter % $limit ) {
-                BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
+                BEvents::i()->fire(__METHOD__, array('docs'=>&$documents));
                 $this->model()->add_documents($documents);
                 $documents = array();
             }
         }
 
         if ($documents) {
-            BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
+            BEvents::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
         }
     }

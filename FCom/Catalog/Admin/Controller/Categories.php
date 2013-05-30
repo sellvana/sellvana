@@ -18,7 +18,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
 
-        BPubSub::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
+        BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
 
         $config = array(
             'grid' => array(
@@ -44,7 +44,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
         );
 
-        BPubSub::i()->fire(__METHOD__.'.config', array('config'=>&$config));
+        BEvents::i()->fire(__METHOD__.'.config', array('config'=>&$config));
 
         return $config;
     }

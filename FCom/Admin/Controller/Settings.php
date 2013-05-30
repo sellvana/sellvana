@@ -20,7 +20,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = BRequest::i()->post();
 
-            BPubSub::i()->fire(__METHOD__, array('post'=>&$post));
+            BEvents::i()->fire(__METHOD__, array('post'=>&$post));
 
             BConfig::i()->add($post['config'], true);
 

@@ -4,7 +4,7 @@ class FCom_Cms_Frontend extends BClass
 {
     public static function bootstrap()
     {
-        BPubSub::i()
+        BEvents::i()
             ->on('BLayout::theme.load.after', 'FCom_Cms_Frontend::layout')
         ;
 

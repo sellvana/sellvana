@@ -5,7 +5,7 @@ class FCom_Market_Admin extends BClass
     static public function bootstrap()
     {
         BLayout::i()->addAllViews('Admin/views');
-        BPubSub::i()
+        BEvents::i()
                 ->on('BLayout::theme.load.after', 'FCom_Market_Admin::layout')
                 ->on('BLayout::hook.hook_modules_notification', 'FCom_Market_Admin.hookFindModulesForUpdates')
                 ;

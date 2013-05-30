@@ -50,7 +50,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id='),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
         );
-        BPubSub::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
+        BEvents::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
         return $config;
     }
 
@@ -73,7 +73,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'new' => ' <button class="st1 sz2 btn" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
             ),
         ));
-        BPubSub::i()->fire(static::$_origClass.'::gridViewBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::gridViewBefore', $args);
     }
 
     public function action_grid_data()
@@ -104,7 +104,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridOrmConfig($orm)
     {
-        BPubSub::i()->fire(static::$_origClass.'::gridOrmConfig', array('orm'=>&$orm));
+        BEvents::i()->fire(static::$_origClass.'::gridOrmConfig', array('orm'=>&$orm));
     }
 
     public function action_grid_data__POST()
@@ -147,7 +147,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
         ));
-        BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
 
     public function action_form__POST()
@@ -183,16 +183,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function formPostBefore($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::formPostBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::formPostBefore', $args);
     }
 
     public function formPostAfter($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::formPostAfter', $args);
+        BEvents::i()->fire(static::$_origClass.'::formPostAfter', $args);
     }
 
     public function formPostError($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::formPostError', $args);
+        BEvents::i()->fire(static::$_origClass.'::formPostError', $args);
     }
 }

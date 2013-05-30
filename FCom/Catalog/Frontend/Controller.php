@@ -20,7 +20,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return $this;
         }
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product.product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
         $layout->view('catalog/product')->product = $product;
@@ -66,11 +66,11 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $post = BRequest::post();
 
         if (!empty($post['add2cart'])) {
-            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToCart', array('product'=>&$product, 'qty' => $post['qty']));
+            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToCart', array('product'=>&$product, 'qty' => $post['qty']));
         }
 
         if (!empty($post['add2wishlist'])) {
-            BPubSub::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
+            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product.addToWishlist', array('product'=>&$product));
         }
 
 

@@ -5,7 +5,7 @@ class FCom_Translation_Admin extends BClass
     static public function bootstrap()
     {
         BLayout::i()->addAllViews('Admin/views');
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Translation_Admin::layout');
+        BEvents::i()->on('BLayout::theme.load.after', 'FCom_Translation_Admin::layout');
 
         BRouting::i()
             ->get('/translations', 'FCom_Translation_Admin_Controller.index')

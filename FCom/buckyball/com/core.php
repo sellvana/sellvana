@@ -1311,7 +1311,7 @@ class BClassAutoload extends BClass
 /**
 * Events and observers registry
 */
-class BPubSub extends BClass
+class BEvents extends BClass
 {
     /**
     * Stores events and observers
@@ -1540,6 +1540,13 @@ class BPubSub extends BClass
         echo "<pre>"; print_r($this->_events); echo "</pre>";
     }
 }
+
+/**
+ * Alias for backwards compatibility
+ * 
+ * @deprecated by BEvents
+ */
+class BPubSub extends BEvents {}
 
 /**
 * Facility to handle session state

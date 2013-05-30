@@ -8,7 +8,7 @@ class FCom_Wishlist_Frontend extends BClass
             ->any('/wishlist', 'FCom_Wishlist_Frontend_Controller.wishlist');
 
         //add to wishlist
-        BPubSub::i()->on('FCom_Catalog_Frontend_Controller::action_product.addToWishlist',
+        BEvents::i()->on('FCom_Catalog_Frontend_Controller::action_product.addToWishlist',
                 'FCom_Wishlist_Frontend_Controller::onAddToWishlist');
 
         BLayout::i()->addAllViews('Frontend/views')

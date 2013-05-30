@@ -18,7 +18,7 @@ class FCom_CatalogIndex_Admin extends BClass
             ->afterTheme('FCom_CatalogIndex_Admin::layout')
         ;
             
-        BPubSub::i()
+        BEvents::i()
             ->on('FCom_Catalog_Model_Product::save.after', 'FCom_CatalogIndex_Admin::onProductSaveAfter')
         ;
     }

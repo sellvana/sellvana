@@ -146,7 +146,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
                 'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
             ),
         ));
-        BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
 
     public function action_install()

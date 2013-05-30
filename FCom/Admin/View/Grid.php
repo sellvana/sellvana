@@ -439,8 +439,8 @@ return [true, 'Testing error'];
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BPubSub::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BPubSub::i()->fire($method.'.orm', array('orm'=>$orm));
+            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
         }
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
@@ -448,7 +448,7 @@ return [true, 'Testing error'];
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BPubSub::i()->fire($method.'.data', array('data'=>&$data));
+            BEvents::i()->fire($method.'.data', array('data'=>&$data));
         }
 
         return $data;
@@ -457,7 +457,7 @@ return [true, 'Testing error'];
     public function export($orm, $class=null)
     {
         if ($class) {
-            BPubSub::i()->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
+            BEvents::i()->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
         }
         $r = BRequest::i()->request();
         if (!empty($r['filters'])) {

@@ -155,13 +155,13 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__.'.after', array('user'=>$this));
         return $this;
     }
 
     static public function logout()
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
+        BEvents::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
 
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
@@ -187,7 +187,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public static function import($data)
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('data'=>&$data));
+        BEvents::i()->fire(__METHOD__.'.before', array('data'=>&$data));
 
         if (!empty($data['customer']['id'])) {
             $cust = static::load($data['customer']['id']);
@@ -223,7 +223,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
-        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
+        BEvents::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
 
         return $result;
     }

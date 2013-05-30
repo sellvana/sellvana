@@ -92,14 +92,14 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
             'custom' => array('personalize'=>true, 'autoresize'=>true),
         );
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
+        BEvents::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
         return $config;
     }
 
     public function action_index()
     {
         $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid'=>$grid));
+        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid'=>$grid));
         $this->messages('modules')->layout('/modules');
     }
 

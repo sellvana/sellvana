@@ -7,7 +7,7 @@ class FCom_CustomField_Common extends BClass
 
     public static function bootstrap()
     {
-        BPubSub::i()
+        BEvents::i()
             ->on('FCom_Catalog_Model_Product::find_one.orm', 'FCom_CustomField_Common.productFindORM')
             ->on('FCom_Catalog_Model_Product::find_many.orm', 'FCom_CustomField_Common.productFindORM')
             // is there save on frontend?

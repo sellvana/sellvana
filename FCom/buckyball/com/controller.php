@@ -1105,7 +1105,7 @@ class BResponse extends BClass
         } elseif (is_null($this->_content)) {
             $this->_content = BLayout::i()->render();
         }
-        BPubSub::i()->fire('BResponse::output.before', array('content'=>&$this->_content));
+        BEvents::i()->fire('BResponse::output.before', array('content'=>&$this->_content));
 
         if ($this->_contentPrefix) {
             echo $this->_contentPrefix;
@@ -1117,7 +1117,7 @@ class BResponse extends BClass
             echo $this->_contentSuffix;
         }
 
-        BPubSub::i()->fire('BResponse::output.after', array('content'=>$this->_content));
+        BEvents::i()->fire('BResponse::output.after', array('content'=>$this->_content));
 
         $this->shutdown(__METHOD__);
     }
@@ -1225,7 +1225,7 @@ class BResponse extends BClass
 
     public function shutdown($lastMethod=null)
     {
-        BPubSub::i()->fire('BResponse::shutdown', array('last_method'=>$lastMethod));
+        BEvents::i()->fire('BResponse::shutdown', array('last_method'=>$lastMethod));
         BSession::i()->close();
         exit;
     }
@@ -1567,7 +1567,7 @@ class BRouting extends BClass
     */
     public function dispatch($requestRoute=null)
     {
-        BPubSub::i()->fire(__METHOD__.'.before');
+        BEvents::i()->fire(__METHOD__.'.before');
 
         $this->processRoutes();
 
@@ -2066,7 +2066,7 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BPubSub::i()->fire(__METHOD__);
+        BEvents::i()->fire(__METHOD__);
         return true;
     }
 
@@ -2076,7 +2076,7 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BPubSub::i()->fire(__METHOD__);
+        BEvents::i()->fire(__METHOD__);
     }
 
     /**

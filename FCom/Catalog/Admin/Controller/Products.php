@@ -18,7 +18,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
         );
-        BPubSub::i()->fire(__METHOD__, array('columns'=>&$columns));
+        BEvents::i()->fire(__METHOD__, array('columns'=>&$columns));
         return $columns;
     }
 
@@ -153,7 +153,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
         );
 
-        BPubSub::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
         $data = BDb::many_as_array($orm->find_many());
         //unset unused columns
         $columnKeys = array_keys($config['grid']['columns']);
@@ -166,7 +166,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
         $config['grid']['data'] = $data;
 
-        BPubSub::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
 
         return $config;
     }
