@@ -38,7 +38,7 @@ class Blog
             ->view('head', array('view_class'=>'BViewHead'))
         ;
 
-        BPubSub::i()->on('BLayout::render.before', 'Blog::onRenderBefore');
+        BEvents::i()->on('BLayout::render.before', 'Blog::onRenderBefore');
     }
 
     public static function user()

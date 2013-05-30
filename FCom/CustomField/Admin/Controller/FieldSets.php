@@ -75,7 +75,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             #'searchGrid' => array('multipleSearch'=>true, 'multipleGroup'=>true),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
         );
-        BPubSub::i()->fire(__METHOD__, array('config'=>&$config));
+        BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         return $config;
     }
 
@@ -248,7 +248,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
             }
             $data['model'] = BLocale::i()->parseRequestDates($data['model'], 'from_date,to_date');
             $model->set($data['model']);
-            BPubSub::i()->fire('FCom_CustomField_Admin_Controller_FieldSets::form_post', array('id'=>$id, 'data'=>$data, 'model'=>$model));
+            BEvents::i()->fire('FCom_CustomField_Admin_Controller_FieldSets::form_post', array('id'=>$id, 'data'=>$data, 'model'=>$model));
             $model->save();
             if (!$id) {
                 $id = $model->id;

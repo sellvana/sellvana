@@ -13,7 +13,7 @@ class FCom_Email_Frontend extends BClass
             ->afterTheme('FCom_Email_Frontend::layout')
         ;
 
-        BPubSub::i()->on('BView::email.before', 'FCom_Email_Admin::onViewEmailBefore');
+        BEvents::i()->on('BView::email.before', 'FCom_Email_Admin::onViewEmailBefore');
     }
 
     public static function onViewEmailBefore($args)

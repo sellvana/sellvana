@@ -60,7 +60,7 @@ class BModuleRegistry extends BClass
 
     public function __construct()
     {
-        //BPubSub::i()->on('BFrontController::dispatch.before', array($this, 'onBeforeDispatch'));
+        //BEvents::i()->on('BFrontController::dispatch.before', array($this, 'onBeforeDispatch'));
     }
 
     /**
@@ -566,7 +566,7 @@ echo "</pre>"; exit;
             }
             $this->popModule();
         }
-        BPubSub::i()->fire('bootstrap::after');
+        BEvents::i()->fire('bootstrap::after');
         return $this;
     }
 

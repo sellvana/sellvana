@@ -4,7 +4,7 @@ class FCom_Customer_Frontend extends BClass
 {
     public static function bootstrap()
     {
-        BPubSub::i()
+        BEvents::i()
             ->on('BLayout::theme.load.after', 'FCom_Customer_Frontend::layout')
         ;
 
@@ -28,7 +28,7 @@ class FCom_Customer_Frontend extends BClass
             //->route('GET /customer/address/billing', 'FCom_Customer_Frontend_Controller_Address.billing')
         ;
 
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Customer_Model_Customer::onAddProductToCart');
+        BEvents::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Customer_Model_Customer::onAddProductToCart');
 
         BLayout::i()->addAllViews('Frontend/views');
 #echo '*FCom_Customer_Frontend*';

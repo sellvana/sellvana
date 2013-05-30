@@ -242,7 +242,7 @@ class BLayout extends BClass
             }
         }
 
-        BPubSub::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
+        BEvents::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
 
         return $this;
     }
@@ -339,12 +339,12 @@ class BLayout extends BClass
                 }
             }
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
-            BPubSub::i()->fire('BLayout::view.add: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view.add: ' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         } else {
             $this->_views[$viewAlias]->setParam($params);
-            BPubSub::i()->fire('BLayout::view.update: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view.update: ' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         }
@@ -439,7 +439,7 @@ class BLayout extends BClass
      */
     public function hook($hookName, $callback, $args = array())
     {
-        BPubSub::i()->on('BLayout::hook.' . $hookName, $callback, $args);
+        BEvents::i()->on('BLayout::hook.' . $hookName, $callback, $args);
 
         return $this;
     }
@@ -781,9 +781,9 @@ class BLayout extends BClass
             return $this;
         }
         BDebug::debug('THEME.LOAD ' . $themeName);
-        BPubSub::i()->fire('BLayout::theme.load.before', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::theme.load.before', array('theme_name' => $themeName));
         BUtil::call($this->_themes[$themeName]['callback']);
-        BPubSub::i()->fire('BLayout::theme.load.after', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::theme.load.after', array('theme_name' => $themeName));
 
         return $this;
     }
@@ -795,7 +795,7 @@ class BLayout extends BClass
      */
     public function afterTheme($callback)
     {
-        BPubSub::i()->on('BLayout::theme.load.after', $callback);
+        BEvents::i()->on('BLayout::theme.load.after', $callback);
 
         return $this;
     }
@@ -817,12 +817,12 @@ class BLayout extends BClass
         if (is_null($routeName) && ($route = BRouting::i()->currentRoute())) {
             $args['route_name'] = $routeName = $route->route_name;
         }
-        $result = BPubSub::i()->fire("BLayout::{$eventName}", $args);
+        $result = BEvents::i()->fire("BLayout::{$eventName}", $args);
 
         $routes = is_string($routeName) ? explode(',', $routeName) : (array)$routeName;
         foreach ($routes as $route) {
             $args['route_name'] = $route;
-            $r2                 = BPubSub::i()->fire("BLayout::{$eventName}: {$route}", $args);
+            $r2                 = BEvents::i()->fire("BLayout::{$eventName}: {$route}", $args);
             $result             = BUtil::arrayMerge($result, $r2);
         }
 
@@ -1088,7 +1088,7 @@ class BView extends BClass
     public function hook($hookName, $args = array())
     {
         $args['_viewname'] = $this->param('view_name');
-        $result            = BPubSub::i()->fire('BLayout::hook.' . $hookName, $args);
+        $result            = BEvents::i()->fire('BLayout::hook.' . $hookName, $args);
 
         return join('', $result);
     }
@@ -1177,7 +1177,7 @@ class BView extends BClass
         }
 
         $result = '';
-        $result .= join('', BPubSub::i()->fire('BView::render.before', array('view' => $this)));
+        $result .= join('', BEvents::i()->fire('BView::render.before', array('view' => $this)));
         if (($renderer = $this->param('renderer'))) {
             $viewContent = call_user_func($renderer, $this);
         } else {
@@ -1194,7 +1194,7 @@ class BView extends BClass
             $this->setParam('meta_data', $metaData);
         }
         $result .= $viewContent;
-        $result .= join('', BPubSub::i()->fire('BView::render.after', array('view' => $this)));
+        $result .= join('', BEvents::i()->fire('BView::render.after', array('view' => $this)));
 
         BDebug::profile($timer);
 
@@ -1219,7 +1219,7 @@ class BView extends BClass
      */
     protected function _afterRender()
     {
-        BPubSub::i()->fire('BView::afterRender', array('view' => $this));
+        BEvents::i()->fire('BView::afterRender', array('view' => $this));
     }
 
     /**
@@ -1398,7 +1398,7 @@ class BView extends BClass
         );
 
         try {
-            $flags = BPubSub::i()->fire("BView::email.before", array('email_data' => $eventData));
+            $flags = BEvents::i()->fire("BView::email.before", array('email_data' => $eventData));
             if ($flags===false) {
                 return false;
             } elseif (is_array($flags)) {
@@ -1413,7 +1413,7 @@ class BView extends BClass
             return false;
         }
 
-        BPubSub::i()->fire("BView::email", array('email_data' => $eventData));
+        BEvents::i()->fire("BView::email", array('email_data' => $eventData));
 
         return mail($to, $subject, trim($body), join("\r\n", $headers), join(' ', $params));
     }

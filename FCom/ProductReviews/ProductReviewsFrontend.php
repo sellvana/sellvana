@@ -4,7 +4,7 @@ class FCom_ProductReviews_Frontend extends BClass
 {
     public static function bootstrap()
     {
-        BPubSub::i()
+        BEvents::i()
             ->on('BLayout::theme.load.after', 'FCom_ProductReviews_Frontend::layout')
             ->on('BLayout::hook.prodreviews-reviews', 'FCom_ProductReviews_Frontend.hookReviews')
         ;

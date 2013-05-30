@@ -1410,7 +1410,7 @@ class BModelUser extends BModel
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__.'.after', array('user'=>$this));
         return $this;
     }
 
@@ -1428,7 +1428,7 @@ class BModelUser extends BModel
     {
         BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
         static::$_sessionUser = null;
-        BPubSub::i()->fire(__METHOD__.'.after');
+        BEvents::i()->fire(__METHOD__.'.after');
     }
 
     public function recoverPassword($emailView='email/user-password-recover')
@@ -1665,7 +1665,7 @@ class BDebug extends BClass
     public function __construct()
     {
         self::$_startTime = microtime(true);
-        BPubSub::i()->on('BResponse::output.after', 'BDebug::afterOutput');
+        BEvents::i()->on('BResponse::output.after', 'BDebug::afterOutput');
     }
 
     /**
@@ -1956,7 +1956,7 @@ class BDebug extends BClass
         echo "DELTA: ".BDebug::i()->delta().', PEAK: '.memory_get_peak_usage(true).', EXIT: '.memory_get_usage(true);
         echo "<pre>";
         print_r(BORM::get_query_log());
-        //BPubSub::i()->debug();
+        //BEvents::i()->debug();
         echo "</pre>";
         //print_r(self::$_events);
 ?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th><th>Relevant Location</th><th>Module</th></tr><?php
@@ -2738,7 +2738,7 @@ class BLoginThrottle extends BClass
 
     protected function _fire($event)
     {
-        BPubSub::i()->fire('BLoginThrottle::'.$event, array(
+        BEvents::i()->fire('BLoginThrottle::'.$event, array(
             'area'     => $this->_area,
             'username' => $this->_username,
             'rec'      => $this->_rec,

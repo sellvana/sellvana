@@ -20,7 +20,7 @@ class FCom_Admin extends BClass
             'system/settings' => 'Update Settings',
             'system/modules' => 'Manage Modules',
         ));
-        BPubSub::i()
+        BEvents::i()
             //->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
             ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
         ;

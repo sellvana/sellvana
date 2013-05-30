@@ -19,7 +19,7 @@ class FCom_CustomField_Admin extends BClass
             ->afterTheme('FCom_CustomField_Admin::layout')
         ;
 
-        BPubSub::i()
+        BEvents::i()
 //            ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
             ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns')
                 //

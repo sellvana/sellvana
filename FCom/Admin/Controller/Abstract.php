@@ -180,11 +180,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function gridPostBefore($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::gridPostBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::gridPostBefore', $args);
     }
 
     public function gridPostAfter($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::gridPostAfter', $args);
+        BEvents::i()->fire(static::$_origClass.'::gridPostAfter', $args);
     }
 }

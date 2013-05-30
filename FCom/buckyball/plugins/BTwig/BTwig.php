@@ -16,7 +16,7 @@ class BTwig extends BClass
     {
         BLayout::i()->addExtRenderer(static::$_defaultFileExt, 'BTwig::renderer');
 
-        BPubSub::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
+        BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
     }
 
     public static function onLayoutAddAllViews($args)

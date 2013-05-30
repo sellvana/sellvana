@@ -27,12 +27,12 @@ class FCom_IndexTank_Admin extends BClass
 
         BLayout::i()->addAllViews('Admin/views');
 
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
+        BEvents::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
 
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
 
             if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
-                BPubSub::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+                BEvents::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
                         ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                         //for categories
@@ -50,7 +50,7 @@ class FCom_IndexTank_Admin extends BClass
 
         }
         //on update settings create new index if index was changed
-        BPubSub::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
+        BEvents::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
 
         FCom_IndexTank_Admin_Controller::bootstrap();
     }

@@ -28,13 +28,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $status = FCom_Sales_Model_OrderStatus::i()->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        BPubSub::i()->fire(__CLASS__.'.addNew', array('order'=>$data));
+        BEvents::i()->fire(__CLASS__.'.addNew', array('order'=>$data));
         return $this->create($data)->save();
     }
 
     public function update($data)
     {
-        BPubSub::i()->fire(__CLASS__.'.update', array('order'=>$data));
+        BEvents::i()->fire(__CLASS__.'.update', array('order'=>$data));
         return $this->set($data)->save();
     }
 

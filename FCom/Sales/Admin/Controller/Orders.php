@@ -117,7 +117,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
         ));
-        BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
 
     public function formPostAfter($args)

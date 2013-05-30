@@ -4,7 +4,7 @@ class FCom_ProductReviews_Admin extends BClass
 {
     public static function bootstrap()
     {
-        BPubSub::i()
+        BEvents::i()
             ->on('BLayout::theme.load.after', 'FCom_ProductReviews_Admin::layout')
             ->on('BLayout::hook.catalog/products/tab/main', 'FCom_ProductReviews_Admin.hookProductTab')
         ;

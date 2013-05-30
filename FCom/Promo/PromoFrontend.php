@@ -5,10 +5,10 @@ class FCom_Promo_Frontend extends BClass
     static public function bootstrap()
     {
         //add product to cart
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::calcTotals', 'FCom_Promo_Frontend::onPromoCartValidate');
-        BPubSub::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Promo_Frontend::onPromoCartAddProduct');
+        BEvents::i()->on('FCom_Checkout_Model_Cart::calcTotals', 'FCom_Promo_Frontend::onPromoCartValidate');
+        BEvents::i()->on('FCom_Checkout_Model_Cart::addProduct', 'FCom_Promo_Frontend::onPromoCartAddProduct');
 
-        BPubSub::i()
+        BEvents::i()
             ->on('BLayout::hook.promotions', 'FCom_Promo_Frontend_Controller.hook_promotions')
         ;
 
@@ -17,7 +17,7 @@ class FCom_Promo_Frontend extends BClass
         ;
 
         BLayout::i()->addAllViews('Frontend/views');
-        BPubSub::i()->on('BLayout::theme.load.after', 'FCom_Promo_Frontend::layout');
+        BEvents::i()->on('BLayout::theme.load.after', 'FCom_Promo_Frontend::layout');
 
     }
 

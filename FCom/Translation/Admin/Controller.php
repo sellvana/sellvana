@@ -81,7 +81,7 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
                 'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
             ),
         ));
-        BPubSub::i()->fire(static::$_origClass.'::formViewBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
 
     public function action_form__POST()

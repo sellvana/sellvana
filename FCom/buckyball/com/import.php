@@ -8,7 +8,7 @@ class BImport extends BClass
 
     public function getFieldData()
     {
-        BPubSub::i()->fire(__METHOD__, array('fields'=>&$this->fields));
+        BEvents::i()->fire(__METHOD__, array('fields'=>&$this->fields));
         return $this->fields;
     }
 

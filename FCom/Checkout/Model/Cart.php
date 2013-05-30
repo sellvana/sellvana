@@ -156,9 +156,9 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $orm = FCom_Checkout_Model_CartItem::i()->orm('ci')->where('ci.cart_id', $this->id)
             ->order_by_desc('ci.update_dt')->limit($limit);
-        BPubSub::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
+        BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
         $items = $orm->find_many();
-        BPubSub::i()->fire(__METHOD__.'.data', array('items'=>&$items));
+        BEvents::i()->fire(__METHOD__.'.data', array('items'=>&$items));
         return $items;
     }
 
@@ -273,7 +273,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             $this->calcTotals()->save();
         }
 
-        BPubSub::i()->fire(__METHOD__, array('model'=>$this, 'item' => $item));
+        BEvents::i()->fire(__METHOD__, array('model'=>$this, 'item' => $item));
 
         static::sessionCartId($this->id);
         return $this;
@@ -297,7 +297,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->items();
         $this->removeItem($this->childById('items', $productId, 'product_id'));
-        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
+        BEvents::i()->fire(__METHOD__, array('model'=>$this));
         return $this;
     }
 
@@ -368,7 +368,7 @@ throw new Exception("Invalid cart_id: ".$cId);
             $this->item_qty += $item->qty;
             $this->subtotal += $item->price*$item->qty;
         }
-        BPubSub::i()->fire(__METHOD__, array('model'=>$this));
+        BEvents::i()->fire(__METHOD__, array('model'=>$this));
         return $this;
     }
 /*

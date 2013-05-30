@@ -4,6 +4,7 @@ class FCom_Checkout_Frontend extends BClass
 {
     static public function bootstrap()
     {
+        FCom_Sales::i()->
 
         BRouting::i()
             //cart
@@ -23,7 +24,7 @@ class FCom_Checkout_Frontend extends BClass
         ;
 
         //merge cart sessions after user login
-        BPubSub::i()
+        BEvents::i()
             ->on('FCom_Customer_Model_Customer::login.after', 'FCom_Checkout_Model_Cart::userLogin')
             ->on('FCom_Customer_Model_Customer::logout.before', 'FCom_Checkout_Model_Cart::userLogout')
 
