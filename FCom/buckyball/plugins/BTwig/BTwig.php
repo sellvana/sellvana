@@ -72,6 +72,10 @@ class BTwig extends BClass
         $args = $view->getAllArgs();
         //TODO: add BRequest and BLayout vars?
         $args['THIS'] = $view;
+        $args['APP'] = BApp::i();
+        $args['REQUEST'] = BRequest::i();
+        $args['LAYOUT'] = BLayout::i();
+        $args['CONFIG'] = BConfig::i();
 
         if (!$source) {
 
@@ -85,6 +89,7 @@ class BTwig extends BClass
             $output = static::$_stringTwig->render($source, $args);
 
         }
+
         BDebug::profile($pId);
         return $output;
     }

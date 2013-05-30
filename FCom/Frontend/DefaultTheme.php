@@ -15,6 +15,7 @@ class FCom_Frontend_DefaultTheme extends BClass
     {
         $cookieConfig = BConfig::i()->get('cookie');
 
+        BLayout::i()->loadLayout(__DIR__.'/layout.yml');
         BLayout::i()
             ->addLayout(array(
                 'base'=>array(
@@ -32,7 +33,6 @@ FCom.base_href = '".BApp::baseUrl()."';
                  ),
              ));
 
-        BLayout::i()->loadLayout(__DIR__.'/layout.yml');
         //BLayout::i()->addLayout(BYAML::i()->load(__DIR__.'/layout.yml'));
 /*
         BLayout::i()

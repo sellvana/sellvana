@@ -1318,6 +1318,17 @@ class BData extends BClass implements ArrayAccess
     {
         return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
     }
+
+    public function get($name)
+    {
+        return isset($this->_data[$name]) ? $this->_data[$name] : null;
+    }
+
+    public function set($name, $value)
+    {
+        $this->_data[$name] = $value;
+        return $this;
+    }
 }
 
 /**
