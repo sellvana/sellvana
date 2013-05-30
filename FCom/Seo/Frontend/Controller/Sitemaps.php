@@ -4,6 +4,29 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
 {
     public function action_sitemap()
     {
+        $this->layout('/sitemap');
+    }
+
+    public function action_index_xml()
+    {
+        $output = '<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        $sitemaps = array( //TODO: fetch real paginated sitemaps
+            array('loc' => BApp::href('sitemap.xml.gz')),
+        );
+        foreach ($sitemaps as $sitemap) {
+            $output .= '<sitemap>'
+                .'<loc>'.$sitemap['loc'].'</loc>'
+                .'<lastmod>'.date('c').'</lastmod>' //TODO: figure out how to get lastmod
+                .'</sitemap>';
+        }
+        $output .= '</sitemapindex>';
+        echo $output;
+        exit;
+    }
+
+    public function action_sitemap_data()
+    {
         $params = BRequest::i()->param();
         $page = $params[2];
         $type = $params[3];
@@ -58,24 +81,6 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         if (!empty($params[4]) && $params[4]==='.gz') {
             $output = gzcompress($output);
         }
-        echo $output;
-        exit;
-    }
-
-    public function action_index()
-    {
-        $output = '<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $sitemaps = array( //TODO: fetch real paginated sitemaps
-            array('loc' => BApp::href('sitemap.xml.gz')),
-        );
-        foreach ($sitemaps as $sitemap) {
-            $output .= '<sitemap>'
-                .'<loc>'.$sitemap['loc'].'</loc>'
-                .'<lastmod>'.date('c').'</lastmod>' //TODO: figure out how to get lastmod
-                .'</sitemap>';
-        }
-        $output .= '</sitemapindex>';
         echo $output;
         exit;
     }

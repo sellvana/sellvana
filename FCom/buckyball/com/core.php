@@ -360,6 +360,19 @@ class BApp extends BClass
     {
         return isset($this->_vars[$key]) ? $this->_vars[$key] : null;
     }
+
+    /**
+     * Helper to get class singletons and instances from templates like Twig
+     *
+     * @param string $class
+     * @param boolean $new
+     * @param array $args
+     * @return BClass
+     */
+    public function instance($class, $new=false, $args=array())
+    {
+        return $class::i($new, $args);
+    }
 }
 
 

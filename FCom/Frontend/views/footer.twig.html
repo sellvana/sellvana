@@ -32,7 +32,12 @@
             </ul>
         </div>
     </div>
-    <p class="copyright">&copy; 2012 Fulleron Inc. <a href="#">Sitemap</a> <a href="#">Privacy</a> <a href="#">Terms of Use</a></p>
+    <p class="copyright">
+        &copy; {{ 'now'|date('Y') }} {{ CONFIG.get('modules/FCom_Core/copyright') }}
+        <a href="{{ APP.href('sitemap') }}">{{ 'Sitemap' |_ }}</a>
+        <a href="{{ APP.href('privacy') }}">{{ 'Privacy' |_ }}</a>
+        <a href="{{ APP.href('terms') }}">{{ 'Terms of Use' |_ }}</a>
+    </p>
     </div>
 </footer>
 

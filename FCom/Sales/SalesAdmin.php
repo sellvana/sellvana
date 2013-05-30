@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__.'/Sales.php';
+
 class FCom_Sales_Admin extends BClass
 {
     public static function bootstrap()

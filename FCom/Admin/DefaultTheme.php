@@ -130,14 +130,17 @@ class FCom_Admin_DefaultTheme extends BClass
 
                 '/login'=>array(
                     array('layout', 'base'),
+                    array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('login')),
                 ),
                 '/password/recover'=>array(
                     array('layout', 'base'),
+                    array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('password/recover')),
                 ),
                 '/password/reset'=>array(
                     array('layout', 'base'),
+                    array('layout', 'form'),
                     array('hook', 'main', 'views'=>array('password/reset')),
                 ),
 

@@ -1,0 +1,41 @@
+{% set customer = APP.instance('FCom_Customer_Model_Customer') %}
+
+<header class="header-wrapper">
+	<div class="header-top-wrapper">
+	    <div class="header-top">
+	        <a href="#" class="site-logo">{{ CONFIG.get('modules/FCom_Core/store_name') }}</a>
+	        <div id="minicart-container">{{ THIS.view('checkout/cart/block') | raw }}</div>
+	        <nav class="sup-links">
+	            <ul>
+	                {% if customer.isLoggedIn() %}
+						<li class="header-sup-signin">
+	                        Hello {{ customer.sessionUser().email }}
+	                        <a href="{{ APP.href('logout') }}">{{ 'Logout' |_ }} </a>
+	                    </li>
+	                    <li><a href="{{ APP.href('customer/myaccount') }}">{{ 'My Account' |_ }}</a></li>
+	                {% else %}
+						<li class="header-sup-signin">{{ 'Hello there!' |_ }}</li>
+						<li><a href="{{ APP.href('login') }}">{{ 'Sign in' |_ }}</a></li>
+						<li class="header-sup-wishlist"><a href="{{ APP.href('customer/register') }}">{{ 'Register' |_ }}</a></li>
+	                {% endif %}
+					<li><a href="{{ APP.href('wishlist') }}">{{ 'Wishlist' |_ }}</a></li>
+	            </ul>
+	        </nav>
+	    </div>
+	</div>
+	<div class="header-nav-wrapper">
+	    <div class="header-nav">
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="{{ APP.baseUrl() }}">{{ 'Home' |_ }}</a>
+                    {{ THIS.view('nav') | raw }}
+                </ul>
+            </nav>
+                <form class="site-search" action="{{ APP.href('catalog/search') }}">
+            	<fieldset>
+            		<input type="text" placeholder="{{ 'Search entire store' |_ }}" name="q" value="{{ REQUEST.get('q') }}"/><button class="icon-button"><span>{{ 'Search' |_ }}</span></button>
+            	</fieldset>
+            </form>
+	    </div>
+	</div>
+</header>

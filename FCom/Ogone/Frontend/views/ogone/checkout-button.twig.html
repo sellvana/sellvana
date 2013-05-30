@@ -1,0 +1,6 @@
+<form method="post" id="ogone-checkout" action="{{THIS.form_url}}">
+    {% for value in THIS.data %}
+        <input type="hidden" name="{{loop.index}}" value="{{value}}"/>
+    {% endfor %}
+    <input type="submit" value="{{'Online secure payment by Ogone'|_}}"/>
+</form>

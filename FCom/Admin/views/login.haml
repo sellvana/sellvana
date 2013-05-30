@@ -1,20 +1,25 @@
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 %section.adm-login-form
     %h3.app-logo = $this->q($storeName)
-    %form(method="post" action="#{BApp::href('login')}")
+    %form#login-form(method="post" action="#{BApp::href('login')}")
         %fieldset
             %header.section-title = $this->_('Log into Account')
             - echo $this->messagesHtml('admin')
             %ul.form-list
                 %li.label-l
                     %label(for="#") = $this->_('Email/Username')
-                    %input.sz1(type="text" name="login[username]")
+                    %input.sz1.required(type="text" name="login[username]")
                 %li.label-l
                     %label(for="#") = $this->_('Password')
-                    %input.sz1(type="password" name="login[password]")
+                    %input.sz1.required(type="password" name="login[password]")
             .btns-set
                 %input.btn.st1.sz1(type="submit" value="#{ $this->_('Login')}")
                 %p
                     %a(href="#{ BApp::href('password/recover') }") = $this->_('Recover your password')
     %p.copyright
         &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
+
+:javascript
+    head(function() {
+        $('#login-form').validate();
+    })

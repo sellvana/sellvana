@@ -25,6 +25,7 @@ input, select,
 textarea 		{ font-family:sans-serif; color:#2f2f2f; }
 textarea { width:250px; height:100px; }
 input[type='text'],
+input[type='email'],
 input[type='url'],
 input[type='password'] { width:280px; }
 
@@ -119,7 +120,7 @@ th, td { text-align:left; }
 
 /* Forms - Inputs */
 /* Inputs have sz1 */
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="email"], input[type="url"], input[type="password"] {
 	border:1px solid #aaa;
 	box-shadow:inset 2px 2px 3px 0 #ddd;
 	-moz-box-shadow:inset 2px 2px 3px 0 #ddd;
@@ -128,7 +129,7 @@ input[type="text"], input[type="password"] {
 	color:#444;
 	font-size:15px;
 	}
-input[type="text"].sz1, input[type="password"].sz1 {
+input[type="text"].sz1, input[type="email"], input[type="url"], input[type="password"].sz1 {
 	padding:6px 5px;
 	font-size:17px;
 	}
@@ -344,7 +345,7 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 .ui-widget textarea,
 .ui-widget button { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
 
-.ui-widget input[type="text"], .ui-widget input[type="password"] {
+.ui-widget input[type="text"], .ui-widget input[type="email"], .ui-widget input[type="url"], .ui-widget input[type="password"] {
 	border:1px solid #aaa;
 	box-shadow:inset 2px 2px 3px 0 #ddd;
 	-moz-box-shadow:inset 2px 2px 3px 0 #ddd;
@@ -796,6 +797,8 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 .adm-login-form .form-list { margin-bottom:10px; }
 .adm-login-form li.label-l label { width:145px; font-size:15px; text-align:right; margin-right:10px; }
 .adm-login-form input[type="text"],
+.adm-login-form input[type="email"],
+.adm-login-form input[type="url"],
 .adm-login-form input[type="password"] { width:250px; }
 .adm-login-form .btns-set { margin-left:155px; }
 .adm-login-form .app-logo { margin-bottom:10px; }
@@ -811,28 +814,29 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 .col-customer-info { float:left; width:330px; }
 .col-customer-info select {width: 294px; padding: 4px 0; margin: 3px 0;}
 .col-customer-address { margin-left:355px; }
-.col-customer-address .ng-scope { 
-	float:left; 
-	width:350px; 
-	background:#fff; 
-	padding:13px; 
+.col-customer-address .ng-scope {
+	float:left;
+	width:350px;
+	background:#fff;
+	padding:13px;
 	margin:0 15px 15px 0;
 	box-shadow:0 2px 3px #ddd;
 	-moz-box-shadow:0 2px 3px #ddd;
 	-webkit-box-shadow:0 2px 3px #ddd;
 	}
 .col-customer-address .ng-scope .adr input[type="text"] { width:280px; margin:3px 0; }
+.col-customer-address .ng-scope .adr input[type="email"] { width:280px; margin:3px 0; }
 .col-customer-address .ng-scope .adr .locality input[type="text"] { width:100px; }
 .col-customer-address .ng-scope .adr .region input[type="text"] { width:40px; }
 .col-customer-address .ng-scope .adr .postal-code input[type="text"] { width:100px; }
 .col-customer-address .ng-scope .adr .country-name select { width:290px; margin:3px 0; }
-.col-customer-address .btn-remove { 
-	float:right; 
-	width:17px; 
-	height:17px; 
-	margin:-6px -6px 0 0; 
-	background-position:-78px -59px; 
-	text-indent:-999em; 
+.col-customer-address .btn-remove {
+	float:right;
+	width:17px;
+	height:17px;
+	margin:-6px -6px 0 0;
+	background-position:-78px -59px;
+	text-indent:-999em;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 	filter: alpha(opacity=80);
 	-moz-opacity: 0.8;
