@@ -12,5 +12,5 @@ Name: <?=$d->firstname.' '.$d->lastname?>
 Email: <?=$d->email?>
 
 Direct link to approve or decline:
-<?=FCom_Frontend::adminHref('customers/form?id='.$d->id)?>
+<?=FCom_Admin_Main::i()->href('customers/form?id='.$d->id)?>
 

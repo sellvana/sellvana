@@ -1,0 +1,68 @@
+
+base: 
+  - view: admin/header
+    do: 
+      - [ addNav, catalog, { label: Catalog, pos: 100 } ]
+      - [ addNav, catalog/categories, { label: Categories, href: /catalog/categories } ]
+      - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
+      - [ addNav, catalog/families, { label: Product Families, href: /catalog/families } ]
+      - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
+      - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
+      - [ addShortcut, catalog/products, { label: New Product, href: /catalog/products/form/ } ]
+
+catalog_product_form_tabs: 
+  - view: admin/form
+    set: { tab_view_prefix: catalog/products-form/ }
+    do: 
+      - [ addTab, main, { label: General Info, pos: 10 } ]
+      - [ addTab, prices, { label: "Prices", 'pos: 15 } ]
+      - [ addTab, linked-products, { label: Linked Products, pos: 20, async: true } ]
+      - [ addTab, categories, { label: Categories, pos: 30, 'async: true } ]
+      - [ addTab, attachments, { label: Attachments, pos: 40, 'async: true } ]
+      - [ addTab, images, { label: Images, pos: 50, 'async: true } ]
+
+/catalog/products: 
+  - { layout: base }
+  - { hook: main, views: admin/grid }
+  - { view: admin/header, do: [[ setNav, catalog/products ]] }
+
+/catalog/products/form: 
+  - { layout: base }
+  - { layout: form }
+  - { layout: catalog_product_form_tabs }
+  - { hook: main, views: 'admin/form' }
+  - { view: admin/header, do: [[ setNav, catalog/products ]] }
+
+/catalog/products/import: 
+  - { layout: base }
+  - { layout: form }
+  - { hook: main, views: catalog/products/import }
+  - { view: admin/header, do: [[ setNav, catalog/products/import ]] }
+
+
+/catalog/categories: 
+  - { layout: base }
+  - { layout: form }
+  - { hook: main, views: catalog/categories }
+  - { view: admin/header, do: [[ setNav, catalog/categories ]] }
+
+/catalog/categories/tree_form: 
+  - { root, catalog/categories-tree-form }
+  - view, catalog/categories-tree-form
+    set: { tab_view_prefix: catalog/categories-tree-form/ }
+    do: 
+      - [ addTab, main, { label: Category, pos: 10 } ]
+      - [ addTab, content, { label: Page Content, pos: 20 } ]
+      - [ addTab, products, { label: Products, pos: 30, async: true } ]
+      # - [ addTab, main, { label: History, pos: 100 } ]
+
+/catalog/families: 
+  - { layout: base'),
+  - { hook: main, views: 'admin/grid' }
+  - { view: admin/header, do: [[ setNav, catalog/families ]] }
+
+
+/settings: 
+  - view: settings
+    do: 
+      - [ addTab, FCom_Catalog, { label: Catalog, async: true } ]

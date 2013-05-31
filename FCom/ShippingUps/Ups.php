@@ -1,6 +1,7 @@
 <?php
 
-class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
+class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract 
+    implements FCom_Sales_Interface_ShippingMethod
 {
     protected $name = 'Universal post service';
     protected $code = 'ShippingUps';

@@ -198,7 +198,7 @@ class FCom_GoogleCheckout extends BClass
 
             }
 
-            $shippingMethods = $cart->getShippingMethods();
+            $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
 
             if (!empty($shippingMethods)) {
                 require_once "lib/googleshipping.php";

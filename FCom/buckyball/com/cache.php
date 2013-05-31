@@ -293,7 +293,12 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
     public function save($key, $data, $ttl = null)
     {
         $ttl = !is_null($ttl) ? $ttl : $this->_config['default_ttl'];
-        return apc_store($this->_config['prefix'].$key, $data, (int)$ttl);
+        $cacheKey = $this->_config['prefix'].$key;
+        /** @see http://stackoverflow.com/questions/10494744/deadlock-with-apc-exists-apc-add-apc-php */
+        if (apc_exists($cacheKey)) {
+            apc_delete($cacheKey);
+        }
+        return apc_store($cacheKey, $data, (int)$ttl);
     }
 
     public function delete($key)
@@ -303,6 +308,7 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
 
     public function loadMany($pattern)
     {
+        //TODO: regexp: new APCIterator('user', '/^MY_APC_TESTA/', APC_ITER_VALUE);
         $items = new APCIterator('user');
         $prefix = $this->_config['prefix'];
         $result = array();

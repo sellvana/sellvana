@@ -20,11 +20,13 @@
             "bootstrap" => array("file" =>"BreCaptcha.php", "callback" =>"BreCaptcha::bootstrap"),
             "version" => "1.0",
         ),
+        /*
         "BYAML" => array(
             "root_dir" => "BYAML",
             "bootstrap" => array("file" =>"BYAML.php", "callback" =>"BYAML::bootstrap"),
             "version" => "0.5",
         ),
+        */
         "BHAML" => array(
             "root_dir" => "BHAML",
             "bootstrap" => array("file" =>"BHAML.php", "callback" =>"BHAML::bootstrap"),

@@ -120,7 +120,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                 BConfig::i()->set('modules/'.$area.'/module_run_level', $levels[$area], false, true);
                 //BConfig::i()->add(array('modules'=>array($area=>array('module_run_level'=>$levels[$area]))), true);
             }
-            FCom_Core::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeLocalConfig();
             BSession::i()->addMessage('Run levels updated', 'success', 'admin');
         } catch (Exception $e) {
             BDebug::logException($e);

@@ -8,7 +8,7 @@ class FCom_GoogleCheckout_Frontend extends BClass
 
         BLayout::i()->addAllViews('Frontend/views');
 
-        FCom_Checkout_Model_Cart::i()->addPaymentMethod('gcheckout', 'FCom_GoogleCheckout_Frontend');
+        FCom_Sales_Main::i()->addPaymentMethod('gcheckout', 'FCom_GoogleCheckout_Frontend');
     }
 
     public function getName()

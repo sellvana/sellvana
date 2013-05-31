@@ -75,7 +75,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             if (!empty($post['postcode'])) {
                 $estimate = array();
-                foreach (FCom_Checkout_Model_Cart::i()->getShippingMethods() as $shipping) {
+                foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
                     $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
                 }
                 BSession::i()->data('shipping_estimate', $estimate);

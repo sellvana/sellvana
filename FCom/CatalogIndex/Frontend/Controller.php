@@ -4,8 +4,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 {
     public function action_reindex()
     {
-        FCom_CatalogIndex::i()->indexProducts(true);
-        FCom_CatalogIndex::i()->indexGC();
+        FCom_CatalogIndex_Main::i()->indexProducts(true);
+        FCom_CatalogIndex_Main::i()->indexGC();
     }
     
     public function action_test()
@@ -34,9 +34,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         if (false) {
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
-            FCom_CustomField_Common::i()->disable(true);
+            FCom_CustomField_Main::i()->disable(true);
             $max = FCom_Catalog_Model_Product::i()->orm()->select_expr('(max(id))', 'id')->find_one();
-            FCom_CustomField_Common::i()->disable(false);
+            FCom_CustomField_Main::i()->disable(false);
             $maxId = $max->id;
 //            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = array();
@@ -70,7 +70,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $catIds = array_keys($categories);
             $hlp = FCom_Catalog_Model_CategoryProduct::i();
 
-            FCom_CustomField_Common::disable(true);
+            FCom_CustomField_Main::disable(true);
             FCom_Catalog_Model_Product::i()->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
                 $pId = $row->id;
                 $exists = array();
@@ -82,18 +82,18 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     $exists[$pId.'-'.$cId] = true;
                 }
             });
-            FCom_CustomField_Common::disable(false);
+            FCom_CustomField_Main::disable(false);
         }
 
         // reindex products
         if (true) {
-            FCom_CatalogIndex::i()->indexProducts($products);//FCom_Catalog_Model_Product::i()->orm()->find_many());
-            FCom_CatalogIndex::i()->indexGC();
+            FCom_CatalogIndex_Main::i()->indexProducts($products);//FCom_Catalog_Model_Product::i()->orm()->find_many());
+            FCom_CatalogIndex_Main::i()->indexGC();
         }
 
         // show sample search result
         if (false) {
-            $result = FCom_CatalogIndex::i()->searchProducts('lorem', array(
+            $result = FCom_CatalogIndex_Main::i()->searchProducts('lorem', array(
                 'category' => 'category-1/subcategory-1-1',
                 'color'=>'Green',
                 'size'=>'Medium',
@@ -119,7 +119,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex::i()->searchProducts(null, null, null, array('category'=>$category));
+        $productsData = FCom_CatalogIndex_Main::i()->searchProducts(null, null, null, array('category'=>$category));
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsData['orm']));
         $r = BRequest::i()->get();
         $r['sc'] = '';
@@ -134,7 +134,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::i()->lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
 
         $head = $this->view('head');
         $crumbs = array('home');
@@ -172,7 +172,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex::i()->searchProducts();
+        $productsData = FCom_CatalogIndex_Main::i()->searchProducts();
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsData['orm']));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];
@@ -183,7 +183,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;

@@ -164,7 +164,7 @@ class BModuleRegistry extends BClass
     public function scan($source)
     {
         // if $source does not end with .json, assume it is a folder
-        if (substr($source, -5)!=='.json' && substr($source, -4)!=='.php') {
+        if (!preg_match('/\.(json|yml|php)$/', $source)) {
             $source .= '/manifest.*';
         }
         $manifests = glob($source, GLOB_BRACE);
@@ -177,6 +177,9 @@ class BModuleRegistry extends BClass
             switch ($info['extension']) {
                 case 'php':
                     $manifest = include($file);
+                    break;
+                case 'yml':
+                    $manifest = BYAML::i()->load($file);
                     break;
                 case 'json':
                     $json = file_get_contents($file);
@@ -1006,6 +1009,8 @@ class BModule extends BClass
 
     public function bootstrap($force=false)
     {
+        BEvents::i()->fire('BModule::bootstrap.before', array('module'=>$this));
+
         if (empty($this->bootstrap)) {
             BDebug::debug('Module does not have bootstrap for this area: '.$this->name);
             $this->run_status = static::IDLE;

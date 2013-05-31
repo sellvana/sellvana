@@ -92,7 +92,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             } else {
                 BSession::i()->addMessage('No products to compare');
-                BResponse::i()->redirect(FCom_Core::lastNav());
+                BResponse::i()->redirect(FCom_Core_Main::i()->lastNav());
             }
         }
         $layout->view('catalog/compare')->products = array_values($products);

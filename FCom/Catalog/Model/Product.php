@@ -51,7 +51,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function thumbUrl($w, $h=null)
     {
-        return FCom_Core::i()->resizeUrl().'?f='.urlencode($this->imageUrl(true)).'&s='.$w.'x'.$h;
+        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode($this->imageUrl(true)).'&s='.$w.'x'.$h;
     }
 
     public function beforeSave()

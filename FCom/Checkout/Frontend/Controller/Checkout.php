@@ -72,8 +72,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart->calculateTotals();
 
 
-        $shippingMethods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
-        $paymentMethods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
+        $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
+        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         if (!empty($paymentMethods[$cart->payment_method])) {
             $layout->view('checkout/checkout')->paymentMethod = $cart->payment_method;
             $layout->view('checkout/checkout')->paymentClass = $paymentMethods[$cart->payment_method];

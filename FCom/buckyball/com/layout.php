@@ -498,7 +498,7 @@ class BLayout extends BClass
     */
     public function loadLayout($layoutFilename)
     {
-        $ext = pathinfo($layoutFilename, PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($layoutFilename, PATHINFO_EXTENSION));
         if (!BUtil::isPathAbsolute($layoutFilename)) {
             $mod = BModuleRegistry::i()->currentModule();
             if ($mod) {
@@ -524,7 +524,7 @@ class BLayout extends BClass
     */
     public function loadLayoutAfterTheme($layoutFilename)
     {
-        $this->afterTheme(function() { BLayout::i()->loadLayout($layoutFilename); });
+        $this->afterTheme(function() use($layoutFilename) { BLayout::i()->loadLayout($layoutFilename); });
         return $this;
     }
 

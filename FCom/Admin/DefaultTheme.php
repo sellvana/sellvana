@@ -13,36 +13,38 @@ class FCom_Admin_DefaultTheme extends BClass
 
     public function layout()
     {
+        BLayout::i()->loadLayout(__DIR__.'/layout.yml');
+        return;
         BLayout::i()
-            ->layout(array(
+            ->addLayout(array(
                 'base'=>array(
                     array('root', 'root'),
                     array('hook', 'head', 'views'=>array('head')),
                     array('view', 'head', 'do'=>array(
                         array('meta', 'Content-Type', 'text/html; charset=UTF-8', true),
-                        array('icon', BConfig::i()->get('web/base_src').'/favicon.ico'),
-                        array('js', '{FCom_Core}/js/lib/jquery.min.js'),
-                        array('js', '{FCom_Core}/js/lib/head.min.js'),
-                        array('js', '{FCom_Core}/js/lib/es5-shim.min.js', array('if'=>'lt IE 9')),
-                        array('js', '{FCom_Core}/js/lib/json2.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.min.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery-ui.min.js'),
-                        array('js', '{FCom_Core}/js/lib/angular.min.js'),
-                        //array('js', '{FCom_Core}/js/lib/jquery.ba-hashchange.min.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.cookie.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.hotkeys.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.layout-latest.js'),
-                        array('js', '{FCom_Core}/js/lib/jquery.pnotify.min.js'),
-                        array('css', '{FCom_Core}/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
-                        array('css', '{FCom_Core}/js/lib/css/jquery.pnotify.default.css'),
+                        array('icon', '@FCom_Core/favicon.ico'),
+                        array('js', '@FCom_Core/js/lib/jquery.min.js'),
+                        array('js', '@FCom_Core/js/lib/head.min.js'),
+                        array('js', '@FCom_Core/js/lib/es5-shim.min.js', array('if'=>'lt IE 9')),
+                        array('js', '@FCom_Core/js/lib/json2.js'),
+                        array('js', '@FCom_Core/js/lib/jquery.min.js'),
+                        array('js', '@FCom_Core/js/lib/jquery-ui.min.js'),
+                        array('js', '@FCom_Core/js/lib/angular.min.js'),
+                        //array('js', '@FCom_Core}/js/lib/jquery.ba-hashchange.min.js'),
+                        array('js', '@FCom_Core/js/lib/jquery.cookie.js'),
+                        array('js', '@FCom_Core/js/lib/jquery.hotkeys.js'),
+                        array('js', '@FCom_Core/js/lib/jquery.layout-latest.js'),
+                        array('js', '@FCom_Core/js/lib/jquery.pnotify.min.js'),
+                        array('css', '@FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css'),
+                        array('css', '@FCom_Core/js/lib/css/jquery.pnotify.default.css'),
                         //highcharts
                         array('js', '{FCom_Admin}/js/highcharts/highcharts.js'),
                     )),
                     array('layout', 'jqgrid'),
                     array('layout', 'jstree'),
                     array('view', 'head', 'do'=>array(
-                        array('js', '{FCom_Admin}/js/fcom.admin.js'),
-                        array('css', '{FCom_Admin}/css/fcom.admin.css'),
+                        array('js', '@FCom_Admin/js/fcom.admin.js'),
+                        array('css', '@FCom_Admin/css/fcom.admin.css'),
                     )),
                     array('view', 'admin/header', 'do'=>array(
                         array('addNav', 'home', array('label'=>'Dashboard', 'href'=>BApp::href(), 'pos'=>10)),
