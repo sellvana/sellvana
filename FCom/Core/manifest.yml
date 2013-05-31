@@ -1,0 +1,7 @@
+modules:
+    FCom_Core:
+        version: 0.1.0
+        require: { module: { BHAML: 3.2, BTwig: 1.12.4 } }
+        bootstrap: { callback: FCom_Core_Main::bootstrap }
+        run_level: REQUIRED
+        description: "Base Fulleron classes and JS libraries"
