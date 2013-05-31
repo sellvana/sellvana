@@ -236,7 +236,6 @@ class BLayout extends BClass
                 continue;
             }
             if (preg_match($re, $file, $m)) {
-#echo $re.', '.$file; print_r($m); echo '<hr>';
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
                 $this->addView($prefix . $m[2], array('template' => $file) + static::$_extRenderers[$m[3]]);
             }
