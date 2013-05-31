@@ -28,8 +28,10 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                     if (!isset($c['title'])) $c['title'] = $c['label'];
                 }
                 unset($c);
+                $this->crumbs_formatted = $crumbs;
+            } else {
+                $this->crumbs_formatted = array();
             }
-            $this->crumbs_formatted = $crumbs;
         }
         return $this->crumbs_formatted;
     }
