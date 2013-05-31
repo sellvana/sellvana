@@ -18,7 +18,7 @@ class BCache extends BClass
 
     public function __construct()
     {
-        foreach (array('File','Shmop','Apc','Memcached','Db') as $type) {
+        foreach (array('File','Shmop','Apc','Memcache','Db') as $type) {
             $this->addBackend($type, 'BCache_Backend_'.$type);
         }
     }
@@ -349,46 +349,62 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
     }
 }
 
-class BCache_Backend_Memcached extends BClass implements BCache_Backend_Interface
+class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 {
+    protected $_config;
+    protected $_conn;
+
     public function info()
     {
-        return array('available' => class_exists('Memcached', false), 'rank' => 2);
+        return array('available' => class_exists('Memcache', false), 'rank' => 1);
     }
 
     public function init($config = array())
     {
-
+        if (empty($config['prefix'])) {
+            $config['prefix'] = substr(md5(__DIR__), 0, 16).'/';
+        }
+        if (empty($config['host'])) {
+            $config['host'] = 'localhost';
+        }
+        if (empty($config['port'])) {
+            $config['port'] = 11211;
+        }
+        $this->_config = $config;
+        $this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
+        $this->_conn = new Memcache;
+        return $this->_conn->pconnect($config['host'], $config['port']);
     }
 
     public function load($key)
     {
-
+        return $this->_conn->get($this->_config['prefix'].$key);
     }
 
     public function save($key, $data, $ttl = null)
     {
-
+        $flag = $this->_config['compress'] ? MEMCACHE_COMPRESSED : 0;
+        return $this->_conn->set($this->_config['prefix'].$key, $data, $flag, is_null($ttl) ? 0, time()+$ttl);
     }
 
     public function delete($key)
     {
-
+        return $this->_conn->delete($this->_config['prefix'].$key);
     }
 
     public function loadMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function deleteMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function gc()
     {
-
+        return false; // not implemented
     }
 }
 
