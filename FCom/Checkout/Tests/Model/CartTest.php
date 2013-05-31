@@ -112,18 +112,4 @@ class FCom_Checkout_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($cart->items()), "Reset failed");
         $this->assertEquals(2, $cart->id(), "Reset failed");
     }
-
-    public function testAddPaymentMethod()
-    {
-        FCom_Checkout_Model_Cart::i()->addPaymentMethod('paypal', 'FCom_PayPal_Frontend');
-        $methods = FCom_Checkout_Model_Cart::i()->getPaymentMethods();
-        $this->assertTrue(isset($methods['paypal']));
-    }
-
-    public function testAddShippingMethod()
-    {
-        FCom_Checkout_Model_Cart::i()->addShippingMethod('ShippingUps', 'FCom_ShippingUps_Ups');
-        $methods = FCom_Checkout_Model_Cart::i()->getShippingMethods();
-        $this->assertTrue(isset($methods['ShippingUps']));
-    }
 }

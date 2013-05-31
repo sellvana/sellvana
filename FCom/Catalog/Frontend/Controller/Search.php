@@ -46,7 +46,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('catalog/product/pager')->query = $q;
         $layout->view('catalog/product/pager')->filters = $filter;
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
 
         $this->layout('/catalog/category');
     }
@@ -79,7 +79,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('catalog/product/pager')->filters = $filter;
         $layout->view('catalog/product/pager')->query = $q;
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
         $this->layout('/catalog/search');
     }
 

@@ -42,14 +42,14 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         );
         $nvpArr = array_merge($nvpArr, $nvpShippingAddress);
         //print_r($nvpArr);exit;
-        $resArr = FCom_PayPal_Api::i()->call('SetExpressCheckout', $nvpArr);
+        $resArr = FCom_PayPal_RemoteApi::i()->call('SetExpressCheckout', $nvpArr);
 //echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
         if (false===$resArr) {
-            throw new BException(FCom_PayPal_Api::i()->getError());
+            throw new BException(FCom_PayPal_RemoteApi::i()->getError());
         }
         $sData =& BSession::i()->dataToUpdate();
         $sData['paypal']['token'] = $resArr['TOKEN'];
-        BResponse::i()->redirect(FCom_PayPal_Api::getExpressCheckoutUrl($resArr['TOKEN']));
+        BResponse::i()->redirect(FCom_PayPal_RemoteApi::getExpressCheckoutUrl($resArr['TOKEN']));
     }
 
     public function action_return()
@@ -62,9 +62,9 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             BResponse::i()->redirect($href);
         }
 
-        $resArr = FCom_PayPal_Api::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
+        $resArr = FCom_PayPal_RemoteApi::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
         if (false===$resArr) {
-            BSession::i()->addMessage(FCom_PayPal_Api::i()->getError(), 'error', 'frontend');
+            BSession::i()->addMessage(FCom_PayPal_RemoteApi::i()->getError(), 'error', 'frontend');
             BResponse::i()->redirect(BApp::href('checkout/checkout'));
         }
 
@@ -122,9 +122,9 @@ class FCom_PayPal_Frontend_Controller extends BActionController
          /* Make the call to PayPal to finalize payment
             If an error occured, show the resulting errors
             */
-        $resArr = FCom_PayPal_Api::i()->call('DoExpressCheckoutPayment', $nvpArr);
+        $resArr = FCom_PayPal_RemoteApi::i()->call('DoExpressCheckoutPayment', $nvpArr);
         if (false===$resArr) {
-            BSession::i()->addMessage(FCom_PayPal_Api::i()->getError(), 'error', 'frontend');
+            BSession::i()->addMessage(FCom_PayPal_RemoteApi::i()->getError(), 'error', 'frontend');
             BResponse::i()->redirect(BApp::href('checkout'));
         }
         /*

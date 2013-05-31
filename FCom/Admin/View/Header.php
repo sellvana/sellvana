@@ -31,6 +31,9 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             }
             $node['pos'] = $pos+10;
         }
+        if (!empty($node['href']) && !preg_match('/^https?:/', $node['href'])) {
+            $node['href'] = BApp::href($node['href']);
+        }
         $root = $node;
         return $this;
     }

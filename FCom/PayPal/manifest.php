@@ -4,23 +4,9 @@
         // paypal IPN
         'FCom_PayPal' => array(
             'version' => '0.1.0',
-            'root_dir' => '',
-            'require' => array('module'=>array('FCom_Core'=>'0.1.0')),
+            'require' => array('module'=>array('FCom_Sales'=>'0.1.10')),
             'translations' => array('de' => 'de.php'),
             'description' => "PayPal&reg; standard payment method",
-            'bootstrap' => array('file'=>'PayPalFrontend.php', 'callback'=>'FCom_PayPal_Frontend::bootstrap'),
-            'areas' => array(
-                'FCom_Admin' => array(
-                    'bootstrap' => array('file'=>'PayPalAdmin.php', 'callback'=>'FCom_PayPal_Admin::bootstrap'),
-                ),
-                'FCom_Frontend' => array(
-                    'bootstrap' => array('file'=>'PayPalFrontend.php', 'callback'=>'FCom_PayPal_Frontend::bootstrap'),
-                ),
-            ),
         ),
-
-
-
-
     ),
 );

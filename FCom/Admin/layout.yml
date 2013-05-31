@@ -1,0 +1,184 @@
+base:
+  - { root: root }
+  - { hook: head, views: head }
+  - view: head
+    do:
+      - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
+      - [ icon, @FCom_Core/favicon.ico ]
+      - [ js, @FCom_Core/js/lib/jquery.min.js ]
+      - [ js, @FCom_Core/js/lib/head.min.js ]
+      - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+      - [ js, @FCom_Core/js/lib/json2.js ]
+      - [ js, @FCom_Core/js/lib/jquery.min.js ]
+      - [ js, @FCom_Core/js/lib/jquery-ui.min.js ]
+      - [ js, @FCom_Core/js/lib/angular.min.js ]
+      # - [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
+      - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
+      - [ js, @FCom_Core/js/lib/jquery.hotkeys.js ]
+      - [ js, @FCom_Core/js/lib/jquery.layout-latest.js ]
+      - [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
+      - [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
+      - [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
+      # highcharts
+      - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
+      - [ js, @FCom_Admin/js/fcom.admin.js ]
+      - [ css, @FCom_Admin/css/fcom.admin.css ]
+
+  - { layout: jqgrid }
+  - { layout: jstree }
+
+  - view: admin/header
+    do:
+      - [ addNav, home, { label: Dashboard, href: /, pos: 10 } ]
+      - [ addNav, system, { label: System, pos: 900 } ]
+      - [ addNav, system/users, { label: Users, href: /users } ]
+      - [ addNav, system/roles, { label: Roles & Permissions, href: /roles } ]
+      - [ addNav, system/settings, { label: Settings, href: /settings } ]
+      - [ addNav, system/modules, { label: Installed Modules, href: /modules } ]
+      - [ addShortcut, system/users, { label: New User, href: /users/form } ]
+
+404:
+  { layout: base }
+  { hook: main, views: 404 }
+
+
+jqgrid:
+  - view: head
+    do:
+      - [ css, {FCom_Core}/js/lib/jqGrid/ui.jqgrid.css ]
+      - [ css, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css ]
+      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js ]
+      - [ js, {FCom_Core}/js/lib/jqGrid/i18n/grid.locale-en.js ]
+      - [ js, {FCom_Core}/js/lib/jqGrid/jquery.jqGrid.min.js ]
+
+      # - [ css, {FCom_Core}/js/lib/jqGrid/css/ui.jqgrid.css ]
+
+      # - [ css, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css ]
+      # - [ js, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js ]
+
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/i18n/grid.locale-en.js ]
+      # - [ js, {FCom_Core}/js/lib/jqGrid/dist/jquery.jqGrid.min.js ]
+
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.base.js ] # jqGrid base
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.common.js ] # jqGrid common for editing
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.formedit.js ] # jqGrid Form editing
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.inlinedit.js ] # jqGrid inline editing
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.celledit.js ] # jqGrid cell editing
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.subgrid.js ] #jqGrid subgrid
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.treegrid.js ] #jqGrid treegrid
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.grouping.js ] #jqGrid grouping
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.custom.js ] #jqGrid custom
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.tbltogrid.js ] #jqGrid table to grid
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.import.js ] #jqGrid import
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/jquery.fmatter.js ] #jqGrid formater
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/JsonXml.js ] # xmljson utils
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.jqueryui.js ] # jQuery UI utils
+      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.filter.js ] # filter Plugin
+
+      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/jquery.tablednd.js ]
+      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
+
+jstree:
+  - view: head
+    do:
+      - [ css, @FCom_Core/js/lib/themes/default/style.css ]
+      - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
+
+mcdropdown:
+  - view: head
+    do:
+      - [ css, @FCom_Core/js/lib/css/jquery.mcdropdown.css ]
+      - [ js, @FCom_Core/js/lib/jquery.mcdropdown.js ]
+      - [ js, @FCom_Core/js/lib/jquery.bgiframe.js ]
+
+form:
+  - view: head
+    do:
+      - [ js, @FCom_Core/js/lib/ckeditor/ckeditor.js ]
+      - [ js, @FCom_Core/js/lib/ckeditor/adapters/jquery.js ]
+      - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
+      - [ css, @FCom_Core/js/lib/themes/default/style.css ]
+      - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
+
+/:
+    - { layout: base }
+    - { hook: main, views: home }
+    - { view: admin/header, do: [[ setNav, home ]] }
+
+/denied:
+    - { layout: base }
+    - { hook: main, views: denied }
+
+
+/login:
+    - { layout: base }
+    - { layout: form }
+    - { hook: main, views: login }
+
+/password/recover:
+    - { layout: base }
+    - { layout: form }
+    - { hook: main, views: password/recover }
+
+/password/reset:
+    - { layout: base }
+    - { layout: form }
+    - { hook: main, views: password/reset }
+
+
+/my_account:
+    - { layout: base }
+    - { hook: main, views: my_account }
+
+/reports:
+    - { layout: base }
+    - { hook: main, views: reports }
+
+/users:
+    - { layout: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/header, do: [[ setNav, admin/users ]] }
+
+/users/form:
+    - { layout: base }
+    - { layout: form }
+    - { view: admin/header, do: [[ setNav, admin/users ]] }
+    - { hook: main, views: admin/form }
+    - view: admin/form 
+      set: { tab_view_prefix: users-form/ }
+      do:
+        - [ addTab, main, { label: General Info } ]
+        - [ addTab, history, { label: History } ]
+
+/roles:
+    - { layout: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/header, do: [[ setNav, admin/roles ]] }
+
+/roles/form:
+    - { layout: base }
+    - { layout: form }
+    - { view: admin/header, do [[ setNav, admin/roles ]] }
+    - { hook: main, views: admin/form }
+    - view: admin/form 
+      set: { tab_view_prefix: roles-form/ }
+      do:
+        - [ addTab, main, { label: Permissions } ]
+        - [ addTab, users, { label: Users } ]
+
+/settings:
+    - { layout: base }
+    - { layout: form }
+    - { hook: main, views: settings }
+    - { view: admin/header, do: [[ setNav, admin/settings ]] }
+    - view: settings
+      set: { tab_view_prefix: settings/ }
+      do:
+        - [ addTab, FCom_Core, { label: Fulleron Core, async: true } ]
+        - [ addTab, FCom_Admin, { label: Fulleron Admin, async: true } ]
+        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, async: true } ]
+
+/modules:
+    - { layout: base }
+    - { hook: main, views: modules }
+    - { view: admin/header, do: [[ setNav, admin/modules ]] }

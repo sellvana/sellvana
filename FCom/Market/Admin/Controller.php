@@ -42,7 +42,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_market()
     {
-        $this->view('market/market')->url = FCom_Market_MarketApi::i()->getSsoUrl();
+        $this->view('market/market')->url = FCom_Market_Main::i()->getSsoUrl();
         $this->layout('/market/market');
     }
 
@@ -60,7 +60,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         //echo $moduleId;exit;
 
         try {
-            $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
+            $modules = FCom_Market_Main::i()->getModules(array($modName));
             $module = $modules[$modName];
             if (!empty($module['require'])) {
                 $module['require'] = BUtil::fromJson($module['require']);
@@ -161,7 +161,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         try {
-            $modules = FCom_Market_MarketApi::i()->getModules(array($modName));
+            $modules = FCom_Market_Main::i()->getModules(array($modName));
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
@@ -169,7 +169,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         try {
-            $moduleFile = FCom_Market_MarketApi::i()->download($modName);
+            $moduleFile = FCom_Market_Main::i()->download($modName);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
@@ -190,7 +190,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
         if ($ftpenabled) {
             $modulePath = dirname($moduleFile).'/'.$modName;
-            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $modulePath);
+            $res = FCom_Market_Main::i()->extract($moduleFile, $modulePath);
             //copy modulePath by FTP to marketPath
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
@@ -210,9 +210,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
 
         } else {
-            $res = FCom_Market_MarketApi::i()->extract($moduleFile, $dlcPath);
+            $res = FCom_Market_Main::i()->extract($moduleFile, $dlcPath);
             if (!$res) {
-                $error = FCom_Market_MarketApi::i()->getErrors();
+                $error = FCom_Market_Main::i()->getErrors();
                 if ($error) {
                     BSession::i()->addMessage($error, 'error');
                 } else {

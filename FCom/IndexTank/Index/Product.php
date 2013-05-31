@@ -10,7 +10,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     /**
      * IndexTank API object
-     * @var FCom_IndexTank_Api
+     * @var FCom_IndexTank_RemoteApi
      */
     protected $_model;
 
@@ -91,7 +91,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //init config
             $this->initFunctions();
             //init model
-            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
         }
         return $this->_model;
     }
@@ -696,9 +696,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
         try {
             //create an index
-            $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->create_index($this->_indexName);
         } catch(Exception $e) {
-            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
         }
 
         $this->updateFunctions();

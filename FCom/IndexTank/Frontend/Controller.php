@@ -32,7 +32,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
 
         $head = $this->view('head');
         $crumbs = array('home');
@@ -88,7 +88,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;

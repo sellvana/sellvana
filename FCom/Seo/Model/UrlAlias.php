@@ -29,7 +29,7 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
     {
         $url = $this->target_url;
         if ($full && !preg_match('#^https?:#', $url)) {
-            $url = FCom_Core::i()->frontendHref($url);
+            $url = FCom_Frontend_Main::i()->href($url);
         }
         return $url;
     }

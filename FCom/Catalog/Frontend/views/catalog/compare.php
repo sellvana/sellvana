@@ -8,7 +8,7 @@ ul.compare li { display:block; float:left; width:240px; border-left:solid 1px #a
 <div class="main col1-layout">
     <?php if (!$xhr) echo $this->view('breadcrumbs') ?>
     <div class="col-main">
-        <?php if (!$xhr): ?><a href="<?=$this->q(FCom_Core::lastNav())?>">&lt;&lt; <?= BLocale::_("Back to results") ?></a><?php endif ?>
+        <?php if (!$xhr): ?><a href="<?=$this->q(FCom_Core_Main::i()->lastNav())?>">&lt;&lt; <?= BLocale::_("Back to results") ?></a><?php endif ?>
 
         <div class="page-title category-title">
             <h1>Compare <span class="compare-num-products"><?=sizeof($this->products)?></span> products</h1>
@@ -39,6 +39,6 @@ ul.compare li { display:block; float:left; width:240px; border-left:solid 1px #a
 </div>
 <?php if (!$xhr): ?>
 <script>
-var compare = new FulleronCompare({emptyUrl:'<?=FCom_Core::lastNav()?>'});
+var compare = new FulleronCompare({emptyUrl:'<?=FCom_Core_Main::i()->lastNav()?>'});
 </script>
 <?php endif ?>

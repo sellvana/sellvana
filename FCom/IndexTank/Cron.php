@@ -4,7 +4,7 @@ class FCom_IndexTank_Cron extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Cron::i()
+        FCom_Cron_Main::i()
             ->task('* * * * *', 'FCom_IndexTank_Cron.indexAll');
 
         BEvents::i()

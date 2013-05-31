@@ -70,7 +70,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $folder = $this->getFolder();
             $r = BRequest::i();
             $fileName = basename($r->get('file'));
-            $fullName = FCom_Core::i()->dir($folder).'/'.$fileName;
+            $fullName = FCom_Core_Main::i()->dir($folder).'/'.$fileName;
             BResponse::i()->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
             break;
         }
@@ -110,7 +110,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $gridId = $r->get('grid');
         $folder = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
         $subfolder = !empty($options['subfolder']) ? $options['subfolder'] : null;
-        $targetDir = FCom_Core::i()->dir($folder);
+        $targetDir = FCom_Core_Main::i()->dir($folder);
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $attModel::i() : $attModel;

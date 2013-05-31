@@ -58,4 +58,18 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($order->id(), 111111);
         $this->assertFalse(is_object($testItem), "Item not exists failed");
     }
+
+    public function testAddPaymentMethod()
+    {
+        FCom_Sales_Main::i()->addPaymentMethod('paypal', 'FCom_PayPal_Frontend');
+        $methods = FCom_Sales_Main::i()->getPaymentMethods();
+        $this->assertTrue(isset($methods['paypal']));
+    }
+
+    public function testAddShippingMethod()
+    {
+        FCom_Sales::i()->addShippingMethod('ups', 'FCom_ShippingUps_Ups');
+        $methods = FCom_Sales_Main::i()->getShippingMethods();
+        $this->assertTrue(isset($methods['ups']));
+    }
 }

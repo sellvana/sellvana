@@ -14,13 +14,13 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
             if (0 === stripos($this->url_href, array('http://', 'https://'))) {
                 return $this->url_href;
             } else {
-                return FCom_Frontend::href($this->url_href);
+                return FCom_Frontend_Main::i()->href($this->url_href);
             }
         }
         $config = BConfig::i()->get('modules/FCom_Cms');
         $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'].'/' : '';
 
-        return FCom_Frontend::href($prefix . $this->url_path);
+        return FCom_Frontend_Main::i()->href($prefix . $this->url_path);
 
     }
 

@@ -4,7 +4,7 @@ class FCom_Market_Cron extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Cron::i()
+        FCom_Cron_Main::i()
             ->task('* * * * *', 'FCom_Market_Cron.collectModules');
     }
 
@@ -13,7 +13,7 @@ class FCom_Market_Cron extends BClass
         set_time_limit(0);
 
         $localModules = BModuleRegistry::i()->debug();
-        $remoteModules = FCom_Market_MarketApi::i()->getModules(array_keys($localModules));
+        $remoteModules = FCom_Market_Main::i()->getModules(array_keys($localModules));
 
 
         $modulesMarket = FCom_Market_Model_Modules::i();

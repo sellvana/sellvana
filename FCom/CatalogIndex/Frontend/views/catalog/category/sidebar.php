@@ -1,7 +1,7 @@
 <?php
 $facets = $this->products_data['facets'];
 $s = $this->products_data['state'];
-$hlp = FCom_CatalogIndex::i();
+$hlp = FCom_CatalogIndex_Main::i();
 ?>
 <section class="block block-filter">
     <header class="block-title"><span class="title">Narrow Results</span></header>

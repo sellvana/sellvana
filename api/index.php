@@ -1,7 +1,7 @@
 <?php
 
 $rootDir = dirname(__DIR__);
-require_once $rootDir.'/FCom/Core/Core.php';
+require_once $rootDir.'/FCom/Core/Main.php';
 
 $webRoot = BRequest::i()->webRoot(1);
 BConfig::i()->add(array(
@@ -18,4 +18,4 @@ if (file_exists(__DIR__.'/index.local.php')) {
 }
 
 BDebug::mode('DEBUG');
-FCom_Core::i()->run('FCom_Api');
+FCom_Core_Main::i()->run('FCom_Api');
