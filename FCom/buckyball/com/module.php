@@ -1009,6 +1009,14 @@ class BModule extends BClass
 
     public function bootstrap($force=false)
     {
+        if ($this->run_status!==BModule::PENDING) {
+            if ($force) {
+                $this->_prepareModuleEnvData(); // prepare data missed in beforeBootstrap
+            } else {
+                return $this; // skip module bootstrap
+            }
+        }
+
         BEvents::i()->fire('BModule::bootstrap.before', array('module'=>$this));
 
         if (empty($this->bootstrap)) {
@@ -1017,13 +1025,6 @@ class BModule extends BClass
             return $this;
         }
 //echo "<hr>"; var_dump($this->bootstrap);
-        if ($this->run_status!==BModule::PENDING) {
-            if ($force) {
-                $this->_prepareModuleEnvData(); // prepare data missed in beforeBootstrap
-            } else {
-                return $this; // skip module bootstrap
-            }
-        }
         if (!empty($this->bootstrap['file'])) {
             $includeFile = BUtil::normalizePath($this->root_dir.'/'.$this->bootstrap['file']);
             BDebug::debug('MODULE.BOOTSTRAP '.$includeFile);

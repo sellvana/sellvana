@@ -1,0 +1,12 @@
+modules:
+    FCom_Frontend:
+        version: 0.1.0
+        require: { module: { FCom_Core: 0.1.0, FCom_Frontend_DefaultTheme: 0.1.0 } }
+        description: "Base Frontend functionality"
+
+    FCom_Frontend_DefaultTheme:
+        version: 0.1.0
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: "Default Frontend theme"
+        provides: { theme: FCom_Frontend_DefaultTheme }
+        bootstrap: { callback: FCom_Frontend_DefaultTheme::bootstrap }

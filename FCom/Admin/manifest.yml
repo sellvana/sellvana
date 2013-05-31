@@ -1,0 +1,12 @@
+modules:
+    FCom_Admin:
+        version: 0.1.4
+        require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
+        description: Base Admin functionality
+
+    FCom_Admin_DefaultTheme:
+        version: 0.1.0
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: "Default Admin theme"
+        provides: { theme: FCom_Admin_DefaultTheme }
+        bootstrap: { callback: FCom_Admin_DefaultTheme::bootstrap }

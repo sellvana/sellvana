@@ -253,8 +253,7 @@ class FCom_Core_Main extends BClass
         }
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
-        $this->_modulesDirs[] = $rootDir.'/FCom'; // Core required modules
-        $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core optional modules
+        $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
         $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
         $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
         $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules

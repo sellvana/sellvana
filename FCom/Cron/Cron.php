@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Cron_Main extends BClass
+class FCom_Cron_Cron extends BClass
 {
     protected $_tasks = array();
 
