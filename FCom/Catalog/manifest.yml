@@ -1,0 +1,10 @@
+modules:
+	FCom_Catalog:
+		version: 0.2.1
+		require: { module: { FCom_Core: 0.1.0 } }
+		categories: [ Catalog, Products ]
+		translations: { de: de.php }
+		description: "Categories and products management, admin and frontend"
+		areas:
+			FCom_Admin:
+				require: { module: { FCom_Admin: 0.1.0 } }

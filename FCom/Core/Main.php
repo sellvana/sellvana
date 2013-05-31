@@ -277,6 +277,7 @@ class FCom_Core_Main extends BClass
 
     public function onModuleBootstrapBefore($args)
     {  
+        $area = BApp::i()->get('area');
         $m = $args['module'];
         if (!$m->bootstrap) { // TODO: check for is_callable() ?
             $area = str_replace('FCom_', '', BApp::i()->get('area'));
@@ -291,7 +292,7 @@ class FCom_Core_Main extends BClass
         if (!$m->migrate && class_exists($m->name.'_Migrate')) { //TODO: move to before migrate
             $m->migrate = $m->name.'_Migrate';
         }
-        if (BApp::i()->get('area')==='FCom_Test') { //TODO: move to tests
+        if ($area==='FCom_Test') { //TODO: move to tests
             if (empty($m->tests) && class_exists($m->name.'_Tests_AllTests')) {
                 $m->tests = $m->name.'_Tests_AllTests';
             }

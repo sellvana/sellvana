@@ -4,7 +4,7 @@
         'FCom_Core'=>array(
             'version' => '0.1.0',
             'root_dir' => 'Core',
-            'require' => array(),
+            'require' => array('BHAML'=>'3.2'),
             'bootstrap' => array('callback'=>'FCom_Core_Main::bootstrap'),
             'run_level' => 'REQUIRED',
             'migrate' => 'FCom_Core_Migrate',

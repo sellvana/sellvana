@@ -1,0 +1,5 @@
+modules:
+	FCom_Promo:
+		version: 0.1.2
+		require: { module: { FCom_Catalog: 0.1.0 }}
+		description: "Promotions module"
