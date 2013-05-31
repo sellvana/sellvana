@@ -10,7 +10,7 @@
 <?php endif; ?>
 
 Please review the following agreement:
-<form method="POST" action="<?=BApp::href('install/agreement')?>">
+<form method="POST" action="<?=BApp::href('install')?>">
     Blah blah...
     <fieldset>
         <input type="submit" name="w[agree]" value="Agree"/>

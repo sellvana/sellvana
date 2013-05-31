@@ -148,7 +148,6 @@ class FCom_Core_Main extends BClass
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
         }
-
         //migration
         if ($config->get('db') && null === $config->get('db/implicit_migration')) {
             $config->set('db/implicit_migration', 1);
@@ -276,15 +275,15 @@ class FCom_Core_Main extends BClass
     }
 
     public function onModuleBootstrapBefore($args)
-    {  
+    {
         $area = BApp::i()->get('area');
         $m = $args['module'];
         if (!$m->bootstrap) { // TODO: check for is_callable() ?
             $area = str_replace('FCom_', '', BApp::i()->get('area'));
             if (class_exists($m->name.'_'.$area)) {
                 $m->bootstrap = array('callback' => $m->name.'_'.$area.'::bootstrap');
-            } elseif (class_exists($m->name.'_Base')) {
-                $m->bootstrap = array('callback' => $m->name.'_Base::bootstrap');
+            } elseif (class_exists($m->name.'_Main')) {
+                $m->bootstrap = array('callback' => $m->name.'_Main::bootstrap');
             } elseif (class_exists($m->name)) {
                 $m->bootstrap = array('callback' => $m->name.'::bootstrap');
             }

@@ -21,11 +21,14 @@ base:
       - [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
-      - [ js, @FCom_Admin/js/fcom.admin.js ]
-      - [ css, @FCom_Admin/css/fcom.admin.css ]
 
   - { layout: jqgrid }
   - { layout: jstree }
+
+  - view: head
+    do:
+      - [ js, @FCom_Admin/js/fcom.admin.js ]
+      - [ css, @FCom_Admin/css/fcom.admin.css ] # need to be separate from other CSS for correct ordering in styling
 
   - view: admin/header
     do:
@@ -45,38 +48,38 @@ base:
 jqgrid:
   - view: head
     do:
-      - [ css, {FCom_Core}/js/lib/jqGrid/ui.jqgrid.css ]
-      - [ css, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css ]
-      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js ]
-      - [ js, {FCom_Core}/js/lib/jqGrid/i18n/grid.locale-en.js ]
-      - [ js, {FCom_Core}/js/lib/jqGrid/jquery.jqGrid.min.js ]
+      - [ css, @FCom_Core/js/lib/jqGrid/ui.jqgrid.css ]
+      - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min.js ]
 
-      # - [ css, {FCom_Core}/js/lib/jqGrid/css/ui.jqgrid.css ]
+      # - [ css, @FCom_Core/js/lib/jqGrid/css/ui.jqgrid.css ]
 
-      # - [ css, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.css ]
-      # - [ js, {FCom_Core}/js/lib/jqGrid/plugins/ui.multiselect.js ]
+      # - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
+      # - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
 
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/i18n/grid.locale-en.js ]
-      # - [ js, {FCom_Core}/js/lib/jqGrid/dist/jquery.jqGrid.min.js ]
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/i18n/grid.locale-en.js ]
+      # - [ js, @FCom_Core/js/lib/jqGrid/dist/jquery.jqGrid.min.js ]
 
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.base.js ] # jqGrid base
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.common.js ] # jqGrid common for editing
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.formedit.js ] # jqGrid Form editing
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.inlinedit.js ] # jqGrid inline editing
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.celledit.js ] # jqGrid cell editing
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.subgrid.js ] #jqGrid subgrid
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.treegrid.js ] #jqGrid treegrid
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.grouping.js ] #jqGrid grouping
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.custom.js ] #jqGrid custom
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.tbltogrid.js ] #jqGrid table to grid
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.import.js ] #jqGrid import
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/jquery.fmatter.js ] #jqGrid formater
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/JsonXml.js ] # xmljson utils
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.jqueryui.js ] # jQuery UI utils
-      # - [ js, {FCom_Core}/js/lib/jqGrid/js/grid.filter.js ] # filter Plugin
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.base.js ] # jqGrid base
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.common.js ] # jqGrid common for editing
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.formedit.js ] # jqGrid Form editing
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.inlinedit.js ] # jqGrid inline editing
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.celledit.js ] # jqGrid cell editing
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.subgrid.js ] #jqGrid subgrid
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.treegrid.js ] #jqGrid treegrid
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.grouping.js ] #jqGrid grouping
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.custom.js ] #jqGrid custom
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.tbltogrid.js ] #jqGrid table to grid
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.import.js ] #jqGrid import
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/jquery.fmatter.js ] #jqGrid formater
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/JsonXml.js ] # xmljson utils
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.jqueryui.js ] # jQuery UI utils
+      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.filter.js ] # filter Plugin
 
-      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/jquery.tablednd.js ]
-      - [ js, {FCom_Core}/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
 
 jstree:
   - view: head
@@ -144,7 +147,7 @@ form:
     - { layout: form }
     - { view: admin/header, do: [[ setNav, admin/users ]] }
     - { hook: main, views: admin/form }
-    - view: admin/form 
+    - view: admin/form
       set: { tab_view_prefix: users-form/ }
       do:
         - [ addTab, main, { label: General Info } ]
@@ -160,7 +163,7 @@ form:
     - { layout: form }
     - { view: admin/header, do [[ setNav, admin/roles ]] }
     - { hook: main, views: admin/form }
-    - view: admin/form 
+    - view: admin/form
       set: { tab_view_prefix: roles-form/ }
       do:
         - [ addTab, main, { label: Permissions } ]
