@@ -2805,7 +2805,7 @@ class BYAML extends BCLass
         $arrayData = static::parse($yamlData);
 
         if ($cache) {
-            BCache::i()->save('BYAML--'.$filename, array('v'=>$filemtime, 'd'=>$arrayData));
+            BCache::i()->save('BYAML--'.$filename, array('v'=>$filemtime, 'd'=>$arrayData), false);
         }
 
         return $arrayData;

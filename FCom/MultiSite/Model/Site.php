@@ -29,7 +29,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
                 $map[$regex] = $site->as_array();
             }
         }
-        BCache::i()->save(static::$_mapCacheKey, $map);
+        BCache::i()->save(static::$_mapCacheKey, $map, false);
         return $map;
     }
 
