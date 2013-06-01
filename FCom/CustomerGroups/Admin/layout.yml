@@ -1,0 +1,18 @@
+base:
+	- view: admin/header
+		do:
+			- [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups } ]
+
+/customer-groups:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, customer/customer-groups ]] }
+
+/customer-groups/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- view: admin/form
+		set: { tab_view_prefix: customer-groups/form/ }
+		do:
+			- [ addTab, main, { label: Customer Group, pos: 10 } ]

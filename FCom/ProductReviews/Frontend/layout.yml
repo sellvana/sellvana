@@ -1,0 +1,8 @@
+base:
+	- view: head
+		do:
+			- [ js, @FCom_ProductReviews/Frontend/js/fcom_productreviews.js ]
+
+/prodreview/add:
+	- { layout: base }
+	- { hook: main, views: prodreviews/add }

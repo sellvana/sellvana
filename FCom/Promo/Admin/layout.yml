@@ -1,0 +1,23 @@
+base:
+	- { view: admin/header, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
+
+promo_form_tabs:
+	- view: promo/form
+		set: { tab_view_prefix: 'promo/tab-' }
+		do:
+			- [ addTab, main, { label: Promo Info } ]
+			- [ addTab, details, { label: Details, async: true } ]
+			- [ addTab, attachments, { label: Attachments, async: true } ]
+			- [ addTab, history, { label: History, async: true } ]
+
+/promo:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, catalog/promo ]] }
+
+/promo/form:
+	- { layout: base }
+	- { layout: form }
+	- { layout: promo_form_tabs }
+	- { hook: main, views: promo/form }
+	- { view: admin/header, do: [[ setNav, catalog/promo ]] }

@@ -37,7 +37,7 @@ class FCom_Checkout_Frontend extends BClass
 
         BLayout::i()
             ->addAllViews('Frontend/views')
-            ->afterTheme('FCom_Checkout_Frontend::layout')
+            ->loadLayoutAfterTheme('Frontend/layout.yml')
         ;
     }
 
@@ -61,45 +61,5 @@ class FCom_Checkout_Frontend extends BClass
                 'label' => 'Discount', 'after'=>'shipping'));
         }
     }
-
-    static public function layout()
-    {
-        BLayout::i()->layout(array(
-            'base'=>array(
-                array('view', 'head', 'do'=>array(
-                    array('js', '{FCom_Checkout}/Frontend/js/fcom.checkout.js'),
-                )
-            )),
-            '/checkout/cart'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/cart'))
-            ),
-            '/checkout/checkout'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/checkout'))
-            ),
-            '/checkout/login'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/login'))
-            ),
-            '/checkout/payment'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/payment'))
-            ),
-            '/checkout/shipping'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/shipping'))
-            ),
-            '/checkout/address'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/address'))
-            ),
-            '/checkout/success'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('checkout/success'))
-            ),
-        ));
-    }
-
 }
 

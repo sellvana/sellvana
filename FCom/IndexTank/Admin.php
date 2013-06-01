@@ -25,9 +25,8 @@ class FCom_IndexTank_Admin extends BClass
             //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
             ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
 
-        BLayout::i()->addAllViews('Admin/views');
-
-        BEvents::i()->on('BLayout::theme.load.after', 'FCom_IndexTank_Admin::layout');
+        BLayout::i()->addAllViews('Admin/views')
+            ->loadLayoutAfterTheme('Admin/layout.yml');
 
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
 
@@ -295,60 +294,4 @@ class FCom_IndexTank_Admin extends BClass
         }
         $doc->delete();
     }
-
-
-    /**
-     * Itialized base layout, navigation links and page views scripts
-     */
-    static public function layout()
-    {
-        BLayout::i()
-            ->layout(array(
-                'base'=>array(
-                    array('view', 'admin/header', 'do'=>array(
-                        array('addNav', 'indextank', array('label'=>'IndexDen', 'pos'=>100)),
-                        array('addNav', 'indextank/product_fields', array('label'=>'Product fields', 'href'=>BApp::href('indextank/product_fields'))),
-                        array('addNav', 'indextank/product_functions', array('label'=>'Product functions', 'href'=>BApp::href('indextank/product_functions'))),
-                    ))),
-                '/indextank/product_fields'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('indextank/product_fields')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_fields'))),
-                ),
-                '/indextank/product_fields/form'=>array(
-                    array('layout', 'base'),
-                    array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('admin/form')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_fields'))),
-                    array('view', 'admin/form', 'set'=>array(
-                        'tab_view_prefix' => 'indextank/product_fields-form/',
-                    ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Fields', 'pos'=>10))
-                    )),
-                ),
-                '/indextank/product_functions'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('indextank/product_functions')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_functions'))),
-                ),
-                '/indextank/product_functions/form'=>array(
-                    array('layout', 'base'),
-                    array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('admin/form')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'indextank/product_functions'))),
-                    array('view', 'admin/form', 'set'=>array(
-                        'tab_view_prefix' => 'indextank/product_functions-form/',
-                    ), 'do'=>array(
-                        array('addTab', 'main', array('label'=>'Product Functions', 'pos'=>10))
-                    )),
-                ),
-                '/settings'=>array(
-                    array('view', 'settings', 'do'=>array(
-                        array('addTab', 'FCom_IndexTank', array('label'=>'IndexDen API', 'async'=>true))
-                    )))
-
-            ));
-    }
-
-
 }

@@ -509,7 +509,7 @@ class BLayout extends BClass
             case 'yml': case 'yaml': $layoutData = BYAML::i()->load($layoutFilename); break;
             case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
             case 'php': $layoutData = include($layoutFilename); break;
-            default: throw new BException('Unknown layout file type');
+            default: throw new BException('Unknown layout file type: '.$layoutFilename);
         }
         BLayout::i()->addLayout($layoutData);
         return $this;
@@ -523,7 +523,15 @@ class BLayout extends BClass
     */
     public function loadLayoutAfterTheme($layoutFilename)
     {
-        $this->afterTheme(function() use($layoutFilename) { BLayout::i()->loadLayout($layoutFilename); });
+        if (!BUtil::isPathAbsolute($layoutFilename)) {
+            $mod = BModuleRegistry::i()->currentModule();
+            if ($mod) {
+                $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+            }
+        }
+        $this->afterTheme(function() use($layoutFilename) { 
+            BLayout::i()->loadLayout($layoutFilename); 
+        });
         return $this;
     }
 

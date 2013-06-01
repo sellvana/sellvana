@@ -284,9 +284,6 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
     public function load($key)
     {
         $fullKey = $this->_config['prefix'].$key;
-        if (!apc_exists($fullKey)) {
-            return null;
-        }
         return apc_fetch($fullKey);
     }
 
@@ -295,9 +292,9 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
         $ttl = !is_null($ttl) ? $ttl : $this->_config['default_ttl'];
         $cacheKey = $this->_config['prefix'].$key;
         /** @see http://stackoverflow.com/questions/10494744/deadlock-with-apc-exists-apc-add-apc-php */
-        if (apc_exists($cacheKey)) {
-            apc_delete($cacheKey);
-        }
+        #if (apc_exists($cacheKey)) {
+        #    apc_delete($cacheKey);
+        #}
         return apc_store($cacheKey, $data, (int)$ttl);
     }
 
@@ -318,7 +315,7 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
                 continue;
             }
             if ($pattern===true || strpos($key, $pattern)!==false) {
-                apc_delete($key);
+                $result[$key] = apc_fetch($key);
             }
         }
         return $result;

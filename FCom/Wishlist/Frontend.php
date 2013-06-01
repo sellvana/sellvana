@@ -12,21 +12,6 @@ class FCom_Wishlist_Frontend extends BClass
                 'FCom_Wishlist_Frontend_Controller::onAddToWishlist');
 
         BLayout::i()->addAllViews('Frontend/views')
-                ->afterTheme('FCom_Wishlist_Frontend::layout');
-    }
-
-    static public function layout()
-    {
-        BLayout::i()->layout(array(
-            'base'=>array(
-                array('view', 'head', 'do'=>array(
-                    array('js', '{FCom_Wishlist}/Frontend/js/fcom.wishlist.js'),
-                )
-            )),
-            '/wishlist'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('wishlist'))
-            )
-        ));
+                ->loadLayoutAfterTheme('Frontend/layout.yml');
     }
 }

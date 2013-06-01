@@ -23,7 +23,7 @@ class FCom_Catalog_Admin extends BClass
 
         BLayout::i()
             ->addAllViews('Admin/views')
-            ->loadLayoutAfterTheme(__DIR__.'/Admin/layout.yml')
+            ->loadLayoutAfterTheme('Admin/layout.yml')
         ;
 
         BEvents::i()
