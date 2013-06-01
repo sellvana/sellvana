@@ -381,7 +381,8 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
     public function save($key, $data, $ttl = null)
     {
         $flag = !empty($this->_config['compress']) ? MEMCACHE_COMPRESSED : 0;
-        return $this->_conn->set($this->_config['prefix'].$key, $data, $flag, is_null($ttl) ? 0 : time()+$ttl);
+        $ttl1 = is_null($ttl) ? 0 : time()+$ttl;
+        return $this->_conn->set($this->_config['prefix'].$key, $data, $flag, $ttl1);
     }
 
     public function delete($key)

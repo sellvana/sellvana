@@ -1,0 +1,7 @@
+modules:
+	FCom_Cms:
+		version: 0.1.0
+		require: { module: { FCom_Core: 0.1.0, BTwig: 1.12.4 } }
+		translations: { de: de.php }
+		description: "CMS for custom pages and blocks"
+
