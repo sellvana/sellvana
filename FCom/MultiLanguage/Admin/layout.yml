@@ -1,5 +1,5 @@
 base:
-	- { view: admin/header, do: [[ addNav, system/translation, { label: Translations, href: /translations } ]] }
+	- { view: admin/header, do: [[ addNav, system/translations, { label: Translations, href: /translations } ]] }
 
 /translations:
 	- { layout: base }
@@ -9,6 +9,7 @@ base:
 /translations/form:
 	- { layout: base }
 	- { layout: form }
+	- { layout: ace }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, system/translations ]] }
 	- view: admin/form	

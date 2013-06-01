@@ -1,9 +1,9 @@
 base:
 	- view: admin/header
 		do:
-			- [ addNav, order, { layout: Orders, pos: 300 } ]
-			- [ addNav, order/orders, { label: Orders, href: /orders } ]
-			- [ addNav, order/orderstatus, { label: Order Status, href: /orderstatus } ]
+			- [ addNav, sales, { label: Sales, pos: 300 } ]
+			- [ addNav, sales/orders, { label: Orders, href: /orders } ]
+			- [ addNav, sales/orderstatus, { label: Order Status, href: /orderstatus } ]
 
 /orders:
 	- { layout: base }

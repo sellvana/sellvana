@@ -40,9 +40,9 @@ base:
       - [ addNav, system/modules, { label: Installed Modules, href: /modules } ]
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-404:
-  { layout: base }
-  { hook: main, views: 404 }
+"404":
+  - { layout: base }
+  - { hook: main, views: "404" }
 
 
 jqgrid:
@@ -93,6 +93,11 @@ mcdropdown:
       - [ css, @FCom_Core/js/lib/css/jquery.mcdropdown.css ]
       - [ js, @FCom_Core/js/lib/jquery.mcdropdown.js ]
       - [ js, @FCom_Core/js/lib/jquery.bgiframe.js ]
+
+ace:
+  - view: head
+    do:
+      - [ js, http://rawgithub.com/ajaxorg/ace-builds/master/src-min-noconflict/ace.js ]
 
 form:
   - view: head
@@ -172,6 +177,7 @@ form:
 /settings:
     - { layout: base }
     - { layout: form }
+    - { layout: ace }
     - { hook: main, views: settings }
     - { view: admin/header, do: [[ setNav, admin/settings ]] }
     - view: settings
