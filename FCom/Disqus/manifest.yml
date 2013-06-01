@@ -1,0 +1,6 @@
+modules:
+	FCom_Disqus:
+		viersion: 0.1.0
+		require: { module: { FCom_Core: 0.1.0 } }
+		translations: { de: de.php }
+		description: Embed Disqus comments on any page

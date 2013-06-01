@@ -5,7 +5,6 @@ class FCom_ProductReviews_Frontend extends BClass
     public static function bootstrap()
     {
         BEvents::i()
-            ->on('BLayout::theme.load.after', 'FCom_ProductReviews_Frontend::layout')
             ->on('BLayout::hook.prodreviews-reviews', 'FCom_ProductReviews_Frontend.hookReviews')
         ;
 
@@ -14,7 +13,8 @@ class FCom_ProductReviews_Frontend extends BClass
             ->any('/prodreviews/.action', 'FCom_ProductReviews_Frontend_Controller')
         ;
 
-        BLayout::i()->addAllViews('Frontend/views');
+        BLayout::i()->addAllViews('Frontend/views')
+            ->loadLayoutAfterTheme('Frontend/layout.yml');
     }
 
     public function hookReviews($args)
@@ -24,20 +24,5 @@ class FCom_ProductReviews_Frontend extends BClass
         BLayout::i()->view('prodreviews/reviews')->product_reviews = $productReviews;
         BLayout::i()->view('prodreviews/reviews')->product = $product;
         return BLayout::i()->view('prodreviews/reviews')->render();
-    }
-
-    public static function layout()
-    {
-        BLayout::i()->layout(array(
-            'base'=>array(
-                array('view', 'head', 'do'=>array(
-                    array('js', '{FCom_ProductReviews}/Frontend/js/fcom.productreviews.js'),
-                )
-            )),
-            '/prodreviews/add'=>array(
-                array('layout', 'base'),
-                array('hook', 'main', 'views'=>array('prodreviews/add')),
-            ),
-        ));
     }
 }

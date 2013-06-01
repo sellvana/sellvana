@@ -1,0 +1,33 @@
+base:
+	- view: head
+		do:
+			- [ js, @FCom_Checkout/Frontend/js/fcom.checkout.js ]
+
+/checkout/cart:
+	- { layout: base }
+	- { hook: main, views: checkout/cart }
+
+/checkout/checkout:
+	- { layout: base }
+	- { hook: main, views: checkout/checkout }
+
+/checkout/login:
+	- { layout: base }
+	- { hook: main, views: checkout/login }
+
+/checkout/payment:
+	- { layout: base }
+	- { hook: main, views: checkout/payment }
+
+/checkout/shipping:
+	- { layout: base }
+	- { hook: main, views: checkout/shipping }
+
+/checkout/address:
+	- { layout: base }
+	- { hook: main, views: checkout/address }
+
+/checkout/success:
+	- { layout: base }
+	- { hook: main, views: checkout/success }
+

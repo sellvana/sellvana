@@ -1,0 +1,7 @@
+modules:
+    FCom_PaymentBasic:
+        version: 0.1.0
+        translations: { de: de.php }
+        description: "Basic payment methods (check/money order, purchase order)"
+        require: { module: { FCom_Sales: 0.1.10 } }
+        

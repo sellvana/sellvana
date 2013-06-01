@@ -1,0 +1,27 @@
+base:
+	- view: admin/header
+		do:
+			- [ addNav, customer, { label: Customers, pos: 300 } ]
+			- [ addNav, customer/customers, { label: Customers, href: /customers } ]
+			- [ addNav, customer/import, { label: Import Customers, href: /customers/import/index } ]
+
+/customers:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, customer/customers ]] }
+
+/customers/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- { view: admin/header, do: [[ setNav, customer/customers ]] }
+	- view: admin/form
+		set: { tab_view_prefix: customer/customers-form/ }
+		do:
+			- [ addTab, main, { label: Customer Info, pos: 10 } ]
+
+/customers/import:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: customer/import }
+	- { view: admin/header, do: [[ setNav, customer/import ]] }

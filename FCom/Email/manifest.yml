@@ -1,0 +1,6 @@
+modules:
+	FCom_Email:
+		version: 0.1.0
+		require: { module: { FCom_Core: 0.1.0 } }
+		translations: { de: de.php }
+		description: "Base email subscription and mailing list management"

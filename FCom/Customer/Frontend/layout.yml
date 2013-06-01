@@ -1,0 +1,48 @@
+/customer/login:
+	- { layout: base }
+	- { hook: main, views: customer/login }
+
+/customer/register:
+	- { layout: base }
+	- { hook: main, views: customer/register }
+
+/customer/password/recover:
+	- { layout: base }
+	- { hook: main, views: customer/password/recover }
+
+/customer/password/reset:
+	- { layout: base }
+	- { hook: main, views: customer/password/reset }
+
+/customer/account:
+	- { layout: base }
+	- { hook: main, views: customer/account }
+
+/customer/account/edit:
+	- { layout: base }
+	- { hook: main, views: customer/account/edit }
+
+/customer/account/editpassword:
+	- { layout: base }
+	- { hook: main, views: customer/account/editpassword }
+
+/customer/address/edit:
+	- { layout: base }
+	- { hook: main, views: customer/address/edit }
+
+/customer/address/list:
+	- { layout: base }
+	- { hook: main, views: customer/address/list }
+
+/customer/address/choose:
+	- { layout: base }
+	- { hook: main, views: customer/address/choose }
+
+/customer/order/list:
+	- { layout: base }
+	- { hook: main, views: customer/order/list }
+
+/customer/order/view:
+	- { layout: base }
+	- { hook: main, views: customer/order/view }
+

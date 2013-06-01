@@ -1,0 +1,56 @@
+base:
+	- view: admin/header
+		do:
+			- [ addNav, cms, { label: CMS, post: 200 } ]
+			- [ addNav, cms/nav, { label: Navigation, href: /cms/nav } ]
+			- [ addNav, cms/pages, { label: Pages, href: /cms/pages } ]
+			- [ addNav, cms/blocks, { label: Blocks, href: /cms/blocks } ]
+
+/cms/nav:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: cms/nav }
+	- { view: admin/header, do: [[ setNav : cms/nav ]] }
+
+/cms/nav/tree_form:
+	- { root: cms/nav-tree-form }
+	- view: cms/nav-tree-form
+		set: { tab_view_prefix: cms/nav-tree-form/ }
+		do:
+			- [ addTab, main, { label: Navigation Node, pos: 10 } ]
+			- [ addTab, content, { label: Page Content, pos: 20 } ]
+
+/cms/pages:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, cms/pages ]] }
+
+/cms/pages/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- { view: admin/header, do: [[ setNav, cms/pages ]] }
+	- view: admin/form
+		set: { tab_view_prefix: cms/pages-form/ }
+		do:
+			- [ addTab, main, { label: CMS Page, pos: 10 } ]
+			- [ addTab, history, { label: History, pos: 20 } ]
+
+/cms/blocks:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
+
+/cms/blocks/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
+	- view: admin/form
+		set: { tab_view_prefix: cms/blocks-form/ }
+		do:
+			- [ addTab, main, { label: CMS Block, pos: 10 } ]
+			- [ addTab, history, { label: History, pos: 20 } ]
+
+/settings:
+	- { view: settings, do: [[ addTab, FCom_Cms, { label: Cms, async: true } ]] }

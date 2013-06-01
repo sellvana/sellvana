@@ -11,7 +11,7 @@ class FCom_CustomerGroups_Admin
     {
         BLayout::i()
             ->addAllViews('Admin/views')
-            ->afterTheme(array(__CLASS__, 'layout'));
+            ->loadLayoutAfterTheme('Admin/layout.yml');
 
         BRouting::i()
             ->get('/customer-groups', 'FCom_CustomerGroups_Admin_Controller_CustomerGroups.index') // list groups
@@ -21,37 +21,6 @@ class FCom_CustomerGroups_Admin
         FCom_Admin_Model_Role::i()->createPermission(
             array(
                 'customer_groups' => "Customer Groups"
-            )
-        );
-    }
-
-    public static function layout()
-    {
-        BLayout::i()->addLayout(
-            array(
-                 'base' => array(
-                     array('view', 'admin/header', 'do' => array(
-                         array('addNav', 'customer/customer-groups', array(
-                             'label' => 'Customer groups', 'href' => BApp::href('customer-groups'),
-                         )),
-                     )),
-                 ),// end base
-                 '/customer-groups' => array(
-                     array('layout', 'base'),
-                     array('hook', 'main', 'views'=>array('admin/grid')),
-                     array('view', 'admin/header', 'do'=>array(array('setNav', 'customer/customer-groups'))),
-                 ),
-                 '/customer-groups/form'=>array(
-                     array('layout', 'base'),
-                     array('layout', 'form'),
-                     array('hook', 'main', 'views'=>array('admin/form')),
-                     array('view', 'admin/header', 'do'=>array(array('setNav', 'customer/customer-groups'))),
-                     array('view', 'admin/form', 'set'=>array(
-                         'tab_view_prefix' => 'customer-groups/form/',
-                     ), 'do'=>array(
-                         array('addTab', 'main', array('label'=>'Customer Group', 'pos'=>10)),
-                     )),
-                 ),
             )
         );
     }

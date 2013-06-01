@@ -18,28 +18,8 @@ class FCom_CatalogIndex_Frontend extends BClass
 
         BLayout::i()
             ->addAllViews('Frontend/views')
-            ->afterTheme('FCom_CatalogIndex_Frontend::layout');
+            ->loadLayoutAfterTheme('Frontend/layout.yml');
 
         BClassRegistry::i()->overrideClass('FCom_Catalog_Frontend_Controller_Search', 'FCom_CatalogIndex_Frontend_Controller');
-    }
-
-    /**
-     * Initialized base layout, navigation links and page views scripts
-     */
-    static public function layout()
-    {
-        BLayout::i()->layout(array(
-            'base'=>array(
-                array('view', 'head', 'do'=>array(
-                    //array('js', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js')
-                )
-            )),
-            '/catalog/category'=>array(
-                array('hook', 'catalog/product/pager.fields', 'views'=>array('catalog/category/_pager_fields')),
-            ),
-            '/catalog/search'=>array(
-                array('hook', 'catalog/product/pager.fields', 'views'=>array('catalog/category/_pager_fields')),
-            ),
-        ));
     }
 }

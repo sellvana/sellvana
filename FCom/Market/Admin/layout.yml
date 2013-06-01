@@ -1,0 +1,24 @@
+base:
+	- view: admin/header
+		do:
+			- [ addNav, market, { label: Market, pos: 100 } ]
+			- [ addNav, market/market, { label: Market Center, href: /market/market } ]
+			- [ addNav, market/index, { label: My Modules, href: /market/index } ]
+
+/market:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, market ]] }
+
+/market/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- view: admin/form
+		set: { tab_view_prefix: market/ }
+		do:
+			- [ addTab, main, { label: Market, pos: 10 } ]
+
+/market/market:
+	- { layout: base }
+	- { hook: main, views: market/market }

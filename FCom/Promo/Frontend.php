@@ -16,8 +16,8 @@ class FCom_Promo_Frontend extends BClass
             ->route( 'GET /promo/media', 'FCom_Promo_Frontend_Controller.media')
         ;
 
-        BLayout::i()->addAllViews('Frontend/views');
-        BEvents::i()->on('BLayout::theme.load.after', 'FCom_Promo_Frontend::layout');
+        BLayout::i()->addAllViews('Frontend/views')
+            ->loadLayoutAfterTheme('Frontend/layout.yml');
 
     }
 

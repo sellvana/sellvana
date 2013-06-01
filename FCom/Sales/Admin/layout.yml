@@ -1,0 +1,36 @@
+base:
+	- view: admin/header
+		do:
+			- [ addNav, order, { layout: Orders, pos: 300 } ]
+			- [ addNav, order/orders, { label: Orders, href: /orders } ]
+			- [ addNav, order/orderstatus, { label: Order Status, href: /orderstatus } ]
+
+/orders:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, order/orders ]] }
+
+/multisite/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- { view: admin/header, do: [[ setNav, order/orders ]] }
+	- view: admin/form	
+		set: { tab_view_prefix: order/orders-form/ }
+		do:
+			- [ addTab, main, { label: Order Info, pos: 10 } ]
+
+/orderstatus:
+	- { layout: base }
+	- { hook: main, views: admin/grid }
+	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
+
+/orderstatus/form:
+	- { layout: base }
+	- { layout: form }
+	- { hook: main, views: admin/form }
+	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
+	- view: admin/form	
+		set: { tab_view_prefix: order/orderstatus-form/ }
+		do:
+			- [ addTab, main, { label: Order Status, pos: 10 } ]

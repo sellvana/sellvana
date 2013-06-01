@@ -1,0 +1,5 @@
+modules:
+	FCom_FreshBooks:
+		version: 0.1.0
+		require: { module: { FCom_Core: 0.1.0 } }
+		description: "FreshBooks&reg; payment method and invoice management API integration"

@@ -16,7 +16,7 @@ class FCom_CustomField_Admin extends BClass
 
         BLayout::i()
             ->addAllViews('Admin/views')
-            ->afterTheme('FCom_CustomField_Admin::layout')
+            ->loadLayoutAfterTheme('Admin/layout.yml')
         ;
 
         BEvents::i()
@@ -27,40 +27,6 @@ class FCom_CustomField_Admin extends BClass
         ;
     }
 
-    public static function layout()
-    {
-        BLayout::i()
-            ->layout(array(
-                'base'=>array(
-                    array('view', 'admin/header', 'do'=>array(
-                        array('addNav', 'catalog/fieldsets', array('label'=>'Field Sets', 'href'=>BApp::href('customfields/fieldsets'))),
-                    )),
-                ),
-                'catalog_product_form_tabs'=>array(
-                    array('view', 'admin/form',
-                        'do'=>array(
-                            array('addTab', 'fields', array('label' => 'Custom Fields', 'pos'=>'15', 'view'=>'customfields/products/fields-tab')),
-                        ),
-                    ),
-                ),
-                '/customfields/fieldsets'=>array(
-                    array('layout', 'base'),
-                    array('hook', 'main', 'views'=>array('customfields/fieldsets')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/fieldsets'))),
-                ),
-                '/customfields/fieldsets/form'=>array(
-                    array('layout', 'base'),
-                    array('layout', 'form'),
-                    array('hook', 'main', 'views'=>array('customfields/fieldsets/form')),
-                    array('view', 'admin/header', 'do'=>array(array('setNav', 'catalog/fieldsets'))),
-                ),/*
-                '/settings'=>array(
-                    array('view', 'settings', 'do'=>array(
-                        array('addTab', 'FCom_CustomField', array('label'=>'Custom Fields', 'async'=>true)),
-                    )),
-                ),*/
-            ));
-    }
 /*
     public function productAfterSave($args)
     {
