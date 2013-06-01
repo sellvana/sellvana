@@ -28,11 +28,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $migrate = false;
         foreach ($modules as $modName=>$mod) {
             $r = (array)$mod;
-            $deps = array();
-            foreach ($r['depends'] as $dep) {
-                $deps[] = $dep['name'];
+            $reqs = array();
+            if (!empty($r['require']['module'])) {
+                foreach ($r['require']['module'] as $req) {
+                    $reqs[] = $req['name'];
+                }
             }
-            $r['depends'] = join(', ', $deps);
+            $r['requires'] = join(', ', $reqs);
             $r['required_by'] = join(', ', $mod->children_copy);
             $r['run_level_core'] = !empty($coreLevels[$modName]) ? $coreLevels[$modName] : null;
             $r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : null;
@@ -80,7 +82,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                     'run_level_core' => array('label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Core")'), 'width'=>120),
                     'run_level_admin' => array('label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Admin")'), 'width'=>120, 'hidden'=>true),
                     'run_level_frontend' => array('label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Frontend")'), 'width'=>120, 'hidden'=>true),
-                    'depends'     => array('label' => 'Dependencies', 'width'=>250),
+                    'requires'     => array('label' => 'Requires', 'width'=>250),
                     'required_by' => array('label' => 'Required By', 'width'=>250),
                 ),
                 'rowNum'      => 200,

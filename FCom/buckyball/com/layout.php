@@ -79,6 +79,7 @@ class BLayout extends BClass
      * @var array
      */
     protected static $_metaDirectives = array(
+        'remove'   => 'BLayout::metaDirectiveRemoveCallback',
         'callback' => 'BLayout::metaDirectiveCallback',
         'layout'   => 'BLayout::metaDirectiveLayoutCallback',
         'root'     => 'BLayout::metaDirectiveRootCallback',
@@ -572,10 +573,10 @@ class BLayout extends BClass
             return $this;
         }
         BDebug::debug('LAYOUT.APPLY ' . $layoutName);
+
+        // collect callbacks
+        $callbacks = array();
         foreach ($this->_layouts[$layoutName] as $d) {
-if (!is_array($d)) {
-    var_dump($d);
-}
             if (empty($d['type'])) {
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
@@ -599,8 +600,20 @@ if (!is_array($d)) {
             }
             $d['name'] = trim($d['name']);
             $d['layout_name'] = $layoutName;
-            $callback         = self::$_metaDirectives[$d['type']];
-            call_user_func($callback, $d);
+            $callback = self::$_metaDirectives[$d['type']];
+
+            if ($d['type'] === 'remove') { 
+                if ($d['name'] === 'all') { //TODO: allow removing specific instructions
+                    $callbacks = array();
+                }
+            } else {
+                $callbacks[] = array($callback, $d);
+            }
+        }
+
+        // perform all callbacks
+        foreach ($callbacks as $cb) {
+            call_user_func($cb[0], $cb[1]);
         }
 
         return $this;
@@ -611,7 +624,15 @@ if (!is_array($d)) {
      */
     public function metaDirectiveCallback($d)
     {
-        call_user_func($d['name']);
+        call_user_func($d['name'], $d);
+    }
+
+    /**
+     * @param $d
+     */
+    public function metaDirectiveRemoveCallback($d)
+    {
+        //TODO: implement
     }
 
     /**
