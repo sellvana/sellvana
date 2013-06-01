@@ -1,7 +1,5 @@
 <?php
 
-set_time_limit(2);
-
 $rootDir = dirname(__DIR__);
 require_once $rootDir.'/FCom/Core/Main.php';
 
