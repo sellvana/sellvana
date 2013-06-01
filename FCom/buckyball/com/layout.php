@@ -573,6 +573,9 @@ class BLayout extends BClass
         }
         BDebug::debug('LAYOUT.APPLY ' . $layoutName);
         foreach ($this->_layouts[$layoutName] as $d) {
+if (!is_array($d)) {
+    var_dump($d);
+}
             if (empty($d['type'])) {
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];

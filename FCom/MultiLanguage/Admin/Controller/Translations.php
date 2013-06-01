@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected static $_origClass = __CLASS__;
+	protected static $_origClass = __CLASS__;
     protected $_gridHref = 'translations';
     //protected $_modelClass = 'FCom_IndexTank_Model_ProductField';
     //protected $_mainTableAlias = 'pf';
@@ -113,5 +113,4 @@ class FCom_Translation_Admin_Controller extends FCom_Admin_Controller_Abstract_G
 
         BResponse::i()->redirect(BApp::href($this->_gridHref));
     }
-
 }

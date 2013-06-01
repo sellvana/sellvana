@@ -913,7 +913,17 @@ function partialParent(el, params) {
     partial($(el).closest('.include'), params);
 }
 
-$(function(){
+FCom.Admin.initAce = function() {
+    $('.js-ace').each(function(idx, el) {
+        var editor = ace.edit(el);
+        var theme = $(el).data('theme');
+        var mode = $(el).data('mode');
+        editor.setTheme("ace/theme/" + (theme ? theme : "monokai"));
+        editor.getSession().setMode("ace/mode/" + (mode ? mode : "text"));
+    });
+}
+
+$(function() {
     $.jgrid.formatter.date.newformat = 'm/d/Y';
     $.jgrid.edit.width = 500;
 
@@ -936,6 +946,12 @@ $(function(){
             height:'toggle'
         }, 100);
     });
+    
+    FCom.Admin.initAce();
+
+    $('.js-resizable').each(function(idx, el) {
+        $(el).resizable();
+    })
 })
 
 $.fn.resizeWithWindow = function(options) {
