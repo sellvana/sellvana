@@ -7,7 +7,7 @@
             baseHref: '#{BApp::href()}'
         }
 %body(class="<#{$this->bodyClass}")
-    #top-message(style="position:fixed; top:10px; left:50%; background:#fff1b7; border:1px solid #ebc27b; border-bottom-color:#deb060; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; z-index:99999; padding:5px 15px; line-height:1.3em; box-shadow:0 2px 3px #ddd; display:none")
+    .top-message
         Something happened here!
 
     - if (FCom_Admin_Model_User::i()->isLoggedIn())

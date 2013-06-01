@@ -5,12 +5,13 @@ base:
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
-      - [ js, @FCom_Core/js/lib/jquery.min.js ]
       - [ js, @FCom_Core/js/lib/head.min.js ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+
       - [ js, @FCom_Core/js/lib/json2.js ]
       - [ js, @FCom_Core/js/lib/jquery.min.js ]
       - [ js, @FCom_Core/js/lib/jquery-ui.min.js ]
+
       - [ js, @FCom_Core/js/lib/angular.min.js ]
       # - [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
       - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
@@ -21,6 +22,10 @@ base:
       - [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
+
+      #- [ css, @FCom_Core/bootstrap/css/bootstrap.min.css ]
+      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
+      #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
 
   - { layout: jqgrid }
   - { layout: jstree }

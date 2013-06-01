@@ -849,6 +849,8 @@ body { background:#f4f4f4; }
 .home-icon { background:url(../img/admin_home_icon.png) no-repeat; width:200px; margin:250px auto 50px; padding-top:200px; color:#bbb; font-weight:bold; font-size:20px; text-shadow:0 1px 0 #fff; text-align:center; }
 .lt-ie9 .adm-nav ul { border:1px solid #bbb; border-bottom-width:2px; }
 
+.top-message { position:fixed; top:10px; left:50%; background:#fff1b7; border:1px solid #ebc27b; border-bottom-color:#deb060; border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; z-index:99999; padding:5px 15px; line-height:1.3em; box-shadow:0 2px 3px #ddd; }
+
 
 /* =============================================================================
    Typography
