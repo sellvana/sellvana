@@ -81,7 +81,8 @@ class BLayout extends BClass
     protected static $_metaDirectives = array(
         'remove'   => 'BLayout::metaDirectiveRemoveCallback',
         'callback' => 'BLayout::metaDirectiveCallback',
-        'layout'   => 'BLayout::metaDirectiveLayoutCallback',
+        'layout'   => 'BLayout::metaDirectiveIncludeCallback',
+        'include'   => 'BLayout::metaDirectiveIncludeCallback',
         'root'     => 'BLayout::metaDirectiveRootCallback',
         'hook'     => 'BLayout::metaDirectiveHookCallback',
         'view'     => 'BLayout::metaDirectiveViewCallback',
@@ -638,7 +639,7 @@ class BLayout extends BClass
     /**
      * @param $d
      */
-    public function metaDirectiveLayoutCallback($d)
+    public function metaDirectiveIncludeCallback($d)
     {
         if ($d['name'] == $d['layout_name']) { // simple 1 level recursion stop
             BDebug::error('Layout recursion detected: ' . $d['name']);
@@ -1702,13 +1703,13 @@ class BViewHead extends BView
     {
         if ($type === 'js' && $this->_headJs['loaded']) {
             foreach ($this->_headJs['scripts'] as $i => $file) {
-                if (strpos($file, $pattern) !== false) {
+                if (true===$pattern || strpos($file, $pattern) !== false) {
                     unset($this->_headJs['scripts'][$i]);
                 }
             }
         }
         foreach ($this->_elements as $k => $args) {
-            if (strpos($k, $type) === 0 && strpos($k, $pattern) !== false) {
+            if (strpos($k, $type) === 0 && (true===$pattern || strpos($k, $pattern) !== false)) {
                 unset($this->_elements[$k]);
             }
         }

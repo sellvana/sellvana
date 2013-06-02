@@ -27,8 +27,8 @@ base:
       #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
       #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
 
-  - { layout: jqgrid }
-  - { layout: jstree }
+  - { include: jqgrid }
+  - { include: jstree }
 
   - view: head
     do:
@@ -46,7 +46,7 @@ base:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
 "404":
-  - { layout: base }
+  - { include: base }
   - { hook: main, views: "404" }
 
 
@@ -114,47 +114,47 @@ form:
       - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
 
 /:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: home }
     - { view: admin/header, do: [[ setNav, home ]] }
 
 /denied:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: denied }
 
 
 /login:
-    - { layout: base }
-    - { layout: form }
+    - { include: base }
+    - { include: form }
     - { hook: main, views: login }
 
 /password/recover:
-    - { layout: base }
-    - { layout: form }
+    - { include: base }
+    - { include: form }
     - { hook: main, views: password/recover }
 
 /password/reset:
-    - { layout: base }
-    - { layout: form }
+    - { include: base }
+    - { include: form }
     - { hook: main, views: password/reset }
 
 
 /my_account:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: my_account }
 
 /reports:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: reports }
 
 /users:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: admin/grid }
     - { view: admin/header, do: [[ setNav, admin/users ]] }
 
 /users/form:
-    - { layout: base }
-    - { layout: form }
+    - { include: base }
+    - { include: form }
     - { view: admin/header, do: [[ setNav, admin/users ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
@@ -164,13 +164,13 @@ form:
         - [ addTab, history, { label: History } ]
 
 /roles:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: admin/grid }
     - { view: admin/header, do: [[ setNav, admin/roles ]] }
 
 /roles/form:
-    - { layout: base }
-    - { layout: form }
+    - { include: base }
+    - { include: form }
     - { view: admin/header, do [[ setNav, admin/roles ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
@@ -180,9 +180,9 @@ form:
         - [ addTab, users, { label: Users } ]
 
 /settings:
-    - { layout: base }
-    - { layout: form }
-    - { layout: ace }
+    - { include: base }
+    - { include: form }
+    - { include: ace }
     - { hook: main, views: settings }
     - { view: admin/header, do: [[ setNav, admin/settings ]] }
     - view: settings
@@ -193,6 +193,6 @@ form:
         - [ addTab, FCom_Frontend, { label: Fulleron Frontend, async: true } ]
 
 /modules:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: modules }
     - { view: admin/header, do: [[ setNav, admin/modules ]] }

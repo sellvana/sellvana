@@ -4,5 +4,5 @@ base:
 			- [ js, @FCom_ProductReviews/Frontend/js/fcom_productreviews.js ]
 
 /prodreview/add:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: prodreviews/add }

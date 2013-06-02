@@ -4,13 +4,13 @@ base:
 			- [ addNav, system/multisite, { label: Multi Site, pos: 30, href: /multisite } ]
 
 /multisite:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, system/multisite ]] }
 
 /multisite/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, system/multisite ]] }
 	- view: admin/form	

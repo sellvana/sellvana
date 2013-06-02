@@ -9,13 +9,13 @@ catalog_product_form_tabs:
 			- [ addTab, product_reviews, { label: Product Reviews, pos: 70, view: prodreviews/products/tab, async: true } ]
 
 /prodreviews:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, catalog/prodreviews ]] }
 
 /prodreviews/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, catalog/prodreviews ]] }
 	- view: admin/form	

@@ -6,13 +6,13 @@ base:
 			- [ addNav, indextank/product_functions, { label: Product Functions, href: /indextank/product_functions } ]
 
 /indextank/product_fields:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: indextank/product_fields }
 	- { view: admin/header, do: [[ setNav, indextank/product_fields ]] }
 
 /indextank/product_fields/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, indextank/product_fields ]] }
 	- view: admin/form	
@@ -21,13 +21,13 @@ base:
 			- [ addTab, main, { label: Product Fields, pos: 10 } ]
 
 /indextank/product_functions:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: indextank/product_functions }
 	- { view: admin/header, do: [[ setNav, indextank/product_functions ]] }
 
 /indextank/product_functions/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, indextank/product_functions ]] }
 	- view: admin/form	

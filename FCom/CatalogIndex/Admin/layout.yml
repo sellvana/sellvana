@@ -4,13 +4,13 @@ base:
 			- [ addNav, catalog/index-fields, { label: Index Fields, href: /catalogindex/fields } ]
 
 /catalogindex/fields:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, catalog/index-fields ]] }
 
 /catalogindex/fields/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, catalog/index-fields ]] }
 	- view: admin/form

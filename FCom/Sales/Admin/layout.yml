@@ -6,13 +6,13 @@ base:
 			- [ addNav, sales/orderstatus, { label: Order Status, href: /orderstatus } ]
 
 /orders:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, order/orders ]] }
 
 /multisite/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, order/orders ]] }
 	- view: admin/form	
@@ -21,13 +21,13 @@ base:
 			- [ addTab, main, { label: Order Info, pos: 10 } ]
 
 /orderstatus:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
 
 /orderstatus/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
 	- view: admin/form	

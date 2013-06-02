@@ -6,13 +6,13 @@ base:
 			- [ addNav, customer/import, { label: Import Customers, href: /customers/import/index } ]
 
 /customers:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, customer/customers ]] }
 
 /customers/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, customer/customers ]] }
 	- view: admin/form
@@ -21,7 +21,7 @@ base:
 			- [ addTab, main, { label: Customer Info, pos: 10 } ]
 
 /customers/import:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: customer/import }
 	- { view: admin/header, do: [[ setNav, customer/import ]] }

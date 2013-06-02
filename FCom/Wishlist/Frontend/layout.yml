@@ -2,5 +2,5 @@ base:
 	- { view: head, do: [[ js, @FCom_Wishlist/Frontend/js/fcom.wishlist.js ]] }
 
 /wishlist:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: wishlist }

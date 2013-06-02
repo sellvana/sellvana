@@ -9,12 +9,12 @@ catalog_product_form_tabs:
 			- [ addTab, fields, { label: Custom Fields, pos: 15, view: customfields/products/fields-tab } ]
 
 /customfields/fieldsets:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: customfields/fieldsets }
 	- { view: admin/header, do: [[ setNav, catalog/fieldsets ]] }
 
 /customfields/fieldsets/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: customfields/fieldsets/form }
 	- { view: admin/header, do: [[ setNav, catalog/fieldsets ]] }

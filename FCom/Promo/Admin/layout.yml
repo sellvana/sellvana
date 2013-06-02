@@ -11,13 +11,13 @@ promo_form_tabs:
 			- [ addTab, history, { label: History, async: true } ]
 
 /promo:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, catalog/promo ]] }
 
 /promo/form:
-	- { layout: base }
-	- { layout: form }
-	- { layout: promo_form_tabs }
+	- { include: base }
+	- { include: form }
+	- { include: promo_form_tabs }
 	- { hook: main, views: promo/form }
 	- { view: admin/header, do: [[ setNav, catalog/promo ]] }

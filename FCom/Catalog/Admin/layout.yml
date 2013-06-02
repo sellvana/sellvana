@@ -22,27 +22,27 @@ catalog_product_form_tabs:
       - [ addTab, images, { label: Images, pos: 50, 'async: true } ]
 
 /catalog/products: 
-  - { layout: base }
+  - { include: base }
   - { hook: main, views: admin/grid }
   - { view: admin/header, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/form: 
-  - { layout: base }
-  - { layout: form }
-  - { layout: catalog_product_form_tabs }
+  - { include: base }
+  - { include: form }
+  - { include: catalog_product_form_tabs }
   - { hook: main, views: 'admin/form' }
   - { view: admin/header, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/import: 
-  - { layout: base }
-  - { layout: form }
+  - { include: base }
+  - { include: form }
   - { hook: main, views: catalog/products/import }
   - { view: admin/header, do: [[ setNav, catalog/products/import ]] }
 
 
 /catalog/categories: 
-  - { layout: base }
-  - { layout: form }
+  - { include: base }
+  - { include: form }
   - { hook: main, views: catalog/categories }
   - { view: admin/header, do: [[ setNav, catalog/categories ]] }
 
@@ -57,7 +57,7 @@ catalog_product_form_tabs:
       # - [ addTab, main, { label: History, pos: 100 } ]
 
 /catalog/families: 
-  - { layout: base'),
+  - { include: base'),
   - { hook: main, views: 'admin/grid' }
   - { view: admin/header, do: [[ setNav, catalog/families ]] }
 
