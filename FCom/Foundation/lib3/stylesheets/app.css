@@ -881,7 +881,7 @@ form.custom .custom.disabled {
 /* The Grid ---------------------- */
 /* line 3, ../../../../../../Ruby200-x64/lib/ruby/gems/2.0.0/gems/zurb-foundation-3.2.0/scss/foundation/components/_grid.scss */
 .row {
-  width: 1000px;
+  width: 100%;
   max-width: 100%;
   min-width: 768px;
   margin: 0 auto;
@@ -2322,7 +2322,7 @@ ul.flyout li.active a, .nav-bar li ul li.active a {
 }
 /* line 28, ../../../../../../Ruby200-x64/lib/ruby/gems/2.0.0/gems/zurb-foundation-3.2.0/scss/foundation/components/modules/_topbar.scss */
 .contain-to-grid .top-bar {
-  max-width: 1000px;
+  max-width: 100%;
   margin: 0 auto;
 }
 /* line 33, ../../../../../../Ruby200-x64/lib/ruby/gems/2.0.0/gems/zurb-foundation-3.2.0/scss/foundation/components/modules/_topbar.scss */

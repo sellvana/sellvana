@@ -6,20 +6,23 @@ base:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       - [ js, @FCom_Core/js/lib/head.min.js ]
+      - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-
       - [ js, @FCom_Core/js/lib/json2.js ]
-      - [ js, @FCom_Core/js/lib/jquery.min.js ]
-      - [ js, @FCom_Core/js/lib/jquery-ui.min.js ]
+      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
 
+  - { include: foundation3 }
+
+  - view: head
+    do:
       - [ js, @FCom_Core/js/lib/angular.min.js ]
-      # - [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
+      #- [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
       - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
       - [ js, @FCom_Core/js/lib/jquery.hotkeys.js ]
       - [ js, @FCom_Core/js/lib/jquery.layout-latest.js ]
-      - [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
+      #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       - [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
-      - [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
+      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
 
@@ -30,12 +33,15 @@ base:
   - { include: jqgrid }
   - { include: jstree }
 
+  - { hook: header, views: admin/header }
+  - { hook: nav, views: admin/nav }
+
   - view: head
     do:
       - [ js, @FCom_Admin/js/fcom.admin.js ]
       - [ css, @FCom_Admin/css/fcom.admin.css ] # need to be separate from other CSS for correct ordering in styling
 
-  - view: admin/header
+  - view: admin/nav
     do:
       - [ addNav, home, { label: Dashboard, href: /, pos: 10 } ]
       - [ addNav, system, { label: System, pos: 900 } ]
@@ -43,12 +49,60 @@ base:
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles } ]
       - [ addNav, system/settings, { label: Settings, href: /settings } ]
       - [ addNav, system/modules, { label: Installed Modules, href: /modules } ]
+
+  - view: admin/header
+    do:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-"404":
-  - { include: base }
-  - { hook: main, views: "404" }
+foundation3:
+  - view: head
+    do:
+      - [ css, @FCom_Foundation/lib3/stylesheets/app.css ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/modernizr.foundation.js, { separate: true } ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.js, { separate: true } ]
+      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js, { separate: true } ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.move.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.swipe.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.accordion.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.alerts.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.buttons.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.clearing.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.forms.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.joyride.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.magellan.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.mediaQueryToggle.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.navigation.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.orbit.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.reveal.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.tabs.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.tooltips.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.topbar.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.placeholder.js ]
+      - [ js, @FCom_Foundation/lib3/javascripts/foundation/app.js ]
 
+foundation4:
+  - view: head
+    do:
+      - [ css, @FCom_Foundation/lib4/stylesheets/app.css ]
+      - [ js, @FCom_Foundation/lib4/javascripts/vendor/custom.modernizr.js, { separate: true } ]
+      - [ js, @FCom_Foundation/lib4/javascripts/vendor/zepto.js, { separate: true } ]
+      #- [ js, @FCom_Foundation/lib4/javascripts/vendor/jquery.js, { separate: true } ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.alerts.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.clearing.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.cookie.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.dropdown.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.forms.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.interchange.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.joyride.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.magellan.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.orbit.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.placeholder.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.reveal.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.section.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.tooltips.js ]
+      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.topbar.js ]
 
 jqgrid:
   - view: head
@@ -113,10 +167,14 @@ form:
       - [ css, @FCom_Core/js/lib/themes/default/style.css ]
       - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
 
+404:
+  - { include: base }
+  - { hook: main, views: 404 }
+
 /:
     - { include: base }
     - { hook: main, views: home }
-    - { view: admin/header, do: [[ setNav, home ]] }
+    - { view: admin/nav, do: [[ setNav, home ]] }
 
 /denied:
     - { include: base }
@@ -150,12 +208,12 @@ form:
 /users:
     - { include: base }
     - { hook: main, views: admin/grid }
-    - { view: admin/header, do: [[ setNav, admin/users ]] }
+    - { view: admin/nav, do: [[ setNav, admin/users ]] }
 
 /users/form:
     - { include: base }
     - { include: form }
-    - { view: admin/header, do: [[ setNav, admin/users ]] }
+    - { view: admin/nav, do: [[ setNav, admin/users ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
       set: { tab_view_prefix: users-form/ }
@@ -166,12 +224,12 @@ form:
 /roles:
     - { include: base }
     - { hook: main, views: admin/grid }
-    - { view: admin/header, do: [[ setNav, admin/roles ]] }
+    - { view: admin/nav, do: [[ setNav, admin/roles ]] }
 
 /roles/form:
     - { include: base }
     - { include: form }
-    - { view: admin/header, do [[ setNav, admin/roles ]] }
+    - { view: admin/nav, do [[ setNav, admin/roles ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
       set: { tab_view_prefix: roles-form/ }
@@ -184,7 +242,7 @@ form:
     - { include: form }
     - { include: ace }
     - { hook: main, views: settings }
-    - { view: admin/header, do: [[ setNav, admin/settings ]] }
+    - { view: admin/nav, do: [[ setNav, admin/settings ]] }
     - view: settings
       set: { tab_view_prefix: settings/ }
       do:
@@ -195,4 +253,4 @@ form:
 /modules:
     - { include: base }
     - { hook: main, views: modules }
-    - { view: admin/header, do: [[ setNav, admin/modules ]] }
+    - { view: admin/nav, do: [[ setNav, admin/modules ]] }

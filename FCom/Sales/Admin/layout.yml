@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, sales, { label: Sales, pos: 300 } ]
 			- [ addNav, sales/orders, { label: Orders, href: /orders } ]
@@ -8,13 +8,13 @@ base:
 /orders:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, order/orders ]] }
+	- { view: admin/nav, do: [[ setNav, sales/orders ]] }
 
 /multisite/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, order/orders ]] }
+	- { view: admin/nav, do: [[ setNav, sales/orders ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: order/orders-form/ }
 		do:
@@ -23,13 +23,13 @@ base:
 /orderstatus:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
+	- { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
 
 /orderstatus/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, order/orderstatus ]] }
+	- { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: order/orderstatus-form/ }
 		do:

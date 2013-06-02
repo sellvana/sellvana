@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, market, { label: Market, pos: 100 } ]
 			- [ addNav, market/market, { label: Market Center, href: /market/market } ]
@@ -8,12 +8,13 @@ base:
 /market:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, market ]] }
+	- { view: admin/nav, do: [[ setNav, market ]] }
 
 /market/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
+	- { view: admin/nav, do: [[ setNav, market ]] }
 	- view: admin/form
 		set: { tab_view_prefix: market/ }
 		do:

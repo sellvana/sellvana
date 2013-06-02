@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, indextank, { label: IndexDen, pos: 100 } ]
 			- [ addNav, indextank/product_fields, { label: Product Fields, href: /indextank/product_fields } ]
@@ -8,13 +8,13 @@ base:
 /indextank/product_fields:
 	- { include: base }
 	- { hook: main, views: indextank/product_fields }
-	- { view: admin/header, do: [[ setNav, indextank/product_fields ]] }
+	- { view: admin/nav, do: [[ setNav, indextank/product_fields ]] }
 
 /indextank/product_fields/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, indextank/product_fields ]] }
+	- { view: admin/nav, do: [[ setNav, indextank/product_fields ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: indextank/product_fields-form/ }
 		do:
@@ -23,13 +23,13 @@ base:
 /indextank/product_functions:
 	- { include: base }
 	- { hook: main, views: indextank/product_functions }
-	- { view: admin/header, do: [[ setNav, indextank/product_functions ]] }
+	- { view: admin/nav, do: [[ setNav, indextank/product_functions ]] }
 
 /indextank/product_functions/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, indextank/product_functions ]] }
+	- { view: admin/nav, do: [[ setNav, indextank/product_functions ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: indextank/product_functions-form/ }
 		do:

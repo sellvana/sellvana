@@ -1,8 +1,9 @@
-storage/config/local.php
-storage/config/db.php
+storage/config/local.yml
+storage/config/db.yml
 storage/log/
 storage/import/
-storage/phptal/
+storage/cache/
+storage/session/
 storage/run/
 storage/dlc/
 storage/downloads/
@@ -14,6 +15,8 @@ local/*
 vendor/*
 user/*
 FCom/MarketServer/
+FCom/Foundation/lib3/.sass-cache
+FCom/Foundation/lib4/.sass-cache
 index.local.php
 .idea
 __db.php

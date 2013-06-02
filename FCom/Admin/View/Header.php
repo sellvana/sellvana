@@ -67,6 +67,65 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         return "<{$tag}{$html}>";
     }
 
+    public function getTree()
+    {
+        return $this->_tree;
+    }
+
+    public function getNodes($root = null, $path = '')
+    {
+
+        if (is_null($root)) {
+            $root = $this->_tree;
+            $this->_curNav = $this->get('current_nav');
+        }
+        if (empty($root['/'])) {
+            return '';
+        }
+
+        uasort($root['/'], function($a, $b) {
+            return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+        });
+
+        if (!static::$_allPermissions) {
+            static::$_allPermissions = FCom_Admin_Model_Role::i()->getAllPermissions();
+        }
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+
+        $result = array();
+        foreach ($root['/'] as $k=>$node) {
+            $key = !empty($node['key']) ? $node['key'] : $k;
+            $nextPath = $path.($path?'/':'').$key;
+            
+            $node['li']['active'] = $this->_curNav===$nextPath || strpos($this->_curNav, $nextPath.'/')===0;
+
+            $children = $this->renderNodes($node, $nextPath);
+
+            if (empty($node['permission']) && !empty(static::$_allPermissions[$nextPath])) {
+                $node['permission'] = $nextPath;
+            }
+            if (!empty($node['permission']) && !$children && !$user->getPermission($node['permission'])) {
+                continue;
+            }
+            if (!isset($node['li']['class'])) {
+                $node['li']['class'] = '';
+            }
+            if (empty($node['label'])) {
+                $node['label'] = $k;
+            }
+            if (empty($node['href'])) {
+                $node['href'] = '#';
+            }
+
+            $result[] = array(
+                'node' => $node, 
+                'children' => $children,
+            );
+        }
+
+        return $result;
+    }
+
     public function renderNodes($root=null, $path='')
     {
         if (is_null($root)) {

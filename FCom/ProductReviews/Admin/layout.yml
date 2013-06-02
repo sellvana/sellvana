@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, catalog/prodreviews, { label: Product Reviews, href: /prodreviews } ]
 
@@ -11,13 +11,13 @@ catalog_product_form_tabs:
 /prodreviews:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, catalog/prodreviews ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
 
 /prodreviews/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, catalog/prodreviews ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: prodreviews/ }
 		do:

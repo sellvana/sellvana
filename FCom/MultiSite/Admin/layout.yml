@@ -1,18 +1,18 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, system/multisite, { label: Multi Site, pos: 30, href: /multisite } ]
 
 /multisite:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, system/multisite ]] }
+	- { view: admin/nav, do: [[ setNav, system/multisite ]] }
 
 /multisite/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, system/multisite ]] }
+	- { view: admin/nav, do: [[ setNav, system/multisite ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: multisite/sites-form/ }
 		do:

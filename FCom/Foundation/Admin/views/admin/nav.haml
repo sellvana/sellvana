@@ -1,0 +1,18 @@
+%ul.nav-bar.vertical
+  - foreach ($this->getNodes() as $n1)
+    %li(class="#{$n1['li']['class']} #{$n1['li']['active']?'active':''} #{$n1['children']?'has-flyout':''}")
+      %a(href="#{$n1['href']}") = $this->_($n1['label'])
+      - if ($n1['children'])
+        %a.flyout-toggle(href="#")
+          %span
+        %ul.flyout
+          - foreach ($n1['children'] as $n2)
+            %li(class="#{$n2['li']['class']} #{$n2['li']['active']?'active':''} #{$n2['children']?'has-flyout':''}")
+              %a(href="#{$n2['href']}") = $this->_($n2['label'])
+              - if ($n2['children'])
+                %a.flyout-toggle(href="#")
+                  %span
+                %ul.flyout
+                  - foreach ($n2['children'] as $n3)
+                    %li(class="#{$n3['li']['class']} #{$n3['li']['active']?'active':''}")
+                      %a(href="#{$n3['href']}") = $this->_($n3['label'])

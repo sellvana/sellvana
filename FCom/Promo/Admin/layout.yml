@@ -1,5 +1,5 @@
 base:
-	- { view: admin/header, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
+	- { view: admin/nav, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
 
 promo_form_tabs:
 	- view: promo/form
@@ -13,11 +13,11 @@ promo_form_tabs:
 /promo:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, catalog/promo ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/promo ]] }
 
 /promo/form:
 	- { include: base }
 	- { include: form }
 	- { include: promo_form_tabs }
 	- { hook: main, views: promo/form }
-	- { view: admin/header, do: [[ setNav, catalog/promo ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/promo ]] }

@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do: 
 			- [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
 
@@ -11,10 +11,10 @@ catalog_product_form_tabs:
 /customfields/fieldsets:
 	- { include: base }
 	- { hook: main, views: customfields/fieldsets }
-	- { view: admin/header, do: [[ setNav, catalog/fieldsets ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
 
 /customfields/fieldsets/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: customfields/fieldsets/form }
-	- { view: admin/header, do: [[ setNav, catalog/fieldsets ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
