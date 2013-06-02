@@ -1,18 +1,18 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, catalog/index-fields, { label: Index Fields, href: /catalogindex/fields } ]
 
 /catalogindex/fields:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, catalog/index-fields ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }
 
 /catalogindex/fields/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, catalog/index-fields ]] }
+	- { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }
 	- view: admin/form
 		set: { tab_view_prefix: catalogindex/fields/form/ }
 		do:

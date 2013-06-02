@@ -7,13 +7,15 @@
             baseHref: '#{BApp::href()}'
         }
 %body(class="#{$this->bodyClass}")
-    .top-message
-        Something happened here!
+    -#.top-message
+        -#Something happened here!
 
     - if (FCom_Admin_Model_User::i()->isLoggedIn())
-        .ui-layout-center.adm-wrapper#root-layout
-            - echo $this->view('admin/header')
-            .adm-middle.ui-layout-center#main-container
+        - echo $this->hook('header')
+        .row
+            .two.columns
+                - echo $this->hook('nav')
+            .ten.columns
                 - echo $this->hook('main')
 
         :javascript
@@ -29,9 +31,7 @@
             });
             */
 
-    - else
+    - else 
         .adm-wrapper#root-layout
             - echo $this->hook('main')
-            
-    :javascript
-        $(document).foundation()
+    - echo $this->hook('footer')

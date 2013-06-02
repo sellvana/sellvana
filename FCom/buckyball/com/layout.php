@@ -1995,7 +1995,7 @@ class BViewHead extends BView
                 if ($this->_headJs['jquery']) {
                     $scripts = 'head.js({jquery:"' . $this->_headJs['jquery'] . '"}, function() { jQuery.fn.ready = head; ' . $scripts . '});';
                 }
-                $html .= "<script>$ = head; {$scripts}</script>";
+                $html .= "<script>/*$ = head;*/ {$scripts}</script>";
             }
 
             return $html;

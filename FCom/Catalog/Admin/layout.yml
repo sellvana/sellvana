@@ -1,12 +1,14 @@
 
 base: 
-  - view: admin/header
+  - view: admin/nav
     do: 
       - [ addNav, catalog, { label: Catalog, pos: 100 } ]
       - [ addNav, catalog/categories, { label: Categories, href: /catalog/categories } ]
       - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
       - [ addNav, catalog/families, { label: Product Families, href: /catalog/families } ]
       - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
+  - view: admin/header
+    do: 
       - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
       - [ addShortcut, catalog/products, { label: New Product, href: /catalog/products/form/ } ]
 
@@ -24,27 +26,27 @@ catalog_product_form_tabs:
 /catalog/products: 
   - { include: base }
   - { hook: main, views: admin/grid }
-  - { view: admin/header, do: [[ setNav, catalog/products ]] }
+  - { view: admin/nav, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/form: 
   - { include: base }
   - { include: form }
   - { include: catalog_product_form_tabs }
   - { hook: main, views: 'admin/form' }
-  - { view: admin/header, do: [[ setNav, catalog/products ]] }
+  - { view: admin/nav, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/import: 
   - { include: base }
   - { include: form }
   - { hook: main, views: catalog/products/import }
-  - { view: admin/header, do: [[ setNav, catalog/products/import ]] }
+  - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
 
 
 /catalog/categories: 
   - { include: base }
   - { include: form }
   - { hook: main, views: catalog/categories }
-  - { view: admin/header, do: [[ setNav, catalog/categories ]] }
+  - { view: admin/nav, do: [[ setNav, catalog/categories ]] }
 
 /catalog/categories/tree_form: 
   - { root, catalog/categories-tree-form }
@@ -59,7 +61,7 @@ catalog_product_form_tabs:
 /catalog/families: 
   - { include: base'),
   - { hook: main, views: 'admin/grid' }
-  - { view: admin/header, do: [[ setNav, catalog/families ]] }
+  - { view: admin/nav, do: [[ setNav, catalog/families ]] }
 
 
 /settings: 

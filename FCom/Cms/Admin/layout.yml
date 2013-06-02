@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, cms, { label: CMS, post: 200 } ]
 			- [ addNav, cms/nav, { label: Navigation, href: /cms/nav } ]
@@ -10,7 +10,7 @@ base:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: cms/nav }
-	- { view: admin/header, do: [[ setNav : cms/nav ]] }
+	- { view: admin/nav, do: [[ setNav : cms/nav ]] }
 
 /cms/nav/tree_form:
 	- { root: cms/nav-tree-form }
@@ -23,13 +23,13 @@ base:
 /cms/pages:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, cms/pages ]] }
+	- { view: admin/nav, do: [[ setNav, cms/pages ]] }
 
 /cms/pages/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, cms/pages ]] }
+	- { view: admin/nav, do: [[ setNav, cms/pages ]] }
 	- view: admin/form
 		set: { tab_view_prefix: cms/pages-form/ }
 		do:
@@ -39,13 +39,13 @@ base:
 /cms/blocks:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
+	- { view: admin/nav, do: [[ setNav, cms/blocks ]] }
 
 /cms/blocks/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
+	- { view: admin/nav, do: [[ setNav, cms/blocks ]] }
 	- view: admin/form
 		set: { tab_view_prefix: cms/blocks-form/ }
 		do:

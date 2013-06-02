@@ -1,5 +1,5 @@
 base:
-	- view: admin/header
+	- view: admin/nav
 		do:
 			- [ addNav, customer, { label: Customers, pos: 300 } ]
 			- [ addNav, customer/customers, { label: Customers, href: /customers } ]
@@ -8,13 +8,13 @@ base:
 /customers:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, customer/customers ]] }
+	- { view: admin/nav, do: [[ setNav, customer/customers ]] }
 
 /customers/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, customer/customers ]] }
+	- { view: admin/nav, do: [[ setNav, customer/customers ]] }
 	- view: admin/form
 		set: { tab_view_prefix: customer/customers-form/ }
 		do:
@@ -24,4 +24,4 @@ base:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: customer/import }
-	- { view: admin/header, do: [[ setNav, customer/import ]] }
+	- { view: admin/nav, do: [[ setNav, customer/import ]] }

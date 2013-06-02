@@ -1,17 +1,17 @@
 base:
-	- { view: admin/header, do: [[ addNav, system/translations, { label: Translations, href: /translations } ]] }
+	- { view: admin/nav, do: [[ addNav, system/translations, { label: Translations, href: /translations } ]] }
 
 /translations:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/header, do: [[ setNav, system/translations ]] }
+	- { view: admin/nav, do: [[ setNav, system/translations ]] }
 
 /translations/form:
 	- { include: base }
 	- { include: form }
 	- { include: ace }
 	- { hook: main, views: admin/form }
-	- { view: admin/header, do: [[ setNav, system/translations ]] }
+	- { view: admin/nav, do: [[ setNav, system/translations ]] }
 	- view: admin/form	
 		set: { tab_view_prefix: translations/ }
 		do:

@@ -923,37 +923,6 @@ FCom.Admin.initAce = function() {
     });
 }
 
-$(function() {
-    $.jgrid.formatter.date.newformat = 'm/d/Y';
-    $.jgrid.edit.width = 500;
-
-    if (typeof CKEDITOR !== 'undefined') {
-        CKEDITOR.config.autoUpdateElement = true;
-        CKEDITOR.config.toolbarStartupExpanded = false;
-        CKEDITOR.config.startupMode = 'source';
-    }
-    //$('.datepicker').datepicker();
-    $(document).bind('ajaxSuccess', function(event, request, settings) {
-        if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
-            if (data.error=='login') {
-                location.href = window.appConfig.baseHref;
-            }
-        }
-    });
-    $('.nav-group header').click(function(ev) {
-        $(ev.currentTarget).parent('li').find('ul').animate({
-            opacity:'toggle',
-            height:'toggle'
-        }, 100);
-    });
-    
-    FCom.Admin.initAce();
-
-    $('.js-resizable').each(function(idx, el) {
-        $(el).resizable();
-    })
-})
-
 $.fn.resizeWithWindow = function(options) {
     var settings = $.extend({ x:false, y:true, dX:null, dX:null, initBy:null, jqGrid:null }, options || {});
     var $win = $(window), $el = this, isGrid = settings.jqGrid || $el.hasClass('ui-jqgrid-btable');
@@ -997,3 +966,36 @@ $.fn.resizeWithWindow = function(options) {
     resize();
     $win.resize(resize);
 }
+
+$(function() {
+    $.jgrid.formatter.date.newformat = 'm/d/Y';
+    $.jgrid.edit.width = 500;
+
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.config.autoUpdateElement = true;
+        CKEDITOR.config.toolbarStartupExpanded = false;
+        CKEDITOR.config.startupMode = 'source';
+    }
+    //$('.datepicker').datepicker();
+    $(document).bind('ajaxSuccess', function(event, request, settings) {
+        if (settings.dataType=='json' && (data = $.parseJSON(request.responseText))) {
+            if (data.error=='login') {
+                location.href = window.appConfig.baseHref;
+            }
+        }
+    });
+    $('.nav-group header').click(function(ev) {
+        $(ev.currentTarget).parent('li').find('ul').animate({
+            opacity:'toggle',
+            height:'toggle'
+        }, 100);
+    });
+    
+    FCom.Admin.initAce();
+
+    $('.js-resizable').each(function(idx, el) {
+        $(el).resizable();
+    })
+
+    $(".foundation-forms").foundationCustomForms();
+})
