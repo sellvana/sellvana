@@ -812,6 +812,9 @@ class BUtil extends BClass
         if (strpos($storedHash, '$2a$')===0 || strpos($storedHash, '$2y$')===0) {
             return static::bcrypt($string, $storedHash);
         }
+        if (!$storedHash) {
+            return false;
+        }
         $sep = $storedHash[0];
         $arr = explode($sep, $storedHash);
         array_shift($arr);
