@@ -6,13 +6,13 @@ base:
 			- [ addNav, market/index, { label: My Modules, href: /market/index } ]
 
 /market:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, market ]] }
 
 /market/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- view: admin/form
 		set: { tab_view_prefix: market/ }
@@ -20,5 +20,5 @@ base:
 			- [ addTab, main, { label: Market, pos: 10 } ]
 
 /market/market:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: market/market }

@@ -32,13 +32,13 @@ base:
     - { hook: footer, views: footer }
 
 404:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: 404 }
 
 /denied:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: denied }
 
 /:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: home }

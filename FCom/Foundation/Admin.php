@@ -1,6 +1,6 @@
 <?php
 
-class Foundation_Admin extends BClass
+class FCom_Foundation_Admin extends BClass
 {
 	static public function bootstrap()
 	{

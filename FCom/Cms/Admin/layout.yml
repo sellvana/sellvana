@@ -7,8 +7,8 @@ base:
 			- [ addNav, cms/blocks, { label: Blocks, href: /cms/blocks } ]
 
 /cms/nav:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: cms/nav }
 	- { view: admin/header, do: [[ setNav : cms/nav ]] }
 
@@ -21,13 +21,13 @@ base:
 			- [ addTab, content, { label: Page Content, pos: 20 } ]
 
 /cms/pages:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, cms/pages ]] }
 
 /cms/pages/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, cms/pages ]] }
 	- view: admin/form
@@ -37,13 +37,13 @@ base:
 			- [ addTab, history, { label: History, pos: 20 } ]
 
 /cms/blocks:
-	- { layout: base }
+	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
 
 /cms/blocks/form:
-	- { layout: base }
-	- { layout: form }
+	- { include: base }
+	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/header, do: [[ setNav, cms/blocks ]] }
 	- view: admin/form

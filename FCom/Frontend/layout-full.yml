@@ -7,7 +7,7 @@
 #
 #     - { root: root/template }                                     # Specify root template name
 #
-#     - { layout: base }                                            # Apply another layout key, in this case special "base"
+#     - { include: base }                                            # Apply another layout key, in this case special "base"
 #
 #     - { hook: head, views: head }                                 # Add view "head" to hook "head"
 #
@@ -72,22 +72,22 @@ base:
     - { hook: footer, views: footer }
 
 404:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: 404 }
 
 /denied:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: denied }
 
 /:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: home }
 
 
 ################# FCom_Catalog:
 
 /catalog/category:
-    - { layout: base }
+    - { include: base }
     - { view: root, set: { show_left_col: true } }
     - { hook: main, views: catalog/category }
     - { hook: sidebar-left, views: catalog/category/sidebar }
@@ -95,23 +95,23 @@ base:
     - { hook: catalog/product/pager.fields, views: catalog/category/_pager_fields } # FCom_CatalogIndex
 
 /catalog/product:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: catalog/product }
 
     - { hook: catalog/product/pager.fields, views: catalog/category/_pager_fields } # FCom_CatalogIndex
 
 /catalog/search:
-    - { layout: base }
+    - { include: base }
     - { view: root, set: { show_left_col: true } }
     - { hook: main, views: catalog/search }
     - { hook: sidebar-left, views: catalog/category/sidebar }
 
 /catalog/review/add:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: catalog/review/add }
 
 /catalog/compare:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: catalog/compare }
 
 /catalog/compare/xhr:
@@ -121,101 +121,101 @@ base:
 ################# FCom_Checkout:
 
 /checkout/cart:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/cart }
 
 /checkout/checkout:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/checkout }
 
 /checkout/login:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/login }
 
 /checkout/payment:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/payment }
 
 /checkout/shipping:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/shipping }
 
 /checkout/address:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/address }
 
 /checkout/success:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: checkout/success }
 
 
 ################# FCom_Customer:
 
 /customer/login:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/login }
 
 /customer/register:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/register }
 
 /customer/password-recover:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/password-recover }
 
 /customer/password-reset:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/password-reset }
 
 /customer/account:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/account }
 
 /customer/account/edit:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/account/edit }
 
 /customer/account/editpassword:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/account/editpassword }
 
 /customer/address/edit:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/address/edit }
 
 /customer/address/list:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/address/list }
 
 /customer/address/choose:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/address/choose }
 
 /customer/order/list:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/order/list }
 
 /customer/order/view:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: customer/order/view }
 
 
 ################# FCom_Email:
 
 /email/pref:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: subscription/email-pref }
 
 
 ################# FCom_ProductReviews:
 
 /prodreviews/add:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: prodreviews/add }
 
 
 ################# FCom_Wishlist:
 
 /wishlist:
-    - { layout: base }
+    - { include: base }
     - { hook: main, views: wishlist }

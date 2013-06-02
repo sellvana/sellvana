@@ -1,0 +1,37 @@
+!!!
+- echo '<html '.$this->getHtmlAttributes().'>'
+%head
+    - echo $this->hook('head')
+    :javascript
+        window.appConfig = {
+            baseHref: '#{BApp::href()}'
+        }
+%body(class="#{$this->bodyClass}")
+    .top-message
+        Something happened here!
+
+    - if (FCom_Admin_Model_User::i()->isLoggedIn())
+        .ui-layout-center.adm-wrapper#root-layout
+            - echo $this->view('admin/header')
+            .adm-middle.ui-layout-center#main-container
+                - echo $this->hook('main')
+
+        :javascript
+            /*
+            head(function() {
+                var $main = $('.adm-content-box'), $win = $(window), $doc = $(document);
+                if ($main.length) {
+                    $win.resize(function() {
+                        var h = $win.height(); //Math.max($doc.height(), $win.height());
+                        $main.height(h-$main.offset().top);
+                    }).trigger('resize');
+                }
+            });
+            */
+
+    - else
+        .adm-wrapper#root-layout
+            - echo $this->hook('main')
+            
+    :javascript
+        $(document).foundation()
