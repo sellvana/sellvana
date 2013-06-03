@@ -7,7 +7,7 @@
         %nav.adm-nav
             %a.start(href="#")
                 %span.adm-logo = $this->_('Fulleron Admin')
-            - echo $this->renderNodes()
+            - echo $this->view('admin/nav')
         %nav.sup-links
             %ul
                 - if (!empty($this->_quickSearches))

@@ -9,7 +9,8 @@ base:
       - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/json2.js ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js, { separate: true } ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js, { separate: true } ]
 
   #- { include: foundation3 }
 
@@ -53,56 +54,6 @@ base:
   - view: admin/header
     do:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
-
-foundation3:
-  - view: head
-    do:
-      - [ css, @FCom_Foundation/lib3/stylesheets/app.css ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/modernizr.foundation.js, { separate: true } ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.js, { separate: true } ]
-      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js, { separate: true } ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.move.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.swipe.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.accordion.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.alerts.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.buttons.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.clearing.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.forms.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.joyride.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.magellan.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.mediaQueryToggle.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.navigation.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.orbit.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.reveal.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.tabs.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.tooltips.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.topbar.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.placeholder.js ]
-      - [ js, @FCom_Foundation/lib3/javascripts/foundation/app.js ]
-
-foundation4:
-  - view: head
-    do:
-      - [ css, @FCom_Foundation/lib4/stylesheets/app.css ]
-      - [ js, @FCom_Foundation/lib4/javascripts/vendor/custom.modernizr.js, { separate: true } ]
-      - [ js, @FCom_Foundation/lib4/javascripts/vendor/zepto.js, { separate: true } ]
-      #- [ js, @FCom_Foundation/lib4/javascripts/vendor/jquery.js, { separate: true } ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.alerts.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.clearing.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.cookie.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.dropdown.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.forms.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.interchange.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.joyride.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.magellan.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.orbit.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.placeholder.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.reveal.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.section.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.tooltips.js ]
-      - [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.topbar.js ]
 
 jqgrid:
   - view: head

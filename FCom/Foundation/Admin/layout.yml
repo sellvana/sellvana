@@ -3,7 +3,7 @@ foundation3:
 		do:
 			- [ css, @FCom_Foundation/lib3/stylesheets/app.css ]
 			- [ js, @FCom_Foundation/lib3/javascripts/foundation/modernizr.foundation.js, { separate: true } ]
-			- [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.js, { separate: true } ]
+			#- [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.js, { separate: true } ]
 			- [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.move.js ]
 			- [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.event.swipe.js ]
 			- [ js, @FCom_Foundation/lib3/javascripts/foundation/jquery.foundation.accordion.js ]
@@ -29,7 +29,7 @@ foundation4:
 			- [ css, @FCom_Foundation/lib4/stylesheets/app.css ]
 			- [ js, @FCom_Foundation/lib4/javascripts/vendor/custom.modernizr.js, { separate: true } ]
 			- [ js, @FCom_Foundation/lib4/javascripts/vendor/zepto.js, { separate: true } ]
-			- [ js, @FCom_Foundation/lib4/javascripts/vendor/jquery.js, { separate: true } ]
+			#- [ js, @FCom_Foundation/lib4/javascripts/vendor/jquery.js, { separate: true } ]
 			- [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.js ]
 			- [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.alerts.js ]
 			- [ js, @FCom_Foundation/lib4/javascripts/foundation/foundation.clearing.js ]
@@ -49,20 +49,20 @@ foundation4:
 base:
 	- view: head
 		do:
-			- [ remove, js, true ]
-			- [ remove, css, true ]
+			#- [ remove, js, true ]
+			#- [ remove, css, true ]
 
 			- [ meta, viewport, width=device-width ]
 
-			- [ js, @FCom_Core/js/lib/head.min.js ]
-			- [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
-			- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-			- [ js, @FCom_Core/js/lib/json2.js ]
+			#- [ js, @FCom_Core/js/lib/head.min.js ]
+			#- [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
+			#- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+			#- [ js, @FCom_Core/js/lib/json2.js ]
 
 	- { include: foundation3 }
-	- view: head
-		do:
-			- [ js, @FCom_Admin/js/fcom.admin.js ]
+	#- view: head
+		#do:
+			#- [ js, @FCom_Admin/js/fcom.admin.js ]
 
-	- { hook: header, views: admin/header }
-	- { hook: nav, views: admin/nav }
+	#- { hook: header, views: admin/header }
+	#- { hook: nav, views: admin/nav }
