@@ -87,7 +87,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
                 $node['href'] = '#';
             }
 
-            $result[] = $node;
+            $result[$k] = $node;
         }
 
         return $result;
