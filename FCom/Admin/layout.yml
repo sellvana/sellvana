@@ -9,9 +9,9 @@ base:
       - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/json2.js ]
-      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js, { separate: true } ]
 
-  - { include: foundation3 }
+  #- { include: foundation3 }
 
   - view: head
     do:

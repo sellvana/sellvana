@@ -1,0 +1,20 @@
+%ul.nav-bar.vertical
+  - foreach ($this->getNodes() as $k1=>$n1)
+    %li(class="#{$n1['li']['class']} #{$n1['li']['active']?'active':''} #{$n1['children']?'nav-group':''}")
+      %a(href="#{$n1['href']}" class="#{$n1['children']?'nav-group-'.$k1:''}")
+        %span.icon
+        %span.title = $this->_($n1['label'])
+      - if ($n1['children'])
+        %ul
+          - foreach ($n1['children'] as $k2=>$n2)
+            %li(class="#{$n2['li']['class']} #{$n2['li']['active']?'active':''} #{$n2['children']?'nav-group':''}")
+              %a(href="#{$n2['href']}" class="#{$n2['children']?'nav-group-'.$k2:''}")
+                %span.icon
+                %span.title = $this->_($n2['label'])
+              - if ($n2['children'])
+                %ul
+                  - foreach ($n2['children'] as $k3=>$n3)
+                    %li(class="#{$n3['li']['class']} #{$n3['li']['active']?'active':''}")
+                      %a(href="#{$n3['href']}")
+                        %span.icon
+                        %span.title = $this->_($n2['label'])
