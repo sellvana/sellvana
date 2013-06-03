@@ -34,7 +34,7 @@ base:
   - { include: jstree }
 
   - { hook: header, views: admin/header }
-  - { hook: nav, views: admin/nav }
+  - { hook: top-nav, views: admin/nav }
 
   - view: head
     do:

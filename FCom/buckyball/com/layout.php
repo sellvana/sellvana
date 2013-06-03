@@ -415,6 +415,14 @@ class BLayout extends BClass
     }
 
     /**
+     * @return string
+     */
+    public function getRootViewName()
+    {
+        return $this->_rootViewName;
+    }
+
+    /**
      * Clone view object to another name
      *
      * @param string $from
@@ -531,8 +539,8 @@ class BLayout extends BClass
                 $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
             }
         }
-        $this->afterTheme(function() use($layoutFilename) { 
-            BLayout::i()->loadLayout($layoutFilename); 
+        $this->afterTheme(function() use($layoutFilename) {
+            BLayout::i()->loadLayout($layoutFilename);
         });
         return $this;
     }
@@ -579,6 +587,9 @@ class BLayout extends BClass
         $callbacks = array();
         foreach ($this->_layouts[$layoutName] as $d) {
             if (empty($d['type'])) {
+                if (!is_array($d)) {
+                    var_dump($layoutName, $d);
+                }
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
                 } else {
@@ -603,7 +614,7 @@ class BLayout extends BClass
             $d['layout_name'] = $layoutName;
             $callback = self::$_metaDirectives[$d['type']];
 
-            if ($d['type'] === 'remove') { 
+            if ($d['type'] === 'remove') {
                 if ($d['name'] === 'all') { //TODO: allow removing specific instructions
                     $callbacks = array();
                 }
@@ -1120,9 +1131,24 @@ class BView extends BClass
     public function hook($hookName, $args = array())
     {
         $args['_viewname'] = $this->param('view_name');
-        $result            = BEvents::i()->fire('BLayout::hook.' . $hookName, $args);
+        $result = '';
 
-        return join('', $result);
+        $debug = BDebug::is('DEBUG');
+        if ($debug) {
+            $result .= "<!-- START HOOK: {$hookName} -->\n";
+        }
+
+        $result .= join('', BEvents::i()->fire('BView::hook.before', array('view' => $this, 'name' => $hookName)));
+
+        $result .= join('', BEvents::i()->fire('BLayout::hook.' . $hookName, $args));
+
+        $result .= join('', BEvents::i()->fire('BView::hook.after', array('view' => $this, 'name' => $hookName)));
+
+        if ($debug) {
+            $result .= "<!-- END HOOK: {$hookName} -->\n";
+        }
+
+        return $result;
     }
 
     /**
@@ -1192,7 +1218,10 @@ class BView extends BClass
      */
     public function render(array $args = array(), $retrieveMetaData = true)
     {
-        $timer = BDebug::debug('RENDER.VIEW ' . $this->param('view_name'));
+        $debug = BDebug::is('DEBUG');
+        $viewName = $this->param('view_name');
+
+        $timer = BDebug::debug('RENDER.VIEW ' . $viewName);
         if ($this->param('raw_text') !== null) {
             return $this->param('raw_text');
         }
@@ -1202,13 +1231,18 @@ class BView extends BClass
         if (($modName = $this->param('module_name'))) {
             BModuleRegistry::i()->pushModule($modName);
         }
+        $result = '';
         if (!$this->_beforeRender()) {
             BDebug::debug('BEFORE.RENDER failed');
-
-            return false;
+            if ($debug) {
+                $result .= "<!-- FAILED VIEW: {$viewName} -->\n";
+            }
+            return $result;
         }
 
-        $result = '';
+        if ($debug && BLayout::i()->getRootViewName()!==$viewName) {
+            $result .= "<!-- START VIEW: {$viewName} -->\n";
+        }
         $result .= join('', BEvents::i()->fire('BView::render.before', array('view' => $this)));
         if (($renderer = $this->param('renderer'))) {
             $viewContent = call_user_func($renderer, $this);
@@ -1228,6 +1262,9 @@ class BView extends BClass
         $result .= $viewContent;
         $result .= join('', BEvents::i()->fire('BView::render.after', array('view' => $this)));
 
+        if ($debug) {
+            $result .= "<!-- END VIEW: {$viewName} -->\n";
+        }
         BDebug::profile($timer);
 
         $this->_afterRender();
@@ -1251,7 +1288,7 @@ class BView extends BClass
      */
     protected function _afterRender()
     {
-        BEvents::i()->fire('BView::afterRender', array('view' => $this));
+
     }
 
     /**
@@ -1896,7 +1933,7 @@ class BViewHead extends BView
             $fsFile = BApp::m($m[1])->root_dir . $m[2];
             $file   = BApp::m($m[1])->baseSrc() . $m[2];
             if (file_exists($fsFile)) {
-                $file .= '?' . filemtime($fsFile);
+                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
         } elseif (preg_match('#\{(.*?)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
             $mod = BApp::m($m[1]);
@@ -1907,7 +1944,7 @@ class BViewHead extends BView
             $fsFile = str_replace('{' . $m[1] . '}', BApp::m($m[1])->root_dir, $file);
             $file   = str_replace('{' . $m[1] . '}', BApp::m($m[1])->baseSrc(), $file);
             if (file_exists($fsFile)) {
-                $file .= '?' . filemtime($fsFile);
+                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
         }
         if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
