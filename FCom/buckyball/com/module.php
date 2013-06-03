@@ -489,7 +489,7 @@ class BModuleRegistry extends BClass
                 $this->propagateDepends($mod);
             }
         }
-        //print_r(static::$_modules);exit;
+        #var_dump(static::$_modules);exit;
         return $this;
     }
 
@@ -980,7 +980,6 @@ class BModule extends BClass
         if ($this->run_status !== BModule::PENDING) {
             return $this;
         }
-
         $this->_prepareModuleEnvData();
 
         if (empty($this->before_bootstrap)) {
