@@ -14,7 +14,7 @@
         - echo $this->hook('header')
         .row
             .two.columns
-                - echo $this->hook('nav')
+                - echo $this->hook('top-nav')
             .ten.columns
                 - echo $this->hook('main')
 
@@ -31,7 +31,7 @@
             });
             */
 
-    - else 
+    - else
         .adm-wrapper#root-layout
             - echo $this->hook('main')
     - echo $this->hook('footer')
