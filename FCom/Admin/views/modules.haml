@@ -22,9 +22,9 @@
             }
             var options = opt.colModel.editoptions.value.split(';');
             var html = [
-                '<select id="module_run_level-', area, '-', escape(opt.rowId), '"',
+                '<select id="module_run_levels-', area, '-', escape(opt.rowId), '"',
                 ' title="', escape(opt.rowId), '"',
-                ' name="module_run_level[', area, '][', escape(opt.rowId),']"',
+                ' name="module_run_levels[', area, '][', escape(opt.rowId),']"',
                 ' style="background:', runLevelColors[val], '"',
                 ' onchange="return fmtRunLevelChange(this)">'
             ];

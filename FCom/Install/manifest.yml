@@ -4,7 +4,7 @@ modules:
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Initial installation wizard"
 
-        auto_use: views
+        auto_use: [ views, layout ]
         routing:
             - [ GET, /, FCom_Install_Controller.index ]
             - [ any, /install, FCom_Install_Controller.index ]

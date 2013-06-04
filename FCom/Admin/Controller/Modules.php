@@ -7,9 +7,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
     public function getModulesData()
     {
         $config = BConfig::i();
-        $coreLevels = $config->get('modules/FCom_Core/module_run_level');
-        $adminLevels = $config->get('modules/FCom_Admin/module_run_level');
-        $frontendLevels = $config->get('modules/FCom_Frontend/module_run_level');
+        $coreLevels = $config->get('module_run_levels/FCom_Core');
+        $adminLevels = $config->get('module_run_levels/FCom_Admin');
+        $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = BModuleRegistry::i()->debug();
 
         try {
@@ -109,7 +109,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
     {
         try {
             $areas = array('FCom_Core', 'FCom_Admin', 'FCom_Frontend');
-            $levels = BRequest::i()->post('module_run_level');
+            $levels = BRequest::i()->post('module_run_levels');
             foreach ($areas as $area) {
                 if (empty($levels[$area])) {
                     continue;
@@ -119,8 +119,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                         unset($levels[$area][$modName]);
                     }
                 }
-                BConfig::i()->set('modules/'.$area.'/module_run_level', $levels[$area], false, true);
-                //BConfig::i()->add(array('modules'=>array($area=>array('module_run_level'=>$levels[$area]))), true);
+                BConfig::i()->set('module_run_levels/'.$area, $levels[$area], false, true);
             }
             FCom_Core_Main::i()->writeLocalConfig();
             BSession::i()->addMessage('Run levels updated', 'success', 'admin');

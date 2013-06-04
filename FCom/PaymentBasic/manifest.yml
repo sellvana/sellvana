@@ -4,8 +4,8 @@ modules:
         translations: { de: de.php }
         description: "Basic payment methods (check/money order, purchase order)"
         require: { module: { FCom_Sales: 0.1.10 } }
-        auto_use: bootstrap
+        auto_use: [ bootstrap ]
         
         areas:
             FCom_Frontend:
-                auto_use: views
+                auto_use: [ views ]

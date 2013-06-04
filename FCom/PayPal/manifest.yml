@@ -7,7 +7,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: views
+                auto_use: [ views ]
 
             FCom_Admin:
                 auto_use: [ bootstrap, views ]

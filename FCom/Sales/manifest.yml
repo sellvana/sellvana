@@ -6,7 +6,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: views
+                auto_use: [ views ]
                 
             FCom_Api:
                 routing:

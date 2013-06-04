@@ -258,7 +258,6 @@ class BLayout extends BClass
     public function defaultViewClass($className)
     {
         $this->_defaultViewClass = $className;
-
         return $this;
     }
 
@@ -339,6 +338,7 @@ class BLayout extends BClass
                     $params['view_class'] = $this->_defaultViewClass;
                 }
             }
+
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
             BEvents::i()->fire('BLayout::view.add: ' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
@@ -825,8 +825,17 @@ class BLayout extends BClass
             return $this;
         }
         BDebug::debug('THEME.LOAD ' . $themeName);
+        $theme = $this->_themes[$themeName];
         BEvents::i()->fire('BLayout::theme.load.before', array('theme_name' => $themeName));
-        BUtil::call($this->_themes[$themeName]['callback']);
+        if (!empty($theme['layout'])) {
+            BLayout::i()->loadLayout($theme['layout']);
+        }
+        if (!empty($theme['views'])) {
+            BLayout::i()->addAllViews($theme['views']);
+        }
+        if (!empty($theme['callback'])) {
+            BUtil::i()->call($theme['callback']);
+        }
         BEvents::i()->fire('BLayout::theme.load.after', array('theme_name' => $themeName));
 
         return $this;

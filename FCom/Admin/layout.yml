@@ -107,7 +107,7 @@ mcdropdown:
 ace:
   - view: head
     do:
-      - [ js, http://rawgithub.com/ajaxorg/ace-builds/master/src-min-noconflict/ace.js ]
+      - [ js, @FCom_Admin/js/ace-src-min-noconflict/ace.js ]
 
 form:
   - view: head

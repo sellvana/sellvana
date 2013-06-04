@@ -4,10 +4,10 @@ modules:
 		require: { module: { FCom_Core: 0.1.0 } }
 		translations: { de: de.php }
 		description: Embed Disqus comments on any page
-        auto_use: views
+        auto_use: [ views ]
 
         areas:
             FCom_Frontend:
-                auto_use: bootstrap
+                auto_use: [ bootstrap ]
                 observe:
                     - [ BLayout::theme.load.after, FCom_Disqus_Frontend::layout ]

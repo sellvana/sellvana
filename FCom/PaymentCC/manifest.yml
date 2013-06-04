@@ -7,4 +7,4 @@ modules:
 
         areas:
             FCom_Frontend:
-                auto_use: views
+                auto_use: [ views ]

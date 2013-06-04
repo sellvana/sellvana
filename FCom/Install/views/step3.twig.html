@@ -1,0 +1,9 @@
+{% set w = SESSION.data('w') %}
+<h1>Step 3</h1>
+<form class="wizard" method="post" action="{{APP.href('install/step3')}}">
+
+    <fieldset>
+        {{ THIS.messagesHtml() |raw }}
+        <button type="submit">Proceed to the next step</button>
+    </fieldset>
+</form>
