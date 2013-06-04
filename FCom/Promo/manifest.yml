@@ -6,7 +6,7 @@ modules:
         
         areas:
             FCom_Admin:
-                auto_use: all
+                auto_use: [ all ]
                 routing:
                     - [ get, /promo, FCom_Promo_Admin_Controller.index ]
                     - [ any, /promo/.action, FCom_Promo_Admin_Controller ]

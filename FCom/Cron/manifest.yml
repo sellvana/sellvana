@@ -3,10 +3,16 @@ modules:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0 } }
         description: Cron scheduled tasks manager
+
+        default_config:
+            modules:
+                FCom_Cron:
+                    mode_by_ip: "127.0.0.1:DEBUG\nDISABLED"
+
         areas:
             FCom_Admin:
                 auto_use: [ layout, views ]
-                
+
             FCom_Cron:
                 routing:
                     - [ GET, /, FCom_Cron_Controller.run ]

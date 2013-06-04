@@ -475,7 +475,7 @@ class BConfig extends BClass
             $config = BUtil::fromJson(file_get_contents($filename));
             break;
         }
-        if (!$config) {
+        if (!is_array($config)) {
             BDebug::error(BLocale::_('Invalid configuration contents: %s', $filename));
         }
         $this->add($config, $toSave);
@@ -1484,6 +1484,9 @@ class BEvents extends BClass
                 foreach (array('.', '->') as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r)==2) {
+if (!class_exists($r[0])) {
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+}
                         $cb = array($r[0]::i(), $r[1]);
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
@@ -1864,6 +1867,7 @@ class BSession_APC extends BClass
 {
     protected $_prefix;
     protected $_ttl = 0;
+    protected $_lockTimeout = 10;
 
     public function __construct()
     {
@@ -1920,7 +1924,7 @@ class BSession_APC extends BClass
             }
         }
 
-        if (!$this->_lockTimeout) {
+        if ($this->_lockTimeout) {
             $locks = apc_fetch($this->_prefix.'/LOCK');
             if (!empty($locks[$id])) {
                 while (!empty($locks[$id]) && $locks[$id] + $this->_lockTimeout >= time()) {

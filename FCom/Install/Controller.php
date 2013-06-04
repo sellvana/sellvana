@@ -6,9 +6,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         if (!parent::beforeDispatch()) return false;
 
-        if (BRequest::i()->method()==='GET') {
-            BLayout::i()->view('head')->css('css/styles.css');
-        } else {
+        if (BRequest::i()->method()==='POST') {
             $sData =& BSession::i()->dataToUpdate();
             $w = BRequest::i()->post('w');
             $sData['w'] = !empty($sData['w']) ? BUtil::arrayMerge($sData['w'], $w) : $w;
@@ -19,11 +17,12 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index()
     {
+        $this->layout('/');
+
         $errors = BDebug::i()->getCollectedErrors();
         BLayout::i()->view('index')->errors = $errors;
         
         $this->messages('index', 'install');
-        BLayout::i()->hookView('main', 'index');
     }
 
     public function action_index__POST()
@@ -35,7 +34,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $step = 1;
         if (BConfig::i()->get('db')) {
             $step = 2;
-            if (class_exists('FCom_Admin_Model_User')
+            if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
                 && FCom_Admin_Model_User::i()->orm('u')->find_one()
             ) {
                 $step = 3;
@@ -46,12 +45,12 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step1()
     {
+        $this->layout('/step1');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['db'])) {
             $sData['w']['db'] = array('host'=>'localhost', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
         }
         $this->messages('step1', 'install');
-        BLayout::i()->hookView('main', 'step1');
     }
 
     public function action_step1__POST()
@@ -71,12 +70,12 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step2()
     {
+        $this->layout('/step2');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['admin'])) {
             $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
         }
         $this->messages('step2', 'install');
-        BLayout::i()->hookView('main', 'step2');
     }
 
     public function action_step2__POST()
@@ -86,7 +85,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
-                ->save()
+                ->save(
                 ->login();
             $url = BApp::href('install/step3');
         } catch (Exception $e) {
@@ -98,8 +97,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step3()
     {
+        $this->layout('/step3');
         $this->messages('step3', 'install');
-        BLayout::i()->hookView('main', 'step3');
     }
 
     public function action_step3__POST()

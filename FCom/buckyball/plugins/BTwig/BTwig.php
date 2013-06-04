@@ -78,6 +78,7 @@ class BTwig extends BClass
         $args['REQUEST'] = BRequest::i();
         $args['LAYOUT'] = BLayout::i();
         $args['CONFIG'] = BConfig::i();
+        $args['SESSION'] = BSession::i();
 
         if (!$source) {
 

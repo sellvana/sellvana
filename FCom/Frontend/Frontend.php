@@ -48,4 +48,26 @@ class FCom_Frontend_Frontend extends BClass
             }
         }
     }
+
+    public static function defaultThemeCustomLayout()
+    {
+        $cookieConfig = BConfig::i()->get('cookie');
+
+        BLayout::i()
+            ->addLayout(array(
+                'base'=>array(
+                    array('view', 'head', 'do'=>array(
+                        array('js_raw', 'js_init', array('content'=>"
+window.less={env:'development'};
+head(function() {
+    $.cookie.options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+    $('.select2').select2({width:'other values', minimumResultsForSearch:20});
+});
+FCom = {};
+FCom.base_href = '".BApp::baseUrl()."';
+")),
+                    )),
+                 ),
+             ));
+    }
 }

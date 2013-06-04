@@ -47,3 +47,6 @@
                         %td
                             .js-ace(name="config[modules][FCom_Admin][add_css_style]" data-mode="css"
                                 style="width:400px; height:100px") = $c->get('modules/FCom_Admin/add_css_style')
+
+:javascript
+    head(function() { FCom.Admin.initAce() })

@@ -1,0 +1,18 @@
+<h1>{{ 'Welcome to Fulleron installation wizard!' |_ }}</h1>
+
+{% if THIS.get('errors') %}
+<span style="color: red">
+    {% for error in THIS.get('errors') %}
+        {{error}}<br/>
+    {% endfor %}
+        <br/>
+</span>
+{% endif %}
+
+Please review the following agreement:
+<form method="POST" action="{{APP.href('install')}}">
+    Blah blah...
+    <fieldset>
+        <input type="submit" name="w[agree]" value="Agree"/>
+    </fieldset>
+</form>

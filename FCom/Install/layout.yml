@@ -1,0 +1,15 @@
+base:
+    - { view: head, do: [[ css, @FCom_Install/css/styles.css ]] }
+
+/:
+    - { hook: main, views: index }
+
+/step1:
+    - { hook: main, views: step1 }
+
+/step2:
+    - { hook: main, views: step2 }
+
+/step3:
+    - { hook: main, views: step3 }
+

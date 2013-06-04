@@ -30,6 +30,7 @@ base:
     - { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
     - { hook: footer, views: footer }
+    - { callback: FCom_Frontend_Frontend::defaultThemeCustomLayout }
 
 404:
     - { include: base }

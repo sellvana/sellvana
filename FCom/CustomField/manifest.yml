@@ -22,6 +22,6 @@ modules:
                     - [ FCom_Catalog_Admin_Controller_Products::formViewBefore, FCom_CustomField_Admin_Controller_Products.formViewBefore ];
 
             FCom_Frontend:
-                auto_use: views
+                auto_use: [ views ]
                 observe:
                     - [ BLayout::hook.custom-fields-filters, FCom_CustomField_Main.hookCustomFieldFilters ]

@@ -139,11 +139,18 @@ class FCom_Core_Main extends BClass
         } else {
              $configFileStatus = false;
         }
+        if (file_exists($configDir.'/module_run_levels.yml')) {
+            $config->addFile('module_run_levels.yml', true);
+        } else {
+            $configFileStatus = false;
+        }
+        /*
         if (file_exists($configDir.'/local.yml')) {
             $config->addFile('local.yml', true);
         } else {
             $configFileStatus = false;
         }
+        */
         if (!$configFileStatus || $config->get('install_status')!=='installed') {
             //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
             BDebug::mode('INSTALLATION');
@@ -238,11 +245,11 @@ class FCom_Core_Main extends BClass
                 }
             }
         } else { // load all manifests
-            $runLevels += (array)$config->get('request/module_run_level') +
-                (array)$config->get('modules/'.$area.'/module_run_level') +
-                (array)$config->get('modules/FCom_Core/module_run_level');
+            $runLevels += (array)$config->get('module_run_levels/request') +
+                (array)$config->get('module_run_levels/'.$area) +
+                (array)$config->get('module_run_levels/FCom_Core');
         }
-        $config->add(array('request'=>array('module_run_level'=>$runLevels)));
+        $config->add(array('module_run_levels'=>array('request'=>$runLevels)));
 
         //FCom::i()->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
@@ -263,8 +270,13 @@ class FCom_Core_Main extends BClass
         }
 #BDebug::profile($d);
 
+        BModuleRegistry::i()->processRequires()->processDefaultConfig();
+
+        if (file_exists($config->get('fs/config_dir').'/local.yml')) {
+            $config->addFile('local.yml', true);
+        }
+
         BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-        //BClassAutoload::i(true, array('root_dir'=>$rootDir.'/market'));
         BClassAutoload::i(true, array('root_dir'=>$rootDir.'/dlc'));
         BClassAutoload::i(true, array('root_dir'=>$rootDir));
 
@@ -277,55 +289,32 @@ class FCom_Core_Main extends BClass
         return $this;
     }
 
-    static public function bootstrap()
+    static public function beforeBootstrap()
     {
         BLayout::i()
             ->defaultViewClass('FCom_Core_View_Base')
             ->view('head', array('view_class'=>'FCom_Core_View_Head'))
-        ;
+        ;        
     }
 
     public function writeDbConfig()
     {
-        BConfig::i()->writeFile('db.yml', array('db'=>BConfig::i()->get('db', true)));
+        $c = array('db'=>BConfig::i()->get('db', true));
+        BConfig::i()->writeFile('db.yml', $c);
         return $this;
     }
 
     public function writeLocalConfig()
     {
-        $c = BConfig::i()->get(null, true);
-        unset($c['db']);
-        if (empty($c['modules']['FCom_Cron']['mode_by_ip'])) {
-            $c['modules']['FCom_Cron']['mode_by_ip'] = '127.0.0.1';
-        }
-        if (empty($c['modules']['FCom_Admin'])) {
-            $c['modules']['FCom_Admin'] = array (
-                'module_run_level' => array (
-                ),
-                'mode_by_ip' => 'DEBUG',
-                'recovery_modules' => '',
-                'add_js' => '',
-                'add_css' => '',
-                'theme' => 'FCom_Admin_DefaultTheme',
-            );
-        }
-        if (empty($c['modules']['FCom_Frontend'])) {
-            $c['modules']['FCom_Frontend'] = array (
-                'module_run_level' => array (
-                ),
-                'mode_by_ip' => 'DEBUG',
-                'recovery_modules' => '',
-                'theme' => 'FCom_Frontend_DefaultTheme',
-                'add_js' => '',
-                'add_css' => '',
-                'nav_top' => array (
-                    'root_cms' => '1',
-                    'root_category' => '1',
-                    'type' => 'categories_root',
-                ),
-            );
-        }
-        BConfig::i()->writeFile('local.yml', $c);
+        $config = BConfig::i();
+        $c = $config->get(null, true);
+        $m = array(
+            'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
+            'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
+        );
+        unset($c['db'], $c['install_status'], $c['module_run_levels']);
+        $config->writeFile('local.yml', $c);
+        $config->writeFile('module_run_levels.yml', $m);
         return $this;
     }
 
@@ -355,21 +344,6 @@ class FCom_Core_Main extends BClass
             mkdir($dir, $mode, true);
         }
         return $dir;
-    }
-
-    /**
-    * Run bootstrap depending on area
-    *
-    * @deprecated by declaring different bootstrap per area in manifest
-    * @param mixed $class
-    */
-    public static function bootstrapByArea($class)
-    {
-        switch (BApp::i()->get('area')) {
-            case 'FCom_Admin': $class .= '_Admin'; break;
-            case 'FCom_Frontend': $class .= '_Frontend'; break;
-        }
-        $class::bootstrap();
     }
 
     /**

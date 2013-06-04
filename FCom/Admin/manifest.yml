@@ -5,7 +5,12 @@ modules:
         description: Base Admin functionality
         before_bootstrap: FCom_Admin_Admin::beforeBootstrap
         observe:
-            - [ 'FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost' ]
+            - [ 'FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin_Main.onSettingsPost' ]
+
+        default_config:
+            modules: 
+                FCom_Admin: 
+                    theme: FCom_Admin_DefaultTheme
 
         areas:
             FCom_Admin:
@@ -42,5 +47,8 @@ modules:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Default Admin theme"
-        provides: { theme: FCom_Admin_DefaultTheme }
-        bootstrap: { callback: FCom_Admin_DefaultTheme::bootstrap }
+        provides: 
+            themes: 
+                FCom_Admin_DefaultTheme: 
+                    area: FCom_Admin
+                    layout: layout.yml
