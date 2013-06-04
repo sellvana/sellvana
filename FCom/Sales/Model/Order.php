@@ -19,7 +19,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function billing()
     {
-        return FCom_Checkout_Model_Address::i()->orm('a')
+        return FCom_Sales_Model_CartAddress::i()->orm('a')
                 ->where('cart_id', $this->cart_id)->where('atype', 'billing')->find_one();
     }
 
@@ -83,7 +83,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function addresses()
     {
-        return FCom_Sales_Model_Address::i()->orm('a')->where('order_id', $this->id)->find_many();
+        return FCom_Sales_Model_OrderAddress::i()->orm('a')->where('order_id', $this->id)->find_many();
     }
 
     public function prepareApiData($orders, $includeItems=false)

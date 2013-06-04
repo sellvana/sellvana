@@ -1,6 +1,7 @@
 <?php
 
-class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract 
+class FCom_ShippingUps_Ups 
+    extends FCom_Sales_Abstract_ShippingMethod 
     implements FCom_Sales_Interface_ShippingMethod
 {
     protected $name = 'Universal post service';
@@ -35,7 +36,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
     public function getEstimate()
     {
         if (!$this->rate) {
-            $cart = FCom_Checkout_Model_Cart::sessionCart();
+            $cart = FCom_Sales_Model_Cart::sessionCart();
             $this->getRateCallback($cart);
             if (!$this->rate) {
                 return 'Unable to calculate';
@@ -95,7 +96,7 @@ class FCom_ShippingUps_Ups extends FCom_Checkout_Model_Shipping_Abstract
     {
         //address
         $user = FCom_Customer_Model_Customer::sessionUser();
-        $shippingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
+        $shippingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
         }

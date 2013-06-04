@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Checkout_Model_Address extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_CartAddress extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_checkout_address';
+    protected static $_table = 'fcom_sales_cart_address';
     protected static $_origClass = __CLASS__;
 
     public function findByCartType($cartId, $atype)

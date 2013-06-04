@@ -1,6 +1,7 @@
 <?php
 
-class FCom_ShippingPlain_ShippingMethod extends FCom_Checkout_Model_Shipping_Abstract 
+class FCom_ShippingPlain_ShippingMethod 
+    extends FCom_Sales_Abstract_ShippingMethod 
     implements FCom_Sales_Interface_ShippingMethod
 {
 

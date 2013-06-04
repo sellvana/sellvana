@@ -1,7 +1,7 @@
 modules:
 	FCom_Promo:
 		version: 0.1.2
-		require: { module: { FCom_Catalog: 0.1.0 }}
+		require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
 		description: "Promotions module"
         
         areas:
@@ -22,6 +22,6 @@ modules:
                 routing:
                     - [ get, /promo/media, FCom_Promo_Frontend_Controller.media ]
                 observe:
-                    - [ FCom_Checkout_Model_Cart::calcTotals, FCom_Promo_Frontend::onPromoCartValidate ];
-                    - [ FCom_Checkout_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ];
+                    - [ FCom_Sales_Model_Cart::calcTotals, FCom_Promo_Frontend::onPromoCartValidate ];
+                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ];
                     - [ BLayout::hook.promotions, FCom_Promo_Frontend_Controller.hook_promotions ]

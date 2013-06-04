@@ -15,7 +15,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Cart', 'active'=>true));
 
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart()->calcTotals();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart()->calcTotals();
         BEvents::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
 
         $shippingEstimate = BSession::i()->data('shipping_estimate');
@@ -28,7 +28,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         $cartHref = BApp::href('cart');
         $post = BRequest::i()->post();
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (BRequest::i()->xhr()) {
             $result = array();
             switch ($post['action']) {
@@ -94,7 +94,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         $options=array('qty' => $qty, 'price' => $product->base_price);
         $cart->addProduct($product->id(), $options);
     }

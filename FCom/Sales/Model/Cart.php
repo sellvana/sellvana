@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_cart';
+    protected static $_table = 'fcom_sales_cart';
     protected static $_origClass = __CLASS__;
 
     protected static $_sessionCart;
@@ -26,7 +26,7 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
     static public function sessionCart($reset = true)
     {
         if ($reset || !static::$_sessionCart) {
-            if ($reset instanceof FCom_Checkout_Model_Cart) {
+            if ($reset instanceof FCom_Sales_Model_Cart) {
                 static::$_sessionCart = $reset;
                 static::sessionCartId($reset->id);
             } else {
@@ -109,18 +109,6 @@ class FCom_Checkout_Model_Cart extends FCom_Core_Model_Abstract
             static::loadCartsData($carts);
         }
         return $carts;
-    }
-
-    public static function loadCartsData(&$carts)
-    {
-        $cIds = array();
-        foreach ($carts as $i=>$c) {
-            $cIds[$c['id']] = $i;
-        }
-        $cartUsers = FCom_Checkout_Model_CartUser::i()->orm()->where_in('cart_id', array_keys($cIds))->find_many();
-        foreach ($cartUsers as $u) {
-            $carts[$cIds[$u->cart_id]]['users'][] = $u->as_array();
-        }
     }
 
     public static function newDescription()

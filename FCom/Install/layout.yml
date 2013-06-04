@@ -2,14 +2,18 @@ base:
     - { view: head, do: [[ css, @FCom_Install/css/styles.css ]] }
 
 /:
+    - { include: base }
     - { hook: main, views: index }
 
 /step1:
+    - { include: base }
     - { hook: main, views: step1 }
 
 /step2:
+    - { include: base }
     - { hook: main, views: step2 }
 
 /step3:
+    - { include: base }
     - { hook: main, views: step3 }
 

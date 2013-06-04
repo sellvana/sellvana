@@ -19,7 +19,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function install()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
+        $tCart = FCom_Sales_Model_Cart::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tCart} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -39,8 +39,8 @@ class FCom_Checkout_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
-        $tCart = FCom_Checkout_Model_Cart::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
+        $tCart = FCom_Sales_Model_Cart::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tCartItem} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -57,7 +57,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_1()
     {
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         if (BDb::ddlFieldInfo($tCartItem, 'price')) {
             return;
         }
@@ -68,8 +68,8 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_2()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
-        $tAddress = FCom_Checkout_Model_Address::table();
+        $tCart = FCom_Sales_Model_Cart::table();
+        $tAddress = FCom_Sales_Model_CartAddress::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tAddress} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -99,7 +99,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_3()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
+        $tCart = FCom_Sales_Model_Cart::table();
         if (BDb::ddlFieldInfo($tCart, "shipping_method")) {
             return;
         }
@@ -116,7 +116,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_4()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
+        $tCart = FCom_Sales_Model_Cart::table();
         if (BDb::ddlFieldInfo($tCart, "shipping_service")){
             return;
         }
@@ -127,7 +127,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_5()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
+        $tCart = FCom_Sales_Model_Cart::table();
         if (BDb::ddlFieldInfo($tCart, "status")){
             return;
         }
@@ -138,7 +138,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_6()
     {
-        $tAddress = FCom_Checkout_Model_Address::table();
+        $tAddress = FCom_Sales_Model_CartAddress::table();
         if (BDb::ddlFieldInfo($tAddress, "email")){
             return;
         }
@@ -149,8 +149,8 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_7()
     {
-        $tCart = FCom_Checkout_Model_Cart::table();
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCart = FCom_Sales_Model_Cart::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         if (BDb::ddlFieldInfo($tCartItem, "rowtotal") || BDb::ddlFieldInfo($tCartItem, "create_dt"
                 || BDb::ddlFieldInfo($tCartItem, "update_dt"))) {
             return;
@@ -170,7 +170,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_8()
     {
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         if (!BDb::ddlFieldInfo($tCartItem, "promo_id_buy")){
             BDb::run("
                 ALTER TABLE {$tCartItem} ADD `promo_id_buy` INT(10) UNSIGNED NOT NULL "
@@ -188,7 +188,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_1_9()
     {
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         if (!BDb::ddlFieldInfo($tCartItem, "promo_qty_used")){
             BDb::run("
                 ALTER TABLE {$tCartItem} ADD `promo_qty_used` decimal(12,4) DEFAULT NULL "
@@ -198,7 +198,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_2_0()
     {
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         BDb::run("
             ALTER TABLE {$tCartItem} MODIFY `promo_id_buy` varchar(50) DEFAULT NULL "
         );
@@ -206,7 +206,7 @@ class FCom_Checkout_Migrate extends BClass
 
     public function upgrade_0_2_1()
     {
-        $tCartItem = FCom_Checkout_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_CartItem::table();
         if (!BDb::ddlFieldInfo($tCartItem, "promo_amt_used")){
             BDb::run("
                 ALTER TABLE {$tCartItem} ADD `promo_amt_used` decimal(12,4) DEFAULT NULL "
