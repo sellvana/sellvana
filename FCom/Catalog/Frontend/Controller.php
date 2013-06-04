@@ -52,7 +52,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->layout('/catalog/product');
     }
 
-    public function action_product_post()
+    public function action_product__POST()
     {
         $r = explode('/', BRequest::i()->params('product'));
         $href = $r[0];

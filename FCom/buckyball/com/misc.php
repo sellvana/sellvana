@@ -571,11 +571,14 @@ class BUtil extends BClass
         return $result;
     }
 
-    static public function arrayMask($array, $fields)
+    static public function arrayMask(array $array, $fields)
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
         }
+//if (!is_)
+        return array_intersect_key($array, array_flip($fields));
+        /*
         $result = array();
         foreach ($fields as $f) {
             if (array_key_exists($f, $array)) {
@@ -583,6 +586,7 @@ class BUtil extends BClass
             }
         }
         return $result;
+        */
     }
 
     /**
@@ -2805,6 +2809,7 @@ class BYAML extends BCLass
         }
 
         $yamlData = file_get_contents($filename);
+        $yamlData = str_replace("\t", '    ', $yamlData); //TODO: make configurable tab size
         $arrayData = static::parse($yamlData);
 
         if ($cache) {

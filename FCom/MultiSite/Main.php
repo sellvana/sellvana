@@ -2,11 +2,6 @@
 
 class FCom_MultiSite_Main extends BClass
 {
-    static public function bootstrap()
-    {
-
-    }
-
     static public function beforeBootstrap()
     {
         $siteData = FCom_MultiSite_Model_Site::i()->findByDomain();

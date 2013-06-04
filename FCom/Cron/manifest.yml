@@ -1,0 +1,13 @@
+modules:
+    FCom_Cron:
+        version: 0.1.0
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: Cron scheduled tasks manager
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                
+            FCom_Cron:
+                routing:
+                    - [ GET, /, FCom_Cron_Controller.run ]
+                    - [ GET, /*task, FCom_Cron_Controller.run ]

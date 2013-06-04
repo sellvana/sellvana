@@ -1,13 +1,7 @@
 <?php
 
-class FCom_Email_Admin extends BClass
+class FCom_Email_Main extends BClass
 {
-    public static function bootstrap()
-    {
-        BLayout::i()->addAllViews('Admin/views');
-        BEvents::i()->on('BView::email.before', 'FCom_Email_Admin::onViewEmailBefore');
-    }
-
     public static function onViewEmailBefore($args)
     {
         $email = $args['email_data']['to'];

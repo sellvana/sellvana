@@ -10,46 +10,26 @@ class FCom_IndexTank_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        BRouting::i()
-            ->route('GET /indextank/product_fields', 'FCom_IndexTank_Admin_Controller_ProductFields.index')
-            ->route('GET|POST /indextank/product_fields/.action', 'FCom_IndexTank_Admin_Controller_ProductFields')
-
-            ->route('GET /indextank/product_functions', 'FCom_IndexTank_Admin_Controller_ProductFunctions.index')
-            ->route('GET|POST /indextank/product_functions/.action', 'FCom_IndexTank_Admin_Controller_ProductFunctions')
-
-            //api function
-            ->route('GET /indextank/products/index', 'FCom_IndexTank_Admin::productsIndexStart')
-            ->route('GET /indextank/products/index-pause', 'FCom_IndexTank_Admin::productsIndexPause')
-            ->route('GET /indextank/products/index-resume', 'FCom_IndexTank_Admin::productsIndexResume')
-            ->route('GET /indextank/products/indexing-status', 'FCom_IndexTank_Admin::productsIndexingStatus')
-            //->route('GET /indextank/products/index-stop', 'FCom_IndexTank_Admin::productsStopIndexAll')
-            ->route('DELETE /indextank/products/index', 'FCom_IndexTank_Admin::productsDeleteAll');
-
-        BLayout::i()->addAllViews('Admin/views')
-            ->loadLayoutAfterTheme('Admin/layout.yml');
-
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
 
             if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
                 BEvents::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
-                        ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
+                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
-                        //for categories
-                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
-                        ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
-                        ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
-                        ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
-                        ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
-                        //for custom fields
-                        ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
-                        ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                    //for categories
+                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
+                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
+                    ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+                    ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
+                    ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
+                    //for custom fields
+                    ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
+                    ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
 
 
         }
-        //on update settings create new index if index was changed
-        BEvents::i()->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_IndexTank_Admin::onSaveAdminSettings');
 
         FCom_IndexTank_Admin_Controller::bootstrap();
     }

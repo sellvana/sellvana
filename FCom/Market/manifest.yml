@@ -3,3 +3,12 @@ modules:
 		version: 0.1.4
 		require: { module: { FCom_Core: 0.1.0 } }
 		description: "Fulleron Extension Market Client"
+
+        areas:
+            FCom_Admin:
+                auto_use: all
+                routing:
+                    - [ GET, /market, FCom_Market_Admin_Controller.index ]
+                    - [ any, /market/.action, FCom_Market_Admin_Controller ]
+                observe:
+                    - [ BLayout::hook.hook_modules_notification, FCom_Market_Admin.hookFindModulesForUpdates ]

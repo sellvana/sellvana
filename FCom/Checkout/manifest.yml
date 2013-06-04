@@ -4,3 +4,22 @@ modules:
 		require: { module: { FCom_Catalog: 0.2.1, FCom_Geo: 0.1.0, FCom_Sales: 0.1.10 } }
 		translations: { de: de.php }
 		description: "Base cart and checkout functionality"
+        areas:
+            FCom_Admin:
+                auto_use: views
+
+            FCom_Frontend:
+                auto_use: [ bootstrap, layout, views ]
+                routing:
+                    - [ any, /cart, FCom_Checkout_Frontend_Controller.cart ]
+                    - [ any, /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]
+                    - [ GET, /checkout/login, FCom_Checkout_Frontend_Controller_Checkout.checkout_login ]
+                    - [ any, /checkout/payment, FCom_Checkout_Frontend_Controller_Checkout.payment ]
+                    - [ any, /checkout/shipping, FCom_Checkout_Frontend_Controller_Checkout.shipping ]
+                    - [ GET, /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
+                    - [ any, /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
+                observe:
+                    - [ FCom_Customer_Model_Customer::login.after, FCom_Checkout_Model_Cart::userLogin ]
+                    - [ FCom_Customer_Model_Customer::logout.before, FCom_Checkout_Model_Cart::userLogout ]
+                    - [ FCom_Catalog_Frontend_Controller::action_product.addToCart, FCom_Checkout_Frontend_Controller::onAddToCart ]
+                    - [ BModuleRegistry::bootstrap.after, FCom_Checkout_Frontend::initCartTotals ]

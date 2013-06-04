@@ -997,5 +997,5 @@ $(function() {
         $(el).resizable();
     })
 
-    $(".foundation-forms").foundationCustomForms();
+    $.fn.foundationCustomForms && $(".foundation-forms").foundationCustomForms();
 })

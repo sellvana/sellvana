@@ -4,11 +4,7 @@ class FCom_Disqus_Frontend extends BClass
 {
     static public function bootstrap()
     {
-        BLayout::i()->addAllViews('Frontend/views');
-        BEvents::i()->on('BLayout::theme.load.after', 'FCom_Disqus_Frontend::layout');
-        //BLocale::addTranslationsFile('tr.json');
-        //BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
-
+        BLayout::i()->afterTheme('FCom_Disqus_Frontend::layout');
     }
 
     static public function layout()

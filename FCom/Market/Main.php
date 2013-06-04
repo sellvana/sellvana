@@ -4,11 +4,6 @@ class FCom_Market_Main extends BClass
 {
     private $error='';
 
-    public static function bootstrap()
-    {
-        //BConfig::i()->get('FCom_Market/market_url');
-    }
-
     public function getSsoUrl()
     {
         return BConfig::i()->get('modules/FCom_Market/market_url') . '/market/sso?'.$this->getTokenUrl();

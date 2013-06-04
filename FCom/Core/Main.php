@@ -268,34 +268,7 @@ class FCom_Core_Main extends BClass
         BClassAutoload::i(true, array('root_dir'=>$rootDir.'/dlc'));
         BClassAutoload::i(true, array('root_dir'=>$rootDir));
 
-        BEvents::i()->on('BModule::bootstrap.before', array($this, 'onModuleBootstrapBefore'));
-
         return $this;
-    }
-
-    public function onModuleBootstrapBefore($args)
-    {
-        $area = BApp::i()->get('area');
-        $m = $args['module'];
-        if (!$m->bootstrap) { // TODO: check for is_callable() ?
-            $area = str_replace('FCom_', '', BApp::i()->get('area'));
-            if (class_exists($m->name.'_'.$area)) {
-                $m->bootstrap = array('callback' => $m->name.'_'.$area.'::bootstrap');
-            } elseif (class_exists($m->name.'_Main')) {
-                $m->bootstrap = array('callback' => $m->name.'_Main::bootstrap');
-            } elseif (class_exists($m->name)) {
-                $m->bootstrap = array('callback' => $m->name.'::bootstrap');
-            }
-        }
-        if (!$m->migrate && class_exists($m->name.'_Migrate')) { //TODO: move to before migrate
-            $m->migrate = $m->name.'_Migrate';
-        }
-        if ($area==='FCom_Test') { //TODO: move to tests
-            if (empty($m->tests) && class_exists($m->name.'_Tests_AllTests')) {
-                $m->tests = $m->name.'_Tests_AllTests';
-            }
-        }
-        // TODO: handle translations (not here, only when needed)
     }
 
     public function addModulesDir($dir)

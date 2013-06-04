@@ -3,3 +3,7 @@ modules:
 		version: 0.1.0
 		require: { module: { FCom_Admin: 0.1.0 } }
 		description: Migrating Admin to Zurb-Foundation
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]

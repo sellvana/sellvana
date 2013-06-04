@@ -1,5 +1,10 @@
 modules:
 	FCom_ApiTest:
 		version: 0.1.0
-		require: { module: { FCom_Core: 0.1.0 } }
+		require: { module: { FCom_Api: 0.1.0 } }
 		description: API Tests area
+        areas:
+            FCom_Api:
+                routing:
+                    - [ GET, /v1/apitest/test, FCom_ApiTest_ApiServer_V1_Test.list ]
+                    - [ any, /v1/apitest/test/.action, FCom_ApiTest_ApiServer_V1_Test ]

@@ -507,6 +507,7 @@ class BLayout extends BClass
     */
     public function loadLayout($layoutFilename)
     {
+#echo "<pre>"; debug_print_backtrace(); echo "</pre>";
         $ext = strtolower(pathinfo($layoutFilename, PATHINFO_EXTENSION));
         if (!BUtil::isPathAbsolute($layoutFilename)) {
             $mod = BModuleRegistry::i()->currentModule();

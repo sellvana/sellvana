@@ -3,6 +3,40 @@ modules:
         version: 0.1.4
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
+        before_bootstrap: FCom_Admin_Admin::beforeBootstrap
+        observe:
+            - [ 'FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost' ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ bootstrap, views ]
+                routing:
+                    - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
+                    - [ GET, /, FCom_Admin_Controller.index ]
+                    - [ GET, /blank, FCom_Admin_Controller.blank ]
+                    - [ POST, /login, FCom_Admin_Controller.login ]
+                    - [ any, /password/recover, FCom_Admin_Controller.password_recover ]
+                    - [ any, /password/reset, FCom_Admin_Controller.password_reset ]
+                    - [ GET, /logout, FCom_Admin_Controller.logout ]
+
+                    - [ GET, /my_account, FCom_Admin_Controller.my_account ]
+                    - [ GET, /reports, FCom_Admin_Controller.reports ]
+                    - [ POST, /my_account/personalize, FCom_Admin_Controller.personalize ]
+
+                    - [ GET, /users, FCom_Admin_Controller_Users.index ]
+                    - [ any, /users/.action, FCom_Admin_Controller_Users ]
+
+                    - [ GET, /roles, FCom_Admin_Controller_Roles.index ]
+                    - [ any, /roles/.action, FCom_Admin_Controller_Roles ]
+
+                    - [ any, /media/grid/:do, FCom_Admin_Controller_MediaLibrary.grid_data ]
+
+                    - [ any, /settings, FCom_Admin_Controller_Settings.index ]
+
+                    - [ any, /modules, FCom_Admin_Controller_Modules.index ]
+                    - [ POST, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
+
+                    - [ GET, /test, FCom_Admin_Controller.test ]
 
     FCom_Admin_DefaultTheme:
         version: 0.1.0
