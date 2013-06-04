@@ -31,7 +31,7 @@ modules:
                     - [ any, /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]
                     #- [ GET, /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
                 observe:
-                    - [ FCom_Checkout_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
+                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
 
             FCom_Api:
                 routing:

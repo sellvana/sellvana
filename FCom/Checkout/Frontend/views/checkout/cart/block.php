@@ -1,5 +1,5 @@
 <?php
-$cart = FCom_Checkout_Model_Cart::sessionCart();
+$cart = FCom_Sales_Model_Cart::sessionCart();
 $cartQty = $cart->itemQty();
 $items = $cart->recentItems();
 ?>

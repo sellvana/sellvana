@@ -92,7 +92,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $customer = FCom_Customer_Model_Customer::sessionUser();
 
         if (!empty($id)) {
-            $cart = FCom_Checkout_Model_Cart::i()->sessionCart();
+            $cart = FCom_Sales_Model_Cart::i()->sessionCart();
             $address = FCom_Customer_Model_Address::i()->load($id);
             //you can't change address for empty cart
             if (!$cart) {
@@ -100,10 +100,10 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
-                FCom_Checkout_Model_Address::i()->newShipping($cart->id(), $customer->defaultShipping());
+                FCom_Sales_Model_CartAddress::i()->newShipping($cart->id(), $customer->defaultShipping());
             } else {
                 $customer->default_billing_id = $address->id();
-                FCom_Checkout_Model_Address::i()->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
+                FCom_Sales_Model_CartAddress::i()->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
             }
             $customer->save();
 

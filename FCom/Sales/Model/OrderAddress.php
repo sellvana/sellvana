@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Model_Address extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_OrderAddress extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_address';
     protected static $_origClass = __CLASS__;

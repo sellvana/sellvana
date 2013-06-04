@@ -9,7 +9,7 @@ class FCom_Core_Controller_Abstract extends BActionController
         }
 
         if (($root = BLayout::i()->view('root'))) {
-            $root->bodyClass = BRequest::i()->path(0, 1);
+            $root->body_class = BRequest::i()->path(0, 1);
         }
         return parent::beforeDispatch();
     }
@@ -30,7 +30,7 @@ class FCom_Core_Controller_Abstract extends BActionController
             $layout->applyTheme($theme);
         }
         foreach ((array)$name as $l) {
-            $layout->layout($l);
+            $layout->applyLayout($l);
         }
         return $this;
     }

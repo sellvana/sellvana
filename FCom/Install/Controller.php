@@ -6,10 +6,17 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         if (!parent::beforeDispatch()) return false;
 
-        if (BRequest::i()->method()==='POST') {
+        $method = BRequest::i()->method();
+        switch ($method) {
+        case 'GET':
+            BLayout::i()->applyTheme('FCom_Install');
+            break;
+
+        case 'POST':
             $sData =& BSession::i()->dataToUpdate();
             $w = BRequest::i()->post('w');
             $sData['w'] = !empty($sData['w']) ? BUtil::arrayMerge($sData['w'], $w) : $w;
+            break;
         }
 
         return true;
@@ -17,7 +24,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index()
     {
-        $this->layout('/');
+        BLayout::i()->applyLayout('/');
 
         $errors = BDebug::i()->getCollectedErrors();
         BLayout::i()->view('index')->errors = $errors;
@@ -45,7 +52,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step1()
     {
-        $this->layout('/step1');
+        BLayout::i()->applyLayout('/step1');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['db'])) {
             $sData['w']['db'] = array('host'=>'localhost', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
@@ -70,7 +77,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step2()
     {
-        $this->layout('/step2');
+        BLayout::i()->applyLayout('/step2');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['admin'])) {
             $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
@@ -85,7 +92,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
-                ->save(
+                ->save()
                 ->login();
             $url = BApp::href('install/step3');
         } catch (Exception $e) {
@@ -97,7 +104,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step3()
     {
-        $this->layout('/step3');
+        BLayout::i()->applyLayout('/step3');
         $this->messages('step3', 'install');
     }
 

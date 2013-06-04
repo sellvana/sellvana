@@ -233,6 +233,7 @@ class FCom_Core_Main extends BClass
         }
         if (BDebug::is('INSTALLATION')) {
             $runLevels = array('FCom_Install' => 'REQUIRED');
+BDebug::mode('DEBUG');
         } else {
             $runLevels = array($area => 'REQUIRED');
         }

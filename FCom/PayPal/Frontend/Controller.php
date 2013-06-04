@@ -4,7 +4,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 {
     public function action_redirect()
     {
-        $cart = FCom_Checkout_Model_Cart::sessionCart();
+        $cart = FCom_Sales_Model_Cart::sessionCart();
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = BApp::href('cart');
@@ -14,7 +14,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         $baseUrl = BApp::href('paypal');
         $nvpShippingAddress = array();
         if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
+            $shippingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
             $nvpShippingAddress = array(
                 'NOSHIPPING' => 0,
                 'REQCONFIRMSHIPPING' => 0,
@@ -55,7 +55,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
     public function action_return()
     {
         $sData =& BSession::i()->dataToUpdate();
-        $cart = FCom_Checkout_Model_Cart::sessionCart();
+        $cart = FCom_Sales_Model_Cart::sessionCart();
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = BApp::href('cart');
@@ -102,7 +102,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         );
         $nvpShipArr = array();
         if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = FCom_Checkout_Model_Address::i()->findByCartType($cart->id(), 'shipping');
+            $shippingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
             $nvpShipArr = array(
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
                     'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
@@ -148,7 +148,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         //unset cart
         $cart->status = 'finished';
         $cart->save();
-        FCom_Checkout_Model_Cart::sessionCartId(null);
+        FCom_Sales_Model_Cart::sessionCartId(null);
 
         $hrefUrl = BApp::href('checkout/success');
         BResponse::i()->redirect($hrefUrl);
