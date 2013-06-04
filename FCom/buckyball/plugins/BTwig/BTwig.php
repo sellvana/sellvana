@@ -21,6 +21,8 @@ class BTwig extends BClass
 
     public static function onLayoutAddAllViews($args)
     {
+        $moduleName = is_string($args['module']) ? $args['module'] : 
+            (is_object($args['module']) ? $args['module']->name : null);
         static::addPath($args['root_dir'], $args['module']->name);
     }
 

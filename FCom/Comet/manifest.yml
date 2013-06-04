@@ -1,0 +1,4 @@
+modules:
+    FCom_Comet:
+        version: 0.1.0
+        description: AJAX Comet Area

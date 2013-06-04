@@ -3,3 +3,20 @@ modules:
 		version: 0.1.6
 		require: { module: { FCom_Catalog: 0.2.1, FCom_CustomField: 0.1.4 } }
 		description: "Catalog search and facets indexing engine"
+        auto_use: [ views, layout ]
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ GET, /catalogindex/fields, FCom_CatalogIndex_Admin_Controller_Fields.index ]
+                    - [ any, /catalogindex/fields/.action, FCom_CatalogIndex_Admin_Controller_Fields ]
+                observe:
+                    - [ FCom_Catalog_Model_Product::save.after, FCom_CatalogIndex_Admin::onProductSaveAfter ]
+
+            FCom_Frontend:
+                routing:
+                    - [ GET, /catalogindex/search, FCom_CatalogIndex_Frontend_Controller.search ]
+                    - [ GET, /index-test, FCom_CatalogIndex_Frontend_Controller.test ]
+                    - [ GET, /index-reindex, FCom_CatalogIndex_Frontend_Controller.reindex ]
+                override:
+                    class:
+                        - [ FCom_Catalog_Frontend_Controller_Search, FCom_CatalogIndex_Frontend_Controller ]

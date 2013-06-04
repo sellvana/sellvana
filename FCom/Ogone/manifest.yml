@@ -4,3 +4,9 @@ modules:
         translations: { de: de.php }
         description: "Ogone Payment Method"
         require: { module: { FCom_Sales: 0.1.10, FCom_Checkout: 0.2.1 } }
+        auto_use: [ bootstrap, views ]
+
+        areas:
+            FCom_Frontend:
+                routing:
+                    - [ any, /ogone/.action, FCom_Ogone_Frontend_Controller ]

@@ -27,7 +27,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $data = array();
         $migrate = false;
         foreach ($modules as $modName=>$mod) {
-            $r = (array)$mod;
+            $r = BUtil::arrayMask((array)$mod, 'name,description,version,run_status,run_level,require,children_copy');
             $reqs = array();
             if (!empty($r['require']['module'])) {
                 foreach ($r['require']['module'] as $req) {

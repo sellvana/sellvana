@@ -3,6 +3,13 @@ modules:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0, FCom_Frontend_DefaultTheme: 0.1.0 } }
         description: "Base Frontend functionality"
+        before_bootstrap: FCom_Frontend_Frontend::beforeBootstrap
+        areas:
+            FCom_Frontend:
+                auto_use: [ bootstrap, views ]
+                routing:
+                    - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]
+                    - [ GET, /, FCom_Frontend_Controller.index ]
 
     FCom_Frontend_DefaultTheme:
         version: 0.1.0

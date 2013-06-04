@@ -5,11 +5,6 @@ class FCom_Sales_Main extends BClass
     protected $_registry = array();
     protected $_heap = array();
 
-    public static function bootstrap()
-    {
-
-    }
-
     public function addPaymentMethod($name, $class=null)
     {
         if (is_null($class)) $class = $name;

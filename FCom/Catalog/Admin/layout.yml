@@ -1,4 +1,3 @@
-
 base:
   - view: admin/nav
     do:

@@ -24,7 +24,9 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
             $pos = 0;
             if (!empty($parent['/'])) {
                 foreach ($parent['/'] as $k=>$n) {
-                    $pos = max($pos, $n['pos']);
+                    if (!empty($n['pos'])) {
+                        $pos = max($pos, $n['pos']);
+                    }
                 }
             }
             $node['pos'] = $pos+10;
@@ -54,7 +56,9 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
         }
 
         uasort($root['/'], function($a, $b) {
-            return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+            $p1 = !empty($a['pos']) ? $a['pos'] : 9999;
+            $p2 = !empty($b['pos']) ? $b['pos'] : 9999;
+            return $p1<$p2 ? -1 : ($p1>$p2 ? 1 : 0);
         });
 
         if (!static::$_allPermissions) {

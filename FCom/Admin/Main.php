@@ -4,10 +4,6 @@ class FCom_Admin_Main extends BClass
 {
     static public function bootstrap()
     {
-        if (BRequest::i()->https()) {
-            BResponse::i()->httpSTS();
-        }
-
         FCom_Admin_Model_User::i();
 
         FCom_Admin_Model_Role::i()->createPermission(array(
@@ -16,15 +12,6 @@ class FCom_Admin_Main extends BClass
             'system/settings' => 'Update Settings',
             'system/modules' => 'Manage Modules',
         ));
-        
-        BEvents::i()
-            //->on('BActionController::beforeDispatch', 'FCom_Admin.onBeforeDispatch')
-            ->on('FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin.onSettingsPost')
-        ;
-    }
-
-    public function onBeforeDispatch()
-    {
     }
 
     public function onSettingsPost($args)

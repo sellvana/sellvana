@@ -3,3 +3,21 @@ modules:
 		version: 0.1.10
 		require: { module: { FCom_Core: 0.1.0 } }
 		description: "Fundamental Sales functionality"
+
+        areas:
+            FCom_Admin:
+                auto_use: views
+                
+            FCom_Api:
+                routing:
+                    - [ any, /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]
+                    - [ any, /v1/sales/order/:id, FCom_Sales_ApiServer_V1_Order.index ]
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ get, /orders, FCom_Sales_Admin_Controller_Orders.index ]
+                    - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
+
+                    - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
+                    - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]

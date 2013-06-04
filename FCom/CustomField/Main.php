@@ -5,17 +5,6 @@ class FCom_CustomField_Main extends BClass
     protected $_types;
     protected $_disabled;
 
-    public static function bootstrap()
-    {
-        BEvents::i()
-            ->on('FCom_Catalog_Model_Product::find_one.orm', 'FCom_CustomField_Main.productFindORM')
-            ->on('FCom_Catalog_Model_Product::find_many.orm', 'FCom_CustomField_Main.productFindORM')
-            // is there save on frontend?
-            //->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Main.productAfterSave')
-            ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Main.productAfterSave')
-        ;
-    }
-
     public function disable($flag)
     {
         $this->_disabled = $flag;

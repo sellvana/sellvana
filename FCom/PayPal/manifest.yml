@@ -4,3 +4,12 @@ modules:
 		require: { module: { FCom_Sales: 0.1.10 } }
 		translations: { de: de.php }
 		description: "PayPal&reg; standard payment method"
+
+        areas:
+            FCom_Admin:
+                auto_use: views
+
+            FCom_Admin:
+                auto_use: [ bootstrap, views ]
+                routing:
+                    - [ any, /paypal/.action, FCom_PayPal_Frontend_Controller ]

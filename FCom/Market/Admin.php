@@ -4,18 +4,6 @@ class FCom_Market_Admin extends BClass
 {
     static public function bootstrap()
     {
-        BLayout::i()->addAllViews('Admin/views')
-            ->loadLayoutAfterTheme('Admin/layout.yml');
-
-        BEvents::i()
-            ->on('BLayout::hook.hook_modules_notification', 'FCom_Market_Admin.hookFindModulesForUpdates')
-        ;
-
-        BRouting::i()
-            ->get('/market', 'FCom_Market_Admin_Controller.index')
-            ->any('/market/.action', 'FCom_Market_Admin_Controller')
-
-        ;
         if (!BConfig::i()->get('modules/FCom_Market/market_url')) {
             BConfig::i()->set('modules/FCom_Market/market_url', 'http://fulleron.com');
         }

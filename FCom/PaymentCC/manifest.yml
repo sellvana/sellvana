@@ -4,3 +4,7 @@ modules:
 		translations: { de: de.php }
 		description: "Payment Credit Card test module"
 		require: { module: { FCom_Sales: 0.1.10 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: views

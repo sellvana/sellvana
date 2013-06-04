@@ -8,3 +8,4 @@ modules:
         author: Fulleron Inc
         license: [ GPL3 ]
         
+        auto_use: bootstrap

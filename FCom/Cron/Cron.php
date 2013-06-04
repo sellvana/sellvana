@@ -4,14 +4,6 @@ class FCom_Cron_Cron extends BClass
 {
     protected $_tasks = array();
 
-    static public function bootstrap()
-    {
-        BRouting::i()
-            ->route('GET /', 'FCom_Cron_Controller.run')
-            ->route('GET /*task', 'FCom_Cron_Controller.run')
-        ;
-    }
-
     public function task($expr, $callback, $args=array())
     {
         if (is_string($callback) && strpos($callback, '.')!==false) {

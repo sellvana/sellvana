@@ -7,25 +7,6 @@ class FCom_Catalog_Admin extends BClass
         $module = BApp::m();
         $module->base_src .= '/Admin';
 
-        BRouting::i()
-            ->get('/catalog/categories', 'FCom_Catalog_Admin_Controller_Categories.index')
-            ->any('/catalog/categories/.action', 'FCom_Catalog_Admin_Controller_Categories')
-
-            ->get('/catalog/products', 'FCom_Catalog_Admin_Controller_Products.index')
-            ->any('/catalog/products/.action', 'FCom_Catalog_Admin_Controller_Products')
-
-            ->get('/catalog/families', 'FCom_Catalog_Admin_Controller_Families.index')
-            ->any('/catalog/families/.action', 'FCom_Catalog_Admin_Controller_Families')
-
-            ->any('/catalog/products/import/.action', 'FCom_Catalog_Admin_Controller_ProductsImport')
-
-        ;
-
-        BLayout::i()
-            ->addAllViews('Admin/views')
-            ->loadLayoutAfterTheme('Admin/layout.yml')
-        ;
-
         BEvents::i()
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')

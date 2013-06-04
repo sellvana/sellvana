@@ -2,31 +2,6 @@
 
 class FCom_CustomField_Admin extends BClass
 {
-    public static function bootstrap()
-    {
-        FCom_CustomField_Main::bootstrap();
-
-        $ctrl = 'FCom_CustomField_Admin_Controller_FieldSets';
-        BRouting::i()
-            ->get('/customfields/fieldsets', $ctrl.'.index')
-            ->any('/customfields/fieldsets/.action', $ctrl)
-
-            ->get('/customfields/products/.action', 'FCom_CustomField_Admin_Controller_Products')
-        ;
-
-        BLayout::i()
-            ->addAllViews('Admin/views')
-            ->loadLayoutAfterTheme('Admin/layout.yml')
-        ;
-
-        BEvents::i()
-//            ->on('FCom_Catalog_Model_Product::afterSave', 'FCom_CustomField_Admin.productAfterSave')
-            ->on('FCom_Catalog_Admin_Controller_Products::gridColumns', 'FCom_CustomField_Admin.productGridColumns')
-                //
-            ->on('FCom_Catalog_Admin_Controller_Products::formViewBefore', 'FCom_CustomField_Admin_Controller_Products.formViewBefore');
-        ;
-    }
-
 /*
     public function productAfterSave($args)
     {
