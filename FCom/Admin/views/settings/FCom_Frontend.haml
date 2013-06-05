@@ -10,8 +10,8 @@
                     %tr
                         %td = $this->_('IP: Mode')
                         %td
-                            %textarea(name="config[modules][FCom_Frontend][mode_by_ip]"
-                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/mode_by_ip')
+                            %textarea(name="config[mode_by_ip][FCom_Frontend]"
+                                style="width:400px; height:100px") = $c->get('mode_by_ip/FCom_Frontend')
                     %tr
                         %td = $this->_('Modules to run in RECOVERY mode')
                         %td

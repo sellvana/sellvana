@@ -127,20 +127,15 @@ class FCom_Core_Main extends BClass
             $config->set('fs/log_dir', $logDir);
         }
 
-
-        if (file_exists($configDir.'/defaults.yml')) {
-            $config->addFile($configDir.'/defaults.yml');
-        }
         // DB configuration is separate to gitignore
-        // used as indication that app is already installed and setup
         $configFileStatus = true;
         if (file_exists($configDir.'/db.yml')) {
             $config->addFile('db.yml', true);
         } else {
              $configFileStatus = false;
         }
-        if (file_exists($configDir.'/module_run_levels.yml')) {
-            $config->addFile('module_run_levels.yml', true);
+        if (file_exists($configDir.'/core.yml')) {
+            $config->addFile('core.yml', true);
         } else {
             $configFileStatus = false;
         }
@@ -181,7 +176,8 @@ class FCom_Core_Main extends BClass
 
         BDebug::adminEmail($config->get('admin_email'));
 
-        $modeByIp = trim($config->get('modules/'.BApp::i()->get('area').'/mode_by_ip'));
+        $modeByIp = trim($config->get('mode_by_ip/'.BApp::i()->get('area')));
+
         if ($modeByIp) {
             $ipModes = array();
             $ipPatterns = array();
@@ -233,7 +229,7 @@ class FCom_Core_Main extends BClass
         }
         if (BDebug::is('INSTALLATION')) {
             $runLevels = array('FCom_Install' => 'REQUIRED');
-BDebug::mode('DEBUG');
+#BDebug::mode('DEBUG');
         } else {
             $runLevels = array($area => 'REQUIRED');
         }
@@ -312,10 +308,11 @@ BDebug::mode('DEBUG');
         $m = array(
             'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
             'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
+            'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
         );
-        unset($c['db'], $c['install_status'], $c['module_run_levels']);
+        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['mode_by_ip']);
         $config->writeFile('local.yml', $c);
-        $config->writeFile('module_run_levels.yml', $m);
+        $config->writeFile('core.yml', $m);
         return $this;
     }
 
