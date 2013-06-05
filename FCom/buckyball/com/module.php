@@ -814,6 +814,7 @@ class BModule extends BClass
     {
         if (!empty($this->provides['themes'])) {
             foreach ($this->provides['themes'] as $name=>$params) {
+                $params['module_name'] = $this->name;
                 BLayout::i()->addTheme($name, $params);
             }
         }

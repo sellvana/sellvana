@@ -2794,12 +2794,13 @@ class BYAML extends BCLass
 
     static public function load($filename, $cache=true)
     {
-        $filename = realpath($filename);
+        $filename1 = realpath($filename);
+        if (!$filename1) {
+            return false;
+        }
+        $filename = $filename1;
 
         $filemtime = filemtime($filename);
-        if (false === $filemtime) {
-            throw new BException('Missing YAML file: '.$filename);
-        }
 
         if ($cache) {
             $cacheData = BCache::i()->load('BYAML--'.$filename);
