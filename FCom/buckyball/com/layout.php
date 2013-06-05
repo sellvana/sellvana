@@ -827,11 +827,12 @@ class BLayout extends BClass
         BDebug::debug('THEME.LOAD ' . $themeName);
         $theme = $this->_themes[$themeName];
         BEvents::i()->fire('BLayout::theme.load.before', array('theme_name' => $themeName));
+        $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir.'/' : '';
         if (!empty($theme['layout'])) {
-            BLayout::i()->loadLayout($theme['layout']);
+            BLayout::i()->loadLayout($modRootDir.$theme['layout']);
         }
         if (!empty($theme['views'])) {
-            BLayout::i()->addAllViews($theme['views']);
+            BLayout::i()->addAllViews($modRootDir.$theme['views']);
         }
         if (!empty($theme['callback'])) {
             BUtil::i()->call($theme['callback']);
