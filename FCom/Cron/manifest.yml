@@ -7,7 +7,9 @@ modules:
         default_config:
             modules:
                 FCom_Cron:
-                    mode_by_ip: "127.0.0.1:DEBUG\nDISABLED"
+                    mode_by_ip: |
+                        127.0.0.1:DEBUG
+                        DISABLED
 
         areas:
             FCom_Admin:

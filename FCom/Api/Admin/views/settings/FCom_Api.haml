@@ -1,0 +1,14 @@
+- $c = $this->model
+
+%fieldset
+    .settings-container
+        .group
+            %h3
+                %a(href="#") = $this->_('Area Settings')
+            %div
+                %table
+                    %tr
+                        %td = $this->_('IP: Mode')
+                        %td
+                            %textarea(name="config[mode_by_ip][FCom_Api]"
+                                style="width:400px; height:100px") = $c->get('mode_by_ip/FCom_Api')

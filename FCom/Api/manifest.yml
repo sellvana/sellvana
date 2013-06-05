@@ -4,3 +4,7 @@ modules:
         require: { module: { FCom_Core: 0.1.0 } }
         description: "API area"
         auto_use: [ bootstrap ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views ]
