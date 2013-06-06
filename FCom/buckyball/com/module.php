@@ -559,6 +559,7 @@ class BModule extends BClass
     public $area;
     public $override;
     public $default_config;
+    public $autoload;
 
     const
         // run_level
@@ -810,6 +811,18 @@ class BModule extends BClass
         return;
     }
 
+    protected function _processAutoload()
+    {
+        if (!empty($this->autoload)) {
+            foreach ((array)$this->autoload as $al) {
+                if (is_string($al)) {
+                    $al = array('root_dir'=>$al);
+                }
+                $this->autoload($al['root_dir'], !empty($al['callback']) ? $al['callback'] : null);
+            }
+        }
+    }
+
     protected function _processProvides()
     {
         if (!empty($this->provides['themes'])) {
@@ -1040,6 +1053,7 @@ class BModule extends BClass
             }
         }
 
+        $this->_processAutoload();
         $this->_processTranslations();
         $this->_processAutoUse();
         $this->_processRouting();
@@ -1225,7 +1239,11 @@ class BMigrate extends BClass
                     } elseif (is_dir($module->root_dir.'/'.$script)) {
                         //TODO: process directory of migration scripts
                     } elseif (class_exists($script, true)) {
-                        $script::i()->run();
+                        if (method_exists($script, 'run')) {
+                            $script::i()->run();
+                        } else {
+                            static::_runClassMethods($script);
+                        }
                     }
                 /*
                     BDb::commit();
@@ -1239,6 +1257,36 @@ class BMigrate extends BClass
         unset($modules);
         $modReg->currentModule(null);
         static::$_migratingModule = null;
+    }
+
+    protected static function _runClassMethods($class)
+    {
+        $methods = get_class_methods($class);
+        $installs = array();
+        $upgrades = array();
+        foreach ($methods as $method) {
+            if (preg_match('/^install__([0-9_]+)$/', $method, $m)) {
+                $installs[] = array(
+                    'method' => $method, 
+                    'to' => str_replace('_', '.', $m[1])
+                );
+            } elseif (preg_match('/^upgrade__([0-9_]+)__([0-9_]+)$/', $method, $m)) {
+                $upgrades[] = array(
+                    'method' => $method, 
+                    'from' => str_replace('_', '.', $m[1]), 
+                    'to' => str_replace('_', '.', $m[2]),
+                );
+            }
+        }
+        usort($installs, function($a, $b) { return version_compare($a['to'], $b['to']); });
+        usort($upgrades, function($a, $b) { return version_compare($a['from'], $b['from']); });
+        end($installs); $install = current($installs);
+        $instance = $class::i();
+
+        static::install($install['to'], array($instance, $install['method']));
+        foreach ($upgrades as $upgrade) {
+            static::upgrade($upgrade['from'], $upgrade['to'], array($instance, $upgrade['method']));
+        }
     }
 
     /**

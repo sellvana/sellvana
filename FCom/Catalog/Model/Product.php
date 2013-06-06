@@ -46,12 +46,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
-        return $url.$media.($this->image_url ? $this->image_url : 'DC642702.jpg');
+        return $url.$media.'/'.($this->thumb_url ? $this->thumb_url : 'image-not-found.jpg');
     }
 
-    public function thumbUrl($w, $h=null)
+    public function thumbUrl($w, $h=null, $full=false)
     {
-        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode($this->imageUrl(true)).'&s='.$w.'x'.$h;
+        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
     }
 
     public function beforeSave()
@@ -69,8 +69,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!parent::afterSave()) return false;
 
         //todo: setup unique uniq_id
-        if (!$this->get('unique_id')) {
-            $this->set('unique_id', $this->id);
+        if (!$this->get('local_sku')) {
+            $this->set('local_sku', $this->id);
             $this->save();
         }
 
@@ -87,7 +87,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function isDisabled()
     {
-        return $this->disabled;
+        return $this->is_hidden;
     }
 
     public function onAssociateCategory($args)
@@ -309,7 +309,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $errors = array();
         foreach($data as $d) {
             //if must have fields not defined then skip the record
-            if (empty($d['product_name']) && empty($d['unique_id']) && empty($d['url_key'])) {
+            if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
                 continue;
             }
 
@@ -361,8 +361,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             if ('create_or_update' == $config['import']['actions'] ||
                     'update' == $config['import']['actions']
                     ) {
-                if (isset($d['unique_id'])) {
-                    $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
+                if (isset($d['local_sku'])) {
+                    $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
                 }
                 if (!$p && isset($d['product_name'])) {
                     $p = $this->orm()->where("product_name", $d['product_name'])->find_one();

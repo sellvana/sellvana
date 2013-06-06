@@ -1,0 +1,36 @@
+- $m = $this->model
+
+%fieldset.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Product Name')
+            %input(type="text" name="model[product_name]" value="#{$m->product_name}")
+        %li
+            %h4.label = $this->_('URL Key').' '.$this->_('(optional)')
+            %input(type="text" name="model[url_key]" value="#{$m->url_key}")
+        %li
+            %h4.label = $this->_('Local SKU')
+            %input(type="text" name="model[local_sku]" value="#{$m->local_sku}")
+        %li
+            %h4.label = $this->_('Short Description')
+            %textarea(type="text" name="model[short_description]") = $m->short_description
+        %li
+            %h4.label = $this->_('Long Description')
+            %textarea(id="general-info-description" name="model[description]") = $m->description
+        %li
+            %h4.label = $this->_('Net Weight')
+            %input(type="text" name="model[net_weight]" value="#{$m->net_weight}")
+        %li
+            %h4.label = $this->_('Shipping Weight')
+            %input(type="text" name="model[net_weight]" value="#{$m->ship_weight}")
+        %li
+            %h4.label = $this->_('Hide Product')
+            %select(name="model[is_hidden")
+                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_hidden)
+
+:javascript
+    head(function() {
+        adminForm.wysiwygCreate('general-info-description');
+    });
+
+- echo $this->hook('catalog/products/tab/main', array('model'=>$this->model))

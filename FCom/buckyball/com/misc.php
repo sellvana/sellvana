@@ -2798,6 +2798,7 @@ class BYAML extends BCLass
     {
         $filename1 = realpath($filename);
         if (!$filename1) {
+            BDebug::debug('BCache load: file does not exist: '.$filename);
             return false;
         }
         $filename = $filename1;

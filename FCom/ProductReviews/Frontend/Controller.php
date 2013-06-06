@@ -35,7 +35,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 $customer = FCom_Customer_Model_Customer::sessionUser();
                 $customerId = $customer->id();
             }
-            FCom_ProductReviews_Model_Reviews::i()->addNew($customerId, $product->id(), $post['review']);
+            FCom_ProductReviews_Model_Review::i()->addNew($customerId, $product->id(), $post['review']);
         }
         BResponse::i()->redirect($product->url());
     }
@@ -53,7 +53,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         }
 
         if (!empty($post['review_helpful'])) {
-            $review = FCom_ProductReviews_Model_Reviews::i()->load($post['rid']);
+            $review = FCom_ProductReviews_Model_Review::i()->load($post['rid']);
             if (!$review) {
                 BResponse::i()->json(array('error' => 'Invalid id'));
             }
@@ -62,39 +62,47 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             } else {
                 $mark = -1;
             }
-            $customer = FCom_Customer_Model_Customer::sessionUser();
-            $record = FCom_ProductReviews_Model_Helpful2Customer::orm()
-                    ->where('customer_id', $customer->id)
-                    ->where('review_id', $review->id)
-                    ->find_one();
+            $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+            $record = FCom_ProductReviews_Model_ReviewFlag::i()->load(array(
+                'customer_id' => $customer->id, 
+                'review_id' => $review->id,
+            ));
 
             if (!$record) {
                 $review->helpful($mark);
-                $data = array('customer_id' => $customer->id, 'review_id' => $review->id, 'mark' => $mark);
-                FCom_ProductReviews_Model_Helpful2Customer::orm()->create($data)->save();
+                $data = array('customer_id' => $customer->id, 'review_id' => $review->id, 'helpful' => $mark);
+                FCom_ProductReviews_Model_ReviewFlag::i()->create($data)->save();
+            } elseif ($record->helpful != $mark) {
+                $review->helpful($mark);
+                $record->set('helpful', $mark)->save();
             }
         }
     }
 
     public function action_offensive()
     {
+        //TODO: convert to POST
         $rid = BRequest::i()->get('rid');
         if (empty($rid)) {
             $this->forward(false);
             return;
         }
-        $review = FCom_ProductReviews_Model_Reviews::i()->load($rid);
+        $review = FCom_ProductReviews_Model_Review::i()->load($rid);
 
         $customer = FCom_Customer_Model_Customer::sessionUser();
-        $record = FCom_ProductReviews_Model_Offensive2Customer::orm()
-                    ->where('customer_id', $customer->id)
-                    ->where('review_id', $review->id)
-                    ->find_one();
+        $record = FCom_ProductReviews_Model_ReviewFlag::i()->load(array(
+            'customer_id' => $customer->id,
+            'review_id' => $review->id
+        ));
         if (!$record) {
             $review->offensive++;
             $review->save();
             $data = array('customer_id' => $customer->id, 'review_id' => $review->id, 'offensive' => 1);
-            FCom_ProductReviews_Model_Offensive2Customer::orm()->create($data)->save();
+            FCom_ProductReviews_Model_ReviewFlag::i()->create($data)->save();
+        } elseif (!$record->offensive) {
+            $review->offensive++;
+            $review->save();
+            $record->set('offensive', 1)->save();
         }
     }
 }

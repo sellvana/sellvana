@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Market_Model_Modules extends FCom_Core_Model_Abstract
+class FCom_MarketClient_Model_Modules extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_market_modules';
+    protected static $_table = 'FCom_MarketClient_modules';
 
 
     public function addModule($module)
