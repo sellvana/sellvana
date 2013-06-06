@@ -1225,7 +1225,11 @@ class BMigrate extends BClass
                     } elseif (is_dir($module->root_dir.'/'.$script)) {
                         //TODO: process directory of migration scripts
                     } elseif (class_exists($script, true)) {
-                        $script::i()->run();
+                        if (method_exists($script, 'run')) {
+                            $script::i()->run();
+                        } else {
+                            static::_runClassMethods($script);
+                        }
                     }
                 /*
                     BDb::commit();
@@ -1239,6 +1243,36 @@ class BMigrate extends BClass
         unset($modules);
         $modReg->currentModule(null);
         static::$_migratingModule = null;
+    }
+
+    protected static function _runClassMethods($class)
+    {
+        $methods = get_class_methods($class);
+        $installs = array();
+        $upgrades = array();
+        foreach ($methods as $method) {
+            if (preg_match('/^install__([0-9_]+)$/', $method, $m)) {
+                $installs[] = array(
+                    'method' => $method, 
+                    'to' => str_replace('_', '.', $m[1])
+                );
+            } elseif (preg_match('/^upgrade__([0-9_]+)__([0-9_]+)$/', $method, $m)) {
+                $upgrades[] = array(
+                    'method' => $method, 
+                    'from' => str_replace('_', '.', $m[1]), 
+                    'to' => str_replace('_', '.', $m[2]),
+                );
+            }
+        }
+        usort($installs, function($a, $b) { return version_compare($a['to'], $b['to']); });
+        usort($upgrades, function($a, $b) { return version_compare($a['from'], $b['from']); });
+        end($installs); $install = current($installs);
+        $instance = $class::i();
+
+        static::install($install['to'], array($instance, $install['method']));
+        foreach ($upgrades as $upgrade) {
+            static::upgrade($upgrade['from'], $upgrade['to'], array($instance, $upgrade['method']));
+        }
     }
 
     /**
