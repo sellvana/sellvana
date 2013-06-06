@@ -1,0 +1,37 @@
+- $m = $this->model
+- $prodImagesConfig = FCom_Catalog_Admin_Controller_Products::i()->productImagesGridConfig($m)
+- $mediaLibConfig = FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array('id'=>'all_images', 'folder'=>'media/product/image'))
+
+#images-layout
+    .ui-layout-west
+        - echo $this->view('jqgrid')->set('config', $prodImagesConfig)
+    .ui-layout-center
+        - echo $this->view('jqgrid')->set('config', $mediaLibConfig)
+
+:javascript
+    var imagesLayout, allImagesGrid;
+    head(function() {
+        imagesLayout = $('#images-layout').height($('.adm-wrapper').height()).layout({
+            useStateCookie: true,
+            west__minWidth:400,
+            west__spacing_open:20,
+            west__closable:false,
+            triggerEventsOnLoad: true,
+            onresize:function(pane, $Pane, paneState) {
+                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                    $(this).setGridWidth(paneState.innerWidth - 20);
+                });
+            }
+        });
+
+        allImagesGrid = new FCom.Admin.MediaLibrary({
+            grid:'#all_images',
+            url:'#{BApp::href('media/grid')}',
+            folder:'media/product/image'
+        });
+
+        new FCom.Admin.TargetGrid({source:'#all_images', target:'#product_images'});
+
+    })
+
+- echo $this->hook('catalog/products/tab/images', array('model'=>$this->model))

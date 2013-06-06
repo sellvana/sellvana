@@ -1,0 +1,36 @@
+- $m = $this->model;
+- $prodAttachConfig = FCom_Catalog_Admin_Controller_Products::i()->productAttachmentsGridConfig($m)
+- $mediaLibConfig = FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array('id'=>'all_attachments', 'folder'=>'media/product/attachment'))
+
+#attachments-layout
+    .ui-layout-west
+        - echo $this->view('jqgrid')->set('config', $prodAttachConfig)
+    .ui-layout-center
+        - echo $this->view('jqgrid')->set('config', $mediaLibConfig)
+
+:javascript
+    var attachmentsLayout, attachmentsGrid;
+    head(function() {
+        attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+            useStateCookie: true,
+            west__minWidth:400,
+            west__spacing_open:20,
+            west__closable:false,
+            triggerEventsOnLoad: true,
+            onresize:function(pane, $Pane, paneState) {
+                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                    $(this).setGridWidth(paneState.innerWidth - 20);
+                });
+            }
+        });
+
+        attachmentsGrid = new FCom.Admin.MediaLibrary({
+            grid:'#all_attachments',
+            url:'#{BApp::href('media/grid')}',
+            folder:'media/product/attachment'
+        });
+
+        new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
+    })
+
+- echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model))
