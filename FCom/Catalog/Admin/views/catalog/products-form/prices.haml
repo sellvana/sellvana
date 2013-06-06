@@ -1,0 +1,25 @@
+- $m = $this->model
+
+%h2 = $this->_('Price options')
+.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Cost')
+            %input(type="text" name="model[cost]" value="#{$m->cost}")
+        %li
+            %h4.label = $this->_('MSRP')
+            %input(type="text" name="model[msrp]" value="#{$m->msrp}")
+        %li
+            %h4.label = $this->_('MAP')
+            %input(type="text" name="model[map]" value="#{$m->map}")
+        %li
+            %h4.label = $this->_('Default Base Price')
+            %input(type="text" name="model[base_price]" value="#{$m->base_price}")
+        %li
+            %h4.label = $this->_('Default Sale Price')
+            %input(type="text" name="model[sale_price]" value="#{$m->sale_price}")
+        %li
+            %h4.label = $this->_('Default Markup')
+            %input(type="text" name="model[markup]" value="#{$m->markup}")
+
+        - echo $this->hook('catalog/products-form/prices', array('model'=>$m))

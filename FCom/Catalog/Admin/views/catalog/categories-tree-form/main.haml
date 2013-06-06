@@ -10,5 +10,5 @@
             %input#main-url_key(type="text" name="model[url_key]" value="#{$m->url_key}")
         %li.label-l
             %label(for="main-is_top_menu") = $this->_('Show in top menu')
-            %input(type="hidden" name="model[is_top_menu]" value="0")
-            %input(type="checkbox" name="model[is_top_menu]" value="1" #{$m->is_top_menu == 1 ? 'checked':''})
+            %select(name="model[is_top_menu")
+                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_top_menu)
