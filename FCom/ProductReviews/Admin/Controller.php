@@ -4,7 +4,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'prodreviews';
-    protected $_modelClass = 'FCom_ProductReviews_Model_Reviews';
+    protected $_modelClass = 'FCom_ProductReviews_Model_Review';
     protected $_mainTableAlias = 'prr';
 
     public function gridConfig($productModel = false)
@@ -34,7 +34,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['grid']['editurl'] = '';
             $config['grid']['url'] = '';
             $config['custom'] = array('personalize'=>true);
-            $orm = FCom_ProductReviews_Model_Reviews::orm('pr')->where('product_id', $productModel->id())
+            $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
                 ->select('pr.*')->select('p.product_name');
 

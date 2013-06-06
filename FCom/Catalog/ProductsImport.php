@@ -14,7 +14,7 @@ class FCom_Catalog_ProductsImport extends BImport
         'product.image_url' => array('pattern'=>'image*url|thumbnail'),
         'product.avg_rating' => array('pattern'=>'avg*rating'),
         'product.num_reviews' => array('pattern'=>'num*reviews'),
-        'product.disabled' => array('pattern'=>'product*disabled'),
+        'product.is_hidden' => array('pattern'=>'hidden|disable'),
         'product.categories' => array('pattern'=>'categories|category'),
         'product.images' => array('pattern'=>'images|image'),
     );
