@@ -1,11 +1,11 @@
 <?php
 
-class FCom_Market_Admin extends BClass
+class FCom_MarketClient_Admin extends BClass
 {
     static public function bootstrap()
     {
-        if (!BConfig::i()->get('modules/FCom_Market/market_url')) {
-            BConfig::i()->set('modules/FCom_Market/market_url', 'http://fulleron.com');
+        if (!BConfig::i()->get('modules/FCom_MarketClient/market_url')) {
+            BConfig::i()->set('modules/FCom_MarketClient/market_url', 'http://fulleron.com');
         }
     }
 
@@ -14,10 +14,10 @@ class FCom_Market_Admin extends BClass
         $modulesNotification = &$args['modulesNotification'];
         //find modules which have updates
         try {
-            if (!BDb::ddlFieldInfo(FCom_Market_Model_Modules::table(), 'need_upgrade')) {
+            if (!BDb::ddlFieldInfo(FCom_MarketClient_Model_Modules::table(), 'need_upgrade')) {
                 return;
             }
-            $res = FCom_Market_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
+            $res = FCom_MarketClient_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
         } catch (Exception $e) {
             return;
         }

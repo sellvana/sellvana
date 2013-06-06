@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Market_Migrate extends BClass
+class FCom_MarketClient_Migrate extends BClass
 {
     public function run()
     {
@@ -13,7 +13,7 @@ class FCom_Market_Migrate extends BClass
 
     public function install()
     {
-        $tModules = FCom_Market_Model_Modules::table();
+        $tModules = FCom_MarketClient_Model_Modules::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tModules} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -28,25 +28,25 @@ class FCom_Market_Migrate extends BClass
 
     public function upgrade_0_1_1()
     {
-        $pModules = FCom_Market_Model_Modules::table();
+        $pModules = FCom_MarketClient_Model_Modules::table();
         BDb::run( " ALTER TABLE {$pModules} ADD `need_upgrade` tinyint(1) NOT NULL DEFAULT '0'");
     }
 
     public function upgrade_0_1_2()
     {
-        $pModules = FCom_Market_Model_Modules::table();
+        $pModules = FCom_MarketClient_Model_Modules::table();
         BDb::run( " ALTER TABLE {$pModules} MODIFY `description` text DEFAULT NULL");
     }
 
     public function upgrade_0_1_3()
     {
-        $pModules = FCom_Market_Model_Modules::table();
+        $pModules = FCom_MarketClient_Model_Modules::table();
         BDb::run( " ALTER TABLE {$pModules} ADD `market_version` varchar(50) DEFAULT NULL");
     }
 
     public function upgrade_0_1_4()
     {
-        $pModules = FCom_Market_Model_Modules::table();
+        $pModules = FCom_MarketClient_Model_Modules::table();
         BDb::ddlTableDef($pModules, array(
             'COLUMNS' => array(
                 'mod_name' => "varchar(255) NOT NULL AFTER `id`",
