@@ -2118,10 +2118,12 @@ class BLocale extends BClass
     protected static $_tr;
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BLocale
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BLocale
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);

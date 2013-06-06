@@ -24,6 +24,9 @@ class BHAML extends BClass
         BLayout::i()->addExtRenderer(static::$_defaultFileExt, 'BHAML::renderer');
     }
 
+    /**
+     * @return MtHaml\Environment
+     */
     static public function haml()
     {
         if (!static::$_haml) {
