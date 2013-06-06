@@ -45,7 +45,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ));
     }
 
-    public function linked_categories_data($model)
+    public function linkedCategoriesData($model)
     {
         $cp = FCom_Catalog_Model_CategoryProduct::i();
         $categories = $cp->orm()->where('product_id', $model->id())->find_many();
@@ -77,6 +77,50 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['custom']['personalize'] = 'products';
         //$config['custom']['autoresize'] = '#linked-products-layout';
         return $config;
+    }
+
+    public function productAttachmentsGridConfig($model)
+    {
+        return array(
+            'grid' => array(
+                'id' => 'product_attachments',
+                'caption' => 'Product Attachments',
+                'datatype' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('A')->select('a.id')->select('a.file_name')->find_many()),
+                'colModel' => array(
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                ),
+                'multiselect' => true,
+                'shrinkToFit' => true,
+                'forceFit' => true,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Product', 'cursor'=>'pointer'),
+            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Product', 'cursor'=>'pointer'),
+        );
+    }
+
+    public function productImagesGridConfig($model)
+    {
+        return array(
+            'grid' => array(
+                'id' => 'product_images',
+                'caption' => 'Product Images',
+                'datatype' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('I')->select('a.id')->select('a.file_name')->find_many()),
+                'colModel' => array(
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                ),
+                'multiselect' => true,
+                'shrinkToFit' => true,
+                'forceFit' => true,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Images to Product', 'cursor'=>'pointer'),
+            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Images From Product', 'cursor'=>'pointer'),
+        );
     }
 
     public function linkedProductGridConfig($model, $type)
