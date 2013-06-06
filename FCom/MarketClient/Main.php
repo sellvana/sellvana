@@ -1,17 +1,17 @@
 <?php
 
-class FCom_Market_Main extends BClass
+class FCom_MarketClient_Main extends BClass
 {
     private $error='';
 
     public function getSsoUrl()
     {
-        return BConfig::i()->get('modules/FCom_Market/market_url') . '/market/sso?'.$this->getTokenUrl();
+        return BConfig::i()->get('modules/FCom_MarketClient/market_url') . '/market/sso?'.$this->getTokenUrl();
     }
 
     public function getModules($modules)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') . '/market/api/list?'.$this->getTokenUrl();
+        $fulleronUrl = BConfig::i()->get('modules/FCom_MarketClient/market_url') . '/market/api/list?'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
         }
@@ -26,7 +26,7 @@ class FCom_Market_Main extends BClass
 
     public function getMyModules()
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url')
+        $fulleronUrl = BConfig::i()->get('modules/FCom_MarketClient/market_url')
                 . '/market/api/mylist'.'?'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
@@ -39,7 +39,7 @@ class FCom_Market_Main extends BClass
 
     public function getModuleById($moduleId)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url').
+        $fulleronUrl = BConfig::i()->get('modules/FCom_MarketClient/market_url').
                 '/market/api/info?modid='.$moduleId.'&'.$this->getTokenUrl();
         if (empty($fulleronUrl)) {
             return false;
@@ -55,7 +55,7 @@ class FCom_Market_Main extends BClass
 
     public function download($moduleName)
     {
-        $fulleronUrl = BConfig::i()->get('modules/FCom_Market/market_url') .
+        $fulleronUrl = BConfig::i()->get('modules/FCom_MarketClient/market_url') .
                 '/market/api/download?mod_name='.$moduleName.'&'.$this->getTokenUrl();
 
         $storage = BConfig::i()->get('fs/storage_dir');
@@ -150,7 +150,7 @@ class FCom_Market_Main extends BClass
 
     private function getTokenUrl()
     {
-        $config = BConfig::i()->get('modules/FCom_Market');
+        $config = BConfig::i()->get('modules/FCom_MarketClient');
         $timestamp = time();
         $id = !empty($config['id']) ? $config['id'] : null;
         $salt = !empty($config['salt']) ? $config['salt'] : null;

@@ -30,7 +30,7 @@ class BHAML extends BClass
     static public function haml()
     {
         if (!static::$_haml) {
-            BApp::m('BHAML')->autoload(__DIR__.'/lib');
+            BApp::m('BHAML')->autoload('lib');
 
             $c = BConfig::i();
             $options = (array)$c->get('modules/BHAML/haml');

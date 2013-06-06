@@ -9,6 +9,6 @@
             %label(for="main-url_key") = $this->_('Url Key')
             %input#main-url_key(type="text" name="model[url_key]" value="#{$m->url_key}")
         %li.label-l
-            %label(for="main-top_menu") = $this->_('Show in top menu')
-            %input(type="hidden" name="model[top_menu]" value="0")
-            %input(type="checkbox" name="model[top_menu]" value="1" #{$m->top_menu == 1 ? 'checked':''})
+            %label(for="main-is_top_menu") = $this->_('Show in top menu')
+            %select(name="model[is_top_menu")
+                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_top_menu)

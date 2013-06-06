@@ -7,11 +7,11 @@
  *  3. Install module
  */
 
-class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'market';
-    protected $_modelClass = 'FCom_Market_Model_Modules';
+    protected $_modelClass = 'FCom_MarketClient_Model_Modules';
     //protected $_mainTableAlias = '';
 
     public function gridConfig()
@@ -42,7 +42,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
 
     public function action_market()
     {
-        $this->view('market/market')->url = FCom_Market_Main::i()->getSsoUrl();
+        $this->view('market/market')->url = FCom_MarketClient_Main::i()->getSsoUrl();
         $this->layout('/market/market');
     }
 
@@ -51,7 +51,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $modName = BRequest::i()->params('mod_name', true);
         if (!$modName) {
             $modid = BRequest::i()->params('id', true);
-            $mod = FCom_Market_Model_Modules::load($modid);
+            $mod = FCom_MarketClient_Model_Modules::load($modid);
             if($mod) {
                 $modName = $mod->mod_name;
             }
@@ -60,7 +60,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         //echo $moduleId;exit;
 
         try {
-            $modules = FCom_Market_Main::i()->getModules(array($modName));
+            $modules = FCom_MarketClient_Main::i()->getModules(array($modName));
             $module = $modules[$modName];
             if (!empty($module['require'])) {
                 $module['require'] = BUtil::fromJson($module['require']);
@@ -114,7 +114,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $model->id = $modName;
         $model->module = $module;
 
-        $modulesInstalled = FCom_Market_Model_Modules::i()->getAllModules();
+        $modulesInstalled = FCom_MarketClient_Model_Modules::i()->getAllModules();
 
         $needUpgrade = false;
         $localVersion = '';
@@ -154,14 +154,14 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         $modName = BRequest::i()->params('mod_name', true);
         if (!$modName) {
             $modid = BRequest::i()->params('id', true);
-            $mod = FCom_Market_Model_Modules::load($modid);
+            $mod = FCom_MarketClient_Model_Modules::load($modid);
             if($mod) {
                 $modName = $mod->mod_name;
             }
         }
 
         try {
-            $modules = FCom_Market_Main::i()->getModules(array($modName));
+            $modules = FCom_MarketClient_Main::i()->getModules(array($modName));
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
@@ -169,7 +169,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         try {
-            $moduleFile = FCom_Market_Main::i()->download($modName);
+            $moduleFile = FCom_MarketClient_Main::i()->download($modName);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
             BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
@@ -187,16 +187,16 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             BUtil::ensureDir($dlcPath);
         }
 
-        $ftpenabled = BConfig::i()->get('modules/FCom_Market/ftp/enabled');
+        $ftpenabled = BConfig::i()->get('modules/FCom_MarketClient/ftp/enabled');
         if ($ftpenabled) {
             $modulePath = dirname($moduleFile).'/'.$modName;
-            $res = FCom_Market_Main::i()->extract($moduleFile, $modulePath);
+            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $modulePath);
             //copy modulePath by FTP to marketPath
             if (!$res) {
                 BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
                 BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
             }
-            $conf = BConfig::i()->get('modules/FCom_Market/ftp');
+            $conf = BConfig::i()->get('modules/FCom_MarketClient/ftp');
             if (empty($conf['port'])) {
                 $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
             }
@@ -210,9 +210,9 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             }
 
         } else {
-            $res = FCom_Market_Main::i()->extract($moduleFile, $dlcPath);
+            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $dlcPath);
             if (!$res) {
-                $error = FCom_Market_Main::i()->getErrors();
+                $error = FCom_MarketClient_Main::i()->getErrors();
                 if ($error) {
                     BSession::i()->addMessage($error, 'error');
                 } else {
@@ -223,7 +223,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
         }
 
         if ($res) {
-            $modExist = FCom_Market_Model_Modules::orm()->where('mod_name', $modName)->find_one();
+            $modExist = FCom_MarketClient_Model_Modules::orm()->where('mod_name', $modName)->find_one();
             if ($modExist) {
                 $modExist->version = $module['version'];
                 $modExist->description = $module['short_description'];
@@ -231,7 +231,7 @@ class FCom_Market_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFo
             } else {
                 $data = array('name' => $module['name'], 'mod_name' => $modName,
                     'version' => $module['version'], 'description' => $module['short_description']);
-                FCom_Market_Model_Modules::orm()->create($data)->save();
+                FCom_MarketClient_Model_Modules::orm()->create($data)->save();
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
