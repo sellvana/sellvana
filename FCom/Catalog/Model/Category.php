@@ -41,7 +41,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
      */
     public function setInMenu($set=true)
     {
-        $this->top_menu = $set;
+        $this->is_top_menu = $set;
         $this->save();
     }
 
@@ -77,6 +77,6 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function inMenu()
     {
-        return $this->top_menu;
+        return $this->is_top_menu;
     }
 }

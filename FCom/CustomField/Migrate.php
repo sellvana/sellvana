@@ -69,6 +69,20 @@ class FCom_CustomField_Migrate extends BClass
             CONSTRAINT `FK_{$tSetField}_set` FOREIGN KEY (`set_id`) REFERENCES {$tSet} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
         ");
+
+        $tProductField = FCom_CustomField_Model_ProductField::table();
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tProductField} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `product_id` int(10) unsigned NOT NULL,
+            `_fieldset_ids` text,
+            `_add_field_ids` text,
+            `_hide_field_ids` text,
+            PRIMARY KEY (`id`),
+            CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
     public function upgrade_0_1_1()

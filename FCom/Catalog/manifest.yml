@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.1
+        version: 0.2.2
         require: { module: { FCom_Core: 0.1.0 } }
         categories: [ Catalog, Products ]
         translations: { de: de.php }
