@@ -559,6 +559,7 @@ class BModule extends BClass
     public $area;
     public $override;
     public $default_config;
+    public $autoload;
 
     const
         // run_level
@@ -810,6 +811,18 @@ class BModule extends BClass
         return;
     }
 
+    protected function _processAutoload()
+    {
+        if (!empty($this->autoload)) {
+            foreach ((array)$this->autoload as $al) {
+                if (is_string($al)) {
+                    $al = array('root_dir'=>$al);
+                }
+                $this->autoload($al['root_dir'], !empty($al['callback']) ? $al['callback'] : null);
+            }
+        }
+    }
+
     protected function _processProvides()
     {
         if (!empty($this->provides['themes'])) {
@@ -1040,6 +1053,7 @@ class BModule extends BClass
             }
         }
 
+        $this->_processAutoload();
         $this->_processTranslations();
         $this->_processAutoUse();
         $this->_processRouting();

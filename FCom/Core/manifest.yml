@@ -5,3 +5,5 @@ modules:
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
         description: "Base Fulleron classes and JS libraries"
+        default_config:
+            db: { implicit_migration: true }
