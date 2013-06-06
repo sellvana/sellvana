@@ -4,7 +4,7 @@
 
     <fieldset>
         <h3>Admin User</h3>
-        <?php echo $this->messagesHtml() ?>
+        {{ THIS.messagesHtml() |raw }}
         <label for="admin-firstname">First Name:</label><input type="text" id="admin-firstname" name="w[admin][firstname]" value="{{w.admin.firstname}}"/><br/>
         <label for="admin-lastname">Last Name:</label><input type="text" id="admin-lastname" name="w[admin][lastname]" value="{{w.admin.lastname}}"/><br/>
         <label for="admin-email">Email:</label><input type="text" id="admin-email" name="w[admin][email]" value="{{w.admin.email}}"/><br/>

@@ -1379,7 +1379,9 @@ class BView extends BClass
     public function optionsHtml($options, $default = '')
     {
         $html    = '';
-        $default = (string)$default;
+        if(!is_array($default)){
+            $default = (string)$default;
+        }
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && !empty($v[0])) {
@@ -1391,7 +1393,11 @@ class BView extends BClass
             if (!is_array($v)) {
                 $v = array('text' => $v);
             }
-            $html .= '<option value="' . $this->q($k) . '"' . ($default === $k ? ' selected' : '')
+            $sel = '';
+            if((is_array($default) && in_array($k, $default)) || $default === $k){
+                $sel = " selected";
+            }
+            $html .= '<option value="' . $this->q($k) . '"' . $sel
                      . (!empty($v['style']) ? ' style="' . $v['style'] . '"' : '')
                      . '>' . $v['text'] . '</option>';
         }

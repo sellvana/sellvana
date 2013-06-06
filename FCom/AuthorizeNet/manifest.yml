@@ -1,0 +1,14 @@
+modules:
+    FCom_AuthorizeNet:
+        version: 0.1.0
+        require: { module: { FCom_Sales: 0.1.10 } }
+        translations: { de: de.php }
+        description: "Authorize.net payment methods"
+        aim:
+          title: "Credit Card (Authorize.net)"
+        dpm:
+          title: "Credit Card Direct Post (Authorize.net)"
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views ]
