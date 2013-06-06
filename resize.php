@@ -5,16 +5,17 @@ error_reporting(E_ALL | E_NOTICE);
 
 $f = !empty($_GET['f']) ? $_GET['f'] : null;
 $s = !empty($_GET['s']) ? explode('x', $_GET['s']) : array('');
+$def = !empty($_GET['d']) ? $_GET['d'] : null;
 $dw = $s[0];
 $dh = !empty($s[1]) ? $s[1] : $s[0];
 $q = !empty($_GET['q']) ? (int)$_GET['q'] : 95;
 $bg = !empty($_GET['bg']) ? $_GET['bg'] : 'FFFFFF';
 
-if (empty($_GET['f']) || empty($_GET['s'])
+if (empty($f) || empty($s)
     #|| empty($_SERVER['HTTP_REFERER']) || empty($_SERVER['HTTP_HOST'])
     #|| strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])===false
-    || strpos($_GET['f'], '..')!==false
-    || $_GET['f'][0]=='/' && strpos($_GET['f'], dirname(__FILE__))!==0
+    || strpos($f, '..')!==false
+    || $f[0]=='/' && strpos($f, dirname(__FILE__))!==0
     #|| !is_file($_GET['f'])
 ) {
     header('Cache-Control: private, no-store, no-cache');
@@ -30,9 +31,8 @@ if (empty($_GET['f']) || empty($_GET['s'])
     imagedestroy($out);
     exit;
 }
-
 if (!is_file($f)) {
-    $f = !empty($_GET['d']) ? $_GET['d'] : __DIR__.'/media/image-not-found.jpg';
+    $f = !empty($def) ? $def : __DIR__.'/media/image-not-found.jpg';
 }
 
 $imgSize = getimagesize($f);

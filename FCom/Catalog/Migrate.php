@@ -6,10 +6,11 @@ class FCom_Catalog_Migrate extends BClass
     {
         BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
             'COLUMNS' => array(
-                'unique_id' => 'RENAME local_sku varchar(100) not null',
-                'disabled' => 'RENAME is_hidden tinyint not null default 0',
-                'image_url' => 'RENAME thumb_url text',
-                'images_data' => 'text',
+                'unique_id'     => 'RENAME local_sku varchar(100) not null',
+                'disabled'      => 'RENAME is_hidden tinyint not null default 0',
+                'image_url'     => 'RENAME thumb_url text',
+                'images_data'   => 'text',
+                'markup'        => 'decimal(12,2) null default null',
             ),
         ));
     }
@@ -37,6 +38,7 @@ class FCom_Catalog_Migrate extends BClass
                 'cost'          => 'decimal(12,2) null default null',
                 'msrp'          => 'decimal(12,2) null default null',
                 'map'           => 'decimal(12,2) null default null',
+                'markup'        => 'decimal(12,2) null default null',
                 'base_price'    => 'DECIMAL(12,2) NOT NULL',
                 'sale_price'    => 'decimal(12,2) null default null',
                 'net_weight'    => 'decimal(12,2) null default null',

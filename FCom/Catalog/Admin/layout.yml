@@ -49,7 +49,7 @@ catalog_product_form_tabs:
 
 /catalog/categories/tree_form:
   - { root, catalog/categories-tree-form }
-  - view, catalog/categories-tree-form
+  - view: catalog/categories-tree-form
     set: { tab_view_prefix: catalog/categories-tree-form/ }
     do:
       - [ addTab, main, { label: Category, pos: 10 } ]

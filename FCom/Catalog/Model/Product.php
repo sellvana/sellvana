@@ -46,12 +46,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
-        return $url.$media.($this->image_url ? $this->image_url : 'DC642702.jpg');
+        return $url.$media.'/'.($this->thumb_url ? $this->thumb_url : 'image-not-found.jpg');
     }
 
-    public function thumbUrl($w, $h=null)
+    public function thumbUrl($w, $h=null, $full=false)
     {
-        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode($this->imageUrl(true)).'&s='.$w.'x'.$h;
+        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
     }
 
     public function beforeSave()

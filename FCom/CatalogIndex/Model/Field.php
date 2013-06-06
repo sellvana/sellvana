@@ -105,20 +105,22 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 $catIds[$idPath[$i]] = $idPath[$i];
             }
         }
-print_r($catProds);
-        // fetch ascendants category names
-        $categories = FCom_Catalog_Model_Category::i()->orm('c')
-            ->select(array('id', 'url_path', 'node_name'))
-            ->where_in('id', $catIds)
-            ->find_many_assoc('id');
-        // fill index data
-        foreach ($products as $p) {
-            if (empty($prodCatIds[$p->id])) {
-                continue;
-            }
-            foreach ($prodCatIds[$p->id] as $cId) {
-                $c = $categories[$cId];
-                $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
+
+        if ($catIds) {
+            // fetch ascendants category names
+            $categories = FCom_Catalog_Model_Category::i()->orm('c')
+                ->select(array('id', 'url_path', 'node_name'))
+                ->where_in('id', $catIds)
+                ->find_many_assoc('id');
+            // fill index data
+            foreach ($products as $p) {
+                if (empty($prodCatIds[$p->id])) {
+                    continue;
+                }
+                foreach ($prodCatIds[$p->id] as $cId) {
+                    $c = $categories[$cId];
+                    $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
+                }
             }
         }
         return $data;

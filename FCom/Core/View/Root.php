@@ -19,7 +19,7 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
 
     public function getBodyClass()
     {
-        return $this->body_class ? join(' ', $this->body_class) : '';
+        return $this->body_class ? join(' ', (array)$this->body_class) : '';
     }
 
     public function getHtmlAttributes()
