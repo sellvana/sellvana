@@ -69,4 +69,13 @@ class FCom_AuthorizeNet_Model_Settings
         }
         return $url;
     }
+
+    /**
+     * @param BConfig $config
+     * @return string
+     */
+    public static function gatewayDpmUrl($config)
+    {
+        return static::gatewayUrl($config);
+    }
 }

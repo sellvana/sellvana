@@ -4,7 +4,10 @@ modules:
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { de: de.php }
         description: "Authorize.net payment methods"
-        title: "Credit Card (Authorize.net)"
+        aim:
+          title: "Credit Card (Authorize.net)"
+        dpm:
+          title: "Credit Card Direct Post (Authorize.net)"
 
         areas:
             FCom_Admin:
