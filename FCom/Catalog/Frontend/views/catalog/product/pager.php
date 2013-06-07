@@ -3,15 +3,15 @@ $s = $this->state;
 if(empty($s['p'])) $s['p'] = 0;
 
 $psOptions = array(25, 50, 100, 500);
+$psOptions = array_combine($psOptions, $psOptions);
 $sortOptions = $this->sort_options ? $this->sort_options : array(
-    'product_name|asc' => 'Product Name (A-Z)',
-    'product_name|desc' => 'Product Name (Z-A)',
-    'manuf_sku|asc' => 'Manuf SKU (A-Z)',
-    'manuf_sku|desc' => 'Manuf SKU (Z-A)',
-    'base_price|asc' => 'Price (Lower first)',
-    'base_price|desc' => 'Price (Higher first)',
+    'product_name asc' => 'Product Name (A-Z)',
+    'product_name desc' => 'Product Name (Z-A)',
+    'manuf_sku asc' => 'Manuf SKU (A-Z)',
+    'manuf_sku desc' => 'Manuf SKU (Z-A)',
+    'base_price asc' => 'Price (Lower first)',
+    'base_price desc' => 'Price (Higher first)',
 );
-
 ?>
 <div class="pager">
     <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
@@ -36,17 +36,13 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     <div class="pager-rows">
 	    <label><?= BLocale::_("Rows") ?>:</label>
 	    <select name="ps" onchange="this.form.submit()" class="select2">
-	<?php foreach ($psOptions as $i): ?>
-	        <option value="<?=$i?>" <?=$s['ps']==$i?'selected':''?>><?=$i?></option>
-	<?php endforeach ?>
+            <?=$this->optionsHtml($psOptions, $s['ps'])?>
 	    </select>
 	</div>
     <div class="pager-sort">
     	<label><?= BLocale::_("Sort") ?>:</label> <?=$s['sc']?>
     	<select name="sc" onchange="this.form.submit()" class="select2">
-<?php foreach ($sortOptions as $k=>$v): ?>
-        	<option value="<?=$k?>" <?=$s['sc']==$k?'selected':''?>><?=BLocale::_($v)?></option>
-<?php endforeach ?>
+            <?=$this->optionsHtml($sortOptions, $s['sc'])?>
     	</select>
     </div>
     <div class="pager-layout">

@@ -475,11 +475,13 @@ div.star-rating { background:transparent !important; overflow:hidden !important;
 	font-size:.9em;
 	line-height:1;
 	}
-.mini-cart.cart-filled:hover .mini-cart-title {
+.mini-cart.cart-filled:hover .mini-cart-title,
+.mini-cart.cart-filled.active .mini-cart-title {
 	position:relative;
 	z-index:999;
 	}
-.mini-cart.cart-filled:hover .mini-cart-title .title { 
+.mini-cart.cart-filled:hover .mini-cart-title .title,
+.mini-cart.cart-filled.active .mini-cart-title .title { 
 	border-bottom:none;
 	border-radius:4px 4px 0 0;
 	-moz-border-radius:4px 4px 0 0;
@@ -504,7 +506,8 @@ div.star-rating { background:transparent !important; overflow:hidden !important;
 	text-align:left;
 	z-index:99;
 	}
-.mini-cart:hover .mini-cart-content { display:block; }
+.mini-cart:hover .mini-cart-content,
+.mini-cart.active .mini-cart-content { display:block; }
 .mini-cart-content header { padding:8px 12px 5px; }
 .mini-cart-content header .title { float:left; margin-top:4px; font-size:.9em; font-weight:bold; text-transform:uppercase; }
 .mini-cart-content header .button { float:right; color:#444; padding:5px 8px; text-align:center; }
