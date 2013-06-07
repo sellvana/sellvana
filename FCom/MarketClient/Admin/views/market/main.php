@@ -52,7 +52,7 @@
     <?php endif; ?>
 
 <script>
-head(function() {
-adminForm.wysiwygCreate('main-content');
+$(function() {
+    adminForm.wysiwygCreate('main-content');
 });
 </script>

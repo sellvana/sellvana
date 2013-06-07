@@ -8,7 +8,7 @@
     </ul>
 </fieldset>
 <script>
-head(function() {
+$(function() {
     var ck = CKEDITOR.instances['main-content'];
     ck && ck.destroy();
     $('#main-content').ckeditor();

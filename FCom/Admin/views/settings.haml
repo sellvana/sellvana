@@ -1,7 +1,7 @@
 - $formUrl = BApp::href('settings');
 
 :javascript
-    head(function() {
+    $(function() {
         function onSortableStop(event, ui) {
             var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
     console.log(ui.item[0].id);

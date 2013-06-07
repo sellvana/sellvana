@@ -30,5 +30,6 @@
 {% endif %}
             {{ THIS.hook('footer') | raw }}
         </div>
+        {{ THIS.hook('before_body_end') | raw }}
     </body>
 </html>

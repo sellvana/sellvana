@@ -4,7 +4,7 @@
 - $prodCtrl = FCom_Catalog_Admin_Controller_Products::i()
 
 :javascript
-    head(function() {
+    $(function() {
 
         FCom.Admin.tree('#categories', {
             url:'#{BApp::href('catalog/categories/tree_data?id='.$this->model->id())}',

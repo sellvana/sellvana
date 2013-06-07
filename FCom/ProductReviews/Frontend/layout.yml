@@ -1,7 +1,7 @@
 base:
-	- view: head
+	- view: bottom_scripts
 		do:
-			- [ js, @FCom_ProductReviews/Frontend/js/fcom_productreviews.js ]
+			- [ js, @FCom_ProductReviews/Frontend/js/fcom.productreviews.js ]
 
 /prodreview/add:
 	- { include: base }

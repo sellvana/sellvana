@@ -10,7 +10,7 @@
             %textarea#main-layout_update(name="model[layout_update]" style="width:90%; height:100px") = $m->layout_update
 
 :javascript
-    head(function() {
+    $(function() {
         var ck = CKEDITOR.instances['main-content'];
         ck && ck.destroy();
         $('#main-content').ckeditor();

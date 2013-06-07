@@ -50,7 +50,7 @@
     </div>
 </div>
 <script>
-head(function() {
+$(function() {
     $('#register-form').validate();
 })
 </script>

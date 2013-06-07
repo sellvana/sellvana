@@ -46,7 +46,7 @@
     </ul>
 </fieldset>
 <script>
-head(function() {
-adminForm.wysiwygCreate('main-content');
+$(function() {
+    adminForm.wysiwygCreate('main-content');
 });
 </script>

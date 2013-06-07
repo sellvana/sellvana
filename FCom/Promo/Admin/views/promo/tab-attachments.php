@@ -33,7 +33,7 @@ $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
     </div>
 </div>
 <script>
-head(function() {
+$(function() {
     attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,

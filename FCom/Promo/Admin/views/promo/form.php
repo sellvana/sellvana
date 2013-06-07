@@ -3,7 +3,7 @@
     $tabs = $this->sortedTabs();
 ?>
 <script>
-head(function() {
+$(function() {
     window.adminForm = FCom.Admin.form({
         form:     '#<?=$this->form_id?>',
         tabs:     '.adm-tabs-sidebar li',

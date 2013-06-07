@@ -23,7 +23,7 @@
     </div>
 </div>
 <script>
-head(function() {
+$(function() {
     $('#recovery-form').validate();
 })
 </script>

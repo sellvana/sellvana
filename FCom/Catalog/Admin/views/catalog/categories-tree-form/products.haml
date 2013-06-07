@@ -9,7 +9,7 @@
         - echo $this->view('jqgrid')->set('config', FCom_Catalog_Admin_Controller_Products::i()->productLibraryGridConfig('products'))
 
 :javascript
-    head(function() {
+    $(function() {
         var linkedProductslayout = $('#category-products-layout').height($('.adm-wrapper').height()).layout({
             useStateCookie: true,
             west__minWidth:400,

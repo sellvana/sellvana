@@ -8,7 +8,7 @@
             - echo $this->view('jqgrid')->set('config', $prodCtrl->linkedProductGridConfig($m, 'similar'))
 
 :javascript
-    head(function() {
+    $(function() {
         var linkedProductslayout = $('#linked-products-layout').height($('.adm-wrapper').height()).layout({
             useStateCookie: true,
             west__minWidth:400,

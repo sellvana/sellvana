@@ -42,7 +42,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
 </div>
 
 <script>
-head(function() {
+$(function() {
     var layout = $('#details-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,

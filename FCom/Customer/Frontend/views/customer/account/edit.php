@@ -46,7 +46,7 @@
     </div>
 </div>
 <script>
-head(function() {
+$(function() {
     $('#edit-form').validate();
 })
 </script>
