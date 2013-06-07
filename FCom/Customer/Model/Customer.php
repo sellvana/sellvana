@@ -265,7 +265,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $this->save();
     }
 
-    public function onAddProductToCart($args)
+    static public function onAddProductToCart($args)
     {
         $cart = $args['model'];
 

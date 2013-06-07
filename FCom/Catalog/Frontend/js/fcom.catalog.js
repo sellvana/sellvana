@@ -1,6 +1,7 @@
 
 
 FCom.CompareBlock = function(opt) {
+//console.log('FROM CATALOG.JS', $, $.cookie);
     var cookieName = opt.cookieName || 'fulleronCompare', cookie = $.cookie(cookieName);
     var selected = cookie ? JSON.parse(cookie) : [], ul = $('ul', opt.thumbContainer);
     var added = {}; // to avoid duplicate notifications

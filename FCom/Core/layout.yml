@@ -1,0 +1,18 @@
+common_js_libs:
+    - view: head
+        do:
+            - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
+            - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
+            - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+
+    - view: bottom_scripts
+        do:
+            - [ js, @FCom_Core/js/lib/jquery.tools.min.js ]
+            - [ js, @FCom_Core/js/lib/json2.js ]
+            - [ js, @FCom_Core/js/lib/date.js ]
+            - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
+            - [ js, @FCom_Core/js/select2/select2.min.js ]
+            - [ js, @FCom_Core/js/lib/jquery.form.js ]
+            - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
+            - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
+            - [ js, //ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js ]

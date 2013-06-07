@@ -1952,7 +1952,7 @@ class BViewHead extends BView
             if (file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
-        } elseif (preg_match('#\{(.*?)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
+        } elseif (preg_match('#\{([A-Za-z0-9_]+)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
             $mod = BApp::m($m[1]);
             if (!$mod) {
                 BDebug::notice('Module not found: ' . $file);

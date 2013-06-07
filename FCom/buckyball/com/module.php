@@ -801,14 +801,13 @@ class BModule extends BClass
             }
         }
         if (isset($auto['all']) || isset($auto['layout'])) {
-            if (file_exists($this->root_dir.'/views')) {
+            if (file_exists($this->root_dir.'/layout.yml')) {
                 BLayout::i()->loadLayoutAfterTheme($this->root_dir.'/layout.yml');
             }
             if (file_exists($this->root_dir.'/'.$areaDir.'/layout.yml')) {
                 BLayout::i()->loadLayoutAfterTheme($this->root_dir.'/'.$areaDir.'/layout.yml');
             }
         }
-        return;
     }
 
     protected function _processAutoload()

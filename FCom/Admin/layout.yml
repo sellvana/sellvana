@@ -10,7 +10,7 @@ base:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
-      - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
+      - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
       - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
       - [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
