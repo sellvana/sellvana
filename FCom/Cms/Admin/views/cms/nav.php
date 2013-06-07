@@ -20,7 +20,7 @@
 </form>
 </div>
 <script>
-head(function() {
+$(function() {
     FCom.Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
     FCom.Admin.checkboxButton('#nav-expand-collapse', {
         off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},

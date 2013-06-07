@@ -31,7 +31,7 @@ function updateFieldSet(subgrid) {
     );
 }
 
-head(function() {
+$(function() {
     var linkedProductslayout = $('#fieldsets-layout').height($('.adm-wrapper').height()).layout({
         useStateCookie: true,
         west__minWidth:400,

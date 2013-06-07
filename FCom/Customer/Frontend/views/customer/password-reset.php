@@ -32,7 +32,7 @@
     </div>
 </div>
 <script>
-head(function() {
+$(function() {
     $('#reset-form').validate();
 })
 </script>

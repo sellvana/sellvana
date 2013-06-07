@@ -6,8 +6,13 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ views ]
-                
+                auto_use: [ views, layout ]
+                routing:
+                    - [ get, /orders, FCom_Sales_Admin_Controller_Orders.index ]
+                    - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
+                    - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
+                    - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+
             FCom_Api:
                 routing:
                     - [ any, /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]

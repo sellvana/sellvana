@@ -1,5 +1,5 @@
 base:
-	- view: head
+	- view: bottom_scripts
 		do:
 			- [ js, @FCom_Checkout/Frontend/js/fcom.checkout.js ]
 

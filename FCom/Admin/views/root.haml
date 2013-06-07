@@ -17,7 +17,7 @@
                 - echo $this->hook('main')
 
         :javascript
-            head(function() {
+            $(function() {
                 var $main = $('.adm-content-box'), $win = $(window), $doc = $(document);
                 if ($main.length) {
                     $win.resize(function() {
@@ -44,3 +44,5 @@
     - else
         .adm-wrapper#root-layout
             - echo $this->hook('main')
+            
+    - echo $this->hook('before_body_end')

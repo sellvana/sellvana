@@ -1,45 +1,47 @@
 base:
   - { root: root }
   - { hook: head, views: head }
+  - { hook: header, views: admin/header }
+  - { hook: top-nav, views: admin/nav }
+  - { hook: before_body_end, views: bottom_scripts }
+
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
-      - [ js, @FCom_Core/js/lib/head.min.js ]
+      #- [ js, @FCom_Core/js/lib/head.min.js ]
       - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
       - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-      - [ js, @FCom_Core/js/lib/json2.js ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js, { separate: true } ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js, { separate: true } ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
+      - [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
+      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
+      #- [ css, @FCom_Core/bootstrap/css/bootstrap.min.css ]
+      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
 
   #- { include: foundation3 }
 
-  - view: head
+  - view: bottom_scripts
     do:
+      - [ js, @FCom_Core/js/lib/json2.js ]
+      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
       - [ js, @FCom_Core/js/lib/angular.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
       - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
       - [ js, @FCom_Core/js/lib/jquery.hotkeys.js ]
       - [ js, @FCom_Core/js/lib/jquery.layout-latest.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
-      - [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
-      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
-
-      #- [ css, @FCom_Core/bootstrap/css/bootstrap.min.css ]
-      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
       #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
+      #- [ js, @FCom_Core/js/fcom.core.js ]
+      - [ js, @FCom_Admin/js/fcom.admin.js ]
 
   - { include: jqgrid }
   - { include: jstree }
 
-  - { hook: header, views: admin/header }
-  - { hook: top-nav, views: admin/nav }
 
   - view: head
     do:
-      - [ js, @FCom_Admin/js/fcom.admin.js ]
       - [ css, @FCom_Admin/css/fcom.admin.css ] # need to be separate from other CSS for correct ordering in styling
 
   - view: admin/nav
@@ -60,13 +62,19 @@ jqgrid:
     do:
       - [ css, @FCom_Core/js/lib/jqGrid/ui.jqgrid.css ]
       - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min.js ]
 
       # - [ css, @FCom_Core/js/lib/jqGrid/css/ui.jqgrid.css ]
 
       # - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
+
+  - view: bottom_scripts
+    do:
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd.js ]
+      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
+
       # - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
 
       # - [ js, @FCom_Core/js/lib/jqGrid/js/i18n/grid.locale-en.js ]
@@ -88,34 +96,37 @@ jqgrid:
       # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.jqueryui.js ] # jQuery UI utils
       # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.filter.js ] # filter Plugin
 
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
-
 jstree:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/themes/default/style.css ]
+  - view: bottom_scripts
+    do:
       - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
 
 mcdropdown:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/css/jquery.mcdropdown.css ]
+  - view: bottom_scripts
+    do:
       - [ js, @FCom_Core/js/lib/jquery.mcdropdown.js ]
       - [ js, @FCom_Core/js/lib/jquery.bgiframe.js ]
 
 ace:
-  - view: head
+  - view: bottom_scripts
     do:
       - [ js, @FCom_Admin/js/ace-src-min-noconflict/ace.js ]
 
 form:
   - view: head
     do:
+      - [ css, @FCom_Core/js/lib/themes/default/style.css ]
+  - view: bottom_scripts
+    do:
       - [ js, @FCom_Core/js/lib/ckeditor/ckeditor.js ]
       - [ js, @FCom_Core/js/lib/ckeditor/adapters/jquery.js ]
       - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
-      - [ css, @FCom_Core/js/lib/themes/default/style.css ]
       - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
 
 404:

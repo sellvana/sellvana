@@ -40,7 +40,7 @@
     -->
 </div>
 <script>
-head(function() {
+$(function() {
     $('#import-accordion').accordion({});
 
     importsGrid = new FCom.Admin.MediaLibrary({

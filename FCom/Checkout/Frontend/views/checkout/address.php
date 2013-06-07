@@ -45,8 +45,8 @@
 		    	<td>
 				    <?=$this->view('geo/embed')?>
 				    <script>
-				        head(function() {
-				        $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
+				        $(function() {
+				            $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
 				        })
 				    </script>
 		    		<label for="#"><?= BLocale::_("Region") ?></label>
@@ -80,7 +80,7 @@
 	</fieldset>
 </form>
 <script>
-head(function() {
+$(function() {
     $('#address-form').validate();
 })
 </script>

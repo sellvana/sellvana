@@ -3,6 +3,7 @@ base:
     - { root: root }
     - { hook: head, views: head }
 
+    - { callback: FCom_Frontend_Frontend::defaultThemeCustomLayout }
     - view: head
         do:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
@@ -14,23 +15,28 @@ base:
             - [ css, @FCom_Core/js/lib/css/jquery.rating.css, { alias: rating } ]
             - [ css, @FCom_Core/js/lib/css/lightbox/lightbox.css, { alias: lightbox } ]
             - [ css, @FCom_Core/js/select2/select2.css ]
-            - [ js, @FCom_Core/js/lib/head.min.js ]
+            #- [ js, @FCom_Core/js/lib/head.min.js ]
+            - [ js, @FCom_Core/js/lib/html5shiv.js, { if: lt IE 9 } ]
             - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
             - [ js, @FCom_Core/js/lib/jquery.min.js ]
+
+    - view: bottom_scripts
+        do:
             - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
             - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
             - [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
             - [ js, @FCom_Core/js/lib/jquery.rating.min.js ]
-            - [ js, http://cdn.jquerytools.org/1.2.7/full/jquery.tools.min.js ]
+            - [ js, @FCom_Core/js/lib/jquery.tools.min.js ]
             - [ js, @FCom_Core/js/lib/jquery.qtip.min.js ]
             - [ js, @FCom_Core/js/lib/lightbox/lightbox.js ]
             - [ js, @FCom_Core/js/select2/select2.min.js ]
             - [ js, @FCom_Core/js/fcom.core.js ]
+            - [ js, @FCom_Frontend/js/fcom.frontend.js ]
 
     - { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
     - { hook: footer, views: footer }
-    - { callback: FCom_Frontend_Frontend::defaultThemeCustomLayout }
+    - { hook: before_body_end, views: bottom_scripts }
 
 404:
     - { include: base }

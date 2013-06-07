@@ -12,7 +12,7 @@
     </ul>
 </fieldset>
 <script>
-head(function() {
+$(function() {
 adminForm.wysiwygCreate('main-content');
 });
 </script>

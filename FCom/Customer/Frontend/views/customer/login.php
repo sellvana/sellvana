@@ -26,7 +26,7 @@
 	</div>
 </div>
 <script>
-head(function() {
+$(function() {
     $('#login-form').validate();
 })
 </script>

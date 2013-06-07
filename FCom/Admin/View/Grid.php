@@ -306,10 +306,10 @@ return [true, 'Testing error'];
                 $cfg['grid']['pager'] = $pagerId;
                 $html .= "<div id=\"{$pagerId}\"></div>";
             }
-            $html .= "<script>head(function() { jQuery('#{$id}')";
+            $html .= "<script>$(function() { $('#{$id}')";
         } else {
             $quotedPagerId = "'#'+pager_id";
-            $html = "jQuery('#'+subgrid_table_id)";
+            $html = "$('#'+subgrid_table_id)";
             unset($cfg['isSubGrid']);
         }
 
