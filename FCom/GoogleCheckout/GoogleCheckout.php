@@ -166,7 +166,7 @@ class FCom_GoogleCheckout extends BClass
     protected function prepareCart()
     {
         if (!$this->gCart) {
-            /* @var $cart FCom_Checkout_Model_Cart */
+            /* @var $cart FCom_Sales_Model_Cart */
             $cart = FCom_Sales_Model_Cart::sessionCart();
             /* @var $salesOrder FCom_Sales_Model_Order */
             $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
