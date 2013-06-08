@@ -701,6 +701,7 @@ class BClassRegistry extends BClass
             'class_name' => $newClass,
             'module_name' => BModuleRegistry::currentModuleName(),
         );
+        BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
         if ($replaceSingleton && !empty($this->_singletons[$class]) && get_class($this->_singletons[$class])!==$newClass) {
             $this->_singletons[$class] = $this->instance($newClass);
         }

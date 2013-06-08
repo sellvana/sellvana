@@ -159,7 +159,6 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $layout->view('catalog/product/pager')->sort_options = FCom_CatalogIndex_Model_Field::i()->getSortingArray();
         $layout->view('catalog/category/sidebar')->products_data = $productsData;
-
         $this->layout('/catalog/category');
     }
 
