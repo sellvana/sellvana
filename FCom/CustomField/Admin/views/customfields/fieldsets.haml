@@ -1,6 +1,6 @@
 - $fieldSetsCtrl = FCom_CustomField_Admin_Controller_FieldSets::i()
 
-:stylesheet
+:css
     #pager-fieldsets .ui-pg-table,
     #pager-fields .ui-pg-table { table-layout:auto !important; }
 
@@ -20,7 +20,7 @@
         for (i=0; i<data.length; i++) {
             fields.push(data[i].id);
         }
-        $.post('<?=BApp::href('customfields/fieldsets/set_field_grid_data')?>',
+        $.post('#{BApp::href('customfields/fieldsets/set_field_grid_data')}',
             {set_id:id, field_ids:fields.join(',')},
             function(data, status, xhr) {
                 grid.jqGrid('setRowData', id, {field_codes:data.field_codes});
@@ -31,7 +31,7 @@
     $(function() {
         var linkedProductslayout = $('#fieldsets-layout').height($('.adm-wrapper').height()).layout({
             useStateCookie: true,
-            west__minWidth:400,
+            west__minWidth:'40%',
             west__spacing_open:20,
             west__closable:false,
             triggerEventsOnLoad: true,
