@@ -6,6 +6,7 @@
                 - echo $this->view('jqgrid')->set('config', FCom_CustomField_Admin_Controller_Products::i()->fieldsetsGridConfig())
             %td(width="50%")
                 - echo $this->view('jqgrid')->set('config', FCom_CustomField_Admin_Controller_Products::i()->fieldsGridConfig())
+                
     #custom-fields-partial(data-src="#{BApp::href('customfields/products/fields_partial/?id='.$this->model->id)}")
         - echo $this->view('customfields/products/fields-partial')->set('model', $this->model)
 
