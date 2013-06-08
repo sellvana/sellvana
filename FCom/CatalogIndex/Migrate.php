@@ -135,15 +135,16 @@ class FCom_CatalogIndex_Migrate extends BClass
         //$this->install();
         BDb::run("
 replace  into `fcom_index_field`
-(`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
+(`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_counts`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
 values
 (1,'product_name','Product Name','text',0,NULL,'field',NULL,'none',0,0,NULL,NULL,'terms','both','Product Name (A-Z) || Product Name (Z-A)',NULL),
 (2,'short_description','Short Description','text',0,NULL,'field',NULL,'none',0,0,NULL,NULL,'terms','none',NULL,NULL),
 (3,'description','Description','text',0,NULL,'field',NULL,'none',0,0,NULL,NULL,'terms','none',NULL,NULL),
 (4,'category','Category','category',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexCategory','exclusive',1,0,1,'catalog/category/_filter_categories','none','none',NULL,NULL),
-(6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',0,0,2,NULL,'none','none',NULL,NULL),
-(7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,0,3,NULL,'none','none',NULL,NULL),
-(8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,0,4,NULL,'none','none',NULL,NULL),(9,'price','Price','decimal',0,NULL,'field','none',NULL,0,0,NULL,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
+(6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,2,NULL,'none','none',NULL,NULL),
+(7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,3,NULL,'none','none',NULL,NULL),
+(8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,1,0,4,NULL,'none','none',NULL,NULL),
+(9,'price','Price','decimal',0,NULL,'field','none',NULL,0,0,NULL,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
         ");
     }
     

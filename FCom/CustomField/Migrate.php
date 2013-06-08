@@ -2,16 +2,7 @@
 
 class FCom_CustomField_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run("
@@ -85,7 +76,7 @@ class FCom_CustomField_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tField = FCom_CustomField_Model_Field::table();
         $fieldName = 'frontend_show';
@@ -95,21 +86,27 @@ class FCom_CustomField_Migrate extends BClass
         BDb::run( " ALTER TABLE {$tField} ADD {$fieldName} tinyint(1) not null default 1; ");
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run( " ALTER TABLE {$tField} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 
-    public function upgrade_0_1_3()
+    public function upgrade__0_1_2__0_1_3()
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run( " ALTER TABLE {$tField} ADD `facet_select` enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'");
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run( " ALTER TABLE {$tField} ADD `system` tinyint(1) NOT NULL DEFAULT '0'");
+    }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        $tProdField = FCom_CustomField_Model_ProductField::table();
+        BDb::run("ALTER TABLE {$tProdField} ADD `_data_serialized` text null AFTER _hide_field_ids");
     }
 }

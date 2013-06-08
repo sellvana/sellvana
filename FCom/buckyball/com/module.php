@@ -865,9 +865,6 @@ class BModule extends BClass
 
     protected function _processOverrides()
     {
-        if (empty($this->override)) {
-            return;
-        }
         if (!empty($this->override['class'])) {
             $hlp = BClassRegistry::i();
             foreach ($this->override['class'] as $o) {
@@ -1017,6 +1014,7 @@ class BModule extends BClass
             return $this;
         }
         $this->_prepareModuleEnvData();
+        $this->_processOverrides();
 
         if (empty($this->before_bootstrap)) {
             return $this;

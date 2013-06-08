@@ -228,7 +228,7 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
         if (!empty($cfg['custom']['dblClickHref'])) {
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { location.href = '{$cfg['custom']['dblClickHref']}'+rowid; }";
         } elseif (!empty($cfg['navGrid']['edit'])) {
-            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { $(this).jqGrid('editGridRow', rowid); }";
+            $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { $(this).jqGrid('editGridRow', rowid); e.stopPropagation(); }";
         }
         if (!empty($cfg['custom']['autoresize'])) {
             if ($cfg['custom']['autoresize']===true) {

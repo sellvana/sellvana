@@ -4,6 +4,22 @@ class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Controller
 {
     //protected $_permission = 'catalog/products/import';
 
+    public function getImportFilesGridConfig()
+    {
+        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array(
+            'id' => 'import_files',
+            'folder' => 'storage/import/products',
+            'config' => array(
+                'grid' => array(
+                    'multiselect'=>false,
+                    'autowidth'=>false,
+                    'width'=>600,
+                    'height'=>300,
+                ),
+            ),
+        ));
+    }
+
     public function action_index()
     {
         $this->layout('/catalog/products/import');

@@ -22,6 +22,6 @@ modules:
                 routing:
                     - [ get, /promo/media, FCom_Promo_Frontend_Controller.media ]
                 observe:
-                    - [ FCom_Sales_Model_Cart::calcTotals, FCom_Promo_Frontend::onPromoCartValidate ];
-                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ];
+                    - [ FCom_Sales_Model_Cart::calcTotals, FCom_Promo_Frontend::onPromoCartValidate ]
+                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ]
                     - [ BLayout::hook.promotions, FCom_Promo_Frontend_Controller.hook_promotions ]

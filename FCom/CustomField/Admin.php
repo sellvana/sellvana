@@ -26,7 +26,7 @@ class FCom_CustomField_Admin extends BClass
             if ($f->admin_input_type=='select') {
                 $col['options'] = FCom_CustomField_Model_FieldOption::i()->orm()
                     ->where('field_id', $f->id)
-                    ->find_many_assoc('id', 'label');
+                    ->find_many_assoc(stripos($f->table_field_type, 'varchar')===0 ? 'label' : 'id', 'label');
             }
             $args['columns'][$f->field_code] = $col;
         }

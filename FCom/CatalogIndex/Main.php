@@ -6,11 +6,6 @@ class FCom_CatalogIndex_Main extends BClass
     protected static $_indexData;
     protected static $_filterValues;
     protected static $_maxChunkSize = 1000;
-
-    static public function bootstrap()
-    {
-        static::parseUrl();
-    }
     
     static public function parseUrl()
     {
@@ -270,6 +265,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
      */
     static public function searchProducts($search=null, $filters=null, $sort=null, $options=array())
     {
+        static::parseUrl();
+        
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', array('d.id','=','p.id'), 'd');
@@ -341,7 +338,6 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $filterFields[$fName]['value_ids'][$vId] = $vId;
             $filterValueIdsByVal[$v['field_id']][$v['val']] = $vId;
         }
-
 
         // apply facet filters
         $facetFilters = array();
@@ -444,6 +440,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
             }
         }
+
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
             FCom_CustomField_Main::i()->disable(true);
         }
@@ -521,6 +518,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
             }
         }
+
         if (BModuleRegistry::isLoaded('FCom_CustomField')) {
             FCom_CustomField_Main::i()->disable(false);
         }
