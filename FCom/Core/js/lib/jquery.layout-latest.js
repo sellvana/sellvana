@@ -11,7 +11,7 @@
  * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
  *
  * SEE: http://layout.jquery-dev.net/LICENSE.txt
- *
+ * 
  * Changelog: http://layout.jquery-dev.net/changelog.cfm#1.3.0.rc30.79
  *
  * Docs: http://layout.jquery-dev.net/documentation.html
@@ -23,11 +23,11 @@
  * {!Object}    non-nullable type (never NULL)
  * {?string}    nullable type (sometimes NULL) - default for {Object}
  * {number=}    optional parameter
- * {*}            ALL types
+ * {*}          ALL types
  */
-/*    TODO for jQ 2.0
- *    change .andSelf() to .addBack()
- *    $.fn.disableSelection won't work
+/*  TODO for jQ 2.0 
+ *  change .andSelf() to .addBack()
+ *  $.fn.disableSelection won't work
  */
 
 // NOTE: For best readability, view with a fixed-width font and tabs equal to 4-chars
@@ -35,17 +35,17 @@
 ;(function ($) {
 
 // alias Math methods - used a lot!
-var    min        = Math.min
-,    max        = Math.max
-,    round    = Math.floor
+var min     = Math.min
+,   max     = Math.max
+,   round   = Math.floor
 
-,    isStr    =  function (v) { return $.type(v) === "string"; }
+,   isStr   =  function (v) { return $.type(v) === "string"; }
 
     /**
-    * @param {!Object}            Instance
-    * @param {Array.<string>}    a_fn
+    * @param {!Object}          Instance
+    * @param {Array.<string>}   a_fn
     */
-,    runPluginCallbacks = function (Instance, a_fn) {
+,   runPluginCallbacks = function (Instance, a_fn) {
         if ($.isArray(a_fn))
             for (var i=0, c=a_fn.length; i<c; i++) {
                 var fn = a_fn[i];
@@ -61,199 +61,199 @@ var    min        = Math.min
 ;
 
 /*
- *    GENERIC $.layout METHODS - used by all layouts
+ *  GENERIC $.layout METHODS - used by all layouts
  */
 $.layout = {
 
     version:    "1.3.rc30.79"
-,    revision:    0.033007 // 1.3.0 final = 1.0300 - major(n+).minor(nn)+patch(nn+)
+,   revision:   0.033007 // 1.3.0 final = 1.0300 - major(n+).minor(nn)+patch(nn+)
 
     // $.layout.browser REPLACES $.browser
-,    browser:    {} // set below
+,   browser:    {} // set below
 
-    // *PREDEFINED* EFFECTS & DEFAULTS
+    // *PREDEFINED* EFFECTS & DEFAULTS 
     // MUST list effect here - OR MUST set an fxSettings option (can be an empty hash: {})
-,    effects: {
+,   effects: {
 
-    //    Pane Open/Close Animations
+    //  Pane Open/Close Animations
         slide: {
-            all:    { duration:  "fast"    } // eg: duration: 1000, easing: "easeOutBounce"
-        ,    north:    { direction: "up"    }
-        ,    south:    { direction: "down"    }
-        ,    east:    { direction: "right"}
-        ,    west:    { direction: "left"    }
+            all:    { duration:  "fast" } // eg: duration: 1000, easing: "easeOutBounce"
+        ,   north:  { direction: "up"   }
+        ,   south:  { direction: "down" }
+        ,   east:   { direction: "right"}
+        ,   west:   { direction: "left" }
         }
-    ,    drop: {
-            all:    { duration:  "slow"    }
-        ,    north:    { direction: "up"    }
-        ,    south:    { direction: "down"    }
-        ,    east:    { direction: "right"}
-        ,    west:    { direction: "left"    }
+    ,   drop: {
+            all:    { duration:  "slow" }
+        ,   north:  { direction: "up"   }
+        ,   south:  { direction: "down" }
+        ,   east:   { direction: "right"}
+        ,   west:   { direction: "left" }
         }
-    ,    scale: {
-            all:    { duration:    "fast"    }
+    ,   scale: {
+            all:    { duration: "fast"  }
         }
-    //    these are not recommended, but can be used
-    ,    blind:        {}
-    ,    clip:        {}
-    ,    explode:    {}
-    ,    fade:        {}
-    ,    fold:        {}
-    ,    puff:        {}
+    //  these are not recommended, but can be used
+    ,   blind:      {}
+    ,   clip:       {}
+    ,   explode:    {}
+    ,   fade:       {}
+    ,   fold:       {}
+    ,   puff:       {}
 
-    //    Pane Resize Animations
-    ,    size: {
-            all:    { easing:    "swing"    }
+    //  Pane Resize Animations
+    ,   size: {
+            all:    { easing:   "swing" }
         }
     }
 
     // INTERNAL CONFIG DATA - DO NOT CHANGE THIS!
-,    config: {
-        optionRootKeys:    "effects,panes,north,south,west,east,center".split(",")
-    ,    allPanes:        "north,south,west,east,center".split(",")
-    ,    borderPanes:    "north,south,west,east".split(",")
-    ,    oppositeEdge: {
-            north:    "south"
-        ,    south:    "north"
-        ,    east:     "west"
-        ,    west:     "east"
+,   config: {
+        optionRootKeys: "effects,panes,north,south,west,east,center".split(",")
+    ,   allPanes:       "north,south,west,east,center".split(",")
+    ,   borderPanes:    "north,south,west,east".split(",")
+    ,   oppositeEdge: {
+            north:  "south"
+        ,   south:  "north"
+        ,   east:   "west"
+        ,   west:   "east"
         }
-    //    offscreen data
-    ,    offscreenCSS:    { left: "-99999px", right: "auto" } // used by hide/close if useOffscreenClose=true
-    ,    offscreenReset:    "offscreenReset" // key used for data
-    //    CSS used in multiple places
-    ,    hidden:        { visibility: "hidden" }
-    ,    visible:    { visibility: "visible" }
-    //    layout element settings
-    ,    resizers: {
+    //  offscreen data
+    ,   offscreenCSS:   { left: "-99999px", right: "auto" } // used by hide/close if useOffscreenClose=true
+    ,   offscreenReset: "offscreenReset" // key used for data
+    //  CSS used in multiple places
+    ,   hidden:     { visibility: "hidden" }
+    ,   visible:    { visibility: "visible" }
+    //  layout element settings
+    ,   resizers: {
             cssReq: {
-                position:     "absolute"
-            ,    padding:     0
-            ,    margin:     0
-            ,    fontSize:    "1px"
-            ,    textAlign:    "left"    // to counter-act "center" alignment!
-            ,    overflow:     "hidden" // prevent toggler-button from overflowing
-            //    SEE $.layout.defaults.zIndexes.resizer_normal
+                position:   "absolute"
+            ,   padding:    0
+            ,   margin:     0
+            ,   fontSize:   "1px"
+            ,   textAlign:  "left"  // to counter-act "center" alignment!
+            ,   overflow:   "hidden" // prevent toggler-button from overflowing
+            //  SEE $.layout.defaults.zIndexes.resizer_normal
             }
-        ,    cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
+        ,   cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
                 background: "#DDD"
-            ,    border:        "none"
+            ,   border:     "none"
             }
         }
-    ,    togglers: {
+    ,   togglers: {
             cssReq: {
-                position:     "absolute"
-            ,    display:     "block"
-            ,    padding:     0
-            ,    margin:     0
-            ,    overflow:    "hidden"
-            ,    textAlign:    "center"
-            ,    fontSize:    "1px"
-            ,    cursor:     "pointer"
-            ,    zIndex:     1
+                position:   "absolute"
+            ,   display:    "block"
+            ,   padding:    0
+            ,   margin:     0
+            ,   overflow:   "hidden"
+            ,   textAlign:  "center"
+            ,   fontSize:   "1px"
+            ,   cursor:     "pointer"
+            ,   zIndex:     1
             }
-        ,    cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
+        ,   cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
                 background: "#AAA"
             }
         }
-    ,    content: {
+    ,   content: {
             cssReq: {
-                position:    "relative" /* contain floated or positioned elements */
+                position:   "relative" /* contain floated or positioned elements */
             }
-        ,    cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
-                overflow:    "auto"
-            ,    padding:    "10px"
+        ,   cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
+                overflow:   "auto"
+            ,   padding:    "10px"
             }
-        ,    cssDemoPane: { // DEMO CSS - REMOVE scrolling from 'pane' when it has a content-div
-                overflow:    "hidden"
-            ,    padding:    0
+        ,   cssDemoPane: { // DEMO CSS - REMOVE scrolling from 'pane' when it has a content-div
+                overflow:   "hidden"
+            ,   padding:    0
             }
         }
-    ,    panes: { // defaults for ALL panes - overridden by 'per-pane settings' below
+    ,   panes: { // defaults for ALL panes - overridden by 'per-pane settings' below
             cssReq: {
-                position:     "absolute"
-            ,    margin:        0
-            //    $.layout.defaults.zIndexes.pane_normal
+                position:   "absolute"
+            ,   margin:     0
+            //  $.layout.defaults.zIndexes.pane_normal
             }
-        ,    cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
+        ,   cssDemo: { // DEMO CSS - applied if: options.PANE.applyDemoStyles=true
                 padding:    "10px"
-            ,    background:    "#FFF"
-            ,    border:        "1px solid #BBB"
-            ,    overflow:    "auto"
+            ,   background: "#FFF"
+            ,   border:     "1px solid #BBB"
+            ,   overflow:   "auto"
             }
         }
-    ,    north: {
-            side:            "top"
-        ,    sizeType:        "Height"
-        ,    dir:            "horz"
-        ,    cssReq: {
-                top:         0
-            ,    bottom:     "auto"
-            ,    left:         0
-            ,    right:         0
-            ,    width:         "auto"
-            //    height:     DYNAMIC
+    ,   north: {
+            side:           "top"
+        ,   sizeType:       "Height"
+        ,   dir:            "horz"
+        ,   cssReq: {
+                top:        0
+            ,   bottom:     "auto"
+            ,   left:       0
+            ,   right:      0
+            ,   width:      "auto"
+            //  height:     DYNAMIC
             }
         }
-    ,    south: {
-            side:            "bottom"
-        ,    sizeType:        "Height"
-        ,    dir:            "horz"
-        ,    cssReq: {
-                top:         "auto"
-            ,    bottom:     0
-            ,    left:         0
-            ,    right:         0
-            ,    width:         "auto"
-            //    height:     DYNAMIC
+    ,   south: {
+            side:           "bottom"
+        ,   sizeType:       "Height"
+        ,   dir:            "horz"
+        ,   cssReq: {
+                top:        "auto"
+            ,   bottom:     0
+            ,   left:       0
+            ,   right:      0
+            ,   width:      "auto"
+            //  height:     DYNAMIC
             }
         }
-    ,    east: {
-            side:            "right"
-        ,    sizeType:        "Width"
-        ,    dir:            "vert"
-        ,    cssReq: {
-                left:         "auto"
-            ,    right:         0
-            ,    top:         "auto" // DYNAMIC
-            ,    bottom:     "auto" // DYNAMIC
-            ,    height:     "auto"
-            //    width:         DYNAMIC
+    ,   east: {
+            side:           "right"
+        ,   sizeType:       "Width"
+        ,   dir:            "vert"
+        ,   cssReq: {
+                left:       "auto"
+            ,   right:      0
+            ,   top:        "auto" // DYNAMIC
+            ,   bottom:     "auto" // DYNAMIC
+            ,   height:     "auto"
+            //  width:      DYNAMIC
             }
         }
-    ,    west: {
-            side:            "left"
-        ,    sizeType:        "Width"
-        ,    dir:            "vert"
-        ,    cssReq: {
-                left:         0
-            ,    right:         "auto"
-            ,    top:         "auto" // DYNAMIC
-            ,    bottom:     "auto" // DYNAMIC
-            ,    height:     "auto"
-            //    width:         DYNAMIC
+    ,   west: {
+            side:           "left"
+        ,   sizeType:       "Width"
+        ,   dir:            "vert"
+        ,   cssReq: {
+                left:       0
+            ,   right:      "auto"
+            ,   top:        "auto" // DYNAMIC
+            ,   bottom:     "auto" // DYNAMIC
+            ,   height:     "auto"
+            //  width:      DYNAMIC
             }
         }
-    ,    center: {
+    ,   center: {
             dir:            "center"
-        ,    cssReq: {
-                left:         "auto" // DYNAMIC
-            ,    right:         "auto" // DYNAMIC
-            ,    top:         "auto" // DYNAMIC
-            ,    bottom:     "auto" // DYNAMIC
-            ,    height:     "auto"
-            ,    width:         "auto"
+        ,   cssReq: {
+                left:       "auto" // DYNAMIC
+            ,   right:      "auto" // DYNAMIC
+            ,   top:        "auto" // DYNAMIC
+            ,   bottom:     "auto" // DYNAMIC
+            ,   height:     "auto"
+            ,   width:      "auto"
             }
         }
     }
 
     // CALLBACK FUNCTION NAMESPACE - used to store reusable callback functions
-,    callbacks: {}
+,   callbacks: {}
 
-,    getParentPaneElem: function (el) {
+,   getParentPaneElem: function (el) {
         // must pass either a container or pane element
         var $el = $(el)
-        ,    layout = $el.data("layout") || $el.data("parentLayout");
+        ,   layout = $el.data("layout") || $el.data("parentLayout");
         if (layout) {
             var $cont = layout.container;
             // see if this container is directly-nested inside an outer-pane
@@ -265,24 +265,24 @@ $.layout = {
         return null;
     }
 
-,    getParentPaneInstance: function (el) {
+,   getParentPaneInstance: function (el) {
         // must pass either a container or pane element
         var $pane = $.layout.getParentPaneElem(el);
         return $pane ? $pane.data("layoutPane") : null;
     }
 
-,    getParentLayoutInstance: function (el) {
+,   getParentLayoutInstance: function (el) {
         // must pass either a container or pane element
         var $pane = $.layout.getParentPaneElem(el);
         return $pane ? $pane.data("parentLayout") : null;
     }
 
-,    getEventObject: function (evt) {
+,   getEventObject: function (evt) {
         return typeof evt === "object" && evt.stopPropagation ? evt : null;
     }
-,    parsePaneName: function (evt_or_pane) {
+,   parsePaneName: function (evt_or_pane) {
         var evt = $.layout.getEventObject( evt_or_pane )
-        ,    pane = evt_or_pane;
+        ,   pane = evt_or_pane;
         if (evt) {
             // ALWAYS stop propagation of events triggered in Layout!
             evt.stopPropagation();
@@ -298,36 +298,36 @@ $.layout = {
 
     // LAYOUT-PLUGIN REGISTRATION
     // more plugins can added beyond this default list
-,    plugins: {
-        draggable:        !!$.fn.draggable // resizing
-    ,    effects: {
-            core:        !!$.effects        // animimations (specific effects tested by initOptions)
-        ,    slide:        $.effects && ($.effects.slide || ($.effects.effect && $.effects.effect.slide)) // default effect
+,   plugins: {
+        draggable:      !!$.fn.draggable // resizing
+    ,   effects: {
+            core:       !!$.effects     // animimations (specific effects tested by initOptions)
+        ,   slide:      $.effects && ($.effects.slide || ($.effects.effect && $.effects.effect.slide)) // default effect
         }
     }
 
-//    arrays of plugin or other methods to be triggered for events in *each layout* - will be passed 'Instance'
-,    onCreate:    []    // runs when layout is just starting to be created - right after options are set
-,    onLoad:        []    // runs after layout container and global events init, but before initPanes is called
-,    onReady:    []    // runs after initialization *completes* - ie, after initPanes completes successfully
-,    onDestroy:    []    // runs after layout is destroyed
-,    onUnload:    []    // runs after layout is destroyed OR when page unloads
-,    afterOpen:    []    // runs after setAsOpen() completes
-,    afterClose:    []    // runs after setAsClosed() completes
+//  arrays of plugin or other methods to be triggered for events in *each layout* - will be passed 'Instance'
+,   onCreate:   []  // runs when layout is just starting to be created - right after options are set
+,   onLoad:     []  // runs after layout container and global events init, but before initPanes is called
+,   onReady:    []  // runs after initialization *completes* - ie, after initPanes completes successfully
+,   onDestroy:  []  // runs after layout is destroyed
+,   onUnload:   []  // runs after layout is destroyed OR when page unloads
+,   afterOpen:  []  // runs after setAsOpen() completes
+,   afterClose: []  // runs after setAsClosed() completes
 
     /*
-    *    GENERIC UTILITY METHODS
+    *   GENERIC UTILITY METHODS
     */
 
     // calculate and return the scrollbar width, as an integer
-,    scrollbarWidth:        function () { return window.scrollbarWidth  || $.layout.getScrollbarSize('width'); }
-,    scrollbarHeight:    function () { return window.scrollbarHeight || $.layout.getScrollbarSize('height'); }
-,    getScrollbarSize:    function (dim) {
-        var $c    = $('<div style="position: absolute; top: -10000px; left: -10000px; width: 100px; height: 100px; overflow: scroll;"></div>').appendTo("body");
-        var d    = { width: $c.css("width") - $c[0].clientWidth, height: $c.height() - $c[0].clientHeight };
+,   scrollbarWidth:     function () { return window.scrollbarWidth  || $.layout.getScrollbarSize('width'); }
+,   scrollbarHeight:    function () { return window.scrollbarHeight || $.layout.getScrollbarSize('height'); }
+,   getScrollbarSize:   function (dim) {
+        var $c  = $('<div style="position: absolute; top: -10000px; left: -10000px; width: 100px; height: 100px; overflow: scroll;"></div>').appendTo("body");
+        var d   = { width: $c.css("width") - $c[0].clientWidth, height: $c.height() - $c[0].clientHeight };
         $c.remove();
-        window.scrollbarWidth    = d.width;
-        window.scrollbarHeight    = d.height;
+        window.scrollbarWidth   = d.width;
+        window.scrollbarHeight  = d.height;
         return dim.match(/^(width|height)$/) ? d[dim] : d;
     }
 
@@ -335,16 +335,16 @@ $.layout = {
     /**
     * Returns hash container 'display' and 'visibility'
     *
-    * @see    $.swap() - swaps CSS, runs callback, resets CSS
-    * @param  {!Object}        $E                jQuery element
-    * @param  {boolean=}    [force=false]    Run even if display != none
-    * @return {!Object}                        Returns current style props, if applicable
+    * @see  $.swap() - swaps CSS, runs callback, resets CSS
+    * @param  {!Object}     $E              jQuery element
+    * @param  {boolean=}    [force=false]   Run even if display != none
+    * @return {!Object}                     Returns current style props, if applicable
     */
-,    showInvisibly: function ($E, force) {
+,   showInvisibly: function ($E, force) {
         if ($E && $E.length && (force || $E.css("display") === "none")) { // only if not *already hidden*
             var s = $E[0].style
                 // save ONLY the 'style' props because that is what we must restore
-            ,    CSS = { display: s.display || '', visibility: s.visibility || '' };
+            ,   CSS = { display: s.display || '', visibility: s.visibility || '' };
             // show element 'invisibly' so can be measured
             $E.css({ display: "block", visibility: "hidden" });
             return CSS;
@@ -358,15 +358,15 @@ $.layout = {
     * @see  _create(), onWindowResize() for container, plus others for pane
     * @return JSON  Returns a hash of all dimensions: top, bottom, left, right, outerWidth, innerHeight, etc
     */
-,    getElementDimensions: function ($E, inset) {
+,   getElementDimensions: function ($E, inset) {
         var
-        //    dimensions hash - start with current data IF passed
-            d    = { css: {}, inset: {} }
-        ,    x    = d.css            // CSS hash
-        ,    i    = { bottom: 0 }    // TEMP insets (bottom = complier hack)
-        ,    N    = $.layout.cssNum
-        ,    off = $E.offset()
-        ,    b, p, ei            // TEMP border, padding
+        //  dimensions hash - start with current data IF passed
+            d   = { css: {}, inset: {} }
+        ,   x   = d.css         // CSS hash
+        ,   i   = { bottom: 0 } // TEMP insets (bottom = complier hack)
+        ,   N   = $.layout.cssNum
+        ,   off = $E.offset()
+        ,   b, p, ei            // TEMP border, padding
         ;
         d.offsetLeft = off.left;
         d.offsetTop  = off.top;
@@ -381,38 +381,38 @@ $.layout = {
             i[ei] = d.inset[ei] + b; // total offset of content from outer side
         });
 
-        x.width        = $E.width();
+        x.width     = $E.width();
         x.height    = $E.height();
-        x.top        = N($E,"top",true);
+        x.top       = N($E,"top",true);
         x.bottom    = N($E,"bottom",true);
-        x.left        = N($E,"left",true);
-        x.right        = N($E,"right",true);
+        x.left      = N($E,"left",true);
+        x.right     = N($E,"right",true);
 
         d.outerWidth    = $E.outerWidth();
-        d.outerHeight    = $E.outerHeight();
+        d.outerHeight   = $E.outerHeight();
         // calc the TRUE inner-dimensions, even in quirks-mode!
         d.innerWidth    = max(0, d.outerWidth  - i.left - i.right);
-        d.innerHeight    = max(0, d.outerHeight - i.top  - i.bottom);
+        d.innerHeight   = max(0, d.outerHeight - i.top  - i.bottom);
         // layoutWidth/Height is used in calcs for manual resizing
         // layoutW/H only differs from innerW/H when in quirks-mode - then is like outerW/H
-        d.layoutWidth    = $E.innerWidth();
-        d.layoutHeight    = $E.innerHeight();
+        d.layoutWidth   = $E.innerWidth();
+        d.layoutHeight  = $E.innerHeight();
 
         //if ($E.prop('tagName') === 'BODY') { debugData( d, $E.prop('tagName') ); } // DEBUG
 
-        //d.visible    = $E.is(":visible");// && x.width > 0 && x.height > 0;
+        //d.visible = $E.is(":visible");// && x.width > 0 && x.height > 0;
 
         return d;
     }
 
-,    getElementStyles: function ($E, list) {
+,   getElementStyles: function ($E, list) {
         var
-            CSS    = {}
-        ,    style    = $E[0].style
-        ,    props    = list.split(",")
-        ,    sides    = "Top,Bottom,Left,Right".split(",")
-        ,    attrs    = "Color,Style,Width".split(",")
-        ,    p, s, a, i, j, k
+            CSS = {}
+        ,   style   = $E[0].style
+        ,   props   = list.split(",")
+        ,   sides   = "Top,Bottom,Left,Right".split(",")
+        ,   attrs   = "Color,Style,Width".split(",")
+        ,   p, s, a, i, j, k
         ;
         for (i=0; i < props.length; i++) {
             p = props[i];
@@ -437,18 +437,18 @@ $.layout = {
     * Return the innerWidth for the current browser/doctype
     *
     * @see  initPanes(), sizeMidPanes(), initHandles(), sizeHandles()
-    * @param  {Array.<Object>}    $E  Must pass a jQuery object - first element is processed
-    * @param  {number=}            outerWidth (optional) Can pass a width, allowing calculations BEFORE element is resized
-    * @return {number}            Returns the innerWidth of the elem by subtracting padding and borders
+    * @param  {Array.<Object>}  $E  Must pass a jQuery object - first element is processed
+    * @param  {number=}         outerWidth (optional) Can pass a width, allowing calculations BEFORE element is resized
+    * @return {number}          Returns the innerWidth of the elem by subtracting padding and borders
     */
-,    cssWidth: function ($E, outerWidth) {
+,   cssWidth: function ($E, outerWidth) {
         // a 'calculated' outerHeight can be passed so borders and/or padding are removed if needed
         if (outerWidth <= 0) return 0;
 
-        var bs    = !$.layout.browser.boxModel ? "border-box" : $.support.boxSizing ? $E.css("boxSizing") : "content-box"
-        ,    b    = $.layout.borderWidth
-        ,    n    = $.layout.cssNum
-        ,    W    = outerWidth
+        var bs  = !$.layout.browser.boxModel ? "border-box" : $.support.boxSizing ? $E.css("boxSizing") : "content-box"
+        ,   b   = $.layout.borderWidth
+        ,   n   = $.layout.cssNum
+        ,   W   = outerWidth
         ;
         // strip border and/or padding from outerWidth to get CSS Width
         if (bs !== "border-box")
@@ -462,18 +462,18 @@ $.layout = {
     * Return the innerHeight for the current browser/doctype
     *
     * @see  initPanes(), sizeMidPanes(), initHandles(), sizeHandles()
-    * @param  {Array.<Object>}    $E  Must pass a jQuery object - first element is processed
-    * @param  {number=}            outerHeight  (optional) Can pass a width, allowing calculations BEFORE element is resized
-    * @return {number}            Returns the innerHeight of the elem by subtracting padding and borders
+    * @param  {Array.<Object>}  $E  Must pass a jQuery object - first element is processed
+    * @param  {number=}         outerHeight  (optional) Can pass a width, allowing calculations BEFORE element is resized
+    * @return {number}          Returns the innerHeight of the elem by subtracting padding and borders
     */
-,    cssHeight: function ($E, outerHeight) {
+,   cssHeight: function ($E, outerHeight) {
         // a 'calculated' outerHeight can be passed so borders and/or padding are removed if needed
         if (outerHeight <= 0) return 0;
 
-        var bs    = !$.layout.browser.boxModel ? "border-box" : $.support.boxSizing ? $E.css("boxSizing") : "content-box"
-        ,    b    = $.layout.borderWidth
-        ,    n    = $.layout.cssNum
-        ,    H    = outerHeight
+        var bs  = !$.layout.browser.boxModel ? "border-box" : $.support.boxSizing ? $E.css("boxSizing") : "content-box"
+        ,   b   = $.layout.borderWidth
+        ,   n   = $.layout.cssNum
+        ,   H   = outerHeight
         ;
         // strip border and/or padding from outerHeight to get CSS Height
         if (bs !== "border-box")
@@ -487,21 +487,21 @@ $.layout = {
     * Returns the 'current CSS numeric value' for a CSS property - 0 if property does not exist
     *
     * @see  Called by many methods
-    * @param {Array.<Object>}    $E                    Must pass a jQuery object - first element is processed
-    * @param {string}            prop                The name of the CSS property, eg: top, width, etc.
-    * @param {boolean=}            [allowAuto=false]    true = return 'auto' if that is value; false = return 0
-    * @return {(string|number)}                        Usually used to get an integer value for position (top, left) or size (height, width)
+    * @param {Array.<Object>}   $E                  Must pass a jQuery object - first element is processed
+    * @param {string}           prop                The name of the CSS property, eg: top, width, etc.
+    * @param {boolean=}         [allowAuto=false]   true = return 'auto' if that is value; false = return 0
+    * @return {(string|number)}                     Usually used to get an integer value for position (top, left) or size (height, width)
     */
-,    cssNum: function ($E, prop, allowAuto) {
+,   cssNum: function ($E, prop, allowAuto) {
         if (!$E.jquery) $E = $($E);
         var CSS = $.layout.showInvisibly($E)
-        ,    p    = $.css($E[0], prop, true)
-        ,    v    = allowAuto && p=="auto" ? p : Math.round(parseFloat(p) || 0);
+        ,   p   = $.css($E[0], prop, true)
+        ,   v   = allowAuto && p=="auto" ? p : Math.round(parseFloat(p) || 0);
         $E.css( CSS ); // RESET
         return v;
     }
 
-,    borderWidth: function (el, side) {
+,   borderWidth: function (el, side) {
         if (el.jquery) el = el[0];
         var b = "border"+ side.substr(0,1).toUpperCase() + side.substr(1); // left => Left
         return $.css(el, b+"Style", true) === "none" ? 0 : Math.round(parseFloat($.css(el, b+"Width", true)) || 0);
@@ -511,13 +511,13 @@ $.layout = {
     * Mouse-tracking utility - FUTURE REFERENCE
     *
     * init: if (!window.mouse) {
-    *            window.mouse = { x: 0, y: 0 };
-    *            $(document).mousemove( $.layout.trackMouse );
-    *        }
+    *           window.mouse = { x: 0, y: 0 };
+    *           $(document).mousemove( $.layout.trackMouse );
+    *       }
     *
-    * @param {Object}        evt
+    * @param {Object}       evt
     *
-,    trackMouse: function (evt) {
+,   trackMouse: function (evt) {
         window.mouse = { x: evt.clientX, y: evt.clientY };
     }
     */
@@ -525,19 +525,19 @@ $.layout = {
     /**
     * SUBROUTINE for preventPrematureSlideClose option
     *
-    * @param {Object}        evt
-    * @param {Object=}        el
+    * @param {Object}       evt
+    * @param {Object=}      el
     */
-,    isMouseOverElem: function (evt, el) {
+,   isMouseOverElem: function (evt, el) {
         var
-            $E    = $(el || this)
-        ,    d    = $E.offset()
-        ,    T    = d.top
-        ,    L    = d.left
-        ,    R    = L + $E.outerWidth()
-        ,    B    = T + $E.outerHeight()
-        ,    x    = evt.pageX    // evt.clientX ?
-        ,    y    = evt.pageY    // evt.clientY ?
+            $E  = $(el || this)
+        ,   d   = $E.offset()
+        ,   T   = d.top
+        ,   L   = d.left
+        ,   R   = L + $E.outerWidth()
+        ,   B   = T + $E.outerHeight()
+        ,   x   = evt.pageX // evt.clientX ?
+        ,   y   = evt.pageY // evt.clientY ?
         ;
         // if X & Y are < 0, probably means is over an open SELECT
         return ($.layout.browser.msie && x < 0 && y < 0) || ((x >= L && x <= R) && (y >= T && y <= B));
@@ -546,29 +546,29 @@ $.layout = {
     /**
     * Message/Logging Utility
     *
-    * @example $.layout.msg("My message");                // log text
+    * @example $.layout.msg("My message");              // log text
     * @example $.layout.msg("My message", true);        // alert text
-    * @example $.layout.msg({ foo: "bar" }, "Title");    // log hash-data, with custom title
+    * @example $.layout.msg({ foo: "bar" }, "Title");   // log hash-data, with custom title
     * @example $.layout.msg({ foo: "bar" }, true, "Title", { sort: false }); -OR-
     * @example $.layout.msg({ foo: "bar" }, "Title", { sort: false, display: true }); // alert hash-data
     *
-    * @param {(Object|string)}            info            String message OR Hash/Array
-    * @param {(Boolean|string|Object)=}    [popup=false]    True means alert-box - can be skipped
-    * @param {(Object|string)=}            [debugTitle=""]    Title for Hash data - can be skipped
-    * @param {Object=}                    [debugOpts]        Extra options for debug output
+    * @param {(Object|string)}          info            String message OR Hash/Array
+    * @param {(Boolean|string|Object)=} [popup=false]   True means alert-box - can be skipped
+    * @param {(Object|string)=}         [debugTitle=""] Title for Hash data - can be skipped
+    * @param {Object=}                  [debugOpts]     Extra options for debug output
     */
-,    msg: function (info, popup, debugTitle, debugOpts) {
+,   msg: function (info, popup, debugTitle, debugOpts) {
         if ($.isPlainObject(info) && window.debugData) {
             if (typeof popup === "string") {
-                debugOpts    = debugTitle;
-                debugTitle    = popup;
+                debugOpts   = debugTitle;
+                debugTitle  = popup;
             }
             else if (typeof debugTitle === "object") {
-                debugOpts    = debugTitle;
-                debugTitle    = null;
+                debugOpts   = debugTitle;
+                debugTitle  = null;
             }
             var t = debugTitle || "log( <object> )"
-            ,    o = $.extend({ sort: false, returnHTML: false, display: false }, debugOpts);
+            ,   o = $.extend({ sort: false, returnHTML: false, display: false }, debugOpts);
             if (popup === true || o.display)
                 debugData( info, t, o );
             else if (window.console)
@@ -579,8 +579,8 @@ $.layout = {
         else if (window.console)
             console.log(info);
         else {
-            var id    = "#layoutLogger"
-            ,    $l = $(id);
+            var id  = "#layoutLogger"
+            ,   $l = $(id);
             if (!$l.length)
                 $l = createLog();
             $l.children("ul").append('<li style="padding: 4px 10px; margin: 0; border-top: 1px solid #CCC;">'+ info.replace(/\</g,"&lt;").replace(/\>/g,"&gt;") +'</li>');
@@ -588,10 +588,10 @@ $.layout = {
 
         function createLog () {
             var pos = $.support.fixedPosition ? 'fixed' : 'absolute'
-            ,    $e = $('<div id="layoutLogger" style="position: '+ pos +'; top: 5px; z-index: 999999; max-width: 25%; overflow: hidden; border: 1px solid #000; border-radius: 5px; background: #FBFBFB; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">'
-                +    '<div style="font-size: 13px; font-weight: bold; padding: 5px 10px; background: #F6F6F6; border-radius: 5px 5px 0 0; cursor: move;">'
-                +    '<span style="float: right; padding-left: 7px; cursor: pointer;" title="Remove Console" onclick="$(this).closest(\'#layoutLogger\').remove()">X</span>Layout console.log</div>'
-                +    '<ul style="font-size: 13px; font-weight: none; list-style: none; margin: 0; padding: 0 0 2px;"></ul>'
+            ,   $e = $('<div id="layoutLogger" style="position: '+ pos +'; top: 5px; z-index: 999999; max-width: 25%; overflow: hidden; border: 1px solid #000; border-radius: 5px; background: #FBFBFB; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">'
+                +   '<div style="font-size: 13px; font-weight: bold; padding: 5px 10px; background: #F6F6F6; border-radius: 5px 5px 0 0; cursor: move;">'
+                +   '<span style="float: right; padding-left: 7px; cursor: pointer;" title="Remove Console" onclick="$(this).closest(\'#layoutLogger\').remove()">X</span>Layout console.log</div>'
+                +   '<ul style="font-size: 13px; font-weight: none; list-style: none; margin: 0; padding: 0 0 2px;"></ul>'
                 + '</div>'
                 ).appendTo("body");
             $e.css('left', $(window).width() - $e.outerWidth() - 5)
@@ -604,247 +604,247 @@ $.layout = {
 
 
 /*
- *    $.layout.browser REPLACES removed $.browser, with extra data
- *    Parsing code here adapted from jQuery 1.8 $.browse
+ *  $.layout.browser REPLACES removed $.browser, with extra data
+ *  Parsing code here adapted from jQuery 1.8 $.browse
  */
 var u = navigator.userAgent.toLowerCase()
-,    m = /(chrome)[ \/]([\w.]+)/.exec( u )
-    ||    /(webkit)[ \/]([\w.]+)/.exec( u )
-    ||    /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( u )
-    ||    /(msie) ([\w.]+)/.exec( u )
-    ||    u.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( u )
-    ||    []
-,    b = m[1] || ""
-,    v = m[2] || 0
-,    ie = b === "msie"
+,   m = /(chrome)[ \/]([\w.]+)/.exec( u )
+    ||  /(webkit)[ \/]([\w.]+)/.exec( u )
+    ||  /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( u )
+    ||  /(msie) ([\w.]+)/.exec( u )
+    ||  u.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( u )
+    ||  []
+,   b = m[1] || ""
+,   v = m[2] || 0
+,   ie = b === "msie"
 ;
 $.layout.browser = {
     version:    v
-,    safari:        b === "webkit"    // webkit (NOT chrome) = safari
-,    webkit:        b === "chrome"    // chrome = webkit
-,    msie:        ie
-,    isIE6:        ie && v == 6
+,   safari:     b === "webkit"  // webkit (NOT chrome) = safari
+,   webkit:     b === "chrome"  // chrome = webkit
+,   msie:       ie
+,   isIE6:      ie && v == 6
     // ONLY IE reverts to old box-model - update for older jQ onReady
-,    boxModel:    !ie || $.support.boxModel !== false
+,   boxModel:   !ie || $.support.boxModel !== false
 };
 if (b) $.layout.browser[b] = true; // set CURRENT browser
-/*    OLD versions of jQuery only set $.support.boxModel after page is loaded
- *    so if this is IE, use support.boxModel to test for quirks-mode (ONLY IE changes boxModel) */
+/*  OLD versions of jQuery only set $.support.boxModel after page is loaded
+ *  so if this is IE, use support.boxModel to test for quirks-mode (ONLY IE changes boxModel) */
 if (ie) $(function(){ $.layout.browser.boxModel = $.support.boxModel; });
 
 
 // DEFAULT OPTIONS
 $.layout.defaults = {
 /*
- *    LAYOUT & LAYOUT-CONTAINER OPTIONS
- *    - none of these options are applicable to individual panes
+ *  LAYOUT & LAYOUT-CONTAINER OPTIONS
+ *  - none of these options are applicable to individual panes
  */
-    name:                        ""            // Not required, but useful for buttons and used for the state-cookie
-,    containerClass:                "ui-layout-container" // layout-container element
-,    inset:                        null        // custom container-inset values (override padding)
-,    scrollToBookmarkOnLoad:        true        // after creating a layout, scroll to bookmark in URL (.../page.htm#myBookmark)
-,    resizeWithWindow:            true        // bind thisLayout.resizeAll() to the window.resize event
-,    resizeWithWindowDelay:        200            // delay calling resizeAll because makes window resizing very jerky
-,    resizeWithWindowMaxDelay:    0            // 0 = none - force resize every XX ms while window is being resized
-,    maskPanesEarly:                false        // true = create pane-masks on resizer.mouseDown instead of waiting for resizer.dragstart
-,    onresizeall_start:            null        // CALLBACK when resizeAll() STARTS    - NOT pane-specific
-,    onresizeall_end:            null        // CALLBACK when resizeAll() ENDS    - NOT pane-specific
-,    onload_start:                null        // CALLBACK when Layout inits - after options initialized, but before elements
-,    onload_end:                    null        // CALLBACK when Layout inits - after EVERYTHING has been initialized
-,    onunload_start:                null        // CALLBACK when Layout is destroyed OR onWindowUnload
-,    onunload_end:                null        // CALLBACK when Layout is destroyed OR onWindowUnload
-,    initPanes:                    true        // false = DO NOT initialize the panes onLoad - will init later
-,    showErrorMessages:            true        // enables fatal error messages to warn developers of common errors
-,    showDebugMessages:            false        // display console-and-alert debug msgs - IF this Layout version _has_ debugging code!
-//    Changing this zIndex value will cause other zIndex values to automatically change
-,    zIndex:                        null        // the PANE zIndex - resizers and masks will be +1
-//    DO NOT CHANGE the zIndex values below unless you clearly understand their relationships
-,    zIndexes: {                                // set _default_ z-index values here...
-        pane_normal:            0            // normal z-index for panes
-    ,    content_mask:            1            // applied to overlays used to mask content INSIDE panes during resizing
-    ,    resizer_normal:            2            // normal z-index for resizer-bars
-    ,    pane_sliding:            100            // applied to *BOTH* the pane and its resizer when a pane is 'slid open'
-    ,    pane_animate:            1000        // applied to the pane when being animated - not applied to the resizer
-    ,    resizer_drag:            10000        // applied to the CLONED resizer-bar when being 'dragged'
+    name:                       ""          // Not required, but useful for buttons and used for the state-cookie
+,   containerClass:             "ui-layout-container" // layout-container element
+,   inset:                      null        // custom container-inset values (override padding)
+,   scrollToBookmarkOnLoad:     true        // after creating a layout, scroll to bookmark in URL (.../page.htm#myBookmark)
+,   resizeWithWindow:           true        // bind thisLayout.resizeAll() to the window.resize event
+,   resizeWithWindowDelay:      200         // delay calling resizeAll because makes window resizing very jerky
+,   resizeWithWindowMaxDelay:   0           // 0 = none - force resize every XX ms while window is being resized
+,   maskPanesEarly:             false       // true = create pane-masks on resizer.mouseDown instead of waiting for resizer.dragstart
+,   onresizeall_start:          null        // CALLBACK when resizeAll() STARTS - NOT pane-specific
+,   onresizeall_end:            null        // CALLBACK when resizeAll() ENDS   - NOT pane-specific
+,   onload_start:               null        // CALLBACK when Layout inits - after options initialized, but before elements
+,   onload_end:                 null        // CALLBACK when Layout inits - after EVERYTHING has been initialized
+,   onunload_start:             null        // CALLBACK when Layout is destroyed OR onWindowUnload
+,   onunload_end:               null        // CALLBACK when Layout is destroyed OR onWindowUnload
+,   initPanes:                  true        // false = DO NOT initialize the panes onLoad - will init later
+,   showErrorMessages:          true        // enables fatal error messages to warn developers of common errors
+,   showDebugMessages:          false       // display console-and-alert debug msgs - IF this Layout version _has_ debugging code!
+//  Changing this zIndex value will cause other zIndex values to automatically change
+,   zIndex:                     null        // the PANE zIndex - resizers and masks will be +1
+//  DO NOT CHANGE the zIndex values below unless you clearly understand their relationships
+,   zIndexes: {                             // set _default_ z-index values here...
+        pane_normal:            0           // normal z-index for panes
+    ,   content_mask:           1           // applied to overlays used to mask content INSIDE panes during resizing
+    ,   resizer_normal:         2           // normal z-index for resizer-bars
+    ,   pane_sliding:           100         // applied to *BOTH* the pane and its resizer when a pane is 'slid open'
+    ,   pane_animate:           1000        // applied to the pane when being animated - not applied to the resizer
+    ,   resizer_drag:           10000       // applied to the CLONED resizer-bar when being 'dragged'
     }
-,    errors: {
-        pane:                    "pane"        // description of "layout pane element" - used only in error messages
-    ,    selector:                "selector"    // description of "jQuery-selector" - used only in error messages
-    ,    addButtonError:            "Error Adding Button\nInvalid "
-    ,    containerMissing:        "UI Layout Initialization Error\nThe specified layout-container does not exist."
-    ,    centerPaneMissing:        "UI Layout Initialization Error\nThe center-pane element does not exist.\nThe center-pane is a required element."
-    ,    noContainerHeight:        "UI Layout Initialization Warning\nThe layout-container \"CONTAINER\" has no height.\nTherefore the layout is 0-height and hence 'invisible'!"
-    ,    callbackError:            "UI Layout Callback Error\nThe EVENT callback is not a valid function."
+,   errors: {
+        pane:                   "pane"      // description of "layout pane element" - used only in error messages
+    ,   selector:               "selector"  // description of "jQuery-selector" - used only in error messages
+    ,   addButtonError:         "Error Adding Button\nInvalid "
+    ,   containerMissing:       "UI Layout Initialization Error\nThe specified layout-container does not exist."
+    ,   centerPaneMissing:      "UI Layout Initialization Error\nThe center-pane element does not exist.\nThe center-pane is a required element."
+    ,   noContainerHeight:      "UI Layout Initialization Warning\nThe layout-container \"CONTAINER\" has no height.\nTherefore the layout is 0-height and hence 'invisible'!"
+    ,   callbackError:          "UI Layout Callback Error\nThe EVENT callback is not a valid function."
     }
 /*
- *    PANE DEFAULT SETTINGS
- *    - settings under the 'panes' key become the default settings for *all panes*
- *    - ALL pane-options can also be set specifically for each panes, which will override these 'default values'
+ *  PANE DEFAULT SETTINGS
+ *  - settings under the 'panes' key become the default settings for *all panes*
+ *  - ALL pane-options can also be set specifically for each panes, which will override these 'default values'
  */
-,    panes: { // default options for 'all panes' - will be overridden by 'per-pane settings'
-        applyDemoStyles:         false        // NOTE: renamed from applyDefaultStyles for clarity
-    ,    closable:                true        // pane can open & close
-    ,    resizable:                true        // when open, pane can be resized
-    ,    slidable:                true        // when closed, pane can 'slide open' over other panes - closes on mouse-out
-    ,    initClosed:                false        // true = init pane as 'closed'
-    ,    initHidden:             false         // true = init pane as 'hidden' - no resizer-bar/spacing
-    //    SELECTORS
-    //,    paneSelector:            ""            // MUST be pane-specific - jQuery selector for pane
-    ,    contentSelector:        ".ui-layout-content" // INNER div/element to auto-size so only it scrolls, not the entire pane!
-    ,    contentIgnoreSelector:    ".ui-layout-ignore"    // element(s) to 'ignore' when measuring 'content'
-    ,    findNestedContent:        false        // true = $P.find(contentSelector), false = $P.children(contentSelector)
-    //    GENERIC ROOT-CLASSES - for auto-generated classNames
-    ,    paneClass:                "ui-layout-pane"    // Layout Pane
-    ,    resizerClass:            "ui-layout-resizer"    // Resizer Bar
-    ,    togglerClass:            "ui-layout-toggler"    // Toggler Button
-    ,    buttonClass:            "ui-layout-button"    // CUSTOM Buttons    - eg: '[ui-layout-button]-toggle/-open/-close/-pin'
-    //    ELEMENT SIZE & SPACING
-    //,    size:                    100            // MUST be pane-specific -initial size of pane
-    ,    minSize:                0            // when manually resizing a pane
-    ,    maxSize:                0            // ditto, 0 = no limit
-    ,    spacing_open:            6            // space between pane and adjacent panes - when pane is 'open'
-    ,    spacing_closed:            6            // ditto - when pane is 'closed'
-    ,    togglerLength_open:        50            // Length = WIDTH of toggler button on north/south sides - HEIGHT on east/west sides
-    ,    togglerLength_closed:     50            // 100% OR -1 means 'full height/width of resizer bar' - 0 means 'hidden'
-    ,    togglerAlign_open:        "center"    // top/left, bottom/right, center, OR...
-    ,    togglerAlign_closed:    "center"    // 1 => nn = offset from top/left, -1 => -nn == offset from bottom/right
-    ,    togglerContent_open:    ""            // text or HTML to put INSIDE the toggler
-    ,    togglerContent_closed:    ""            // ditto
-    //    RESIZING OPTIONS
-    ,    resizerDblClickToggle:    true        //
-    ,    autoResize:                true        // IF size is 'auto' or a percentage, then recalc 'pixel size' whenever the layout resizes
-    ,    autoReopen:                true        // IF a pane was auto-closed due to noRoom, reopen it when there is room? False = leave it closed
-    ,    resizerDragOpacity:        1            // option for ui.draggable
-    //,    resizerCursor:            ""            // MUST be pane-specific - cursor when over resizer-bar
-    ,    maskContents:            false        // true = add DIV-mask over-or-inside this pane so can 'drag' over IFRAMES
-    ,    maskObjects:            false        // true = add IFRAME-mask over-or-inside this pane to cover objects/applets - content-mask will overlay this mask
-    ,    maskZindex:                null        // will override zIndexes.content_mask if specified - not applicable to iframe-panes
-    ,    resizingGrid:            false        // grid size that the resizers will snap-to during resizing, eg: [20,20]
-    ,    livePaneResizing:        false        // true = LIVE Resizing as resizer is dragged
-    ,    liveContentResizing:    false        // true = re-measure header/footer heights as resizer is dragged
-    ,    liveResizingTolerance:    1            // how many px change before pane resizes, to control performance
-    //    SLIDING OPTIONS
-    ,    sliderCursor:            "pointer"    // cursor when resizer-bar will trigger 'sliding'
-    ,    slideTrigger_open:        "click"        // click, dblclick, mouseenter
-    ,    slideTrigger_close:        "mouseleave"// click, mouseleave
-    ,    slideDelay_open:        300            // applies only for mouseenter event - 0 = instant open
-    ,    slideDelay_close:        300            // applies only for mouseleave event (300ms is the minimum!)
-    ,    hideTogglerOnSlide:        false        // when pane is slid-open, should the toggler show?
-    ,    preventQuickSlideClose:    $.layout.browser.webkit // Chrome triggers slideClosed as it is opening
-    ,    preventPrematureSlideClose: false    // handle incorrect mouseleave trigger, like when over a SELECT-list in IE
-    //    PANE-SPECIFIC TIPS & MESSAGES
-    ,    tips: {
-            Open:                "Open"        // eg: "Open Pane"
-        ,    Close:                "Close"
-        ,    Resize:                "Resize"
-        ,    Slide:                "Slide Open"
-        ,    Pin:                "Pin"
-        ,    Unpin:                "Un-Pin"
-        ,    noRoomToOpen:        "Not enough room to show this panel."    // alert if user tries to open a pane that cannot
-        ,    minSizeWarning:        "Panel has reached its minimum size"    // displays in browser statusbar
-        ,    maxSizeWarning:        "Panel has reached its maximum size"    // ditto
+,   panes: { // default options for 'all panes' - will be overridden by 'per-pane settings'
+        applyDemoStyles:        false       // NOTE: renamed from applyDefaultStyles for clarity
+    ,   closable:               true        // pane can open & close
+    ,   resizable:              true        // when open, pane can be resized 
+    ,   slidable:               true        // when closed, pane can 'slide open' over other panes - closes on mouse-out
+    ,   initClosed:             false       // true = init pane as 'closed'
+    ,   initHidden:             false       // true = init pane as 'hidden' - no resizer-bar/spacing
+    //  SELECTORS
+    //, paneSelector:           ""          // MUST be pane-specific - jQuery selector for pane
+    ,   contentSelector:        ".ui-layout-content" // INNER div/element to auto-size so only it scrolls, not the entire pane!
+    ,   contentIgnoreSelector:  ".ui-layout-ignore" // element(s) to 'ignore' when measuring 'content'
+    ,   findNestedContent:      false       // true = $P.find(contentSelector), false = $P.children(contentSelector)
+    //  GENERIC ROOT-CLASSES - for auto-generated classNames
+    ,   paneClass:              "ui-layout-pane"    // Layout Pane
+    ,   resizerClass:           "ui-layout-resizer" // Resizer Bar
+    ,   togglerClass:           "ui-layout-toggler" // Toggler Button
+    ,   buttonClass:            "ui-layout-button"  // CUSTOM Buttons   - eg: '[ui-layout-button]-toggle/-open/-close/-pin'
+    //  ELEMENT SIZE & SPACING
+    //, size:                   100         // MUST be pane-specific -initial size of pane
+    ,   minSize:                0           // when manually resizing a pane
+    ,   maxSize:                0           // ditto, 0 = no limit
+    ,   spacing_open:           6           // space between pane and adjacent panes - when pane is 'open'
+    ,   spacing_closed:         6           // ditto - when pane is 'closed'
+    ,   togglerLength_open:     50          // Length = WIDTH of toggler button on north/south sides - HEIGHT on east/west sides
+    ,   togglerLength_closed:   50          // 100% OR -1 means 'full height/width of resizer bar' - 0 means 'hidden'
+    ,   togglerAlign_open:      "center"    // top/left, bottom/right, center, OR...
+    ,   togglerAlign_closed:    "center"    // 1 => nn = offset from top/left, -1 => -nn == offset from bottom/right
+    ,   togglerContent_open:    ""          // text or HTML to put INSIDE the toggler
+    ,   togglerContent_closed:  ""          // ditto
+    //  RESIZING OPTIONS
+    ,   resizerDblClickToggle:  true        // 
+    ,   autoResize:             true        // IF size is 'auto' or a percentage, then recalc 'pixel size' whenever the layout resizes
+    ,   autoReopen:             true        // IF a pane was auto-closed due to noRoom, reopen it when there is room? False = leave it closed
+    ,   resizerDragOpacity:     1           // option for ui.draggable
+    //, resizerCursor:          ""          // MUST be pane-specific - cursor when over resizer-bar
+    ,   maskContents:           false       // true = add DIV-mask over-or-inside this pane so can 'drag' over IFRAMES
+    ,   maskObjects:            false       // true = add IFRAME-mask over-or-inside this pane to cover objects/applets - content-mask will overlay this mask
+    ,   maskZindex:             null        // will override zIndexes.content_mask if specified - not applicable to iframe-panes
+    ,   resizingGrid:           false       // grid size that the resizers will snap-to during resizing, eg: [20,20]
+    ,   livePaneResizing:       false       // true = LIVE Resizing as resizer is dragged
+    ,   liveContentResizing:    false       // true = re-measure header/footer heights as resizer is dragged
+    ,   liveResizingTolerance:  1           // how many px change before pane resizes, to control performance
+    //  SLIDING OPTIONS
+    ,   sliderCursor:           "pointer"   // cursor when resizer-bar will trigger 'sliding'
+    ,   slideTrigger_open:      "click"     // click, dblclick, mouseenter
+    ,   slideTrigger_close:     "mouseleave"// click, mouseleave
+    ,   slideDelay_open:        300         // applies only for mouseenter event - 0 = instant open
+    ,   slideDelay_close:       300         // applies only for mouseleave event (300ms is the minimum!)
+    ,   hideTogglerOnSlide:     false       // when pane is slid-open, should the toggler show?
+    ,   preventQuickSlideClose: $.layout.browser.webkit // Chrome triggers slideClosed as it is opening
+    ,   preventPrematureSlideClose: false   // handle incorrect mouseleave trigger, like when over a SELECT-list in IE
+    //  PANE-SPECIFIC TIPS & MESSAGES
+    ,   tips: {
+            Open:               "Open"      // eg: "Open Pane"
+        ,   Close:              "Close"
+        ,   Resize:             "Resize"
+        ,   Slide:              "Slide Open"
+        ,   Pin:                "Pin"
+        ,   Unpin:              "Un-Pin"
+        ,   noRoomToOpen:       "Not enough room to show this panel."   // alert if user tries to open a pane that cannot
+        ,   minSizeWarning:     "Panel has reached its minimum size"    // displays in browser statusbar
+        ,   maxSizeWarning:     "Panel has reached its maximum size"    // ditto
         }
-    //    HOT-KEYS & MISC
-    ,    showOverflowOnHover:    false        // will bind allowOverflow() utility to pane.onMouseOver
-    ,    enableCursorHotkey:        true        // enabled 'cursor' hotkeys
-    //,    customHotkey:            ""            // MUST be pane-specific - EITHER a charCode OR a character
-    ,    customHotkeyModifier:    "SHIFT"        // either 'SHIFT', 'CTRL' or 'CTRL+SHIFT' - NOT 'ALT'
-    //    PANE ANIMATION
-    //    NOTE: fxSss_open, fxSss_close & fxSss_size options (eg: fxName_open) are auto-generated if not passed
-    ,    fxName:                    "slide"     // ('none' or blank), slide, drop, scale -- only relevant to 'open' & 'close', NOT 'size'
-    ,    fxSpeed:                null        // slow, normal, fast, 200, nnn - if passed, will OVERRIDE fxSettings.duration
-    ,    fxSettings:                {}            // can be passed, eg: { easing: "easeOutBounce", duration: 1500 }
-    ,    fxOpacityFix:            true        // tries to fix opacity in IE to restore anti-aliasing after animation
-    ,    animatePaneSizing:        false        // true = animate resizing after dragging resizer-bar OR sizePane() is called
+    //  HOT-KEYS & MISC
+    ,   showOverflowOnHover:    false       // will bind allowOverflow() utility to pane.onMouseOver
+    ,   enableCursorHotkey:     true        // enabled 'cursor' hotkeys
+    //, customHotkey:           ""          // MUST be pane-specific - EITHER a charCode OR a character
+    ,   customHotkeyModifier:   "SHIFT"     // either 'SHIFT', 'CTRL' or 'CTRL+SHIFT' - NOT 'ALT'
+    //  PANE ANIMATION
+    //  NOTE: fxSss_open, fxSss_close & fxSss_size options (eg: fxName_open) are auto-generated if not passed
+    ,   fxName:                 "slide"     // ('none' or blank), slide, drop, scale -- only relevant to 'open' & 'close', NOT 'size'
+    ,   fxSpeed:                null        // slow, normal, fast, 200, nnn - if passed, will OVERRIDE fxSettings.duration
+    ,   fxSettings:             {}          // can be passed, eg: { easing: "easeOutBounce", duration: 1500 }
+    ,   fxOpacityFix:           true        // tries to fix opacity in IE to restore anti-aliasing after animation
+    ,   animatePaneSizing:      false       // true = animate resizing after dragging resizer-bar OR sizePane() is called
     /*  NOTE: Action-specific FX options are auto-generated from the options above if not specifically set:
-        fxName_open:            "slide"        // 'Open' pane animation
-        fnName_close:            "slide"        // 'Close' pane animation
-        fxName_size:            "slide"        // 'Size' pane animation - when animatePaneSizing = true
-        fxSpeed_open:            null
-        fxSpeed_close:            null
-        fxSpeed_size:            null
+        fxName_open:            "slide"     // 'Open' pane animation
+        fnName_close:           "slide"     // 'Close' pane animation
+        fxName_size:            "slide"     // 'Size' pane animation - when animatePaneSizing = true
+        fxSpeed_open:           null
+        fxSpeed_close:          null
+        fxSpeed_size:           null
         fxSettings_open:        {}
-        fxSettings_close:        {}
+        fxSettings_close:       {}
         fxSettings_size:        {}
     */
-    //    CHILD/NESTED LAYOUTS
-    ,    children:                null        // Layout-options for nested/child layout - even {} is valid as options
-    ,    containerSelector:        ''            // if child is NOT 'directly nested', a selector to find it/them (can have more than one child layout!)
-    ,    initChildren:            true        // true = child layout will be created as soon as _this_ layout completes initialization
-    ,    destroyChildren:        true        // true = destroy child-layout if this pane is destroyed
-    ,    resizeChildren:            true        // true = trigger child-layout.resizeAll() when this pane is resized
-    //    EVENT TRIGGERING
-    ,    triggerEventsOnLoad:    false        // true = trigger onopen OR onclose callbacks when layout initializes
-    ,    triggerEventsDuringLiveResize: true    // true = trigger onresize callback REPEATEDLY if livePaneResizing==true
-    //    PANE CALLBACKS
-    ,    onshow_start:            null        // CALLBACK when pane STARTS to Show    - BEFORE onopen/onhide_start
-    ,    onshow_end:                null        // CALLBACK when pane ENDS being Shown    - AFTER  onopen/onhide_end
-    ,    onhide_start:            null        // CALLBACK when pane STARTS to Close    - BEFORE onclose_start
-    ,    onhide_end:                null        // CALLBACK when pane ENDS being Closed    - AFTER  onclose_end
-    ,    onopen_start:            null        // CALLBACK when pane STARTS to Open
-    ,    onopen_end:                null        // CALLBACK when pane ENDS being Opened
-    ,    onclose_start:            null        // CALLBACK when pane STARTS to Close
-    ,    onclose_end:            null        // CALLBACK when pane ENDS being Closed
-    ,    onresize_start:            null        // CALLBACK when pane STARTS being Resized ***FOR ANY REASON***
-    ,    onresize_end:            null        // CALLBACK when pane ENDS being Resized ***FOR ANY REASON***
-    ,    onsizecontent_start:    null        // CALLBACK when sizing of content-element STARTS
-    ,    onsizecontent_end:        null        // CALLBACK when sizing of content-element ENDS
-    ,    onswap_start:            null        // CALLBACK when pane STARTS to Swap
-    ,    onswap_end:                null        // CALLBACK when pane ENDS being Swapped
-    ,    ondrag_start:            null        // CALLBACK when pane STARTS being ***MANUALLY*** Resized
-    ,    ondrag_end:                null        // CALLBACK when pane ENDS being ***MANUALLY*** Resized
+    //  CHILD/NESTED LAYOUTS
+    ,   children:               null        // Layout-options for nested/child layout - even {} is valid as options
+    ,   containerSelector:      ''          // if child is NOT 'directly nested', a selector to find it/them (can have more than one child layout!)
+    ,   initChildren:           true        // true = child layout will be created as soon as _this_ layout completes initialization
+    ,   destroyChildren:        true        // true = destroy child-layout if this pane is destroyed
+    ,   resizeChildren:         true        // true = trigger child-layout.resizeAll() when this pane is resized
+    //  EVENT TRIGGERING
+    ,   triggerEventsOnLoad:    false       // true = trigger onopen OR onclose callbacks when layout initializes
+    ,   triggerEventsDuringLiveResize: true // true = trigger onresize callback REPEATEDLY if livePaneResizing==true
+    //  PANE CALLBACKS
+    ,   onshow_start:           null        // CALLBACK when pane STARTS to Show    - BEFORE onopen/onhide_start
+    ,   onshow_end:             null        // CALLBACK when pane ENDS being Shown  - AFTER  onopen/onhide_end
+    ,   onhide_start:           null        // CALLBACK when pane STARTS to Close   - BEFORE onclose_start
+    ,   onhide_end:             null        // CALLBACK when pane ENDS being Closed - AFTER  onclose_end
+    ,   onopen_start:           null        // CALLBACK when pane STARTS to Open
+    ,   onopen_end:             null        // CALLBACK when pane ENDS being Opened
+    ,   onclose_start:          null        // CALLBACK when pane STARTS to Close
+    ,   onclose_end:            null        // CALLBACK when pane ENDS being Closed
+    ,   onresize_start:         null        // CALLBACK when pane STARTS being Resized ***FOR ANY REASON***
+    ,   onresize_end:           null        // CALLBACK when pane ENDS being Resized ***FOR ANY REASON***
+    ,   onsizecontent_start:    null        // CALLBACK when sizing of content-element STARTS
+    ,   onsizecontent_end:      null        // CALLBACK when sizing of content-element ENDS
+    ,   onswap_start:           null        // CALLBACK when pane STARTS to Swap
+    ,   onswap_end:             null        // CALLBACK when pane ENDS being Swapped
+    ,   ondrag_start:           null        // CALLBACK when pane STARTS being ***MANUALLY*** Resized
+    ,   ondrag_end:             null        // CALLBACK when pane ENDS being ***MANUALLY*** Resized
     }
 /*
- *    PANE-SPECIFIC SETTINGS
- *    - options listed below MUST be specified per-pane - they CANNOT be set under 'panes'
- *    - all options under the 'panes' key can also be set specifically for any pane
- *    - most options under the 'panes' key apply only to 'border-panes' - NOT the the center-pane
+ *  PANE-SPECIFIC SETTINGS
+ *  - options listed below MUST be specified per-pane - they CANNOT be set under 'panes'
+ *  - all options under the 'panes' key can also be set specifically for any pane
+ *  - most options under the 'panes' key apply only to 'border-panes' - NOT the the center-pane
  */
-,    north: {
-        paneSelector:            ".ui-layout-north"
-    ,    size:                    "auto"        // eg: "auto", "30%", .30, 200
-    ,    resizerCursor:            "n-resize"    // custom = url(myCursor.cur)
-    ,    customHotkey:            ""            // EITHER a charCode (43) OR a character ("o")
+,   north: {
+        paneSelector:           ".ui-layout-north"
+    ,   size:                   "auto"      // eg: "auto", "30%", .30, 200
+    ,   resizerCursor:          "n-resize"  // custom = url(myCursor.cur)
+    ,   customHotkey:           ""          // EITHER a charCode (43) OR a character ("o")
     }
-,    south: {
-        paneSelector:            ".ui-layout-south"
-    ,    size:                    "auto"
-    ,    resizerCursor:            "s-resize"
-    ,    customHotkey:            ""
+,   south: {
+        paneSelector:           ".ui-layout-south"
+    ,   size:                   "auto"
+    ,   resizerCursor:          "s-resize"
+    ,   customHotkey:           ""
     }
-,    east: {
-        paneSelector:            ".ui-layout-east"
-    ,    size:                    200
-    ,    resizerCursor:            "e-resize"
-    ,    customHotkey:            ""
+,   east: {
+        paneSelector:           ".ui-layout-east"
+    ,   size:                   200
+    ,   resizerCursor:          "e-resize"
+    ,   customHotkey:           ""
     }
-,    west: {
-        paneSelector:            ".ui-layout-west"
-    ,    size:                    200
-    ,    resizerCursor:            "w-resize"
-    ,    customHotkey:            ""
+,   west: {
+        paneSelector:           ".ui-layout-west"
+    ,   size:                   200
+    ,   resizerCursor:          "w-resize"
+    ,   customHotkey:           ""
     }
-,    center: {
-        paneSelector:            ".ui-layout-center"
-    ,    minWidth:                0
-    ,    minHeight:                0
+,   center: {
+        paneSelector:           ".ui-layout-center"
+    ,   minWidth:               0
+    ,   minHeight:              0
     }
 };
 
 $.layout.optionsMap = {
     // layout/global options - NOT pane-options
     layout: ("name,instanceKey,stateManagement,effects,inset,zIndexes,errors,"
-    +    "zIndex,scrollToBookmarkOnLoad,showErrorMessages,maskPanesEarly,"
-    +    "outset,resizeWithWindow,resizeWithWindowDelay,resizeWithWindowMaxDelay,"
-    +    "onresizeall,onresizeall_start,onresizeall_end,onload,onload_start,onload_end,onunload,onunload_start,onunload_end").split(",")
-//    borderPanes: [ ALL options that are NOT specified as 'layout' ]
+    +   "zIndex,scrollToBookmarkOnLoad,showErrorMessages,maskPanesEarly,"
+    +   "outset,resizeWithWindow,resizeWithWindowDelay,resizeWithWindowMaxDelay,"
+    +   "onresizeall,onresizeall_start,onresizeall_end,onload,onload_start,onload_end,onunload,onunload_start,onunload_end").split(",")
+//  borderPanes: [ ALL options that are NOT specified as 'layout' ]
     // default.panes options that apply to the center-pane (most options apply _only_ to border-panes)
-,    center: ("paneClass,contentSelector,contentIgnoreSelector,findNestedContent,applyDemoStyles,triggerEventsOnLoad,"
-    +    "showOverflowOnHover,maskContents,maskObjects,liveContentResizing,"
-    +    "containerSelector,children,initChildren,resizeChildren,destroyChildren,"
-    +    "onresize,onresize_start,onresize_end,onsizecontent,onsizecontent_start,onsizecontent_end").split(",")
+,   center: ("paneClass,contentSelector,contentIgnoreSelector,findNestedContent,applyDemoStyles,triggerEventsOnLoad,"
+    +   "showOverflowOnHover,maskContents,maskObjects,liveContentResizing,"
+    +   "containerSelector,children,initChildren,resizeChildren,destroyChildren,"
+    +   "onresize,onresize_start,onresize_end,onsizecontent,onsizecontent_start,onsizecontent_end").split(",")
     // options that MUST be specifically set 'per-pane' - CANNOT set in the panes (defaults) key
-,    noDefault: ("paneSelector,resizerCursor,customHotkey").split(",")
+,   noDefault: ("paneSelector,resizerCursor,customHotkey").split(",")
 };
 
 /**
@@ -853,25 +853,25 @@ $.layout.optionsMap = {
  * Plugins may also call this method so they can transform their own data
  *
  * @param  {!Object}    hash            Data/options passed by user - may be a single level or nested levels
- * @param  {boolean=}    [addKeys=false]    Should the primary layout.options keys be added if they do not exist?
- * @return {Object}                        Returns hash of minWidth & minHeight
+ * @param  {boolean=}   [addKeys=false] Should the primary layout.options keys be added if they do not exist?
+ * @return {Object}                     Returns hash of minWidth & minHeight
  */
 $.layout.transformData = function (hash, addKeys) {
-    var    json = addKeys ? { panes: {}, center: {} } : {} // init return object
-    ,    branch, optKey, keys, key, val, i, c;
+    var json = addKeys ? { panes: {}, center: {} } : {} // init return object
+    ,   branch, optKey, keys, key, val, i, c;
 
     if (typeof hash !== "object") return json; // no options passed
 
     // convert all 'flat-keys' to 'sub-key' format
     for (optKey in hash) {
-        branch    = json;
-        val        = hash[ optKey ];
+        branch  = json;
+        val     = hash[ optKey ];
         keys    = optKey.split("__"); // eg: west__size or north__fxSettings__duration
-        c        = keys.length - 1;
+        c       = keys.length - 1;
         // convert underscore-delimited to subkeys
         for (i=0; i <= c; i++) {
             key = keys[i];
-            if (i === c) {    // last key = value
+            if (i === c) {  // last key = value
                 if ($.isPlainObject( val ))
                     branch[key] = $.layout.transformData( val ); // RECURSE
                 else
@@ -892,47 +892,47 @@ $.layout.transformData = function (hash, addKeys) {
 $.layout.backwardCompatibility = {
     // data used by renameOldOptions()
     map: {
-    //    OLD Option Name:            NEW Option Name
-        applyDefaultStyles:            "applyDemoStyles"
-    //    CHILD/NESTED LAYOUTS
-    ,    childOptions:                "children"
-    ,    initChildLayout:            "initChildren"
-    ,    destroyChildLayout:            "destroyChildren"
-    ,    resizeChildLayout:            "resizeChildren"
-    ,    resizeNestedLayout:            "resizeChildren"
-    //    MISC Options
-    ,    resizeWhileDragging:        "livePaneResizing"
-    ,    resizeContentWhileDragging:    "liveContentResizing"
-    ,    triggerEventsWhileDragging:    "triggerEventsDuringLiveResize"
-    ,    maskIframesOnResize:        "maskContents"
-    //    STATE MANAGEMENT
-    ,    useStateCookie:                "stateManagement.enabled"
-    ,    "cookie.autoLoad":            "stateManagement.autoLoad"
-    ,    "cookie.autoSave":            "stateManagement.autoSave"
-    ,    "cookie.keys":                "stateManagement.stateKeys"
-    ,    "cookie.name":                "stateManagement.cookie.name"
-    ,    "cookie.domain":            "stateManagement.cookie.domain"
-    ,    "cookie.path":                "stateManagement.cookie.path"
-    ,    "cookie.expires":            "stateManagement.cookie.expires"
-    ,    "cookie.secure":            "stateManagement.cookie.secure"
-    //    OLD Language options
-    ,    noRoomToOpenTip:            "tips.noRoomToOpen"
-    ,    togglerTip_open:            "tips.Close"    // open   = Close
-    ,    togglerTip_closed:            "tips.Open"        // closed = Open
-    ,    resizerTip:                    "tips.Resize"
-    ,    sliderTip:                    "tips.Slide"
+    //  OLD Option Name:            NEW Option Name
+        applyDefaultStyles:         "applyDemoStyles"
+    //  CHILD/NESTED LAYOUTS
+    ,   childOptions:               "children"
+    ,   initChildLayout:            "initChildren"
+    ,   destroyChildLayout:         "destroyChildren"
+    ,   resizeChildLayout:          "resizeChildren"
+    ,   resizeNestedLayout:         "resizeChildren"
+    //  MISC Options
+    ,   resizeWhileDragging:        "livePaneResizing"
+    ,   resizeContentWhileDragging: "liveContentResizing"
+    ,   triggerEventsWhileDragging: "triggerEventsDuringLiveResize"
+    ,   maskIframesOnResize:        "maskContents"
+    //  STATE MANAGEMENT
+    ,   useStateCookie:             "stateManagement.enabled"
+    ,   "cookie.autoLoad":          "stateManagement.autoLoad"
+    ,   "cookie.autoSave":          "stateManagement.autoSave"
+    ,   "cookie.keys":              "stateManagement.stateKeys"
+    ,   "cookie.name":              "stateManagement.cookie.name"
+    ,   "cookie.domain":            "stateManagement.cookie.domain"
+    ,   "cookie.path":              "stateManagement.cookie.path"
+    ,   "cookie.expires":           "stateManagement.cookie.expires"
+    ,   "cookie.secure":            "stateManagement.cookie.secure"
+    //  OLD Language options
+    ,   noRoomToOpenTip:            "tips.noRoomToOpen"
+    ,   togglerTip_open:            "tips.Close"    // open   = Close
+    ,   togglerTip_closed:          "tips.Open"     // closed = Open
+    ,   resizerTip:                 "tips.Resize"
+    ,   sliderTip:                  "tips.Slide"
     }
 
 /**
-* @param {Object}    opts
+* @param {Object}   opts
 */
-,    renameOptions: function (opts) {
+,   renameOptions: function (opts) {
         var map = $.layout.backwardCompatibility.map
-        ,    oldData, newData, value
+        ,   oldData, newData, value
         ;
         for (var itemPath in map) {
-            oldData    = getBranch( itemPath );
-            value    = oldData.branch[ oldData.key ];
+            oldData = getBranch( itemPath );
+            value   = oldData.branch[ oldData.key ];
             if (value !== undefined) {
                 newData = getBranch( map[itemPath], true );
                 newData.branch[ newData.key ] = value;
@@ -941,14 +941,14 @@ $.layout.backwardCompatibility = {
         }
 
         /**
-        * @param {string}    path
-        * @param {boolean=}    [create=false]    Create path if does not exist
+        * @param {string}   path
+        * @param {boolean=} [create=false]  Create path if does not exist
         */
         function getBranch (path, create) {
             var a = path.split(".") // split keys into array
-            ,    c = a.length - 1
-            ,    D = { branch: opts, key: a[c] } // init branch at top & set key (last item)
-            ,    i = 0, k, undef;
+            ,   c = a.length - 1
+            ,   D = { branch: opts, key: a[c] } // init branch at top & set key (last item)
+            ,   i = 0, k, undef;
             for (; i<c; i++) { // skip the last key (data)
                 k = a[i];
                 if (D.branch[ k ] == undefined) { // child-key does not exist
@@ -966,9 +966,9 @@ $.layout.backwardCompatibility = {
     }
 
 /**
-* @param {Object}    opts
+* @param {Object}   opts
 */
-,    renameAllOptions: function (opts) {
+,   renameAllOptions: function (opts) {
         var ren = $.layout.backwardCompatibility.renameOptions;
         // rename root (layout) options
         ren( opts );
@@ -984,7 +984,7 @@ $.layout.backwardCompatibility = {
         // rename options inside *each pane key*, eg: options.west
         $.each($.layout.config.allPanes, function (i, pane) {
             if (opts[pane]) ren( opts[pane] );
-        });
+        }); 
         return opts;
     }
 };
@@ -992,65 +992,65 @@ $.layout.backwardCompatibility = {
 
 
 
-/*    ============================================================
- *    BEGIN WIDGET: $( selector ).layout( {options} );
- *    ============================================================
+/*  ============================================================
+ *  BEGIN WIDGET: $( selector ).layout( {options} );
+ *  ============================================================
  */
 $.fn.layout = function (opts) {
     var
 
     // local aliases to global data
-    browser    = $.layout.browser
-,    _c        = $.layout.config
+    browser = $.layout.browser
+,   _c      = $.layout.config
 
     // local aliases to utlity methods
-,    cssW    = $.layout.cssWidth
-,    cssH    = $.layout.cssHeight
-,    elDims    = $.layout.getElementDimensions
-,    styles    = $.layout.getElementStyles
-,    evtObj    = $.layout.getEventObject
-,    evtPane    = $.layout.parsePaneName
+,   cssW    = $.layout.cssWidth
+,   cssH    = $.layout.cssHeight
+,   elDims  = $.layout.getElementDimensions
+,   styles  = $.layout.getElementStyles
+,   evtObj  = $.layout.getEventObject
+,   evtPane = $.layout.parsePaneName
 
 /**
  * options - populated by initOptions()
  */
-,    options = $.extend(true, {}, $.layout.defaults)
-,    effects    = options.effects = $.extend(true, {}, $.layout.effects)
+,   options = $.extend(true, {}, $.layout.defaults)
+,   effects = options.effects = $.extend(true, {}, $.layout.effects)
 
 /**
  * layout-state object
  */
-,    state = {
+,   state = {
         // generate unique ID to use for event.namespace so can unbind only events added by 'this layout'
-        id:                "layout"+ $.now()    // code uses alias: sID
-    ,    initialized:    false
-    ,    paneResizing:    false
-    ,    panesSliding:    {}
-    ,    container:    {     // list all keys referenced in code to avoid compiler error msgs
-            innerWidth:        0
-        ,    innerHeight:    0
-        ,    outerWidth:        0
-        ,    outerHeight:    0
-        ,    layoutWidth:    0
-        ,    layoutHeight:    0
+        id:             "layout"+ $.now()   // code uses alias: sID
+    ,   initialized:    false
+    ,   paneResizing:   false
+    ,   panesSliding:   {}
+    ,   container:  {   // list all keys referenced in code to avoid compiler error msgs
+            innerWidth:     0
+        ,   innerHeight:    0
+        ,   outerWidth:     0
+        ,   outerHeight:    0
+        ,   layoutWidth:    0
+        ,   layoutHeight:   0
         }
-    ,    north:        { childIdx: 0 }
-    ,    south:        { childIdx: 0 }
-    ,    east:        { childIdx: 0 }
-    ,    west:        { childIdx: 0 }
-    ,    center:        { childIdx: 0 }
+    ,   north:      { childIdx: 0 }
+    ,   south:      { childIdx: 0 }
+    ,   east:       { childIdx: 0 }
+    ,   west:       { childIdx: 0 }
+    ,   center:     { childIdx: 0 }
     }
 
 /**
  * parent/child-layout pointers
  */
-//,    hasParentLayout    = false    - exists ONLY inside Instance so can be set externally
-,    children = {
-        north:        null
-    ,    south:        null
-    ,    east:        null
-    ,    west:        null
-    ,    center:        null
+//, hasParentLayout = false - exists ONLY inside Instance so can be set externally
+,   children = {
+        north:      null
+    ,   south:      null
+    ,   east:       null
+    ,   west:       null
+    ,   center:     null
     }
 
 /*
@@ -1062,20 +1062,20 @@ $.fn.layout = function (opts) {
     /**
     * Manages all internal timers
     */
-,    timer = {
-        data:    {}
-    ,    set:    function (s, fn, ms) { timer.clear(s); timer.data[s] = setTimeout(fn, ms); }
-    ,    clear:    function (s) { var t=timer.data; if (t[s]) {clearTimeout(t[s]); delete t[s];} }
+,   timer = {
+        data:   {}
+    ,   set:    function (s, fn, ms) { timer.clear(s); timer.data[s] = setTimeout(fn, ms); }
+    ,   clear:  function (s) { var t=timer.data; if (t[s]) {clearTimeout(t[s]); delete t[s];} }
     }
 
     /**
     * Alert or console.log a message - IF option is enabled.
     *
-    * @param {(string|!Object)}    msg                Message (or debug-data) to display
-    * @param {boolean=}            [popup=false]    True by default, means 'alert', false means use console.log
-    * @param {boolean=}            [debug=false]    True means is a widget debugging message
+    * @param {(string|!Object)} msg             Message (or debug-data) to display
+    * @param {boolean=}         [popup=false]   True by default, means 'alert', false means use console.log
+    * @param {boolean=}         [debug=false]   True means is a widget debugging message
     */
-,    _log = function (msg, popup, debug) {
+,   _log = function (msg, popup, debug) {
         var o = options;
         if ((o.showErrorMessages && !debug) || (debug && o.showDebugMessages))
             $.layout.msg( o.name +' / '+ msg, (popup !== false) );
@@ -1085,22 +1085,22 @@ $.fn.layout = function (opts) {
     /**
     * Executes a Callback function after a trigger event, like resize, open or close
     *
-    * @param {string}                evtName                    Name of the layout callback, eg "onresize_start"
-    * @param {(string|boolean)=}    [pane=""]                This is passed only so we can pass the 'pane object' to the callback
-    * @param {(string|boolean)=}    [skipBoundEvents=false]    True = do not run events bound to the elements - only the callbacks set in options
+    * @param {string}               evtName                 Name of the layout callback, eg "onresize_start"
+    * @param {(string|boolean)=}    [pane=""]               This is passed only so we can pass the 'pane object' to the callback
+    * @param {(string|boolean)=}    [skipBoundEvents=false] True = do not run events bound to the elements - only the callbacks set in options
     */
-,    _runCallbacks = function (evtName, pane, skipBoundEvents) {
-        var    hasPane    = pane && isStr(pane)
-        ,    s        = hasPane ? state[pane] : state
-        ,    o        = hasPane ? options[pane] : options
-        ,    lName    = options.name
+,   _runCallbacks = function (evtName, pane, skipBoundEvents) {
+        var hasPane = pane && isStr(pane)
+        ,   s       = hasPane ? state[pane] : state
+        ,   o       = hasPane ? options[pane] : options
+        ,   lName   = options.name
             // names like onopen and onopen_end separate are interchangeable in options...
-        ,    lng        = evtName + (evtName.match(/_/) ? "" : "_end")
-        ,    shrt    = lng.match(/_end$/) ? lng.substr(0, lng.length - 4) : ""
-        ,    fn        = o[lng] || o[shrt]
-        ,    retVal    = "NC" // NC = No Callback
-        ,    args    = []
-        ,    $P
+        ,   lng     = evtName + (evtName.match(/_/) ? "" : "_end")
+        ,   shrt    = lng.match(/_end$/) ? lng.substr(0, lng.length - 4) : ""
+        ,   fn      = o[lng] || o[shrt]
+        ,   retVal  = "NC" // NC = No Callback
+        ,   args    = []
+        ,   $P
         ;
         if ( !hasPane && $.type(pane) === 'boolean' ) {
             skipBoundEvents = pane; // allow pane param to be skipped for Layout callback
@@ -1113,10 +1113,10 @@ $.fn.layout = function (opts) {
                 // convert function name (string) to function object
                 if (isStr( fn )) {
                     if (fn.match(/,/)) {
-                        // function name cannot contain a comma,
+                        // function name cannot contain a comma, 
                         // so must be a function name AND a parameter to pass
                         args = fn.split(",")
-                        ,    fn = eval(args[0]);
+                        ,   fn = eval(args[0]);
                     }
                     else // just the name of an external function?
                         fn = eval(fn);
@@ -1142,9 +1142,9 @@ $.fn.layout = function (opts) {
         // trigger additional events bound directly to the pane
         if (!skipBoundEvents && retVal !== false) {
             if ( hasPane ) { // PANE events can be bound to each pane-elements
-                $P    = $Ps[pane];
-                o    = options[pane];
-                s    = state[pane];
+                $P  = $Ps[pane];
+                o   = options[pane];
+                s   = state[pane];
                 $P.triggerHandler('layoutpane'+ lng, [ pane, $P, s, o, lName ]);
                 if (shrt)
                     $P.triggerHandler('layoutpane'+ shrt, [ pane, $P, s, o, lName ]);
@@ -1170,37 +1170,37 @@ $.fn.layout = function (opts) {
     /**
     * cure iframe display issues in IE & other browsers
     */
-,    _fixIframe = function (pane) {
+,   _fixIframe = function (pane) {
         if (browser.mozilla) return; // skip FireFox - it auto-refreshes iframes onShow
         var $P = $Ps[pane];
         // if the 'pane' is an iframe, do it
         if (state[pane].tagName === "IFRAME")
-            $P.css(_c.hidden).css(_c.visible);
+            $P.css(_c.hidden).css(_c.visible); 
         else // ditto for any iframes INSIDE the pane
             $P.find('IFRAME').css(_c.hidden).css(_c.visible);
     }
 
     /**
-    * @param  {string}        pane        Can accept ONLY a 'pane' (east, west, etc)
-    * @param  {number=}        outerSize    (optional) Can pass a width, allowing calculations BEFORE element is resized
-    * @return {number}        Returns the innerHeight/Width of el by subtracting padding and borders
+    * @param  {string}      pane        Can accept ONLY a 'pane' (east, west, etc)
+    * @param  {number=}     outerSize   (optional) Can pass a width, allowing calculations BEFORE element is resized
+    * @return {number}      Returns the innerHeight/Width of el by subtracting padding and borders
     */
-,    cssSize = function (pane, outerSize) {
+,   cssSize = function (pane, outerSize) {
         var fn = _c[pane].dir=="horz" ? cssH : cssW;
         return fn($Ps[pane], outerSize);
     }
 
     /**
-    * @param  {string}        pane        Can accept ONLY a 'pane' (east, west, etc)
-    * @return {Object}        Returns hash of minWidth & minHeight
+    * @param  {string}      pane        Can accept ONLY a 'pane' (east, west, etc)
+    * @return {Object}      Returns hash of minWidth & minHeight
     */
-,    cssMinDims = function (pane) {
+,   cssMinDims = function (pane) {
         // minWidth/Height means CSS width/height = 1px
-        var    $P    = $Ps[pane]
-        ,    dir    = _c[pane].dir
-        ,    d    = {
-                minWidth:    1001 - cssW($P, 1000)
-            ,    minHeight:    1001 - cssH($P, 1000)
+        var $P  = $Ps[pane]
+        ,   dir = _c[pane].dir
+        ,   d   = {
+                minWidth:   1001 - cssW($P, 1000)
+            ,   minHeight:  1001 - cssH($P, 1000)
             }
         ;
         if (dir === "horz") d.minSize = d.minHeight;
@@ -1212,11 +1212,11 @@ $.fn.layout = function (opts) {
     // TODO: *maybe* return cssW/H from these so caller can use this info
 
     /**
-    * @param {(string|!Object)}        el
-    * @param {number=}                outerWidth
-    * @param {boolean=}                [autoHide=false]
+    * @param {(string|!Object)}     el
+    * @param {number=}              outerWidth
+    * @param {boolean=}             [autoHide=false]
     */
-,    setOuterWidth = function (el, outerWidth, autoHide) {
+,   setOuterWidth = function (el, outerWidth, autoHide) {
         var $E = el, w;
         if (isStr(el)) $E = $Ps[el]; // west
         else if (!el.jquery) $E = $(el);
@@ -1235,11 +1235,11 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {(string|!Object)}        el
-    * @param {number=}                outerHeight
-    * @param {boolean=}                [autoHide=false]
+    * @param {(string|!Object)}     el
+    * @param {number=}              outerHeight
+    * @param {boolean=}             [autoHide=false]
     */
-,    setOuterHeight = function (el, outerHeight, autoHide) {
+,   setOuterHeight = function (el, outerHeight, autoHide) {
         var $E = el, h;
         if (isStr(el)) $E = $Ps[el]; // west
         else if (!el.jquery) $E = $(el);
@@ -1262,12 +1262,12 @@ $.fn.layout = function (opts) {
     * If 'auto' or a decimal/percentage is passed as 'size', a pixel-size is calculated
     *
     /**
-    * @param  {string}                pane
+    * @param  {string}              pane
     * @param  {(string|number)=}    size
-    * @param  {string=}                [dir]
+    * @param  {string=}             [dir]
     * @return {number}
     */
-,    _parseSize = function (pane, size, dir) {
+,   _parseSize = function (pane, size, dir) {
         if (!dir) dir = _c[pane].dir;
 
         if (isStr(size) && size.match(/%/))
@@ -1292,12 +1292,12 @@ $.fn.layout = function (opts) {
             return 0;
         else { // size < 0 || size=='auto' || size==Missing || size==Invalid
             // auto-size the pane
-            var    dim    = (dir === "horz" ? "height" : "width")
-            ,    $P    = $Ps[pane]
-            ,    $C    = dim === 'height' ? $Cs[pane] : false
-            ,    vis    = $.layout.showInvisibly($P) // show pane invisibly if hidden
-            ,    szP    = $P.css(dim) // SAVE current pane size
-            ,    szC    = $C ? $C.css(dim) : 0 // SAVE current content size
+            var dim = (dir === "horz" ? "height" : "width")
+            ,   $P  = $Ps[pane]
+            ,   $C  = dim === 'height' ? $Cs[pane] : false
+            ,   vis = $.layout.showInvisibly($P) // show pane invisibly if hidden
+            ,   szP = $P.css(dim) // SAVE current pane size
+            ,   szC = $C ? $C.css(dim) : 0 // SAVE current content size
             ;
             $P.css(dim, "auto");
             if ($C) $C.css(dim, "auto");
@@ -1313,15 +1313,15 @@ $.fn.layout = function (opts) {
     *
     * @param  {(string|!Object)}    pane
     * @param  {boolean=}            [inclSpace=false]
-    * @return {number}                Returns EITHER Width for east/west panes OR Height for north/south panes
+    * @return {number}              Returns EITHER Width for east/west panes OR Height for north/south panes
     */
-,    getPaneSize = function (pane, inclSpace) {
-        var
-            $P    = $Ps[pane]
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        ,    oSp    = (inclSpace ? o.spacing_open : 0)
-        ,    cSp    = (inclSpace ? o.spacing_closed : 0)
+,   getPaneSize = function (pane, inclSpace) {
+        var 
+            $P  = $Ps[pane]
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        ,   oSp = (inclSpace ? o.spacing_open : 0)
+        ,   cSp = (inclSpace ? o.spacing_closed : 0)
         ;
         if (!$P || s.isHidden)
             return 0;
@@ -1336,49 +1336,49 @@ $.fn.layout = function (opts) {
     /**
     * Calculate min/max pane dimensions and limits for resizing
     *
-    * @param  {string}        pane
+    * @param  {string}      pane
     * @param  {boolean=}    [slide=false]
     */
-,    setSizeLimits = function (pane, slide) {
+,   setSizeLimits = function (pane, slide) {
         if (!isInitialized()) return;
-        var
-            o                = options[pane]
-        ,    s                = state[pane]
-        ,    c                = _c[pane]
-        ,    dir                = c.dir
-        ,    type            = c.sizeType.toLowerCase()
-        ,    isSliding        = (slide != undefined ? slide : s.isSliding) // only open() passes 'slide' param
-        ,    $P                = $Ps[pane]
-        ,    paneSpacing        = o.spacing_open
-        //    measure the pane on the *opposite side* from this pane
-        ,    altPane            = _c.oppositeEdge[pane]
-        ,    altS            = state[altPane]
-        ,    $altP            = $Ps[altPane]
-        ,    altPaneSize        = (!$altP || altS.isVisible===false || altS.isSliding ? 0 : (dir=="horz" ? $altP.outerHeight() : $altP.outerWidth()))
-        ,    altPaneSpacing    = ((!$altP || altS.isHidden ? 0 : options[altPane][ altS.isClosed !== false ? "spacing_closed" : "spacing_open" ]) || 0)
-        //    limitSize prevents this pane from 'overlapping' opposite pane
-        ,    containerSize    = (dir=="horz" ? sC.innerHeight : sC.innerWidth)
-        ,    minCenterDims    = cssMinDims("center")
-        ,    minCenterSize    = dir=="horz" ? max(options.center.minHeight, minCenterDims.minHeight) : max(options.center.minWidth, minCenterDims.minWidth)
-        //    if pane is 'sliding', then ignore center and alt-pane sizes - because 'overlays' them
-        ,    limitSize        = (containerSize - paneSpacing - (isSliding ? 0 : (_parseSize("center", minCenterSize, dir) + altPaneSize + altPaneSpacing)))
-        ,    minSize            = s.minSize = max( _parseSize(pane, o.minSize), cssMinDims(pane).minSize )
-        ,    maxSize            = s.maxSize = min( (o.maxSize ? _parseSize(pane, o.maxSize) : 100000), limitSize )
-        ,    r                = s.resizerPosition = {} // used to set resizing limits
-        ,    top                = sC.inset.top
-        ,    left            = sC.inset.left
-        ,    W                = sC.innerWidth
-        ,    H                = sC.innerHeight
-        ,    rW                = o.spacing_open // subtract resizer-width to get top/left position for south/east
+        var 
+            o               = options[pane]
+        ,   s               = state[pane]
+        ,   c               = _c[pane]
+        ,   dir             = c.dir
+        ,   type            = c.sizeType.toLowerCase()
+        ,   isSliding       = (slide != undefined ? slide : s.isSliding) // only open() passes 'slide' param
+        ,   $P              = $Ps[pane]
+        ,   paneSpacing     = o.spacing_open
+        //  measure the pane on the *opposite side* from this pane
+        ,   altPane         = _c.oppositeEdge[pane]
+        ,   altS            = state[altPane]
+        ,   $altP           = $Ps[altPane]
+        ,   altPaneSize     = (!$altP || altS.isVisible===false || altS.isSliding ? 0 : (dir=="horz" ? $altP.outerHeight() : $altP.outerWidth()))
+        ,   altPaneSpacing  = ((!$altP || altS.isHidden ? 0 : options[altPane][ altS.isClosed !== false ? "spacing_closed" : "spacing_open" ]) || 0)
+        //  limitSize prevents this pane from 'overlapping' opposite pane
+        ,   containerSize   = (dir=="horz" ? sC.innerHeight : sC.innerWidth)
+        ,   minCenterDims   = cssMinDims("center")
+        ,   minCenterSize   = dir=="horz" ? max(options.center.minHeight, minCenterDims.minHeight) : max(options.center.minWidth, minCenterDims.minWidth)
+        //  if pane is 'sliding', then ignore center and alt-pane sizes - because 'overlays' them
+        ,   limitSize       = (containerSize - paneSpacing - (isSliding ? 0 : (_parseSize("center", minCenterSize, dir) + altPaneSize + altPaneSpacing)))
+        ,   minSize         = s.minSize = max( _parseSize(pane, o.minSize), cssMinDims(pane).minSize )
+        ,   maxSize         = s.maxSize = min( (o.maxSize ? _parseSize(pane, o.maxSize) : 100000), limitSize )
+        ,   r               = s.resizerPosition = {} // used to set resizing limits
+        ,   top             = sC.inset.top
+        ,   left            = sC.inset.left
+        ,   W               = sC.innerWidth
+        ,   H               = sC.innerHeight
+        ,   rW              = o.spacing_open // subtract resizer-width to get top/left position for south/east
         ;
         switch (pane) {
-            case "north":    r.min = top + minSize;
+            case "north":   r.min = top + minSize;
                             r.max = top + maxSize;
                             break;
             case "west":    r.min = left + minSize;
                             r.max = left + maxSize;
                             break;
-            case "south":    r.min = top + H - maxSize - rW;
+            case "south":   r.min = top + H - maxSize - rW;
                             r.max = top + H - minSize - rW;
                             break;
             case "east":    r.min = left + W - maxSize - rW;
@@ -1392,49 +1392,49 @@ $.fn.layout = function (opts) {
     *
     * @return JSON  Returns a hash of all dimensions: top, bottom, left, right, (outer) width and (outer) height
     */
-,    calcNewCenterPaneDims = function () {
+,   calcNewCenterPaneDims = function () {
         var d = {
             top:    getPaneSize("north", true) // true = include 'spacing' value for pane
-        ,    bottom:    getPaneSize("south", true)
-        ,    left:    getPaneSize("west", true)
-        ,    right:    getPaneSize("east", true)
-        ,    width:    0
-        ,    height:    0
+        ,   bottom: getPaneSize("south", true)
+        ,   left:   getPaneSize("west", true)
+        ,   right:  getPaneSize("east", true)
+        ,   width:  0
+        ,   height: 0
         };
 
         // NOTE: sC = state.container
         // calc center-pane outer dimensions
-        d.width        = sC.innerWidth - d.left - d.right;  // outerWidth
+        d.width     = sC.innerWidth - d.left - d.right;  // outerWidth
         d.height    = sC.innerHeight - d.bottom - d.top; // outerHeight
         // add the 'container border/padding' to get final positions relative to the container
-        d.top        += sC.inset.top;
+        d.top       += sC.inset.top;
         d.bottom    += sC.inset.bottom;
-        d.left        += sC.inset.left;
-        d.right        += sC.inset.right;
+        d.left      += sC.inset.left;
+        d.right     += sC.inset.right;
 
         return d;
     }
 
 
     /**
-    * @param {!Object}        el
-    * @param {boolean=}        [allStates=false]
+    * @param {!Object}      el
+    * @param {boolean=}     [allStates=false]
     */
-,    getHoverClasses = function (el, allStates) {
+,   getHoverClasses = function (el, allStates) {
         var
-            $El        = $(el)
-        ,    type    = $El.data("layoutRole")
-        ,    pane    = $El.data("layoutEdge")
-        ,    o        = options[pane]
-        ,    root    = o[type +"Class"]
-        ,    _pane    = "-"+ pane // eg: "-west"
-        ,    _open    = "-open"
-        ,    _closed    = "-closed"
-        ,    _slide    = "-sliding"
-        ,    _hover    = "-hover " // NOTE the trailing space
-        ,    _state    = $El.hasClass(root+_closed) ? _closed : _open
-        ,    _alt    = _state === _closed ? _open : _closed
-        ,    classes = (root+_hover) + (root+_pane+_hover) + (root+_state+_hover) + (root+_pane+_state+_hover)
+            $El     = $(el)
+        ,   type    = $El.data("layoutRole")
+        ,   pane    = $El.data("layoutEdge")
+        ,   o       = options[pane]
+        ,   root    = o[type +"Class"]
+        ,   _pane   = "-"+ pane // eg: "-west"
+        ,   _open   = "-open"
+        ,   _closed = "-closed"
+        ,   _slide  = "-sliding"
+        ,   _hover  = "-hover " // NOTE the trailing space
+        ,   _state  = $El.hasClass(root+_closed) ? _closed : _open
+        ,   _alt    = _state === _closed ? _open : _closed
+        ,   classes = (root+_hover) + (root+_pane+_hover) + (root+_state+_hover) + (root+_pane+_state+_hover)
         ;
         if (allStates) // when 'removing' classes, also remove alternate-state classes
             classes += (root+_alt+_hover) + (root+_pane+_alt+_hover);
@@ -1444,20 +1444,20 @@ $.fn.layout = function (opts) {
 
         return $.trim(classes);
     }
-,    addHover    = function (evt, el) {
+,   addHover    = function (evt, el) {
         var $E = $(el || this);
         if (evt && $E.data("layoutRole") === "toggler")
             evt.stopPropagation(); // prevent triggering 'slide' on Resizer-bar
         $E.addClass( getHoverClasses($E) );
     }
-,    removeHover    = function (evt, el) {
+,   removeHover = function (evt, el) {
         var $E = $(el || this);
         $E.removeClass( getHoverClasses($E, true) );
     }
 
-,    onResizerEnter    = function (evt) { // ALSO called by toggler.mouseenter
+,   onResizerEnter  = function (evt) { // ALSO called by toggler.mouseenter
         var pane    = $(this).data("layoutEdge")
-        ,    s        = state[pane]
+        ,   s       = state[pane]
         ;
         // ignore closed-panes and mouse moving back & forth over resizer!
         // also ignore if ANY pane is currently resizing
@@ -1468,10 +1468,10 @@ $.fn.layout = function (opts) {
         if (options.maskPanesEarly)
             showMasks( pane, { resizing: true });
     }
-,    onResizerLeave    = function (evt, el) {
-        var    e        = el || this // el is only passed when called by the timer
-        ,    pane    = $(e).data("layoutEdge")
-        ,    name    = pane +"ResizerLeave"
+,   onResizerLeave  = function (evt, el) {
+        var e       = el || this // el is only passed when called by the timer
+        ,   pane    = $(e).data("layoutEdge")
+        ,   name    = pane +"ResizerLeave"
         ;
         timer.clear(pane+"_openSlider"); // cancel slideOpen timer, if set
         timer.clear(name); // cancel enableSelection timer - may re/set below
@@ -1501,11 +1501,11 @@ $.fn.layout = function (opts) {
     * @see  none - triggered onInit
     * @return  mixed    true = fully initialized | false = panes not initialized (yet) | 'cancel' = abort
     */
-,    _create = function () {
+,   _create = function () {
         // initialize config/options
         initOptions();
         var o = options
-        ,    s = state;
+        ,   s = state;
 
         // TEMP state so isInitialized returns true during init process
         s.creatingLayout = true;
@@ -1543,21 +1543,21 @@ $.fn.layout = function (opts) {
     * Initialize the layout IF not already
     *
     * @see  All methods in Instance run this test
-    * @return  boolean    true = layoutElements have been initialized | false = panes are not initialized (yet)
+    * @return  boolean  true = layoutElements have been initialized | false = panes are not initialized (yet)
     */
-,    isInitialized = function () {
-        if (state.initialized || state.creatingLayout) return true;    // already initialized
-        else return _initLayoutElements();    // try to init panes NOW
+,   isInitialized = function () {
+        if (state.initialized || state.creatingLayout) return true; // already initialized
+        else return _initLayoutElements();  // try to init panes NOW
     }
 
     /**
     * Initialize the layout - called automatically whenever an instance of layout is created
     *
     * @see  _create() & isInitialized
-    * @param {boolean=}        [retry=false]    // indicates this is a 2nd try
+    * @param {boolean=}     [retry=false]   // indicates this is a 2nd try
     * @return  An object pointer to the instance created
     */
-,    _initLayoutElements = function (retry) {
+,   _initLayoutElements = function (retry) {
         // initialize config/options
         var o = options;
         // CANNOT init panes inside a hidden container!
@@ -1611,20 +1611,20 @@ $.fn.layout = function (opts) {
     /**
     * Initialize nested layouts for a specific pane - can optionally pass layout-options
     *
-    * @param {(string|Object)}    evt_or_pane    The pane being opened, ie: north, south, east, or west
-    * @param {Object=}            [opts]        Layout-options - if passed, will OVERRRIDE options[pane].children
+    * @param {(string|Object)}  evt_or_pane The pane being opened, ie: north, south, east, or west
+    * @param {Object=}          [opts]      Layout-options - if passed, will OVERRRIDE options[pane].children
     * @return  An object pointer to the layout instance created - or null
     */
-,    createChildren = function (evt_or_pane, opts) {
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $P    = $Ps[pane]
+,   createChildren = function (evt_or_pane, opts) {
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $P  = $Ps[pane]
         ;
         if (!$P) return;
-        var    $C    = $Cs[pane]
-        ,    s    = state[pane]
-        ,    o    = options[pane]
-        ,    sm    = options.stateManagement || {}
-        ,    cos = opts ? (o.children = opts) : o.children
+        var $C  = $Cs[pane]
+        ,   s   = state[pane]
+        ,   o   = options[pane]
+        ,   sm  = options.stateManagement || {}
+        ,   cos = opts ? (o.children = opts) : o.children
         ;
         if ( $.isPlainObject( cos ) )
             cos = [ cos ]; // convert a hash to a 1-elem array
@@ -1639,8 +1639,8 @@ $.fn.layout = function (opts) {
             var $containers = co.containerSelector ? $P.find( co.containerSelector ) : ($C || $P);
 
             $containers.each(function(){
-                var $cont    = $(this)
-                ,    child    = $cont.data("layout") //    see if a child-layout ALREADY exists on this element
+                var $cont   = $(this)
+                ,   child   = $cont.data("layout") //   see if a child-layout ALREADY exists on this element
                 ;
                 // if no layout exists, but children are set, try to create the layout now
                 if (!child) {
@@ -1651,15 +1651,15 @@ $.fn.layout = function (opts) {
                     // then see if it also contains state-data for this child-layout
                     // If so, copy the stateData to child.options.stateManagement.autoLoad
                     if ( sm.includeChildren && state.stateData[pane] ) {
-                        //    THIS layout's state was cached when its state was loaded
-                        var    paneChildren = state.stateData[pane].children || {}
-                        ,    childState    = paneChildren[ co.instanceKey ]
-                        ,    co_sm        = co.stateManagement || (co.stateManagement = { autoLoad: true })
+                        //  THIS layout's state was cached when its state was loaded
+                        var paneChildren = state.stateData[pane].children || {}
+                        ,   childState  = paneChildren[ co.instanceKey ]
+                        ,   co_sm       = co.stateManagement || (co.stateManagement = { autoLoad: true })
                         ;
                         // COPY the stateData into the autoLoad key
                         if ( co_sm.autoLoad === true && childState ) {
-                            co_sm.autoSave            = false; // disable autoSave because saving handled by parent-layout
-                            co_sm.includeChildren    = true;  // cascade option - FOR NOW
+                            co_sm.autoSave          = false; // disable autoSave because saving handled by parent-layout
+                            co_sm.includeChildren   = true;  // cascade option - FOR NOW
                             co_sm.autoLoad = $.extend(true, {}, childState); // COPY the state-hash
                         }
                     }
@@ -1678,30 +1678,30 @@ $.fn.layout = function (opts) {
         });
     }
 
-,    setInstanceKey = function (child, parentPaneState) {
+,   setInstanceKey = function (child, parentPaneState) {
         // create a named key for use in state and instance branches
-        var    $c    = child.container
-        ,    o    = child.options
-        ,    sm    = o.stateManagement
-        ,    key    = o.instanceKey || $c.data("layoutInstanceKey")
+        var $c  = child.container
+        ,   o   = child.options
+        ,   sm  = o.stateManagement
+        ,   key = o.instanceKey || $c.data("layoutInstanceKey")
         ;
         if (!key) key = (sm && sm.cookie ? sm.cookie.name : '') || o.name; // look for a name/key
-        if (!key) key = "layout"+ (++parentPaneState.childIdx);    // if no name/key found, generate one
-        else key = key.replace(/[^\w-]/gi, '_').replace(/_{2,}/g, '_');     // ensure is valid as a hash key
+        if (!key) key = "layout"+ (++parentPaneState.childIdx); // if no name/key found, generate one
+        else key = key.replace(/[^\w-]/gi, '_').replace(/_{2,}/g, '_');  // ensure is valid as a hash key
         o.instanceKey = key;
         $c.data("layoutInstanceKey", key); // useful if layout is destroyed and then recreated
         return key;
     }
 
     /**
-    * @param {string}        pane        The pane being opened, ie: north, south, east, or west
-    * @param {Object=}        newChild    New child-layout Instance to add to this pane
+    * @param {string}       pane        The pane being opened, ie: north, south, east, or west
+    * @param {Object=}      newChild    New child-layout Instance to add to this pane
     */
-,    refreshChildren = function (pane, newChild) {
-        var    $P    = $Ps[pane]
-        ,    pC    = children[pane]
-        ,    s    = state[pane]
-        ,    o
+,   refreshChildren = function (pane, newChild) {
+        var $P  = $Ps[pane]
+        ,   pC  = children[pane]
+        ,   s   = state[pane]
+        ,   o
         ;
         // check for destroy()ed layouts and update the child pointers & arrays
         if ($.isPlainObject( pC )) {
@@ -1741,9 +1741,9 @@ $.fn.layout = function (opts) {
         }
     }
 
-,    windowResize = function () {
-        var    o = options
-        ,    delay = Number(o.resizeWithWindowDelay);
+,   windowResize = function () {
+        var o = options
+        ,   delay = Number(o.resizeWithWindowDelay);
         if (delay < 10) delay = 100; // MUST have a delay!
         // resizing uses a delay-loop because the resize event fires repeatly - except in FF, but delay anyway
         timer.clear("winResize"); // if already running
@@ -1759,13 +1759,13 @@ $.fn.layout = function (opts) {
         if (!timer.data["winResizeRepeater"]) setWindowResizeRepeater();
     }
 
-,    setWindowResizeRepeater = function () {
+,   setWindowResizeRepeater = function () {
         var delay = Number(options.resizeWithWindowMaxDelay);
         if (delay > 0)
             timer.set("winResizeRepeater", function(){ setWindowResizeRepeater(); resizeAll(); }, delay);
     }
 
-,    unload = function () {
+,   unload = function () {
         var o = options;
 
         _runCallbacks("onunload_start");
@@ -1781,50 +1781,50 @@ $.fn.layout = function (opts) {
     *
     * @see  _create()
     */
-,    _initContainer = function () {
+,   _initContainer = function () {
         var
-            N        = $N[0]
-        ,    $H        = $("html")
-        ,    tag        = sC.tagName = N.tagName
-        ,    id        = sC.id = N.id
-        ,    cls        = sC.className = N.className
-        ,    o        = options
-        ,    name    = o.name
-        ,    props    = "position,margin,padding,border"
-        ,    css        = "layoutCSS"
-        ,    CSS        = {}
-        ,    hid        = "hidden" // used A LOT!
-        //    see if this container is a 'pane' inside an outer-layout
-        ,    parent    = $N.data("parentLayout")    // parent-layout Instance
-        ,    pane    = $N.data("layoutEdge")        // pane-name in parent-layout
-        ,    isChild    = parent && pane
-        ,    num        = $.layout.cssNum
-        ,    $parent, n
+            N       = $N[0] 
+        ,   $H      = $("html")
+        ,   tag     = sC.tagName = N.tagName
+        ,   id      = sC.id = N.id
+        ,   cls     = sC.className = N.className
+        ,   o       = options
+        ,   name    = o.name
+        ,   props   = "position,margin,padding,border"
+        ,   css     = "layoutCSS"
+        ,   CSS     = {}
+        ,   hid     = "hidden" // used A LOT!
+        //  see if this container is a 'pane' inside an outer-layout
+        ,   parent  = $N.data("parentLayout")   // parent-layout Instance
+        ,   pane    = $N.data("layoutEdge")     // pane-name in parent-layout
+        ,   isChild = parent && pane
+        ,   num     = $.layout.cssNum
+        ,   $parent, n
         ;
         // sC = state.container
         sC.selector = $N.selector.split(".slice")[0];
-        sC.ref        = (o.name ? o.name +' layout / ' : '') + tag + (id ? "#"+id : cls ? '.['+cls+']' : ''); // used in messages
-        sC.isBody    = (tag === "BODY");
+        sC.ref      = (o.name ? o.name +' layout / ' : '') + tag + (id ? "#"+id : cls ? '.['+cls+']' : ''); // used in messages
+        sC.isBody   = (tag === "BODY");
 
         // try to find a parent-layout
         if (!isChild && !sC.isBody) {
             $parent = $N.closest("."+ $.layout.defaults.panes.paneClass);
-            parent    = $parent.data("parentLayout");
+            parent  = $parent.data("parentLayout");
             pane    = $parent.data("layoutEdge");
-            isChild    = parent && pane;
+            isChild = parent && pane;
         }
 
-        $N    .data({
+        $N  .data({
                 layout: Instance
-            ,    layoutContainer: sID // FLAG to indicate this is a layout-container - contains unique internal ID
+            ,   layoutContainer: sID // FLAG to indicate this is a layout-container - contains unique internal ID
             })
             .addClass(o.containerClass)
         ;
         var layoutMethods = {
             destroy:    ''
-        ,    initPanes:    ''
-        ,    resizeAll:    'resizeAll'
-        ,    resize:        'resizeAll'
+        ,   initPanes:  ''
+        ,   resizeAll:  'resizeAll'
+        ,   resize:     'resizeAll'
         };
         // loop hash and bind all methods - include layoutID namespacing
         for (name in layoutMethods) {
@@ -1845,17 +1845,17 @@ $.fn.layout = function (opts) {
             if (sC.isBody) {
                 // SAVE <BODY> CSS
                 $N.data(css, $.extend( styles($N, props), {
-                    height:        $N.css("height")
-                ,    overflow:    $N.css("overflow")
-                ,    overflowX:    $N.css("overflowX")
-                ,    overflowY:    $N.css("overflowY")
+                    height:     $N.css("height")
+                ,   overflow:   $N.css("overflow")
+                ,   overflowX:  $N.css("overflowX")
+                ,   overflowY:  $N.css("overflowY")
                 }));
                 // ALSO SAVE <HTML> CSS
                 $H.data(css, $.extend( styles($H, 'padding'), {
-                    height:        "auto" // FF would return a fixed px-size!
-                ,    overflow:    $H.css("overflow")
-                ,    overflowX:    $H.css("overflowX")
-                ,    overflowY:    $H.css("overflowY")
+                    height:     "auto" // FF would return a fixed px-size!
+                ,   overflow:   $H.css("overflow")
+                ,   overflowX:  $H.css("overflowX")
+                ,   overflowY:  $H.css("overflowY")
                 }));
             }
             else // handle props normally for non-body elements
@@ -1865,9 +1865,9 @@ $.fn.layout = function (opts) {
         try {
             // common container CSS
             CSS = {
-                overflow:    hid
-            ,    overflowX:    hid
-            ,    overflowY:    hid
+                overflow:   hid
+            ,   overflowX:  hid
+            ,   overflowY:  hid
             };
             $N.css( CSS );
 
@@ -1876,9 +1876,9 @@ $.fn.layout = function (opts) {
                 n = parseInt(o.inset, 10) || 0
                 o.inset = {
                     top:    n
-                ,    bottom:    n
-                ,    left:    n
-                ,    right:    n
+                ,   bottom: n
+                ,   left:   n
+                ,   right:  n
                 };
             }
 
@@ -1889,9 +1889,9 @@ $.fn.layout = function (opts) {
                     // use padding from parent-elem (HTML) as outset
                     o.outset = {
                         top:    num($H, "paddingTop")
-                    ,    bottom:    num($H, "paddingBottom")
-                    ,    left:    num($H, "paddingLeft")
-                    ,    right:    num($H, "paddingRight")
+                    ,   bottom: num($H, "paddingBottom")
+                    ,   left:   num($H, "paddingLeft")
+                    ,   right:  num($H, "paddingRight")
                     };
                 }
                 else if (!$.isPlainObject(o.outset)) {
@@ -1899,38 +1899,38 @@ $.fn.layout = function (opts) {
                     n = parseInt(o.outset, 10) || 0
                     o.outset = {
                         top:    n
-                    ,    bottom:    n
-                    ,    left:    n
-                    ,    right:    n
+                    ,   bottom: n
+                    ,   left:   n
+                    ,   right:  n
                     };
                 }
                 // HTML
                 $H.css( CSS ).css({
-                    height:        "100%"
-                ,    border:        "none"    // no border or padding allowed when using height = 100%
-                ,    padding:    0        // ditto
-                ,    margin:        0
+                    height:     "100%"
+                ,   border:     "none"  // no border or padding allowed when using height = 100%
+                ,   padding:    0       // ditto
+                ,   margin:     0
                 });
                 // BODY
                 if (browser.isIE6) {
                     // IE6 CANNOT use the trick of setting absolute positioning on all 4 sides - must have 'height'
                     $N.css({
-                        width:        "100%"
-                    ,    height:        "100%"
-                    ,    border:        "none"    // no border or padding allowed when using height = 100%
-                    ,    padding:    0        // ditto
-                    ,    margin:        0
-                    ,    position:    "relative"
+                        width:      "100%"
+                    ,   height:     "100%"
+                    ,   border:     "none"  // no border or padding allowed when using height = 100%
+                    ,   padding:    0       // ditto
+                    ,   margin:     0
+                    ,   position:   "relative"
                     });
                     // convert body padding to an inset option - the border cannot be measured in IE6!
                     if (!o.inset) o.inset = elDims( $N ).inset;
                 }
                 else { // use absolute positioning for BODY to allow borders & padding without overflow
                     $N.css({
-                        width:        "auto"
-                    ,    height:        "auto"
-                    ,    margin:        0
-                    ,    position:    "absolute"    // allows for border and padding on BODY
+                        width:      "auto"
+                    ,   height:     "auto"
+                    ,   margin:     0
+                    ,   position:   "absolute"  // allows for border and padding on BODY
                     });
                     // apply edge-positioning created above
                     $N.css( o.outset );
@@ -1940,7 +1940,7 @@ $.fn.layout = function (opts) {
             }
             else {
                 // container MUST have 'position'
-                var    p = $N.css("position");
+                var p = $N.css("position");
                 if (!p || !p.match(/(fixed|absolute|relative)/))
                     $N.css("position","relative");
 
@@ -1963,9 +1963,9 @@ $.fn.layout = function (opts) {
     * Bind layout hotkeys - if options enabled
     *
     * @see  _create() and addPane()
-    * @param {string=}    [panes=""]    The edge(s) to process
+    * @param {string=}  [panes=""]  The edge(s) to process
     */
-,    initHotkeys = function (panes) {
+,   initHotkeys = function (panes) {
         panes = panes ? panes.split(",") : _c.borderPanes;
         // bind keyDown to capture hotkeys, if option enabled for ANY pane
         $.each(panes, function (i, pane) {
@@ -1982,7 +1982,7 @@ $.fn.layout = function (opts) {
     *
     * @see  _create()
     */
-,    initOptions = function () {
+,   initOptions = function () {
         var data, d, pane, key, val, i, c, o;
 
         // reprocess user's layout-options to have correct options sub-key structure
@@ -2034,7 +2034,7 @@ $.fn.layout = function (opts) {
             // center-pane uses SOME keys in defaults.panes branch
             if (pane === 'center') {
                 // ONLY copy keys from opts.panes listed in: $.layout.optionsMap.center
-                data = $.layout.optionsMap.center;        // list of 'center-pane keys'
+                data = $.layout.optionsMap.center;      // list of 'center-pane keys'
                 for (i=0, c=data.length; i<c; i++) {    // loop the list...
                     key = data[i];
                     // only need to use pane-default if pane-specific value not set
@@ -2047,20 +2047,20 @@ $.fn.layout = function (opts) {
                 o = options[pane] = $.extend(true, {}, d, o); // re-apply pane-specific opts AFTER pane-defaults
                 createFxOptions( pane );
                 // ensure all border-pane-specific base-classes exist
-                if (!o.resizerClass)    o.resizerClass    = "ui-layout-resizer";
-                if (!o.togglerClass)    o.togglerClass    = "ui-layout-toggler";
+                if (!o.resizerClass)    o.resizerClass  = "ui-layout-resizer";
+                if (!o.togglerClass)    o.togglerClass  = "ui-layout-toggler";
             }
             // ensure we have base pane-class (ALL panes)
             if (!o.paneClass) o.paneClass = "ui-layout-pane";
         });
 
         // update options.zIndexes if a zIndex-option specified
-        var zo    = opts.zIndex
-        ,    z    = options.zIndexes;
+        var zo  = opts.zIndex
+        ,   z   = options.zIndexes;
         if (zo > 0) {
-            z.pane_normal        = zo;
-            z.content_mask        = max(zo+1, z.content_mask);    // MIN = +1
-            z.resizer_normal    = max(zo+2, z.resizer_normal);    // MIN = +2
+            z.pane_normal       = zo;
+            z.content_mask      = max(zo+1, z.content_mask);    // MIN = +1
+            z.resizer_normal    = max(zo+2, z.resizer_normal);  // MIN = +2
         }
 
         // DELETE 'panes' key now that we are done - values were copied to EACH pane
@@ -2068,53 +2068,53 @@ $.fn.layout = function (opts) {
 
 
         function createFxOptions ( pane ) {
-            var    o = options[pane]
-            ,    d = options.panes;
+            var o = options[pane]
+            ,   d = options.panes;
             // ensure fxSettings key to avoid errors
             if (!o.fxSettings) o.fxSettings = {};
             if (!d.fxSettings) d.fxSettings = {};
 
-            $.each(["_open","_close","_size"], function (i,n) {
+            $.each(["_open","_close","_size"], function (i,n) { 
                 var
-                    sName        = "fxName"+ n
-                ,    sSpeed        = "fxSpeed"+ n
-                ,    sSettings    = "fxSettings"+ n
+                    sName       = "fxName"+ n
+                ,   sSpeed      = "fxSpeed"+ n
+                ,   sSettings   = "fxSettings"+ n
                     // recalculate fxName according to specificity rules
-                ,    fxName = o[sName] =
+                ,   fxName = o[sName] =
                         o[sName]    // options.west.fxName_open
-                    ||    d[sName]    // options.panes.fxName_open
-                    ||    o.fxName    // options.west.fxName
-                    ||    d.fxName    // options.panes.fxName
-                    ||    "none"        // MEANS $.layout.defaults.panes.fxName == "" || false || null || 0
-                ,    fxExists    = $.effects && ($.effects[fxName] || ($.effects.effect && $.effects.effect[fxName]))
+                    ||  d[sName]    // options.panes.fxName_open
+                    ||  o.fxName    // options.west.fxName
+                    ||  d.fxName    // options.panes.fxName
+                    ||  "none"      // MEANS $.layout.defaults.panes.fxName == "" || false || null || 0
+                ,   fxExists    = $.effects && ($.effects[fxName] || ($.effects.effect && $.effects.effect[fxName]))
                 ;
                 // validate fxName to ensure is valid effect - MUST have effect-config data in options.effects
                 if (fxName === "none" || !options.effects[fxName] || !fxExists)
                     fxName = o[sName] = "none"; // effect not loaded OR unrecognized fxName
 
                 // set vars for effects subkeys to simplify logic
-                var    fx        = options.effects[fxName] || {}    // effects.slide
-                ,    fx_all    = fx.all    || null                // effects.slide.all
-                ,    fx_pane    = fx[pane]    || null                // effects.slide.west
+                var fx      = options.effects[fxName] || {} // effects.slide
+                ,   fx_all  = fx.all    || null             // effects.slide.all
+                ,   fx_pane = fx[pane]  || null             // effects.slide.west
                 ;
                 // create fxSpeed[_open|_close|_size]
                 o[sSpeed] =
-                    o[sSpeed]                // options.west.fxSpeed_open
-                ||    d[sSpeed]                // options.west.fxSpeed_open
-                ||    o.fxSpeed                // options.west.fxSpeed
-                ||    d.fxSpeed                // options.panes.fxSpeed
-                ||    null                    // DEFAULT - let fxSetting.duration control speed
+                    o[sSpeed]               // options.west.fxSpeed_open
+                ||  d[sSpeed]               // options.west.fxSpeed_open
+                ||  o.fxSpeed               // options.west.fxSpeed
+                ||  d.fxSpeed               // options.panes.fxSpeed
+                ||  null                    // DEFAULT - let fxSetting.duration control speed
                 ;
                 // create fxSettings[_open|_close|_size]
                 o[sSettings] = $.extend(
                     true
-                ,    {}
-                ,    fx_all                    // effects.slide.all
-                ,    fx_pane                    // effects.slide.west
-                ,    d.fxSettings            // options.panes.fxSettings
-                ,    o.fxSettings            // options.west.fxSettings
-                ,    d[sSettings]            // options.panes.fxSettings_open
-                ,    o[sSettings]            // options.west.fxSettings_open
+                ,   {}
+                ,   fx_all                  // effects.slide.all
+                ,   fx_pane                 // effects.slide.west
+                ,   d.fxSettings            // options.panes.fxSettings
+                ,   o.fxSettings            // options.west.fxSettings
+                ,   d[sSettings]            // options.panes.fxSettings_open
+                ,   o[sSettings]            // options.west.fxSettings_open
                 );
             });
 
@@ -2130,9 +2130,9 @@ $.fn.layout = function (opts) {
     * Initialize module objects, styling, size and position for all panes
     *
     * @see  _initElements()
-    * @param {string}    pane        The pane to process
+    * @param {string}   pane        The pane to process
     */
-,    getPane = function (pane) {
+,   getPane = function (pane) {
         var sel = options[pane].paneSelector
         if (sel.substr(0,1)==="#") // ID selector
             // NOTE: elements selected 'by ID' DO NOT have to be 'children'
@@ -2145,10 +2145,10 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {Object=}        evt
+    * @param {Object=}      evt
     */
-,    initPanes = function (evt) {
-        // stopPropagation if called by trigger("layoutinitpanes") - use evtPane utility
+,   initPanes = function (evt) {
+        // stopPropagation if called by trigger("layoutinitpanes") - use evtPane utility 
         evtPane(evt);
 
         // NOTE: do north & south FIRST so we can measure their height - do center LAST
@@ -2170,9 +2170,9 @@ $.fn.layout = function (opts) {
         // size center-pane AGAIN in case we 'closed' a border-pane in loop above
         sizeMidPanes("center");
 
-        //    Chrome/Webkit sometimes fires callbacks BEFORE it completes resizing!
-        //    Before RC30.3, there was a 10ms delay here, but that caused layout
-        //    to load asynchrously, which is BAD, so try skipping delay for now
+        //  Chrome/Webkit sometimes fires callbacks BEFORE it completes resizing!
+        //  Before RC30.3, there was a 10ms delay here, but that caused layout 
+        //  to load asynchrously, which is BAD, so try skipping delay for now
 
         // process pane contents and callbacks, and init/resize child-layout if exists
         $.each(_c.allPanes, function (idx, pane) {
@@ -2184,22 +2184,22 @@ $.fn.layout = function (opts) {
     * Add a pane to the layout - subroutine of initPanes()
     *
     * @see  initPanes()
-    * @param {string}    pane            The pane to process
-    * @param {boolean=}    [force=false]    Size content after init
+    * @param {string}   pane            The pane to process
+    * @param {boolean=} [force=false]   Size content after init
     */
-,    addPane = function (pane, force) {
+,   addPane = function (pane, force) {
         if (!force && !isInitialized()) return;
         var
-            o        = options[pane]
-        ,    s        = state[pane]
-        ,    c        = _c[pane]
-        ,    dir        = c.dir
-        ,    fx        = s.fx
-        ,    spacing    = o.spacing_open || 0
-        ,    isCenter = (pane === "center")
-        ,    CSS        = {}
-        ,    $P        = $Ps[pane]
-        ,    size, minSize, maxSize, child
+            o       = options[pane]
+        ,   s       = state[pane]
+        ,   c       = _c[pane]
+        ,   dir     = c.dir
+        ,   fx      = s.fx
+        ,   spacing = o.spacing_open || 0
+        ,   isCenter = (pane === "center")
+        ,   CSS     = {}
+        ,   $P      = $Ps[pane]
+        ,   size, minSize, maxSize, child
         ;
         // if pane-pointer already exists, remove the old one first
         if ($P)
@@ -2221,20 +2221,20 @@ $.fn.layout = function (opts) {
 
         // create alias for pane data in Instance - initHandles will add more
         Instance[pane] = {
-            name:        pane
-        ,    pane:        $Ps[pane]
-        ,    content:    $Cs[pane]
-        ,    options:    options[pane]
-        ,    state:        state[pane]
-        ,    children:    children[pane]
+            name:       pane
+        ,   pane:       $Ps[pane]
+        ,   content:    $Cs[pane]
+        ,   options:    options[pane]
+        ,   state:      state[pane]
+        ,   children:   children[pane]
         };
 
         // add classes, attributes & events
-        $P    .data({
-                parentLayout:    Instance        // pointer to Layout Instance
-            ,    layoutPane:        Instance[pane]    // NEW pointer to pane-alias-object
-            ,    layoutEdge:        pane
-            ,    layoutRole:        "pane"
+        $P  .data({
+                parentLayout:   Instance        // pointer to Layout Instance
+            ,   layoutPane:     Instance[pane]  // NEW pointer to pane-alias-object
+            ,   layoutEdge:     pane
+            ,   layoutRole:     "pane"
             })
             .css(c.cssReq).css("zIndex", options.zIndexes.pane_normal)
             .css(o.applyDemoStyles ? c.cssDemo : {}) // demo styles
@@ -2243,35 +2243,35 @@ $.fn.layout = function (opts) {
             .bind("mouseleave."+ sID, removeHover )
             ;
         var paneMethods = {
-                hide:                ''
-            ,    show:                ''
-            ,    toggle:                ''
-            ,    close:                ''
-            ,    open:                ''
-            ,    slideOpen:            ''
-            ,    slideClose:            ''
-            ,    slideToggle:        ''
-            ,    size:                'sizePane'
-            ,    sizePane:            'sizePane'
-            ,    sizeContent:        ''
-            ,    sizeHandles:        ''
-            ,    enableClosable:        ''
-            ,    disableClosable:    ''
-            ,    enableSlideable:    ''
-            ,    disableSlideable:    ''
-            ,    enableResizable:    ''
-            ,    disableResizable:    ''
-            ,    swapPanes:            'swapPanes'
-            ,    swap:                'swapPanes'
-            ,    move:                'swapPanes'
-            ,    removePane:            'removePane'
-            ,    remove:                'removePane'
-            ,    createChildren:        ''
-            ,    resizeChildren:        ''
-            ,    resizeAll:            'resizeAll'
-            ,    resizeLayout:        'resizeAll'
+                hide:               ''
+            ,   show:               ''
+            ,   toggle:             ''
+            ,   close:              ''
+            ,   open:               ''
+            ,   slideOpen:          ''
+            ,   slideClose:         ''
+            ,   slideToggle:        ''
+            ,   size:               'sizePane'
+            ,   sizePane:           'sizePane'
+            ,   sizeContent:        ''
+            ,   sizeHandles:        ''
+            ,   enableClosable:     ''
+            ,   disableClosable:    ''
+            ,   enableSlideable:    ''
+            ,   disableSlideable:   ''
+            ,   enableResizable:    ''
+            ,   disableResizable:   ''
+            ,   swapPanes:          'swapPanes'
+            ,   swap:               'swapPanes'
+            ,   move:               'swapPanes'
+            ,   removePane:         'removePane'
+            ,   remove:             'removePane'
+            ,   createChildren:     ''
+            ,   resizeChildren:     ''
+            ,   resizeAll:          'resizeAll'
+            ,   resizeLayout:       'resizeAll'
             }
-        ,    name;
+        ,   name;
         // loop hash and bind all methods - include layoutID namespacing
         for (name in paneMethods) {
             $P.bind("layoutpane"+ name.toLowerCase() +"."+ sID, Instance[ paneMethods[name] || name ]);
@@ -2284,8 +2284,8 @@ $.fn.layout = function (opts) {
             // call _parseSize AFTER applying pane classes & styles - but before making visible (if hidden)
             // if o.size is auto or not valid, then MEASURE the pane and use that as its 'size'
             size    = s.size = _parseSize(pane, o.size);
-            minSize    = _parseSize(pane,o.minSize) || 1;
-            maxSize    = _parseSize(pane,o.maxSize) || 100000;
+            minSize = _parseSize(pane,o.minSize) || 1;
+            maxSize = _parseSize(pane,o.maxSize) || 100000;
             if (size > 0) size = max(min(size, maxSize), minSize);
             s.autoResize = o.autoResize; // used with percentage sizes
 
@@ -2293,21 +2293,21 @@ $.fn.layout = function (opts) {
             s.isClosed  = false; // true = pane is closed
             s.isSliding = false; // true = pane is currently open by 'sliding' over adjacent panes
             s.isResizing= false; // true = pane is in process of being resized
-            s.isHidden    = false; // true = pane is hidden - no spacing, resizer or toggler is visible!
+            s.isHidden  = false; // true = pane is hidden - no spacing, resizer or toggler is visible!
 
             // array for 'pin buttons' whose classNames are auto-updated on pane-open/-close
             if (!s.pins) s.pins = [];
         }
-        //    states common to ALL panes
-        s.tagName    = $P[0].tagName;
-        s.edge        = pane;        // useful if pane is (or about to be) 'swapped' - easy find out where it is (or is going)
+        //  states common to ALL panes
+        s.tagName   = $P[0].tagName;
+        s.edge      = pane;     // useful if pane is (or about to be) 'swapped' - easy find out where it is (or is going)
         s.noRoom    = false;    // true = pane 'automatically' hidden due to insufficient room - will unhide automatically
-        s.isVisible    = true;        // false = pane is invisible - closed OR hidden - simplify logic
+        s.isVisible = true;     // false = pane is invisible - closed OR hidden - simplify logic
 
         // init pane positioning
         setPanePosition( pane );
 
-        // if pane is not visible,
+        // if pane is not visible, 
         if (dir === "horz") // north or south pane
             CSS.height = cssH($P, size);
         else if (dir === "vert") // east or west pane
@@ -2346,10 +2346,10 @@ $.fn.layout = function (opts) {
         }
     }
 
-,    afterInitPane = function (pane) {
-        var    $P    = $Ps[pane]
-        ,    s    = state[pane]
-        ,    o    = options[pane]
+,   afterInitPane = function (pane) {
+        var $P  = $Ps[pane]
+        ,   s   = state[pane]
+        ,   o   = options[pane]
         ;
         if (!$P) return;
 
@@ -2377,40 +2377,40 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {string=}    panes        The pane(s) to process
+    * @param {string=}  panes       The pane(s) to process
     */
-,    setPanePosition = function (panes) {
+,   setPanePosition = function (panes) {
         panes = panes ? panes.split(",") : _c.borderPanes;
 
         // create toggler DIVs for each pane, and set object pointers for them, eg: $R.north = north toggler DIV
         $.each(panes, function (i, pane) {
-            var $P    = $Ps[pane]
-            ,    $R    = $Rs[pane]
-            ,    o    = options[pane]
-            ,    s    = state[pane]
-            ,    side =  _c[pane].side
-            ,    CSS    = {}
+            var $P  = $Ps[pane]
+            ,   $R  = $Rs[pane]
+            ,   o   = options[pane]
+            ,   s   = state[pane]
+            ,   side =  _c[pane].side
+            ,   CSS = {}
             ;
             if (!$P) return; // pane does not exist - skip
 
             // set css-position to account for container borders & padding
             switch (pane) {
-                case "north":     CSS.top     = sC.inset.top;
-                                CSS.left     = sC.inset.left;
-                                CSS.right    = sC.inset.right;
+                case "north":   CSS.top     = sC.inset.top;
+                                CSS.left    = sC.inset.left;
+                                CSS.right   = sC.inset.right;
                                 break;
-                case "south":     CSS.bottom    = sC.inset.bottom;
-                                CSS.left     = sC.inset.left;
-                                CSS.right     = sC.inset.right;
+                case "south":   CSS.bottom  = sC.inset.bottom;
+                                CSS.left    = sC.inset.left;
+                                CSS.right   = sC.inset.right;
                                 break;
-                case "west":     CSS.left     = sC.inset.left; // top, bottom & height set by sizeMidPanes()
+                case "west":    CSS.left    = sC.inset.left; // top, bottom & height set by sizeMidPanes()
                                 break;
-                case "east":     CSS.right     = sC.inset.right; // ditto
+                case "east":    CSS.right   = sC.inset.right; // ditto
                                 break;
-                case "center":    // top, left, width & height set by sizeMidPanes()
+                case "center":  // top, left, width & height set by sizeMidPanes()
             }
             // apply position
-            $P.css(CSS);
+            $P.css(CSS); 
 
             // update resizer position
             if ($R && s.isClosed)
@@ -2424,45 +2424,45 @@ $.fn.layout = function (opts) {
     * Initialize module objects, styling, size and position for all resize bars and toggler buttons
     *
     * @see  _create()
-    * @param {string=}    [panes=""]    The edge(s) to process
+    * @param {string=}  [panes=""]  The edge(s) to process
     */
-,    initHandles = function (panes) {
+,   initHandles = function (panes) {
         panes = panes ? panes.split(",") : _c.borderPanes;
 
         // create toggler DIVs for each pane, and set object pointers for them, eg: $R.north = north toggler DIV
         $.each(panes, function (i, pane) {
-            var $P        = $Ps[pane];
-            $Rs[pane]    = false; // INIT
-            $Ts[pane]    = false;
+            var $P      = $Ps[pane];
+            $Rs[pane]   = false; // INIT
+            $Ts[pane]   = false;
             if (!$P) return; // pane does not exist - skip
 
-            var    o        = options[pane]
-            ,    s        = state[pane]
-            ,    c        = _c[pane]
-            ,    paneId    = o.paneSelector.substr(0,1) === "#" ? o.paneSelector.substr(1) : ""
-            ,    rClass    = o.resizerClass
-            ,    tClass    = o.togglerClass
-            ,    spacing    = (s.isVisible ? o.spacing_open : o.spacing_closed)
-            ,    _pane    = "-"+ pane // used for classNames
-            ,    _state    = (s.isVisible ? "-open" : "-closed") // used for classNames
-            ,    I        = Instance[pane]
+            var o       = options[pane]
+            ,   s       = state[pane]
+            ,   c       = _c[pane]
+            ,   paneId  = o.paneSelector.substr(0,1) === "#" ? o.paneSelector.substr(1) : ""
+            ,   rClass  = o.resizerClass
+            ,   tClass  = o.togglerClass
+            ,   spacing = (s.isVisible ? o.spacing_open : o.spacing_closed)
+            ,   _pane   = "-"+ pane // used for classNames
+            ,   _state  = (s.isVisible ? "-open" : "-closed") // used for classNames
+            ,   I       = Instance[pane]
                 // INIT RESIZER BAR
-            ,    $R        = I.resizer = $Rs[pane] = $("<div></div>")
+            ,   $R      = I.resizer = $Rs[pane] = $("<div></div>")
                 // INIT TOGGLER BUTTON
-            ,    $T        = I.toggler = (o.closable ? $Ts[pane] = $("<div></div>") : false)
+            ,   $T      = I.toggler = (o.closable ? $Ts[pane] = $("<div></div>") : false)
             ;
 
             //if (s.isVisible && o.resizable) ... handled by initResizable
             if (!s.isVisible && o.slidable)
                 $R.attr("title", o.tips.Slide).css("cursor", o.sliderCursor);
 
-            $R    // if paneSelector is an ID, then create a matching ID for the resizer, eg: "#paneLeft" => "paneLeft-resizer"
+            $R  // if paneSelector is an ID, then create a matching ID for the resizer, eg: "#paneLeft" => "paneLeft-resizer"
                 .attr("id", paneId ? paneId +"-resizer" : "" )
                 .data({
-                    parentLayout:    Instance
-                ,    layoutPane:        Instance[pane]    // NEW pointer to pane-alias-object
-                ,    layoutEdge:        pane
-                ,    layoutRole:        "resizer"
+                    parentLayout:   Instance
+                ,   layoutPane:     Instance[pane]  // NEW pointer to pane-alias-object
+                ,   layoutEdge:     pane
+                ,   layoutRole:     "resizer"
                 })
                 .css(_c.resizers.cssReq).css("zIndex", options.zIndexes.resizer_normal)
                 .css(o.applyDemoStyles ? _c.resizers.cssDemo : {}) // add demo styles
@@ -2475,13 +2475,13 @@ $.fn.layout = function (opts) {
                 $R.bind("dblclick."+ sID, toggle );
 
             if ($T) {
-                $T    // if paneSelector is an ID, then create a matching ID for the resizer, eg: "#paneLeft" => "#paneLeft-toggler"
+                $T  // if paneSelector is an ID, then create a matching ID for the resizer, eg: "#paneLeft" => "#paneLeft-toggler"
                     .attr("id", paneId ? paneId +"-toggler" : "" )
                     .data({
-                        parentLayout:    Instance
-                    ,    layoutPane:        Instance[pane]    // NEW pointer to pane-alias-object
-                    ,    layoutEdge:        pane
-                    ,    layoutRole:        "toggler"
+                        parentLayout:   Instance
+                    ,   layoutPane:     Instance[pane]  // NEW pointer to pane-alias-object
+                    ,   layoutEdge:     pane
+                    ,   layoutRole:     "toggler"
                     })
                     .css(_c.togglers.cssReq) // add base/required styles
                     .css(o.applyDemoStyles ? _c.togglers.cssDemo : {}) // add demo styles
@@ -2494,8 +2494,8 @@ $.fn.layout = function (opts) {
                 if (o.togglerContent_open) // ui-layout-open
                     $("<span>"+ o.togglerContent_open +"</span>")
                         .data({
-                            layoutEdge:        pane
-                        ,    layoutRole:        "togglerContent"
+                            layoutEdge:     pane
+                        ,   layoutRole:     "togglerContent"
                         })
                         .data("layoutRole", "togglerContent")
                         .data("layoutEdge", pane)
@@ -2507,8 +2507,8 @@ $.fn.layout = function (opts) {
                 if (o.togglerContent_closed) // ui-layout-closed
                     $("<span>"+ o.togglerContent_closed +"</span>")
                         .data({
-                            layoutEdge:        pane
-                        ,    layoutRole:        "togglerContent"
+                            layoutEdge:     pane
+                        ,   layoutRole:     "togglerContent"
                         })
                         .addClass("content content-closed")
                         .css("display","none")
@@ -2526,7 +2526,7 @@ $.fn.layout = function (opts) {
             if (s.isVisible)
                 setAsOpen(pane);    // onOpen will be called, but NOT onResize
             else {
-                setAsClosed(pane);    // onClose will be called
+                setAsClosed(pane);  // onClose will be called
                 bindStartSlidingEvents(pane, true); // will enable events IF option is set
             }
 
@@ -2541,17 +2541,17 @@ $.fn.layout = function (opts) {
     * Initialize scrolling ui-layout-content div - if exists
     *
     * @see  initPane() - or externally after an Ajax injection
-    * @param {string}    pane            The pane to process
-    * @param {boolean=}    [resize=true]    Size content after init
+    * @param {string}   pane            The pane to process
+    * @param {boolean=} [resize=true]   Size content after init
     */
-,    initContent = function (pane, resize) {
+,   initContent = function (pane, resize) {
         if (!isInitialized()) return;
-        var
-            o    = options[pane]
-        ,    sel    = o.contentSelector
-        ,    I    = Instance[pane]
-        ,    $P    = $Ps[pane]
-        ,    $C
+        var 
+            o   = options[pane]
+        ,   sel = o.contentSelector
+        ,   I   = Instance[pane]
+        ,   $P  = $Ps[pane]
+        ,   $C
         ;
         if (sel) $C = I.content = $Cs[pane] = (o.findNestedContent)
             ? $P.find(sel).eq(0) // match 1-element only
@@ -2585,11 +2585,11 @@ $.fn.layout = function (opts) {
     * -dependancy: $.fn.resizable - will skip if not found
     *
     * @see  _create()
-    * @param {string=}    [panes=""]    The edge(s) to process
+    * @param {string=}  [panes=""]  The edge(s) to process
     */
-,    initResizable = function (panes) {
-        var    draggingAvailable = $.layout.plugins.draggable
-        ,    side // set in start()
+,   initResizable = function (panes) {
+        var draggingAvailable = $.layout.plugins.draggable
+        ,   side // set in start()
         ;
         panes = panes ? panes.split(",") : _c.borderPanes;
 
@@ -2600,24 +2600,24 @@ $.fn.layout = function (opts) {
                 return true; // skip to next
             }
 
-            var s        = state[pane]
-            ,    z        = options.zIndexes
-            ,    c        = _c[pane]
-            ,    side    = c.dir=="horz" ? "top" : "left"
-            ,    $P         = $Ps[pane]
-            ,    $R        = $Rs[pane]
-            ,    base    = o.resizerClass
-            ,    lastPos    = 0 // used when live-resizing
-            ,    r, live // set in start because may change
-            //    'drag' classes are applied to the ORIGINAL resizer-bar while dragging is in process
-            ,    resizerClass        = base+"-drag"                // resizer-drag
-            ,    resizerPaneClass    = base+"-"+pane+"-drag"        // resizer-north-drag
-            //    'helper' class is applied to the CLONED resizer-bar while it is being dragged
-            ,    helperClass            = base+"-dragging"            // resizer-dragging
-            ,    helperPaneClass        = base+"-"+pane+"-dragging" // resizer-north-dragging
-            ,    helperLimitClass    = base+"-dragging-limit"    // resizer-drag
-            ,    helperPaneLimitClass = base+"-"+pane+"-dragging-limit"    // resizer-north-drag
-            ,    helperClassesSet    = false                     // logic var
+            var s       = state[pane]
+            ,   z       = options.zIndexes
+            ,   c       = _c[pane]
+            ,   side    = c.dir=="horz" ? "top" : "left"
+            ,   $P      = $Ps[pane]
+            ,   $R      = $Rs[pane]
+            ,   base    = o.resizerClass
+            ,   lastPos = 0 // used when live-resizing
+            ,   r, live // set in start because may change
+            //  'drag' classes are applied to the ORIGINAL resizer-bar while dragging is in process
+            ,   resizerClass        = base+"-drag"              // resizer-drag
+            ,   resizerPaneClass    = base+"-"+pane+"-drag"     // resizer-north-drag
+            //  'helper' class is applied to the CLONED resizer-bar while it is being dragged
+            ,   helperClass         = base+"-dragging"          // resizer-dragging
+            ,   helperPaneClass     = base+"-"+pane+"-dragging" // resizer-north-dragging
+            ,   helperLimitClass    = base+"-dragging-limit"    // resizer-drag
+            ,   helperPaneLimitClass = base+"-"+pane+"-dragging-limit"  // resizer-north-drag
+            ,   helperClassesSet    = false                     // logic var
             ;
 
             if (!s.isClosed)
@@ -2626,18 +2626,18 @@ $.fn.layout = function (opts) {
 
             $R.draggable({
                 containment:    $N[0] // limit resizing to layout container
-            ,    axis:            (c.dir=="horz" ? "y" : "x") // limit resizing to horz or vert axis
-            ,    delay:            0
-            ,    distance:        1
-            ,    grid:            o.resizingGrid
-            //    basic format for helper - style it using class: .ui-draggable-dragging
-            ,    helper:            "clone"
-            ,    opacity:        o.resizerDragOpacity
-            ,    addClasses:        false // avoid ui-state-disabled class when disabled
-            //,    iframeFix:        o.draggableIframeFix // TODO: consider using when bug is fixed
-            ,    zIndex:            z.resizer_drag
+            ,   axis:           (c.dir=="horz" ? "y" : "x") // limit resizing to horz or vert axis
+            ,   delay:          0
+            ,   distance:       1
+            ,   grid:           o.resizingGrid
+            //  basic format for helper - style it using class: .ui-draggable-dragging
+            ,   helper:         "clone"
+            ,   opacity:        o.resizerDragOpacity
+            ,   addClasses:     false // avoid ui-state-disabled class when disabled
+            //, iframeFix:      o.draggableIframeFix // TODO: consider using when bug is fixed
+            ,   zIndex:         z.resizer_drag
 
-            ,    start: function (e, ui) {
+            ,   start: function (e, ui) {
                     // REFRESH options & state pointers in case we used swapPanes
                     o = options[pane];
                     s = state[pane];
@@ -2649,7 +2649,7 @@ $.fn.layout = function (opts) {
                     if (false === _runCallbacks("ondrag_start", pane)) return false;
 
                     s.isResizing        = true; // prevent pane from closing while resizing
-                    state.paneResizing    = pane; // easy to see if ANY pane is resizing
+                    state.paneResizing  = pane; // easy to see if ANY pane is resizing
                     timer.clear(pane+"_closeSlider"); // just in case already triggered
 
                     // SET RESIZER LIMITS - used in drag()
@@ -2661,19 +2661,19 @@ $.fn.layout = function (opts) {
                     helperClassesSet = false; // reset logic var - see drag()
 
                     // DISABLE TEXT SELECTION (probably already done by resizer.mouseOver)
-                    $('body').disableSelection();
+                    $('body').disableSelection(); 
 
                     // MASK PANES CONTAINING IFRAMES, APPLETS OR OTHER TROUBLESOME ELEMENTS
                     showMasks( pane, { resizing: true });
                 }
 
-            ,    drag: function (e, ui) {
+            ,   drag: function (e, ui) {
                     if (!helperClassesSet) { // can only add classes after clone has been added to the DOM
                         //$(".ui-draggable-dragging")
                         ui.helper
                             .addClass( helperClass +" "+ helperPaneClass ) // add helper classes
-                            .css({ right: "auto", bottom: "auto" })    // fix dir="rtl" issue
-                            .children().css("visibility","hidden")    // hide toggler inside dragged resizer-bar
+                            .css({ right: "auto", bottom: "auto" }) // fix dir="rtl" issue
+                            .children().css("visibility","hidden")  // hide toggler inside dragged resizer-bar
                         ;
                         helperClassesSet = true;
                         // draggable bug!? RE-SET zIndex to prevent E/W resize-bar showing through N/S pane!
@@ -2706,12 +2706,12 @@ $.fn.layout = function (opts) {
                     }
                 }
 
-            ,    stop: function (e, ui) {
+            ,   stop: function (e, ui) {
                     $('body').enableSelection(); // RE-ENABLE TEXT SELECTION
                     window.defaultStatus = ""; // clear 'resizing limit' message from statusbar
                     $R.removeClass( resizerClass +" "+ resizerPaneClass ); // remove drag classes from Resizer
                     s.isResizing        = false;
-                    state.paneResizing    = false; // easy to see if ANY pane is resizing
+                    state.paneResizing  = false; // easy to see if ANY pane is resizing
                     resizePanes(e, ui, pane, true); // true = resizingDone
                 }
 
@@ -2723,22 +2723,22 @@ $.fn.layout = function (opts) {
         *
         * Sub-routine called from stop() - and drag() if livePaneResizing
         *
-        * @param {!Object}        evt
-        * @param {!Object}        ui
-        * @param {string}        pane
-        * @param {boolean=}        [resizingDone=false]
+        * @param {!Object}      evt
+        * @param {!Object}      ui
+        * @param {string}       pane
+        * @param {boolean=}     [resizingDone=false]
         */
         var resizePanes = function (evt, ui, pane, resizingDone) {
-            var    dragPos    = ui.position
-            ,    c        = _c[pane]
-            ,    o        = options[pane]
-            ,    s        = state[pane]
-            ,    resizerPos
+            var dragPos = ui.position
+            ,   c       = _c[pane]
+            ,   o       = options[pane]
+            ,   s       = state[pane]
+            ,   resizerPos
             ;
             switch (pane) {
-                case "north":    resizerPos = dragPos.top; break;
+                case "north":   resizerPos = dragPos.top; break;
                 case "west":    resizerPos = dragPos.left; break;
-                case "south":    resizerPos = sC.layoutHeight - dragPos.top  - o.spacing_open; break;
+                case "south":   resizerPos = sC.layoutHeight - dragPos.top  - o.spacing_open; break;
                 case "east":    resizerPos = sC.layoutWidth  - dragPos.left - o.spacing_open; break;
             };
             // remove container margin from resizer position to get the pane size
@@ -2765,48 +2765,48 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    *    sizeMask
+    *   sizeMask
     *
-    *    Needed to overlay a DIV over an IFRAME-pane because mask CANNOT be *inside* the pane
-    *    Called when mask created, and during livePaneResizing
+    *   Needed to overlay a DIV over an IFRAME-pane because mask CANNOT be *inside* the pane
+    *   Called when mask created, and during livePaneResizing
     */
-,    sizeMask = function () {
-        var $M        = $(this)
-        ,    pane    = $M.data("layoutMask") // eg: "west"
-        ,    s        = state[pane]
+,   sizeMask = function () {
+        var $M      = $(this)
+        ,   pane    = $M.data("layoutMask") // eg: "west"
+        ,   s       = state[pane]
         ;
         // only masks over an IFRAME-pane need manual resizing
         if (s.tagName == "IFRAME" && s.isVisible) // no need to mask closed/hidden panes
             $M.css({
                 top:    s.offsetTop
-            ,    left:    s.offsetLeft
-            ,    width:    s.outerWidth
-            ,    height:    s.outerHeight
+            ,   left:   s.offsetLeft
+            ,   width:  s.outerWidth
+            ,   height: s.outerHeight
             });
         /* ALT Method...
         var $P = $Ps[pane];
         $M.css( $P.position() ).css({ width: $P[0].offsetWidth, height: $P[0].offsetHeight });
         */
     }
-,    sizeMasks = function () {
+,   sizeMasks = function () {
         $Ms.each( sizeMask ); // resize all 'visible' masks
     }
 
     /**
-    * @param {string}    pane        The pane being resized, animated or isSliding
-    * @param {Object=}    [args]        (optional) Options: which masks to apply, and to which panes
+    * @param {string}   pane        The pane being resized, animated or isSliding
+    * @param {Object=}  [args]      (optional) Options: which masks to apply, and to which panes
     */
-,    showMasks = function (pane, args) {
-        var    c        = _c[pane]
-        ,    panes    =  ["center"]
-        ,    z        = options.zIndexes
-        ,    a        = $.extend({
+,   showMasks = function (pane, args) {
+        var c       = _c[pane]
+        ,   panes   =  ["center"]
+        ,   z       = options.zIndexes
+        ,   a       = $.extend({
                         objectsOnly:    false
-                    ,    animation:        false
-                    ,    resizing:        true
-                    ,    sliding:        state[pane].isSliding
-                    },    args )
-        ,    o, s
+                    ,   animation:      false
+                    ,   resizing:       true
+                    ,   sliding:        state[pane].isSliding
+                    },  args )
+        ,   o, s
         ;
         if (a.resizing)
             panes.push( pane );
@@ -2832,20 +2832,20 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {boolean=}    force        Hide masks even if a pane is sliding
+    * @param {boolean=} force       Hide masks even if a pane is sliding
     */
-,    hideMasks = function (force) {
+,   hideMasks = function (force) {
         // ensure no pane is resizing - could be a timing issue
         if (force || !state.paneResizing) {
             $Ms.hide(); // hide ALL masks
         }
         // if ANY pane is sliding, then DO NOT remove masks from panes with maskObjects enabled
         else if (!force && !$.isEmptyObject( state.panesSliding )) {
-            var    i = $Ms.length - 1
-            ,    p, $M;
+            var i = $Ms.length - 1
+            ,   p, $M;
             for (; i >= 0; i--) {
-                $M    = $Ms.eq(i);
-                p    = $M.data("layoutMask");
+                $M  = $Ms.eq(i);
+                p   = $M.data("layoutMask");
                 if (!options[p].maskObjects) {
                     $M.hide();
                 }
@@ -2854,11 +2854,11 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {string}    pane
+    * @param {string}   pane
     */
-,    getMasks = function (pane) {
-        var $Masks    = $([])
-        ,    $M, i = 0, c = $Ms.length
+,   getMasks = function (pane) {
+        var $Masks  = $([])
+        ,   $M, i = 0, c = $Ms.length
         ;
         for (; i<c; i++) {
             $M = $Ms.eq(i);
@@ -2877,17 +2877,17 @@ $.fn.layout = function (opts) {
     * Generates both DIV (ALWAYS used) and IFRAME (optional) elements as masks
     * An IFRAME mask is created *under* the DIV when maskObjects=true, because a DIV cannot mask an applet
     *
-    * @param {string}    pane
+    * @param {string}   pane
     */
-,    createMasks = function (pane) {
+,   createMasks = function (pane) {
         var
-            $P        = $Ps[pane]
-        ,    s        = state[pane]
-        ,    o        = options[pane]
-        ,    z        = options.zIndexes
-        //,    objMask    = o.maskObjects && s.tagName != "IFRAME" // check for option
-        ,    $Masks    = $([])
-        ,    isIframe, el, $M, css, i
+            $P      = $Ps[pane]
+        ,   s       = state[pane]
+        ,   o       = options[pane]
+        ,   z       = options.zIndexes
+        //, objMask = o.maskObjects && s.tagName != "IFRAME" // check for option
+        ,   $Masks  = $([])
+        ,   isIframe, el, $M, css, i
         ;
         if (!o.maskContents && !o.maskObjects) return $Masks;
         // if o.maskObjects=true, then loop TWICE to create BOTH kinds of mask, else only create a DIV
@@ -2898,31 +2898,31 @@ $.fn.layout = function (opts) {
             el.className = "ui-layout-mask ui-layout-mask-"+ pane; // for user styling
             css = el.style;
             // styles common to both DIVs and IFRAMES
-            css.display        = "block";
+            css.display     = "block";
             css.position    = "absolute";
-            css.background    = "#FFF";
+            css.background  = "#FFF";
             if (isIframe) { // IFRAME-only props
                 el.frameborder = 0;
-                el.src        = "about:blank";
+                el.src      = "about:blank";
                 //el.allowTransparency = true; - for IE, but breaks masking ability!
-                css.opacity    = 0;
-                css.filter    = "Alpha(Opacity='0')";
-                css.border    = 0;
+                css.opacity = 0;
+                css.filter  = "Alpha(Opacity='0')";
+                css.border  = 0;
             }
             // if pane is an IFRAME, then must mask the pane itself
             if (s.tagName == "IFRAME") {
                 // NOTE sizing done by a subroutine so can be called during live-resizing
-                css.zIndex    = z.pane_normal+1; // 1-higher than pane
+                css.zIndex  = z.pane_normal+1; // 1-higher than pane
                 $N.append( el ); // append to LAYOUT CONTAINER
             }
             // otherwise put masks *inside the pane* to mask its contents
             else {
                 $M.addClass("ui-layout-mask-inside-pane");
-                css.zIndex    = o.maskZindex || z.content_mask; // usually 1, but customizable
-                css.top        = 0;
+                css.zIndex  = o.maskZindex || z.content_mask; // usually 1, but customizable
+                css.top     = 0;
                 css.left    = 0;
-                css.width    = "100%";
-                css.height    = "100%";
+                css.width   = "100%";
+                css.height  = "100%";
                 $P.append( el ); // append INSIDE pane element
             }
             // add to return object
@@ -2937,15 +2937,15 @@ $.fn.layout = function (opts) {
     /**
     * Destroy this layout and reset all elements
     *
-    * @param {boolean=}    [destroyChildren=false]        Destory Child-Layouts first?
+    * @param {boolean=} [destroyChildren=false]     Destory Child-Layouts first?
     */
-,    destroy = function (evt_or_destroyChildren, destroyChildren) {
+,   destroy = function (evt_or_destroyChildren, destroyChildren) {
         // UNBIND layout events and remove global object
-        $(window).unbind("."+ sID);        // resize & unload
-        $(document).unbind("."+ sID);    // keyDown (hotkeys)
+        $(window).unbind("."+ sID);     // resize & unload
+        $(document).unbind("."+ sID);   // keyDown (hotkeys)
 
         if (typeof evt_or_destroyChildren === "object")
-            // stopPropagation if called by trigger("layoutdestroy") - use evtPane utility
+            // stopPropagation if called by trigger("layoutdestroy") - use evtPane utility 
             evtPane(evt_or_destroyChildren);
         else // no event, so transfer 1st param to destroyChildren param
             destroyChildren = evt_or_destroyChildren;
@@ -2954,7 +2954,7 @@ $.fn.layout = function (opts) {
         //var parentPane = Instance.hasParentLayout ? $.layout.getParentPaneInstance( $N ) : null;
 
         // reset layout-container
-        $N    .clearQueue()
+        $N  .clearQueue()
             .removeData("layout")
             .removeData("layoutContainer")
             .removeClass(options.containerClass)
@@ -2994,8 +2994,8 @@ $.fn.layout = function (opts) {
         // if this is a child layout, CLEAR the child-pointer in the parent
         /* for now the pointer REMAINS, but with only container, options and destroyed keys
         if (parentPane) {
-            var layout    = parentPane.pane.data("parentLayout")
-            ,    key        = layout.options.instanceKey || 'error';
+            var layout  = parentPane.pane.data("parentLayout")
+            ,   key     = layout.options.instanceKey || 'error';
             // THIS SYNTAX MAY BE WRONG!
             parentPane.children[key] = layout.children[ parentPane.name ].children[key] = null;
         }
@@ -3008,21 +3008,21 @@ $.fn.layout = function (opts) {
     * Remove a pane from the layout - subroutine of destroy()
     *
     * @see  destroy()
-    * @param {(string|Object)}    evt_or_pane            The pane to process
-    * @param {boolean=}            [remove=false]        Remove the DOM element?
-    * @param {boolean=}            [skipResize=false]    Skip calling resizeAll()?
-    * @param {boolean=}            [destroyChild=true]    Destroy Child-layouts? If not passed, obeys options setting
+    * @param {(string|Object)}  evt_or_pane         The pane to process
+    * @param {boolean=}         [remove=false]      Remove the DOM element?
+    * @param {boolean=}         [skipResize=false]  Skip calling resizeAll()?
+    * @param {boolean=}         [destroyChild=true] Destroy Child-layouts? If not passed, obeys options setting
     */
-,    removePane = function (evt_or_pane, remove, skipResize, destroyChild) {
+,   removePane = function (evt_or_pane, remove, skipResize, destroyChild) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $P    = $Ps[pane]
-        ,    $C    = $Cs[pane]
-        ,    $R    = $Rs[pane]
-        ,    $T    = $Ts[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $P  = $Ps[pane]
+        ,   $C  = $Cs[pane]
+        ,   $R  = $Rs[pane]
+        ,   $T  = $Ts[pane]
         ;
         // NOTE: elements can still exist even after remove()
-        //        so check for missing data(), which is cleared by removed()
+        //      so check for missing data(), which is cleared by removed()
         if ($P && $.isEmptyObject( $P.data() )) $P = false;
         if ($C && $.isEmptyObject( $C.data() )) $C = false;
         if ($R && $.isEmptyObject( $R.data() )) $R = false;
@@ -3030,13 +3030,13 @@ $.fn.layout = function (opts) {
 
         if ($P) $P.stop(true, true);
 
-        var    o    = options[pane]
-        ,    s    = state[pane]
-        ,    d    = "layout"
-        ,    css    = "layoutCSS"
-        ,    pC    = children[pane]
-        ,    hasChildren    = $.isPlainObject( pC ) && !$.isEmptyObject( pC )
-        ,    destroy        = destroyChild !== undefined ? destroyChild : o.destroyChildren
+        var o   = options[pane]
+        ,   s   = state[pane]
+        ,   d   = "layout"
+        ,   css = "layoutCSS"
+        ,   pC  = children[pane]
+        ,   hasChildren = $.isPlainObject( pC ) && !$.isEmptyObject( pC )
+        ,   destroy     = destroyChild !== undefined ? destroyChild : o.destroyChildren
         ;
         // FIRST destroy the child-layout(s)
         if (hasChildren && destroy) {
@@ -3057,23 +3057,23 @@ $.fn.layout = function (opts) {
         if ($P && remove && !hasChildren)
             $P.remove(); // remove the pane-element and everything inside it
         else if ($P && $P[0]) {
-            //    create list of ALL pane-classes that need to be removed
-            var    root    = o.paneClass // default="ui-layout-pane"
-            ,    pRoot    = root +"-"+ pane // eg: "ui-layout-pane-west"
-            ,    _open    = "-open"
-            ,    _sliding= "-sliding"
-            ,    _closed    = "-closed"
-            ,    classes    = [    root, root+_open, root+_closed, root+_sliding,        // generic classes
-                            pRoot, pRoot+_open, pRoot+_closed, pRoot+_sliding ]    // pane-specific classes
+            //  create list of ALL pane-classes that need to be removed
+            var root    = o.paneClass // default="ui-layout-pane"
+            ,   pRoot   = root +"-"+ pane // eg: "ui-layout-pane-west"
+            ,   _open   = "-open"
+            ,   _sliding= "-sliding"
+            ,   _closed = "-closed"
+            ,   classes = [ root, root+_open, root+_closed, root+_sliding,      // generic classes
+                            pRoot, pRoot+_open, pRoot+_closed, pRoot+_sliding ] // pane-specific classes
             ;
             $.merge(classes, getHoverClasses($P, true)); // ADD hover-classes
             // remove all Layout classes from pane-element
-            $P    .removeClass( classes.join(" ") ) // remove ALL pane-classes
+            $P  .removeClass( classes.join(" ") ) // remove ALL pane-classes
                 .removeData("parentLayout")
                 .removeData("layoutPane")
                 .removeData("layoutRole")
                 .removeData("layoutEdge")
-                .removeData("autoHidden")    // in case set
+                .removeData("autoHidden")   // in case set
                 .unbind("."+ sID) // remove ALL Layout events
                 // TODO: remove these extra unbind commands when jQuery is fixed
                 //.unbind("mouseenter"+ sID)
@@ -3110,17 +3110,17 @@ $.fn.layout = function (opts) {
 
 /*
  * ###########################
- *       ACTION METHODS
+ *     ACTION METHODS
  * ###########################
  */
 
     /**
-    * @param {string}    pane
+    * @param {string}   pane
     */
-,    _hidePane = function (pane) {
-        var $P    = $Ps[pane]
-        ,    o    = options[pane]
-        ,    s    = $P[0].style
+,   _hidePane = function (pane) {
+        var $P  = $Ps[pane]
+        ,   o   = options[pane]
+        ,   s   = $P[0].style
         ;
         if (o.useOffscreenClose) {
             if (!$P.data(_c.offscreenReset))
@@ -3132,16 +3132,16 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {string}    pane
+    * @param {string}   pane
     */
-,    _showPane = function (pane) {
-        var $P    = $Ps[pane]
-        ,    o    = options[pane]
-        ,    off    = _c.offscreenCSS
-        ,    old    = $P.data(_c.offscreenReset)
-        ,    s    = $P[0].style
+,   _showPane = function (pane) {
+        var $P  = $Ps[pane]
+        ,   o   = options[pane]
+        ,   off = _c.offscreenCSS
+        ,   old = $P.data(_c.offscreenReset)
+        ,   s   = $P[0].style
         ;
-        $P    .show() // ALWAYS show, just in case
+        $P  .show() // ALWAYS show, just in case
             .removeData(_c.offscreenReset);
         if (o.useOffscreenClose && old) {
             if (s.left == off.left)
@@ -3156,16 +3156,16 @@ $.fn.layout = function (opts) {
     * Completely 'hides' a pane, including its spacing - as if it does not exist
     * The pane is not actually 'removed' from the source, so can use 'show' to un-hide it
     *
-    * @param {(string|Object)}    evt_or_pane            The pane being hidden, ie: north, south, east, or west
-    * @param {boolean=}            [noAnimation=false]
+    * @param {(string|Object)}  evt_or_pane         The pane being hidden, ie: north, south, east, or west
+    * @param {boolean=}         [noAnimation=false] 
     */
-,    hide = function (evt_or_pane, noAnimation) {
+,   hide = function (evt_or_pane, noAnimation) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        ,    $P    = $Ps[pane]
-        ,    $R    = $Rs[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        ,   $P  = $Ps[pane]
+        ,   $R  = $Rs[pane]
         ;
         if (!$P || s.isHidden) return; // pane does not exist OR is already hidden
 
@@ -3196,18 +3196,18 @@ $.fn.layout = function (opts) {
     /**
     * Show a hidden pane - show as 'closed' by default unless openPane = true
     *
-    * @param {(string|Object)}    evt_or_pane            The pane being opened, ie: north, south, east, or west
-    * @param {boolean=}            [openPane=false]
-    * @param {boolean=}            [noAnimation=false]
-    * @param {boolean=}            [noAlert=false]
+    * @param {(string|Object)}  evt_or_pane         The pane being opened, ie: north, south, east, or west
+    * @param {boolean=}         [openPane=false]
+    * @param {boolean=}         [noAnimation=false]
+    * @param {boolean=}         [noAlert=false]
     */
-,    show = function (evt_or_pane, openPane, noAnimation, noAlert) {
+,   show = function (evt_or_pane, openPane, noAnimation, noAlert) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        ,    $P    = $Ps[pane]
-        ,    $R    = $Rs[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        ,   $P  = $Ps[pane]
+        ,   $R  = $Rs[pane]
         ;
         if (!$P || !s.isHidden) return; // pane does not exist OR is not hidden
 
@@ -3231,14 +3231,14 @@ $.fn.layout = function (opts) {
     /**
     * Toggles a pane open/closed by calling either open or close
     *
-    * @param {(string|Object)}    evt_or_pane        The pane being toggled, ie: north, south, east, or west
-    * @param {boolean=}            [slide=false]
+    * @param {(string|Object)}  evt_or_pane     The pane being toggled, ie: north, south, east, or west
+    * @param {boolean=}         [slide=false]
     */
-,    toggle = function (evt_or_pane, slide) {
+,   toggle = function (evt_or_pane, slide) {
         if (!isInitialized()) return;
-        var    evt        = evtObj(evt_or_pane)
-        ,    pane    = evtPane.call(this, evt_or_pane)
-        ,    s        = state[pane]
+        var evt     = evtObj(evt_or_pane)
+        ,   pane    = evtPane.call(this, evt_or_pane)
+        ,   s       = state[pane]
         ;
         if (evt) // called from to $R.dblclick OR triggerPaneEvent
             evt.stopImmediatePropagation();
@@ -3254,13 +3254,13 @@ $.fn.layout = function (opts) {
     /**
     * Utility method used during init or other auto-processes
     *
-    * @param {string}    pane   The pane being closed
-    * @param {boolean=}    [setHandles=false]
+    * @param {string}   pane   The pane being closed
+    * @param {boolean=} [setHandles=false]
     */
-,    _closePane = function (pane, setHandles) {
+,   _closePane = function (pane, setHandles) {
         var
-            $P    = $Ps[pane]
-        ,    s    = state[pane]
+            $P  = $Ps[pane]
+        ,   s   = state[pane]
         ;
         _hidePane(pane);
         s.isClosed = true;
@@ -3271,13 +3271,13 @@ $.fn.layout = function (opts) {
     /**
     * Close the specified pane (animation optional), and resize all other panes as needed
     *
-    * @param {(string|Object)}    evt_or_pane            The pane being closed, ie: north, south, east, or west
-    * @param {boolean=}            [force=false]
-    * @param {boolean=}            [noAnimation=false]
-    * @param {boolean=}            [skipCallback=false]
+    * @param {(string|Object)}  evt_or_pane         The pane being closed, ie: north, south, east, or west
+    * @param {boolean=}         [force=false]
+    * @param {boolean=}         [noAnimation=false]
+    * @param {boolean=}         [skipCallback=false]
     */
-,    close = function (evt_or_pane, force, noAnimation, skipCallback) {
-        var    pane = evtPane.call(this, evt_or_pane);
+,   close = function (evt_or_pane, force, noAnimation, skipCallback) {
+        var pane = evtPane.call(this, evt_or_pane);
         // if pane has been initialized, but NOT the complete layout, close pane instantly
         if (!state.initialized && $Ps[pane]) {
             _closePane(pane, true); // INIT pane as closed
@@ -3286,20 +3286,20 @@ $.fn.layout = function (opts) {
         if (!isInitialized()) return;
 
         var
-            $P    = $Ps[pane]
-        ,    $R    = $Rs[pane]
-        ,    $T    = $Ts[pane]
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        ,    c    = _c[pane]
-        ,    doFX, isShowing, isHiding, wasSliding;
+            $P  = $Ps[pane]
+        ,   $R  = $Rs[pane]
+        ,   $T  = $Ts[pane]
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        ,   c   = _c[pane]
+        ,   doFX, isShowing, isHiding, wasSliding;
 
         // QUEUE in case another action/animation is in progress
         $N.queue(function( queueNext ){
 
             if ( !$P
-            ||    (!o.closable && !s.isShowing && !s.isHiding)    // invalid request // (!o.resizable && !o.closable) ???
-            ||    (!force && s.isClosed && !s.isShowing)            // already closed
+            ||  (!o.closable && !s.isShowing && !s.isHiding)    // invalid request // (!o.resizable && !o.closable) ???
+            ||  (!force && s.isClosed && !s.isShowing)          // already closed
             ) return queueNext();
 
             // onclose_start callback - will CANCEL hide if returns false
@@ -3307,9 +3307,9 @@ $.fn.layout = function (opts) {
             var abort = !s.isShowing && false === _runCallbacks("onclose_start", pane);
 
             // transfer logic vars to temp vars
-            isShowing    = s.isShowing;
+            isShowing   = s.isShowing;
             isHiding    = s.isHiding;
-            wasSliding    = s.isSliding;
+            wasSliding  = s.isSliding;
             // now clear the logic vars (REQUIRED before aborting)
             delete s.isShowing;
             delete s.isHiding;
@@ -3317,9 +3317,9 @@ $.fn.layout = function (opts) {
             if (abort) return queueNext();
 
             doFX        = !noAnimation && !s.isClosed && (o.fxName_close != "none");
-            s.isMoving    = true;
-            s.isClosed    = true;
-            s.isVisible    = false;
+            s.isMoving  = true;
+            s.isClosed  = true;
+            s.isVisible = false;
             // update isHidden BEFORE sizing panes
             if (isHiding) s.isHidden = true;
             else if (isShowing) s.isHidden = false;
@@ -3334,7 +3334,7 @@ $.fn.layout = function (opts) {
 
             // CLOSE THE PANE
             if (doFX) { // animate the close
-                lockPaneForFX(pane, true);    // need to set left/top so animation will work
+                lockPaneForFX(pane, true);  // need to set left/top so animation will work
                 $P.hide( o.fxName_close, o.fxSettings_close, o.fxSpeed_close, function () {
                     lockPaneForFX(pane, false); // undo
                     if (s.isClosed) close_2();
@@ -3350,7 +3350,7 @@ $.fn.layout = function (opts) {
 
         // SUBROUTINE
         function close_2 () {
-            s.isMoving    = false;
+            s.isMoving  = false;
             bindStartSlidingEvents(pane, true); // will enable if o.slidable = true
 
             // if opposite-pane was autoClosed, see if it can be autoOpened now
@@ -3362,32 +3362,32 @@ $.fn.layout = function (opts) {
 
             if (!skipCallback && (state.initialized || o.triggerEventsOnLoad)) {
                 // onclose callback - UNLESS just 'showing' a hidden pane as 'closed'
-                if (!isShowing)    _runCallbacks("onclose_end", pane);
+                if (!isShowing) _runCallbacks("onclose_end", pane);
                 // onhide OR onshow callback
-                if (isShowing)    _runCallbacks("onshow_end", pane);
-                if (isHiding)    _runCallbacks("onhide_end", pane);
+                if (isShowing)  _runCallbacks("onshow_end", pane);
+                if (isHiding)   _runCallbacks("onhide_end", pane);
             }
         }
     }
 
     /**
-    * @param {string}    pane    The pane just closed, ie: north, south, east, or west
+    * @param {string}   pane    The pane just closed, ie: north, south, east, or west
     */
-,    setAsClosed = function (pane) {
+,   setAsClosed = function (pane) {
         if (!$Rs[pane]) return; // handles not initialized yet!
         var
-            $P        = $Ps[pane]
-        ,    $R        = $Rs[pane]
-        ,    $T        = $Ts[pane]
-        ,    o        = options[pane]
-        ,    s        = state[pane]
-        ,    side    = _c[pane].side
-        ,    rClass    = o.resizerClass
-        ,    tClass    = o.togglerClass
-        ,    _pane    = "-"+ pane // used for classNames
-        ,    _open    = "-open"
-        ,    _sliding= "-sliding"
-        ,    _closed    = "-closed"
+            $P      = $Ps[pane]
+        ,   $R      = $Rs[pane]
+        ,   $T      = $Ts[pane]
+        ,   o       = options[pane]
+        ,   s       = state[pane]
+        ,   side    = _c[pane].side
+        ,   rClass  = o.resizerClass
+        ,   tClass  = o.togglerClass
+        ,   _pane   = "-"+ pane // used for classNames
+        ,   _open   = "-open"
+        ,   _sliding= "-sliding"
+        ,   _closed = "-closed"
         ;
         $R
             .css(side, sC.inset[side]) // move the resizer
@@ -3428,28 +3428,28 @@ $.fn.layout = function (opts) {
     /**
     * Open the specified pane (animation optional), and resize all other panes as needed
     *
-    * @param {(string|Object)}    evt_or_pane            The pane being opened, ie: north, south, east, or west
-    * @param {boolean=}            [slide=false]
-    * @param {boolean=}            [noAnimation=false]
-    * @param {boolean=}            [noAlert=false]
+    * @param {(string|Object)}  evt_or_pane         The pane being opened, ie: north, south, east, or west
+    * @param {boolean=}         [slide=false]
+    * @param {boolean=}         [noAnimation=false]
+    * @param {boolean=}         [noAlert=false]
     */
-,    open = function (evt_or_pane, slide, noAnimation, noAlert) {
+,   open = function (evt_or_pane, slide, noAnimation, noAlert) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $P    = $Ps[pane]
-        ,    $R    = $Rs[pane]
-        ,    $T    = $Ts[pane]
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        ,    c    = _c[pane]
-        ,    doFX, isShowing
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $P  = $Ps[pane]
+        ,   $R  = $Rs[pane]
+        ,   $T  = $Ts[pane]
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        ,   c   = _c[pane]
+        ,   doFX, isShowing
         ;
         // QUEUE in case another action/animation is in progress
         $N.queue(function( queueNext ){
 
             if ( !$P
-            ||    (!o.resizable && !o.closable && !s.isShowing)    // invalid request
-            ||    (s.isVisible && !s.isSliding)                    // already open
+            ||  (!o.resizable && !o.closable && !s.isShowing)   // invalid request
+            ||  (s.isVisible && !s.isSliding)                   // already open
             ) return queueNext();
 
             // pane can ALSO be unhidden by just calling show(), so handle this scenario
@@ -3498,15 +3498,15 @@ $.fn.layout = function (opts) {
             delete s.isShowing;
 
             doFX        = !noAnimation && s.isClosed && (o.fxName_open != "none");
-            s.isMoving    = true;
-            s.isVisible    = true;
-            s.isClosed    = false;
+            s.isMoving  = true;
+            s.isVisible = true;
+            s.isClosed  = false;
             // update isHidden BEFORE sizing panes - WHY??? Old?
             if (isShowing) s.isHidden = false;
 
             if (doFX) { // ANIMATE
                 // mask adjacent panes with objects
-                lockPaneForFX(pane, true);    // need to set left/top so animation will work
+                lockPaneForFX(pane, true);  // need to set left/top so animation will work
                     $P.show( o.fxName_open, o.fxSettings_open, o.fxSpeed_open, function() {
                     lockPaneForFX(pane, false); // undo
                     if (s.isVisible) open_2(); // continue
@@ -3515,14 +3515,14 @@ $.fn.layout = function (opts) {
             }
             else { // no animation
                 _showPane(pane);// just show pane and...
-                open_2();        // continue
+                open_2();       // continue
                 queueNext();
             };
         });
 
         // SUBROUTINE
         function open_2 () {
-            s.isMoving    = false;
+            s.isMoving  = false;
 
             // cure iframe display issues
             _fixIframe(pane);
@@ -3535,27 +3535,27 @@ $.fn.layout = function (opts) {
             // set classes, position handles and execute callbacks...
             setAsOpen(pane);
         };
-
+    
     }
 
     /**
-    * @param {string}    pane        The pane just opened, ie: north, south, east, or west
-    * @param {boolean=}    [skipCallback=false]
+    * @param {string}   pane        The pane just opened, ie: north, south, east, or west
+    * @param {boolean=} [skipCallback=false]
     */
-,    setAsOpen = function (pane, skipCallback) {
-        var
-            $P        = $Ps[pane]
-        ,    $R        = $Rs[pane]
-        ,    $T        = $Ts[pane]
-        ,    o        = options[pane]
-        ,    s        = state[pane]
-        ,    side    = _c[pane].side
-        ,    rClass    = o.resizerClass
-        ,    tClass    = o.togglerClass
-        ,    _pane    = "-"+ pane // used for classNames
-        ,    _open    = "-open"
-        ,    _closed    = "-closed"
-        ,    _sliding= "-sliding"
+,   setAsOpen = function (pane, skipCallback) {
+        var 
+            $P      = $Ps[pane]
+        ,   $R      = $Rs[pane]
+        ,   $T      = $Ts[pane]
+        ,   o       = options[pane]
+        ,   s       = state[pane]
+        ,   side    = _c[pane].side
+        ,   rClass  = o.resizerClass
+        ,   tClass  = o.togglerClass
+        ,   _pane   = "-"+ pane // used for classNames
+        ,   _open   = "-open"
+        ,   _closed = "-closed"
+        ,   _sliding= "-sliding"
         ;
         $R
             .css(side, sC.inset[side] + getPaneSize(pane)) // move the resizer
@@ -3569,7 +3569,7 @@ $.fn.layout = function (opts) {
 
         removeHover( 0, $R ); // remove hover classes
         if (o.resizable && $.layout.plugins.draggable)
-            $R    .draggable("enable")
+            $R  .draggable("enable")
                 .css("cursor", o.resizerCursor)
                 .attr("title", o.tips.Resize);
         else if (!s.isSliding)
@@ -3577,7 +3577,7 @@ $.fn.layout = function (opts) {
 
         // if pane also has a toggler button, adjust that too
         if ($T) {
-            $T    .removeClass( tClass+_closed +" "+ tClass+_pane+_closed )
+            $T  .removeClass( tClass+_closed +" "+ tClass+_pane+_closed )
                 .addClass( tClass+_open +" "+ tClass+_pane+_open )
                 .attr("title", o.tips.Close); // may be blank
             removeHover( 0, $T ); // remove hover classes
@@ -3619,12 +3619,12 @@ $.fn.layout = function (opts) {
     *
     * Pass-though methods for sliding
     */
-,    slideOpen = function (evt_or_pane) {
+,   slideOpen = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    evt        = evtObj(evt_or_pane)
-        ,    pane    = evtPane.call(this, evt_or_pane)
-        ,    s        = state[pane]
-        ,    delay    = options[pane].slideDelay_open
+        var evt     = evtObj(evt_or_pane)
+        ,   pane    = evtPane.call(this, evt_or_pane)
+        ,   s       = state[pane]
+        ,   delay   = options[pane].slideDelay_open
         ;
         // prevent event from triggering on NEW resizer binding created below
         if (evt) evt.stopImmediatePropagation();
@@ -3646,13 +3646,13 @@ $.fn.layout = function (opts) {
         };
     }
 
-,    slideClose = function (evt_or_pane) {
+,   slideClose = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    evt        = evtObj(evt_or_pane)
-        ,    pane    = evtPane.call(this, evt_or_pane)
-        ,    o        = options[pane]
-        ,    s        = state[pane]
-        ,    delay    = s.isMoving ? 1000 : 300 // MINIMUM delay - option may override
+        var evt     = evtObj(evt_or_pane)
+        ,   pane    = evtPane.call(this, evt_or_pane)
+        ,   o       = options[pane]
+        ,   s       = state[pane]
+        ,   delay   = s.isMoving ? 1000 : 300 // MINIMUM delay - option may override
         ;
         if (s.isClosed || s.isResizing)
             return; // skip if already closed OR in process of resizing
@@ -3680,9 +3680,9 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @param {(string|Object)}    evt_or_pane        The pane being opened, ie: north, south, east, or west
+    * @param {(string|Object)}  evt_or_pane     The pane being opened, ie: north, south, east, or west
     */
-,    slideToggle = function (evt_or_pane) {
+,   slideToggle = function (evt_or_pane) {
         var pane = evtPane.call(this, evt_or_pane);
         toggle(pane, true);
     }
@@ -3691,14 +3691,14 @@ $.fn.layout = function (opts) {
     /**
     * Must set left/top on East/South panes so animation will work properly
     *
-    * @param {string}    pane    The pane to lock, 'east' or 'south' - any other is ignored!
-    * @param {boolean}    doLock  true = set left/top, false = remove
+    * @param {string}   pane    The pane to lock, 'east' or 'south' - any other is ignored!
+    * @param {boolean}  doLock  true = set left/top, false = remove
     */
-,    lockPaneForFX = function (pane, doLock) {
-        var $P    = $Ps[pane]
-        ,    s    = state[pane]
-        ,    o    = options[pane]
-        ,    z    = options.zIndexes
+,   lockPaneForFX = function (pane, doLock) {
+        var $P  = $Ps[pane]
+        ,   s   = state[pane]
+        ,   o   = options[pane]
+        ,   z   = options.zIndexes
         ;
         if (doLock) {
             showMasks( pane, { animation: true, objectsOnly: true });
@@ -3727,21 +3727,21 @@ $.fn.layout = function (opts) {
     * Toggle sliding functionality of a specific pane on/off by adding removing 'slide open' trigger
     *
     * @see  open(), close()
-    * @param {string}    pane    The pane to enable/disable, 'north', 'south', etc.
-    * @param {boolean}    enable    Enable or Disable sliding?
+    * @param {string}   pane    The pane to enable/disable, 'north', 'south', etc.
+    * @param {boolean}  enable  Enable or Disable sliding?
     */
-,    bindStartSlidingEvents = function (pane, enable) {
-        var o        = options[pane]
-        ,    $P        = $Ps[pane]
-        ,    $R        = $Rs[pane]
-        ,    evtName    = o.slideTrigger_open.toLowerCase()
+,   bindStartSlidingEvents = function (pane, enable) {
+        var o       = options[pane]
+        ,   $P      = $Ps[pane]
+        ,   $R      = $Rs[pane]
+        ,   evtName = o.slideTrigger_open.toLowerCase()
         ;
         if (!$R || (enable && !o.slidable)) return;
 
         // make sure we have a valid event
         if (evtName.match(/mouseover/))
             evtName = o.slideTrigger_open = "mouseenter";
-        else if (!evtName.match(/(click|dblclick|mouseenter)/))
+        else if (!evtName.match(/(click|dblclick|mouseenter)/)) 
             evtName = o.slideTrigger_open = "click";
 
         // must remove double-click-toggle when using dblclick-slide
@@ -3764,18 +3764,18 @@ $.fn.layout = function (opts) {
     * See bindStartSlidingEvents for code to control 'slide open'
     *
     * @see  slideOpen(), slideClose()
-    * @param {string}    pane    The pane to process, 'north', 'south', etc.
-    * @param {boolean}    enable    Enable or Disable events?
+    * @param {string}   pane    The pane to process, 'north', 'south', etc.
+    * @param {boolean}  enable  Enable or Disable events?
     */
-,    bindStopSlidingEvents = function (pane, enable) {
-        var    o        = options[pane]
-        ,    s        = state[pane]
-        ,    c        = _c[pane]
-        ,    z        = options.zIndexes
-        ,    evtName    = o.slideTrigger_close.toLowerCase()
-        ,    action    = (enable ? "bind" : "unbind")
-        ,    $P        = $Ps[pane]
-        ,    $R        = $Rs[pane]
+,   bindStopSlidingEvents = function (pane, enable) {
+        var o       = options[pane]
+        ,   s       = state[pane]
+        ,   c       = _c[pane]
+        ,   z       = options.zIndexes
+        ,   evtName = o.slideTrigger_close.toLowerCase()
+        ,   action  = (enable ? "bind" : "unbind")
+        ,   $P      = $Ps[pane]
+        ,   $R      = $Rs[pane]
         ;
         timer.clear(pane+"_closeSlider"); // just in case
 
@@ -3813,7 +3813,7 @@ $.fn.layout = function (opts) {
         if (!enable)
             timer.clear(pane+"_closeSlider");
         else if (evtName === "click" && !o.resizable) {
-            // IF pane is not resizable (which already has a cursor and tip)
+            // IF pane is not resizable (which already has a cursor and tip) 
             // then set the a cursor & title/tip on resizer when sliding
             $R.css("cursor", enable ? o.sliderCursor : "default");
             $R.attr("title", enable ? o.tips.Close : ""); // use Toggler-tip, eg: "Close Pane"
@@ -3831,19 +3831,19 @@ $.fn.layout = function (opts) {
     * Hides/closes a pane if there is insufficient room - reverses this when there is room again
     * MUST have already called setSizeLimits() before calling this method
     *
-    * @param {string}    pane                    The pane being resized
-    * @param {boolean=}    [isOpening=false]        Called from onOpen?
-    * @param {boolean=}    [skipCallback=false]    Should the onresize callback be run?
-    * @param {boolean=}    [force=false]
+    * @param {string}   pane                    The pane being resized
+    * @param {boolean=} [isOpening=false]       Called from onOpen?
+    * @param {boolean=} [skipCallback=false]    Should the onresize callback be run?
+    * @param {boolean=} [force=false]
     */
-,    makePaneFit = function (pane, isOpening, skipCallback, force) {
-        var    o    = options[pane]
-        ,    s    = state[pane]
-        ,    c    = _c[pane]
-        ,    $P    = $Ps[pane]
-        ,    $R    = $Rs[pane]
-        ,    isSidePane     = c.dir==="vert"
-        ,    hasRoom        = false
+,   makePaneFit = function (pane, isOpening, skipCallback, force) {
+        var o   = options[pane]
+        ,   s   = state[pane]
+        ,   c   = _c[pane]
+        ,   $P  = $Ps[pane]
+        ,   $R  = $Rs[pane]
+        ,   isSidePane  = c.dir==="vert"
+        ,   hasRoom     = false
         ;
         // special handling for center & east/west panes
         if (pane === "center" || (isSidePane && s.noVerticalRoom)) {
@@ -3880,7 +3880,7 @@ $.fn.layout = function (opts) {
             else if ($R && s.isVisible && $P.is(":visible")) {
                 // make sure resizer-bar is positioned correctly
                 // handles situation where nested layout was 'hidden' when initialized
-                var    pos = s.size + sC.inset[c.side];
+                var pos = s.size + sC.inset[c.side];
                 if ($.layout.cssNum( $R, c.side ) != pos) $R.css( c.side, pos );
             }
 
@@ -3914,19 +3914,19 @@ $.fn.layout = function (opts) {
     /**
     * manualSizePane is an exposed flow-through method allowing extra code when pane is 'manually resized'
     *
-    * @param {(string|Object)}    evt_or_pane                The pane being resized
-    * @param {number}            size                    The *desired* new size for this pane - will be validated
-    * @param {boolean=}            [skipCallback=false]    Should the onresize callback be run?
-    * @param {boolean=}            [noAnimation=false]
-    * @param {boolean=}            [force=false]            Force resizing even if does not seem necessary
+    * @param {(string|Object)}  evt_or_pane             The pane being resized
+    * @param {number}           size                    The *desired* new size for this pane - will be validated
+    * @param {boolean=}         [skipCallback=false]    Should the onresize callback be run?
+    * @param {boolean=}         [noAnimation=false]
+    * @param {boolean=}         [force=false]           Force resizing even if does not seem necessary
     */
-,    manualSizePane = function (evt_or_pane, size, skipCallback, noAnimation, force) {
+,   manualSizePane = function (evt_or_pane, size, skipCallback, noAnimation, force) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    o    = options[pane]
-        ,    s    = state[pane]
-        //    if resizing callbacks have been delayed and resizing is now DONE, force resizing to complete...
-        ,    forceResize = force || (o.livePaneResizing && !s.isResizing)
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   o   = options[pane]
+        ,   s   = state[pane]
+        //  if resizing callbacks have been delayed and resizing is now DONE, force resizing to complete...
+        ,   forceResize = force || (o.livePaneResizing && !s.isResizing)
         ;
         // ANY call to manualSizePane disables autoResize - ie, percentage sizing
         s.autoResize = false;
@@ -3937,24 +3937,24 @@ $.fn.layout = function (opts) {
     /**
     * sizePane is called only by internal methods whenever a pane needs to be resized
     *
-    * @param {(string|Object)}    evt_or_pane                The pane being resized
-    * @param {number}            size                    The *desired* new size for this pane - will be validated
-    * @param {boolean=}            [skipCallback=false]    Should the onresize callback be run?
-    * @param {boolean=}            [noAnimation=false]
-    * @param {boolean=}            [force=false]            Force resizing even if does not seem necessary
+    * @param {(string|Object)}  evt_or_pane             The pane being resized
+    * @param {number}           size                    The *desired* new size for this pane - will be validated
+    * @param {boolean=}         [skipCallback=false]    Should the onresize callback be run?
+    * @param {boolean=}         [noAnimation=false]
+    * @param {boolean=}         [force=false]           Force resizing even if does not seem necessary
     */
-,    sizePane = function (evt_or_pane, size, skipCallback, noAnimation, force) {
+,   sizePane = function (evt_or_pane, size, skipCallback, noAnimation, force) {
         if (!isInitialized()) return;
-        var    pane    = evtPane.call(this, evt_or_pane) // probably NEVER called from event?
-        ,    o        = options[pane]
-        ,    s        = state[pane]
-        ,    $P        = $Ps[pane]
-        ,    $R        = $Rs[pane]
-        ,    side    = _c[pane].side
-        ,    dimName    = _c[pane].sizeType.toLowerCase()
-        ,    skipResizeWhileDragging = s.isResizing && !o.triggerEventsDuringLiveResize
-        ,    doFX    = noAnimation !== true && o.animatePaneSizing
-        ,    oldSize, newSize
+        var pane    = evtPane.call(this, evt_or_pane) // probably NEVER called from event?
+        ,   o       = options[pane]
+        ,   s       = state[pane]
+        ,   $P      = $Ps[pane]
+        ,   $R      = $Rs[pane]
+        ,   side    = _c[pane].side
+        ,   dimName = _c[pane].sizeType.toLowerCase()
+        ,   skipResizeWhileDragging = s.isResizing && !o.triggerEventsDuringLiveResize
+        ,   doFX    = noAnimation !== true && o.animatePaneSizing
+        ,   oldSize, newSize
         ;
         // QUEUE in case another action/animation is in progress
         $N.queue(function( queueNext ){
@@ -3966,7 +3966,7 @@ $.fn.layout = function (opts) {
             size = min(size, s.maxSize);
             if (size < s.minSize) { // not enough room for pane!
                 queueNext(); // call before makePaneFit() because it needs the queue free
-                makePaneFit(pane, false, skipCallback);    // will hide or close pane
+                makePaneFit(pane, false, skipCallback); // will hide or close pane
                 return;
             }
 
@@ -3984,10 +3984,10 @@ $.fn.layout = function (opts) {
             newSize = cssSize(pane, size);
 
             if (doFX && $P.is(":visible")) { // ANIMATE
-                var fx        = $.layout.effects.size[pane] || $.layout.effects.size.all
-                ,    easing    = o.fxSettings_size.easing || fx.easing
-                ,    z        = options.zIndexes
-                ,    props    = {};
+                var fx      = $.layout.effects.size[pane] || $.layout.effects.size.all
+                ,   easing  = o.fxSettings_size.easing || fx.easing
+                ,   z       = options.zIndexes
+                ,   props   = {};
                 props[ dimName ] = newSize +'px';
                 s.isMoving = true;
                 // overlay all elements during animation
@@ -4002,15 +4002,15 @@ $.fn.layout = function (opts) {
                 });
             }
             else { // no animation
-                $P.css( dimName, newSize );    // resize pane
+                $P.css( dimName, newSize ); // resize pane
                 delete s.newSize;
-                // if pane is visible, then
+                // if pane is visible, then 
                 if ($P.is(":visible"))
                     sizePane_2(); // continue
                 else {
                     // pane is NOT VISIBLE, so just update state data...
                     // when pane is *next opened*, it will have the new size
-                    s.size = size;                // update state.size
+                    s.size = size;              // update state.size
                     $.extend(s, elDims($P));    // update state dimensions
                 }
                 queueNext();
@@ -4020,22 +4020,22 @@ $.fn.layout = function (opts) {
 
         // SUBROUTINE
         function sizePane_2 () {
-            /*    Panes are sometimes not sized precisely in some browsers!?
-             *    This code will resize the pane up to 3 times to nudge the pane to the correct size
+            /*  Panes are sometimes not sized precisely in some browsers!?
+             *  This code will resize the pane up to 3 times to nudge the pane to the correct size
              */
-            var    actual    = dimName==='width' ? $P.outerWidth() : $P.outerHeight()
-            ,    tries    = [{
-                               pane:        pane
-                        ,    count:        1
-                        ,    target:        size
-                        ,    actual:        actual
-                        ,    correct:    (size === actual)
-                        ,    attempt:    size
-                        ,    cssSize:    newSize
+            var actual  = dimName==='width' ? $P.outerWidth() : $P.outerHeight()
+            ,   tries   = [{
+                            pane:       pane
+                        ,   count:      1
+                        ,   target:     size
+                        ,   actual:     actual
+                        ,   correct:    (size === actual)
+                        ,   attempt:    size
+                        ,   cssSize:    newSize
                         }]
-            ,    lastTry = tries[0]
-            ,    thisTry    = {}
-            ,    msg        = 'Inaccurate size after resizing the '+ pane +'-pane.'
+            ,   lastTry = tries[0]
+            ,   thisTry = {}
+            ,   msg     = 'Inaccurate size after resizing the '+ pane +'-pane.'
             ;
             while ( !lastTry.correct ) {
                 thisTry = { pane: pane, count: lastTry.count+1, target: size };
@@ -4048,8 +4048,8 @@ $.fn.layout = function (opts) {
                 thisTry.cssSize = cssSize(pane, thisTry.attempt);
                 $P.css( dimName, thisTry.cssSize );
 
-                thisTry.actual    = dimName=='width' ? $P.outerWidth() : $P.outerHeight();
-                thisTry.correct    = (size === thisTry.actual);
+                thisTry.actual  = dimName=='width' ? $P.outerWidth() : $P.outerHeight();
+                thisTry.correct = (size === thisTry.actual);
 
                 // log attempts and alert the user of this *non-fatal error* (if showDebugMessages)
                 if ( tries.length === 1) {
@@ -4066,7 +4066,7 @@ $.fn.layout = function (opts) {
             // END TESTING CODE
 
             // update pane-state dimensions
-            s.size    = size;
+            s.size  = size;
             $.extend(s, elDims($P));
 
             if (s.isVisible && $P.is(":visible")) {
@@ -4101,28 +4101,28 @@ $.fn.layout = function (opts) {
     }
 
     /**
-    * @see  initPanes(), sizePane(),     resizeAll(), open(), close(), hide()
-    * @param {(Array.<string>|string)}    panes                    The pane(s) being resized, comma-delmited string
-    * @param {boolean=}                    [skipCallback=false]    Should the onresize callback be run?
-    * @param {boolean=}                    [force=false]
+    * @see  initPanes(), sizePane(),    resizeAll(), open(), close(), hide()
+    * @param {(Array.<string>|string)}  panes                   The pane(s) being resized, comma-delmited string
+    * @param {boolean=}                 [skipCallback=false]    Should the onresize callback be run?
+    * @param {boolean=}                 [force=false]
     */
-,    sizeMidPanes = function (panes, skipCallback, force) {
+,   sizeMidPanes = function (panes, skipCallback, force) {
         panes = (panes ? panes : "east,west,center").split(",");
 
         $.each(panes, function (i, pane) {
             if (!$Ps[pane]) return; // NO PANE - skip
-            var
-                o        = options[pane]
-            ,    s        = state[pane]
-            ,    $P        = $Ps[pane]
-            ,    $R        = $Rs[pane]
-            ,    isCenter= (pane=="center")
-            ,    hasRoom    = true
-            ,    CSS        = {}
-            //    if pane is not visible, show it invisibly NOW rather than for *each call* in this script
-            ,    visCSS    = $.layout.showInvisibly($P)
+            var 
+                o       = options[pane]
+            ,   s       = state[pane]
+            ,   $P      = $Ps[pane]
+            ,   $R      = $Rs[pane]
+            ,   isCenter= (pane=="center")
+            ,   hasRoom = true
+            ,   CSS     = {}
+            //  if pane is not visible, show it invisibly NOW rather than for *each call* in this script
+            ,   visCSS  = $.layout.showInvisibly($P)
 
-            ,    newCenter    = calcNewCenterPaneDims()
+            ,   newCenter   = calcNewCenterPaneDims()
             ;
 
             // update pane-state dimensions
@@ -4135,28 +4135,28 @@ $.fn.layout = function (opts) {
                 }
                 // set state for makePaneFit() logic
                 $.extend(s, cssMinDims(pane), {
-                    maxWidth:    newCenter.width
-                ,    maxHeight:    newCenter.height
+                    maxWidth:   newCenter.width
+                ,   maxHeight:  newCenter.height
                 });
                 CSS = newCenter;
-                s.newWidth    = CSS.width;
-                s.newHeight    = CSS.height;
-                // convert OUTER width/height to CSS width/height
-                CSS.width    = cssW($P, CSS.width);
+                s.newWidth  = CSS.width;
+                s.newHeight = CSS.height;
+                // convert OUTER width/height to CSS width/height 
+                CSS.width   = cssW($P, CSS.width);
                 // NEW - allow pane to extend 'below' visible area rather than hide it
-                CSS.height    = cssH($P, CSS.height);
-                hasRoom        = CSS.width >= 0 && CSS.height >= 0; // height >= 0 = ALWAYS TRUE NOW
+                CSS.height  = cssH($P, CSS.height);
+                hasRoom     = CSS.width >= 0 && CSS.height >= 0; // height >= 0 = ALWAYS TRUE NOW
 
                 // during layout init, try to shrink east/west panes to make room for center
                 if (!state.initialized && o.minWidth > newCenter.width) {
                     var
-                        reqPx    = o.minWidth - s.outerWidth
-                    ,    minE    = options.east.minSize || 0
-                    ,    minW    = options.west.minSize || 0
-                    ,    sizeE    = state.east.size
-                    ,    sizeW    = state.west.size
-                    ,    newE    = sizeE
-                    ,    newW    = sizeW
+                        reqPx   = o.minWidth - s.outerWidth
+                    ,   minE    = options.east.minSize || 0
+                    ,   minW    = options.west.minSize || 0
+                    ,   sizeE   = state.east.size
+                    ,   sizeW   = state.west.size
+                    ,   newE    = sizeE
+                    ,   newW    = sizeW
                     ;
                     if (reqPx > 0 && state.east.isVisible && sizeE > minE) {
                         newE = max( sizeE-minE, sizeE-reqPx );
@@ -4188,13 +4188,13 @@ $.fn.layout = function (opts) {
                     return true; // SKIP - pane already the correct size
                 }
                 // east/west have same top, bottom & height as center
-                CSS.top        = newCenter.top;
-                CSS.bottom    = newCenter.bottom;
-                s.newSize    = newCenter.height
+                CSS.top     = newCenter.top;
+                CSS.bottom  = newCenter.bottom;
+                s.newSize   = newCenter.height
                 // NEW - allow pane to extend 'below' visible area rather than hide it
-                CSS.height    = cssH($P, newCenter.height);
-                s.maxHeight    = CSS.height;
-                hasRoom        = (s.maxHeight >= 0); // ALWAYS TRUE NOW
+                CSS.height  = cssH($P, newCenter.height);
+                s.maxHeight = CSS.height;
+                hasRoom     = (s.maxHeight >= 0); // ALWAYS TRUE NOW
                 if (!hasRoom) s.noVerticalRoom = true; // makePaneFit() logic
             }
 
@@ -4230,12 +4230,12 @@ $.fn.layout = function (opts) {
             * Extra CSS for IE6 or IE7 in Quirks-mode - add 'width' to NORTH/SOUTH panes
             * Normally these panes have only 'left' & 'right' positions so pane auto-sizes
             * ALSO required when pane is an IFRAME because will NOT default to 'full width'
-            *    TODO: Can I use width:100% for a north/south iframe?
-            *    TODO: Sounds like a job for $P.outerWidth( sC.innerWidth ) SETTER METHOD
+            *   TODO: Can I use width:100% for a north/south iframe?
+            *   TODO: Sounds like a job for $P.outerWidth( sC.innerWidth ) SETTER METHOD
             */
             if (pane === "center") { // finished processing midPanes
                 var fix = browser.isIE6 || !browser.boxModel;
-                if ($Ps.north && (fix || state.north.tagName=="IFRAME"))
+                if ($Ps.north && (fix || state.north.tagName=="IFRAME")) 
                     $Ps.north.css("width", cssW($Ps.north, sC.innerWidth));
                 if ($Ps.south && (fix || state.south.tagName=="IFRAME"))
                     $Ps.south.css("width", cssW($Ps.south, sC.innerWidth));
@@ -4250,13 +4250,13 @@ $.fn.layout = function (opts) {
 
     /**
     * @see  window.onresize(), callbacks or custom code
-    * @param {(Object|boolean)=}    evt_or_refresh    If 'true', then also reset pane-positioning
+    * @param {(Object|boolean)=}    evt_or_refresh  If 'true', then also reset pane-positioning
     */
-,    resizeAll = function (evt_or_refresh) {
-        var    oldW    = sC.innerWidth
-        ,    oldH    = sC.innerHeight
+,   resizeAll = function (evt_or_refresh) {
+        var oldW    = sC.innerWidth
+        ,   oldH    = sC.innerHeight
         ;
-        // stopPropagation if called by trigger("layoutdestroy") - use evtPane utility
+        // stopPropagation if called by trigger("layoutdestroy") - use evtPane utility 
         evtPane(evt_or_refresh);
 
         // cannot size layout when 'container' is hidden or collapsed
@@ -4284,10 +4284,10 @@ $.fn.layout = function (opts) {
         // state.container has already been set, so user can access this info for calcuations
         if (false === _runCallbacks("onresizeall_start")) return false;
 
-        var    // see if container is now 'smaller' than before
-            shrunkH    = (sC.innerHeight < oldH)
-        ,    shrunkW    = (sC.innerWidth < oldW)
-        ,    $P, o, s
+        var // see if container is now 'smaller' than before
+            shrunkH = (sC.innerHeight < oldH)
+        ,   shrunkW = (sC.innerWidth < oldW)
+        ,   $P, o, s
         ;
         // NOTE special order for sizing: S-N-E-W
         $.each(["south","north","east","west"], function (i, pane) {
@@ -4320,10 +4320,10 @@ $.fn.layout = function (opts) {
     /**
     * Whenever a pane resizes or opens that has a nested layout, trigger resizeAll
     *
-    * @param {(string|Object)}    evt_or_pane        The pane just resized or opened
+    * @param {(string|Object)}  evt_or_pane     The pane just resized or opened
     */
-,    resizeChildren = function (evt_or_pane, skipRefresh) {
-        var    pane = evtPane.call(this, evt_or_pane);
+,   resizeChildren = function (evt_or_pane, skipRefresh) {
+        var pane = evtPane.call(this, evt_or_pane);
 
         if (!options[pane].resizeChildren) return;
 
@@ -4341,10 +4341,10 @@ $.fn.layout = function (opts) {
     /**
     * IF pane has a content-div, then resize all elements inside pane to fit pane-height
     *
-    * @param {(string|Object)}    evt_or_panes        The pane(s) being resized
-    * @param {boolean=}            [remeasure=false]    Should the content (header/footer) be remeasured?
+    * @param {(string|Object)}  evt_or_panes        The pane(s) being resized
+    * @param {boolean=}         [remeasure=false]   Should the content (header/footer) be remeasured?
     */
-,    sizeContent = function (evt_or_panes, remeasure) {
+,   sizeContent = function (evt_or_panes, remeasure) {
         if (!isInitialized()) return;
 
         var panes = evtPane.call(this, evt_or_panes);
@@ -4352,17 +4352,17 @@ $.fn.layout = function (opts) {
 
         $.each(panes, function (idx, pane) {
             var
-                $P    = $Ps[pane]
-            ,    $C    = $Cs[pane]
-            ,    o    = options[pane]
-            ,    s    = state[pane]
-            ,    m    = s.content // m = measurements
+                $P  = $Ps[pane]
+            ,   $C  = $Cs[pane]
+            ,   o   = options[pane]
+            ,   s   = state[pane]
+            ,   m   = s.content // m = measurements
             ;
             if (!$P || !$C || !$P.is(":visible")) return true; // NOT VISIBLE - skip
 
             // if content-element was REMOVED, update OR remove the pointer
             if (!$C.length) {
-                initContent(pane, false);    // false = do NOT sizeContent() - already there!
+                initContent(pane, false);   // false = do NOT sizeContent() - already there!
                 if (!$C) return;            // no replacement element found - pointer have been removed
             }
 
@@ -4398,17 +4398,17 @@ $.fn.layout = function (opts) {
 
             function _measure () {
                 var
-                    ignore    = options[pane].contentIgnoreSelector
-                ,    $Fs        = $C.nextAll().not(".ui-layout-mask").not(ignore || ":lt(0)") // not :lt(0) = ALL
-                ,    $Fs_vis    = $Fs.filter(':visible')
-                ,    $F        = $Fs_vis.filter(':last')
+                    ignore  = options[pane].contentIgnoreSelector
+                ,   $Fs     = $C.nextAll().not(".ui-layout-mask").not(ignore || ":lt(0)") // not :lt(0) = ALL
+                ,   $Fs_vis = $Fs.filter(':visible')
+                ,   $F      = $Fs_vis.filter(':last')
                 ;
                 m = {
                     top:            $C[0].offsetTop
-                ,    height:            $C.outerHeight()
-                ,    numFooters:        $Fs.length
-                ,    hiddenFooters:    $Fs.length - $Fs_vis.length
-                ,    spaceBelow:        0 // correct if no content footer ($E)
+                ,   height:         $C.outerHeight()
+                ,   numFooters:     $Fs.length
+                ,   hiddenFooters:  $Fs.length - $Fs_vis.length
+                ,   spaceBelow:     0 // correct if no content footer ($E)
                 }
                     m.spaceAbove    = m.top; // just for state - not used in calc
                     m.bottom        = m.top + m.height;
@@ -4426,33 +4426,33 @@ $.fn.layout = function (opts) {
     * Called every time a pane is opened, closed, or resized to slide the togglers to 'center' and adjust their length if necessary
     *
     * @see  initHandles(), open(), close(), resizeAll()
-    * @param {(string|Object)=}        evt_or_panes    The pane(s) being resized
+    * @param {(string|Object)=}     evt_or_panes    The pane(s) being resized
     */
-,    sizeHandles = function (evt_or_panes) {
+,   sizeHandles = function (evt_or_panes) {
         var panes = evtPane.call(this, evt_or_panes)
         panes = panes ? panes.split(",") : _c.borderPanes;
 
         $.each(panes, function (i, pane) {
-            var
-                o    = options[pane]
-            ,    s    = state[pane]
-            ,    $P    = $Ps[pane]
-            ,    $R    = $Rs[pane]
-            ,    $T    = $Ts[pane]
-            ,    $TC
+            var 
+                o   = options[pane]
+            ,   s   = state[pane]
+            ,   $P  = $Ps[pane]
+            ,   $R  = $Rs[pane]
+            ,   $T  = $Ts[pane]
+            ,   $TC
             ;
             if (!$P || !$R) return;
 
             var
-                dir            = _c[pane].dir
-            ,    _state        = (s.isClosed ? "_closed" : "_open")
-            ,    spacing        = o["spacing"+ _state]
-            ,    togAlign    = o["togglerAlign"+ _state]
-            ,    togLen        = o["togglerLength"+ _state]
-            ,    paneLen
-            ,    left
-            ,    offset
-            ,    CSS = {}
+                dir         = _c[pane].dir
+            ,   _state      = (s.isClosed ? "_closed" : "_open")
+            ,   spacing     = o["spacing"+ _state]
+            ,   togAlign    = o["togglerAlign"+ _state]
+            ,   togLen      = o["togglerLength"+ _state]
+            ,   paneLen
+            ,   left
+            ,   offset
+            ,   CSS = {}
             ;
 
             if (spacing === 0) {
@@ -4464,24 +4464,24 @@ $.fn.layout = function (opts) {
 
             // Resizer Bar is ALWAYS same width/height of pane it is attached to
             if (dir === "horz") { // north/south
-                //paneLen = $P.outerWidth(); // s.outerWidth ||
+                //paneLen = $P.outerWidth(); // s.outerWidth || 
                 paneLen = sC.innerWidth; // handle offscreen-panes
                 s.resizerLength = paneLen;
                 left = $.layout.cssNum($P, "left")
                 $R.css({
-                    width:    cssW($R, paneLen) // account for borders & padding
-                ,    height:    cssH($R, spacing) // ditto
-                ,    left:    left > -9999 ? left : sC.inset.left // handle offscreen-panes
+                    width:  cssW($R, paneLen) // account for borders & padding
+                ,   height: cssH($R, spacing) // ditto
+                ,   left:   left > -9999 ? left : sC.inset.left // handle offscreen-panes
                 });
             }
             else { // east/west
-                paneLen = $P.outerHeight(); // s.outerHeight ||
+                paneLen = $P.outerHeight(); // s.outerHeight || 
                 s.resizerLength = paneLen;
                 $R.css({
-                    height:    cssH($R, paneLen) // account for borders & padding
-                ,    width:    cssW($R, spacing) // ditto
-                ,    top:    sC.inset.top + getPaneSize("north", true) // TODO: what if no North pane?
-                //,    top:    $.layout.cssNum($Ps["center"], "top")
+                    height: cssH($R, paneLen) // account for borders & padding
+                ,   width:  cssW($R, spacing) // ditto
+                ,   top:    sC.inset.top + getPaneSize("north", true) // TODO: what if no North pane?
+                //, top:    $.layout.cssNum($Ps["center"], "top")
                 });
             }
 
@@ -4507,7 +4507,7 @@ $.fn.layout = function (opts) {
                             case "left":    offset = 0;
                                             break;
                             case "bottom":
-                            case "right":    offset = paneLen - togLen;
+                            case "right":   offset = paneLen - togLen;
                                             break;
                             case "middle":
                             case "center":
@@ -4524,10 +4524,10 @@ $.fn.layout = function (opts) {
                 if (dir === "horz") { // north/south
                     var width = cssW($T, togLen);
                     $T.css({
-                        width:    width  // account for borders & padding
-                    ,    height:    cssH($T, spacing) // ditto
-                    ,    left:    offset // TODO: VERIFY that toggler  positions correctly for ALL values
-                    ,    top:    0
+                        width:  width  // account for borders & padding
+                    ,   height: cssH($T, spacing) // ditto
+                    ,   left:   offset // TODO: VERIFY that toggler  positions correctly for ALL values
+                    ,   top:    0
                     });
                     // CENTER the toggler content SPAN
                     $T.children(".content").each(function(){
@@ -4538,10 +4538,10 @@ $.fn.layout = function (opts) {
                 else { // east/west
                     var height = cssH($T, togLen);
                     $T.css({
-                        height:    height // account for borders & padding
-                    ,    width:    cssW($T, spacing) // ditto
-                    ,    top:    offset // POSITION the toggler
-                    ,    left:    0
+                        height: height // account for borders & padding
+                    ,   width:  cssW($T, spacing) // ditto
+                    ,   top:    offset // POSITION the toggler
+                    ,   left:   0
                     });
                     // CENTER the toggler content SPAN
                     $T.children(".content").each(function(){
@@ -4564,36 +4564,36 @@ $.fn.layout = function (opts) {
 
 
     /**
-    * @param {(string|Object)}    evt_or_pane
+    * @param {(string|Object)}  evt_or_pane
     */
-,    enableClosable = function (evt_or_pane) {
+,   enableClosable = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $T    = $Ts[pane]
-        ,    o    = options[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $T  = $Ts[pane]
+        ,   o   = options[pane]
         ;
         if (!$T) return;
         o.closable = true;
-        $T    .bind("click."+ sID, function(evt){ evt.stopPropagation(); toggle(pane); })
+        $T  .bind("click."+ sID, function(evt){ evt.stopPropagation(); toggle(pane); })
             .css("visibility", "visible")
             .css("cursor", "pointer")
             .attr("title", state[pane].isClosed ? o.tips.Open : o.tips.Close) // may be blank
             .show();
     }
     /**
-    * @param {(string|Object)}    evt_or_pane
-    * @param {boolean=}            [hide=false]
+    * @param {(string|Object)}  evt_or_pane
+    * @param {boolean=}         [hide=false]
     */
-,    disableClosable = function (evt_or_pane, hide) {
+,   disableClosable = function (evt_or_pane, hide) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $T    = $Ts[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $T  = $Ts[pane]
         ;
         if (!$T) return;
         options[pane].closable = false;
         // is closable is disable, then pane MUST be open!
         if (state[pane].isClosed) open(pane, false, true);
-        $T    .unbind("."+ sID)
+        $T  .unbind("."+ sID)
             .css("visibility", hide ? "hidden" : "visible") // instead of hide(), which creates logic issues
             .css("cursor", "default")
             .attr("title", "");
@@ -4601,33 +4601,33 @@ $.fn.layout = function (opts) {
 
 
     /**
-    * @param {(string|Object)}    evt_or_pane
+    * @param {(string|Object)}  evt_or_pane
     */
-,    enableSlidable = function (evt_or_pane) {
+,   enableSlidable = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $R    = $Rs[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $R  = $Rs[pane]
         ;
         if (!$R || !$R.data('draggable')) return;
-        options[pane].slidable = true;
+        options[pane].slidable = true; 
         if (state[pane].isClosed)
             bindStartSlidingEvents(pane, true);
     }
     /**
-    * @param {(string|Object)}    evt_or_pane
+    * @param {(string|Object)}  evt_or_pane
     */
-,    disableSlidable = function (evt_or_pane) {
+,   disableSlidable = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $R    = $Rs[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $R  = $Rs[pane]
         ;
         if (!$R) return;
-        options[pane].slidable = false;
+        options[pane].slidable = false; 
         if (state[pane].isSliding)
             close(pane, false, true);
         else {
             bindStartSlidingEvents(pane, false);
-            $R    .css("cursor", "default")
+            $R  .css("cursor", "default")
                 .attr("title", "");
             removeHover(null, $R[0]); // in case currently hovered
         }
@@ -4635,32 +4635,32 @@ $.fn.layout = function (opts) {
 
 
     /**
-    * @param {(string|Object)}    evt_or_pane
+    * @param {(string|Object)}  evt_or_pane
     */
-,    enableResizable = function (evt_or_pane) {
+,   enableResizable = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $R    = $Rs[pane]
-        ,    o    = options[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $R  = $Rs[pane]
+        ,   o   = options[pane]
         ;
         if (!$R || !$R.data('draggable')) return;
-        o.resizable = true;
+        o.resizable = true; 
         $R.draggable("enable");
         if (!state[pane].isClosed)
-            $R    .css("cursor", o.resizerCursor)
-                 .attr("title", o.tips.Resize);
+            $R  .css("cursor", o.resizerCursor)
+                .attr("title", o.tips.Resize);
     }
     /**
-    * @param {(string|Object)}    evt_or_pane
+    * @param {(string|Object)}  evt_or_pane
     */
-,    disableResizable = function (evt_or_pane) {
+,   disableResizable = function (evt_or_pane) {
         if (!isInitialized()) return;
-        var    pane = evtPane.call(this, evt_or_pane)
-        ,    $R    = $Rs[pane]
+        var pane = evtPane.call(this, evt_or_pane)
+        ,   $R  = $Rs[pane]
         ;
         if (!$R || !$R.data('draggable')) return;
-        options[pane].resizable = false;
-        $R    .draggable("disable")
+        options[pane].resizable = false; 
+        $R  .draggable("disable")
             .css("cursor", "default")
             .attr("title", "");
         removeHover(null, $R[0]); // in case currently hovered
@@ -4671,10 +4671,10 @@ $.fn.layout = function (opts) {
     * Move a pane from source-side (eg, west) to target-side (eg, east)
     * If pane exists on target-side, move that to source-side, ie, 'swap' the panes
     *
-    * @param {(string|Object)}    evt_or_pane1    The pane/edge being swapped
-    * @param {string}            pane2            ditto
+    * @param {(string|Object)}  evt_or_pane1    The pane/edge being swapped
+    * @param {string}           pane2           ditto
     */
-,    swapPanes = function (evt_or_pane1, pane2) {
+,   swapPanes = function (evt_or_pane1, pane2) {
         if (!isInitialized()) return;
         var pane1 = evtPane.call(this, evt_or_pane1);
         // change state.edge NOW so callbacks can know where pane is headed...
@@ -4682,7 +4682,7 @@ $.fn.layout = function (opts) {
         state[pane2].edge = pane1;
         // run these even if NOT state.initialized
         if (false === _runCallbacks("onswap_start", pane1)
-         ||    false === _runCallbacks("onswap_start", pane2)
+         || false === _runCallbacks("onswap_start", pane2)
         ) {
             state[pane1].edge = pane1; // reset
             state[pane2].edge = pane2;
@@ -4690,19 +4690,19 @@ $.fn.layout = function (opts) {
         }
 
         var
-            oPane1    = copy( pane1 )
-        ,    oPane2    = copy( pane2 )
-        ,    sizes    = {}
+            oPane1  = copy( pane1 )
+        ,   oPane2  = copy( pane2 )
+        ,   sizes   = {}
         ;
         sizes[pane1] = oPane1 ? oPane1.state.size : 0;
         sizes[pane2] = oPane2 ? oPane2.state.size : 0;
 
         // clear pointers & state
-        $Ps[pane1] = false;
+        $Ps[pane1] = false; 
         $Ps[pane2] = false;
         state[pane1] = {};
         state[pane2] = {};
-
+        
         // ALWAYS remove the resizer & toggler elements
         if ($Ts[pane1]) $Ts[pane1].remove();
         if ($Ts[pane2]) $Ts[pane2].remove();
@@ -4732,31 +4732,31 @@ $.fn.layout = function (opts) {
 
         function copy (n) { // n = pane
             var
-                $P    = $Ps[n]
-            ,    $C    = $Cs[n]
+                $P  = $Ps[n]
+            ,   $C  = $Cs[n]
             ;
             return !$P ? false : {
-                pane:        n
-            ,    P:            $P ? $P[0] : false
-            ,    C:            $C ? $C[0] : false
-            ,    state:        $.extend(true, {}, state[n])
-            ,    options:    $.extend(true, {}, options[n])
+                pane:       n
+            ,   P:          $P ? $P[0] : false
+            ,   C:          $C ? $C[0] : false
+            ,   state:      $.extend(true, {}, state[n])
+            ,   options:    $.extend(true, {}, options[n])
             }
         };
 
         function move (oPane, pane) {
             if (!oPane) return;
             var
-                P        = oPane.P
-            ,    C        = oPane.C
-            ,    oldPane = oPane.pane
-            ,    c        = _c[pane]
-            //    save pane-options that should be retained
-            ,    s        = $.extend(true, {}, state[pane])
-            ,    o        = options[pane]
-            //    RETAIN side-specific FX Settings - more below
-            ,    fx        = { resizerCursor: o.resizerCursor }
-            ,    re, size, pos
+                P       = oPane.P
+            ,   C       = oPane.C
+            ,   oldPane = oPane.pane
+            ,   c       = _c[pane]
+            //  save pane-options that should be retained
+            ,   s       = $.extend(true, {}, state[pane])
+            ,   o       = options[pane]
+            //  RETAIN side-specific FX Settings - more below
+            ,   fx      = { resizerCursor: o.resizerCursor }
+            ,   re, size, pos
             ;
             $.each("fxName,fxSpeed,fxSettings".split(","), function (i, k) {
                 fx[k +"_open"]  = o[k +"_open"];
@@ -4767,8 +4767,8 @@ $.fn.layout = function (opts) {
             // update object pointers and attributes
             $Ps[pane] = $(P)
                 .data({
-                    layoutPane:        Instance[pane]    // NEW pointer to pane-alias-object
-                ,    layoutEdge:        pane
+                    layoutPane:     Instance[pane]  // NEW pointer to pane-alias-object
+                ,   layoutEdge:     pane
                 })
                 .css(_c.hidden)
                 .css(c.cssReq)
@@ -4776,8 +4776,8 @@ $.fn.layout = function (opts) {
             $Cs[pane] = C ? $(C) : false;
 
             // set options and state
-            options[pane]    = $.extend(true, {}, oPane.options, fx);
-            state[pane]        = $.extend(true, {}, oPane.state);
+            options[pane]   = $.extend(true, {}, oPane.options, fx);
+            state[pane]     = $.extend(true, {}, oPane.state);
 
             // change classNames on the pane, eg: ui-layout-pane-east ==> ui-layout-pane-west
             re = new RegExp(o.paneClass +"-"+ oldPane, "g");
@@ -4817,17 +4817,17 @@ $.fn.layout = function (opts) {
     * Unpinned means the pane is 'sliding' - ie, over-top of the adjacent panes
     *
     * @see  open(), setAsOpen(), setAsClosed()
-    * @param {string}    pane   These are the params returned to callbacks by layout()
-    * @param {boolean}    doPin  True means set the pin 'down', False means 'up'
+    * @param {string}   pane   These are the params returned to callbacks by layout()
+    * @param {boolean}  doPin  True means set the pin 'down', False means 'up'
     */
-,    syncPinBtns = function (pane, doPin) {
+,   syncPinBtns = function (pane, doPin) {
         if ($.layout.plugins.buttons)
             $.each(state[pane].pins, function (i, selector) {
                 $.layout.buttons.setPinState(Instance, $(selector), pane, doPin);
             });
     }
 
-;    // END var DECLARATIONS
+;   // END var DECLARATIONS
 
     /**
     * Capture keys when enableCursorHotkey - toggle pane if hotkey pressed
@@ -4842,15 +4842,15 @@ $.fn.layout = function (opts) {
         var
             PANE = {
                 38: "north" // Up Cursor    - $.ui.keyCode.UP
-            ,    40: "south" // Down Cursor    - $.ui.keyCode.DOWN
-            ,    37: "west"  // Left Cursor    - $.ui.keyCode.LEFT
-            ,    39: "east"  // Right Cursor    - $.ui.keyCode.RIGHT
+            ,   40: "south" // Down Cursor  - $.ui.keyCode.DOWN
+            ,   37: "west"  // Left Cursor  - $.ui.keyCode.LEFT
+            ,   39: "east"  // Right Cursor - $.ui.keyCode.RIGHT
             }
-        ,    ALT        = evt.altKey // no worky!
-        ,    SHIFT    = evt.shiftKey
-        ,    CTRL    = evt.ctrlKey
-        ,    CURSOR    = (CTRL && code >= 37 && code <= 40)
-        ,    o, k, m, pane
+        ,   ALT     = evt.altKey // no worky!
+        ,   SHIFT   = evt.shiftKey
+        ,   CTRL    = evt.ctrlKey
+        ,   CURSOR  = (CTRL && code >= 37 && code <= 40)
+        ,   o, k, m, pane
         ;
 
         if (CURSOR && options[PANE[code]].enableCursorHotkey) // valid cursor-hotkey
@@ -4882,15 +4882,15 @@ $.fn.layout = function (opts) {
 
 /*
  * ######################################
- *    UTILITY METHODS
- *    called externally or by initButtons
+ *  UTILITY METHODS
+ *  called externally or by initButtons
  * ######################################
  */
 
     /**
     * Change/reset a pane overflow setting & zIndex to allow popups/drop-downs to work
     *
-    * @param {Object=}   [el]    (optional) Can also be 'bound' to a click, mouseOver, or other event
+    * @param {Object=}   [el]   (optional) Can also be 'bound' to a click, mouseOver, or other event
     */
     function allowOverflow (el) {
         if (!isInitialized()) return;
@@ -4911,11 +4911,11 @@ $.fn.layout = function (opts) {
 
         var
             pane    = $P.data("layoutEdge")
-        ,    s        = state[pane]
+        ,   s       = state[pane]
         ;
 
         // if pane is already raised, then reset it before doing it again!
-        // this would happen if allowOverflow is attached to BOTH the pane and an element
+        // this would happen if allowOverflow is attached to BOTH the pane and an element 
         if (s.cssSaved)
             resetOverflow(pane); // reset previous CSS before continuing
 
@@ -4926,11 +4926,11 @@ $.fn.layout = function (opts) {
         }
 
         var
-            newCSS    = { zIndex: (options.zIndexes.resizer_normal + 1) }
-        ,    curCSS    = {}
-        ,    of        = $P.css("overflow")
-        ,    ofX        = $P.css("overflowX")
-        ,    ofY        = $P.css("overflowY")
+            newCSS  = { zIndex: (options.zIndexes.resizer_normal + 1) }
+        ,   curCSS  = {}
+        ,   of      = $P.css("overflow")
+        ,   ofX     = $P.css("overflowX")
+        ,   ofY     = $P.css("overflowY")
         ;
         // determine which, if any, overflow settings need to be changed
         if (of != "visible") {
@@ -4959,7 +4959,7 @@ $.fn.layout = function (opts) {
 
     };
     /**
-    * @param {Object=}   [el]    (optional) Can also be 'bound' to a click, mouseOver, or other event
+    * @param {Object=}   [el]   (optional) Can also be 'bound' to a click, mouseOver, or other event
     */
     function resetOverflow (el) {
         if (!isInitialized()) return;
@@ -4980,8 +4980,8 @@ $.fn.layout = function (opts) {
 
         var
             pane    = $P.data("layoutEdge")
-        ,    s        = state[pane]
-        ,    CSS        = s.cssSaved || {}
+        ,   s       = state[pane]
+        ,   CSS     = s.cssSaved || {}
         ;
         // reset the zIndex
         if (!s.isSliding && !s.isResizing)
@@ -5012,75 +5012,75 @@ $.fn.layout = function (opts) {
         return $N.data("layout"); // cached pointer
 
     // init global vars
-    var
-        $Ps    = {}    // Panes x5        - set in initPanes()
-    ,    $Cs    = {}    // Content x5    - set in initPanes()
-    ,    $Rs    = {}    // Resizers x4    - set in initHandles()
-    ,    $Ts    = {}    // Togglers x4    - set in initHandles()
-    ,    $Ms    = $([])    // Masks - up to 2 masks per pane (IFRAME + DIV)
-    //    aliases for code brevity
-    ,    sC    = state.container // alias for easy access to 'container dimensions'
-    ,    sID    = state.id // alias for unique layout ID/namespace - eg: "layout435"
+    var 
+        $Ps = {}    // Panes x5     - set in initPanes()
+    ,   $Cs = {}    // Content x5   - set in initPanes()
+    ,   $Rs = {}    // Resizers x4  - set in initHandles()
+    ,   $Ts = {}    // Togglers x4  - set in initHandles()
+    ,   $Ms = $([]) // Masks - up to 2 masks per pane (IFRAME + DIV)
+    //  aliases for code brevity
+    ,   sC  = state.container // alias for easy access to 'container dimensions'
+    ,   sID = state.id // alias for unique layout ID/namespace - eg: "layout435"
     ;
 
     // create Instance object to expose data & option Properties, and primary action Methods
     var Instance = {
-    //    layout data
-        options:            options            // property - options hash
-    ,    state:                state            // property - dimensions hash
-    //    object pointers
-    ,    container:            $N                // property - object pointers for layout container
-    ,    panes:                $Ps                // property - object pointers for ALL Panes: panes.north, panes.center
-    ,    contents:            $Cs                // property - object pointers for ALL Content: contents.north, contents.center
-    ,    resizers:            $Rs                // property - object pointers for ALL Resizers, eg: resizers.north
-    ,    togglers:            $Ts                // property - object pointers for ALL Togglers, eg: togglers.north
-    //    border-pane open/close
-    ,    hide:                hide            // method - ditto
-    ,    show:                show            // method - ditto
-    ,    toggle:                toggle            // method - pass a 'pane' ("north", "west", etc)
-    ,    open:                open            // method - ditto
-    ,    close:                close            // method - ditto
-    ,    slideOpen:            slideOpen        // method - ditto
-    ,    slideClose:            slideClose        // method - ditto
-    ,    slideToggle:        slideToggle        // method - ditto
-    //    pane actions
-    ,    setSizeLimits:        setSizeLimits    // method - pass a 'pane' - update state min/max data
-    ,    _sizePane:            sizePane        // method -intended for user by plugins only!
-    ,    sizePane:            manualSizePane    // method - pass a 'pane' AND an 'outer-size' in pixels or percent, or 'auto'
-    ,    sizeContent:        sizeContent        // method - pass a 'pane'
-    ,    swapPanes:            swapPanes        // method - pass TWO 'panes' - will swap them
-    ,    showMasks:            showMasks        // method - pass a 'pane' OR list of panes - default = all panes with mask option set
-    ,    hideMasks:            hideMasks        // method - ditto'
-    //    pane element methods
-    ,    initContent:        initContent        // method - ditto
-    ,    addPane:            addPane            // method - pass a 'pane'
-    ,    removePane:            removePane        // method - pass a 'pane' to remove from layout, add 'true' to delete the pane-elem
-    ,    createChildren:        createChildren    // method - pass a 'pane' and (optional) layout-options (OVERRIDES options[pane].children
-    ,    refreshChildren:    refreshChildren    // method - pass a 'pane' and a layout-instance
-    //    special pane option setting
-    ,    enableClosable:        enableClosable    // method - pass a 'pane'
-    ,    disableClosable:    disableClosable    // method - ditto
-    ,    enableSlidable:        enableSlidable    // method - ditto
-    ,    disableSlidable:    disableSlidable    // method - ditto
-    ,    enableResizable:    enableResizable    // method - ditto
-    ,    disableResizable:    disableResizable// method - ditto
-    //    utility methods for panes
-    ,    allowOverflow:        allowOverflow    // utility - pass calling element (this)
-    ,    resetOverflow:        resetOverflow    // utility - ditto
-    //    layout control
-    ,    destroy:            destroy            // method - no parameters
-    ,    initPanes:            isInitialized    // method - no parameters
-    ,    resizeAll:            resizeAll        // method - no parameters
-    //    callback triggering
-    ,    runCallbacks:        _runCallbacks    // method - pass evtName & pane (if a pane-event), eg: trigger("onopen", "west")
-    //    alias collections of options, state and children - created in addPane and extended elsewhere
-    ,    hasParentLayout:    false            // set by initContainer()
-    ,    children:            children        // pointers to child-layouts, eg: Instance.children.west.layoutName
-    ,    north:                false            // alias group: { name: pane, pane: $Ps[pane], options: options[pane], state: state[pane], children: children[pane] }
-    ,    south:                false            // ditto
-    ,    west:                false            // ditto
-    ,    east:                false            // ditto
-    ,    center:                false            // ditto
+    //  layout data
+        options:            options         // property - options hash
+    ,   state:              state           // property - dimensions hash
+    //  object pointers
+    ,   container:          $N              // property - object pointers for layout container
+    ,   panes:              $Ps             // property - object pointers for ALL Panes: panes.north, panes.center
+    ,   contents:           $Cs             // property - object pointers for ALL Content: contents.north, contents.center
+    ,   resizers:           $Rs             // property - object pointers for ALL Resizers, eg: resizers.north
+    ,   togglers:           $Ts             // property - object pointers for ALL Togglers, eg: togglers.north
+    //  border-pane open/close
+    ,   hide:               hide            // method - ditto
+    ,   show:               show            // method - ditto
+    ,   toggle:             toggle          // method - pass a 'pane' ("north", "west", etc)
+    ,   open:               open            // method - ditto
+    ,   close:              close           // method - ditto
+    ,   slideOpen:          slideOpen       // method - ditto
+    ,   slideClose:         slideClose      // method - ditto
+    ,   slideToggle:        slideToggle     // method - ditto
+    //  pane actions
+    ,   setSizeLimits:      setSizeLimits   // method - pass a 'pane' - update state min/max data
+    ,   _sizePane:          sizePane        // method -intended for user by plugins only!
+    ,   sizePane:           manualSizePane  // method - pass a 'pane' AND an 'outer-size' in pixels or percent, or 'auto'
+    ,   sizeContent:        sizeContent     // method - pass a 'pane'
+    ,   swapPanes:          swapPanes       // method - pass TWO 'panes' - will swap them
+    ,   showMasks:          showMasks       // method - pass a 'pane' OR list of panes - default = all panes with mask option set
+    ,   hideMasks:          hideMasks       // method - ditto'
+    //  pane element methods
+    ,   initContent:        initContent     // method - ditto
+    ,   addPane:            addPane         // method - pass a 'pane'
+    ,   removePane:         removePane      // method - pass a 'pane' to remove from layout, add 'true' to delete the pane-elem
+    ,   createChildren:     createChildren  // method - pass a 'pane' and (optional) layout-options (OVERRIDES options[pane].children
+    ,   refreshChildren:    refreshChildren // method - pass a 'pane' and a layout-instance
+    //  special pane option setting
+    ,   enableClosable:     enableClosable  // method - pass a 'pane'
+    ,   disableClosable:    disableClosable // method - ditto
+    ,   enableSlidable:     enableSlidable  // method - ditto
+    ,   disableSlidable:    disableSlidable // method - ditto
+    ,   enableResizable:    enableResizable // method - ditto
+    ,   disableResizable:   disableResizable// method - ditto
+    //  utility methods for panes
+    ,   allowOverflow:      allowOverflow   // utility - pass calling element (this)
+    ,   resetOverflow:      resetOverflow   // utility - ditto
+    //  layout control
+    ,   destroy:            destroy         // method - no parameters
+    ,   initPanes:          isInitialized   // method - no parameters
+    ,   resizeAll:          resizeAll       // method - no parameters
+    //  callback triggering
+    ,   runCallbacks:       _runCallbacks   // method - pass evtName & pane (if a pane-event), eg: trigger("onopen", "west")
+    //  alias collections of options, state and children - created in addPane and extended elsewhere
+    ,   hasParentLayout:    false           // set by initContainer()
+    ,   children:           children        // pointers to child-layouts, eg: Instance.children.west.layoutName
+    ,   north:              false           // alias group: { name: pane, pane: $Ps[pane], options: options[pane], state: state[pane], children: children[pane] }
+    ,   south:              false           // ditto
+    ,   west:               false           // ditto
+    ,   east:               false           // ditto
+    ,   center:             false           // ditto
     };
 
     // create the border layout NOW
@@ -5105,7 +5105,7 @@ $.fn.layout = function (opts) {
  * jquery.layout.state 1.0
  * $Date: 2011-07-16 08:00:00 (Sat, 16 July 2011) $
  *
- * Copyright (c) 2012
+ * Copyright (c) 2012 
  *   Kevin Dalman (http://allpro.net)
  *
  * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
@@ -5117,42 +5117,42 @@ $.fn.layout = function (opts) {
  * @see: http://groups.google.com/group/jquery-ui-layout
  */
 /*
- *    State-management options stored in options.stateManagement, which includes a .cookie hash
- *    Default options saves ALL KEYS for ALL PANES, ie: pane.size, pane.isClosed, pane.isHidden
+ *  State-management options stored in options.stateManagement, which includes a .cookie hash
+ *  Default options saves ALL KEYS for ALL PANES, ie: pane.size, pane.isClosed, pane.isHidden
  *
- *    // STATE/COOKIE OPTIONS
- *    @example $(el).layout({
+ *  // STATE/COOKIE OPTIONS
+ *  @example $(el).layout({
                 stateManagement: {
                     enabled:    true
-                ,    stateKeys:    "east.size,west.size,east.isClosed,west.isClosed"
-                ,    cookie:        { name: "appLayout", path: "/" }
+                ,   stateKeys:  "east.size,west.size,east.isClosed,west.isClosed"
+                ,   cookie:     { name: "appLayout", path: "/" }
                 }
             })
- *    @example $(el).layout({ stateManagement__enabled: true }) // enable auto-state-management using cookies
- *    @example $(el).layout({ stateManagement__cookie: { name: "appLayout", path: "/" } })
- *    @example $(el).layout({ stateManagement__cookie__name: "appLayout", stateManagement__cookie__path: "/" })
+ *  @example $(el).layout({ stateManagement__enabled: true }) // enable auto-state-management using cookies
+ *  @example $(el).layout({ stateManagement__cookie: { name: "appLayout", path: "/" } })
+ *  @example $(el).layout({ stateManagement__cookie__name: "appLayout", stateManagement__cookie__path: "/" })
  *
- *    // STATE/COOKIE METHODS
- *    @example myLayout.saveCookie( "west.isClosed,north.size,south.isHidden", {expires: 7} );
- *    @example myLayout.loadCookie();
- *    @example myLayout.deleteCookie();
- *    @example var JSON = myLayout.readState();    // CURRENT Layout State
- *    @example var JSON = myLayout.readCookie();    // SAVED Layout State (from cookie)
- *    @example var JSON = myLayout.state.stateData;    // LAST LOADED Layout State (cookie saved in layout.state hash)
+ *  // STATE/COOKIE METHODS
+ *  @example myLayout.saveCookie( "west.isClosed,north.size,south.isHidden", {expires: 7} );
+ *  @example myLayout.loadCookie();
+ *  @example myLayout.deleteCookie();
+ *  @example var JSON = myLayout.readState();   // CURRENT Layout State
+ *  @example var JSON = myLayout.readCookie();  // SAVED Layout State (from cookie)
+ *  @example var JSON = myLayout.state.stateData;   // LAST LOADED Layout State (cookie saved in layout.state hash)
  *
- *    CUSTOM STATE-MANAGEMENT (eg, saved in a database)
- *    @example var JSON = myLayout.readState( "west.isClosed,north.size,south.isHidden" );
- *    @example myLayout.loadState( JSON );
+ *  CUSTOM STATE-MANAGEMENT (eg, saved in a database)
+ *  @example var JSON = myLayout.readState( "west.isClosed,north.size,south.isHidden" );
+ *  @example myLayout.loadState( JSON );
  */
 
 /**
- *    UI COOKIE UTILITY
+ *  UI COOKIE UTILITY
  *
- *    A $.cookie OR $.ui.cookie namespace *should be standard*, but until then...
- *    This creates $.ui.cookie so Layout does not need the cookie.jquery.js plugin
- *    NOTE: This utility is REQUIRED by the layout.state plugin
+ *  A $.cookie OR $.ui.cookie namespace *should be standard*, but until then...
+ *  This creates $.ui.cookie so Layout does not need the cookie.jquery.js plugin
+ *  NOTE: This utility is REQUIRED by the layout.state plugin
  *
- *    Cookie methods in Layout are created as part of State Management
+ *  Cookie methods in Layout are created as part of State Management 
  */
 if (!$.ui) $.ui = {};
 $.ui.cookie = {
@@ -5160,10 +5160,10 @@ $.ui.cookie = {
     // cookieEnabled is not in DOM specs, but DOES works in all browsers,including IE6
     acceptsCookies: !!navigator.cookieEnabled
 
-,    read: function (name) {
-        var    c        = document.cookie
-        ,    cs        = c ? c.split(';') : []
-        ,    pair    // loop var
+,   read: function (name) {
+        var c       = document.cookie
+        ,   cs      = c ? c.split(';') : []
+        ,   pair    // loop var
         ;
         for (var i=0, n=cs.length; i < n; i++) {
             pair = $.trim(cs[i]).split('='); // name=value pair
@@ -5173,13 +5173,13 @@ $.ui.cookie = {
         return null;
     }
 
-,    write: function (name, val, cookieOpts) {
-        var    params    = ""
-        ,    date    = ""
-        ,    clear    = false
-        ,    o        = cookieOpts || {}
-        ,    x        = o.expires  || null
-        ,    t        = $.type(x)
+,   write: function (name, val, cookieOpts) {
+        var params  = ""
+        ,   date    = ""
+        ,   clear   = false
+        ,   o       = cookieOpts || {}
+        ,   x       = o.expires  || null
+        ,   t       = $.type(x)
         ;
         if (t === "date")
             date = x;
@@ -5196,14 +5196,14 @@ $.ui.cookie = {
                 clear = true;
             }
         }
-        if (date)        params += ";expires="+ date.toUTCString();
-        if (o.path)        params += ";path="+ o.path;
-        if (o.domain)    params += ";domain="+ o.domain;
-        if (o.secure)    params += ";secure";
+        if (date)       params += ";expires="+ date.toUTCString();
+        if (o.path)     params += ";path="+ o.path;
+        if (o.domain)   params += ";domain="+ o.domain;
+        if (o.secure)   params += ";secure";
         document.cookie = name +"="+ (clear ? "" : encodeURIComponent( val )) + params; // write or clear cookie
     }
 
-,    clear: function (name) {
+,   clear: function (name) {
         $.ui.cookie.write(name, "", {expires: -1});
     }
 
@@ -5224,31 +5224,31 @@ if (!$.cookie) $.cookie = function (k, v, o) {
 // tell Layout that the state plugin is available
 $.layout.plugins.stateManagement = true;
 
-//    Add State-Management options to layout.defaults
+//  Add State-Management options to layout.defaults
 $.layout.config.optionRootKeys.push("stateManagement");
 $.layout.defaults.stateManagement = {
-    enabled:        false    // true = enable state-management, even if not using cookies
-,    autoSave:        true    // Save a state-cookie when page exits?
-,    autoLoad:        true    // Load the state-cookie when Layout inits?
-,    animateLoad:    true    // animate panes when loading state into an active layout
-,    includeChildren: true    // recurse into child layouts to include their state as well
+    enabled:        false   // true = enable state-management, even if not using cookies
+,   autoSave:       true    // Save a state-cookie when page exits?
+,   autoLoad:       true    // Load the state-cookie when Layout inits?
+,   animateLoad:    true    // animate panes when loading state into an active layout
+,   includeChildren: true   // recurse into child layouts to include their state as well
     // List state-data to save - must be pane-specific
-,    stateKeys:    "north.size,south.size,east.size,west.size,"+
+,   stateKeys:  "north.size,south.size,east.size,west.size,"+
                 "north.isClosed,south.isClosed,east.isClosed,west.isClosed,"+
                 "north.isHidden,south.isHidden,east.isHidden,west.isHidden"
-,    cookie: {
-        name:    ""    // If not specified, will use Layout.name, else just "Layout"
-    ,    domain:    ""    // blank = current domain
-    ,    path:    ""    // blank = current page, "/" = entire website
-    ,    expires: ""    // 'days' to keep cookie - leave blank for 'session cookie'
-    ,    secure:    false
+,   cookie: {
+        name:   ""  // If not specified, will use Layout.name, else just "Layout"
+    ,   domain: ""  // blank = current domain
+    ,   path:   ""  // blank = current page, "/" = entire website
+    ,   expires: "" // 'days' to keep cookie - leave blank for 'session cookie'
+    ,   secure: false
     }
 };
 // Set stateManagement as a layout-option, NOT a pane-option
 $.layout.optionsMap.layout.push("stateManagement");
 
 /*
- *    State Management methods
+ *  State Management methods
  */
 $.layout.state = {
 
@@ -5257,15 +5257,15 @@ $.layout.state = {
      *
      * myLayout.saveCookie( keys, cookieOpts )
      *
-     * @param {Object}            inst
-     * @param {(string|Array)=}    keys
-     * @param {Object=}            cookieOpts
+     * @param {Object}          inst
+     * @param {(string|Array)=} keys
+     * @param {Object=}         cookieOpts
      */
     saveCookie: function (inst, keys, cookieOpts) {
-        var o    = inst.options
-        ,    sm    = o.stateManagement
-        ,    oC    = $.extend(true, {}, sm.cookie, cookieOpts || null)
-        ,    data = inst.state.stateData = inst.readState( keys || sm.stateKeys ) // read current panes-state
+        var o   = inst.options
+        ,   sm  = o.stateManagement
+        ,   oC  = $.extend(true, {}, sm.cookie, cookieOpts || null)
+        ,   data = inst.state.stateData = inst.readState( keys || sm.stateKeys ) // read current panes-state
         ;
         $.ui.cookie.write( oC.name || o.name || "Layout", $.layout.state.encodeJSON(data), oC );
         return $.extend(true, {}, data); // return COPY of state.stateData data
@@ -5274,9 +5274,9 @@ $.layout.state = {
     /**
      * Remove the state cookie
      *
-     * @param {Object}    inst
+     * @param {Object}  inst
      */
-,    deleteCookie: function (inst) {
+,   deleteCookie: function (inst) {
         var o = inst.options;
         $.ui.cookie.clear( o.stateManagement.cookie.name || o.name || "Layout" );
     }
@@ -5284,9 +5284,9 @@ $.layout.state = {
     /**
      * Read & return data from the cookie - as JSON
      *
-     * @param {Object}    inst
+     * @param {Object}  inst
      */
-,    readCookie: function (inst) {
+,   readCookie: function (inst) {
         var o = inst.options;
         var c = $.ui.cookie.read( o.stateManagement.cookie.name || o.name || "Layout" );
         // convert cookie string back to a hash and return it
@@ -5296,9 +5296,9 @@ $.layout.state = {
     /**
      * Get data from the cookie and USE IT to loadState
      *
-     * @param {Object}    inst
+     * @param {Object}  inst
      */
-,    loadCookie: function (inst) {
+,   loadCookie: function (inst) {
         var c = $.layout.state.readCookie(inst); // READ the cookie
         if (c) {
             inst.state.stateData = $.extend(true, {}, c); // SET state.stateData
@@ -5310,11 +5310,11 @@ $.layout.state = {
     /**
      * Update layout options from the cookie, if one exists
      *
-     * @param {Object}        inst
-     * @param {Object=}        stateData
+     * @param {Object}      inst
+     * @param {Object=}     stateData
      * @param {boolean=}    animate
      */
-,    loadState: function (inst, data, opts) {
+,   loadState: function (inst, data, opts) {
         if (!$.isPlainObject( data ) || $.isEmptyObject( data )) return;
 
         // normalize data & cache in the state object
@@ -5324,39 +5324,39 @@ $.layout.state = {
         var smo = inst.options.stateManagement;
         opts = $.extend({
             animateLoad:        false //smo.animateLoad
-        ,    includeChildren:    smo.includeChildren
+        ,   includeChildren:    smo.includeChildren
         }, opts );
 
         if (!inst.state.initialized) {
             /*
-             *    layout NOT initialized, so just update its options
+             *  layout NOT initialized, so just update its options
              */
             // MUST remove pane.children keys before applying to options
             // use a copy so we don't remove keys from original data
             var o = $.extend(true, {}, data);
             //delete o.center; // center has no state-data - only children
             $.each($.layout.config.allPanes, function (idx, pane) {
-                if (o[pane]) delete o[pane].children;
+                if (o[pane]) delete o[pane].children;          
              });
             // update CURRENT layout-options with saved state data
             $.extend(true, inst.options, o);
         }
         else {
             /*
-             *    layout already initialized, so modify layout's configuration
+             *  layout already initialized, so modify layout's configuration
              */
             var noAnimate = !opts.animateLoad
-            ,    o, c, h, state, open
+            ,   o, c, h, state, open
             ;
             $.each($.layout.config.borderPanes, function (idx, pane) {
                 o = data[ pane ];
                 if (!$.isPlainObject( o )) return; // no key, skip pane
 
-                s    = o.size;
-                c    = o.initClosed;
-                h    = o.initHidden;
-                ar    = o.autoResize
-                state    = inst.state[pane];
+                s   = o.size;
+                c   = o.initClosed;
+                h   = o.initHidden;
+                ar  = o.autoResize
+                state   = inst.state[pane];
                 open    = state.isVisible;
 
                 // reset autoResize
@@ -5366,17 +5366,17 @@ $.layout.state = {
                 if (!open)
                     inst._sizePane(pane, s, false, false, false); // false=skipCallback/noAnimation/forceResize
                 // open/close as necessary - DO NOT CHANGE THIS ORDER!
-                if (h === true)            inst.hide(pane, noAnimate);
+                if (h === true)         inst.hide(pane, noAnimate);
                 else if (c === true)    inst.close(pane, false, noAnimate);
-                else if (c === false)    inst.open (pane, false, noAnimate);
-                else if (h === false)    inst.show (pane, false, noAnimate);
+                else if (c === false)   inst.open (pane, false, noAnimate);
+                else if (h === false)   inst.show (pane, false, noAnimate);
                 // resize AFTER any other actions
                 if (open)
                     inst._sizePane(pane, s, false, false, noAnimate); // animate resize if option passed
             });
 
             /*
-             *    RECURSE INTO CHILD-LAYOUTS
+             *  RECURSE INTO CHILD-LAYOUTS
              */
             if (opts.includeChildren) {
                 var paneStateChildren, childState;
@@ -5397,23 +5397,23 @@ $.layout.state = {
     /**
      * Get the *current layout state* and return it as a hash
      *
-     * @param {Object=}        inst    // Layout instance to get state for
-     * @param {object=}        [opts]    // State-Managements override options
+     * @param {Object=}     inst    // Layout instance to get state for
+     * @param {object=}     [opts]  // State-Managements override options
      */
-,    readState: function (inst, opts) {
+,   readState: function (inst, opts) {
         // backward compatility
         if ($.type(opts) === 'string') opts = { keys: opts };
         if (!opts) opts = {};
-        var    sm        = inst.options.stateManagement
-        ,    ic        = opts.includeChildren
-        ,    recurse    = ic !== undefined ? ic : sm.includeChildren
-        ,    keys    = opts.stateKeys || sm.stateKeys
-        ,    alt        = { isClosed: 'initClosed', isHidden: 'initHidden' }
-        ,    state    = inst.state
-        ,    panes    = $.layout.config.allPanes
-        ,    data    = {}
-        ,    pair, pane, key, val
-        ,    ps, pC, child, array, count, branch
+        var sm      = inst.options.stateManagement
+        ,   ic      = opts.includeChildren
+        ,   recurse = ic !== undefined ? ic : sm.includeChildren
+        ,   keys    = opts.stateKeys || sm.stateKeys
+        ,   alt     = { isClosed: 'initClosed', isHidden: 'initHidden' }
+        ,   state   = inst.state
+        ,   panes   = $.layout.config.allPanes
+        ,   data    = {}
+        ,   pair, pane, key, val
+        ,   ps, pC, child, array, count, branch
         ;
         if ($.isArray(keys)) keys = keys.join(",");
         // convert keys to an array and change delimiters from '__' to '.'
@@ -5457,20 +5457,20 @@ $.layout.state = {
     }
 
     /**
-     *    Stringify a JSON hash so can save in a cookie or db-field
+     *  Stringify a JSON hash so can save in a cookie or db-field
      */
-,    encodeJSON: function (JSON) {
+,   encodeJSON: function (JSON) {
         return parse(JSON);
         function parse (h) {
             var D=[], i=0, k, v, t // k = key, v = value
-            ,    a = $.isArray(h)
+            ,   a = $.isArray(h)
             ;
             for (k in h) {
                 v = h[k];
                 t = typeof v;
-                if (t == 'string')        // STRING - add quotes
+                if (t == 'string')      // STRING - add quotes
                     v = '"'+ v +'"';
-                else if (t == 'object')    // SUB-KEY - recurse into it
+                else if (t == 'object') // SUB-KEY - recurse into it
                     v = parse(v);
                 D[i++] = (!a ? '"'+ k +'":' : '') + v;
             }
@@ -5479,37 +5479,37 @@ $.layout.state = {
     }
 
     /**
-     *    Convert stringified JSON back to a hash object
-     *    @see        $.parseJSON(), adding in jQuery 1.4.1
+     *  Convert stringified JSON back to a hash object
+     *  @see        $.parseJSON(), adding in jQuery 1.4.1
      */
-,    decodeJSON: function (str) {
+,   decodeJSON: function (str) {
         try { return $.parseJSON ? $.parseJSON(str) : window["eval"]("("+ str +")") || {}; }
         catch (e) { return {}; }
     }
 
 
-,    _create: function (inst) {
-        var _    = $.layout.state
-        ,    o    = inst.options
-        ,    sm    = o.stateManagement
+,   _create: function (inst) {
+        var _   = $.layout.state
+        ,   o   = inst.options
+        ,   sm  = o.stateManagement
         ;
-        //    ADD State-Management plugin methods to inst
+        //  ADD State-Management plugin methods to inst
          $.extend( inst, {
-        //    readCookie - update options from cookie - returns hash of cookie data
-            readCookie:        function () { return _.readCookie(inst); }
-        //    deleteCookie
-        ,    deleteCookie:    function () { _.deleteCookie(inst); }
-        //    saveCookie - optionally pass keys-list and cookie-options (hash)
-        ,    saveCookie:        function (keys, cookieOpts) { return _.saveCookie(inst, keys, cookieOpts); }
-        //    loadCookie - readCookie and use to loadState() - returns hash of cookie data
-        ,    loadCookie:        function () { return _.loadCookie(inst); }
-        //    loadState - pass a hash of state to use to update options
-        ,    loadState:        function (stateData, opts) { _.loadState(inst, stateData, opts); }
-        //    readState - returns hash of current layout-state
-        ,    readState:        function (keys) { return _.readState(inst, keys); }
-        //    add JSON utility methods too...
-        ,    encodeJSON:        _.encodeJSON
-        ,    decodeJSON:        _.decodeJSON
+        //  readCookie - update options from cookie - returns hash of cookie data
+            readCookie:     function () { return _.readCookie(inst); }
+        //  deleteCookie
+        ,   deleteCookie:   function () { _.deleteCookie(inst); }
+        //  saveCookie - optionally pass keys-list and cookie-options (hash)
+        ,   saveCookie:     function (keys, cookieOpts) { return _.saveCookie(inst, keys, cookieOpts); }
+        //  loadCookie - readCookie and use to loadState() - returns hash of cookie data
+        ,   loadCookie:     function () { return _.loadCookie(inst); }
+        //  loadState - pass a hash of state to use to update options
+        ,   loadState:      function (stateData, opts) { _.loadState(inst, stateData, opts); }
+        //  readState - returns hash of current layout-state
+        ,   readState:      function (keys) { return _.readState(inst, keys); }
+        //  add JSON utility methods too...
+        ,   encodeJSON:     _.encodeJSON
+        ,   decodeJSON:     _.decodeJSON
         });
 
         // init state.stateData key, even if plugin is initially disabled
@@ -5518,8 +5518,8 @@ $.layout.state = {
         // autoLoad MUST BE one of: data-array, data-hash, callback-function, or TRUE
         if ( !sm.autoLoad ) return;
 
-        //    When state-data exists in the autoLoad key USE IT,
-        //    even if stateManagement.enabled == false
+        //  When state-data exists in the autoLoad key USE IT,
+        //  even if stateManagement.enabled == false
         if ($.isPlainObject( sm.autoLoad )) {
             if (!$.isEmptyObject( sm.autoLoad )) {
                 inst.loadState( sm.autoLoad );
@@ -5541,7 +5541,7 @@ $.layout.state = {
         }
     }
 
-,    _unload: function (inst) {
+,   _unload: function (inst) {
         var sm = inst.options.stateManagement;
         if (sm.enabled && sm.autoSave) {
             // if options is a function, call it to save the stateData
@@ -5568,7 +5568,7 @@ $.layout.onUnload.push( $.layout.state._unload );
  * jquery.layout.buttons 1.0
  * $Date: 2011-07-16 08:00:00 (Sat, 16 July 2011) $
  *
- * Copyright (c) 2012
+ * Copyright (c) 2012 
  *   Kevin Dalman (http://allpro.net)
  *
  * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
@@ -5585,13 +5585,13 @@ $.layout.onUnload.push( $.layout.state._unload );
 // tell Layout that the state plugin is available
 $.layout.plugins.buttons = true;
 
-//    Add buttons options to layout.defaults
+//  Add buttons options to layout.defaults
 $.layout.defaults.autoBindCustomButtons = false;
 // Specify autoBindCustomButtons as a layout-option, NOT a pane-option
 $.layout.optionsMap.layout.push("autoBindCustomButtons");
 
 /*
- *    Button methods
+ *  Button methods
  */
 $.layout.buttons = {
 
@@ -5600,12 +5600,12 @@ $.layout.buttons = {
     *
     * @see  _create()
     *
-    * @param  {Object}        inst    Layout Instance object
+    * @param  {Object}      inst    Layout Instance object
     */
     init: function (inst) {
-        var pre        = "ui-layout-button-"
-        ,    layout    = inst.options.name || ""
-        ,    name;
+        var pre     = "ui-layout-button-"
+        ,   layout  = inst.options.name || ""
+        ,   name;
         $.each("toggle,open,close,pin,toggle-slide,open-slide".split(","), function (i, action) {
             $.each($.layout.config.borderPanes, function (ii, pane) {
                 $("."+pre+action+"-"+pane).each(function(){
@@ -5623,22 +5623,22 @@ $.layout.buttons = {
     *
     * Two classes are added to the element, based on the buttonClass...
     * The type of button is appended to create the 2nd className:
-    *  - ui-layout-button-pin        // action btnClass
-    *  - ui-layout-button-pin-west    // action btnClass + pane
+    *  - ui-layout-button-pin       // action btnClass
+    *  - ui-layout-button-pin-west  // action btnClass + pane
     *  - ui-layout-button-toggle
     *  - ui-layout-button-open
     *  - ui-layout-button-close
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}           pane         Name of the pane the button is for: 'north', 'south', etc.
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           pane        Name of the pane the button is for: 'north', 'south', etc.
     *
-    * @return {Array.<Object>}    If both params valid, the element matching 'selector' in a jQuery wrapper - otherwise returns null
+    * @return {Array.<Object>}  If both params valid, the element matching 'selector' in a jQuery wrapper - otherwise returns null
     */
-,    get: function (inst, selector, pane, action) {
-        var $E    = $(selector)
-        ,    o    = inst.options
-        ,    err    = o.errors.addButtonError
+,   get: function (inst, selector, pane, action) {
+        var $E  = $(selector)
+        ,   o   = inst.options
+        ,   err = o.errors.addButtonError
         ;
         if (!$E.length) { // element not found
             $.layout.msg(err +" "+ o.errors.selector +": "+ selector, true);
@@ -5649,7 +5649,7 @@ $.layout.buttons = {
         }
         else { // VALID
             var btn = o[pane].buttonClass +"-"+ action;
-            $E    .addClass( btn +" "+ btn +"-"+ pane )
+            $E  .addClass( btn +" "+ btn +"-"+ pane )
                 .data("layoutName", o.name); // add layout identifier - even if blank!
         }
         return $E;
@@ -5659,20 +5659,20 @@ $.layout.buttons = {
     /**
     * NEW syntax for binding layout-buttons - will eventually replace addToggle, addOpen, etc.
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}            action
-    * @param {string}            pane
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           action
+    * @param {string}           pane
     */
-,    bind: function (inst, selector, action, pane) {
+,   bind: function (inst, selector, action, pane) {
         var _ = $.layout.buttons;
         switch (action.toLowerCase()) {
-            case "toggle":            _.addToggle    (inst, selector, pane); break;
-            case "open":            _.addOpen    (inst, selector, pane); break;
-            case "close":            _.addClose    (inst, selector, pane); break;
-            case "pin":                _.addPin    (inst, selector, pane); break;
-            case "toggle-slide":    _.addToggle    (inst, selector, pane, true); break;
-            case "open-slide":        _.addOpen    (inst, selector, pane, true); break;
+            case "toggle":          _.addToggle (inst, selector, pane); break;  
+            case "open":            _.addOpen   (inst, selector, pane); break;
+            case "close":           _.addClose  (inst, selector, pane); break;
+            case "pin":             _.addPin    (inst, selector, pane); break;
+            case "toggle-slide":    _.addToggle (inst, selector, pane, true); break;    
+            case "open-slide":      _.addOpen   (inst, selector, pane, true); break;
         }
         return inst;
     }
@@ -5680,12 +5680,12 @@ $.layout.buttons = {
     /**
     * Add a custom Toggler button for a pane
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}              pane         Name of the pane the button is for: 'north', 'south', etc.
-    * @param {boolean=}            slide         true = slide-open, false = pin-open
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           pane        Name of the pane the button is for: 'north', 'south', etc.
+    * @param {boolean=}         slide       true = slide-open, false = pin-open
     */
-,    addToggle: function (inst, selector, pane, slide) {
+,   addToggle: function (inst, selector, pane, slide) {
         $.layout.buttons.get(inst, selector, pane, "toggle")
             .click(function(evt){
                 inst.toggle(pane, !!slide);
@@ -5697,12 +5697,12 @@ $.layout.buttons = {
     /**
     * Add a custom Open button for a pane
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}            pane         Name of the pane the button is for: 'north', 'south', etc.
-    * @param {boolean=}            slide         true = slide-open, false = pin-open
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           pane        Name of the pane the button is for: 'north', 'south', etc.
+    * @param {boolean=}         slide       true = slide-open, false = pin-open
     */
-,    addOpen: function (inst, selector, pane, slide) {
+,   addOpen: function (inst, selector, pane, slide) {
         $.layout.buttons.get(inst, selector, pane, "open")
             .attr("title", inst.options[pane].tips.Open)
             .click(function (evt) {
@@ -5715,11 +5715,11 @@ $.layout.buttons = {
     /**
     * Add a custom Close button for a pane
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}           pane         Name of the pane the button is for: 'north', 'south', etc.
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           pane        Name of the pane the button is for: 'north', 'south', etc.
     */
-,    addClose: function (inst, selector, pane) {
+,   addClose: function (inst, selector, pane) {
         $.layout.buttons.get(inst, selector, pane, "close")
             .attr("title", inst.options[pane].tips.Close)
             .click(function (evt) {
@@ -5739,13 +5739,13 @@ $.layout.buttons = {
     *  - ui-layout-pane-pin-up
     *  - ui-layout-pane-west-pin-up
     *
-    * @param {Object}            inst        Layout Instance object
-    * @param {(string|!Object)}    selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
-    * @param {string}           pane         Name of the pane the pin is for: 'north', 'south', etc.
+    * @param {Object}           inst        Layout Instance object
+    * @param {(string|!Object)} selector    jQuery selector (or element) for button, eg: ".ui-layout-north .toggle-button"
+    * @param {string}           pane        Name of the pane the pin is for: 'north', 'south', etc.
     */
-,    addPin: function (inst, selector, pane) {
-        var    _    = $.layout.buttons
-        ,    $E    = _.get(inst, selector, pane, "pin");
+,   addPin: function (inst, selector, pane) {
+        var _   = $.layout.buttons
+        ,   $E  = _.get(inst, selector, pane, "pin");
         if ($E.length) {
             var s = inst.state[pane];
             $E.click(function (evt) {
@@ -5768,26 +5768,26 @@ $.layout.buttons = {
     *
     * @see  addPin(), syncPins()
     *
-    * @param {Object}            inst    Layout Instance object
-    * @param {Array.<Object>}    $Pin    The pin-span element in a jQuery wrapper
-    * @param {string}            pane    These are the params returned to callbacks by layout()
-    * @param {boolean}            doPin    true = set the pin 'down', false = set it 'up'
+    * @param {Object}           inst    Layout Instance object
+    * @param {Array.<Object>}   $Pin    The pin-span element in a jQuery wrapper
+    * @param {string}           pane    These are the params returned to callbacks by layout()
+    * @param {boolean}          doPin   true = set the pin 'down', false = set it 'up'
     */
-,    setPinState: function (inst, $Pin, pane, doPin) {
+,   setPinState: function (inst, $Pin, pane, doPin) {
         var updown = $Pin.attr("pin");
         if (updown && doPin === (updown=="down")) return; // already in correct state
         var
-            o        = inst.options[pane]
-        ,    pin        = o.buttonClass +"-pin"
-        ,    side    = pin +"-"+ pane
-        ,    UP        = pin +"-up "+    side +"-up"
-        ,    DN        = pin +"-down "+side +"-down"
+            o       = inst.options[pane]
+        ,   pin     = o.buttonClass +"-pin"
+        ,   side    = pin +"-"+ pane
+        ,   UP      = pin +"-up "+  side +"-up"
+        ,   DN      = pin +"-down "+side +"-down"
         ;
         $Pin
             .attr("pin", doPin ? "down" : "up") // logic
             .attr("title", doPin ? o.tips.Unpin : o.tips.Pin)
-            .removeClass( doPin ? UP : DN )
-            .addClass( doPin ? DN : UP )
+            .removeClass( doPin ? UP : DN ) 
+            .addClass( doPin ? DN : UP ) 
         ;
     }
 
@@ -5797,11 +5797,11 @@ $.layout.buttons = {
     *
     * @see  open(), close()
     *
-    * @param {Object}            inst    Layout Instance object
-    * @param {string}    pane    These are the params returned to callbacks by layout()
-    * @param {boolean}    doPin    True means set the pin 'down', False means 'up'
+    * @param {Object}           inst    Layout Instance object
+    * @param {string}   pane    These are the params returned to callbacks by layout()
+    * @param {boolean}  doPin   True means set the pin 'down', False means 'up'
     */
-,    syncPinBtns: function (inst, pane, doPin) {
+,   syncPinBtns: function (inst, pane, doPin) {
         // REAL METHOD IS _INSIDE_ LAYOUT - THIS IS HERE JUST FOR REFERENCE
         $.each(inst.state[pane].pins, function (i, selector) {
             $.layout.buttons.setPinState(inst, $(selector), pane, doPin);
@@ -5809,17 +5809,17 @@ $.layout.buttons = {
     }
 
 
-,    _load: function (inst) {
-        var    _    = $.layout.buttons;
+,   _load: function (inst) {
+        var _   = $.layout.buttons;
         // ADD Button methods to Layout Instance
         // Note: sel = jQuery Selector string
         $.extend( inst, {
-            bindButton:        function (sel, action, pane) { return _.bind(inst, sel, action, pane); }
-        //    DEPRECATED METHODS
-        ,    addToggleBtn:    function (sel, pane, slide) { return _.addToggle(inst, sel, pane, slide); }
-        ,    addOpenBtn:        function (sel, pane, slide) { return _.addOpen(inst, sel, pane, slide); }
-        ,    addCloseBtn:    function (sel, pane) { return _.addClose(inst, sel, pane); }
-        ,    addPinBtn:        function (sel, pane) { return _.addPin(inst, sel, pane); }
+            bindButton:     function (sel, action, pane) { return _.bind(inst, sel, action, pane); }
+        //  DEPRECATED METHODS
+        ,   addToggleBtn:   function (sel, pane, slide) { return _.addToggle(inst, sel, pane, slide); }
+        ,   addOpenBtn:     function (sel, pane, slide) { return _.addOpen(inst, sel, pane, slide); }
+        ,   addCloseBtn:    function (sel, pane) { return _.addClose(inst, sel, pane); }
+        ,   addPinBtn:      function (sel, pane) { return _.addPin(inst, sel, pane); }
         });
 
         // init state array to hold pin-buttons
@@ -5833,7 +5833,7 @@ $.layout.buttons = {
             _.init(inst);
     }
 
-,    _unload: function (inst) {
+,   _unload: function (inst) {
         // TODO: unbind all buttons???
     }
 
@@ -5849,7 +5849,7 @@ $.layout.onLoad.push(  $.layout.buttons._load );
  * jquery.layout.browserZoom 1.0
  * $Date: 2011-12-29 08:00:00 (Thu, 29 Dec 2011) $
  *
- * Copyright (c) 2012
+ * Copyright (c) 2012 
  *   Kevin Dalman (http://allpro.net)
  *
  * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
@@ -5870,7 +5870,7 @@ $.layout.defaults.browserZoomCheckInterval = 1000;
 $.layout.optionsMap.layout.push("browserZoomCheckInterval");
 
 /*
- *    browserZoom methods
+ *  browserZoom methods
  */
 $.layout.browserZoom = {
 
@@ -5880,14 +5880,14 @@ $.layout.browserZoom = {
             $.layout.browserZoom._setTimer(inst);
     }
 
-,    _setTimer: function (inst) {
+,   _setTimer: function (inst) {
         // abort if layout destroyed or browser does not need this check
         if (inst.destroyed) return;
-        var o    = inst.options
-        ,    s    = inst.state
-        //    don't need check if inst has parentLayout, but check occassionally in case parent destroyed!
-        //    MINIMUM 100ms interval, for performance
-        ,    ms    = inst.hasParentLayout ?  5000 : Math.max( o.browserZoomCheckInterval, 100 )
+        var o   = inst.options
+        ,   s   = inst.state
+        //  don't need check if inst has parentLayout, but check occassionally in case parent destroyed!
+        //  MINIMUM 100ms interval, for performance
+        ,   ms  = inst.hasParentLayout ?  5000 : Math.max( o.browserZoomCheckInterval, 100 )
         ;
         // set the timer
         setTimeout(function(){
@@ -5900,21 +5900,21 @@ $.layout.browserZoom = {
             // set a NEW timeout
             $.layout.browserZoom._setTimer(inst);
         }
-        ,    ms );
+        ,   ms );
     }
 
-,    ratio: function () {
-        var w    = window
-        ,    s    = screen
-        ,    d    = document
-        ,    dE    = d.documentElement || d.body
-        ,    b    = $.layout.browser
-        ,    v    = b.version
-        ,    r, sW, cW
+,   ratio: function () {
+        var w   = window
+        ,   s   = screen
+        ,   d   = document
+        ,   dE  = d.documentElement || d.body
+        ,   b   = $.layout.browser
+        ,   v   = b.version
+        ,   r, sW, cW
         ;
         // we can ignore all browsers that fire window.resize event onZoom
         if ((b.msie && v > 8)
-        ||    !b.msie
+        ||  !b.msie
         ) return false; // don't need to track zoom
 
         if (s.deviceXDPI && s.systemXDPI) // syntax compiler hack
