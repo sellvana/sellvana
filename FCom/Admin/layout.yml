@@ -192,7 +192,7 @@ form:
 /roles/form:
     - { include: base }
     - { include: form }
-    - { view: admin/nav, do [[ setNav, admin/roles ]] }
+    - { view: admin/nav, do: [[ setNav, admin/roles ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
       set: { tab_view_prefix: roles-form/ }

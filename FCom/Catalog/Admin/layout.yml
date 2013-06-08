@@ -4,7 +4,6 @@ base:
       - [ addNav, catalog, { label: Catalog, pos: 100 } ]
       - [ addNav, catalog/categories, { label: Categories, href: /catalog/categories } ]
       - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
-      - [ addNav, catalog/families, { label: Product Families, href: /catalog/families } ]
       - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
   - view: admin/header
     do:

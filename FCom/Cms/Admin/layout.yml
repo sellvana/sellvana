@@ -10,7 +10,7 @@ base:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: cms/nav }
-	- { view: admin/nav, do: [[ setNav : cms/nav ]] }
+	- { view: admin/nav, do: [[ setNav, cms/nav ]] }
 
 /cms/nav/tree_form:
 	- { root: cms/nav-tree-form }
