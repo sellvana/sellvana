@@ -16,7 +16,7 @@ class FCom_Sales_Model_CartItem extends FCom_Core_Model_Abstract
 
     public function rowTotal()
     {
-        return $this->price*$this->qty;
+        return $this->price * $this->qty;
     }
 
     public function isGroupAble()
@@ -43,7 +43,14 @@ class FCom_Sales_Model_CartItem extends FCom_Core_Model_Abstract
         if (!parent::beforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
+        $this->data_serialized = BUtil::toJson($this->data);
         return true;
+    }
+
+    public function afterLoad()
+    {
+        parent::afterLoad();
+        $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : array();
     }
 }
 

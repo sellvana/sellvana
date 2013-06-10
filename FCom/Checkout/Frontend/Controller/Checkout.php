@@ -5,7 +5,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout_login()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>BApp::baseUrl()),
             array('label'=>'Login or guest checkout', 'active'=>true));
         $this->layout('/checkout/login');
     }
@@ -13,38 +13,29 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>BApp::baseUrl()),
             array('label'=>'Checkout', 'active'=>true));
 
         $shipAddress = null;
         $billAddress = null;
 
-        $user = false;
-        if (BApp::m('FCom_Customer')) {
-            $user = FCom_Customer_Model_Customer::sessionUser();
-        }
-        $guestCheckout = false;
-        if (!$user) {
-            $guestCheckout = true;
+        $customer = false;
+        if (BModuleRegistry::isLoaded('FCom_Customer')) {
+            $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         }
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart()->calcTotals();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        if (!$cart || !$cart->id) {
+            BResponse::i()->redirect(BApp::href('cart'));
+        }
 
-        if ($cart->id()) {
-            $shipAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
-            $billAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'billing');
+        $billAddress = $cart->getAddressByType('billing');
+        $shipAddress = $cart->getAddressByType('shipping');
 
-            if ($user) {
-                //copy user address to checkout address
-                if (!$shipAddress && $user->defaultShipping()) {
-                    FCom_Sales_Model_CartAddress::i()->newShipping($cart->id(), $user->defaultShipping());
-                    $shipAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
-                }
-                if (!$billAddress && $user->defaultBilling()) {
-                    FCom_Sales_Model_CartAddress::i()->newBilling($cart->id(), $user->defaultBilling(), $user->email);
-                    $billAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'billing');
-                }
-            }
+        if (!$billAddress && $customer) {
+            $cart->importAddressesFromCustomer($customer);
+            $billAddress = $cart->getAddressByType('billing');
+            $shipAddress = $cart->getAddressByType('shipping');
         }
 
         if (empty($shipAddress)) {
@@ -56,9 +47,9 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
-        if ($user) {
-            $cart->payment_method = empty($cart->payment_method) ? $user->getPaymentMethod() : $cart->payment_method;
-            $cart->payment_detials = empty($cart->payment_detials) ? $user->getPaymentDetails() : $cart->payment_detials;
+        if ($customer) {
+            $cart->payment_method = empty($cart->payment_method) ? $customer->getPaymentMethod() : $cart->payment_method;
+            $cart->payment_details = empty($cart->payment_details) ? $customer->getPaymentDetails() : $cart->payment_details;
         }
 
         if (empty($cart->payment_method)) {
@@ -66,27 +57,22 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect($href);
         }
 
-
-
-        //print_r($cart);exit;
         $cart->calculateTotals();
 
 
         $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         if (!empty($paymentMethods[$cart->payment_method])) {
-            $layout->view('checkout/checkout')->paymentMethod = $cart->payment_method;
-            $layout->view('checkout/checkout')->paymentClass = $paymentMethods[$cart->payment_method];
-            $layout->view('checkout/checkout')->paymentDetails = BUtil::fromJson($cart->payment_detials);
+            $layout->view('checkout/checkout')->payment_method = $paymentMethods[$cart->payment_method];
+            $layout->view('checkout/checkout')->payment_details = BUtil::fromJson($cart->payment_details);
         }
 
         $this->messages('checkout/checkout');
         $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->guest_checkout = $guestCheckout;
-        $layout->view('checkout/checkout')->shippingAddress = FCom_Sales_Model_CartAddress::as_html($shipAddress);
-        $layout->view('checkout/checkout')->billingAddress = FCom_Sales_Model_CartAddress::as_html($billAddress);
-        $layout->view('checkout/checkout')->billingAddressObject = $billAddress;
-        $layout->view('checkout/checkout')->shippingMethods = $shippingMethods;
+        $layout->view('checkout/checkout')->guest_checkout = !$customer;
+        $layout->view('checkout/checkout')->shipping_address = $shipAddress;
+        $layout->view('checkout/checkout')->billing_address = $billAddress;
+        $layout->view('checkout/checkout')->shipping_methods = $shippingMethods;
 
         $layout->view('checkout/checkout')->totals = $cart->getTotals();
         $this->layout('/checkout/checkout');
@@ -108,12 +94,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (!empty($post['payment'])) {
             $cart->payment_details = BUtil::toJson($post['payment']);
             if (FCom_Customer_Model_Customer::isLoggedIn()) {
-                $user = FCom_Customer_Model_Customer::sessionUser();
+                $user = FCom_Customer_Model_Customer::i()->sessionUser();
                 $user->setPaymentDetails($post['payment']);
             }
         }
-        if (!empty($post['discount_code'])) {
-            $cart->discount_code = $post['discount_code'];
+        if (!empty($post['coupon_code'])) {
+            $cart->coupon_code = $post['coupon_code'];
         }
         if (!empty($post['create_account'])) {
             $r = $post['account'];
@@ -126,7 +112,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             } catch (Exception $e) {
                 //die($e->getMessage());
             }
-            //$cart->discount_code = $post['discount_code'];
+            //$cart->coupon_code = $post['coupon_code'];
         }
         $cart->save();
 
@@ -148,7 +134,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $orderData['shipping_service_title'] = $shippingServiceTitle;
             $orderData['payment_method'] = $cart->payment_method;
             $orderData['payment_details'] = $cart->payment_details;
-            $orderData['discount_code'] = $cart->discount_code;
+            $orderData['coupon_code'] = $cart->coupon_code;
             $orderData['tax'] = $cart->tax;
             $orderData['total_json'] = $cart->total_json;
             $orderData['balance'] = $cart->calc_balance; //grand total minus discount, which have to be paid
@@ -194,7 +180,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             }
 
             //Made payment
-            $paymentMethods = FCom_Sales_Model_Cart::i()->getPaymentMethods();
+            $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
             if (is_object($paymentMethods[$cart->payment_method])) {
                 $paymentMethods[$cart->payment_method]->processPayment();
             }
@@ -208,7 +194,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     {
         $layout = BLayout::i();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $paymentMethods = FCom_Sales_Model_Cart::i()->getPaymentMethods();
+        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         $layout->view('breadcrumbs')->crumbs = array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
@@ -227,7 +213,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $cart->payment_method = $post['payment_method'];
             $cart->save();
             if (BApp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                $user = FCom_Customer_Model_Customer::sessionUser();
+                $user = FCom_Customer_Model_Customer::i()->sessionUser();
                 $user->payment_method = $post['payment_method'];
                 $user->save();
             }
@@ -264,7 +250,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $user = false;
         if (BApp::m('FCom_Customer')) {
-            $user = FCom_Customer_Model_Customer::sessionUser();
+            $user = FCom_Customer_Model_Customer::i()->sessionUser();
         }
 
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);

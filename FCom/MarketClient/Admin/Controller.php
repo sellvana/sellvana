@@ -51,7 +51,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         $modName = BRequest::i()->params('mod_name', true);
         if (!$modName) {
             $modid = BRequest::i()->params('id', true);
-            $mod = FCom_MarketClient_Model_Modules::load($modid);
+            $mod = FCom_MarketClient_Model_Modules::i()->load($modid);
             if($mod) {
                 $modName = $mod->mod_name;
             }
@@ -154,7 +154,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         $modName = BRequest::i()->params('mod_name', true);
         if (!$modName) {
             $modid = BRequest::i()->params('id', true);
-            $mod = FCom_MarketClient_Model_Modules::load($modid);
+            $mod = FCom_MarketClient_Model_Modules::i()->load($modid);
             if($mod) {
                 $modName = $mod->mod_name;
             }

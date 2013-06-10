@@ -10,7 +10,7 @@
                 'id' => array('label'=>'ID', 'hidden'=>true),
                 'ts' => array('label'=>'TimeStamp', 'formatter'=>'date'),
                 'version' => array('label'=>'Version'),
-                'user_id' => array('label'=>'User', 'options'=>FCom_Admin_Model_User::options()),
+                'user_id' => array('label'=>'User', 'options'=>FCom_Admin_Model_User::i()->options()),
                 'username' => array('Label'=>'User Name', 'hidden'=>true),
                 'comments' => array('labl'=>'Comments'),
             ),

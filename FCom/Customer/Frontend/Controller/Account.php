@@ -9,7 +9,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
     public function action_index()
     {
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
         $this->view('customer/account')->customer = $customer;
         $crumbs[] = array('label'=>'Account', 'active'=>true);
@@ -19,7 +19,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
     public function action_edit()
     {
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
 
         $post = BRequest::i()->post();
@@ -51,7 +51,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
     public function action_editpassword()
     {
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
 
         $post = BRequest::i()->post();

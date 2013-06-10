@@ -54,6 +54,15 @@ class BTwig extends BClass
             static::$_fileTwig->addFilter($i18nFilter);
             static::$_stringTwig->addFilter($i18nFilter);
 
+            $currencyFilter = new Twig_SimpleFilter('currency', 'BLocale::currency');
+            static::$_fileTwig->addFilter($currencyFilter);
+            static::$_stringTwig->addFilter($currencyFilter);
+
+            $debugFilter = new Twig_SimpleFilter('debug', function($v) {
+                echo "<pre>"; print_r($v); echo "</pre>";
+            });
+            static::$_fileTwig->addFilter($debugFilter);
+
             static::$_fileTwig->addGlobal('REQUEST', BRequest::i());
             static::$_stringTwig->addGlobal('REQUEST', BRequest::i());
 

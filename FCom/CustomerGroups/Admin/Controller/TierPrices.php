@@ -69,7 +69,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     'group_id'    => array(
                         'label' => BLocale::_('Group'),
                         'index' => $this->_mainTableAlias . '.group_id', 'width' => 200,
-                        'options' => FCom_CustomerGroups_Model_Group::groupsOptions(),
+                        'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(),
                         'editable' => true,
                         'edittype' => 'select'
                     ),

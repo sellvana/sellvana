@@ -167,7 +167,7 @@ class FCom_GoogleCheckout extends BClass
     {
         if (!$this->gCart) {
             /* @var $cart FCom_Sales_Model_Cart */
-            $cart = FCom_Sales_Model_Cart::sessionCart();
+            $cart = FCom_Sales_Model_Cart::i()->sessionCart();
             /* @var $salesOrder FCom_Sales_Model_Order */
             $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
             if (!$salesOrder) {

@@ -83,10 +83,12 @@ class FCom_Ogone_RemoteApi extends BClass
 
     public function prepareRequestData()
     {
+        return array();
         $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
         $order = new BData(array()); // order
         $cust = new BData(array()); // customer
-        $ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
+        $ogoneOrder = new BData(array()); // order
+        //$ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
 
         $complus = '';
         $paramplus = array('amountOfProducts' => '5', 'usedCoupon' => 1); //?

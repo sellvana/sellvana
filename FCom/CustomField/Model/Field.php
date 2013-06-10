@@ -12,7 +12,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         'table_field_type' => array(
             'date' => 'Date',
             'datetime' => 'Date/Time',
-            'decimal(12,4)' => 'Decimal',
+            'decimal(12,2)' => 'Decimal',
             'int(11)' => 'Integer',
             'tinyint(3)' => 'Tiny Int',
             'text' => 'Long Text',

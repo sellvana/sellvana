@@ -70,7 +70,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $catIds = array_keys($categories);
             $hlp = FCom_Catalog_Model_CategoryProduct::i();
 
-            FCom_CustomField_Main::disable(true);
+            FCom_CustomField_Main::i()->disable(true);
             FCom_Catalog_Model_Product::i()->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
                 $pId = $row->id;
                 $exists = array();
@@ -82,7 +82,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     $exists[$pId.'-'.$cId] = true;
                 }
             });
-            FCom_CustomField_Main::disable(false);
+            FCom_CustomField_Main::i()->disable(false);
         }
 
         // reindex products

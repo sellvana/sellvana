@@ -4,7 +4,7 @@ $parent = false;
 $siblings = false;
 if ($category) {
     if ($category->parent_id) {
-        $parent = FCom_Catalog_Model_Category::load($category->parent_id);
+        $parent = FCom_Catalog_Model_Category::i()->load($category->parent_id);
         $siblings = $category->siblings();
     }
     $children = $category->children();

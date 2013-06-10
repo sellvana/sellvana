@@ -101,7 +101,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'shipping_method' => $order->shipping_method,
                 'shipping_service'       => $order->shipping_service,
                 'payment_method'       => $order->payment_method,
-                'discount_code'       => $order->discount_code
+                'coupon_code'       => $order->coupon_code
             );
             if ($includeItems) {
                 $items = $order->items();
@@ -149,8 +149,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if (!empty($post['payment_method'])) {
             $data['payment_method'] = $post['payment_method'];
         }
-        if (!empty($post['discount_code'])) {
-            $data['discount_code'] = $post['discount_code'];
+        if (!empty($post['coupon_code'])) {
+            $data['coupon_code'] = $post['coupon_code'];
         }
         return $data;
     }

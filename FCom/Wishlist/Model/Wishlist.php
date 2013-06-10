@@ -10,7 +10,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function wishlist()
     {
-        $user = FCom_Customer_Model_Customer::sessionUser();
+        $user = FCom_Customer_Model_Customer::i()->sessionUser();
         if (!$user){
             return false;
         }

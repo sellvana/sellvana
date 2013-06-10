@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://fulleron.home/FCom/Core/js/lib/less.min.js?1333539941" ></script>
-
 <form action="<?=BApp::href('checkout/address')?>" method="post" class="address-form" id="address-form">
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="<?=$this->address_type?>">

@@ -10,7 +10,8 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 * Individual module suites can be run directly with the phpunit command.
 *
 */
-class FCom_Test_AllTests {
+class FCom_Test_AllTests extends BClass
+{
 
     public static function suite()
     {
@@ -42,5 +43,5 @@ class FCom_Test_AllTests {
 }
 
 if (PHPUnit_MAIN_METHOD == 'FCom_Test_AllTests::suite') {
-    FCom_Test_AllTests::suite();
+    FCom_Test_AllTests::i()->suite();
 }
