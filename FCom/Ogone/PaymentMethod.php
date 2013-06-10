@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Ogone_PaymentMethod extends BClass
+class FCom_Ogone_PaymentMethod extends FCom_Sales_Model_PaymentMethod_Abstract
 {
     public function getName()
     {

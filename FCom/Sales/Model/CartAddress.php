@@ -5,11 +5,7 @@ class FCom_Sales_Model_CartAddress extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_cart_address';
     protected static $_origClass = __CLASS__;
 
-    public function findByCartType($cartId, $atype)
-    {
-        return FCom_Sales_Model_CartAddress::i()->orm()->where("cart_id",$cartId)->where('atype', $atype)->find_one();
-    }
-    public static function as_html($obj=null)
+    public function as_html($obj=null)
     {
         if (is_null($obj)) {
             $obj = $this;
@@ -33,48 +29,5 @@ class FCom_Sales_Model_CartAddress extends FCom_Core_Model_Abstract
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         return true;
-    }
-
-    public function newShipping($cartId, $userData)
-    {
-        $this->newAddress($cartId, 'shipping', $userData->as_array());
-    }
-
-    public function newBilling($cartId, $userData, $email)
-    {
-        $this->newAddress($cartId, 'billing', $userData->as_array(), $email);
-    }
-
-    public function newAddress($cartId, $atype, $userData, $email = '')
-    {
-        $address = array(
-            'cart_id' => $cartId,
-            'email' => $email,
-            'atype' => $atype,
-            'firstname' => $userData['firstname'],
-            'lastname' => $userData['lastname'],
-            'attn' => $userData['attn'],
-            'street1' => $userData['street1'],
-            'street2' => $userData['street2'],
-            'street3' => $userData['street3'],
-            'city' => $userData['city'],
-            'region' => $userData['region'],
-            'postcode' => $userData['postcode'],
-            'country' => $userData['country'],
-            'phone' => $userData['phone'],
-            'fax' => $userData['fax'],
-            'lat' => $userData['lat'],
-            'lng' => $userData['lng'],
-            'created_dt' => null,
-            'updated_dt' => null
-        );
-        $newAddress = $this->findByCartType($cartId, $atype);
-        if (!$newAddress) {
-            $newAddress = FCom_Sales_Model_CartAddress::create($address);
-        } else {
-            $newAddress->set($address);
-        }
-        $newAddress->save();
-        return $newAddress;
     }
 }

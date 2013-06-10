@@ -575,6 +575,7 @@ class BUtil extends BClass
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
+            array_walk($fields, 'trim');
         }
 //if (!is_)
         return array_intersect_key($array, array_flip($fields));
@@ -1244,6 +1245,65 @@ class BUtil extends BClass
         return rmdir($dir);
     }
     */
+
+    static public function topoSort(array $array, array $args=array())
+    {
+        if (empty($array)) {
+            return array();
+        }
+
+        // nodes listed in 'after' are parents
+        // nodes listed in 'before' are children
+        // prepare initial $nodes array
+        $beforeVar = !empty($args['before']) ? $args['before'] : 'before';
+        $afterVar = !empty($args['before']) ? $args['after'] : 'after';
+        $isObject = is_object(current($array));
+        $nodes = array();
+        foreach ($array as $k=>$v) {
+            $before = $isObject ? $v->$beforeVar : $v[$beforeVar];
+            if (is_string($before)) {
+                $before = array_walk(explode(',', $before), 'trim');
+            }
+            $after = $isObject ? $v->$afterVar : $v[$afterVar];
+            if (is_string($after)) {
+                $after = array_walk(explode(',', $after), 'trim');
+            }
+            $nodes[$k] = array('key' => $k, 'item' => $v, 'parents' => (array)$after, 'children' => (array)$before);
+        }
+
+        // get nodes without parents
+        $rootNodes = array();
+        foreach ($nodes as $k=>$node) {
+            if (empty($node['parents'])) {
+                $rootNodes[] = $node;
+            }
+        }
+        // begin algorithm
+        $sorted = array();
+        while ($nodes) {
+            // check for circular reference
+            if (!$rootNodes) return false;
+            // remove this node from root nodes and add it to the output
+            $n = array_pop($rootNodes);
+            $sorted[$n['key']] = $n['item'];
+            // for each of its children: queue the new node, finally remove the original
+            for ($i = count($n['children'])-1; $i>=0; $i--) {
+                // get child node
+                $childNode = $nodes[$n['children'][$i]];
+                // remove child nodes from parent
+                unset($n['children'][$i]);
+                // remove parent from child node
+                unset($childNode['parents'][array_search($n['name'], $childNode['parents'])]);
+                // check if this child has other parents. if not, add it to the root nodes list
+                if (!$childNode['parents']) {
+                    array_push($rootNodes, $childNode);
+                }
+            }
+            // remove processed node from list
+            unset($nodes[$n['key']]);
+        }
+        return $sorted;
+    }
 }
 
 /**
@@ -2550,6 +2610,21 @@ class BLocale extends BClass
     static public function getTranslations()
     {
         return self::$_tr;
+    }
+
+    static protected $_currency;
+
+    static public function setCurrency($currency)
+    {
+        static::$_currency = $currency;
+    }
+
+    static public function currency($value, $currency = null)
+    {
+        if (!$currency) {
+            $currency = static::$_currency;
+        }
+        return sprintf('%s%s', $currency, number_format($value, 2));
     }
 }
 

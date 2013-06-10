@@ -21,7 +21,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
-        $order = FCom_Sales_Model_Order::load(2);
+        $order = FCom_Sales_Model_Order::i()->load(2);
         $order->paid();
 
         $this->assertEquals('paid', $order->status()->code);
@@ -31,7 +31,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
-        $order = FCom_Sales_Model_Order::load(2);
+        $order = FCom_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);
@@ -44,7 +44,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
-        $order = FCom_Sales_Model_Order::load(2);
+        $order = FCom_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);

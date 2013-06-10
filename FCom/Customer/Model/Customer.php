@@ -230,18 +230,18 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function defaultBilling()
     {
-        if ($this->default_billing_id && !$this->defaultBilling) {
-            $this->defaultBilling = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
+        if ($this->default_billing_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
         }
-        return $this->defaultBilling;
+        return $this->default_billing;
     }
 
     public function defaultShipping()
     {
-        if ($this->default_shipping_id && !$this->defaultShipping) {
-            $this->defaultShipping = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
+        if ($this->default_shipping_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
         }
-        return $this->defaultShipping;
+        return $this->default_billing;
     }
 
     public function addresses()

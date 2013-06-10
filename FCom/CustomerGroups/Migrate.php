@@ -60,8 +60,8 @@ class FCom_CustomerGroups_Migrate
                     'id'         => 'int(10) unsigned not null auto_increment primary key',
                     'product_id' => 'int(10) unsigned not null',
                     'group_id'   => 'int(10) unsigned not null',
-                    'base_price' => 'decimal(12,4) not null',
-                    'sale_price' => 'decimal(12,4) not null',
+                    'base_price' => 'decimal(12,2) not null',
+                    'sale_price' => 'decimal(12,2) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ),
                 'KEYS' => array(

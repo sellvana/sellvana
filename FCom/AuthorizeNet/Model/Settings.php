@@ -175,7 +175,7 @@ class FCom_AuthorizeNet_Model_Settings
     public static function countries()
     {
         $countries = array();
-        foreach (FCom_Geo_Model_Country::options() as $iso => $name) {
+        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
             if (empty($iso)) {
                 continue;
             }

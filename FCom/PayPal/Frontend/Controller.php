@@ -4,7 +4,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 {
     public function action_redirect()
     {
-        $cart = FCom_Sales_Model_Cart::sessionCart();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = BApp::href('cart');
@@ -49,13 +49,13 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         }
         $sData =& BSession::i()->dataToUpdate();
         $sData['paypal']['token'] = $resArr['TOKEN'];
-        BResponse::i()->redirect(FCom_PayPal_RemoteApi::getExpressCheckoutUrl($resArr['TOKEN']));
+        BResponse::i()->redirect(FCom_PayPal_RemoteApi::i()->getExpressCheckoutUrl($resArr['TOKEN']));
     }
 
     public function action_return()
     {
         $sData =& BSession::i()->dataToUpdate();
-        $cart = FCom_Sales_Model_Cart::sessionCart();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = BApp::href('cart');
@@ -148,7 +148,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         //unset cart
         $cart->status = 'finished';
         $cart->save();
-        FCom_Sales_Model_Cart::sessionCartId(null);
+        FCom_Sales_Model_Cart::i()->sessionCartId(null);
 
         $hrefUrl = BApp::href('checkout/success');
         BResponse::i()->redirect($hrefUrl);

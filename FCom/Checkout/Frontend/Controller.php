@@ -15,7 +15,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Cart', 'active'=>true));
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart()->calcTotals();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         BEvents::i()->fire('FCom_Checkout_Frontend_Controller::action_cart.cart', array('cart'=>$cart));
 
         $shippingEstimate = BSession::i()->data('shipping_estimate');
@@ -44,7 +44,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     $cart->user_id = FCom_Customer_Model_Customer::sessionUserId();
                     $cart->save();
                 }
-                $cart->addProduct($p->id(), $options);
+                $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                 $result = array(
                     'title' => 'Added to cart',
                     'html' => '<img src="'.$p->thumbUrl(35, 35).'" width="35" height="35" style="float:left"/> '.htmlspecialchars($p->product_name)
@@ -52,7 +52,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                         .'<br><br><a href="'.$cartHref.'" class="button">Go to cart</a>',
                     'minicart_html' => BLayout::i()->view('checkout/cart/block')->render(),
                     'cnt' => $cart->itemQty(),
-                    'subtotal' => $cart->calcTotals()->subtotal
+                    'subtotal' => $cart->subtotal,
                 );
                 break;
             }
@@ -80,7 +80,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 }
                 BSession::i()->data('shipping_estimate', $estimate);
             }
-            $cart->calcTotals()->save();
+            $cart->calculateTotals()->save();
             BResponse::i()->redirect($cartHref);
         }
     }
@@ -95,7 +95,6 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
         $qty = !empty($qty) ? $qty : 1;
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $options=array('qty' => $qty, 'price' => $product->base_price);
-        $cart->addProduct($product->id(), $options);
+        $cart->addProduct($product->id(), array('qty' => $qty, 'price' => $product->base_price));
     }
 }

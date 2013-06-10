@@ -138,7 +138,7 @@ class FCom_IndexTank_Admin extends BClass
         if (empty($args['id'])) {
             return;
         }
-        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $categoryMoving = FCom_Catalog_Model_Category::i()->load($args['id']);
         $catIds = explode("/", $categoryMoving->id_path);
 
         if (empty($catIds)) {
@@ -158,7 +158,7 @@ class FCom_IndexTank_Admin extends BClass
         if (empty($args['id'])) {
             return;
         }
-        $categoryMoving = FCom_Catalog_Model_Category::load($args['id']);
+        $categoryMoving = FCom_Catalog_Model_Category::i()->load($args['id']);
         $catIds = explode("/", $categoryMoving->id_path);
 
         if (empty($catIds)) {

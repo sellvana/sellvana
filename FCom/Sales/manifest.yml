@@ -1,8 +1,9 @@
 modules:
 	FCom_Sales:
-		version: 0.2.0
-		require: { module: { FCom_Core: 0.1.0 } }
+		version: 0.2.1
+		require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
 		description: "Fundamental Sales functionality"
+        auto_use: [ bootstrap ]
 
         areas:
             FCom_Admin:
@@ -26,3 +27,6 @@ modules:
 
                     - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                observe:
+                    - [ FCom_Customer_Model_Customer::login.after, FCom_Sales_Model_Cart::onUserLogin ]
+                    - [ FCom_Customer_Model_Customer::logout.before, FCom_Sales_Model_Cart::onUserLogout ]

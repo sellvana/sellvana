@@ -1,19 +1,19 @@
 <?php
 
-class FCom_ShippingUps_Ups 
-    extends FCom_Sales_Abstract_ShippingMethod 
-    implements FCom_Sales_Interface_ShippingMethod
+class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Model_ShippingMethod_Abstract
 {
     protected $name = 'Universal post service';
     protected $code = 'ShippingUps';
     protected $rate;
 
-    public static function bootstrap()
+    public function init()
     {
     }
 
     public function rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
     {
+        include_once __DIR__ .'/lib/UpsRate.php';
+
         $config = BConfig::i()->get('modules/FCom_ShippingUps');
         $password = !empty($config['password']) ? $config['password'] : '';
         $account = !empty($config['account']) ? $config['account'] : '';
@@ -36,7 +36,7 @@ class FCom_ShippingUps_Ups
     public function getEstimate()
     {
         if (!$this->rate) {
-            $cart = FCom_Sales_Model_Cart::sessionCart();
+            $cart = FCom_Sales_Model_Cart::i()->sessionCart();
             $this->getRateCallback($cart);
             if (!$this->rate) {
                 return 'Unable to calculate';
@@ -95,8 +95,8 @@ class FCom_ShippingUps_Ups
     public function getRateCallback($cart)
     {
         //address
-        $user = FCom_Customer_Model_Customer::sessionUser();
-        $shippingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'shipping');
+        $user = FCom_Customer_Model_Customer::i()->sessionUser();
+        $shippingAddress = $cart->getAddressByType('shipping');
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
         }

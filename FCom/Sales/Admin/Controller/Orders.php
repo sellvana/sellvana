@@ -21,7 +21,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'shipping_address' => array('label'=>'Ship to Address', 'index'=>'as.shipping_address'),
             'gt_base' => array('label'=>'GT (base)', 'index'=>'o.gt_base'),
             'balance' => array('label'=>'GT (paid)', 'index'=>'o.balance'),
-            'discount' => array('label'=>'Discount', 'index'=>'o.discount_code'),
+            'discount' => array('label'=>'Discount', 'index'=>'o.coupon_code'),
             'os_name' => array('label'=>'Status', 'index'=>'os.name'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('orders/form/?id=');
@@ -61,7 +61,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $orderId = BRequest::i()->params('id', true);
         $act = BRequest::i()->params('act', true);
 
-        $order = FCom_Sales_Model_Order::load($orderId);
+        $order = FCom_Sales_Model_Order::i()->load($orderId);
         $shipping = FCom_Sales_Model_OrderAddress::i()->findByOrder($orderId,'shipping');
         $billing = FCom_Sales_Model_OrderAddress::i()->findByOrder($orderId,'billing');
         if ($shipping) {
@@ -76,7 +76,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         }
 
         if ($order->user_id) {
-            $customer = FCom_Customer_Model_Customer::load($order->user_id);
+            $customer = FCom_Customer_Model_Customer::i()->load($order->user_id);
             $customer->guest = false;
         } else {
             $customer = new stdClass();

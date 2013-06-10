@@ -9,7 +9,7 @@
         <b><?= BLocale::_("Default billing address") ?></b><br/>
     <?php endif; ?>
 
-    <?=FCom_Customer_Model_Address::as_html($address)?>
+    <?=FCom_Customer_Model_Address::i()->as_html($address)?>
         <a href="<?=Bapp::href("customer/address/edit")?>?id=<?=$address->id?>"><?= BLocale::_("Edit") ?></a>
     <hr/>
 <?php endforeach; ?>

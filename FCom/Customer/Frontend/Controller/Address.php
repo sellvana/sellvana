@@ -9,7 +9,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
 
     public function action_index()
     {
-        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $addresses = $customer->addresses();
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
@@ -22,7 +22,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
     public function action_edit()
     {
         $layout = BLayout::i();
-        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $id = BRequest::i()->get('id');
         $defaultShipping = false;
         $defaultBilling = false;
@@ -36,7 +36,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $defaultBilling = true;
             }
         } else {
-            $address = FCom_Customer_Model_Address::create();
+            $address = FCom_Customer_Model_Address::i()->create();
         }
 
         $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
@@ -59,7 +59,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
 
     public function action_index__POST()
     {
-        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $r = BRequest::i()->post();
 
         //create new address if shipping address not equal to billing
@@ -89,7 +89,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
     {
         $type = BRequest::get('t');
         $id = BRequest::get('id');
-        $customer = FCom_Customer_Model_Customer::sessionUser();
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
 
         if (!empty($id)) {
             $cart = FCom_Sales_Model_Cart::i()->sessionCart();

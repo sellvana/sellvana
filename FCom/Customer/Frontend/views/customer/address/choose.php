@@ -11,7 +11,7 @@
         <?php endif; ?>
     <?php endif; ?>
 
-    <?=FCom_Customer_Model_Address::as_html($address)?>
+    <?=FCom_Customer_Model_Address::i()->as_html($address)?>
         <a href="<?=Bapp::href("customer/address/choose")?>?id=<?=$address->id?>&t=<?=$this->type?>"><?= BLocale::_("Select") ?></a>
     <hr/>
 <?php endforeach; ?>

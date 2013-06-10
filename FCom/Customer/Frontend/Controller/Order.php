@@ -9,7 +9,7 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
 
     public function action_index()
     {
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $orders = FCom_Sales_Model_Order::i()->orm()->where('user_id', $customerId)->find_many();
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
@@ -22,7 +22,7 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
     public function action_view()
     {
         $id = BRequest::get('id');
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $order = FCom_Sales_Model_Order::i()->orm()->where('id', $id)
                 ->where('user_id', $customerId)->find_one();
         if (!$order) {

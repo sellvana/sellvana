@@ -5,6 +5,13 @@ class FCom_Sales_Main extends BClass
     protected $_registry = array();
     protected $_heap = array();
 
+    static public function bootstrap()
+    {
+        foreach (array('Subtotal', 'Shipping', 'Discount', 'GrandTotal') as $total) {
+            FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_CartTotal_'.$total);
+        }
+    }
+
     public function addPaymentMethod($name, $class=null)
     {
         if (is_null($class)) $class = $name;
@@ -33,13 +40,6 @@ class FCom_Sales_Main extends BClass
         return $this;
     }
 
-    public function addOrderTotalRow($name, $class=null)
-    {
-        if (is_null($class)) $class = $name;
-        $this->_registry['order_total_row'][$name] = $class;
-        return $this;
-    }
-
     public function getShippingMethodClassName($name)
     {
         return !empty($this->_registry['shipping_method'][$name]) ? $this->_registry['shipping_method'][$name] : null;
@@ -48,9 +48,10 @@ class FCom_Sales_Main extends BClass
     protected function _getHeap($type, $name=null)
     {
         if (empty($this->_heap[$type])) {
-            foreach ($this->_registry[$type] as $name=>$class) {
-                $this->_heap[$type][$name] = $class::i();
+            foreach ($this->_registry[$type] as $n=>$class) {
+                $this->_heap[$type][$n] = $class::i();
             }
+            uasort($this->_heap[$type], function($a, $b) { return $a->getSortOrder() - $b->getSortOrder(); });
         }
         return is_null($name) ? $this->_heap[$type] :
             (!empty($this->_heap[$type][$name]) ? $this->_heap[$type][$name] : null);
@@ -74,11 +75,6 @@ class FCom_Sales_Main extends BClass
     public function getDiscountMethods()
     {
         return $this->_getHeap('discount_method');
-    }
-
-    public function getOrderTotalRows()
-    {
-        return $this->_getHeap('order_total_row');
     }
 }
 

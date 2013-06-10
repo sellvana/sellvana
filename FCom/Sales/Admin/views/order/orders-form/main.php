@@ -10,8 +10,8 @@
 
     function CustomerAddressesCtrl($scope) {
         $scope.addresses = <?=BUtil::toJson(BDb::many_as_array($m->addresses()))?>;
-        $scope.countries = <?=BUtil::toJson(FCom_Geo_Model_Country::options())?>;
-        $scope.regions = <?=BUtil::toJson(FCom_Geo_Model_Region::allOptions())?>;
+        $scope.countries = <?=BUtil::toJson(FCom_Geo_Model_Country::i()->options())?>;
+        $scope.regions = <?=BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions())?>;
 
         $scope.del_ids = [];
         $scope.newId = 0;

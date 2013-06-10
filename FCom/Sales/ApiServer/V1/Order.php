@@ -15,7 +15,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
         }
 
         if ($id) {
-            $orders[] = FCom_Sales_Model_Order::load($id);
+            $orders[] = FCom_Sales_Model_Order::i()->load($id);
         } else {
             $orders = FCom_Sales_Model_Order::orm()->limit($len, $start)->find_many();
         }
@@ -103,7 +103,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
 
         $data = FCom_Sales_Model_Order::i()->formatApiPost($post);
 
-        $order = FCom_Sales_Model_Order::load($id);
+        $order = FCom_Sales_Model_Order::i()->load($id);
         if (!$order) {
             $this->notFound("Order id #{$id} not found");
         }
@@ -141,7 +141,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_Admin_Controller_ApiServer_Abst
             $this->notFound("Order id is required");
         }
 
-        $order = FCom_Sales_Model_Order::load($id);
+        $order = FCom_Sales_Model_Order::i()->load($id);
         if (!$order) {
             $this->notFound("Order id #{$id} not found");
         }

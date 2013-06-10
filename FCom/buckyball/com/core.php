@@ -324,7 +324,7 @@ class BApp extends BClass
     public static function href($url='', $full=true, $method=2)
     {
         return BApp::baseUrl($full, $method)
-            . BFrontController::processHref($url);
+            . BRouting::processHref($url);
     }
 
     /**
@@ -1395,7 +1395,7 @@ class BEvents extends BClass
         }
         //TODO: create named observers
         $this->_events[$eventName]['observers'][] = $observer;
-        BDebug::debug('SUBSCRIBE '.$eventName.': '.substr(var_export($callback, 1), 0, 100), 1);
+        BDebug::debug('SUBSCRIBE '.$eventName, 1);
         return $this;
     }
 

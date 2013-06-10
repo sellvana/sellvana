@@ -1,23 +1,8 @@
 <?php
+
 class FCom_Sales_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
-        BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
-        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
-        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
-        BMigrate::upgrade('0.1.9', '0.1.10', array($this, 'upgrade_0_1_10'));
-        BMigrate::upgrade('0.1.10', '0.2.0', array($this, 'upgrade_0_2_0'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -27,7 +12,7 @@ class FCom_Sales_Migrate extends BClass
             `cart_id` int(10) unsigned NOT NULL,
             `status` enum('new', 'paid') not null default 'new',
             `item_qty` int(10) unsigned NOT NULL,
-            `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
+            `subtotal` decimal(12,2) NOT NULL DEFAULT '0.0000',
             `shipping_method` varchar(50) NOT NULL,
             `shipping_service` char(2) NOT NULL,
             `payment_method` varchar(50) NOT NULL,
@@ -49,7 +34,7 @@ class FCom_Sales_Migrate extends BClass
             `order_id` int(10) unsigned DEFAULT NULL,
             `product_id` int(10) unsigned DEFAULT NULL,
             `qty` int(10) unsigned DEFAULT NULL,
-            `total` decimal(12,4) NOT NULL DEFAULT '0.0000',
+            `total` decimal(12,2) NOT NULL DEFAULT '0.0000',
             `product_info` text,
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tItem}_cart` FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -57,7 +42,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         $tAddress = FCom_Sales_Model_OrderAddress::table();
@@ -88,7 +73,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -97,7 +82,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_3()
+    public function upgrade__0_1_2__0_1_3()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -105,7 +90,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -113,7 +98,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_5()
+    public function upgrade__0_1_4__0_1_5()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -121,7 +106,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_6()
+    public function upgrade__0_1_5__0_1_6()
     {
         $tStatus = FCom_Sales_Model_OrderStatus::table();
         BDb::run("
@@ -134,7 +119,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_7()
+    public function upgrade__0_1_6__0_1_7()
     {
         $tStatus = FCom_Sales_Model_OrderStatus::table();
         BDb::run("
@@ -142,7 +127,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_8()
+    public function upgrade__0_1_7__0_1_8()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -150,7 +135,7 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_9()
+    public function upgrade__0_1_8__0_1_9()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -161,7 +146,7 @@ class FCom_Sales_Migrate extends BClass
     }
     
     
-    public function upgrade_0_1_10()
+    public function upgrade__0_1_9__0_1_10()
     {
         BDb::ddlTableDef(FCom_Sales_Model_OrderAddress::table(), array(
             'COLUMNS' => array(
@@ -171,7 +156,7 @@ class FCom_Sales_Migrate extends BClass
         ));
     }
 
-    public function upgrade_0_2_0()
+    public function upgrade__0_1_10__0_2_0()
     {
 
         $tCart = FCom_Sales_Model_Cart::table();
@@ -186,9 +171,9 @@ class FCom_Sales_Migrate extends BClass
             `user_id` int(10) unsigned NOT NULL,
             `description` varchar(255) DEFAULT NULL,
             `sort_order` int(11) DEFAULT NULL,
-            `item_qty` decimal(12,4) NOT NULL DEFAULT '0.0000',
+            `item_qty` decimal(12,2) NOT NULL DEFAULT '0.0000',
             `item_num` smallint(6) unsigned NOT NULL DEFAULT '0',
-            `subtotal` decimal(12,4) NOT NULL DEFAULT '0.0000',
+            `subtotal` decimal(12,2) NOT NULL DEFAULT '0.0000',
             `session_id` varchar(100) DEFAULT NULL,
             `shipping_method` VARCHAR( 50 ) NOT NULL ,
             `shipping_price` DECIMAL( 10, 2 ) NOT NULL ,
@@ -211,14 +196,14 @@ class FCom_Sales_Migrate extends BClass
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `cart_id` int(10) unsigned DEFAULT NULL,
             `product_id` int(10) unsigned DEFAULT NULL,
-            `qty` decimal(12,4) DEFAULT NULL,
-            `price` decimal(12,4) NOT NULL DEFAULT '0.0000',
-            `rowtotal` DECIMAL(12,4) NULL,
+            `qty` decimal(12,2) DEFAULT NULL,
+            `price` decimal(12,2) NOT NULL DEFAULT '0.0000',
+            `rowtotal` decimal(12,2) NULL,
 
             `promo_id_buy` VARCHAR(50) NOT NULL,
             `promo_id_get` INT(10) UNSIGNED NOT NULL,
-            `promo_qty_used` decimal(12,4) DEFAULT NULL,
-            `promo_amt_used` decimal(12,4) DEFAULT NULL,
+            `promo_qty_used` decimal(12,2) DEFAULT NULL,
+            `promo_amt_used` decimal(12,2) DEFAULT NULL,
 
             `create_dt` DATETIME NOT NULL,
             `update_dt` DATETIME NOT NULL,
@@ -252,5 +237,63 @@ class FCom_Sales_Migrate extends BClass
             CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
+    }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
+            'KEYS' => array(
+                'NewIndex1' => 'DROP',
+                'user_id' => 'DROP',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
+            'COLUMNS' => array(
+                'data_serialized' => 'text after totals_json',
+                'company_id' => 'DROP',
+                'location_id' => 'DROP',
+                'description' => 'DROP',
+                'user_id' => 'DROP',
+                'totals_json' => 'DROP',
+                'calc_balance' => 'DROP',
+                'sort_order' => 'DROP',
+                'discount_code' => 'RENAME coupon_code varchar(50) null',
+                'customer_id' => 'int unsigned not null after session_id',
+                'customer_email' => 'varchar(100) null after customer_id',
+                'tax_amount' => 'decimal(12,2) not null default 0 after subtotal',
+                'discount_amount' => 'decimal(12,2) not null default 0 after tax_amount',
+                'grand_total' => 'decimal(12,2) not null default 0 after discount_amount',
+                'status' => "vachar(10) not null default 'new'",
+            ),
+            'KEYS' => array(
+                'session_id' => '(session_id)',
+                'customer_id' => '(customer_id)',
+                'status' => '(status)',
+            ),
+        ));
+        
+        BDb::ddlTableDef(FCom_Sales_Model_CartItem::table(), array(
+            'COLUMNS' => array(
+                'local_sku' => 'varchar(100) null after product_id',
+                'product_name' => 'varchar(255) null after local_sku',
+                'tax' => 'decimal(12,2) not null default 0 after rowtotal',
+                'discount' => 'decimal(12,2) not null default 0 after tax',
+                'data_serialized' => 'text after update_dt',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Sales_Model_CartAddress::table(), array(
+            'COLUMNS' => array(
+                'state' => 'RENAME region varchar(50)',
+                'zip' => 'RENAME postcode varchar(20)',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Sales_Model_Order::table(), array(
+            'COLUMNS' => array(
+                'user_id' => 'RENAME customer_id int unsigned null',
+                'discount_code' => 'RENAME coupon_code varchar(50) null',
+                //'tax' => 'decimal(10,2) null'??
+                'data_serialized' => 'text',
+            ),
+        ));
     }
 }

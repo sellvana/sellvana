@@ -21,7 +21,7 @@
 					<a href="<?php echo BApp::href('customer/password/recover')?>">Forgot your password?</a></a>
 				</div>
 				<div class="divider"></div>
-				<p>No Account? <strong><a href="<?php echo BApp::href('checkout')?>"><?= BLocale::_("Checkout as a guest") ?> &raquo;</strong></a></p>
+				<p>No Account? <strong><a href="<?php echo BApp::href('checkout')?>?guest=yes"><?= BLocale::_("Checkout as a guest") ?> &raquo;</strong></a></p>
 			</fieldset>
 		</form>
 	</div>

@@ -62,7 +62,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $productsData = $productsORM->paginate(null, array('ps'=>25));
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
 
-        $category = FCom_Catalog_Model_Category::orm()->where_null('parent_id')->find_one();
+        $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
         BApp::i()
             ->set('current_query', $q)
             ->set('current_category', $category)

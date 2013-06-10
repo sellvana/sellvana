@@ -1,7 +1,8 @@
 <?php
-$cart = FCom_Sales_Model_Cart::sessionCart();
+$cart = FCom_Sales_Model_Cart::i()->sessionCart();
 $cartQty = $cart->itemQty();
 $items = $cart->recentItems();
+$checkoutButton = FCom_Checkout_Frontend_CheckoutMethod::i()->getCartCheckoutButton();
 ?>
 <div class="mini-cart <?php echo !$cartQty?' empty-cart':'cart-filled';?>">
     <div class="mini-cart-title">
@@ -18,7 +19,7 @@ $items = $cart->recentItems();
 <?php foreach ($items as $item): $p = $item->product() ?>
             <li>
                 <a href="<?=$p->url()?>">
-                    <img src="<?=$p->thumb_url?>" width="50" height="50" alt="" class="product-image"/>
+                    <img src="<?=$p->thumbUrl(50)?>" width="50" height="50" alt="" class="product-image"/>
                     <span class="product-name"><?=$this->q($p->product_name)?></span>
                     <span class="info"><?=$this->_('Qty')?> <?=number_format($item->qty,0)?></span>
                     <div class="price-box">
@@ -30,7 +31,7 @@ $items = $cart->recentItems();
         </ol>
         <div class="subtotal">
             <?=$this->_('Subtotal')?>: $<?=number_format($cart->subtotal)?>
-            <a href="<?=BApp::href('cart')?>" class="button btn-aux btn-sz1"><span><?=$this->_('Checkout')?></span></a>
+            <a href="<?=$checkoutButton['href']?>" class="button btn-aux btn-sz1"><span><?=$this->_('Checkout')?></span></a>
         </div>
     </div>
 <?php endif ?>

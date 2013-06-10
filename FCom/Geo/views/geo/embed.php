@@ -1,7 +1,7 @@
 <script>
 $(function(){
-    var geoCountries = <?php echo BUtil::toJson(FCom_Geo_Model_Country::options($this->countries)) ?>;
-    var geoRegions = <?php echo BUtil::toJson(FCom_Geo_Model_Region::allOptions()) ?>;
+    var geoCountries = <?php echo BUtil::toJson(FCom_Geo_Model_Country::i()->options($this->countries)) ?>;
+    var geoRegions = <?php echo BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions()) ?>;
 
     $.fn.geoCountryRegion = function(opt) {
         opt = opt || {};

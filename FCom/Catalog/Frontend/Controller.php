@@ -45,7 +45,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $user = false;
         if (Bapp::m('FCom_Customer')) {
-            $user = FCom_Customer_Model_Customer::sessionUser();
+            $user = FCom_Customer_Model_Customer::i()->sessionUser();
         }
         $layout->view('catalog/product')->user = $user;
 

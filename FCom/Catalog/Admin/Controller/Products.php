@@ -248,7 +248,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     $product->delete();
                 }elseif(false == $product){
                     $data=array('product_id' => $model->id(), 'category_id'=>$cat_id);
-                    FCom_Catalog_Model_CategoryProduct::create($data)->save();
+                    FCom_Catalog_Model_CategoryProduct::i()->create($data)->save();
                     /*
                     $category = $category_model->load($cat_id);
                     if(!$category){
@@ -259,7 +259,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $c_id)->find_one();
                         if(false == $product){
                             $data=array('product_id' => $model->id(), 'category_id'=>$c_id);
-                            FCom_Catalog_Model_CategoryProduct::create($data)->save();
+                            FCom_Catalog_Model_CategoryProduct::i()->create($data)->save();
                         }
                     }
                      *

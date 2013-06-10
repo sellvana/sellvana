@@ -82,7 +82,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             BResponse::i()->redirect($href);
         }
 
-        $address = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), $addressType);
+        $address = $cart->getAddressByType($addressType);
         if (!$address) {
             $address = FCom_Sales_Model_CartAddress::i()->orm()->create();
         }
@@ -95,7 +95,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         if ($r['address_equal']) {
             //copy shipping address to billing address
-            $addressCopy = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), $addressType2);
+            $addressCopy = $cart->getAddressByType($addressType2);
             if (!$addressCopy) {
                 $addressCopy = FCom_Sales_Model_CartAddress::i()->orm()->create();
                 $addressCopy->cart_id = $cart->id();
@@ -107,7 +107,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         if (BApp::m('FCom_Customer')) {
             //todo move this code to FCom_Customer and add the trigger for this event
-            $user = FCom_Customer_Model_Customer::sessionUser();
+            $user = FCom_Customer_Model_Customer::i()->sessionUser();
             if ('shipping' == $addressType) {
                 if ($user && !$user->defaultShipping()) {
                     $newAddress = $address->as_array();

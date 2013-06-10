@@ -1,6 +1,6 @@
 <?php
 
-interface FCom_Sales_Interface_CheckoutMethod
+interface FCom_Sales_Model_CheckoutMethod_Interface
 {
     public function getCartCheckoutButton();
 }

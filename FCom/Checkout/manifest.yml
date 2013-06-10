@@ -19,7 +19,4 @@ modules:
                     - [ GET, /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
                     - [ any, /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
                 observe:
-                    - [ FCom_Customer_Model_Customer::login.after, FCom_Sales_Model_Cart::userLogin ]
-                    - [ FCom_Customer_Model_Customer::logout.before, FCom_Sales_Model_Cart::userLogout ]
                     - [ FCom_Catalog_Frontend_Controller::action_product.addToCart, FCom_Checkout_Frontend_Controller::onAddToCart ]
-                    - [ BModuleRegistry::bootstrap.after, FCom_Checkout_Frontend::initCartTotals ]

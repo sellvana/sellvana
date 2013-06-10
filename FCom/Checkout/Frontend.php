@@ -12,7 +12,7 @@ class FCom_Checkout_Frontend extends BClass
      */
     public static function initCartTotals()
     {
-        $cart = FCom_Sales_Model_Cart::sessionCart();
+        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (false == $cart->items()) {
             return;
         }
@@ -22,7 +22,7 @@ class FCom_Checkout_Frontend extends BClass
             FCom_Sales_Model_Cart::i()->addTotalRow('shipping', array('callback'=>$shippingClass.'.getRateCallback',
                 'label' => 'Shipping', 'after'=>'subtotal'));
         }
-        if ($cart->discount_code) {
+        if ($cart->coupon_code) {
             FCom_Sales_Model_Cart::i()->addTotalRow('discount', array('callback'=>'FCom_Sales_Model_Cart.discountCallback',
                 'label' => 'Discount', 'after'=>'shipping'));
         }
