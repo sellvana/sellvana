@@ -249,7 +249,7 @@ class FCom_Sales_Migrate extends BClass
         ));
         BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
             'COLUMNS' => array(
-                'data_serialized' => 'text after totals_json',
+                'data_serialized' => 'text',
                 'company_id' => 'DROP',
                 'location_id' => 'DROP',
                 'description' => 'DROP',
@@ -263,7 +263,7 @@ class FCom_Sales_Migrate extends BClass
                 'tax_amount' => 'decimal(12,2) not null default 0 after subtotal',
                 'discount_amount' => 'decimal(12,2) not null default 0 after tax_amount',
                 'grand_total' => 'decimal(12,2) not null default 0 after discount_amount',
-                'status' => "vachar(10) not null default 'new'",
+                'status' => "varchar(10) not null default 'new'",
             ),
             'KEYS' => array(
                 'session_id' => '(session_id)',
