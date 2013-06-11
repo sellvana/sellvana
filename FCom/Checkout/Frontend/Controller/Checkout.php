@@ -29,13 +29,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect(BApp::href('cart'));
         }
 
-        $billAddress = $cart->getAddressByType('billing');
         $shipAddress = $cart->getAddressByType('shipping');
+        $billAddress = $cart->getAddressByType('billing');
 
-        if (!$billAddress && $customer) {
+        if (!$shipAddress && $customer) {
             $cart->importAddressesFromCustomer($customer);
-            $billAddress = $cart->getAddressByType('billing');
             $shipAddress = $cart->getAddressByType('shipping');
+            $billAddress = $cart->getAddressByType('billing');
         }
 
         if (empty($shipAddress)) {
@@ -107,7 +107,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             //$r['email'] = $billAddress->email;
             try {
                 $customer = FCom_Customer_Model_Customer::i()->register($r);
-                $cart->user_id = $customer->id();
+                $cart->customer_id = $customer->id();
                 $cart->save();
             } catch (Exception $e) {
                 //die($e->getMessage());
@@ -126,7 +126,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             //redirect to payment page
             $orderData = array();
             $orderData['cart_id'] = $cart->id();
-            $orderData['user_id'] = $cart->user_id;
+            $orderData['customer_id'] = $cart->customer_id;
             $orderData['item_qty']  = $cart->item_qty;
             $orderData['subtotal']  = $cart->subtotal;
             $orderData['shipping_method'] = $cart->shipping_method;

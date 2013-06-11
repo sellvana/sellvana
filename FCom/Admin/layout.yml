@@ -209,9 +209,11 @@ form:
     - view: settings
       set: { tab_view_prefix: settings/ }
       do:
-        - [ addTab, FCom_Core, { label: Fulleron Core, async: true } ]
-        - [ addTab, FCom_Admin, { label: Fulleron Admin, async: true } ]
-        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, async: true } ]
+        - [ addTabGroup, other, { label: Other, pos: 900 } ]
+        - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
+        - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true } ]
+        - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true } ]
+        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true } ]
 
 /modules:
     - { include: base }

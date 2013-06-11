@@ -1,6 +1,6 @@
 <?php
 $c = $this->model;
-$services = FCom_ShippingUps_Ups::i()->getServices();
+$services = FCom_ShippingUps_ShippingMethod::i()->getServices();
 ?>
 <fieldset>
 <div class="settings-container">

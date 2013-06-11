@@ -73,7 +73,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $customer->set('session_cart_id', $sessCartId)->save();
         }
 
-        static::sessionCartId($user->session_cart_id);
+        static::sessionCartId($customer->session_cart_id);
     }
 
     static public function onUserLogout()
@@ -259,6 +259,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $total->init($this)->calculate();
             $data['totals'][$total->getCode()] = $total->asArray();
         }
+        $data['last_calc_at'] = time();
         $this->data = $data;
         return $this;
     }
@@ -266,9 +267,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getTotals()
     {
         //TODO: price invalidate
-        if (empty($this->data['totals']) || empty($this->data['last_calc_at']) 
+        if (empty($this->data['totals']) || empty($this->data['last_calc_at'])
             || $this->data['last_calc_at']<time()-86400
-        ) { 
+        ) {
             $this->calculateTotals()->save();
         }
 
@@ -321,17 +322,17 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $address = $this->getAddressByType($atype);
         if (!$address) {
-            $address = $hlp->create(array('cart_id' => $this->id, 'atype' => $atype));
+            $address = FCom_Sales_Model_Cart_Address::i()->create(array('cart_id' => $this->id, 'atype' => $atype));
         }
         if ($data instanceof FCom_Customer_Model_Address) {
-            $data = BUtil::arrayMask($data->as_array(), 'firstname,lastname,attn,
-                street1,street2,street3,city,region,postcode,country,phone,fax,lat,lng');
+            $data = BUtil::arrayMask($data->as_array(), 'firstname,lastname,attn,' .
+                'street1,street2,street3,city,region,postcode,country,phone,fax,lat,lng');
         }
         $address->set($data)->save();
         $this->addresses[$atype] = $address;
         return $this;
     }
-    
+
     public function importAddressesFromCustomer($customer)
     {
         $hlp = FCom_Sales_Model_Cart_Address::i();
@@ -341,11 +342,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             return false;
         }
         $defShipping = $customer->defaultShipping();
-        
+
         $this->setAddressByType('billing', $defBilling);
 
         if ($defBilling->id == $defShipping->id) {
-            $cart->shipping_same = 1;
+            $this->shipping_same = 1;
         } else {
             $this->setAddressByType('shipping', $defShipping);
         }

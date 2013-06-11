@@ -1,6 +1,6 @@
 base:
 	- view: admin/nav
-		do: 
+		do:
 			- [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
 
 catalog_product_form_tabs:
@@ -18,3 +18,8 @@ catalog_product_form_tabs:
 	- { include: form }
 	- { hook: main, views: customfields/fieldsets/form }
 	- { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
+
+/settings:
+  - view: settings
+    do:
+      - [ addTab, FCom_CustomField, { label: Custom Fields, group: catalog } ]

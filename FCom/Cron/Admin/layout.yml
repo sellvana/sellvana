@@ -1,5 +1,4 @@
 /settings:
     - view: settings
-        set: { tab_view_prefix: settings/ }
         do:
-            - [ addTab, FCom_Cron, { label: Fulleron Crontab, async: true } ]
+            - [ addTab, FCom_Cron, { label: Fulleron Crontab, group: areas, async: true } ]

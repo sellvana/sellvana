@@ -75,8 +75,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $order->billing = $billing;
         }
 
-        if ($order->user_id) {
-            $customer = FCom_Customer_Model_Customer::i()->load($order->user_id);
+        if ($order->customer_id) {
+            $customer = FCom_Customer_Model_Customer::i()->load($order->customer_id);
             $customer->guest = false;
         } else {
             $customer = new stdClass();

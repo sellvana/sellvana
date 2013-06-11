@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://fulleron.home/FCom/Core/js/lib/less.min.js?1333539941" ></script>
-
 <form action="<?=BApp::href('customer/address')?>" method="post">
     <?php if (!empty($this->address->id)): ?>
         <input type="hidden" name="id" value="<?=$this->address->id?>">

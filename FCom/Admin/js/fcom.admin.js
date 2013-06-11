@@ -703,11 +703,14 @@ console.log(url_get, url_post);
             $('a[href=#'+tabId+']', tabs).closest('li').addClass('dirty');
         });
         $('a', tabs).click(function(ev) {
+            var a = $(ev.currentTarget), li = a.parent('li');
+            if (a.data('no-tab')) {
+                return;
+            }
             curLi.removeClass('active');
             curPane.attr('hidden', 'hidden');
             ev.stopPropagation();
 
-            var a = $(ev.currentTarget), li = a.parent('li');
             if (curLi===li) {
                 return false;
             }
@@ -990,7 +993,7 @@ $(function() {
             height:'toggle'
         }, 100);
     });
-    
+
     FCom.Admin.initAce();
 
     $('.js-resizable').each(function(idx, el) {

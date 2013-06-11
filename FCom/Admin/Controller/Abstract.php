@@ -87,6 +87,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $curTab = $k;
                 }
                 if ($curTab===$k) {
+                    $tab['active'] = true;
                     $tab['async'] = false;
                 }
                 if (!empty($tab['view'])) {
@@ -103,6 +104,28 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
             unset($tab);
         }
+        $view->tabs = $tabs;
+
+        if ($view->tab_groups) {
+            $tabGroups = $view->sortedTabGroups();
+            foreach ($tabs as $k=>$tab) {
+                $tabGroups[$tab['group']]['tabs'][$k] = $tab;
+                if (!empty($tab['active'])) {
+                    $tabGroups[$tab['group']]['open'] = true;
+                }
+            }
+            foreach ($tabGroups as $k=>$tabGroup) {
+                if (empty($tabGroup['tabs'])) {
+                    unset($tabGroups[$k]);
+                } else {
+                    uasort($tabGroup['tabs'], function($a, $b) {
+                        return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+                    });
+                }
+            }
+            $view->tab_groups = $tabGroups;
+        }
+
         $view->set(array(
             'tabs' => $tabs,
             'model' => $model,

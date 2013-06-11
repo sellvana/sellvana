@@ -53,4 +53,4 @@ base:
 			- [ addTab, history, { label: History, pos: 20 } ]
 
 /settings:
-	- { view: settings, do: [[ addTab, FCom_Cms, { label: Cms, async: true } ]] }
+	- { view: settings, do: [[ addTab, FCom_Cms, { label: Cms, group: catalog, async: true } ]] }

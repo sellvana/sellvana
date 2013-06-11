@@ -1,36 +1,45 @@
 base:
-	- view: admin/nav
-		do:
-			- [ addNav, sales, { label: Sales, pos: 300 } ]
-			- [ addNav, sales/orders, { label: Orders, href: /orders } ]
-			- [ addNav, sales/orderstatus, { label: Order Status, href: /orderstatus } ]
+    - view: admin/nav
+        do:
+            - [ addNav, sales, { label: Sales, pos: 300 } ]
+            - [ addNav, sales/orders, { label: Orders, href: /orders } ]
+            - [ addNav, sales/orderstatus, { label: Order Status, href: /orderstatus } ]
 
 /orders:
-	- { include: base }
-	- { hook: main, views: admin/grid }
-	- { view: admin/nav, do: [[ setNav, sales/orders ]] }
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, sales/orders ]] }
 
 /multisite/form:
-	- { include: base }
-	- { include: form }
-	- { hook: main, views: admin/form }
-	- { view: admin/nav, do: [[ setNav, sales/orders ]] }
-	- view: admin/form	
-		set: { tab_view_prefix: order/orders-form/ }
-		do:
-			- [ addTab, main, { label: Order Info, pos: 10 } ]
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, sales/orders ]] }
+    - view: admin/form
+        set: { tab_view_prefix: order/orders-form/ }
+        do:
+            - [ addTab, main, { label: Order Info, pos: 10 } ]
 
 /orderstatus:
-	- { include: base }
-	- { hook: main, views: admin/grid }
-	- { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
 
 /orderstatus/form:
-	- { include: base }
-	- { include: form }
-	- { hook: main, views: admin/form }
-	- { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
-	- view: admin/form	
-		set: { tab_view_prefix: order/orderstatus-form/ }
-		do:
-			- [ addTab, main, { label: Order Status, pos: 10 } ]
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
+    - view: admin/form
+        set: { tab_view_prefix: order/orderstatus-form/ }
+        do:
+            - [ addTab, main, { label: Order Status, pos: 10 } ]
+
+/settings:
+    - view: settings
+        do:
+            - [ addTabGroup, sales, { label: Sales, pos: 100 } ]
+            - [ addTabGroup, shipping_methods, { label: Shipping Methods, pos: 110 } ]
+            - [ addTabGroup, payment_methods, { label: Payment Methods, pos: 120 } ]
+            - [ addTabGroup, checkout_methods, { label: Checkout Methods, pos: 130 } ]
+

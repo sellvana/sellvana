@@ -4,7 +4,7 @@
     $(function() {
         function onSortableStop(event, ui) {
             var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
-    console.log(ui.item[0].id);
+            console.log(ui.item[0].id);
             var handle = ui.item;
             if (type=='tabs') handle = handle.children('h3');
             handle.triggerHandler('focusout');
@@ -28,9 +28,19 @@
             }
         }
 
+        $('.adm-tabs-sidebar h3 a').click(function(ev) {
+            $(this).parents('li').children('ul').toggle('blind');
+            ev.stopPropagation();
+            return false;
+        });
+
         function initTabs() {
-            $('.settings-container', this).accordion({header: '> div > h3'})
-                .sortable({axis: 'y', handle: 'h3', stop: onSortableStop, distance:5});
+            $('.settings-container', this).accordion({
+                header: '> div > h3',
+                heightStyle: "content",
+                event: "click hoverintent"
+            })
+                //.sortable({axis: 'y', handle: 'h3', stop: onSortableStop, distance:5});
         }
         window.adminForm = FCom.Admin.form({
             form:     '#settings-form',
@@ -42,7 +52,7 @@
         });
         $('#settings-form').validate();
         initTabs.apply($('#settings-form'));
-        $('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
+        //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
     });
 
 %form#settings-form(action="#{$formUrl}" method="post")
@@ -60,12 +70,17 @@
         %aside.form-img-sidebar
             %nav.adm-tabs-sidebar
                 %ul
-                    - foreach ($this->tabs as $k=>$tab)
-                        - if (empty($tab['disabled']))
-                            %li(id="settings-tab-#{$k}" class="#{$k===$this->cur_tab ? 'active' : ''}")
-                                %a(href="#tab-#{$k}" onclick="$('#current_tab').val('#{$k}')")
-                                    %span.icon
-                                    = $tab['label']
+                    - foreach ($this->tab_groups as $gk => $group)
+                        %li
+                            %h3
+                                %a(href="#" data-no-tab="1") = $group['label']
+                            %ul(a="a" #{!empty($group['open']) ? '' : 'hidden'})
+                                - foreach ($group['tabs'] as $k => $tab)
+                                    - if (empty($tab['disabled']))
+                                        %li(id="settings-tab-#{$k}" class="#{$k===$this->cur_tab ? 'active' : ''}")
+                                            %a(href="#tab-#{$k}" onclick="$('#current_tab').val('#{$k}')")
+                                                %span.icon
+                                                = $tab['label']
         .adm-main
             .adm-tabs-container
                 - foreach ($this->tabs as $k=>$tab)

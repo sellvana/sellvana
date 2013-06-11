@@ -109,7 +109,7 @@
                     </tfoot>
                 </table>
             </section>
-            <p><a href="/cart"><?= BLocale::_("Need to change quantities or delete") ?>?</a></p>
+            <p><a href="<?=BApp::href('cart')?>"><?= BLocale::_("Need to change quantities or remove items?") ?></a></p>
 
             <?php if ($this->guest_checkout) :?>
                 <label for="#"><?= BLocale::_("Create an account") ?>?</label>
@@ -121,7 +121,6 @@
                 <label for="#"><?= BLocale::_("Confirm Password") ?> </label>
                 <input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/><br/>
             <?php endif; ?>
-            <button type="submit" name="update" class="button btn-aux btn-sz1"><span><?= BLocale::_("Apply changes") ?></span></button>
         </div>
         <!-- .col-checkout-left ends -->
         <div class="col-checkout-review-right">

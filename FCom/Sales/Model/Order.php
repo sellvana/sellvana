@@ -77,7 +77,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function isOrderExists($productId, $customerID)
     {
         return $this->orm('o')->join('FCom_Sales_Model_Order_Item', array('o.id','=','oi.order_id'), 'oi')
-                ->where("user_id", $customerID)->where("product_id", $productId)->find_one();
+                ->where("customer_id", $customerID)->where("product_id", $productId)->find_one();
 
     }
 
@@ -92,7 +92,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         foreach($orders as $i => $order) {
             $result[$i] = array(
                 'id'                => $order->id,
-                'customer_id'      => $order->user_id,
+                'customer_id'      => $order->customer_id,
                 'status'               => $order->status,
                 'item_qty'             => $order->item_qty,
                 'subtotal'               => $order->subtotal,
@@ -123,7 +123,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $data = array();
         if (!empty($post['customer_id'])) {
-            $data['user_id'] = $post['customer_id'];
+            $data['customer_id'] = $post['customer_id'];
         }
         if (!empty($post['status'])) {
             $data['status'] = $post['status'];

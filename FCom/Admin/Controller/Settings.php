@@ -8,9 +8,13 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
     {
         $view = $this->view('settings');
         $tabViews = BLayout::i()->findViewsRegex('#^settings/#');
+        $tabGroups = array();
+
         foreach ($tabViews as $tabViewName=>$tabView) {
             $tabName = preg_replace('#^settings/#', '', $tabViewName);
-            $view->addTab($tabName, array('async'=>true, 'label'=>str_replace('_', ' ', $tabName), 'view'=>$tabViewName));
+            if (empty($view->tabs[$tabName])) {
+                $view->addTab($tabName, array('async'=>true, 'label'=>str_replace('_', ' ', $tabName), 'view'=>$tabViewName));
+            }
         }
         $this->layout('/settings')->messages('settings')->processFormTabs($view, BConfig::i());
     }
