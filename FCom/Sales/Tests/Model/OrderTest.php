@@ -11,7 +11,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
-        $data = array('cart_id' => 3, 'user_id' => 2);
+        $data = array('cart_id' => 3, 'customer_id' => 2);
         FCom_Sales_Model_Order::i()->addNew($data);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_order'), "Insert failed");
@@ -68,7 +68,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
 
     public function testAddShippingMethod()
     {
-        FCom_Sales::i()->addShippingMethod('ups', 'FCom_ShippingUps_Ups');
+        FCom_Sales::i()->addShippingMethod('ups', 'FCom_ShippingUps_ShippingMethod');
         $methods = FCom_Sales_Main::i()->getShippingMethods();
         $this->assertTrue(isset($methods['ups']));
     }

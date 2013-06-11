@@ -7,8 +7,11 @@ modules:
         observe:
             - [ BView::email.before, FCom_Email_Main::onViewEmailBefore ]
         auto_use: [ views ]
-        
+
         areas:
+            FCom_Admin:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 auto_use: [ layout ]
                 routing:

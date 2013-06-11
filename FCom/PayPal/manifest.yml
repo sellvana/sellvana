@@ -7,9 +7,6 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ views ]
-
-            FCom_Admin:
-                auto_use: [ bootstrap, views ]
+                auto_use: [ bootstrap, views, layout ]
                 routing:
                     - [ any, /paypal/.action, FCom_PayPal_Frontend_Controller ]

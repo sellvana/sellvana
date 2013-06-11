@@ -3,10 +3,10 @@ modules:
 		version: 0.1.0
 		description: "SEO related goodies, such as sitemaps and URL aliases"
 		require: { module: { FCom_Core: 0.1.0 } }
-		
+
         areas:
             FCom_Admin:
-                auto_use: [ views ]
+                auto_use: [ views, layout ]
                 routing:
                     - [ get, /sitemaps, FCom_Seo_Admin_Controller_Sitemaps.index ]
                     - [ any, /sitemaps/.action, FCom_Seo_Admin_Controller_Sitemaps ]

@@ -1,27 +1,33 @@
 base:
-	- view: admin/nav
-		do:
-			- [ addNav, customer, { label: Customers, pos: 300 } ]
-			- [ addNav, customer/customers, { label: Customers, href: /customers } ]
-			- [ addNav, customer/import, { label: Import Customers, href: /customers/import/index } ]
+    - view: admin/nav
+        do:
+            - [ addNav, customer, { label: Customers, pos: 300 } ]
+            - [ addNav, customer/customers, { label: Customers, href: /customers } ]
+            - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index } ]
 
 /customers:
-	- { include: base }
-	- { hook: main, views: admin/grid }
-	- { view: admin/nav, do: [[ setNav, customer/customers ]] }
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, customer/customers ]] }
 
 /customers/form:
-	- { include: base }
-	- { include: form }
-	- { hook: main, views: admin/form }
-	- { view: admin/nav, do: [[ setNav, customer/customers ]] }
-	- view: admin/form
-		set: { tab_view_prefix: customer/customers-form/ }
-		do:
-			- [ addTab, main, { label: Customer Info, pos: 10 } ]
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, customer/customers ]] }
+    - view: admin/form
+        set: { tab_view_prefix: customer/customers-form/ }
+        do:
+            - [ addTab, main, { label: Customer Info, pos: 10 } ]
 
 /customers/import:
-	- { include: base }
-	- { include: form }
-	- { hook: main, views: customer/import }
-	- { view: admin/nav, do: [[ setNav, customer/import ]] }
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: customer/import }
+    - { view: admin/nav, do: [[ setNav, customer/import ]] }
+
+/settings:
+    - view: settings
+        do:
+            - [ addTabGroup, customers, { label: Customers, pos: 50 } ]
+            - [ addTab, FCom_Customer, { label: Customers, group: customers } ]

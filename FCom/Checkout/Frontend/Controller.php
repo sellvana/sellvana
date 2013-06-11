@@ -41,7 +41,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
                 $options=array('qty' => $post['qty'], 'price' => $p->base_price);
                 if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                    $cart->user_id = FCom_Customer_Model_Customer::sessionUserId();
+                    $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
                     $cart->save();
                 }
                 $cart->addProduct($p->id(), $options)->calculateTotals()->save();

@@ -1,0 +1,24 @@
+- $c = $this->model
+
+%fieldset
+    .settings-container
+        .group
+            %h3
+                %a(href="#") = $this->_('Basic Payment Settings')
+            %div
+                %table
+                    %tr
+                        %td = $this->_('Label')
+                        %td
+                            %input(type="text" name="config[modules][FCom_PaymentBasic][label]" 
+                                value="#{ $c->get('modules/FCom_PaymentBasic/label') }")
+                    %tr
+                        %td = $this->_('Sort Order')
+                        %td
+                            %input(type="text" name="config[modules][FCom_PaymentBasic][sort_order]" 
+                                value="#{ $c->get('modules/FCom_PaymentBasic/sort_order') }")
+                    %tr
+                        %td = $this->_('Custom Order Status On Payment')
+                        %td
+                            %select(name="config[modules][FCom_PaymentBasic][order_status_authorized")
+                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('modules/FCom_PaymentBasic/order_status_authorized'))
