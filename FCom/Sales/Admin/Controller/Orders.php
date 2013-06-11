@@ -33,15 +33,15 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('FCom_Sales_Model_OrderAddress', 'o.id = ab.order_id and ab.atype="billing"', 'ab') //array('o.id','=','a.order_id')
+        $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = ab.order_id and ab.atype="billing"', 'ab') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", ab.firstname,ab.lastname)','billing_name')
             ->select_expr('CONCAT_WS(" \n", ab.street1,ab.city,ab.country,ab.phone)','billing_address')
         ;
-        $orm->left_outer_join('FCom_Sales_Model_OrderAddress', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
+        $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
             ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address')
         ;
-        $orm->left_outer_join('FCom_Sales_Model_OrderStatus', 'o.status_id = os.id', 'os')
+        $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status_id = os.id', 'os')
             ->select(array('os_name' => 'os.name'))
         ;
     }
@@ -62,16 +62,16 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $act = BRequest::i()->params('act', true);
 
         $order = FCom_Sales_Model_Order::i()->load($orderId);
-        $shipping = FCom_Sales_Model_OrderAddress::i()->findByOrder($orderId,'shipping');
-        $billing = FCom_Sales_Model_OrderAddress::i()->findByOrder($orderId,'billing');
+        $shipping = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId,'shipping');
+        $billing = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId,'billing');
         if ($shipping) {
             $order->shipping_name = $shipping->firstname.' '.$shipping->lastname;
-            $order->shipping_address = FCom_Sales_Model_OrderAddress::i()->as_html($shipping);
+            $order->shipping_address = FCom_Sales_Model_Order_Address::i()->as_html($shipping);
             $order->shipping = $shipping;
         }
         if ($billing) {
             $order->billing_name = $billing->firstname.' '.$billing->lastname;
-            $order->billing_address = FCom_Sales_Model_OrderAddress::i()->as_html($billing);
+            $order->billing_address = FCom_Sales_Model_Order_Address::i()->as_html($billing);
             $order->billing = $billing;
         }
 
@@ -127,7 +127,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $order = $args['model'];
             $addrPost = BRequest::i()->post('address');
             if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_Sales_Model_OrderAddress::i()->orm('a')->where('order_id', $order->id)->find_many_assoc();
+                $oldModels = FCom_Sales_Model_Order_Address::i()->orm('a')->where('order_id', $order->id)->find_many_assoc();
                 foreach ($newData as $data) {
                     if (empty($data['id'])) {
                         continue;
@@ -137,18 +137,18 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                         $addr->set($data)->save();
                     } elseif ($data['id']<0) {
                         unset($data['id']);
-                        $addr = FCom_Sales_Model_OrderAddress::i()->newAddress($order->id(), $data);
+                        $addr = FCom_Sales_Model_Order_Address::i()->newAddress($order->id(), $data);
                     }
                 }
             }
             if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Sales_Model_OrderAddress::i()->delete_many(array('id'=>$del, 'order_id'=>$order->id));
+                FCom_Sales_Model_Order_Address::i()->delete_many(array('id'=>$del, 'order_id'=>$order->id));
             }
 
             $modelPost = BRequest::i()->post('model');
             $items = $modelPost['items'];
             if ($items) {
-                $oldItems = FCom_Sales_Model_OrderItem::i()->orm('i')->where('order_id', $order->id)->find_many_assoc();
+                $oldItems = FCom_Sales_Model_Order_Item::i()->orm('i')->where('order_id', $order->id)->find_many_assoc();
                 foreach ($items as $id => $itemData) {
                     if (empty($id)) {
                         continue;

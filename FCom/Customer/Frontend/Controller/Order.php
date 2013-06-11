@@ -29,7 +29,7 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
             BResponse::i()->redirect(Bapp::href('customer/order'));
         }
 
-        $orderItems = FCom_Sales_Model_OrderItem::i()->orm()->where("order_id", $order->id())->find_many();
+        $orderItems = FCom_Sales_Model_Order_Item::i()->orm()->where("order_id", $order->id())->find_many();
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Orders', 'href'=>Bapp::href('customer/order'));

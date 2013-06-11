@@ -103,7 +103,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
         if (!empty($post['create_account'])) {
             $r = $post['account'];
-            //$billAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id(), 'billing');
+            //$billAddress = $cart->getAddressByType('billing');
             //$r['email'] = $billAddress->email;
             try {
                 $customer = FCom_Customer_Model_Customer::i()->register($r);
@@ -161,22 +161,22 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 $orderItem['total'] = $item->rowTotal();
                 $orderItem['product_info'] = BUtil::toJson($product->as_array());
 
-                $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($salesOrder->id(), $item->product_id);
+                $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($salesOrder->id(), $item->product_id);
                 if ($testItem) {
                     $testItem->update($orderItem);
                 } else {
-                    FCom_Sales_Model_OrderItem::i()->addNew($orderItem);
+                    FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
                 }
             }
 
             //copy addresses
-            $shippingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id, 'shipping');
+            $shippingAddress = $cart->getAddressByType('shipping');
             if ($shippingAddress) {
-                FCom_Sales_Model_CartAddress::i()->newAddress($salesOrder->id(), $shippingAddress);
+                FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $shippingAddress);
             }
-            $billingAddress = FCom_Sales_Model_CartAddress::i()->findByCartType($cart->id, 'billing');
+            $billingAddress = $cart->getAddressByType('billing');
             if ($billingAddress) {
-                FCom_Sales_Model_CartAddress::i()->newAddress($salesOrder->id(), $billingAddress);
+                FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $billingAddress);
             }
 
             //Made payment

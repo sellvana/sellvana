@@ -1,8 +1,8 @@
 <?php
 
-class FCom_Sales_Model_OrderAddress extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'fcom_sales_address';
+    protected static $_table = 'fcom_sales_order_address';
     protected static $_origClass = __CLASS__;
 
     public function findByOrder($orderId, $atype='shipping')

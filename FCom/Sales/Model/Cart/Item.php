@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Model_CartItem extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
 

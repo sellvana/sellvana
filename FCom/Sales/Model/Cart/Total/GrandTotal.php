@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Model_CartTotal_GrandTotal extends FCom_Sales_Model_CartTotal_Abstract
+class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'grandtotal';
     protected $_label = 'Grand Total';

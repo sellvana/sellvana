@@ -4,7 +4,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'orderstatus';
-    protected $_modelClass = 'FCom_Sales_Model_OrderStatus';
+    protected $_modelClass = 'FCom_Sales_Model_Order_Status';
     protected $_gridTitle = 'Orders Status';
     protected $_recordName = 'Order status';
     protected $_mainTableAlias = 'os';

@@ -232,7 +232,7 @@ class FCom_Promo_Frontend extends BClass
         }
 
         //check cart promo items
-        $allCartItemPromo = FCom_Sales_Model_CartItem::orm()->where('cart_id', $cart->id)->where_not_equal('promo_id_get', 0)->find_many();
+        $allCartItemPromo = FCom_Sales_Model_Cart_Item::orm()->where('cart_id', $cart->id)->where_not_equal('promo_id_get', 0)->find_many();
         foreach($allCartItemPromo as $promoItem) {
             if (!in_array($promoItem->promo_id_get, $activePromoIds)) {
                 $promoItem->delete();
@@ -306,7 +306,7 @@ class FCom_Promo_Frontend extends BClass
                         }
                     }
 
-                    $item = FCom_Sales_Model_CartItem::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+                    $item = FCom_Sales_Model_Cart_Item::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                     //IF GET QTY < Item Qty then add 1
                     if ($item && $promo->get_amount > $item->qty) {
@@ -320,7 +320,7 @@ class FCom_Promo_Frontend extends BClass
                             $item->price = 0;
                         } else {
                             //if not then add new promo item and decrase qty of current item
-                            $item = FCom_Sales_Model_CartItem::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                            $item = FCom_Sales_Model_Cart_Item::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                 'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
                             $currentItem->qty -= 1;
@@ -362,7 +362,7 @@ class FCom_Promo_Frontend extends BClass
                         }
                     }
                     if ($sameGroup) {
-                         $item = FCom_Sales_Model_CartItem::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+                         $item = FCom_Sales_Model_Cart_Item::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item && $promo->get_amount > $item->qty) {
@@ -376,7 +376,7 @@ class FCom_Promo_Frontend extends BClass
                                 $item->price = 0;
                             } else {
                                 //if not then add new promo item and decrase qty of current item
-                                $item = FCom_Sales_Model_CartItem::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                $item = FCom_Sales_Model_Cart_Item::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                     'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
                                 $currentItem->qty -= 1;
@@ -398,7 +398,7 @@ class FCom_Promo_Frontend extends BClass
                     }
 
                     if ($currentItem->qty > 1 && $promo->get_amount > $promoItemQtyTotal) {
-                         $item = FCom_Sales_Model_CartItem::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+                         $item = FCom_Sales_Model_Cart_Item::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item) {
@@ -413,7 +413,7 @@ class FCom_Promo_Frontend extends BClass
                             } else {
                                 //file_put_contents("/tmp/data",print_r($currentItem,1));exit;
                                 //if not then add new promo item and decrase qty of current item
-                                $item = FCom_Sales_Model_CartItem::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                $item = FCom_Sales_Model_Cart_Item::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                     'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
                                 $currentItem->qty -= 1;
@@ -455,7 +455,7 @@ class FCom_Promo_Frontend extends BClass
                             ->find_many();
 
                     if ($groupProductGet) {
-                        $item = FCom_Sales_Model_CartItem::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
+                        $item = FCom_Sales_Model_Cart_Item::i()->load(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id, 'promo_id_get' => $promo->id));
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item && $promo->get_amount > $item->qty) {
@@ -469,7 +469,7 @@ class FCom_Promo_Frontend extends BClass
                                 $item->price = 0;
                             } else {
                                 //if not then add new promo item and decrase qty of current item
-                                $item = FCom_Sales_Model_CartItem::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
+                                $item = FCom_Sales_Model_Cart_Item::i()->create(array('cart_id'=>$cart->id, 'product_id'=>$currentItem->product_id,
                                     'qty'=>1, 'price' => 0, 'promo_id_get' => $promo->id));
 
                                 $currentItem->qty -= 1;
