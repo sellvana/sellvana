@@ -1,7 +1,7 @@
 <?php
 
-abstract class FCom_Sales_Model_ShippingMethod_Abstract extends BClass implements 
-    FCom_Sales_Model_ShippingMethod_Interface
+abstract class FCom_Sales_Method_Shipping_Abstract extends BClass implements 
+    FCom_Sales_Method_Shipping_Interface
 {
     protected $_sortOrder = 50;
 

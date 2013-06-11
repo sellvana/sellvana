@@ -1,6 +1,6 @@
 <?php
 
-interface FCom_Sales_Model_ShippingMethod_Interface
+interface FCom_Sales_Method_Shipping_Interface
 {
 
     /**

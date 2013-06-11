@@ -35,7 +35,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);
-        FCom_Sales_Model_OrderItem::i()->addNew($orderItem);
+        FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
 
         $this->assertEquals(2, count($order->items()), "After add failed");
     }
@@ -48,14 +48,14 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);
-        FCom_Sales_Model_OrderItem::i()->addNew($orderItem);
+        FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
 
         $this->assertEquals(2, count($order->items()), "After add failed");
 
-        $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($order->id(), 1);
+        $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($order->id(), 1);
         $this->assertTrue(is_object($testItem), "Item exists failed");
 
-        $testItem = FCom_Sales_Model_OrderItem::i()->isItemExist($order->id(), 111111);
+        $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($order->id(), 111111);
         $this->assertFalse(is_object($testItem), "Item not exists failed");
     }
 

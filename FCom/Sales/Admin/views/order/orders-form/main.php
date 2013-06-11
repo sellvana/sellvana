@@ -54,7 +54,7 @@
                 <select name="model[status_id]">
                     <?php
                     $status = $m->status() ? $m->status()->code : $m->status;
-                    foreach(FCom_Sales_Model_OrderStatus::i()->statusList() as $stobj):?>
+                    foreach(FCom_Sales_Model_Order_Status::i()->statusList() as $stobj):?>
                         <option value="<?=$stobj->id?>" <?=$stobj->code==$status?'selected':''?>><?=$stobj->name?></option>
                     <?php endforeach; ?>
                 </select>

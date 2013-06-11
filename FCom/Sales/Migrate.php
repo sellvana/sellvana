@@ -26,7 +26,7 @@ class FCom_Sales_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        $tItem = FCom_Sales_Model_OrderItem::table();
+        $tItem = FCom_Sales_Model_Order_Item::table();
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tItem} (
@@ -45,7 +45,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $tOrder = FCom_Sales_Model_Order::table();
-        $tAddress = FCom_Sales_Model_OrderAddress::table();
+        $tAddress = FCom_Sales_Model_Order_Address::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tAddress} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -108,7 +108,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        $tStatus = FCom_Sales_Model_OrderStatus::table();
+        $tStatus = FCom_Sales_Model_Order_Status::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tStatus} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -121,7 +121,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $tStatus = FCom_Sales_Model_OrderStatus::table();
+        $tStatus = FCom_Sales_Model_Order_Status::table();
         BDb::run("
             insert into {$tStatus}(id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
         ");
@@ -148,7 +148,7 @@ class FCom_Sales_Migrate extends BClass
     
     public function upgrade__0_1_9__0_1_10()
     {
-        BDb::ddlTableDef(FCom_Sales_Model_OrderAddress::table(), array(
+        BDb::ddlTableDef(FCom_Sales_Model_Order_Address::table(), array(
             'COLUMNS' => array(
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
@@ -160,8 +160,8 @@ class FCom_Sales_Migrate extends BClass
     {
 
         $tCart = FCom_Sales_Model_Cart::table();
-        $tCartItem = FCom_Sales_Model_CartItem::table();
-        $tAddress = FCom_Sales_Model_CartAddress::table();
+        $tCartItem = FCom_Sales_Model_Cart_Item::table();
+        $tAddress = FCom_Sales_Model_Cart_Address::table();
 
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tCart} (
@@ -272,7 +272,7 @@ class FCom_Sales_Migrate extends BClass
             ),
         ));
         
-        BDb::ddlTableDef(FCom_Sales_Model_CartItem::table(), array(
+        BDb::ddlTableDef(FCom_Sales_Model_Cart_Item::table(), array(
             'COLUMNS' => array(
                 'local_sku' => 'varchar(100) null after product_id',
                 'product_name' => 'varchar(255) null after local_sku',
@@ -281,7 +281,7 @@ class FCom_Sales_Migrate extends BClass
                 'data_serialized' => 'text after update_dt',
             ),
         ));
-        BDb::ddlTableDef(FCom_Sales_Model_CartAddress::table(), array(
+        BDb::ddlTableDef(FCom_Sales_Model_Cart_Address::table(), array(
             'COLUMNS' => array(
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
@@ -295,5 +295,10 @@ class FCom_Sales_Migrate extends BClass
                 'data_serialized' => 'text',
             ),
         ));
+    }
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        BDb::run("RENAME TABLE `fcom_sales_address` TO `fcom_sales_order_address`");
     }
 }

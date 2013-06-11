@@ -1,6 +1,6 @@
 <?php
 
-class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Model_ShippingMethod_Abstract
+class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
 
     public function getEstimate()

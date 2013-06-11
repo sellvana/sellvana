@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Model_OrderStatus extends FCom_Core_Model_Abstract
+class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order_status';
     protected static $_origClass = __CLASS__;
@@ -10,7 +10,7 @@ class FCom_Sales_Model_OrderStatus extends FCom_Core_Model_Abstract
     *
     * @param bool $new if true returns a new instance, otherwise singleton
     * @param array $args
-    * @return FCom_Sales_Model_OrderItem
+    * @return FCom_Sales_Model_Order_Item
     */
     public static function i($new=false, array $args=array())
     {

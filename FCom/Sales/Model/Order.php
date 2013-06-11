@@ -19,13 +19,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function billing()
     {
-        return FCom_Sales_Model_CartAddress::i()->orm('a')
+        return FCom_Sales_Model_Cart_Address::i()->orm('a')
                 ->where('cart_id', $this->cart_id)->where('atype', 'billing')->find_one();
     }
 
     public function addNew($data)
     {
-        $status = FCom_Sales_Model_OrderStatus::i()->statusNew();
+        $status = FCom_Sales_Model_Order_Status::i()->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
         BEvents::i()->fire(__CLASS__.'.addNew', array('order'=>$data));
@@ -40,7 +40,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function paid()
     {
-        $status = FCom_Sales_Model_OrderStatus::i()->statusPaid();
+        $status = FCom_Sales_Model_Order_Status::i()->statusPaid();
         $data = array();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -50,7 +50,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function pending()
     {
-        $status = FCom_Sales_Model_OrderStatus::i()->statusPending();
+        $status = FCom_Sales_Model_Order_Status::i()->statusPending();
         $data = array();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -59,7 +59,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function status()
     {
-        return FCom_Sales_Model_OrderStatus::i()->orm()->where('id', $this->status_id)->find_one();
+        return FCom_Sales_Model_Order_Status::i()->orm()->where('id', $this->status_id)->find_one();
     }
     
 
@@ -70,20 +70,20 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function items($assoc=true)
     {
-        $this->items = FCom_Sales_Model_OrderItem::i()->orm()->where('order_id', $this->id)->find_many_assoc();
+        $this->items = FCom_Sales_Model_Order_Item::i()->orm()->where('order_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
     public function isOrderExists($productId, $customerID)
     {
-        return $this->orm('o')->join('FCom_Sales_Model_OrderItem', array('o.id','=','oi.order_id'), 'oi')
+        return $this->orm('o')->join('FCom_Sales_Model_Order_Item', array('o.id','=','oi.order_id'), 'oi')
                 ->where("user_id", $customerID)->where("product_id", $productId)->find_one();
 
     }
 
     public function addresses()
     {
-        return FCom_Sales_Model_OrderAddress::i()->orm('a')->where('order_id', $this->id)->find_many();
+        return FCom_Sales_Model_Order_Address::i()->orm('a')->where('order_id', $this->id)->find_many();
     }
 
     public function prepareApiData($orders, $includeItems=false)

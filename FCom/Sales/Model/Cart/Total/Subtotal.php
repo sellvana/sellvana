@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Model_CartTotal_Subtotal extends FCom_Sales_Model_CartTotal_Abstract
+class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'subtotal';
     protected $_label = 'Subtotal';

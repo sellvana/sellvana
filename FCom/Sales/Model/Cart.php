@@ -100,13 +100,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function items($assoc=true)
     {
-        $this->items = FCom_Sales_Model_CartItem::i()->orm()->where('cart_id', $this->id)->find_many_assoc();
+        $this->items = FCom_Sales_Model_Cart_Item::i()->orm()->where('cart_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
     public function recentItems($limit=3)
     {
-        $orm = FCom_Sales_Model_CartItem::i()->orm('ci')->where('ci.cart_id', $this->id)
+        $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id)
             ->order_by_desc('ci.update_dt')->limit($limit);
         BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
         $items = $orm->find_many();
@@ -141,7 +141,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public static function cartItems($cartId)
     {
         $tProduct = FCom_Catalog_Model_Product::table();
-        $tCartItem = FCom_Sales_Model_CartItem::table();
+        $tCartItem = FCom_Sales_Model_Cart_Item::table();
         return BDb::many_as_array(FCom_Catalog_Model_Product::i()->orm()
             ->join($tCartItem, array($tCartItem.'.product_id','=',$tProduct.'.id'))
             ->select($tProduct.'.*')
@@ -176,12 +176,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         } else {
             $params['price'] = $params['price']; //$params['price'] * $params['qty']; // ??
         }
-        $item = FCom_Sales_Model_CartItem::i()->load(array('cart_id'=>$this->id, 'product_id'=>$productId));
+        $item = FCom_Sales_Model_Cart_Item::i()->load(array('cart_id'=>$this->id, 'product_id'=>$productId));
         if ($item && $item->promo_id_get == 0) {
             $item->add('qty', $params['qty']);
             $item->set('price', $params['price']);
         } else {
-            $item = FCom_Sales_Model_CartItem::i()->create(array('cart_id'=>$this->id, 'product_id'=>$productId,
+            $item = FCom_Sales_Model_Cart_Item::i()->create(array('cart_id'=>$this->id, 'product_id'=>$productId,
                 'qty'=>$params['qty'], 'price' => $params['price']));
         }
         $item->save();
@@ -299,7 +299,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getAddressByType($atype)
     {
         if (!$this->addresses) {
-            $this->addresses = FCom_Sales_Model_CartAddress::i()->orm()
+            $this->addresses = FCom_Sales_Model_Cart_Address::i()->orm()
                 ->where("cart_id", $this->id)
                 ->find_many_assoc('atype');
         }
@@ -334,7 +334,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     
     public function importAddressesFromCustomer($customer)
     {
-        $hlp = FCom_Sales_Model_CartAddress::i();
+        $hlp = FCom_Sales_Model_Cart_Address::i();
 
         $defBilling = $customer->defaultBilling();
         if (!$defBilling) {

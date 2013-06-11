@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Ogone_CheckoutMethod extends FCom_Sales_Model_CheckoutMethod_Abstract
+class FCom_Ogone_CheckoutMethod extends FCom_Sales_Method_Checkout_Abstract
 {
     public function getCartCheckoutButton()
     {

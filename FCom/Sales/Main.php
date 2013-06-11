@@ -8,7 +8,7 @@ class FCom_Sales_Main extends BClass
     static public function bootstrap()
     {
         foreach (array('Subtotal', 'Shipping', 'Discount', 'GrandTotal') as $total) {
-            FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_CartTotal_'.$total);
+            FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_'.$total);
         }
     }
 

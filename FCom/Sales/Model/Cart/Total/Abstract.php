@@ -1,6 +1,6 @@
 <?php
 
-abstract class FCom_Sales_Model_CartTotal_Abstract extends BCLass implements FCom_Sales_Model_CartTotal_Interface
+abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FCom_Sales_Model_Cart_Total_Interface
 {
     protected $_cart;
     protected $_code;
