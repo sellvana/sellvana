@@ -62,7 +62,7 @@ class FCom_Catalog_Migrate extends BClass
 
         BDb::ddlTableDef($tMedia, array(
             'COLUMNS' => array(
-                'id'            => 'unsigned NOT NULL AUTO_INCREMENT',
+                'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
                 'product_id'    => 'int(10) unsigned DEFAULT NULL',
                 'media_type'    => 'char(1) NOT NULL',
                 'file_id'       => 'int(11) unsigned NOT NULL',
@@ -80,7 +80,7 @@ class FCom_Catalog_Migrate extends BClass
 
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
-                'id'            => 'unsigned NOT NULL AUTO_INCREMENT',
+                'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
                 'link_type'     => "enum('related','similar') NOT NULL",
                 'product_id'    => 'int(10) unsigned NOT NULL',
                 'linked_product_id' => 'int(10) unsigned NOT NULL',
@@ -90,19 +90,19 @@ class FCom_Catalog_Migrate extends BClass
 
         BDb::ddlTableDef($tCategory, array(
             'COLUMNS' => array(
-                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT', 
-                'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL', 
-                'id_path'       => 'VARCHAR(50) NOT NULL', 
-                'sort_order'    => 'INT(10) UNSIGNED NOT NULL', 
-                'node_name'     => 'VARCHAR(255) NOT NULL', 
-                'full_name'     => 'VARCHAR(255) NOT NULL', 
-                'url_key'       => 'VARCHAR(255) NOT NULL', 
-                'url_path'      => 'VARCHAR(255) NOT NULL', 
-                'num_children'  => 'INT(11) UNSIGNED DEFAULT NULL', 
-                'num_descendants' => 'INT(11) UNSIGNED DEFAULT NULL', 
-                'num_products'  => 'INT(10) UNSIGNED DEFAULT NULL', 
-                'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL', 
-                'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL', 
+                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL',
+                'id_path'       => 'VARCHAR(50) NOT NULL',
+                'sort_order'    => 'INT(10) UNSIGNED NOT NULL',
+                'node_name'     => 'VARCHAR(255) NOT NULL',
+                'full_name'     => 'VARCHAR(255) NOT NULL',
+                'url_key'       => 'VARCHAR(255) NOT NULL',
+                'url_path'      => 'VARCHAR(255) NOT NULL',
+                'num_children'  => 'INT(11) UNSIGNED DEFAULT NULL',
+                'num_descendants' => 'INT(11) UNSIGNED DEFAULT NULL',
+                'num_products'  => 'INT(10) UNSIGNED DEFAULT NULL',
+                'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+                'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -118,10 +118,10 @@ class FCom_Catalog_Migrate extends BClass
 
         BDb::ddlTableDef($tCategoryProduct, array(
             'COLUMNS' => array(
-                'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT', 
-                'product_id'    => 'INT(10) UNSIGNED NOT NULL', 
-                'category_id'   => 'INT(10) UNSIGNED NOT NULL', 
-                'sort_order'    => 'INT(10) UNSIGNED DEFAULT NULL', 
+                'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'product_id'    => 'INT(10) UNSIGNED NOT NULL',
+                'category_id'   => 'INT(10) UNSIGNED NOT NULL',
+                'sort_order'    => 'INT(10) UNSIGNED DEFAULT NULL',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(

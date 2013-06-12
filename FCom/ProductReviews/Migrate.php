@@ -22,7 +22,7 @@ class FCom_ProductReviews_Migrate extends BClass
         $tProduct = FCom_Catalog_Model_Product::table();
 
         BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tReviews} (
+            CREATE TABLE IF NOT EXISTS {$tReview} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `product_id` int(10) unsigned NOT NULL,
             `customer_id` int(10) unsigned NOT NULL,
@@ -41,7 +41,7 @@ class FCom_ProductReviews_Migrate extends BClass
         BDb::run("
             ALTER TABLE {$tProduct} ADD COLUMN avg_rating decimal(5,2) NULL,
             ADD COLUMN num_reviews int NULL;
-        "); 
+        ");
 
         BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
             `id` int unsigned not null auto_increment primary key,
