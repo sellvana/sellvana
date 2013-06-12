@@ -833,7 +833,7 @@ class BModule extends BClass
     }
 
     protected function _processRouting()
-    { 
+    {
         if (empty($this->routing)) {
             return;
         }
@@ -850,7 +850,7 @@ class BModule extends BClass
     }
 
     protected function _processObserve()
-    { 
+    {
         if (empty($this->observe)) {
             return;
         }
@@ -1264,13 +1264,13 @@ class BMigrate extends BClass
         foreach ($methods as $method) {
             if (preg_match('/^install__([0-9_]+)$/', $method, $m)) {
                 $installs[] = array(
-                    'method' => $method, 
+                    'method' => $method,
                     'to' => str_replace('_', '.', $m[1])
                 );
             } elseif (preg_match('/^upgrade__([0-9_]+)__([0-9_]+)$/', $method, $m)) {
                 $upgrades[] = array(
-                    'method' => $method, 
-                    'from' => str_replace('_', '.', $m[1]), 
+                    'method' => $method,
+                    'from' => str_replace('_', '.', $m[1]),
                     'to' => str_replace('_', '.', $m[2]),
                 );
             }

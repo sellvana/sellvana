@@ -71,9 +71,14 @@ class FCom_Core_Main extends BClass
             $localConfig['web']['base_store'] = $baseHref;
         }
 
+        $permissionErrors = array();
+
         $mediaDir = $config->get('fs/media_dir');
         if (!$mediaDir) {
             $mediaDir = $rootDir.'/media';
+            if (!is_writable($mediaDir)) {
+                $permissionErrors[] = '/media';
+            }
             $config->set('fs/media_dir', $mediaDir);
         }
 
@@ -96,6 +101,9 @@ class FCom_Core_Main extends BClass
         $storageDir = $config->get('fs/storage_dir');
         if (!$storageDir) {
             $storageDir = $rootDir.'/storage';
+            if (!is_writable($storageDir)) {
+                $permissionErrors[] = '/storage';
+            }
             $config->set('fs/storage_dir', $storageDir);
         }
 
@@ -108,10 +116,10 @@ class FCom_Core_Main extends BClass
 
         // for the rest of var dirs use writable tmp if storage is not writable
         // MD5 used to keep separate storage for each fulleron instance
-        if (!is_writable($storageDir)) {
-            $storageDir = sys_get_temp_dir().'/fulleron/'.md5(__DIR__);
-            $config->set('fs/storage_dir', $storageDir);
-        }
+        #if (!is_writable($storageDir)) {
+        #    $storageDir = sys_get_temp_dir().'/fulleron/'.md5(__DIR__);
+        #    $config->set('fs/storage_dir', $storageDir);
+        #}
 
         // cache files
         $cacheDir = $config->get('fs/cache_dir');
@@ -125,6 +133,14 @@ class FCom_Core_Main extends BClass
         if (!$logDir) {
             $logDir = $storageDir.'/log';
             $config->set('fs/log_dir', $logDir);
+        }
+
+        if ($permissionErrors) {
+            BLayout::i()
+                ->addView('permissions', array('template' => __DIR__.'/views/permissions.php'))
+                ->setRootView('permissions');
+            BLayout::i()->view('permissions')->set('errors', $permissionErrors);
+            BResponse::i()->output();
         }
 
         // DB configuration is separate to gitignore
@@ -292,7 +308,7 @@ class FCom_Core_Main extends BClass
             ->defaultViewClass('FCom_Core_View_Base')
             ->view('head', array('view_class'=>'FCom_Core_View_Head'))
             ->view('bottom_scripts', array('view_class'=>'FCom_Core_View_Head'))
-        ;        
+        ;
     }
 
     public function writeDbConfig()
