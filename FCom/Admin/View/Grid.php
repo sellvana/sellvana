@@ -445,7 +445,7 @@ return [true, 'Testing error'];
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::maskFields($data, 'p,ps,s,sd,q,_search,filters')));
+        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
             BEvents::i()->fire($method.'.data', array('data'=>&$data));

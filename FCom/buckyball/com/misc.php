@@ -571,23 +571,36 @@ class BUtil extends BClass
         return $result;
     }
 
-    static public function arrayMask(array $array, $fields)
+    /**
+    * Return only specific fields from source array
+    *
+    * @param array $source
+    * @param array|string $fields
+    * @param boolean $inverse if true, will return anything NOT in $fields
+    * @param boolean $setNulls fill missing fields with nulls
+    * @result array
+    */
+    static public function arrayMask(array $source, $fields, $inverse=false, $setNulls=true)
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
             array_walk($fields, 'trim');
         }
-//if (!is_)
-        return array_intersect_key($array, array_flip($fields));
-        /*
         $result = array();
-        foreach ($fields as $f) {
-            if (array_key_exists($f, $array)) {
-                $result[$f] = $array[$f];
+        if (!$inverse) {
+            foreach ($fields as $k) {
+                if (isset($source[$k])) {
+                    $result[$k] = $source[$k];
+                } elseif ($setNulls) {
+                    $result[$k] = null;
+                }
+            }
+        } else {
+            foreach ($source as $k=>$v) {
+                if (!in_array($k, $fields)) $result[$k] = $v;
             }
         }
         return $result;
-        */
     }
 
     /**
@@ -837,37 +850,6 @@ class BUtil extends BClass
     public static function sha512base64($str)
     {
         return base64_encode(pack('H*', hash('sha512', $str)));
-    }
-
-    /**
-    * Return only specific fields from source array
-    *
-    * @param array $source
-    * @param array|string $fields
-    * @param boolean $inverse if true, will return anything NOT in $fields
-    * @param boolean $setNulls fill missing fields with nulls
-    * @result array
-    */
-    public static function maskFields($source, $fields, $inverse=false, $setNulls=true)
-    {
-        if (is_string($fields)) {
-            $fields = explode(',', $fields);
-        }
-        $result = array();
-        if (!$inverse) {
-            foreach ($fields as $k) {
-                if (isset($source[$k])) {
-                    $result[$k] = $source[$k];
-                } elseif ($setNulls) {
-                    $result[$k] = null;
-                }
-            }
-        } else {
-            foreach ($source as $k=>$v) {
-                if (!in_array($k, $fields)) $result[$k] = $v;
-            }
-        }
-        return $result;
     }
 
     /**
@@ -1526,7 +1508,7 @@ class BModelUser extends BModel
             throw new Exception('Incomplete or invalid form data.');
         }
 
-        $r = BUtil::maskFields($r, 'email,password');
+        $r = BUtil::arrayMask($r, 'email,password');
         $user = static::create($r)->save();
         if (($view = BLayout::i()->view('email/user-new-user'))) {
             $view->set('user', $user)->email();

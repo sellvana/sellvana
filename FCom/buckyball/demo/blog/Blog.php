@@ -215,7 +215,7 @@ class Blog_Controller_Admin extends BActionController
                 throw new Exception("Invalid post data");
             }
             $post = BlogPost::i()->create(array('posted_at' => BDb::now()))
-                ->set(BUtil::maskFields($request, 'title,preview,body'))
+                ->set(BUtil::arrayMask($request, 'title,preview,body'))
                 ->save();
             Blog::redirect('/posts/'.$post->id, 'success',  "New post has been created!");
         } catch (Exception $e) {
@@ -239,7 +239,7 @@ class Blog_Controller_Admin extends BActionController
                 $post->delete();
                 Blog::redirect('/', 'success',  "The post has been deleted!");
             } else {
-                $post->set(BUtil::maskFields($request, 'title,preview,body'))->save();
+                $post->set(BUtil::arrayMask($request, 'title,preview,body'))->save();
                 Blog::redirect('/posts/'.$post->id, 'success',  "The post has been updated!");
             }
         } catch (Exception $e) {

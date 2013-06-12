@@ -299,7 +299,7 @@ class BDb
                 exit;
             }
             $row = $r->$method();
-            if (!is_null($fields)) $row = BUtil::maskFields($row, $fields, $maskInverse);
+            if (!is_null($fields)) $row = BUtil::arrayMask($row, $fields, $maskInverse);
             $res[$i] = $row;
         }
         return $res;
@@ -1254,7 +1254,7 @@ exit;
             $key = $this->_get_id_column_name();
         }
         foreach ($objects as $r) {
-            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::maskFields($r, $labelColumn) : $r->get($labelColumn));
+            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::arrayMask($r, $labelColumn) : $r->get($labelColumn));
             if (!is_array($key)) { // save on performance for 1D keys
                 $v = $r->get($key);
                 if (!empty($options['key_lower'])) $v = strtolower($v);
