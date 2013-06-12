@@ -5,7 +5,7 @@
 {% set checkout_methods = APP.instance('FCom_Sales_Main').getCheckoutMethods() %}
 
 {% if false == cartItems %}
-    <p class="note-msg">{{ "There are no products matching the selection." |_ }}</p>
+    <p class="note-msg">{{ "You have an empty cart." |_ }}</p>
 {% else %}
     <div class="col-cart-left data-table">
         <header class="page-title">
@@ -30,7 +30,7 @@
                 </thead>
                 <tbody>
                 {% for item in cartItems %}
-                    {% set p = item.product() %} 
+                    {% set p = item.product() %}
                     {% if p %}
                         <tr id="tr-product-{{ p.id }}">
                             <td class="a-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="{{ item.id }}"></label></td>

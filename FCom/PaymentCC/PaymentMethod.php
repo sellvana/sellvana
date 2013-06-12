@@ -7,7 +7,7 @@ class FCom_PaymentCC_PaymentMethod extends BClass
         return 'Credit Card';
     }
 
-    public function processPayment()
+    public function payOnCheckout()
     {
         die("Credit Card payment not imlemented yet");
     }

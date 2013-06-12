@@ -7,7 +7,7 @@ class FCom_PayPal_PaymentMethod extends BClass
         return 'PayPal Express Checkout';
     }
 
-    public function processPayment()
+    public function payOnCheckout()
     {
         $href = BApp::href('paypal/redirect');
         BResponse::i()->redirect($href);

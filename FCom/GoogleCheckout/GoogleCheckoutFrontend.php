@@ -16,7 +16,7 @@ class FCom_GoogleCheckout_Frontend extends BClass
         return 'Google Checkout';
     }
 
-    public function processPayment()
+    public function payOnCheckout()
     {
         $href = BApp::href('gcheckout/redirect');
         BResponse::i()->redirect($href);
