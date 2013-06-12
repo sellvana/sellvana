@@ -7,4 +7,8 @@ modules:
         description: "Base Fulleron classes and JS libraries"
         auto_use: [ layout ]
         default_config:
-            db: { implicit_migration: true }
+            db:
+                dbname: fulleron
+                username: root
+                logging: false
+                implicit_migration: true

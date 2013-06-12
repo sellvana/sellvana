@@ -28,7 +28,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         $errors = BDebug::i()->getCollectedErrors();
         BLayout::i()->view('index')->errors = $errors;
-        
+
         $this->messages('index', 'install');
     }
 
@@ -38,16 +38,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
             BResponse::i()->redirect(BApp::href('?error=1'));
         }
-        $step = 1;
-        if (BConfig::i()->get('db')) {
-            $step = 2;
-            if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
-                && FCom_Admin_Model_User::i()->orm('u')->find_one()
-            ) {
-                $step = 3;
-            }
-        }
-        BResponse::i()->redirect(BApp::href('install/step'.$step));
+        BResponse::i()->redirect(BApp::href('install/step1'));
     }
 
     public function action_step1()
@@ -65,9 +56,20 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         try {
             $w = BRequest::i()->post('w');
             BConfig::i()->add(array('db'=>$w['db']), true);
-            BMigrate::i()->migrateModules('FCom_Admin');
             FCom_Core_Main::i()->writeDbConfig();
-            $url = BApp::href('install/step2');
+
+            if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
+                && FCom_Admin_Model_User::i()->orm('u')->find_one()
+            ) {
+                if (BConfig::i()->get('install_status')==='installed') {
+                    $url = BApp::href();
+                } else {
+                    $url = BApp::href('install/step3');
+                }
+            } else {
+                BMigrate::i()->migrateModules('FCom_Admin');
+                $url = BApp::href('install/step2');
+            }
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
             $url = BApp::href('install/step1');
@@ -89,6 +91,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         try {
             $w = BRequest::i()->post('w');
+            BMigrate::i()->migrateModules('FCom_Admin');
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
