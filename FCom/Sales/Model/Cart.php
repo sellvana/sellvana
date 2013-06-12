@@ -75,7 +75,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         } elseif ($sessCartId && !$custCart) { // if only session cart exist
 
-            $custCart->set('customer_id', $customer->id)->save(); // assign it to customer
+            static::sessionCart()->set('customer_id', $customer->id)->save(); // assign it to customer
 
         } elseif (!$sessCartId && $custCart) { // if only customer cart exist
 

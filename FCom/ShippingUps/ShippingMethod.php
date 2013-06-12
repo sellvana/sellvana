@@ -2,15 +2,15 @@
 
 class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
-    protected $name = 'Universal post service';
-    protected $code = 'ShippingUps';
-    protected $rate;
+    protected $_name = 'Universal post service';
+    protected $_code = 'ShippingUps';
+    protected $_rate;
 
     public function init()
     {
     }
 
-    public function rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
+    protected function _rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
     {
         include_once __DIR__ .'/lib/UpsRate.php';
 
@@ -27,22 +27,22 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             return false;
         }
 
-        $this->rate = new UpsRate($rateApiUrl);
-        $this->rate->setUpsParams($accessKey,$account, $password, $shipNumber);
-        $this->rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
+        $this->_rate = new UpsRate($rateApiUrl);
+        $this->_rate->setUpsParams($accessKey,$account, $password, $shipNumber);
+        $this->_rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
         return true;
     }
 
     public function getEstimate()
     {
-        if (!$this->rate) {
+        if (!$this->_rate) {
             $cart = FCom_Sales_Model_Cart::i()->sessionCart();
             $this->getRateCallback($cart);
-            if (!$this->rate) {
+            if (!$this->_rate) {
                 return 'Unable to calculate';
             }
         }
-        $estimate = $this->rate->getEstimate();
+        $estimate = $this->_rate->getEstimate();
         if (!$estimate) {
             return 'Unable to calculate';
         }
@@ -102,7 +102,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         }
         $tozip = $shippingAddress->postcode;
         //service
-        if ($cart->shipping_method == $this->code) {
+        if ($cart->shipping_method == $this->_code) {
             $service = $cart->shipping_service;
         } else {
             $service = '01';
@@ -138,22 +138,22 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         //package weight
         $total = 0;
         foreach($packages as $pack) {
-            $this->rateApiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
-            if ($this->rate->isError()) {
+            $this->_rateApiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
+            if ($this->_rate->isError()) {
                  continue;
             }
-            $total += $this->rate->getTotal();
+            $total += $this->_rate->getTotal();
         }
         return $total;
     }
 
     public function getError()
     {
-        return $this->rate->getError();
+        return $this->_rate->getError();
     }
 
     public function getDescription()
     {
-        return $this->name;
+        return $this->_name;
     }
 }

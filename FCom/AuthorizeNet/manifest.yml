@@ -4,11 +4,19 @@ modules:
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { de: de.php }
         description: "Authorize.net payment methods"
-        aim:
-          title: "Credit Card (Authorize.net)"
-        dpm:
-          title: "Credit Card Direct Post (Authorize.net)"
+
+        auto_use: [ bootstrap ]
+        default_config:
+            modules:
+                FCom_AuthorizeNet:
+                    aim:
+                        title: "Credit Card (Authorize.net)"
+                    dpm:
+                        title: "Credit Card Direct Post (Authorize.net)"
 
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]
+
+            FCom_Frontend:
+                auto_use: [ views ]

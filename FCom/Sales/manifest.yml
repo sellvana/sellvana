@@ -5,6 +5,12 @@ modules:
 		description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
+        default_config:
+            modules:
+                FCom_Sales:
+                    default_payment_method: basic
+                    default_shipping_method: plain
+
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]

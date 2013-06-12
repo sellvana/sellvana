@@ -146,7 +146,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (!empty($post['payment_method'])) {
             $cart->payment_method = $post['payment_method'];
             $cart->save();
-            if (BApp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
+            if (FCom_Customer_Model_Customer::isLoggedIn()) {
                 $user = FCom_Customer_Model_Customer::i()->sessionUser();
                 $user->payment_method = $post['payment_method'];
                 $user->save();
