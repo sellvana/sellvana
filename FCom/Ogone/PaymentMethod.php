@@ -7,7 +7,7 @@ class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         return 'Ogone';
     }
 
-    public function processPayment()
+    public function payOnCheckout()
     {
         die("Ogone payment not imlemented yet");
     }

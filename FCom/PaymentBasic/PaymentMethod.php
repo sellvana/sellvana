@@ -27,8 +27,19 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         return BLayout::i()->view('check_mo/form');
     }
 
-    public function processPayment()
+    public function payOnCheckout()
     {
-        die("Check / Money Order payment not imlemented yet");
+        $this->authorize();
+        return $this;
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function capture()
+    {
+        return true;
     }
 }
