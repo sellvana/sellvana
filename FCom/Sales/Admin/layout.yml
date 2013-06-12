@@ -42,4 +42,5 @@ base:
             - [ addTabGroup, shipping_methods, { label: Shipping Methods, pos: 110 } ]
             - [ addTabGroup, payment_methods, { label: Payment Methods, pos: 120 } ]
             - [ addTabGroup, checkout_methods, { label: Checkout Methods, pos: 130 } ]
+            - [ addTab, FCom_Sales, { label: Sales, group: sales, pos: 10 } ]
 

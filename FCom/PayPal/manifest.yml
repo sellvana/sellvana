@@ -10,3 +10,8 @@ modules:
                 auto_use: [ bootstrap, views, layout ]
                 routing:
                     - [ any, /paypal/.action, FCom_PayPal_Frontend_Controller ]
+
+            FCom_Frontend:
+                auto_use: [ bootstrap, views, layout ]
+                routing:
+                    - [ any, /paypal/.action, FCom_PayPal_Frontend_Controller ]

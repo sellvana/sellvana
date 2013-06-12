@@ -2,6 +2,7 @@
 
 class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
+    protected $_name = 'Plain Shipping';
 
     public function getEstimate()
     {

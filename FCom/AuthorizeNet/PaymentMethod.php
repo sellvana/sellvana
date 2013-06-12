@@ -1,10 +1,10 @@
 <?php
 
-class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
+class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
     public function getName()
     {
-        return 'Ogone';
+        return 'Authorize.net';
     }
 
     public function getCheckoutFormView()

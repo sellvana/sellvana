@@ -6,5 +6,8 @@ modules:
 		require: { module: { FCom_Sales: 0.1.10 } }
 
         areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
             FCom_Frontend:
                 auto_use: [ views ]

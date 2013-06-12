@@ -603,6 +603,26 @@ class BUtil extends BClass
         return $result;
     }
 
+    static public function arrayToOptions(array $source, $labelField, $keyField=null, $emptyLabel=null)
+    {
+        $options = array();
+        if (!is_null($emptyLabel)) {
+            $options = array("" => $emptyLabel);
+        }
+        $isObject = is_object(current($source));
+        foreach ($source as $k=>$item) {
+            if ($isObject) {
+                $key = is_null($keyField) ? $k : $item->$keyField;
+                $label = $labelField[0]==='.' ? $item->{substr($labelField, 1)}() : $item->labelField;
+                $options[$key] = $label;
+            } else {
+                $key = is_null($keyField) ? $k : $item[$keyField];
+                $options[$key] = $item[$labelField];
+            }
+        }
+        return $options;
+    }
+
     /**
     * Create IV for mcrypt operations
     *
