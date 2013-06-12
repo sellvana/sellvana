@@ -16,7 +16,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             if (!$hlp->validateToken($email, $r->request('token'))) {
                 throw new Exception('Invalid token');
             }
-            $data = BUtil::maskFields($r->post('model'), 'id,email,create_dt,update_dt', true);
+            $data = BUtil::arrayMask($r->post('model'), 'id,email,create_dt,update_dt', true);
             $pref = $hlp->load($email, 'email');
             if (!$pref) {
                 $pref = $hlp->create(array('email'=>$email));
