@@ -35,15 +35,16 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 if (!empty($cart)) {
                     static::$_sessionCart = $cart;
                 } else {
+                    $sessionId = BSession::i()->sessionId();
                     $cart = static::i()->orm()
-                        ->where('session_id', BSession::i()->sessionId())
+                        ->where('session_id', $sessionId)
                         ->where('status', 'new')
                         ->find_one();
                     if ($cart) {
                         static::$_sessionCart = $cart;
                         static::sessionCartId($cart->id);
                     } else {
-                        static::$_sessionCart = static::i()->create();
+                        static::$_sessionCart = static::i()->create(array('session_id' => $sessionId));
                         static::sessionCartId();
                     }
                 }
@@ -54,26 +55,34 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     static public function onUserLogin()
     {
+        // load just logged in customer
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+        // something wrong, abort abort!
         if (!$customer) {
             return;
         }
+        // get session cart id
         $sessCartId = static::sessionCartId();
-        if ($customer->session_cart_id) {
-            $cart = static::i()->load($customer->session_cart_id);
-            if (!$cart) {
-                $customer->session_cart_id = $sessCartId;
-                $customer->save();
-            } elseif ($customer->session_cart_id != $sessCartId) {
-                if ($sessCartId) {
-                    $cart->merge($sessCartId)->save();
-                }
-            }
-        } elseif ($sessCartId) {
-            $customer->set('session_cart_id', $sessCartId)->save();
-        }
+        // try to load customer cart which is new (not abandoned or converted to order)
+        $custCart = FCom_Sales_Model_Cart::i()->load(array($customer->id => 'customer_id', 'status'=>'new'));
 
-        static::sessionCartId($customer->session_cart_id);
+        if ($sessCartId && $custCart && $sessCartId !== $custCart->id) {
+
+            // if both current session cart and customer cart exist and they're different carts
+            $custCart->merge($sessCartId)->save(); // merge them into customer cart
+            static::sessionCartId($custCart->id); // and set it as session cart
+            static::$_sessionCart = $custCart;
+
+        } elseif ($sessCartId && !$custCart) { // if only session cart exist
+
+            $custCart->set('customer_id', $customer->id)->save(); // assign it to customer
+
+        } elseif (!$sessCartId && $custCart) { // if only customer cart exist
+
+            static::sessionCartId($custCart->id); // set it as session cart
+            static::$_sessionCart = $custCart;
+
+        }
     }
 
     static public function onUserLogout()
