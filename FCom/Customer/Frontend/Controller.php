@@ -96,8 +96,9 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
             $customer = FCom_Customer_Model_Customer::i()->register($r);
             FCom_Customer_Model_Address::i()->import($a, $customer);
+            $customer->login();
             BSession::i()->addMessage('Thank you for your registration', 'success', 'frontend');
-            BResponse::i()->redirect(BApp::href('customer/register'));
+            BResponse::i()->redirect(BApp::href());
         } catch (Exception $e) {
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
