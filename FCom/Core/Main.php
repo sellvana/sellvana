@@ -143,34 +143,6 @@ class FCom_Core_Main extends BClass
             BResponse::i()->output();
         }
 
-        // DB configuration is separate to gitignore
-        $configFileStatus = true;
-        if (file_exists($configDir.'/db.yml')) {
-            $config->addFile('db.yml', true);
-        } else {
-             $configFileStatus = false;
-        }
-        if (file_exists($configDir.'/core.yml')) {
-            $config->addFile('core.yml', true);
-        } else {
-            $configFileStatus = false;
-        }
-        /*
-        if (file_exists($configDir.'/local.yml')) {
-            $config->addFile('local.yml', true);
-        } else {
-            $configFileStatus = false;
-        }
-        */
-        if (!$configFileStatus || $config->get('install_status')!=='installed') {
-            //$area = 'FCom_Admin'; //TODO: make sure works without (bootstrap considerations)
-            BDebug::mode('INSTALLATION');
-        }
-        //migration
-        if ($config->get('db') && null === $config->get('db/implicit_migration')) {
-            $config->set('db/implicit_migration', 1);
-        }
-
 #echo "<Pre>"; print_r($config->get()); exit;
         // add area module
         BApp::i()->set('area', $area, true);
@@ -243,12 +215,17 @@ class FCom_Core_Main extends BClass
             BResponse::i()->status('404', 'Page not found', 'Page not found');
             die;
         }
-        if (BDebug::is('INSTALLATION')) {
-            $runLevels = array('FCom_Install' => 'REQUIRED');
-#BDebug::mode('DEBUG');
-        } else {
-            $runLevels = array($area => 'REQUIRED');
+
+        if (file_exists($config->get('fs/config_dir').'/core.yml')) {
+            $config->addFile('core.yml', true);
         }
+
+        if ($config->get('install_status') === 'installed') {
+            $runLevels = array($area => 'REQUIRED');
+        } else {
+            $runLevels = array('FCom_Install' => 'REQUIRED');
+        }
+
         if (BDebug::is('RECOVERY')) { // load manifests for RECOVERY mode
             $recoveryModules = BConfig::i()->get('modules/FCom_Core/recovery_modules');
             if ($recoveryModules) {
@@ -285,6 +262,10 @@ class FCom_Core_Main extends BClass
 
         BModuleRegistry::i()->processRequires()->processDefaultConfig();
 
+        // DB configuration is separate to gitignore
+        if (file_exists($config->get('fs/config_dir').'/db.yml')) {
+            $config->addFile('db.yml', true);
+        }
         if (file_exists($config->get('fs/config_dir').'/local.yml')) {
             $config->addFile('local.yml', true);
         }
