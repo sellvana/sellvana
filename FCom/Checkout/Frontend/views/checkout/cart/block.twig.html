@@ -1,0 +1,38 @@
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% set cartQty = cart.itemQty() %}
+{% set items = cart.recentItems() %}
+{% set checkoutButton = APP.instance('FCom_Checkout_Frontend_CheckoutMethod').getCartCheckoutButton() %}
+
+<div class="mini-cart {{ cartQty ? 'cart-filled' : 'empty-cart' }}">
+    <div class="mini-cart-title">
+        <a href="{{ APP.href('cart') }}" rel="nofollow" class="title">
+        <em class="icon icon-header-cart"></em><em class="icon icon-header-arrow"></em>
+        {{ "Cart: %s" | _(cartQty) }}</a>
+    </div>
+{% if cartQty %}
+    <div class="mini-cart-content">
+        <header>
+            <span class="title">{{ 'Recently Added' |_ }}</span>
+        </header>
+        <ol>
+{% for item in items %}
+    {% set p = item.product() %}
+            <li>
+                <a href="{{ p.url() }}">
+                    <img src="{{ p.thumbUrl(50) }}" width="50" height="50" alt="" class="product-image"/>
+                    <span class="product-name">{{ p.get('product_name') }}</span>
+                    <span class="info">{{ 'Qty' |_ }} {{ item.get('qty') | number_format(0) }}</span>
+                    <div class="price-box">
+                        <span class="price-range">{{ item.rowTotal() | currency }}</span>
+                    </div>
+                </a>
+            </li>
+{% endfor %}
+        </ol>
+        <div class="subtotal">
+            {{ 'Subtotal' |_ }}: {{ cart.get('subtotal') | currency }}
+            <a href="{{ checkoutButton.href }}" class="button btn-aux btn-sz1"><span>{{ 'Checkout' |_ }}</span></a>
+        </div>
+    </div>
+{% endif %}
+</div>

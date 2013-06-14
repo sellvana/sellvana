@@ -1,0 +1,9 @@
+{% set order = THIS.get('order') %}
+{% set billing = order.billing() %}
+<h2>{{ "Payment is done successfully" |_ }}</h2>
+{% if THIS.get('user') %}
+    {{ "Order" |_ }} #<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>
+    <br/>
+{% endif %}
+{{ "Billing information" |_ }}:<br/>
+{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}

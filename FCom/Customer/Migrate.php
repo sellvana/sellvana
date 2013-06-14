@@ -2,15 +2,7 @@
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::run("
@@ -63,7 +55,7 @@ class FCom_Customer_Migrate extends BClass
         */
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tAddress = FCom_Customer_Model_Address::table();
         BDb::ddlClearCache();
@@ -79,7 +71,7 @@ class FCom_Customer_Migrate extends BClass
         } catch (Exception $e) {}
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::ddlClearCache();
@@ -95,13 +87,25 @@ class FCom_Customer_Migrate extends BClass
             ");
         } catch (Exception $e) {}
     }
-    
-    public function upgrade_0_1_3()
+
+    public function upgrade__0_1_2__0_1_3()
     {
         BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
             'COLUMNS' => array(
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
+                'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
+                'suffix' => 'VARCHAR(10) NULL AFTER prefix',
+                'company' => 'VARCHAR(50) NULL AFTER suffix',
             ),
         ));
     }

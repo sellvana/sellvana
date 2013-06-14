@@ -4,12 +4,14 @@ modules:
 		require: { module: { FCom_Catalog: 0.2.1, FCom_Geo: 0.1.0, FCom_Sales: 0.1.10 } }
 		translations: { de: de.php }
 		description: "Base cart and checkout functionality"
+        auto_use: [ views ]
+
         areas:
             FCom_Admin:
-                auto_use: [ views, layout ]
+                auto_use: [ layout ]
 
             FCom_Frontend:
-                auto_use: [ bootstrap, layout, views ]
+                auto_use: [ bootstrap, layout ]
                 routing:
                     - [ any, /cart, FCom_Checkout_Frontend_Controller.cart ]
                     - [ any, /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]

@@ -1,0 +1,10 @@
+{% set order = THIS.get('order') %}
+{% set billing = order.billing() %}
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ From: "Fulleron" <support@fulleron.com> }-->
+<!--{ To: "{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') }}" <{{ billing.get('email') }}> }-->
+<!--{ Subject: Thank your for payment. }-->
+
+Hello, {{ billing.get('firstname') }}.
+
+<p>Thank you </p>
