@@ -1,14 +1,15 @@
-not{% set cart = THIS.get('cart') %}
+{% set cart = THIS.get('cart') %}
+
 <div class="page-checkout-review">
-    <form action="{{APP.href('checkout')}}" method="post">
+    <form action="{{ APP.href('checkout') }}" method="post">
         <div class="col-checkout-review-left">
             <header class="page-title">
-                <h1 class="title">{{'Review and Place Order'|_}}</h1>
+                <h1 class="title">{{ 'Review and Place Order'|_ }}</h1>
             </header>
             {% if THIS.messagesHtml() %}
                 <p class="error">{{ THIS.messagesHtml() | raw }}</p>
             {% endif %}
-            <h2>{{'Review the information below then click "Place your order"' |_}}</h2>
+            <h2>{{ 'Review the information below then click "Place your order"' |_ }}</h2>
             <div class="col2-set">
                 <div class="col first">
                     <h4>{{ "Shipping to" |_}}</h4>

@@ -1428,124 +1428,19 @@ class BView extends BClass
      */
     public function email($p = array())
     {
-        static $availHeaders = array('to', 'from', 'cc', 'bcc', 'reply-to', 'return-path', 'content-type');
-
         if (is_string($p)) {
             $p = array('to' => $p);
         }
-        $body    = $this->render($p, true);
-        $headers = array();
-        $params  = array();
-        $subject = '';
-        $files   = array();
-        $to      = '';
 
-        if (($metaData = $this->param('meta_data'))) {
-            foreach ($metaData as $k => $v) {
-                $lh = strtolower($k);
-                if ($lh == 'subject') {
-                    $subject = $v;
-                } elseif ($lh == 'to') {
-                    $to = $v;
-                } elseif ($lh == 'attach') {
-                    $files[] = $v;
-                } elseif (in_array($lh, $availHeaders)) {
-                    $headers[$lh] = $k . ': ' . $v;
-                }
-            }
-        }
-        foreach ($p as $k => $v) {
-            $lh = strtolower($k);
-            if ($lh == 'subject') {
-                $subject = $v;
-            } elseif ($lh == 'to') {
-                $to = $v;
-            } elseif ($lh == 'attach') {
-                $files[] = $v;
-            } elseif (in_array($lh, $availHeaders)) {
-                $headers[$lh] = $k . ': ' . $v;
-            } elseif ($k == '-f') $params[$k] = $k . ' ' . $v;
-        }
+        $body = $this->render($p, true);
 
-        if (!empty($headers['from']) && strtolower($headers['from']) == 'from: "" <>') {
-            unset($headers['from']);
-        }
-
-        if ($files) {
-            $this->addAttachment($files, $headers, $body);
-        }
-
-        $eventData = array(
-            'to' => $to,
-            'subject' => $subject,
-            'body' => trim($body),
-            'headers' => $headers,
-            'params' => $params,
+        $data = array_merge(
+            array_change_key_case($this->param('meta_data'), CASE_LOWER),
+            array_change_key_case($p, CASE_LOWER)
         );
+        $data['body'] = $body;
 
-        try {
-            $flags = BEvents::i()->fire("BView::email.before", array('email_data' => $eventData));
-            if ($flags===false) {
-                return false;
-            } elseif (is_array($flags)) {
-                foreach ($flags as $f) {
-                    if ($f===false) {
-                        return false;
-                    }
-                }
-            }
-        } catch (BException $e) {
-            BDebug::warning($e->getMessage());
-            return false;
-        }
-
-        BEvents::i()->fire("BView::email", array('email_data' => $eventData));
-
-        return mail($to, $subject, trim($body), join("\r\n", $headers), join(' ', $params));
-    }
-
-    /**
-     * Add email attachment
-     *
-     * @param $files
-     * @param $mailheaders
-     * @param $body
-     */
-    function addAttachment($files, &$mailheaders, &$body)
-    {
-        $body = trim($body);
-        //$headers = array();
-        // boundary
-        $semi_rand     = md5(time());
-        $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-
-        // headers for attachment
-        $headers   = $mailheaders;
-        $headers[] = "MIME-Version: 1.0";
-        $headers[] = "Content-Type: multipart/mixed;";
-        $headers[] = " boundary=\"{$mime_boundary}\"";
-
-        //headers and message for text
-        $message = "--{$mime_boundary}\n\n" . $body . "\n\n";
-
-        // preparing attachments
-        for ($i = 0; $i < count($files); $i++) {
-            if (is_file($files[$i])) {
-                $message .= "--{$mime_boundary}\n";
-                $fp   = @fopen($files[$i], "rb");
-                $data = @fread($fp, filesize($files[$i]));
-                @fclose($fp);
-                $data = chunk_split(base64_encode($data));
-                $message .= "Content-Type: application/octet-stream; name=\"" . basename($files[$i]) . "\"\n" .
-                            "Content-Description: " . basename($files[$i]) . "\n" .
-                            "Content-Disposition: attachment;\n" . " filename=\"" . basename($files[$i]) . "\"; size=" . filesize($files[$i]) . ";\n" .
-                            "Content-Transfer-Encoding: base64\n\n" . $data . "\n\n";
-            }
-        }
-        $message .= "--{$mime_boundary}--";
-
-        $body        = $message;
-        $mailheaders = $headers;
+        return BEmail::i()->send($data);
     }
 
     /**

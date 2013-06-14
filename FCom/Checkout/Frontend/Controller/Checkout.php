@@ -13,16 +13,17 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>BApp::baseUrl()),
-            array('label'=>'Checkout', 'active'=>true));
+        $layout->view('breadcrumbs')->set(array(
+            'crumbs' => array(
+                array('label'=>'Home', 'href'=>BApp::baseUrl()),
+                array('label'=>'Checkout', 'active'=>true),
+            ),
+        ));
 
         $shipAddress = null;
         $billAddress = null;
 
-        $customer = false;
-        if (BModuleRegistry::isLoaded('FCom_Customer')) {
-            $customer = FCom_Customer_Model_Customer::i()->sessionUser();
-        }
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (!$cart || !$cart->id) {
@@ -63,18 +64,22 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         if (!empty($paymentMethods[$cart->payment_method])) {
-            $layout->view('checkout/checkout')->payment_method = $paymentMethods[$cart->payment_method];
-            $layout->view('checkout/checkout')->payment_details = BUtil::fromJson($cart->payment_details);
+            $layout->view('checkout/checkout')->set(array(
+                'payment_method' => $paymentMethods[$cart->payment_method],
+                'payment_details' => BUtil::fromJson($cart->payment_details),
+            ));
         }
 
         $this->messages('checkout/checkout');
-        $layout->view('checkout/checkout')->cart = $cart;
-        $layout->view('checkout/checkout')->guest_checkout = !$customer;
-        $layout->view('checkout/checkout')->shipping_address = $shipAddress;
-        $layout->view('checkout/checkout')->billing_address = $billAddress;
-        $layout->view('checkout/checkout')->shipping_methods = $shippingMethods;
 
-        $layout->view('checkout/checkout')->totals = $cart->getTotals();
+        $layout->view('checkout/checkout')->set(array(
+            'cart' => $cart,
+            'guest_checkout' => !$customer,
+            'shipping_address' => $shipAddress,
+            'billing_address' => $billAddress,
+            'shipping_methods' => $shippingMethods,
+            'totals' => $cart->getTotals()
+        ));
         $this->layout('/checkout/checkout');
     }
 
@@ -119,7 +124,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (empty($post['place_order'])) {
             BResponse::i()->redirect(BApp::href('checkout'));
         }
-        $cart->placeOrder();
+        $order = $cart->placeOrder();
+
+        FCom_Sales_Model_Cart::i()->sessionCartId(false);
+
+        $sData =& BSession::i()->dataToUpdate();
+        $sData['last_order']['id'] = $order->id;
 
         BResponse::i()->redirect(BApp::href('checkout/success'));
     }
@@ -189,12 +199,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
 
-        BLayout::i()->view('email/new-bill')->set('order', $salesOrder)->email();
-        $this->view('breadcrumbs')->crumbs = array(
+        BLayout::i()->view('email/new-order-customer')->set('order', $salesOrder)->email();
+        $this->view('breadcrumbs')->set('crumbs', array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
-            array('label'=>'Confirmation', 'active'=>true));
-        $this->view('checkout/success')->order = $salesOrder;
-        $this->view('checkout/success')->user = $user;
+            array('label'=>'Confirmation', 'active'=>true),
+        ));
+        $this->view('checkout/success')->set(array('order' => $salesOrder, 'user' => $user));
         $this->layout('/checkout/success');
     }
 }
