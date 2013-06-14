@@ -36,6 +36,16 @@
                                 %li
                                     %a(href="#{$sc['href']}") = $sc['label']
 
+                - if (!empty($this->_recent))
+                    %li.sup-recent
+                        %a(href="#")
+                            %span.icon
+                            %span.title = $this->_('Recent Activity')
+                        %ul.sub-section
+                            - foreach ($this->_recent as $sc)
+                                %li
+                                    %a(href="#{$sc['href']}") = $sc['label']
+
                 - if ($modulesNotification)
                     %li.sup-updates
                         %a(href="#{BApp::href('market/index')}")
