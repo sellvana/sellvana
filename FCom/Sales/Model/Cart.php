@@ -294,6 +294,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$this->customer_id && FCom_Customer_Model_Customer::i()->isLoggedIn()) {
             $this->customer_id = FCom_Customer_Model_Customer::i()->sessionUserId();
         }
+        if (!$this->shipping_method) {
+            $this->shipping_method = BConfig::i()->get('modules/FCom_Sales/default_shipping_method');
+            $services = $this->getShippingMethod()->getDefaultService();
+            $this->shipping_service = key($services);
+        }
+        if (!$this->payment_method) {
+            $this->payment_method = BConfig::i()->get('modules/FCom_Sales/default_payment_method');
+        }
 
         $this->update_dt = BDb::now();
         $this->data_serialized = BUtil::toJson($this->data);
@@ -454,9 +462,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
 
         $cart->set('status', 'ordered')->save();
-
-        static::sessionCartId(false);
-        static::$_sessionCart = null;
+        return $salesOrder;
     }
 
     public function __destruct()

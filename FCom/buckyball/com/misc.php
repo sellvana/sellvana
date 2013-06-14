@@ -1306,6 +1306,177 @@ class BUtil extends BClass
         }
         return $sorted;
     }
+
+}
+
+class BEmail extends BClass
+{
+    static protected $_handlers = array();
+    static protected $_defaultHandler = 'default';
+
+    public function __construct()
+    {
+        $this->addHandler('default', array($this, 'defaultHandler'));
+    }
+
+    public function addHandler($name, $params)
+    {
+        if (is_callable($params)) {
+            $params = array(
+                'description' => $name,
+                'callback' => $params,
+            );
+        }
+        static::$_handlers[$name] = $params;
+    }
+
+    public function getHandlers()
+    {
+        return static::$_handlers;
+    }
+
+    public function setDefaultHandler($name)
+    {
+        static::$_defaultHandler = $name;
+    }
+
+    public function send($data)
+    {
+        static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|x-.*)$/';
+
+        $data = array_change_key_case($data, CASE_LOWER);
+
+        $body = trim($data['body']);
+        unset($data['body']);
+
+        $to      = '';
+        $subject = '';
+        $headers = array();
+        $params  = array();
+        $files   = array();
+
+        foreach ($data as $k => $v) {
+            if ($k == 'subject') {
+                $subject = $v;
+
+            } elseif ($k == 'to') {
+                $to = $v;
+
+            } elseif ($k == 'attach') {
+                foreach ((array)$v as $file) {
+                    $files[] = $file;
+                }
+
+            } elseif ($k[0] === '-') {
+                $params[$k] = $k . ' ' . $v;
+
+            } elseif (preg_match($allowedHeadersRegex, $k)) {
+                if (!empty($v) && $v!=='"" <>') {
+                    $headers[$k] = $k . ': ' . $v;
+                }
+            }
+        }
+
+        $origBody = $body;
+        if ($files) {
+            // $body and $headers will be updated
+            $this->_addAttachment($files, $headers, $body);
+        }
+
+        $emailData = array(
+            'to' => &$to,
+            'subject' => &$subject,
+            'orig_body' => &$origBody,
+            'body' => &$body,
+            'headers' => &$headers,
+            'params' => &$params,
+            'files' => &$files,
+            'orig_data' => $data,
+        );
+
+        return $this->_dispatch($emailData);
+    }
+
+    protected function _dispatch($emailData)
+    {
+        try {
+            $flags = BEvents::i()->fire('BEmail::send.before', array('email_data' => $emailData));
+            if ($flags===false) {
+                return false;
+            } elseif (is_array($flags)) {
+                foreach ($flags as $f) {
+                    if ($f===false) {
+                        return false;
+                    }
+                }
+            }
+        } catch (BException $e) {
+            BDebug::warning($e->getMessage());
+            return false;
+        }
+
+        $callback = static::$_handlers[static::$_defaultHandler]['callback'];
+        if (is_callable($callback)) {
+            $result = call_user_func($callback, $emailData);
+        } else {
+            BDebug::warning('Default email handler is not callable');
+            $result = false;
+        }
+        $emailData['result'] = $result;
+
+        BEvents::i()->fire('BEmail::send.after', array('email_data' => $emailData));
+
+        return $result;
+    }
+
+    /**
+     * Add email attachment
+     *
+     * @param $files
+     * @param $mailheaders
+     * @param $body
+     */
+    protected function _addAttachment($files, &$mailheaders, &$body)
+    {
+        $body = trim($body);
+        //$headers = array();
+        // boundary
+        $semi_rand     = md5(microtime());
+        $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+
+        // headers for attachment
+        $headers   = $mailheaders;
+        $headers[] = "MIME-Version: 1.0";
+        $headers[] = "Content-Type: multipart/mixed;";
+        $headers[] = " boundary=\"{$mime_boundary}\"";
+
+        //headers and message for text
+        $message = "--{$mime_boundary}\n\n" . $body . "\n\n";
+
+        // preparing attachments
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $data = chunk_split(base64_encode(file_get_contents($file)));
+                $name = basename($file);
+                $message .= "--{$mime_boundary}\n" .
+                    "Content-Type: application/octet-stream; name=\"" . $name . "\"\n" .
+                    "Content-Description: " . $name . "\n" .
+                    "Content-Disposition: attachment;\n" . " filename=\"" . $name . "\"; size=" . filesize($files[$i]) . ";\n" .
+                    "Content-Transfer-Encoding: base64\n\n" . $data . "\n\n";
+            }
+        }
+        $message .= "--{$mime_boundary}--";
+
+        $body        = $message;
+        $mailheaders = $headers;
+        return true;
+    }
+
+    public function defaultHandler($data)
+    {
+        return mail($data['to'], $data['subject'], $data['body'],
+            join("\r\n", $data['headers']), join(' ', $data['params']));
+    }
 }
 
 /**
@@ -1726,6 +1897,8 @@ class BDebug extends BClass
 
     static protected $_collectedErrors = array();
 
+    static protected $_errorHandlerLog = array();
+
     /**
     * Constructor, remember script start time for delta timestamps
     *
@@ -1754,6 +1927,23 @@ class BDebug extends BClass
         set_error_handler('BDebug::errorHandler');
         set_exception_handler('BDebug::exceptionHandler');
         register_shutdown_function('BDebug::shutdownHandler');
+    }
+
+    public static function startErrorLogger()
+    {
+        static::$_errorHandlerLog = array();
+        set_error_handler('BDebug::errorHandlerLogger');
+    }
+
+    public static function stopErrorLogger()
+    {
+        set_error_handler('BDebug::errorHandler');
+        return static::$_errorHandlerLog;
+    }
+
+    public static function errorHandlerLogger($code, $message, $file, $line, $context=null)
+    {
+        return static::$_errorHandlerLog[] = compact('code', 'message', 'file', 'line', 'context');
     }
 
     public static function errorHandler($code, $message, $file, $line, $context=null)

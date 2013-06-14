@@ -1,0 +1,24 @@
+- $c = $this->model
+
+%fieldset
+    .settings-container
+        .group
+            %h3
+                %a(href="#") = $this->_('Email Sending')
+            %div
+                %table
+                    %tr
+                        %td = $this->_('SMTP Host')
+                        %td
+                            %input(type="text" name="config[modules][FCom_Email][smtp_host]"
+                                value="#{$c->get('modules/FCom_Email/smtp_host')}")
+                    %tr
+                        %td = $this->_('Sendmail From')
+                        %td
+                            %input(type="text" name="config[modules][FCom_Email][sendmail_from]"
+                                value="#{$c->get('modules/FCom_Email/sendmail_from')}")
+                    %tr
+                        %td = $this->_('Default Handler')
+                        %td
+                            %select(name="config[modules][FCom_Email][default_handler]")
+                                - echo $this->optionsHtml(BUtil::arrayToOptions(BEmail::i()->getHandlers(), 'description'), $c->get('modules/FCom_Email/default_handler'))
