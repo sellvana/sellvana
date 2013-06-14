@@ -144,8 +144,8 @@ class FCom_Sales_Migrate extends BClass
             UPDATE  {$tOrder} SET `status_id` = 3 where status = 'paid';
         ");
     }
-    
-    
+
+
     public function upgrade__0_1_9__0_1_10()
     {
         BDb::ddlTableDef(FCom_Sales_Model_Order_Address::table(), array(
@@ -271,7 +271,7 @@ class FCom_Sales_Migrate extends BClass
                 'status' => '(status)',
             ),
         ));
-        
+
         BDb::ddlTableDef(FCom_Sales_Model_Cart_Item::table(), array(
             'COLUMNS' => array(
                 'local_sku' => 'varchar(100) null after product_id',
@@ -302,6 +302,32 @@ class FCom_Sales_Migrate extends BClass
         BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
             'COLUMNS' => array(
                 'last_calc_at' => 'int unsigned',
+            ),
+        ));
+    }
+
+
+    public function upgrade__0_2_2__0_2_3()
+    {
+        BDb::ddlTableDef(FCom_Sales_Model_Cart_Address::table(), array(
+            'COLUMNS' => array(
+                'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
+                'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
+                'suffix' => 'VARCHAR(10) NULL AFTER prefix',
+                'company' => 'VARCHAR(50) NULL AFTER suffix',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Sales_Model_Order::table(), array(
+            'COLUMNS' => array(
+                'customer_email' => 'VARCHAR(100) NULL AFTER customer_id',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Sales_Model_Order_Address::table(), array(
+            'COLUMNS' => array(
+                'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
+                'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
+                'suffix' => 'VARCHAR(10) NULL AFTER prefix',
+                'company' => 'VARCHAR(50) NULL AFTER suffix',
             ),
         ));
     }

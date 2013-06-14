@@ -1002,3 +1002,20 @@ $(function() {
 
     $.fn.foundationCustomForms && $(".foundation-forms").foundationCustomForms();
 })
+
+
+angular.module('fcom.directives', [])
+
+.directive('fcomSelect2', function() {
+    return {
+        restrict: 'AC',
+        link: function($scope, element, attrs) {
+            var params = {
+                width:'other values', minimumResultsForSearch:20
+            }
+            angular.extend(params, $scope.$eval(attrs.mySelect2));
+
+            $(element).select2(params||{});
+        }
+    }
+})
