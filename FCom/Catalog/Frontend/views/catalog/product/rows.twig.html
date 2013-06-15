@@ -1,0 +1,33 @@
+{% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
+
+{% for p in THIS.get('products') %}
+<tr class="item" id="tr-product-{{p.get('id')}}">
+    <td>
+        <img src="{{p.thumbUrl(125, 125)}}" width="125" height="125" class="product-image" alt="{{p.get('product_name')}}"/>
+    </td>
+    <td>
+        <span class="product-name"><a href="{{p.url(THIS.get('category'))}}">{{p.get('product_name')}}</a></span>
+        {% if p.get('avg_rating') %}
+        <span class="rating">
+            <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
+            {{ '%s of 5' | _(p.get('avg_rating')) }}
+            {% if p.get('num_reviews') %}
+                (<a href="{{p.url(THIS.get('category'))}}#reviews">{{ '%s reviews' | _(p.num_reviews) }}</a>)
+            {% endif %}
+        </span>
+        {% endif %}
+        <div class="price-box">
+        	<div class="old-price"><span class="title">{{ 'Was:' |_ }}</span><span class="price">{{p.get('base_price') | currency }}</span></div>
+        	<div class="new-price"><span class="title">{{ 'Now:' |_ }}</span><span class="price">{{p.get('sale_price') | currency }}</span></div>
+        </div>
+        <div class="product-description">
+        	<p>{{p.get('short_description')}}</p>
+        </div>
+    </td>
+    <td class="actions last a-left">
+       	<button class="button btn-add-to-cart" onclick="FCom.cart.add({{p.get('id')}}, 1)"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
+        <p><label for="wishlist-{{p.get('id')}}"><input type="checkbox" id="wishlist-{{p.get('id')}}"/> {{ 'Wishlist' |_ }}</label></p>
+        <p><label for="compare-{{p.get('id')}}"><input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{p.get('id')}}" value="{{p.get('id')}}"/> {{ 'Compare' |_ }}</label></p>
+    </td>
+</tr>
+{% endfor %}
