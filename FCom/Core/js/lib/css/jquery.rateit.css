@@ -16,7 +16,7 @@ div.rateit div.rateit-range
     position: relative;
     display: -moz-inline-box;
     display: inline-block;
-    background: url(../images/star.gif);
+    background: url(../images/rateit/star.gif);
     height: 16px;
 }
 
@@ -46,7 +46,7 @@ div.rateit div.rateit-hover-rtl, div.rateit div.rateit-selected-rtl
 
 div.rateit div.rateit-hover
 {
-    background: url(../images/star.gif) left -32px;
+    background: url(../images/rateit/star.gif) left -32px;
 }
 
 div.rateit div.rateit-hover-rtl
@@ -56,7 +56,7 @@ div.rateit div.rateit-hover-rtl
 
 div.rateit div.rateit-selected
 {
-    background: url(../images/star.gif) left -16px;
+    background: url(../images/rateit/star.gif) left -16px;
 }
 
 div.rateit div.rateit-selected-rtl
@@ -66,17 +66,17 @@ div.rateit div.rateit-selected-rtl
 
 div.rateit div.rateit-preset
 {
-    background: url(../images/star.gif) left -48px;
+    background: url(../images/rateit/star.gif) left -48px;
 }
 
 div.rateit div.rateit-preset-rtl
 {
-    background: url(../images/star.gif) left -48px;
+    background: url(../images/rateit/star.gif) left -48px;
 }
 
 div.rateit div.rateit-reset
 {
-    background: url(../images/delete.gif) 0 0;
+    background: url(../images/rateit/delete.gif) 0 0;
     width: 16px;
     height: 16px;
     display: -moz-inline-box;

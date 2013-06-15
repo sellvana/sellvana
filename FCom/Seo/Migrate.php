@@ -2,12 +2,7 @@
 
 class FCom_Seo_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::i()->install('0.1.0', array($this, 'install'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         BDb::ddlTableDef(FCom_Seo_Model_UrlAlias::table(), array(
             'COLUMNS' => array(
