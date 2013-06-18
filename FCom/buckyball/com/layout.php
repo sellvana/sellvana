@@ -92,7 +92,7 @@ class BLayout extends BClass
      * @var array
      */
     protected static $_extRenderers = array(
-        '.php' => array(),
+        '.php' => array('renderer' => null),
     );
 
     /**
@@ -148,9 +148,11 @@ class BLayout extends BClass
      * @param $rootDir
      * @return $this
      */
-    public function setViewRootDir($rootDir)
+    public function setViewRootDir($rootDir, $module=null)
     {
-        $module    = BModuleRegistry::i()->currentModule();
+        if (is_null($module)) {
+            $module = BModuleRegistry::i()->currentModule();
+        }
         $isAbsPath = strpos($rootDir, '/') === 0 || strpos($rootDir, ':') === 1;
         if ($module) {
             $module->view_root_dir = $isAbsPath ? $rootDir : $module->root_dir . '/' . $rootDir;

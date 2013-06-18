@@ -19,7 +19,7 @@ class BTwig extends BClass
         BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
     }
 
-    public static function init()
+    public static function init($path=null)
     {
 
         require_once __DIR__.'/lib/Twig/Autoloader.php';
@@ -76,7 +76,7 @@ class BTwig extends BClass
     public static function addPath($path, $namespace)
     {
         if (!static::$_fileLoader) {
-            static::init();
+            static::init($path);
         }
         static::$_fileLoader->prependPath($path, $namespace);
     }
