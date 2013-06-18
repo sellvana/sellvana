@@ -1,0 +1,17 @@
+- $m = $this->model
+
+%fieldset.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Handle')
+            %input(type="text" name="model[handle]" value="#{$m->handle}")
+        %li
+            %h4.label = $this->_('Description')
+            %input(type="text" name="model[description]" value="#{$m->description}")
+        %li
+            %h4.label = $this->_('Content')
+            %textarea#main-content(name="model[content]") = $m->content
+:javascript
+    $(function() {
+        adminForm.wysiwygCreate('main-content');
+    });

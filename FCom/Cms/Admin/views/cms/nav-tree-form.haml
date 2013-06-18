@@ -1,0 +1,23 @@
+- $tabs = $this->sortedTabs()
+- $m = $this->model
+- $formUrl = BApp::href('cms/nav/tree_form/'.$m->id)
+
+%section.adm-content-box
+    %header.adm-main-header
+        .btns-set
+            %button.st1.sz1.btn(onclick="return adminForm.saveAll(this)")
+                %span = $this->_('Save')
+
+    %nav.adm-tabs
+        %ul
+            - foreach ($tabs as $k => $tab)
+                %li(class="#{$k===$this->cur_tab ? 'active' : ''}")
+                    %a(href="#{$k}")
+                        %span.icon
+                        = $tab['label']
+    .adm-tabs-container
+        - foreach ($tabs as $k => $tab)
+            - if !empty($tab['view'])
+                %section.adm-tabs-content(id="tab-#{$k}" #{$k!==$this->cur_tab ? 'hidden' : ''} #{empty($tab['async'] ? 'data-loaded="true"' : ''})
+                    - if empty($tab['async'])
+                        - echo $this->view($tab['view'])

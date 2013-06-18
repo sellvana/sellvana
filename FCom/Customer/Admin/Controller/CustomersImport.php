@@ -4,6 +4,22 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 {
     protected $_permission = 'customers/import';
 
+    public function customerFilesGridConfig()
+    {
+        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array(
+            'id' => 'import_files',
+            'folder' => 'storage/import/customers',
+            'config' => array(
+                'grid' => array(
+                    'multiselect'=>false,
+                    'autowidth'=>false,
+                    'width'=>600,
+                    'height'=>300,
+                ),
+            ),
+        ));
+    }
+
     public function action_index()
     {
         $this->layout('/customers/import');
