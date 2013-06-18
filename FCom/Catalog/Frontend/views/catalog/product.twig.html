@@ -1,0 +1,109 @@
+{% set prod = THIS.get('product') %}
+{% set cat = THIS.get('category') %}
+
+<div class="product-view">
+    <div class="product-main">
+        <form action="" method="post" onsubmit="return false;">
+            <input type="hidden" name="id" value="{{ prod.id() }}">
+            <div class="col-product-shop">
+                <h1 class="product-name">{{ prod.get('product_name') }} Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</h1>
+                <!--<p class="no-rating"><a href="{{ APP.href('prodreviews/add') }}?pid={{ prod.id() }}">{{ "Be the first to review this product" |_ }}</a></p>-->
+                <span class="rating">
+                    <div class="rateit" data-rateit-value="{{prod.get('avg_rating')}}"></div>
+                    {{ '%s of 5' | _(prod.get('avg_rating')) }}
+                    {% if prod.get('num_reviews') %}
+                        (<a href="{{prod.url(cat)}}#reviews">{{ '%s reviews' | _(prod.get('num_reviews')) }}</a>)
+                    {% endif %}
+                </span>
+                {{ THIS.view('catalog/product/price', {'prod': prod}) | raw }}
+                <div class="add-to-cart-line">
+                    {{ THIS.view('checkout/cart/add2cart', {'prod': prod}) | raw }}
+                    {{ THIS.view('wishlist/add2wishlist', {'prod': prod}) | raw }}
+                    <label for="compare-{{ prod.id() }}" class="checkbox-line"><input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{ prod.id() }}" value="{{ prod.id() }}"> {{ "Compare" |_ }}</label>
+                    <label for="wishlist-{{ prod.id() }}" class="checkbox-line"><input type="checkbox" name="wishlist" id="wishlist-{{ prod.id() }}" value="{{ prod.id() }}"> {{ "Wishlist" |_ }}</label>
+                    <div class="clearer"></div>
+                </div>
+                <div class="short-description">
+                    {{ PROD.get('description') | striptags }}
+                </div>
+                <div>
+                    {{ THIS.view('customfields/product', {'prod': prod}) | raw }}
+                </div>
+                {{ THIS.view('compare/block') | raw }}
+            </div>
+
+            {% set mediaList = APP.instance('FCom_Catalog_Model_ProductMedia').orm().where('product_id', prod.id()).where('media_type', 'I').find_many() %}
+            <div class="col-product-image">
+                <div class="product-image">
+                    <img src="{{ prod.thumbUrl(400) }}" alt="{{ prod.get('product_name') }}" title="{{ prod.get('product_name') }}" width="400" height="400"/>
+                </div>
+                <div class="additional-views">
+                    <ul>
+                        {% for media in mediaList %}
+                        <li>
+                            <a href="{{ media.getUrl() }}" rel="lightbox[prod_{{ prod.id() }}]" title=""><img src="{{ media.getUrl() }}" width="40" height="40" alt=""></a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="clearer"></div>
+        </form>
+    </div>
+    <div class="product-more-info">
+        <ul class="tabs">
+            <li><a href="#overview">{{ "Overview" |_ }}</a></li>
+            <li><a href="#specifications">{{ "Specifications" |_ }}</a></li>
+            <li><a href="#similar">{{ "Similar Products" |_ }}</a></li>
+            <li><a href="#accessories">{{ "Accessories" |_ }}</a></li>
+            <li><a href="#reviews">{{ "Reviews" |_ }}</a></li>
+        </ul>
+        <div class="panes">
+            <div class="tab-content tab-overview">
+                <header>{{ "Overview" |_ }}</header>
+                    Tray Acrylic Material
+
+                    1 lb package contains: 1 lb powder, 8oz liquid.
+
+                    3 lb package contains: 3 lbs powder, 16oz liquid.
+            </div>
+            <div class="tab-content tab-specifications">
+                <header>{{ "Specifications" |_ }}</header>
+            </div>
+            <div class="tab-content tab-similar-products">
+                <header>{{ "Similar Products" |_ }}</header>
+                <table class="product-list">
+                    <colgroup><col width="30">
+                    <col width="60">
+                    <col>
+                    <col width="180">
+                    </colgroup><tbody>
+{{ THIS.view('catalog/product/rows').set('products', APP.instance('FCom_Catalog_Model_ProductLink').productsByType(prod.id(), 'similar')) }}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-content tab-accessories">
+                <header>{{ "Accessories" |_ }}</header>
+                <table class="product-list">
+                    <colgroup><col width="30">
+                    <col width="60">
+                    <col>
+                    <col width="180">
+                    </colgroup><tbody>
+{{ THIS.view('catalog/product/rows').set('products', APP.instance('FCom_Catalog_Model_Product').orm().offset(30).limit(10).find_many()) }}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-content tab-reviews">
+                <header>{{ "Reviews" |_ }}</header>
+                {{ THIS.hook('prodreviews-reviews', {'product': prod}) | raw }}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(function() {
+    // setup ul.tabs to work as tabs for each div directly under div.panes
+    $(".tabs").tabs("div.panes > div");
+});
+</script>

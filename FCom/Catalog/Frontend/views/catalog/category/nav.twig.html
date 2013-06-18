@@ -1,0 +1,5 @@
+{% set categories = APP.instance('FCom_Catalog_Model_Category').getTopNavCategories() %}
+
+{% for cat in categories %}
+    <li><a href="{{ APP.href(cat.get('url_path')) }}">{{ cat.get('node_name') }}<em class="icon"></em></a></li>
+{% endfor %}

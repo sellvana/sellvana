@@ -19,7 +19,6 @@ class FCom_Core_Main extends BClass
             BDebug::i()->registerErrorHandlers();
 
             $this->initConfig($area);
-            $this->initDebug();
             $this->initModules();
 
             return BApp::i();
@@ -220,6 +219,8 @@ class FCom_Core_Main extends BClass
             $config->addFile('core.yml', true);
         }
 
+        $this->initDebug();
+
         if ($config->get('install_status') === 'installed') {
             $runLevels = array($area => 'REQUIRED');
         } else {
@@ -227,7 +228,7 @@ class FCom_Core_Main extends BClass
         }
 
         if (BDebug::is('RECOVERY')) { // load manifests for RECOVERY mode
-            $recoveryModules = BConfig::i()->get('modules/FCom_Core/recovery_modules');
+            $recoveryModules = BConfig::i()->get('recovery_modules/'.$area);
             if ($recoveryModules) {
                 $moduleNames = preg_split('#\s*(,|\n)\s*#', $recoveryModules);
                 foreach ($moduleNames as $modName) {
@@ -306,9 +307,10 @@ class FCom_Core_Main extends BClass
         $m = array(
             'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
             'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
+            'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
             'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
         );
-        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['mode_by_ip']);
+        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'], $c['mode_by_ip']);
         $config->writeFile('local.yml', $c);
         $config->writeFile('core.yml', $m);
         return $this;

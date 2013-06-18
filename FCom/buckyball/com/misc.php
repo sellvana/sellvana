@@ -304,6 +304,9 @@ class BUtil extends BClass
             $pos = $arg_pos + strlen($replace); // skip to end of replacement for next iteration
         }
 
+        if (!$args) {
+            $args = array('');
+        }
         return vsprintf($format, array_values($args));
     }
 
