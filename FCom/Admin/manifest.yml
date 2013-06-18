@@ -8,8 +8,8 @@ modules:
             - [ 'FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin_Main.onSettingsPost' ]
 
         default_config:
-            modules: 
-                FCom_Admin: 
+            modules:
+                FCom_Admin:
                     theme: FCom_Admin_DefaultTheme
 
         areas:
@@ -47,8 +47,8 @@ modules:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Default Admin theme"
-        provides: 
-            themes: 
-                FCom_Admin_DefaultTheme: 
+        provides:
+            themes:
+                FCom_Admin_DefaultTheme:
                     area: FCom_Admin
                     layout: layout.yml
