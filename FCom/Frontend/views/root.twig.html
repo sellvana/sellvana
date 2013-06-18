@@ -4,6 +4,7 @@
         {{ THIS.hook('head') | raw }}
     </head>
     <body class="{{ THIS.getBodyClass() }}">
+        {{ THIS.hook('body_start') | raw }}
         <div class="page-wrapper">
             {{ THIS.hook('header') | raw }}
 {% if REQUEST.rawPath() != '/' %}

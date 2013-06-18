@@ -6,7 +6,7 @@ modules:
         before_bootstrap: FCom_Frontend_Frontend::beforeBootstrap
 
         default_config:
-            modules: 
+            modules:
                 FCom_Frontend:
                     theme: FCom_Frontend_DefaultTheme
                     nav_top: { root_cms: 1, root_category: 1, type: categories_root }
@@ -22,8 +22,8 @@ modules:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Default Frontend theme"
-        provides: 
-            themes: 
-                FCom_Frontend_DefaultTheme: 
+        provides:
+            themes:
+                FCom_Frontend_DefaultTheme:
                     area: FCom_Frontend
                     layout: layout.yml

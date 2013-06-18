@@ -1,15 +1,15 @@
 - $m = $this->model
 - $customerGroups = null
-- if BModuleRegistry::i()->module("FCom_CustomerGroups")->runStatus(BNULL) == BModule::LOADED
+- if (BModuleRegistry::i()->module("FCom_CustomerGroups")->runStatus(BNULL) == BModule::LOADED)
     - $customerGroups = FCom_CustomerGroups_Model_Group::i()->groupsOptions()
 
 :javascript
     //var custModule = angular.module('custModule', []);
 
     function CustomerAddressesCtrl($scope) {
-        $scope.addresses = <?=BUtil::toJson(BDb::many_as_array($m->addresses()))?>;
-        $scope.countries = <?=BUtil::toJson(FCom_Geo_Model_Country::i()->options())?>;
-        $scope.regions = <?=BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions())?>;
+        $scope.addresses = #{BUtil::toJson(BDb::many_as_array($m->addresses()))};
+        $scope.countries = #{BUtil::toJson(FCom_Geo_Model_Country::i()->options())};
+        $scope.regions = #{BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions())};
 
         $scope.del_ids = [];
         $scope.newId = 0;
@@ -62,7 +62,7 @@
                     %input#model-phone_evening(type="text" name="model[phone_evening]" value="#{$m->phone_evening}")
                 %li.label-l
                     %label(for="model-status") = $this->_('Status')
-                    %select#model-status($name="model[status]")
+                    %select#model-status(name="model[status]")
                         - echo $this->optionsHtml($m->fieldOptions('status'), $m->status)
 
         #fieldset
@@ -78,7 +78,7 @@
     .col-customer-address(ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none")
         %h3.form-group-title = $this->_('Addresses')
         %div(ng-repeat="a in addresses")
-            %a.btn-remove(href ng-click="delAddress(a)") = [X]
+            %a.btn-remove(href ng-click="delAddress(a)") [X]
             %label
                 %input(type="checkbox" ng-model="a.edit_mode")
                 = $this->_('Edit')

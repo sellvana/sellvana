@@ -1,0 +1,2 @@
+base:
+    - { hook: body_start, views: admin/toolbar }

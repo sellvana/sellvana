@@ -138,33 +138,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $caption = $type=='related' ? 'Related Products' : 'Similar Products';
             break;
 
-        case 'family':
-            $family = FCom_Catalog_Model_ProductFamily::i()->orm()->table_alias('pf')
-                ->where('pf.product_id', $model ? $model->id : 0)
-                ->join('FCom_Catalog_Model_Family', array('f.id','=','pf.family_id'), 'f')
-                ->select('f.id')->select('f.family_name')
-                ->find_one();
-
-            $orm->join('FCom_Catalog_Model_ProductFamily', array('pf.product_id','=','p.id'), 'pf')
-                ->where('pf.family_id', $family ? $family->id : 0);
-
-            $vendorName = $model ? htmlspecialchars($model->manuf_vendor_name) : '';
-            $vendorId = $model ? $model->manuf_vendor_id : '';
-            $caption = 'Family Products '
-.'<input type="text" id="family-autocomplete" name="family_name" style="width:100px" value="'
-    .($family ? htmlspecialchars($family->family_name) : '').'"/>'
-.'<input type="hidden" id="family-id" name="family_id" value="'.($family ? $family->id : '').'"/>'
-.'<button type="button" id="family-new" title="New Family"><span class="ui-icon ui-icon-plus"></span></button>'
-.'<button type="button" id="family-rename" title="Rename Family"><span class="ui-icon ui-icon-pencil"></span></button>'
-.' Mfr: <input type="text" id="family-manuf-autocomplete" style="width:100px" value="'.$vendorName.'">'
-.'<input type="hidden" id="family-manuf-id" name="manuf_id" value="'.$vendorId.'"/>'
-;
-            break;
         default:
             $caption = '';
         }
-
-
 
         $gridId = 'linked_products_'.$type;
         $config = array(
@@ -173,17 +149,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data'          => null,
                 'datatype'      => 'local',
                 'caption'       => $caption,
-                'columns' => array(
+                'columns'       => array(
                     'id' => array('label'=>'ID', 'width'=>30),
                     'product_name' => array('label'=>'Product name', 'width'=>250),
                     'manuf_sku' => array('label'=>'Mfr Part #', 'width'=>250),
                 ),
-                /*
-                'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'index'=>'id', 'width'=>40, 'hidden'=>true),
-                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-                    array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
-                ),*/
                 'rowNum'        => 10,
                 'sortname'      => 'product_name',
                 'sortorder'     => 'asc',

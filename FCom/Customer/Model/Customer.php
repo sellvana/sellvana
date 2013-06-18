@@ -5,6 +5,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer';
     protected static $_origClass = __CLASS__;
 
+    protected static $_fieldOptions = array(
+        'status' => array(
+            'new'      => 'New',
+            'active'   => 'Active',
+            'disabled' => 'Disabled',
+        ),
+    );
+
     protected static $_sessionUser;
     protected $defaultShipping = null;
     protected $defaultBilling = null;

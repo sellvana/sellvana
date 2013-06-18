@@ -1,0 +1,10 @@
+modules:
+    FCom_FrontendCP:
+        version: 0.1.0
+        require: { module: { FCom_Frontend: 0.1.0 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ put, /*path, FCom_FrontendCP_Frontend_Controller.update ]
