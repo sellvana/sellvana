@@ -1,0 +1,17 @@
+- $m = $this->model
+
+%fieldset
+    %ul.form-list
+        %li.label-top
+            %label(for="main-content") = $this->_('Content')
+            %textarea#main-content(name="model[content]") = $m->content
+        %li.label-top
+            %label(for="main-layout_update") = $this->_('Layout Update')
+            %textarea#main-layout_update(name="model[layout_update]" style="width:90%; height:100px") = $m->layout_update
+
+:javascript
+    $(function() {
+        var ck = CKEDITOR.instances['main-content'];
+        ck && ck.destroy();
+        $('#main-content').ckeditor();
+    });

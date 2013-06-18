@@ -1,0 +1,30 @@
+- $m = $this->model
+
+%fieldset.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Handle')
+            %input(type="text" name="model[handle]" value="#{$m->handle}")
+        %li
+            %h4.label = $this->_('Title')
+            %input(type="text" name="model[title]" value="#{$m->title}")
+        %li
+            %h4.label = $this->_('Content')
+            %textarea#main-content(name="model[content]") = $m->content
+        %li
+            %h4.label = $this->_('Layout Update')
+            %textarea#main-layout_update(name="model[layout_update]") = $m->layout_update
+        %li
+            %h4.label = $this->_('Meta Title')
+            %input(type="text" name="model[meta_title]" value="#{$m->meta_title}")
+        %li
+            %h4.label = $this->_('Meta Description')
+            %textarea#main-meta_description(name="model[meta_description]") = $m->meta_description
+        %li
+            %h4.label = $this->_('Meta Keywords')
+            %textarea#main-meta_keywords(name="model[meta_keywords]") = $m->meta_keywords
+
+:javascript
+    $(function() {
+        adminForm.wysiwygCreate('main-content');
+    });

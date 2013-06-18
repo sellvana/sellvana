@@ -1,0 +1,120 @@
+- $m = $this->model
+- $customerGroups = null
+- if BModuleRegistry::i()->module("FCom_CustomerGroups")->runStatus(BNULL) == BModule::LOADED
+    - $customerGroups = FCom_CustomerGroups_Model_Group::i()->groupsOptions()
+
+:javascript
+    //var custModule = angular.module('custModule', []);
+
+    function CustomerAddressesCtrl($scope) {
+        $scope.addresses = <?=BUtil::toJson(BDb::many_as_array($m->addresses()))?>;
+        $scope.countries = <?=BUtil::toJson(FCom_Geo_Model_Country::i()->options())?>;
+        $scope.regions = <?=BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions())?>;
+
+        $scope.del_ids = [];
+        $scope.newId = 0;
+
+        $scope.addAddress = function() {
+            $scope.addresses.push({edit_mode:true, id:--$scope.newId});
+        }
+
+        $scope.delAddress = function(addr) {
+            for (var i = 0, ii = $scope.addresses.length; i<ii; i++) {
+                if (addr === $scope.addresses[i]) {
+                    $scope.addresses.splice(i, 1);
+                }
+            }
+            if (addr.id>0) {
+                $scope.del_ids.push(addr.id);
+            }
+        }
+    }
+
+    function CustomerAddressCtrl($scope) {
+
+    }
+
+%div(ng-app ng-controller="CustomerAddressesCtrl")
+    %header.adm-main-header = $this->_('Customer Info')
+    .col-customer-info
+        %fieldset
+            %h3.form-group-title = $this->_('Personal Information')
+            %ul.form-list
+                %li.label-l
+                    %label(for="model-firstname") = $this->_('First Name')
+                    %input#model-firstname(type="text" name="model[firstname]" value="#{$m->firstname}")
+                %li.label-l
+                    %label(for="model-lastname") = $this->_('Last Name')
+                    %input#model-lastname(type="text" name="model[lastname]" value="#{$m->lastname}")
+                %li.label-l
+                    %label(for="model-email") = $this->_('Email')
+                    %input#model-email(type="email" name="model[email]" value="#{$m->email}")
+                - if (isset($customerGroups))
+                    %li.label-l
+                        %label(for="model-group") = $this->_('Customer Group')
+                        %select#model-group(name="model[customer_group]")
+                            - echo $this->optionsHtml($customerGroups, $m->customer_group)
+                %li.label-l
+                    %label(for="model-phone") = $this->_('Daytime Phone')
+                    %input#model-phone(type="text" name="model[phone]" value="#{$m->phone}")
+                %li.label-l
+                    %label(for="model-phone_evening") = $this->_('Evening Phone')
+                    %input#model-phone_evening(type="text" name="model[phone_evening]" value="#{$m->phone_evening}")
+                %li.label-l
+                    %label(for="model-status") = $this->_('Status')
+                    %select#model-status($name="model[status]")
+                        - echo $this->optionsHtml($m->fieldOptions('status'), $m->status)
+
+        #fieldset
+            %h3.form-group-title = $this->_('Password Reset')
+            %ul.form-list
+                %li.label-l
+                    %label(for="model-password") = $this->_('New Password')
+                    %input#model-password(type="password" name="model[password]")
+                %li.label-l
+                    %label(for="model-password_confirm") = $this->_('Confirm Password')
+                    %input#model-password_confirm(type="password" name="model[password_confirm]")
+
+    .col-customer-address(ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none")
+        %h3.form-group-title = $this->_('Addresses')
+        %div(ng-repeat="a in addresses")
+            %a.btn-remove(href ng-click="delAddress(a)") = [X]
+            %label
+                %input(type="checkbox" ng-model="a.edit_mode")
+                = $this->_('Edit')
+            .adr
+                .street-address
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.street1" placeholder="#{$this->_('Street 1')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.street1")
+                .extended-address(ng-show="a.street2 || a.edit_mode")
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.street2" placeholder="#{$this->_('Street 2')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.street2")
+                .extended-address(ng-show="a.street3 || a.edit_mode")
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.street3" placeholder="#{$this->_('Street 3')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.street2")
+                %span.locality
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.city" placeholder="#{$this->_('City')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.city")
+                ,
+                %span.region
+                    %select(ng-show="a.edit_mode && regions[a.country]" ng-options="name for (key,name) in regions[a.country]" ng-model="a.region" fcom-select2)
+                        %option
+                    %input(type="text" ng-show="a.edit_mode && !regions[a.country]" ng-model="a.region" placeholder="#{$this->_('Region/State')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.region")
+                %span.postal-code
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.postcode" size="6" placeholder="#{$this->_('Zip/Postal Code')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.postcode")
+                .country-name
+                    %select(ng-show="a.edit_mode" ng-options="key as name for (key,name) in countries" ng-model="a.country" fcom-select2)
+                        %option
+                    %span(ng-hide="a.edit_mode" ng-bind="countries[a.country]")
+                .phone
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.phone" placeholder="#{$this->_('Phone')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.phone")
+                .fax
+                    %input(type="text" ng-show="a.edit_mode" ng-model="a.fax" placeholder="#{$this->_('Fax')}")
+                    %span(ng-hide="a.edit_mode" ng-bind="a.fax")
+
+        %a(href ng-click="addAddress()" class="add-link") = $this->_('+ Add Another')
+        %input(type="hidden" name="address[data_json]" value="{{addresses}}")
+        %input(type="hidden" name="address[del_json]" value="{{del_ids}}")

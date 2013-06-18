@@ -32,6 +32,27 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         ));
     }
 
+    public function historyGridConfig($m)
+    {
+        return array(
+            'grid'=>array(
+                'id' => 'cms_blocks_form_history',
+                'url' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
+                'editurl' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'hidden'=>true),
+                    'ts' => array('label'=>'TimeStamp', 'formatter'=>'date'),
+                    'version' => array('label'=>'Version'),
+                    'user_id' => array('label'=>'User', 'options'=>FCom_Admin_Model_User::i()->options()),
+                    'username' => array('Label'=>'User Name', 'hidden'=>true),
+                    'comments' => array('labl'=>'Comments'),
+                ),
+            ),
+            'custom'=>array('personalize'=>true),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+        );
+    }
+
     public function action_history_grid_data()
     {
         $id = BRequest::i()->params('id', true);

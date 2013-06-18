@@ -1,0 +1,54 @@
+- $hlp = FCom_Customer_Import::i()
+- $info = $hlp->getFileInfo($this->dir.'/'.$this->file)
+
+%form#import-columns-form(method="post")
+	%input(type="hidden" name="config[filename]" value="#{$this->file}")
+	%table
+		%tr
+			%td = $this->_('Field Delimiter:')
+			%td
+				%input(type="text" name="config[delim]" value="#{$info['delim']}")
+		%tr
+			%td = $this->_('Skip First Lines:')
+			%td
+				%input(type="text" name="config[skip_first" value="#{$info['skip_first']}")
+	%br
+	%table
+		%tr
+			%td.col
+				%table.data-table
+					%thead
+						%tr
+							%th = $this->_('Column Content')
+							%th = $this->_('DB Field')
+					%tbody
+						- foreach ($info['first_row'] as $i => $v)
+							%tr
+								%td = $v
+								%td
+									%select(name="config[columns][#{$i}]")
+										%option
+										- echo $this->optionsHtml($hlp->getFieldOptions(), !empty($info['columns'][$i]) ? $info['columns'][$i] : '')
+			%td.col
+				%table.data-table
+					%thead
+						%tr
+							%th = $this->_('DB Field')
+							%th = $this->_('Default')
+					%tbody
+						- foreach ($hlp->getFieldData() as $k => $f)
+							%tr
+								%td = $k
+								%td
+									- if (!empty($f['options']))
+										%select(name="config[defaults][#{$k}]")
+											%option
+											- echo $this->optionsHtml($f['options'], !empty($info['defaults'][$k]) ? $info['defaults'][$k] : '')
+									- else
+										- if (empty($f['input']) || $f['input'] == 'text')
+											%input(type="text" name="config[defaults][#{$k}]" value="#{!empty($info['defaults'][$k]) ? $this->q($info['defaults'][$k]) : ''}"
+										- elseif ($f['input'] == 'textarea')
+											%textarea(name="config[defaults][#{$k}]" style="width:400px; height:100px") <
+												= !empty($info['defaults'][$k]) ? $this->q($info['defaults'][$k]) : ''
+	
+	%button.btw.st1.sz1(type="button") = $this->_('Save configuration and go to next step')
