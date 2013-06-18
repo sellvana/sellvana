@@ -29,7 +29,7 @@
                             %select(name="config[db][logging]")
                                 - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
                     %tr
-                        %td = $this->_('Enable Logging')
+                        %td = $this->_('Enable Implicit Migration')
                         %td
                             %select(name="config[db][implicit_migration]")
                                 - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))

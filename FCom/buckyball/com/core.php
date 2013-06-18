@@ -518,6 +518,7 @@ class BConfig extends BClass
     * Ex: BConfig::i()->get('some/deep/config')
     *
     * @param string $path
+    * @param boolean $toSave if true, get the configuration from config tree to save
     */
     public function get($path=null, $toSave=false)
     {

@@ -294,7 +294,7 @@ class BLayout extends BClass
      */
     public function getView($viewName)
     {
-        return isset($this->_views[$viewName]) ? $this->_views[$viewName] : null;
+        return isset($this->_views[$viewName]) ? $this->_views[$viewName] : BViewEmpty::i();
     }
 
     /**
@@ -1458,6 +1458,17 @@ class BView extends BClass
         }
 
         return BLocale::_($string, $params, $module);
+    }
+}
+
+/**
+ * Helper view to avoid errors of using views from disabled modules
+ */
+class BViewEmpty extends BView
+{
+    protected function _render()
+    {
+        return '';
     }
 }
 
