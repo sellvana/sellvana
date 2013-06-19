@@ -14,6 +14,11 @@ modules:
 
         areas:
             FCom_Admin:
+                views:
+                    - [ root, { view_class: FCom_Core_View_Root } ]
+                    - [ admin/header, { view_class: FCom_Admin_View_Header } ]
+                    - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
+                    - [ jqgrid, { view_class: FCom_Admin_View_Grid } ]
                 auto_use: [ bootstrap, views ]
                 routing:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]

@@ -1608,6 +1608,12 @@ class BViewHead extends BView
         return $this;
     }
 
+    public function csrf_token()
+    {
+        $this->addMeta('csrf-token', BSession::i()->csrfToken());
+        return $this;
+    }
+
     /**
      * Add canonical link
      * @param $href

@@ -224,6 +224,7 @@ class FCom_Core_Main extends BClass
         if ($config->get('install_status') === 'installed') {
             $runLevels = array($area => 'REQUIRED');
         } else {
+            $config->set('module_run_levels', array());
             $runLevels = array('FCom_Install' => 'REQUIRED');
         }
 
@@ -255,6 +256,7 @@ class FCom_Core_Main extends BClass
         $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
         $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
         $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
+        $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
 
         foreach ($this->_modulesDirs as $dir) {
             BModuleRegistry::i()->scan($dir);
@@ -380,5 +382,18 @@ class FCom_Core_Main extends BClass
             $d = $s->data('lastNav');
             return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
+    }
+
+    public static function defaultThemeCustomLayout()
+    {
+        $cookieConfig = BConfig::i()->get('cookie');
+        $head = BLayout::i()->view('head');
+
+        $head->meta('csrf-token', BSession::i()->csrfToken());
+        $head->js_raw('js_init', array('content'=>"
+FCom = {};
+FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+FCom.base_href = '".BApp::baseUrl()."';
+        "));
     }
 }

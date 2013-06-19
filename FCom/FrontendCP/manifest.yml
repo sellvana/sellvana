@@ -6,5 +6,9 @@ modules:
         areas:
             FCom_Frontend:
                 auto_use: [ layout, views ]
+                views:
+                    - [ frontendcp/editable, { view_class: FCom_FrontendCP_Frontend_View_EditableAttributes } ]
                 routing:
-                    - [ put, /*path, FCom_FrontendCP_Frontend_Controller.update ]
+                    - [ post, /frontendcp/upload, FCom_FrontendCP_Frontend_Controller.upload ]
+                    - [ put, /frontendcp/update, FCom_FrontendCP_Frontend_Controller.update ]
+

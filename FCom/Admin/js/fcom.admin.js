@@ -1,5 +1,3 @@
-
-FCom = {};
 FCom.Admin = {};
 
 FCom.Admin.MediaLibrary = function(options) {

@@ -6,7 +6,9 @@
         <form action="" method="post" onsubmit="return false;">
             <input type="hidden" name="id" value="{{ prod.id() }}">
             <div class="col-product-shop">
-                <h1 class="product-name" data-mercury="simple">{{ prod.get('product_name') }} Toshiba 24L4200U 24-Inch 1080p 60Hz LED TV</h1>
+                <h1 class="product-name"
+                    {{ THIS.view('frontendcp/editable', { type:'simple', entity:'product', id:prod.id(), field:'product_name' }) | raw }}
+                >{{ prod.get('product_name') }}</h1>
                 <!--<p class="no-rating"><a href="{{ APP.href('prodreviews/add') }}?pid={{ prod.id() }}">{{ "Be the first to review this product" |_ }}</a></p>-->
                 <span class="rating">
                     <div class="rateit" data-rateit-value="{{prod.get('avg_rating')}}"></div>
@@ -23,7 +25,9 @@
                     <label for="wishlist-{{ prod.id() }}" class="checkbox-line"><input type="checkbox" name="wishlist" id="wishlist-{{ prod.id() }}" value="{{ prod.id() }}"> {{ "Wishlist" |_ }}</label>
                     <div class="clearer"></div>
                 </div>
-                <div class="short-description" data-mercury="full">
+                <div class="short-description"
+                    {{ THIS.view('frontendcp/editable', { type:'full', entity:'product', id:prod.id(), field:'description'}) | raw }}
+                >
                     {{ PROD.get('description') | striptags('<'+'script>') }}
                 </div>
                 <div>
@@ -35,7 +39,9 @@
             {% set mediaList = APP.instance('FCom_Catalog_Model_ProductMedia').orm().where('product_id', prod.id()).where('media_type', 'I').find_many() %}
             <div class="col-product-image">
                 <div class="product-image">
-                    <img src="{{ prod.thumbUrl(400) }}" alt="{{ prod.get('product_name') }}" title="{{ prod.get('product_name') }}" width="400" height="400" data-mercury="image"/>
+                    <img src="{{ prod.thumbUrl(400) }}" alt="{{ prod.get('product_name') }}" title="{{ prod.get('product_name') }}" width="400" height="400"
+                        {{ THIS.view('frontendcp/editable', { type:'image', entity:'product', id:prod.id(), field:'thumb_url'}) | raw }}
+                    />
                 </div>
                 <div class="additional-views">
                     <ul>

@@ -849,6 +849,19 @@ class BModule extends BClass
         }
     }
 
+    protected function _processViews()
+    {
+        if (empty($this->views)) {
+            return;
+        }
+        $hlp = BLayout::i();
+        foreach ($this->views as $v) {
+            $viewName = strtolower($v[0]);
+            $params = $v[1];
+            $hlp->addView($viewName, $params);
+        }
+    }
+
     protected function _processObserve()
     {
         if (empty($this->observe)) {
@@ -1052,6 +1065,7 @@ class BModule extends BClass
 
         $this->_processAutoload();
         $this->_processTranslations();
+        $this->_processViews(); // before auto_use to initialize custom view classes
         $this->_processAutoUse();
         $this->_processRouting();
         $this->_processObserve();

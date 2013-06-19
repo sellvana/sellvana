@@ -13,6 +13,9 @@ modules:
 
         areas:
             FCom_Frontend:
+                views:
+                    - [ root, { view_class: FCom_Frontend_View_Root } ]
+                    - [ breadcrumbs, { view_class: FCom_Frontend_View_Breadcrumbs } ]
                 auto_use: [ bootstrap, views ]
                 routing:
                     - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]

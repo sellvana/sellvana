@@ -1,2 +1,2 @@
 base:
-    - { hook: body_start, views: admin/toolbar }
+    - { hook: body_start, views: frontendcp/toolbar }

@@ -29,3 +29,14 @@ return FCom.i18n[str] || str;
 function addslashes(str) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
+
+var csrfToken = $('meta[name="csrf-token"]').attr('content');
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-Token': csrfToken
+    }
+})
+
+$(function() {
+    $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
+})

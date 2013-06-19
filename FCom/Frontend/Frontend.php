@@ -7,8 +7,6 @@ class FCom_Frontend_Frontend extends BClass
         $defaultTheme = BConfig::i()->get('modules/FCom_Frontend/theme');
         BLayout::i()
             ->defaultTheme($defaultTheme ? $defaultTheme : 'FCom_Frontend_DefaultTheme')
-            ->addView('root', array('view_class'=>'FCom_Frontend_View_Root'))
-            ->addView('breadcrumbs', array('view_class'=>'FCom_Frontend_View_Breadcrumbs'))
         ;
     }
 
@@ -47,16 +45,5 @@ class FCom_Frontend_Frontend extends BClass
                 $head->css_raw($config['add_css_style']);
             }
         }
-    }
-
-    public static function defaultThemeCustomLayout()
-    {
-        $cookieConfig = BConfig::i()->get('cookie');
-
-        BLayout::i()->view('head')->js_raw('js_init', array('content'=>"
-FCom = {};
-FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
-FCom.base_href = '".BApp::baseUrl()."';
-        "));
     }
 }

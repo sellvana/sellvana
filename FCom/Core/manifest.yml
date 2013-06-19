@@ -12,3 +12,5 @@ modules:
                 username: root
                 logging: false
                 implicit_migration: true
+            web:
+                csrf_check_method: token
