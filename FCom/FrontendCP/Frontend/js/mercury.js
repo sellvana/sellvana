@@ -7235,6 +7235,13 @@ Showdown.converter = function() {
       return data;
     };
 
+    Region.prototype.copyDataAttributes = function(source, target) {
+        for (var _i in source.data()) {
+            target.attr('data-' + _i, source.data(_i));
+        }
+        return Region;
+      };
+
     Region.prototype.serialize = function() {
       return {
         type: this.type(),
@@ -8464,6 +8471,7 @@ Showdown.converter = function() {
       height = this.element.height();
       value = this.element.html().replace(/^\s+|\s+$/g, '').replace('&gt;', '>');
       this.textarea = jQuery('<textarea>', this.document).val(value).addClass('mercury-textarea');
+      this.copyDataAttributes(this.element, this.textarea);
       this.textarea.css({
         border: 0,
         background: 'transparent',
@@ -8979,6 +8987,7 @@ Showdown.converter = function() {
       }
       value = this.element.text();
       this.textarea = jQuery('<textarea>', this.document).val(value).addClass('mercury-textarea');
+      this.copyDataAttributes(this.element, this.textarea);
       this.textarea.css({
         border: 0,
         background: 'transparent',

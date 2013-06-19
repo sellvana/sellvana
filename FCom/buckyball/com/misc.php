@@ -1063,6 +1063,9 @@ class BUtil extends BClass
         if (!empty($parsed['query'])) {
             foreach (explode('&', $parsed['query']) as $q) {
                 $a = explode('=', $q);
+                if ($a[0]==='') {
+                    continue;
+                }
                 $a[0] = urldecode($a[0]);
                 $query[$a[0]] = urldecode($a[1]);
             }

@@ -18,7 +18,30 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
         if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
             BResponse::i()->status(403);
         }
-        $input = BRequest::i()->json();
-        BResponse::i()->json($_SERVER);
+        $request = BRequest::i()->json();
+
+        $result = array();
+        try {
+            if (empty($request['content'])) {
+                throw new Exception('Missing content');
+            }
+            $handlers = FCom_FrontendCP_Main::i()->getEntityHandlers();
+
+            foreach ($request['content'] as $id => $params) {
+                if (empty($params['data']['entity']) || empty($handlers[$params['data']['entity']])) {
+                    $result['content'][$id] = array('error' => 'Missing or invalid entity');
+                    continue;
+                }
+                $handler = $handlers[$params['data']['entity']];
+                if (is_callable($handler)) {
+                    $params['id'] = $id;
+                    $result['content'][$id] = call_user_func($handler, $params);
+                }
+            }
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+        BResponse::i()->json($result);
     }
 }
