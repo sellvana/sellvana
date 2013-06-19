@@ -25,11 +25,9 @@
                     <label for="wishlist-{{ prod.id() }}" class="checkbox-line"><input type="checkbox" name="wishlist" id="wishlist-{{ prod.id() }}" value="{{ prod.id() }}"> {{ "Wishlist" |_ }}</label>
                     <div class="clearer"></div>
                 </div>
-                <div class="short-description"
+                <div class="description"
                     {{ THIS.view('frontendcp/editable', { type:'full', entity:'product', id:prod.id(), field:'description'}) | raw }}
-                >
-                    {{ PROD.get('description') | striptags('<'+'script>') }}
-                </div>
+                >{{ prod.get('description') | striptags('<'+'script>') }}</div>
                 <div>
                     {{ THIS.view('customfields/product', {'prod': prod}) | raw }}
                 </div>

@@ -7,7 +7,7 @@ $hlp = FCom_CatalogIndex_Main::i();
     <header class="block-title"><span class="title">Narrow Results</span></header>
     <form class="block-content" method="get" action="">
         <fieldset>
-            
+
         </fieldset>
         <?php if (!empty($facets)): ?>
             <?php foreach ($facets as $fKey => $facet): ?>
@@ -41,4 +41,3 @@ $hlp = FCom_CatalogIndex_Main::i();
         <?php endif; ?>
     </form>
 </section>
-

@@ -5,7 +5,7 @@ modules:
         categories: [ Catalog, Products ]
         translations: { de: de.php }
         description: "Categories and products management, admin and frontend"
-        auto_use: all
+        auto_use: [ bootstrap, views, layout ]
 
         areas:
             FCom_Admin:
@@ -36,6 +36,6 @@ modules:
                 routing:
                     - [ any, /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
                     - [ any, /v1/catalog/category/:id, FCom_Catalog_ApiServer_V1_Category.index ]
-                    
+
                     - [ any, /v1/catalog/product, FCom_Catalog_ApiServer_V1_Product.index ]
                     - [ any, /v1/catalog/product/:id, FCom_Catalog_ApiServer_V1_Product.index ]

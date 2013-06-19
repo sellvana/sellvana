@@ -7,7 +7,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         FCom_CatalogIndex_Main::i()->indexProducts(true);
         FCom_CatalogIndex_Main::i()->indexGC();
     }
-    
+
     public function action_test()
     {
         BResponse::i()->startLongResponse();
