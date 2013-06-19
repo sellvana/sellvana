@@ -5,6 +5,8 @@ base:
   - { hook: top-nav, views: admin/nav }
   - { hook: before_body_end, views: bottom_scripts }
 
+  - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
@@ -34,7 +36,7 @@ base:
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
       #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
-      #- [ js, @FCom_Core/js/fcom.core.js ]
+      - [ js, @FCom_Core/js/fcom.core.js ]
       - [ js, @FCom_Admin/js/fcom.admin.js ]
 
   - { include: jqgrid }

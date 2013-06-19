@@ -41,17 +41,17 @@
                     %tr
                         %td = $this->_('Store Name')
                         %td
-                            %input(type="text" name="config[modules][FCom_Core][store_name]" 
+                            %input(type="text" name="config[modules][FCom_Core][store_name]"
                                 value="#{ $c->get('modules/FCom_Core/store_name') }")
                     %tr
                         %td = $this->_('Admin Email')
                         %td
-                            %input(type="text" name="config[modules][FCom_Core][admin_email]" 
+                            %input(type="text" name="config[modules][FCom_Core][admin_email]"
                                 value="#{ $c->get('modules/FCom_Core/admin_email') }")
                     %tr
                         %td = $this->_('Copyright Message')
                         %td
-                            %input(type="text" name="config[modules][FCom_Core][copyright]" 
+                            %input(type="text" name="config[modules][FCom_Core][copyright]"
                                 value="#{ $c->get('modules/FCom_Core/copyright') }")
         .group
             %h3
@@ -78,7 +78,7 @@
                     %tr
                         %td = $this->_('Session Namespace')
                         %td
-                            %input(type="text" name="config[cookie][session_namespace]" 
+                            %input(type="text" name="config[cookie][session_namespace]"
                                 value="#{ $c->get('cookie/session_namespace') }")
                     %tr
                         %td = $this->_('Verify Session IP')
@@ -95,3 +95,14 @@
                         %td
                             %select(name="config[web][hide_script_name]")
                                 - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))
+
+        .group
+            %h3
+                %a(href="#") = $this->_('CSRF Protection')
+            %div
+                %table
+                    %tr
+                        %td = $this->_('Check Method')
+                        %td
+                            %select(name="config[web][csrf_check_method]")
+                                - echo $this->optionsHtml(array('referrer'=>'Referrer', 'token'=>'Token'), $c->get('web/csrf_check_method'))

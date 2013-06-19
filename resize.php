@@ -1,23 +1,30 @@
 <?php
 
+/**
+ * Parameters:
+ *
+ * - f=<filename>
+ * - d=<default_filename>
+ * - s=<width>x<height> || <width|500>
+ * - q=<quality|95>
+ * - bg=<background|#FFFFFF>
+ */
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_NOTICE);
 
-$f = !empty($_GET['f']) ? $_GET['f'] : null;
-$s = !empty($_GET['s']) ? explode('x', $_GET['s']) : array('');
-$def = !empty($_GET['d']) ? $_GET['d'] : null;
-$dw = $s[0];
-$dh = !empty($s[1]) ? $s[1] : $s[0];
-$q = !empty($_GET['q']) ? (int)$_GET['q'] : 95;
-$bg = !empty($_GET['bg']) ? $_GET['bg'] : 'FFFFFF';
-
-if (empty($f) || empty($s)
-    #|| empty($_SERVER['HTTP_REFERER']) || empty($_SERVER['HTTP_HOST'])
-    #|| strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])===false
-    || strpos($f, '..')!==false
-    || $f[0]=='/' && strpos($f, dirname(__FILE__))!==0
-    #|| !is_file($_GET['f'])
-) {
+$f = !empty($_GET['f']) ? realpath(ltrim($_GET['f'], '/')) : null;
+if (!$f || !is_file($f)) {
+    $f = realpath( !empty($_GET['d']) ? $_GET['d'] : 'media/image-not-found.jpg' );
+}
+if (!empty($f)) {
+    $s = !empty($_GET['s']) ? explode('x', $_GET['s']) : array('500');
+    $dw = $s[0];
+    $dh = !empty($s[1]) ? $s[1] : $s[0];
+    $q = !empty($_GET['q']) ? (int)$_GET['q'] : 95;
+    $bg = !empty($_GET['bg']) ? $_GET['bg'] : 'FFFFFF';
+}
+if (strpos($f, __DIR__)!==0) {
     header('Cache-Control: private, no-store, no-cache');
     header('Content-type: image/gif');
     if (!$s) {
@@ -30,9 +37,6 @@ if (empty($f) || empty($s)
     imagegif($out, null);
     imagedestroy($out);
     exit;
-}
-if (!is_file($f)) {
-    $f = !empty($def) ? $def : __DIR__.'/media/image-not-found.jpg';
 }
 
 $imgSize = getimagesize($f);
@@ -47,6 +51,8 @@ case IMAGETYPE_JPEG:
 case IMAGETYPE_PNG:
     $in = imagecreatefrompng($f);
     break;
+default:
+
 }
 
 $sw = imagesx($in);

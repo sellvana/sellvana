@@ -3,7 +3,9 @@
 {% for p in THIS.get('products') %}
 <tr class="item" id="tr-product-{{ p.id() }}">
     <td>
-        <img src="{{ p.thumbUrl(125, 125) }}" width="125" height="125" class="product-image" alt="{{ p.get('product_name') }}"/>
+        <img src="{{ p.thumbUrl(125, 125) }}" width="125" height="125" class="product-image" alt="{{ p.get('product_name') }}"
+            {{ THIS.view('frontendcp/editable', { type:'image', entity:'product', id:p.id(), field:'thumb_url'}) | raw }}
+        />
     </td>
     <td>
         <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
@@ -18,7 +20,7 @@
         {% endif %}
         {{ THIS.view('catalog/product/price').set('prod', p) | raw }}
         <div class="product-description">
-            <p>{{ p.get('short_description') }}</p>
+            <p {{ THIS.view('frontendcp/editable', { type:'simple', entity:'product', id:p.id(), field:'short_description'}) | raw }}>{{ p.get('short_description') }}</p>
         </div>
     </td>
     <td class="actions last a-left">

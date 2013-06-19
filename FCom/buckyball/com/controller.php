@@ -470,6 +470,7 @@ class BRequest extends BClass
                         $result[$key] = array('error'=>'invalid_type', 'tp'=>1, 'type'=>$type, 'name'=>$name);
                         continue;
                     }
+                    BUtil::ensureDir($targetDir);
                     move_uploaded_file($tmpName, $targetDir.'/'.$name);
                     $result[$key] = array('name'=>$name, 'tp'=>2, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
                 } else {
@@ -485,6 +486,7 @@ class BRequest extends BClass
                 if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
                     $result = array('error'=>'invalid_type', 'tp'=>4, 'type'=>$type, 'pattern'=>$typesRegex, 'source'=>$source, 'name'=>$name);
                 } else {
+                    BUtil::ensureDir($targetDir);
                     move_uploaded_file($tmpName, $targetDir.'/'.$name);
                     $result = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
                 }
@@ -515,13 +517,15 @@ class BRequest extends BClass
     {
         $c = BConfig::i();
 
-        $m = $c->get('web/csrf_methods');
-        $methods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
-        $whitelist = $c->get('web/csrf_whitelist');
 
-        if (is_array($methods) && !in_array(static::method(), $methods)) {
+        $m = $c->get('web/csrf_http_methods');
+        $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+
+        if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
         }
+
+        $whitelist = $c->get('web/csrf_path_whitelist');
         if ($whitelist) {
             $path = static::rawPath();
             foreach ((array)$whitelist as $pattern) {
@@ -530,16 +534,34 @@ class BRequest extends BClass
                 }
             }
         }
-        if (!($ref = static::referrer())) {
-            return true; // no referrer sent, high prob. csrf
+
+        $m = $c->get('web/csrf_check_method');
+        $method = $m ? $m : 'referrer';
+
+        switch ($method) {
+            case 'referrer':
+                if (!($ref = static::referrer())) {
+                    return true; // no referrer sent, high prob. csrf
+                }
+                $p = parse_url($ref);
+                $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
+                $webRoot = static::webRoot();
+                if ($p['host']!==static::httpHost() || $webRoot && strpos($p['path'], $webRoot)!==0) {
+                    return true; // referrer host or doc root path do not match, high prob. csrf
+                }
+                return false; // not csrf
+
+            case 'token':
+                if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+                    $receivedToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
+                } elseif (!empty($_POST['X-CSRF-TOKEN'])) {
+                    $receivedToken = $_POST['X-CSRF-TOKEN'];
+                }
+                return empty($receivedToken) || $receivedToken !== BSession::i()->csrfToken();
+
+            default:
+                throw new BException('Invalid CSRF check method: '.$method);
         }
-        $p = parse_url($ref);
-        $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
-        $webRoot = static::webRoot();
-        if ($p['host']!==static::httpHost() || $webRoot && strpos($p['path'], $webRoot)!==0) {
-            return true; // referrer host or doc root path do not match, high prob. csrf
-        }
-        return false; // not csrf
     }
 
     /**
@@ -1993,7 +2015,7 @@ class BActionController extends BClass
             $tmpMethod = $actionMethod.'__'.$reqMethod;
             if (method_exists($this, $tmpMethod)) {
                 $actionMethod = $tmpMethod;
-            } elseif (BRouting::i()->currentRoute()->multi_method) { 
+            } elseif (BRouting::i()->currentRoute()->multi_method) {
                 $this->forward(false); // If route has multiple methods, require method suffix
             }
         }

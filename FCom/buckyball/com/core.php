@@ -1521,7 +1521,7 @@ if (!class_exists($r[0])) {
 
 /**
  * Alias for backwards compatibility
- * 
+ *
  * @deprecated by BEvents
  */
 class BPubSub extends BEvents {}
@@ -1859,6 +1859,15 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         return $msgs;
     }
 
+    public function csrfToken()
+    {
+        $data =& static::dataToUpdate();
+        if (empty($data['_csrf_token'])) {
+            $data['_csrf_token'] = BUtil::randomString(32);
+        }
+        return $data['_csrf_token'];
+    }
+
     public function __destruct()
     {
         //$this->close();
@@ -1920,7 +1929,7 @@ class BSession_APC extends BClass
                 return ''; // no session
             } elseif (!empty($ts[$id]) && $ts[$id] + $this->_ttl < time()) {
                 unset($ts[$id]);
-                apc_delete($key); 
+                apc_delete($key);
                 apc_store($this->_prefix.'/TS', $ts);
                 return ''; // session expired
             }

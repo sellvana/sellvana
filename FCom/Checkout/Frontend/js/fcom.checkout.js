@@ -2,7 +2,6 @@ FCom.CartWidget = function(opt) {
     opt = opt || {};
     var cartActiveTimeout;
     function add(id, qty) {
-console.log(FCom);
         if (!opt.apiUrl) opt.apiUrl = FCom.base_href + "cart";
         $.post(opt.apiUrl, {action:'add', id:id, qty:qty||1}, function(data) {
             //console.log(data);

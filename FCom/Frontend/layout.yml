@@ -3,7 +3,8 @@ base:
     - { root: root }
     - { hook: head, views: head }
 
-    - { callback: FCom_Frontend_Frontend::defaultThemeCustomLayout }
+    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+
     - view: head
         do:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
