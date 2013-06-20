@@ -1,0 +1,27 @@
+- $m = $this->model
+
+%fieldset.adm-section-group
+    %ul.form-list
+        %li
+            %h4.label = $this->_('Page Enabled')
+            %select(name="model[page_enabled]")
+                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->page_enabled)
+        %li
+            %h4.label = $this->_('Page URL Path')
+            %input(type="text" name="model[page_url]" value="#{$m->page_url}")
+        %li
+            %h4.label = $this->_('Window Title')
+            %input(type="text" name="model[page_title]" value="#{$m->page_title}")
+        %li
+            %h4.label = $this->_('Page Layout Update')
+            %textarea#main-layout_update(name="model[layout_update]") = $m->layout_update
+        %li
+            %h4.label = $this->_('Meta Title')
+            %input(type="text" name="model[meta_title]" value="#{$m->meta_title}")
+        %li
+            %h4.label = $this->_('Meta Description')
+            %textarea#main-meta_description(name="model[meta_description]") = $m->meta_description
+        %li
+            %h4.label = $this->_('Meta Keywords')
+            %textarea#main-meta_keywords(name="model[meta_keywords]") = $m->meta_keywords
+

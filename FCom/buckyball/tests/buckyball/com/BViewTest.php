@@ -99,9 +99,9 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testGetTemplateFileName()
     {
         $view = BView::factory('my', array('template' => 'test.php'));
-        $this->assertEquals(BLayout::i()->getViewRootDir() . '/test.php', $view->getTemplateFileName('.php'));
+        $this->assertEquals(BLayout::i()->getViewRootDir() . '/test.php', $view->getTemplateFileName());
         $view->setParam('template', null);
-        $this->assertEquals(BLayout::i()->getViewRootDir() . '/my.php', $view->getTemplateFileName('.php'));
+        $this->assertEquals(BLayout::i()->getViewRootDir() . '/my.php', $view->getTemplateFileName());
     }
 
     public function testRenderRawText()
@@ -142,7 +142,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
             ->addLayout(array(
                              'base' => array(
                                  array(
-                                     'view', 'cms/nav',
+                                     'view', 'cms/nav-menu',
                                      'do' => array(
                                          array('addNav', '/module', 'Sample module'),
                                      )

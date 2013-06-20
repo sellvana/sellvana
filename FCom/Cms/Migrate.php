@@ -2,12 +2,7 @@
 
 class FCom_Cms_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tNav = FCom_Cms_Model_Nav::table();
         BDb::run("
@@ -99,6 +94,49 @@ class FCom_Cms_Migrate extends BClass
         ");
 
         BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
+    }
 
+    public function upgrade__0_1_0__0_1_1()
+    {
+        BDb::ddlTableDef(FCom_Cms_Model_Block::table(), array(
+            'COLUMNS' => array(
+                'renderer' => 'varchar(100) null after content',
+                'page_enabled' => 'TINYINT DEFAULT 0 NOT NULL',
+                'page_url' => 'VARCHAR (100) NULL',
+                'page_title' => 'TEXT NULL',
+                'meta_title' => 'TEXT NULL',
+                'meta_description' => 'TEXT NULL',
+                'meta_keywords' => 'TEXT NULL',
+                'modified_time' => 'int unsigned',
+            ),
+            'KEYS' => array(
+                'UNQ_handle' => 'UNIQUE (handle)',
+                'UNQ_page_url' => 'UNIQUE (page_enabled, page_url)',
+            ),
+        ));
+        /*
+        BDb::ddlTableDef(FCom_Cms_Model_Nav::table(), array(
+            'COLUMNS' => array(
+                'contents' => 'RENAME content text null',
+                'renderer' => 'varchar(100) null after content',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Cms_Model_Page::table(), array(
+            'COLUMNS' => array(
+                'renderer' => 'varchar(100) null after content',
+            ),
+            'KEYS' => array(
+                'UNQ_handle' => 'UNIQUE (handle)',
+            ),
+        ));
+        */
+
+/*
+        $homePage = FCom_Cms_Model_Page::i()->create(array(
+            'handle' => 'home',
+            'title' => 'Home Page',
+            'content' => file_get_contents(__DIR__.'/Frontend/views/_default/home.twig.html'),
+        ));
+*/
     }
 }

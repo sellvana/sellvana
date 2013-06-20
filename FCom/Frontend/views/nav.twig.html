@@ -2,7 +2,7 @@
 
 {% if conf.type == 'cms' %}
 
-    {{ THIS.view('cms/nav').set('root_id', conf.root_cms) | raw }}
+    {{ THIS.view('cms/nav-menu').set('root_id', conf.root_cms) | raw }}
 
 {% elseif conf.type == 'categories_root' %}
 

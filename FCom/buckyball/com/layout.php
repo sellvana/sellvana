@@ -88,11 +88,13 @@ class BLayout extends BClass
         'view'     => 'BLayout::metaDirectiveViewCallback',
     );
 
+    protected static $_renderers = array();
+
     /**
      * @var array
      */
     protected static $_extRenderers = array(
-        '.php' => array('renderer' => null),
+        '.php' => array('callback' => null),
     );
 
     /**
@@ -174,15 +176,41 @@ class BLayout extends BClass
      * @param array $params
      * @return $this
      */
-    public function addExtRenderer($ext, $params)
+    public function addRenderer($name, $params)
     {
-        if (is_string($params)) {
-            $params = array('renderer' => $params);
+        if (is_string($name) && is_string($params)) {
+            $params = array('file_ext' => array($name), 'callback' => $params);
         }
-        static::$_extRenderers[$ext] = $params;
-        static::$_extRegex           = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
+        if (is_string($params['file_ext'])) {
+            $params['file_ext'] = explode(';', $params['file_ext']);
+        }
+
+        static::$_renderers[$name] = $params;
+
+        foreach ($params['file_ext'] as $ext) {
+            static::$_extRenderers[$ext] = $params;
+        }
+        static::$_extRegex = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
         BDebug::debug('ADD RENDERER: '.$ext);
         return $this;
+    }
+
+    public function getAllRenderers($asOptions=false)
+    {
+        if ($asOptions) {
+            $options = array();
+            foreach (static::$_renderers as $k=>$r) {
+                $options[$k] = !empty($r['description']) ? $r['description'] : $k;
+            }
+            asort($options);
+            return $options;
+        }
+        return static::$_renderers;
+    }
+
+    public function getRenderer($name)
+    {
+        return !empty(static::$_renderers[$name]) ? static::$_renderers[$name] : null;
     }
 
     /**
@@ -241,7 +269,9 @@ class BLayout extends BClass
             }
             if (preg_match($re, $file, $m)) {
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
-                $this->addView($prefix . $m[2], array('template' => $file) + static::$_extRenderers[$m[3]]);
+                $viewParams = array('template' => $file, 'file_ext' => $m[3]);
+                $viewParams['renderer'] = static::$_extRenderers[$m[3]]['callback'];
+                $this->addView($prefix . $m[2], $viewParams);
             }
         }
 
@@ -1165,12 +1195,15 @@ class BView extends BClass
     }
 
     /**
-     * @param      $defaultFileExt
+     * @param string $defaultFileExt
      * @param bool $quiet
      * @return BView|mixed|string
      */
-    public function getTemplateFileName($defaultFileExt, $quiet = false)
+    public function getTemplateFileName($fileExt = null, $quiet = false)
     {
+        if (is_null($fileExt)) {
+            $fileExt = $this->getParam('file_ext');
+        }
         $template = $this->param('template');
         if (!$template && ($viewName = $this->param('view_name'))) {
             $template = $viewName . $defaultFileExt;
@@ -1211,14 +1244,17 @@ class BView extends BClass
     /**
      * View class specific rendering
      *
-     * Can be overridden for different template engines (Smarty, etc)
-     *
      * @return string
      */
     protected function _render()
     {
+        $renderer = $this->param('renderer');
+        if ($renderer) {
+            return call_user_func($renderer, $this);
+        }
+
         ob_start();
-        include $this->getTemplateFileName('.php');
+        include $this->getTemplateFileName();
         return ob_get_clean();
     }
 
@@ -1257,11 +1293,9 @@ class BView extends BClass
             $result .= "<!-- START VIEW: {$viewName} -->\n";
         }
         $result .= join('', BEvents::i()->fire('BView::render.before', array('view' => $this)));
-        if (($renderer = $this->param('renderer'))) {
-            $viewContent = call_user_func($renderer, $this);
-        } else {
-            $viewContent = $this->_render();
-        }
+
+        $viewContent = $this->_render();
+
         if ($retrieveMetaData) {
             $metaData = array();
             if (preg_match_all(static::$_metaDataRegex, $viewContent, $matches, PREG_SET_ORDER)) {

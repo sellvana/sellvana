@@ -20,5 +20,5 @@
         - foreach ($tabs as $k => $tab)
             - if (!empty($tab['view']))
                 %section.adm-tabs-content(id="tab-#{$k}" #{$k!==$this->cur_tab ? 'hidden' : ''} #{empty($tab['async']) ? 'data-loaded="true"' : ''})
-                - if (empty($tab['async']))
-                    - echo $this->view($tab['view'])
+                    - if (empty($tab['async']))
+                        - echo $this->view($tab['view'])

@@ -5,21 +5,15 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_cms_block';
     protected static $_origClass = __CLASS__;
 
-    public function render()
+    public function validate()
     {
-        $layout = BLayout::i();
-        $viewName = 'cms_block_'.$this->handle.'_'.strtotime($this->update_dt);
-        $layout->addView($viewName, array(
-            'renderer'    => 'BPHPTAL::renderer',
-            'source'      => $this->content,
-            'source_name' => $viewName,
-        ));
-        return $layout->view($viewName)->render();
+        return true;
     }
 
-    public function __toString()
+    public function afterCreate()
     {
-        return $this->render();
+        parent::afterCreate();
+        $this->set('renderer', 'BTwig');
     }
 
     public function beforeSave()
@@ -36,6 +30,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         $this->set('version', $this->version ? $this->version + 1 : '1');
 //        $this->set('version_comments', $this->version ? $this->version : '1');
         $this->set('update_dt', BDb::now());
+        $this->set('modified_time', time()); // attempt to compare with filemtime() for caching
         return true;
     }
 

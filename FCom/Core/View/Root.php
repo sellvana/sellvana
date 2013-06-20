@@ -13,7 +13,7 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
     public function addBodyClass($class)
     {
         $this->body_class = !$this->body_class ? (array)$class
-            : array_merge($this->body_class, (array)$class);
+            : array_merge((array)$this->body_class, (array)$class);
         return $this;
     }
 
