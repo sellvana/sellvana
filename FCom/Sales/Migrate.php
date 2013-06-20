@@ -309,9 +309,11 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_2_2__0_2_3()
     {
-        BDb::run("
-            RENAME TABLE fcom_sales_address TO fcom_sales_order_address;
-        ");
+        if (!BDb::ddlTableExists('fcom_sales_order_address')) {
+            BDb::run("
+                RENAME TABLE fcom_sales_address TO fcom_sales_order_address;
+            ");
+        }
         BDb::ddlTableDef(FCom_Sales_Model_Cart_Address::table(), array(
             'COLUMNS' => array(
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',

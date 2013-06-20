@@ -113,7 +113,11 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step3__POST()
     {
-        BConfig::i()->add(array('install_status'=>'installed'), true);
+        BConfig::i()->add(array(
+            'install_status' => 'installed',
+            'db' => array('implicit_migration' => 1),
+        ), true);
+        FCom_Core_Main::i()->writeDbConfig();
         FCom_Core_Main::i()->writeLocalConfig();
         BResponse::i()->redirect(BApp::baseUrl());
     }

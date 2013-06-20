@@ -1,6 +1,8 @@
 #Header unset ETag
 #FileETag None
 
+AddHandler application/x-httpd-php55 .php
+
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 months"
