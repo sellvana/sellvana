@@ -34,10 +34,10 @@ modules:
         root_dir: BFireLogger
         bootstrap: { file: BFireLogger.php, callback: BFireLogger::bootstrap }
 
-    BMarkdownExtra:
+    BMarkdown:
         version: 1.0.0
-        root_dir: BGanon
-        bootstrap: { file: markdown.php, callback: BMarkdown_Extra_Loader::bootstrap }
+        root_dir: BMarkdown
+        bootstrap: { file: BMarkdown.php, callback: BMarkdown::bootstrap }
 
     BHighcharts:
         version: 1.0.0

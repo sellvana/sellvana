@@ -1,3 +1,4 @@
+/*
 FCom.tabs = function(options) {
     var tabs = $(options.tabs);
     var curLi = $(options.tabs+'[class=active]');
@@ -21,7 +22,7 @@ FCom.tabs = function(options) {
         return false;
     });
 }
-
+*/
 FCom._ = function(str) {
 return FCom.i18n[str] || str;
 }

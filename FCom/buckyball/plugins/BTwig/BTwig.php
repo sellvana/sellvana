@@ -2,7 +2,7 @@
 
 class BTwig extends BClass
 {
-    protected static $_defaultFileExt = '.twig.html';
+    protected static $_cacheDir;
 
     protected static $_fcomVars;
 
@@ -14,7 +14,11 @@ class BTwig extends BClass
 
     public static function bootstrap()
     {
-        BLayout::i()->addExtRenderer(static::$_defaultFileExt, 'BTwig::renderer');
+        BLayout::i()->addRenderer('BTwig', array(
+            'description' => 'Twig (HTML)',
+            'callback' => 'BTwig::renderer',
+            'file_ext' => array('.twig', '.twig.html', '.html.twig'),
+        ));
 
         BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
     }
@@ -27,11 +31,11 @@ class BTwig extends BClass
 
         $config = BConfig::i();
 
-        $cacheDir = $config->get('fs/cache_dir').'/twig';
-        BUtil::ensureDir($cacheDir);
+        static::$_cacheDir = $config->get('fs/cache_dir').'/twig';
+        BUtil::ensureDir(static::$_cacheDir);
 
         $options = array(
-            'cache' => $cacheDir,
+            'cache' => static::$_cacheDir,
             'debug' => 1,#$config->get('modules/BTwig/debug'),
             'auto_reload' => 1,#$config->get('modules/BTwig/auto_reload'),
         );
@@ -68,7 +72,7 @@ class BTwig extends BClass
 
     public static function onLayoutAddAllViews($args)
     {
-        $moduleName = is_string($args['module']) ? $args['module'] : 
+        $moduleName = is_string($args['module']) ? $args['module'] :
             (is_object($args['module']) ? $args['module']->name : null);
         static::addPath($args['root_dir'], $args['module']->name);
     }
@@ -87,7 +91,7 @@ class BTwig extends BClass
 
         $pId = BDebug::debug('BTwig render: '.$viewName);
 
-        $source = $view->param('source');
+        $source = $view->getParam('source');
         $args = $view->getAllArgs();
         //TODO: add BRequest and BLayout vars?
         $args['THIS'] = $view;
@@ -96,7 +100,7 @@ class BTwig extends BClass
 
             //$filename = $view->getTemplateFileName(static::$_defaultFileExt);
             $modName = $view->getParam('module_name');
-            $template = static::$_fileTwig->loadTemplate('@'.$modName.'/'.$viewName.static::$_defaultFileExt);
+            $template = static::$_fileTwig->loadTemplate('@'.$modName.'/'.$viewName . $view->getParam('file_ext'));
             $output = $template->render($args);
 
         } else {
