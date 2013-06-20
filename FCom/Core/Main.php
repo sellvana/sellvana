@@ -215,8 +215,9 @@ class FCom_Core_Main extends BClass
             die;
         }
 
-        if (file_exists($config->get('fs/config_dir').'/core.yml')) {
-            $config->addFile('core.yml', true);
+        $configDir = $config->get('fs/config_dir');
+        if (file_exists($configDir.'/core.php')) {
+            $config->addFile('core.php', true);
         }
 
         $this->initDebug();
@@ -265,11 +266,10 @@ class FCom_Core_Main extends BClass
 
         BModuleRegistry::i()->processRequires()->processDefaultConfig();
 
-        // DB configuration is separate to gitignore
-        if (file_exists($config->get('fs/config_dir').'/db.yml')) {
-            $config->addFile('db.yml', true);
+        if (file_exists($configDir.'/db.php')) {
+            $config->addFile('db.php', true);
         }
-        if (file_exists($config->get('fs/config_dir').'/local.yml')) {
+        if (file_exists($configDir.'/local.yml')) {
             $config->addFile('local.yml', true);
         }
 
@@ -298,7 +298,7 @@ class FCom_Core_Main extends BClass
     public function writeDbConfig()
     {
         $c = array('db'=>BConfig::i()->get('db', true));
-        BConfig::i()->writeFile('db.yml', $c);
+        BConfig::i()->writeFile('db.php', $c); // PHP for simpler loading
         return $this;
     }
 
@@ -306,15 +306,18 @@ class FCom_Core_Main extends BClass
     {
         $config = BConfig::i();
         $c = $config->get(null, true);
+        // collect configuration necessary for core startup
         $m = array(
             'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
             'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
             'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
             'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
+            'cache' => !empty($c['cache']) ? $c['cache'] : null,
         );
-        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'], $c['mode_by_ip']);
+        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'],
+            $c['mode_by_ip'], $c['cache']);
+        $config->writeFile('core.php', $m); // PHP for simpler loading
         $config->writeFile('local.yml', $c);
-        $config->writeFile('core.yml', $m);
         return $this;
     }
 
