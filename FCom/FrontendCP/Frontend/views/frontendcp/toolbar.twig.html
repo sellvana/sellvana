@@ -26,6 +26,8 @@
             {% if user.getPermission('frontendcp/edit') %}
                 <button type="button" id="admin-toolbar--edit">{{ 'Edit Page Contents' |_ }}</button>
             {% endif %}
+
+            {{ THIS.hook('frontendcp/toolbar') | raw }}
         </div>
     </div>
 
@@ -63,7 +65,7 @@
                     top.location.href = location.href
                         .replace(/mercury_frame=true/, '')
                         .replace(/_=[0-9]+/, '')
-                        .replace(/&$/, '')
+                        .replace(/&+$/, '')
                         .replace(/\?$/, '');
                     return false;
                 })

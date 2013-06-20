@@ -2093,8 +2093,10 @@ class BModel extends Model
                 if (!$this->beforeSave()) {
                      $this->beforeSave();
                 }
-                BEvents::i()->fire($this->origClass().'::beforeSave', array('model'=>$this));
-                BEvents::i()->fire('BModel::beforeSave', array('model'=>$this));
+                BEvents::i()->fire($this->origClass().'::beforeSave', array('model'=>$this)); //deprecated
+                BEvents::i()->fire($this->origClass().'::save.before', array('model'=>$this));
+                BEvents::i()->fire('BModel::beforeSave', array('model'=>$this)); //deprecated
+                BEvents::i()->fire('BModel::save.before', array('model'=>$this));
             } catch (BModelException $e) {
                 return $this;
             }
@@ -2106,8 +2108,10 @@ class BModel extends Model
 
         if ($beforeAfter) {
             $this->afterSave();
-            BEvents::i()->fire($this->_origClass().'::afterSave', array('model'=>$this));
-            BEvents::i()->fire('BModel::afterSave', array('model'=>$this));
+            BEvents::i()->fire($this->_origClass().'::afterSave', array('model'=>$this)); //deprecated
+            BEvents::i()->fire($this->_origClass().'::save.after', array('model'=>$this));
+            BEvents::i()->fire('BModel::afterSave', array('model'=>$this)); //deprecated
+            BEvents::i()->fire('BModel::save.after', array('model'=>$this));
         }
 
         if (static::$_cacheAuto) {
