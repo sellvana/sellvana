@@ -26,7 +26,7 @@ class FCom_Cms_Migrate extends BClass
             CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
-
+/*
         $tPage = FCom_Cms_Model_Page::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPage} (
@@ -60,7 +60,7 @@ class FCom_Cms_Migrate extends BClass
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
-
+*/
         $tBlock = FCom_Cms_Model_Block::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tBlock} (

@@ -1364,6 +1364,7 @@ class BEvents extends BClass
             }
             return $this;
         }
+        $eventName = strtolower($eventName);
         $this->_events[$eventName] = array(
             'observers' => array(),
             'args' => $args,
@@ -1395,6 +1396,7 @@ class BEvents extends BClass
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers
+        $eventName = strtolower($eventName);
         $this->_events[$eventName]['observers'][] = $observer;
         BDebug::debug('SUBSCRIBE '.$eventName, 1);
         return $this;
@@ -1409,6 +1411,7 @@ class BEvents extends BClass
     */
     public function off($eventName, $callback=null)
     {
+        $eventName = strtolower($eventName);
         if (is_null($callback)) {
             unset($this->_events[$eventName]);
             return $this;
@@ -1428,15 +1431,13 @@ class BEvents extends BClass
     *
     * dispatch|fire|notify|pub|publish ?
     *
-    * instead of call-time pass-by-reference use object for $args
-    * for compatibility with PHP 5.4.0
-    *
     * @param string $eventName
     * @param array|object $args
     * @return array Collection of results from observers
     */
     public function fire($eventName, $args=array())
     {
+        $eventName = strtolower($eventName);
         BDebug::debug('FIRE '.$eventName.(empty($this->_events[$eventName])?' (NO SUBSCRIBERS)':''), 1);
         $result = array();
         if (empty($this->_events[$eventName])) {
@@ -1511,6 +1512,17 @@ if (!class_exists($r[0])) {
             }
         }
         return $result;
+    }
+
+    public function fireRegex($eventRegex, $args)
+    {
+        $results = array();
+        foreach ($this->_events as $eventName => $event) {
+            if (preg_match($eventRegex, $eventName)) {
+                $results += (array)$this->fire($eventName, $args);
+            }
+        }
+        return $results;
     }
 
     public function debug()

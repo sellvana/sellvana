@@ -234,6 +234,11 @@ class FCom_CatalogIndex_Main extends BClass
         //TODO: implement 1 field reindexing for all affected products
     }
 
+    static public function reindexFieldValue($field, $value)
+    {
+        //TODO: implement 1 field value reindexing
+    }
+
     static public function indexCleanMemory($all=false)
     {
         static::$_indexData = null;
@@ -551,4 +556,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         return array('orm'=>$productsOrm, 'facets'=>$facets);
     }
 
+    static public function onProductSaveAfter($args)
+    {
+        static::indexProducts(array($args['model']));
+    }
 }

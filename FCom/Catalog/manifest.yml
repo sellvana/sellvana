@@ -32,6 +32,9 @@ modules:
                     - [ GET, /*category/:product, FCom_Catalog_Frontend_Controller.product ]
                     - [ GET, /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
 
+                observe:
+                     - [ FCom_FrontendCP_Frontend_Controller::action_update.after, FCom_Catalog_Frontend_ControlPanel::onAfterUpdate ]
+
             FCom_Api:
                 routing:
                     - [ any, /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
