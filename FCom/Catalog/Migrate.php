@@ -137,4 +137,19 @@ class FCom_Catalog_Migrate extends BClass
 
         BDb::run("REPLACE INTO {$tCategory} (id,id_path) VALUES (1,1)");
     }
+
+    public function upgrade__0_2_2__0_2_3()
+    {
+        BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
+            'COLUMNS' => array(
+                'images_data' => 'DROP',
+                'data_serialized' => 'mediumtext null',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Catalog_Model_Category::table(), array(
+            'COLUMNS' => array(
+                'data_serialized' => 'mediumtext null',
+            ),
+        ));
+    }
 }

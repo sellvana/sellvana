@@ -90,7 +90,7 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                 'editurl' => BApp::href('customfields/fieldsets/field_grid_data'),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>30),
-                    'field_code' => array('label'=>'Field Code', 'width'=>200, 'editable'=>true),
+                    'field_code' => array('label'=>'Field Code', 'width'=>200, 'editable'=>'new'),
                     'field_name' => array('label'=>'Field Name', 'width'=>200, 'editable'=>true),
                     'frontend_label' => array('label'=>'Frontend Label', 'width'=>200, 'editable'=>true),
                     'frontend_show' => array('label'=>'Show on frontend', 'width'=>50, 'editable'=>true,
@@ -120,14 +120,12 @@ for (i=0; i<src.length; i++) data.push({id:src[i], field_code:src[i]});
                     'multiselect' => true,
                     'autowidth' => false,
                 ),
-                'navGrid'=>array('add'=>true, 'edit'=>true, 'del'=>true, 'refresh'=>true, 'search'=>false,
-                    'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
-                ),
+                'navGrid'=>array('add'=>true, 'edit'=>true, 'del'=>true, 'refresh'=>true, 'search'=>false),
             ),
             'navGrid' => array('add'=>true, 'addtext'=>'New', 'addtitle'=>'Create new Field', 'edit'=>true, 'del'=>true),
             'custom' => array('personalize'=>true),
             #'inlineNav' => array(),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn', 'searchOperators' => true),
         );
         return $config;
     }

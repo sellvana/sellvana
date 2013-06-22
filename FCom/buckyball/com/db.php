@@ -1353,7 +1353,7 @@ exit;
             echo 'TO: '; print_r($this->_dirty_fields); echo "\n\n";
             $result = true;
         }
-        $this->_old_values = array();
+        //$this->_old_values = array(); // commented out to make original loaded object old values available after save
         return $result;
     }
 
