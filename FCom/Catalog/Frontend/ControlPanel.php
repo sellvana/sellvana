@@ -21,9 +21,10 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
         $field = $params['data']['field'];
         $value = isset($params['value']) ? $params['value'] : null;
         if ($params['type']==='image') {
-            if (preg_match('/resize\.php\?f=media%2F([^&]+)/', $params['attributes']['src'], $m)) {
+            //TODO: ugly, but is there a better way?
+            if (preg_match('/resize\.php\?f=media%2F([^&]+)/', $params['attributes']['src'], $m)) { 
                 $src = urldecode($m[1]);
-                if ($src!=='image-not-found.jpg') { // TODO: make configurable
+                if ($src!=='image-not-found.jpg') {
                     $value = $src;
                 }
             } else {

@@ -26,6 +26,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                 'rowNum'        => 20,
                 'rowList'       => array(10, 20, 50, 100, 200),
                 'pager'         => true,
+                'toppager'      => true,
                 'gridview'      => true,
                 'viewrecords'   => true,
                 'shrinkToFit'   => false,
@@ -37,7 +38,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                 'multiselectWidth' => 30,
                 'ignoreCase'    => true,
            ),
-           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
+           'navGrid' => array('cloneToTop'=>true, 'add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
                 'search'=>array('multipleSearch'=>true, 'multipleGroup'=>true),
            )),
         );
@@ -300,7 +301,8 @@ return [true, 'Testing error'];
         $isSubGrid = !empty($cfg['isSubGrid']);
         if (!$isSubGrid) {
             $id = $cfg['grid']['id'];
-            $html = "<table id=\"{$id}\"></table>";
+            $html = '';
+            $html .= "<table id=\"{$id}\"></table>";
             if (!empty($cfg['grid']['pager'])) {
                 $pagerId = true===$cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
                 $cfg['grid']['pager'] = $pagerId;
@@ -326,14 +328,17 @@ return [true, 'Testing error'];
             if (is_numeric($k)) {
                 $k = array_shift($opt);
             }
-            if (empty($quotedPagerId)) {
+            if (empty($quotedPagerId) && !empty($pagerId)) {
                 if (!empty($opt['_pager'])) {
                     $localPagerId = $opt['_pager'];
                     unset($opt['_pager']);
                 } else {
-                    $localPagerId = $pagerId;
+                    $localPagerId = 'pg_'.$id.'_toppager'; #$pagerId;
                 }
                 $quotedPagerId = "'#{$localPagerId}'";
+            }
+            if (empty($quotedPagerId)) {
+                $quotedPagerId = 'false';
             }
             if (is_array($opt) && !empty($opt['prm'])) {
                 $prm = $opt['prm'];
