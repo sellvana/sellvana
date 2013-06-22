@@ -6,6 +6,7 @@ modules:
         auto_use: [ views, layout ]
         observe:
             - [ FCom_Catalog_Model_Product::save.after, FCom_CatalogIndex_Main::onProductSaveAfter ]
+            - [ FCom_CustomField_Model_Field::save.after, FCom_CatalogIndex_Main::onCustomFieldSaveAfter ]
         areas:
             FCom_Admin:
                 routing:

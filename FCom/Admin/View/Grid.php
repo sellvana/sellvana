@@ -6,20 +6,20 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
     {
         $this->default_config = array(
             'grid' => array(
-                'prmNames' => array(
-                    'page' => 'p',
-                    'rows' => 'ps',
-                    'sort' => 's',
-                    'order' => 'sd',
+                'prmNames'      => array(
+                    'page'          => 'p',
+                    'rows'          => 'ps',
+                    'sort'          => 's',
+                    'order'         => 'sd',
                 ),
-                'datatype'  => 'json',
-                'jsonReader' =>  array(
-                    'root' => 'rows',
-                    'page'=>'p',
-                    'total'=>'mp',
-                    'records'=>'c',
-                    'repeatitems'=>false,
-                    'id'=>'id',
+                'datatype'      => 'json',
+                'jsonReader'    => array(
+                    'root'          => 'rows',
+                    'page'          => 'p',
+                    'total'         => 'mp',
+                    'records'       => 'c',
+                    'repeatitems'   => false,
+                    'id'            => 'id',
                 ),
                 'sortname'      => 'id',
                 'sortorder'     => 'asc',
@@ -183,6 +183,7 @@ var subgrid = $('#'+subgrid_table_id);
         $cfg = $this->_processSubGridConfig($cfg);
 
         $pos = 0;
+        $editableOnlyNew = array();
         foreach ($cfg['grid']['colModel'] as &$col) {
             if (!empty($col['position'])) {
                 $pos = $col['position'];
@@ -221,8 +222,25 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
                 if (!isset($col['searchoptions']['defaultValue'])) $col['searchoptions']['defaultValue'] = '';
                 unset($col['options']);
             }
+            if (!empty($col['editable']) && $col['editable']==='new') {
+                $col['editable'] = true;
+                $editableOnlyNew[] = $col['name'];
+            }
         }
         unset($col);
+        if (!empty($editableOnlyNew)) {
+            $jsEditArr = array();
+            $jsAddArr = array();
+            foreach ($editableOnlyNew as $name) {
+                $jsText = "$('#tr_{$name} input, #tr_{$name} select', form).attr('readonly', ";
+                $jsEditArr[] = $jsText."'readonly');";
+                $jsAddArr[] = $jsText."false);";
+            }
+            //TODO: jqGrid edit events don't trigger ?!?!
+            $cfg['navGrid']['prm']['edit']['beforeShowForm'] = "function(form) { console.log('edit'); ".join('', $jsEditArr)." }";
+            $cfg['navGrid']['prm']['add']['beforeShowForm'] = "function(form) { console.log('add'); ".join('', $jsAddArr)." }";
+        }
+
         usort($cfg['grid']['colModel'], function($a, $b) {
             $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
         });
@@ -254,6 +272,9 @@ $('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'".addslashes($cfg['custom']
                 'onClickButton' => "function() {
                     $('body').append('<iframe src=\"{$exportUrl}\" display=\"none\"></iframe');
                 }");
+        }
+        if  (!empty($cfg['grid']['toppager']) && !empty($cfg['grid']['id'])) {
+            $cfg[] = "$('#pager-{$cfg['grid']['id']}').hide()";
         }
         /*
         if (!empty($cfg['custom']['hashState'])) {
@@ -317,7 +338,7 @@ return [true, 'Testing error'];
 
         $extraJS = array();
         $extraHTML = array();
-        foreach ($cfg as $k=>$opt) {
+        foreach ($cfg as $k => $opt) {
             if ($k==='html') {
                 $extraHTML[] = join('', (array)$opt);
                 continue;
@@ -333,7 +354,7 @@ return [true, 'Testing error'];
                     $localPagerId = $opt['_pager'];
                     unset($opt['_pager']);
                 } else {
-                    $localPagerId = 'pg_'.$id.'_toppager'; #$pagerId;
+                    $localPagerId = $id.'_toppager'; #$pagerId;
                 }
                 $quotedPagerId = "'#{$localPagerId}'";
             }
@@ -503,6 +524,10 @@ return [true, 'Testing error'];
         $fp = fopen($filename, 'w');
         fputcsv($fp, $headers);
         $orm->iterate(function($row) use($columns, $fp) {
+            if ($class) {
+                //TODO: any faster solution?
+                BEvents::i()->fire($class.'::action_grid_data.data_row', array('row'=>$row, 'columns'=>$columns));
+            }
             $data = array();
             foreach ($columns as $col) {
                 if (!empty($col['hidden'])) continue;

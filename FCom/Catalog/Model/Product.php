@@ -5,6 +5,18 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
 
+    protected static $_fieldOptions = array(
+        'stock_status' => array(
+            'in_stock' => 'In Stock',
+            'backorder' => 'On Backorder',
+            'special_order' => 'Special Order',
+            'do_not_carry' => 'Do Not Carry',
+            'temp_unavail' => 'Temporarily Unavailable',
+            'vendor_disc' => 'Supplier Discontinued',
+            'manuf_disc' => 'MFR Discontinued',
+        ),
+    );
+
     private $_importErrors = null;
     private $_dataImport = array();
 
@@ -21,18 +33,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public static function stockStatusOptions($onlyAvailable=false)
     {
-        $options = array(
-            'in_stock' => 'In Stock',
-            'backorder' => 'On Backorder',
-            'special_order' => 'Special Order',
-        );
-        if (!$onlyAvailable) {
-            $options += array(
-                'do_not_carry' => 'Do Not Carry',
-                'temp_unavail' => 'Temporarily Unavailable',
-                'vendor_disc' => 'Supplier Discontinued',
-                'manuf_disc' => 'MFR Discontinued',
-            );
+        $options = $this->fieldOptions('stock_status');
+        if ($onlyAvailable) {
+            return BUtil::arrayMask($options, 'in_stock,backorder,special_order');
         }
         return $options;
     }

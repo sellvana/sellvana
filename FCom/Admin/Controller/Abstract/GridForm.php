@@ -48,7 +48,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'toppager' => true,
             ),
             'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id='),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn', 'searchOperators' => true),
         );
         BEvents::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
         return $config;
@@ -87,7 +87,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         $oc = static::$_origClass;
 
-        $gridConfig = $oc::i()->gridConfig();
+        $gridConfig = $this->gridConfig();
         $gridId = $gridConfig['grid']['id'];
         if (!$gridId) {
             $gridId = $oc;
@@ -95,11 +95,17 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         $grid = FCom_Admin_View_Grid::i();
         if ($export) {
-            $grid->set('config', $this->gridConfig())->export($orm, $oc);
+            $grid->set('config', $gridConfig)->export($orm, $oc);
         } else {
             $data = $grid->processORM($orm, $oc.'::action_grid_data', $gridId);
+            $data = $this->gridDataAfter($data);
             BResponse::i()->json($data);
         }
+    }
+
+    public function gridDataAfter($data)
+    {
+        return $data;
     }
 
     public function gridOrmConfig($orm)

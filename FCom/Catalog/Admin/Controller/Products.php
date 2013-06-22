@@ -14,7 +14,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $columns = array(
             'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
             'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true),
-            'manuf_sku'=>array('label'=>'Mfr Part #', 'index'=>'p.manuf_sku', 'width'=>100),
+            'local_sku'=>array('label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
             'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
             'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
         );
@@ -32,7 +32,24 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function gridOrmConfig($orm)
     {
+        parent::gridOrmConfig($orm);
         $orm->use_index('primary');
+    }
+
+    public function gridDataAfter($data)
+    {
+        foreach ($data as $row) {
+            if (!empty($row['data_serialized'])) {
+                $unserialized = BUtil::fromJson($row['data_serialized']);
+                if (!empty($unserialized['custom_data'])) {
+                    foreach ($unserialized['custom_data'] as $k => $v) {
+                        $row[$k] = $v;
+                    }
+                }
+                unset($row['data_serialized']);
+            }
+        }
+        return $data;
     }
 
     public function formViewBefore($args)

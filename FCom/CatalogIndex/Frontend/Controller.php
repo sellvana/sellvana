@@ -4,8 +4,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 {
     public function action_reindex()
     {
-        FCom_CatalogIndex_Main::i()->indexProducts(true);
-        FCom_CatalogIndex_Main::i()->indexGC();
+        FCom_CatalogIndex_Indexer::i()->indexProducts(true);
+        FCom_CatalogIndex_Indexer::i()->indexGC();
     }
 
     public function action_test()
@@ -87,13 +87,13 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // reindex products
         if (true) {
-            FCom_CatalogIndex_Main::i()->indexProducts($products);//FCom_Catalog_Model_Product::i()->orm()->find_many());
-            FCom_CatalogIndex_Main::i()->indexGC();
+            FCom_CatalogIndex_Indexer::i()->indexProducts($products);//FCom_Catalog_Model_Product::i()->orm()->find_many());
+            FCom_CatalogIndex_Indexer::i()->indexGC();
         }
 
         // show sample search result
         if (false) {
-            $result = FCom_CatalogIndex_Main::i()->searchProducts('lorem', array(
+            $result = FCom_CatalogIndex_Indexer::i()->searchProducts('lorem', array(
                 'category' => 'category-1/subcategory-1-1',
                 'color'=>'Green',
                 'size'=>'Medium',
@@ -119,7 +119,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex_Main::i()->searchProducts(null, null, null, array('category'=>$category));
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, null, array('category'=>$category));
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsData['orm']));
         $r = BRequest::i()->get();
         $r['sc'] = '';
@@ -171,7 +171,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex_Main::i()->searchProducts();
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts();
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsData['orm']));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];
