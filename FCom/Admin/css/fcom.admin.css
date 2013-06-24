@@ -264,6 +264,15 @@ button.sz2, input[type="submit"].sz2, input[type="button"].sz2 { padding:6px 15p
 
 
 /* jQuery UI Tables */
+.ui-jqgrid .ui-search-table .ui-search-input>input,
+.ui-jqgrid .ui-search-table .ui-search-input>select
+{
+    display: block;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 .ui-widget { font:12px/1.2 'Helvetica Nue', Arial, Helvetica, sans-serif; }
 .ui-jqgrid { border:none; }
 .ui-jqgrid tr.jqgrow td { padding:5px; }
