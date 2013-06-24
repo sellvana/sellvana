@@ -65,7 +65,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                     foreach ($f['rules'] as $rule) {
                         $idx = $rule['field'];
                         foreach ($cfg['grid']['columns'] as $colId=>&$col) {
-                            if ($colId===$idx || !empty($col['index']) && $col['index']===$idx) {
+                            if ($colId===$idx || !empty($col['index']) && $col['index']===$idx && $rule['data']!=='') {
                                 $col['searchoptions']['defaultValue'] = $rule['data'];
                                 break;
                             }
@@ -82,6 +82,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
         if (!empty($cfg['custom']['columnChooser'])) {
             $cfg[] = array('navButtonAdd',
                 'caption' => '',
+                //'modal' => true,
                 'title' => 'Customize Columns',
                 'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() { $('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
@@ -143,7 +144,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
     protected function _processSubGridConfig($cfg)
     {
         if (!empty($cfg['subGrid']) && is_array($cfg['subGrid'])) {
-            $cfg['grid']['gridview'] = false;
+            $cfg['grid']['gridview'] = true;
             $cfg['grid']['subGrid'] = true;
             $cfg['grid']['subGridOptions'] = array(
                 'plusicon' => 'ui-icon-triangle-1-e',
@@ -218,7 +219,7 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
                 if (!isset($col['stype'])) $col['stype'] = 'select';
                 if (!isset($col['edittype'])) $col['edittype'] = 'select';
                 if (!isset($col['editoptions']['value'])) $col['editoptions']['value'] = $options;
-                if (!isset($col['searchoptions']['value'])) $col['searchoptions']['value'] = ':All;'.$options;
+                if (!isset($col['searchoptions']['value'])) $col['searchoptions']['value'] = ':;'.$options;
                 if (!isset($col['searchoptions']['defaultValue'])) $col['searchoptions']['defaultValue'] = '';
                 unset($col['options']);
             }
@@ -411,6 +412,9 @@ return [true, 'Testing error'];
         if (!empty($filter['rules'])) {
             foreach ($filter['rules'] as $r) {
                 $data = $r['data'];
+                if ($data==='') {
+                    continue;
+                }
                 switch ($r['op']) {
                     case 'bw': $part = array($r['field'].' LIKE ?', $data.'%'); break;
                     case 'bn': $part = array($r['field'].' NOT LIKE ?', $data.'%'); break;

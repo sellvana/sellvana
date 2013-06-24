@@ -741,77 +741,35 @@ console.log(url_get, url_post);
     };
 }
 
-/*
+
 $.extend($.jgrid.defaults, {
+
 });
-*/
 
-FCom.Admin.jqGrid = function(id, options) {
-    var i, grid = $("#"+id), opt = {
-        grid: {
-            mtype:'POST'
-            ,datatype: "json"
-            ,jsonReader: {root:'rows', page:'p', total:'mp', records:'c', repeatitems:false, id:'id'}
-            ,rowList : [20,30,50]
-            //,scroll:1
-            //,loadonce:true
-            ,gridview: true
-            ,viewrecords: true
-            ,pager: '#'+id+'-pager'
-            ,shrinkToFit:true
-            ,autowidth:true
-            //,altRows:true
-            ,height:'100%'
-        },
-        nav: {
-            params: { add:true, del:true, edit:true }
-        }
-    };
-    $.extend(true, opt, options);
-    if (!grid.length) {
-        $(opt.parent).append('<table id="'+id+'"></table><div id="'+id+'-pager"></div>');
-        grid = $("#"+id);
-    }
-    if (opt.tableDnD) {
-        grid.tableDnD(opt.tableDnD);
-        $.extend(true, opt.grid, {
-            gridComplete: function() {
-                $("#_empty",grid).addClass("nodrag nodrop");
-                grid.tableDnDUpdate();
-            }
-        });
-    }
-    if (opt.tree) {
-        $.extend(true, opt.grid, {
-            treeGrid: true
-            ,treeGridModel: 'adjacency'
-            ,treeReader: {
-                level_field:'level'
-                ,parent_id_field:'parent_id'
-                ,leaf_field:'is_leaf'
-                ,expanded_field:'is_expanded'
-            }
-            ,gridView:false
-            ,ExpandColumn:'node_name'
-        }, opt.tree);
-    }
-    grid.jqGrid(opt.grid);
+$.extend($.jgrid.edit, {
 
-    function autoresize() {
-        var p = $(opt.parent) || grid.parents('.ui-layout-pane');
-        grid.jqGrid('setGridWidth', p.width()-20).jqGrid('setGridHeight', p.height()-80);
-    }
+});
 
-    if (opt.nav) {
-        grid.jqGrid('navGrid','#'+id+'-pager', opt.nav.params||{}, opt.nav.edit||{},
-            opt.nav.add||{}, opt.nav.del||{}, opt.nav.search||{}, opt.nav.view||{});
-    }
-    if (opt.plugins) {
-        for (i in opt.plugins) grid.jqGrid(i, opt.plugins[i]);
-    }
+$.extend($.jgrid.add, {
 
-    return {autoresize:autoresize};
-}
+});
+
+$.extend($.jgrid.del, {
+
+});
+
+$.extend($.jgrid.view, {
+
+});
+
+$.extend($.jgrid.search, {
+
+});
+
+$.extend($.jgrid.nav, {
+
+});
+
 
 FCom.Admin.jqGrid.fmtHiddenInput = function (cellvalue, options, rowObject) {
     console.log(cellvalue,options,rowObject);
