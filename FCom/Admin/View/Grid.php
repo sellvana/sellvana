@@ -38,7 +38,7 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
                 'multiselectWidth' => 30,
                 'ignoreCase'    => true,
            ),
-           'navGrid' => array('cloneToTop'=>true, 'add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
+           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
                 'search'=>array('multipleSearch'=>true, 'multipleGroup'=>true),
            )),
         );
@@ -273,9 +273,6 @@ $('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'".addslashes($cfg['custom']
                     $('body').append('<iframe src=\"{$exportUrl}\" display=\"none\"></iframe');
                 }");
         }
-        if  (!empty($cfg['grid']['toppager']) && !empty($cfg['grid']['id'])) {
-            $cfg[] = "$('#pager-{$cfg['grid']['id']}').hide()";
-        }
         /*
         if (!empty($cfg['custom']['hashState'])) {
             $cfg['grid']['serializeGridData'] = "function(data) {
@@ -326,7 +323,8 @@ return [true, 'Testing error'];
             $html .= "<table id=\"{$id}\"></table>";
             if (!empty($cfg['grid']['pager'])) {
                 $pagerId = true===$cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
-                $cfg['grid']['pager'] = $pagerId;
+                $cfg['grid']['pager'] = false;
+                $cfg['grid']['toppager'] = $pagerId;
                 $html .= "<div id=\"{$pagerId}\"></div>";
             }
             $html .= "<script>$(function() { $('#{$id}')";

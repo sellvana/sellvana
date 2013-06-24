@@ -13,7 +13,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     public function categoryProductGridConfig($model)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
-            ->select(array('p.id', 'p.product_name', 'p.manuf_sku'))
+            ->select(array('p.id', 'p.product_name', 'p.local_sku'))
             ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
@@ -29,7 +29,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-                    array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
+                    array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'local_sku', 'width'=>70),
                 ),
                 'rowNum'        => 10,
                 'sortname'      => 'p.product_name',

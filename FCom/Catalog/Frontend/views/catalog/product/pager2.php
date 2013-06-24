@@ -5,8 +5,8 @@ $sortOptions = $this->sort_options ? $this->sort_options : array(
     '' => 'Sort...',
     'product_name|asc' => 'Product Name (A-Z)',
     'product_name|desc' => 'Product Name (Z-A)',
-    'manuf_sku|asc' => 'Manuf SKU (A-Z)',
-    'manuf_sku|desc' => 'Manuf SKU (Z-A)',
+    'local_sku|asc' => 'SKU (A-Z)',
+    'local_sku|desc' => 'SKU (Z-A)',
     'base_price|asc' => 'Price (Lower first)',
     'base_price|desc' => 'Price (Higher first)',
 );
