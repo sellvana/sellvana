@@ -82,7 +82,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        //$key = $this->manuf()->manuf_name.'-'.$this->manuf_sku.'-'.$this->product_name;
+        //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
         $this->set('url_key', BLocale::transliterate($key));
         return $this;
@@ -110,7 +110,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $result[$i] = array(
                 'id'                => $product->id,
                 'product_name'      => $product->product_name,
-                'sku'               => $product->manuf_sku,
+                'sku'               => $product->local_sku,
                 'price'             => $product->base_price,
                 'url'               => $product->url_key,
                 'weight'            => $product->weight,
@@ -132,7 +132,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $data['product_name'] = $post['product_name'];
         }
         if (!empty($post['sku'])) {
-            $data['manuf_sku'] = $post['sku'];
+            $data['local_sku'] = $post['sku'];
         }
         if (!empty($post['price'])) {
             $data['base_price'] = $post['price'];
@@ -211,7 +211,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $and = array();
         if ($qs) {
             foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
-            $productsORM->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+            $productsORM->where(array('OR'=>array('local_sku'=>$q, 'AND'=>$and)));
         }
 
         if (!empty($filter)){

@@ -29,6 +29,7 @@ class FCom_CatalogIndex_Main extends BClass
                 }
             }
         }
+        return static::$_filterParams;
     }
 
     static public function getUrl($add=array(), $remove=array())

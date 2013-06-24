@@ -193,7 +193,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $data = FCom_Promo_Model_Product::i()->orm()->table_alias('pp')
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pp.product_id'), 'p')
                 ->select('pp.group_id')
-                ->select('p.id')->select('p.product_name')->select('p.manuf_sku')
+                ->select('p.id')->select('p.product_name')->select('p.local_sku')
                 ->where('promo_id', $model->id)->find_many();
             foreach ($data as $p) {
                 $groupData[$p->group_id][] = $p->as_array();
@@ -215,7 +215,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'colModel'      => array(
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-                    array('name'=>'manuf_sku', 'label'=>'Mfr Part #', 'index'=>'manuf_sku', 'width'=>70),
+                    array('name'=>'local_sku', 'label'=>'Mfr Part #', 'index'=>'local_sku', 'width'=>70),
                 ),
                 'rowNum'        => 10,
                 'sortname'      => 'p.product_name',

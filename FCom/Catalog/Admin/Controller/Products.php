@@ -143,7 +143,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function linkedProductGridConfig($model, $type)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
-            ->select(array('p.id', 'p.product_name', 'p.manuf_sku'));
+            ->select(array('p.id', 'p.product_name', 'p.local_sku'));
 
         switch ($type) {
         case 'related': case 'similar':
@@ -169,7 +169,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'columns'       => array(
                     'id' => array('label'=>'ID', 'width'=>30),
                     'product_name' => array('label'=>'Product name', 'width'=>250),
-                    'manuf_sku' => array('label'=>'Mfr Part #', 'width'=>250),
+                    'local_sku' => array('label'=>'Local SKU', 'width'=>250),
                 ),
                 'rowNum'        => 10,
                 'sortname'      => 'product_name',

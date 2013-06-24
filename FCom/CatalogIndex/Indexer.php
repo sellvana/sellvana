@@ -215,7 +215,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
      */
     static public function searchProducts($search=null, $filters=null, $sort=null, $options=array())
     {
-        static::parseUrl();
+        $filterParams = FCom_CatalogIndex_Main::i()->parseUrl();
 
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
@@ -246,7 +246,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         if (is_null($filters)) {
-            $filters = static::$_filterParams;
+            $filters = $filterParams;
         }
 
         // result for facet counts

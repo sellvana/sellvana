@@ -124,7 +124,7 @@
                     $product = BUtil::fromJson($item->product_info);
                     ?>
                     <li>Product: <?=$product['product_name']?></li>
-                    <li>SKU: <?=$product['manuf_sku']?></li>
+                    <li>SKU: <?=$product['local_sku']?></li>
                     <li>Price: <?=$product['base_price']?></li>
                     <li>Qty:
                         <input type="text" name="model[items][<?=$item->id?>][qty]" value="<?=$item->qty?>" onkeyup="$('#total_<?=$item->id?>').val(<?=$product['base_price']?>*this.value)">
@@ -303,7 +303,7 @@
                     $product = BUtil::fromJson($item->product_info);
                     ?>
                     <li>Product: <?=$product['product_name']?></li>
-                    <li>SKU: <?=$product['manuf_sku']?></li>
+                    <li>SKU: <?=$product['local_sku']?></li>
                     <li>Price: <?=$product['base_price']?></li>
                     <li>Qty: <?=$item->qty?></li>
                     <li>Total: <?=$item->total?></li>

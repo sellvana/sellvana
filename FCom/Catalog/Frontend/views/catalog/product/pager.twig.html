@@ -3,13 +3,13 @@
 {% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'list' %}
 
 {% set psOptions = { 25:25, 50:50, 100:100, 500:500 } %}
-{% set sortOptions = THIS.get("sort_options") %} 
-{% if not sortOptions %} 
+{% set sortOptions = THIS.get("sort_options") %}
+{% if not sortOptions %}
     {% set sortOptions = {
         'product_name asc': 'Product Name (A-Z)',
         'product_name desc': 'Product Name (Z-A)',
-        'manuf_sku asc': 'Manuf SKU (A-Z)',
-        'manuf_sku desc': 'Manuf SKU (Z-A)',
+        'local_sku asc': 'SKU (A-Z)',
+        'local_sku desc': 'SKU (Z-A)',
         'base_price asc': 'Price (Lower first)',
         'base_price desc': 'Price (Higher first)'
     } %}
