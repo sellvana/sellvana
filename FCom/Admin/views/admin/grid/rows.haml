@@ -1,0 +1,5 @@
+
+- foreach ($this->rows as $row)
+    %tr(id="tr-#{$this->grid['id'] . '-' . $row['id']}" class="#{$row['class']}")
+        - foreach ($this->columns as $col)
+            %td(id="td-#{$this->grid['id'] . '-' . $row['id'] . '-'. $col['name']}")
