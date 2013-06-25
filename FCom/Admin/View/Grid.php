@@ -437,7 +437,7 @@ return [true, 'Testing error'];
         }
         if (!empty($filter['groups'])) {
             foreach ($filter['groups'] as $g) {
-                $where[$filter['groupOp']][] = $this->processFilters($g);
+                $where[$filter['groupOp']][] = $this->_processFilters($g);
             }
         }
         return $where;

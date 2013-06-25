@@ -1,0 +1,70 @@
+- $data = $this->gridData()
+- $config = $this->grid['config'];
+- $s = $data['result']['state']
+-# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows
+
+.fcom-datagrid
+-# %form(method="get" action="#{$this->gridUrl()")
+-# %fieldset
+    %input(type="text" name="search[_quick]" value="#{!empty($s['search']['_quick']) ? $s['search']['_quick'] : ''}")
+    %input(type="submit" value="#{$this->_('Search')}")
+
+    %label = $this->_('Rows per page:')
+    %select.js-fcom-datagrid__change
+        - foreach ($config['page_size_options'] as $i)
+            %option(value="{$this->gridUrl(array('ps'=>$i))}" #{!empty($s['ps']) && $s['ps'] == $i ? 'selected="selected"' : ''}) = $i
+
+    %label = $this->_('Page:')
+    - if ($s['p'] > 1)
+        %a(href="#{$this->gridUrl(array('p'=>$s['p']-1))}") &laquo;
+
+    %select.js-fcom-datagrid__change
+        - for ($i = 0; $i <= $s['mp']; $i++)
+            %option(value="#{$this->gridUrl(array('p'=>$i))}" #{!empty($s['p']) && $s['p'] == $i ? 'selected="selected"' : ''}) = $i
+
+    - if ($s['p'] < $s['mp'])
+        %a(href="#{$this->gridUrl(array('p'=>$s['p']+1))}") &raquo;
+
+    - echo $this->_('of %s', $s['mp'])
+    
+    - /*
+    - if ($s['p'] > 6)
+        %a(href="#{$this->gridUrl('p'=>1)}")
+    - if ($s['p'] > 7)
+        &hellip;
+    - for ($i = max($s['p']-5, 1); $i <= min($s['p']+5, $s['mp']); $i++)
+        %a(href="#{$this->gridUrl(array('p'=>$i))}" #{$i == $s['p'] ? 'class="active"' : ''}) = $i
+    - if ($s['p'] <= $s['mp']-7)
+        &hellip;
+    - if ($s['p'] <= $s['mp']-6)
+        %a(href="#{$this->gridUrl(array('p'=>$s['mp']))}") = $s['mp']
+    - */
+    
+    - $this->_('Rows %s - %s of %s', array($s['from_row'], $s['to_row'], $s['c']))
+
+    %table.fcom-datagrid__grid
+        %thead
+            %tr(id="tr-sort-#{$config['id']}")
+                - foreach ($config['columns'] as $colId=>$column)
+                    %th(id="th-sort-#{$config['id'].'-'.$colId}")
+                        - switch ($column['type'])
+                            - case 'default'
+                                - if (empty($column['no_sort']))
+                                    %a(href="#{$this->sortUrl($colId)}" class="#{$this->sortClass($colId)}")
+                                        = $column['label']
+                                - else
+                                    %a(href="#") = $column['label']
+
+            - if (!empty($config['filters']))
+                %tr(id="tr-filter-#{$config['id']}")
+                    - foreach ($config['columns'] as $colId => $column)
+                        %th(id="th-filter-#{$config['id'].'-'.$colId}")
+                            - echo $this->colFilterHtml($colId)
+
+        %tbody
+            - foreach ($data['result']['out'] as $rowId => $row)
+                %tr(id="tr-data-#{$config['id'].'-'.$rowId}" class="#{$rowId % 2 ? 'odd' : 'even'}")
+                    - foreach ($config['columns'] as $colId => $column)
+                        %td(id="td-data-#{$config['id'].'-'.$rowId.'-'.$colId}" class="#{$this->cellClass($row, $colId)}" 
+                                style="#{$this->cellStyle($row, $colId)}")
+                            - echo $this->cellHtml($row, $colId)

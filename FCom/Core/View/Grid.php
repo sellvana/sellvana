@@ -1,54 +1,49 @@
 <?php
-/**
-* Copyright 2011 Unirgy LLC
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 
-class BUI
-{
-    static public function bootstrap()
-    {
-        BLayout::i()->setViewRootDir('view');
-    }
-
-    public function jqgridData($orm)
-    {
-        $p = BRequest::i()->request();
-        $data = $orm->paginate(array('p'=>$p['page'], 'ps'=>$p['rows'], 's'=>$p['sidx'], 'sd'=>$p['sord']));
-        $res = $data['state'];
-        $res['rows'] = BDb::many_as_array($data['rows']);
-        return $res;
-    }
-}
-
-class BViewGrid extends BView
+class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 {
     public function gridUrl($changeRequest=array())
     {
         $grid = $this->grid;
         $grid['request'] = BUtil::arrayMerge($grid['request'], $changeRequest);
-        return BApp::href($grid['config']['gridUrl']).'?'.http_build_query($grid['request']);
+        return BApp::href($grid['config']['grid_url']).'?'.http_build_query($grid['request']);
     }
 
     public function sortUrl($colId)
     {
         if (!empty($this->grid['request']['sort']) && $this->grid['request']['sort']==$colId) {
-            $change = array('sortDir'=>$this->grid['request']['sortDir']=='desc'?'asc':'desc');
+            $change = array('sort_dir'=>$this->grid['request']['sort_dir']=='desc'?'asc':'desc');
         } else {
-            $change = array('sort'=>$colId, 'sortDir'=>'asc');
+            $change = array('sort'=>$colId, 'sort_dir'=>'asc');
         }
         return $this->gridUrl($change);
+    }
+
+    public function sortClass($colId)
+    {
+        $s = $this->grid['result']['state'];
+        return !empty($s['s'] && $s['s']==$colId ? 'sort-'.$s['sd'] : ''
+    }
+
+    public function colFilterHtml($colId)
+    {
+
+    }
+
+    public function cellStyle($row, $colId)
+    {
+        $column = $this->grid['config']['columns'][$colId];
+        return is_callable($column['style']) ? call_user_func($column['style'], $row, $colId) : $column['style'];
+    }
+
+    public function cellClass($row, $colId)
+    {
+
+    }
+
+    public function cellHtml($row, $colId)
+    {
+
     }
 
     public function cellData($cell, $rowId=null, $colId=null)
@@ -59,10 +54,10 @@ class BViewGrid extends BView
         }
         $cell = $this->grid['data']['rows'][$rowId][$colId];
         */
-        if (!empty($this->grid['config']['columns'][$colId]['render'])) {
-            $render = $this->grid['config']['columns'][$colId]['render'];
-            if (is_callable($render)) {
-                return call_user_func($render, $cell, $rowId, $colId);
+        if (!empty($this->grid['config']['columns'][$colId]['renderer'])) {
+            $renderer = $this->grid['config']['columns'][$colId]['renderer'];
+            if (is_callable($renderer)) {
+                return call_user_func($renderer, $cell, $rowId, $colId);
             }
         }
 
@@ -83,8 +78,8 @@ class BViewGrid extends BView
         if (!isset($c['sort'])) {
             $c['sort'] = '';
         }
-        if (!isset($c['sortDir'])) {
-            $c['sortDir'] = 'asc';
+        if (!isset($c['sort_dir'])) {
+            $c['sort_dir'] = 'asc';
         }
         if (empty($c['fields'])) {
             $c['fields'] = $c['columns'];
@@ -122,7 +117,7 @@ class BViewGrid extends BView
             'page' => array('int', !empty($config['page']) ? $config['page'] : 1),
             'pageSize' => array('int', !empty($config['pageSize']) ? $config['pageSize'] : $config['pageSizeOptions'][0]),
             'sort' => array('lower', !empty($config['sort']) ? $config['sort'] : null),
-            'sortDir' => array('alnum|lower', !empty($config['sortDir']) ? $config['sortDir'] : 'asc'),
+            'sort_dir' => array('alnum|lower', !empty($config['sort_dir']) ? $config['sort_dir'] : 'asc'),
             'search' => array('', array()),
         ));
 
@@ -180,7 +175,7 @@ class BViewGrid extends BView
             if (!empty($config['columns'][$p['sort']]['sort_by'])) {
                 $p['sort'] = $config['columns'][$p['sort']]['sort_by'];
             }
-            $orderBy = $p['sortDir']=='desc' ? 'order_by_desc' : 'order_by_asc';
+            $orderBy = $p['sort_dir']=='desc' ? 'order_by_desc' : 'order_by_asc';
             $orm->$orderBy($p['sort']);
         }
 #var_dump($orm);
@@ -364,93 +359,44 @@ class BViewGrid extends BView
     {
         $descrArr = array();
         if (!empty($params['search'])) {
-            $descr = "Filtered by: ";
+            $descr = $this->_("Filtered by:").' ';
             foreach ($params['search'] as $k=>$s) {
                 if ($k==='_quick') {
                     $filter = array('type'=>'quick');
-                    $descr .= '<b>Quick search</b>';
+                    $descr .= '<b>'.$this->_('Quick search').'</b>';
                 } else {
                     $filter = $this->grid['config']['filters'][$k];
                     $descr .= '<b>'.$filter['label'].'</b>';
                 }
                 switch ($filter['type']) {
-                case 'multiselect':
-                    $opts = array();
-                    $os = explode(',', $s);
-                    if (sizeof($os)==1) {
-                        $descr .= ' is <u>'.$filter['options'][$os[0]].'</u>';
-                    } else {
-                        foreach ($os as $o) {
-                            $opts[] = $filter['options'][$o];
+                    case 'multiselect':
+                        $opts = array();
+                        $os = explode(',', $s);
+                        if (sizeof($os)==1) {
+                            $descr .= ' '.$this->_('is <u>%s</u>', $this->q($filter['options'][$os[0]]));
+                        } else {
+                            foreach ($os as $o) {
+                                $opts[] = $filter['options'][$o];
+                            }
+                            $descr .= ' '.$this->_('is one of <u>%s</u>', $this->q(join(', ', $opts)));
                         }
-                        $descr .= ' is one of <u>'.join(', ', $opts).'</u>';
-                    }
-                    break;
+                        break;
 
-                case 'text-range': case 'date-range':
-                    $descr .= ' is between <u>'.BResponse::q($s['from']).'</u> and <u>'.BResponse::q($s['to']).'</u>';
-                    break;
+                    case 'text-range': case 'date-range':
+                        $descr .= ' '.$this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
 
-                case 'quick':
-                    $descr .= ' by <u>'.BResponse::q($s).'</u>';
-                    break;
+                        break;
+                    case 'quick':
+                        $descr .= ' '.$this->_('by <u>%s</u>', $this->q($s));
+                        break;
 
-                default:
-                    $descr .= ' contains <u>'.BResponse::q($s).'</u>';
+                    default:
+                        $descr .= ' '.$this->('contains <u>%s</u>', $this->q($s));
                 }
                 $descr .= '; ';
             }
             $descrArr[] = $descr;
         }
         return $descrArr ? join("; ", $descrArr) : '';
-    }
-}
-
-class BViewJqGrid extends BViewGrid
-{
-    public function jqGridConfig(array $o = array())
-    {
-        $c = $this->gridPrepareConfig($this->grid['config']);
-        $colNames = array();
-        $colModel = array();
-        foreach ($c['columns'] as $k=>$col) {
-            $colNames[] = $col['title'];
-            $col['name'] = $col['field'];
-            $col['index'] = !empty($col['sort_by']) ? $col['sort_by'] : $col['field'];
-            unset($col['field'], $col['sort_by'], $col['title']);
-            $colModel[] = $col;
-        }
-        $result = $o + array(
-            'url' => BApp::href($c['dataUrl']),
-            'datatype' => 'json',
-            'colNames' => $colNames,
-            'colModel' => $colModel,
-            'rowNum' => $c['pageSize'],
-            'rowList' => $c['pageSizeOptions'],
-            'pager' => '#'.$c['id'].'_pager',
-            'sortname' => $c['sort'],
-            'sortorder' => $c['sortDir'],
-        );
-        return $result;
-    }
-
-    public function jqGridData(array $o = array())
-    {
-        $r = BRequest::i()->get();
-        $this->grid['request'] = array(
-            'page' => !empty($r['page']) ? $r['page'] : null,
-            'pageSize' => !empty($r['rows']) ? $r['rows'] : null,
-            'sort' => !empty($r['sidx']) ? $r['sidx'] : null,
-            'sortDir' => !empty($r['sord']) ? $r['sord'] : null,
-            'search' => array('', array()),
-        );
-        $this->gridData(array('no_raw'=>true));
-        $data = array();
-        foreach ($this->result['out'] as $rowId=>$row) {
-            foreach ($row as $colId=>$cell) {
-                $data[$rowId][$colId] = $cell['value'];
-            }
-        }
-        return $data;
     }
 }
