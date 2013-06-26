@@ -21,6 +21,10 @@ catalog_product_form_tabs:
       - [ addTab, attachments, { label: Attachments, pos: 40, async: true } ]
       - [ addTab, images, { label: Images, pos: 50, async: true } ]
 
+/catalog/test:
+  - { include: base }
+  - { hook: main, views: core/grid-wrapper }
+
 /catalog/products:
   - { include: base }
   - { hook: main, views: admin/grid }

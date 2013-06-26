@@ -9,6 +9,35 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
 
+    public function action_test()
+    {
+        $columns = array(
+            'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
+            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true),
+            'local_sku'=>array('label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
+            'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
+            'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
+        );
+
+        $view = $this->view('core/grid');
+        $view->set('grid', array(
+            'config' => array(
+                'id' => 'products',
+                'orm' => FCom_Catalog_Model_Product::i()->orm(),
+                'columns' => $columns,
+                'actions' => array(
+                    'refresh' => true,
+                ),
+            ),
+        ));
+
+        if (BRequest::i()->xhr()) {
+            BLayout::i()->setRootView('core/grid');
+        } else {
+            $this->layout('/catalog/test');
+        }
+    }
+
     public function gridColumns()
     {
         $columns = array(
@@ -202,8 +231,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
-
-
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
@@ -284,35 +311,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 //exit;
         return $this;
-    }
-
-    public function processFamilyProductsPost($model, $data)
-    {
-        if (empty($data['family_id'])) {
-            return;
-        }
-        $hlp = FCom_Catalog_Model_ProductFamily::i();
-        $pf = $hlp->load($model->id, 'product_id');
-        $fId = $pf ? $pf->family_id : null;
-        if ($pf && !empty($data['family_id']) && $data['family_id']!=$pf->family_id) {
-            $pf->delete();
-        }
-        if ($data['family_id']) {
-            if ($fId!=$data['family_id']) {
-                $hlp->create(array('family_id'=>$data['family_id'], 'product_id'=>$model->id))->save();
-            }
-            if (!empty($data['grid']['linked_products_family']['add'])) {
-                foreach (explode(',', $data['grid']['linked_products_family']['add']) as $id) {
-                    if (!$id) continue;
-                    $hlp->delete_many(array('product_id'=>$id));
-                    $hlp->create(array('family_id'=>$data['family_id'], 'product_id'=>$id))->save();
-                }
-            }
-            if (!empty($data['grid']['linked_products_family']['del'])) {
-                $pIds = explode(',', $data['grid']['linked_products_family']['del']);
-                $hlp->delete_many(array('family_id'=>$data['family_id'], 'product_id'=>$pIds));
-            }
-        }
     }
 
     public function processMediaPost($model, $data)

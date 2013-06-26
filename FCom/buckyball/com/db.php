@@ -1472,9 +1472,9 @@ exit;
             'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (isset($d['ps']) ? $d['ps'] : 100), // page size
             's'  => !empty($r['s'])  ? $r['s']  : (isset($d['s'])  ? $d['s']  : ''), // sort by
             'sd' => !empty($r['sd']) ? $r['sd'] : (isset($d['sd']) ? $d['sd'] : 'asc'), // sort dir
-            'rs' => !empty($r['rs']) ? $r['rs'] : null,
-            'rc' => !empty($r['rc']) ? $r['rc'] : null,
-            'q'  => !empty($r['q'])  ? $r['q'] : null,
+            'rs' => !empty($r['rs']) ? $r['rs'] : null, // starting row
+            'rc' => !empty($r['rc']) ? $r['rc'] : null, // total rows on page
+            'q'  => !empty($r['q'])  ? $r['q'] : null, // query string
             'c'  => !empty($d['c'])  ? $d['c'] : null, //total found
         );
 #print_r($r); print_r($d); print_r($s); exit;

@@ -1,0 +1,12 @@
+- $gridView = $this->view('core/grid')
+- $config = $gridView->gridConfig()
+
+.fcom-datagrid-wrapper
+    - echo $gridView
+
+:javascript
+    $(function() {
+        var grid = new FCom.Grid("##{$config['id']}", {
+            grid_url: "#{$config['grid_url']}"
+        })
+    })

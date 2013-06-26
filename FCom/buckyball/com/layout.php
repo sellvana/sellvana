@@ -1206,7 +1206,7 @@ class BView extends BClass
         }
         $template = $this->param('template');
         if (!$template && ($viewName = $this->param('view_name'))) {
-            $template = $viewName . $defaultFileExt;
+            $template = $viewName . $fileExt;
         }
         if ($template) {
             if (!BUtil::isPathAbsolute($template)) {

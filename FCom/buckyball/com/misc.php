@@ -1014,6 +1014,11 @@ class BUtil extends BClass
             || !empty($path[1]) && $path[1]===':'; // windows drive letter C:
     }
 
+    public static function isUrlFull($url)
+    {
+        return preg_match('#^(https?:)?//#', $url);
+    }
+
     public static function ensureDir($dir)
     {
         if (is_file($dir)) {
@@ -1095,6 +1100,21 @@ class BUtil extends BClass
     {
         return 'href="'.static::paginateSortUrl($url, $state, $field)
             .'" class="'.$class.' '.($state['s']==$field ? $state['sd'] : '').'"';
+    }
+
+    public static function tagHtml($tag, $attrs = array(), $content = null)
+    {
+        $attrsHtmlArr = array();
+        foreach ($attrs as $k => $v) {
+            if ('' === $v || is_null($v) || false === $v) {
+                continue;
+            }
+            if (true === $v) {
+                $v = $k;
+            }
+            $attrsHtmlArr[] = $k.'="'.htmlspecialchars($v, ENT_QUOTES, 'UTF-8').'"';
+        }
+        return '<'.$tag.' '.join(' ', $attrsHtmlArr).'>'.$content.'</'.$tag.'>';
     }
 
     /**

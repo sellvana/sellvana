@@ -2,48 +2,65 @@
 
 class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 {
+    static protected $_defaultActions = array(
+        'refresh' => true,
+    );
+
     public function gridUrl($changeRequest=array())
     {
-        $grid = $this->grid;
-        $grid['request'] = BUtil::arrayMerge($grid['request'], $changeRequest);
-        return BApp::href($grid['config']['grid_url']).'?'.http_build_query($grid['request']);
+        return BUtil::setUrlQuery($this->grid['config']['grid_url'], $changeRequest);
     }
 
     public function sortUrl($colId)
     {
-        if (!empty($this->grid['request']['sort']) && $this->grid['request']['sort']==$colId) {
-            $change = array('sort_dir'=>$this->grid['request']['sort_dir']=='desc'?'asc':'desc');
+        if (!empty($this->grid['request']['s']) && $this->grid['request']['s']==$colId) {
+            $change = array('sd'=>$this->grid['request']['sd']=='desc'?'asc':'desc');
         } else {
-            $change = array('sort'=>$colId, 'sort_dir'=>'asc');
+            $change = array('s'=>$colId, 'sd'=>'asc');
         }
         return $this->gridUrl($change);
+    }
+
+    public function pageSizeOptions()
+    {
+        $options = $this->grid['config']['page_size_options'];
+        $options = array_combine($options, $options);
+        return $options;
+    }
+
+    public function gridActions()
+    {
+        return $this->grid['config']['actions'];
     }
 
     public function sortClass($colId)
     {
         $s = $this->grid['result']['state'];
-        return !empty($s['s'] && $s['s']==$colId ? 'sort-'.$s['sd'] : ''
+        return !empty($s['s']) && $s['s']==$colId ? 'sort-'.$s['sd'] : '';
     }
 
     public function colFilterHtml($colId)
     {
-
+        return '';
     }
 
     public function cellStyle($row, $colId)
     {
         $column = $this->grid['config']['columns'][$colId];
+        if (empty($column['style'])) {
+            return '';
+        }
         return is_callable($column['style']) ? call_user_func($column['style'], $row, $colId) : $column['style'];
     }
 
     public function cellClass($row, $colId)
     {
-
+        return !empty($row[$colId]['class']) ? $row[$colId]['class'] : '';
     }
 
     public function cellHtml($row, $colId)
     {
-
+        return $row[$colId]['raw'];
     }
 
     public function cellData($cell, $rowId=null, $colId=null)
@@ -64,13 +81,19 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return nl2br($this->q(!empty($cell['value']) ? $cell['value'] : ''));
     }
 
-    public function gridPrepareConfig($c)
+    public function gridConfig()
     {
-        if (empty($c['pageSizeOptions'])) {
-            $c['pageSizeOptions'] = array(25,50,100);
+        //TODO: remember processed config
+        $c = $this->grid['config'];
+
+        if (empty($c['grid_url'])) {
+            $c['grid_url'] = BRequest::currentUrl();
         }
-        if (empty($c['pageSize'])) {
-            $c['pageSize'] = $c['pageSizeOptions'][0];
+        if (empty($c['page_size_options'])) {
+            $c['page_size_options'] = array(1, 25, 50, 100);
+        }
+        if (empty($c['page_size'])) {
+            $c['page_size'] = $c['page_size_options'][0];
         }
         if (empty($c['search'])) {
             $c['search'] = new stdClass;
@@ -94,7 +117,32 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                 }
             }
         }
-        BEvents::i()->fire('BViewGrid::gridPrepareConfig.after', array('config'=>&$c));
+        if (!empty($c['actions'])) {
+            foreach ($c['actions'] as $k => &$action) {
+                if (true === $action && !empty(static::$_defaultActions[$action])) {
+                    switch ($k) {
+                        case 'refresh':
+                            $action = BUtil::tagHtml('a',
+                                array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh'),
+                                BLocale::_('Refresh')
+                            );
+                            break;
+
+                        default:
+                            $action = static::$_defaultActions[$action];
+                    }
+                }
+                if (is_string($action)) {
+                    $action = array('html' => $action);
+                }
+            }
+            unset($action);
+        }
+        BEvents::i()->fire(__METHOD__.'.after', array('config' => &$c));
+
+        $grid = $this->grid;
+        $grid['config'] = $c;
+        $this->grid = $grid;
         return $c;
     }
 
@@ -102,103 +150,48 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     {
         // fetch grid configuration
         $grid = $this->grid;
+        /*
         $config =& $grid['config'];
         if (!empty($grid['serverConfig'])) {
             $config = BUtil::arrayMerge($config, $grid['serverConfig']);
         }
-
-        $config = $this->gridPrepareConfig($config);
+        */
+        $config = $this->grid['config'];
 
         // fetch request parameters
         if (empty($grid['request'])) {
             $grid['request'] = BRequest::i()->get();
         }
-        $p = BRequest::i()->sanitize($grid['request'], array(
-            'page' => array('int', !empty($config['page']) ? $config['page'] : 1),
-            'pageSize' => array('int', !empty($config['pageSize']) ? $config['pageSize'] : $config['pageSizeOptions'][0]),
-            'sort' => array('lower', !empty($config['sort']) ? $config['sort'] : null),
-            'sort_dir' => array('alnum|lower', !empty($config['sort_dir']) ? $config['sort_dir'] : 'asc'),
-            'search' => array('', array()),
-        ));
 
-        foreach ($p['search'] as $k=>$s) {
-            if ($s==='') {
-                unset($p['search'][$k]);
-            }
-        }
-
-        BDb::connect();
-        // create collection factory
-        #$orm = AModel::factory($config['model']);
-        $table = $config['table'];
-        $orm = BORM::for_table($table);
-        if (!empty($config['table_alias'])) {
-            $orm->table_alias($config['table_alias']);
-            $tableAlias = $config['table_alias'];
-        } else {
-            $tableAlias = $config['table'];
-        }
-
-        if (!empty($config['where'])) {
-            $orm->where_complex($config['where']);
-        }
+        $orm = $config['orm'];
 
         BEvents::i()->fire('BViewGrid::gridData.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
         $mapColumns = array();
 
-        $this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
-        $this->_processGridFilters($config, $p['search'], $orm);
+        //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
+        $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
 
-        // fetch count of all rows and calculate resulting state variables
-        $countOrm = clone $orm;
-        $p['totalRows'] = $countOrm->count();
-        $p['pageSize'] = min($p['pageSize'], 10000);
-        $p['totalPages'] = ceil($p['totalRows']/$p['pageSize']);
-        $p['page'] = min($p['page'], $p['totalPages']);
-        $p['fromRow'] = $p['page'] ? $p['pageSize']*($p['page']-1)+1 : 1;
-        $p['toRow'] = min($p['fromRow']+$p['pageSize']-1, $p['totalRows']);
+        $result = $orm->paginate(null, array(
+            's' => !empty($config['sort']) ? $config['sort'] : null,
+            'sd' => !empty($config['sort_dir']) ? $config['sort_dir'] : null,
+            'ps' => !empty($config['page_size']) ? $config['page_size'] : null,
+        ));
+        $state['description'] = $this->stateDescription($result['state']);
+        $grid['result'] = array(
+            'state' => $result['state'],
+            'raw' => empty($options['no_out']) ? $result['rows'] : null,
+            'out' => array(),
+            //'query' => $orm,
+        );
 
-        $this->_processGridJoins($config, $mapColumns, $orm, 'after_count');
-
-        // add columns to select
-        foreach ($config['select'] as $k=>$f) {
-            if ($f[0]==='(') {
-                $orm->select_expr(str_replace('{t}', $tableAlias, $f), $k);
-                continue;
-            }
-            $orm->select((strpos($f, '.')===false ? $tableAlias.'.' : '').$f, !is_int($k) ? $k : null);
-        }
-
-        // add sorting
-        if ($p['sort']) {
-            if (!empty($config['columns'][$p['sort']]['sort_by'])) {
-                $p['sort'] = $config['columns'][$p['sort']]['sort_by'];
-            }
-            $orderBy = $p['sort_dir']=='desc' ? 'order_by_desc' : 'order_by_asc';
-            $orm->$orderBy($p['sort']);
-        }
-#var_dump($orm);
-        // run query
-        try {
-            $models = $orm->offset($p['fromRow']-1)->limit($p['pageSize'])->find_many();
-        } catch (PDOException $e) {
-            echo $e->getMessage()."\n<hr>\n".$orm->get_last_query()."\n";
-            exit;
-        }
-#echo $orm->get_last_query();
-
-        // init result
-        $p['description'] = $this->stateDescription($p);
-        $grid['result'] = array('state'=>$p, 'raw'=>array(), 'out'=>array()/*, 'query'=>ORM::get_last_query()*/);
-
-        foreach ($models as $i=>$model) {
+        foreach ($result['rows'] as $i => $model) {
             $r = $model->as_array();
             if (empty($options['no_raw'])) {
-                $grid['result']['raw'][$i] = $r;
+                //$grid['result']['raw'][$i] = $r;
             }
             if (empty($options['no_out'])) {
-                foreach ($config['fields'] as $k=>$f) {
+                foreach ($config['columns'] as $k=>$f) {
                     $field = !empty($f['field']) ? $f['field'] : $k;
                     $grid['result']['out'][$i][$k]['raw'] = isset($r[$field]) ? $r[$field] : null;
                     $value = isset($r[$field]) ? $r[$field] : (isset($f['default']) ? $f['default'] : '');
@@ -235,6 +228,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                 case 'boolean': $value = !!$value; break;
                 case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
                 case 'currency': $value = $value ? '$'.number_format($value, 2) : ''; break;
+                default: BDebug::warning('Grid value format not implemented: '.$format);
             }
         } elseif (is_callable($format)) {
             $value = $format($value);
@@ -355,9 +349,12 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         }
     }
 
-    public function stateDescription($params)
+    public function stateDescription($params=null)
     {
         $descrArr = array();
+        if (is_null($params)) {
+            $params = $this->grid['result']['state'];
+        }
         if (!empty($params['search'])) {
             $descr = $this->_("Filtered by:").' ';
             foreach ($params['search'] as $k=>$s) {
@@ -391,7 +388,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                         break;
 
                     default:
-                        $descr .= ' '.$this->('contains <u>%s</u>', $this->q($s));
+                        $descr .= ' '.$this->_('contains <u>%s</u>', $this->q($s));
                 }
                 $descr .= '; ';
             }
