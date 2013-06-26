@@ -1340,7 +1340,7 @@ class BEvents extends BClass
      *
      * @param bool  $new
      * @param array $args
-     * @return BPubSub
+     * @return BEvents
      */
     public static function i($new=false, array $args=array())
     {
@@ -1354,7 +1354,7 @@ class BEvents extends BClass
     *
     * @param string|array $eventName accepts multiple events in form of non-associative array
     * @param array|object $args
-    * @return BPubSub
+    * @return BEvents
     */
     public function event($eventName, $args=array())
     {
@@ -1377,17 +1377,16 @@ class BEvents extends BClass
     *
     * observe|watch|on|sub|subscribe ?
     *
-    * @todo case insensitive event names
     * @param string|array $eventName accepts multiple observers in form of non-associative array
     * @param mixed $callback
     * @param array|object $args
-    * @return BPubSub
+    * @return BEvents
     */
     public function on($eventName, $callback=null, $args=array())
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
-                $this->observe($obs[0], $obs[1], !empty($obs[2]) ? $obs[2] : array());
+                $this->on($obs[0], $obs[1], !empty($obs[2]) ? $obs[2] : array());
             }
             return $this;
         }
@@ -1403,17 +1402,48 @@ class BEvents extends BClass
     }
 
     /**
+     * Run callback on event only once, and remove automatically
+     * 
+     * @param string|array $eventName accepts multiple observers in form of non-associative array
+     * @param mixed $callback
+     * @param array|object $args
+     * @return BEvents
+     */
+    public function once($eventName, $callback=null, $args=array())
+    {
+        if (is_array($eventName)) {
+            foreach ($eventName as $obs) {
+                $this->once($obs[0], $obs[1], !empty($obs[2]) ? $obs[2] : array());
+            }
+            return $this;
+        }
+        $this->on($eventName, $callback, $args);
+        $lastId = sizeof($this->_events[$eventName]['observers']);
+        $this->on($eventName, function() use ($eventName, $lastId) { 
+            BEvents::i()
+                ->off($eventName, $lastId-1) // remove the observer
+                ->off($eventName, $lastId) // remove the remover
+            ;
+        });
+        return $this;
+    }
+
+    /**
     * Disable all observers for an event or a specific observer
     *
     * @param string $eventName
     * @param callback $callback
-    * @return BPubSub
+    * @return BEvents
     */
     public function off($eventName, $callback=null)
     {
         $eventName = strtolower($eventName);
-        if (is_null($callback)) {
+        if (true === $callback) {
             unset($this->_events[$eventName]);
+            return $this;
+        }
+        if (is_numeric($callback)) {
+            unset($this->_events[$eventName]['observers'][$callback]);
             return $this;
         }
         if (!empty($this->_events[$eventName]['observers'])) {
