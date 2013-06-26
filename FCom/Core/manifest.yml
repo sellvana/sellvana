@@ -5,7 +5,10 @@ modules:
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
         description: "Base Fulleron classes and JS libraries"
-        auto_use: [ layout ]
+        auto_use: [ layout, views ]
+        views:
+            - [ core/grid, { view_class: FCom_Core_View_Grid } ]
+
         default_config:
             db:
                 dbname: fulleron

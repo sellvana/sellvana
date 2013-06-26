@@ -11,6 +11,7 @@ modules:
             FCom_Admin:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
+                    - [ any, /catalog/test, FCom_Catalog_Admin_Controller_Products.test ]
                     - [ GET, /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
                     - [ any, /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
 

@@ -741,35 +741,37 @@ console.log(url_get, url_post);
     };
 }
 
+if ($.jgrid) {
+    $.extend($.jgrid.defaults, {
 
-$.extend($.jgrid.defaults, {
+    });
 
-});
+    $.extend($.jgrid.edit, {
 
-$.extend($.jgrid.edit, {
+    });
 
-});
+    $.extend($.jgrid.add, {
 
-$.extend($.jgrid.add, {
+    });
 
-});
+    $.extend($.jgrid.del, {
 
-$.extend($.jgrid.del, {
+    });
 
-});
+    $.extend($.jgrid.view, {
 
-$.extend($.jgrid.view, {
+    });
 
-});
+    $.extend($.jgrid.search, {
 
-$.extend($.jgrid.search, {
+    });
 
-});
+    $.extend($.jgrid.nav, {
 
-$.extend($.jgrid.nav, {
+    });
+}
 
-});
-
+FCom.Admin.jqGrid = {}
 
 FCom.Admin.jqGrid.fmtHiddenInput = function (cellvalue, options, rowObject) {
     console.log(cellvalue,options,rowObject);

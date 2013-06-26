@@ -101,7 +101,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public function getData()
+    public function as_array(array $objHashes=array())
     {
         $data = $this->as_array();
         unset($data['password_hash']);

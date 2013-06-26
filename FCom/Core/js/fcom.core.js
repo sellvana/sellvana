@@ -27,6 +27,27 @@ FCom._ = function(str) {
 return FCom.i18n[str] || str;
 }
 
+FCom.Grid = function(gridEl, config) {
+    gridEl = $(gridEl);
+
+    var gridParent = gridEl.parent();
+
+    function initDOM() {
+        $('select.js-change-url', gridParent).on('change', function(ev) { load(this.value); });
+        $('a.js-change-url', gridParent).on('click', function(ev) { load(this.href); return false; });
+    }
+    initDOM();
+
+    function load(url) {
+        if (url) {
+            config.grid_url = url;
+        }
+        gridParent.load(config.grid_url, function(response, status, xhr) {
+            initDOM();
+        })
+    }
+}
+
 function addslashes(str) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
@@ -41,3 +62,4 @@ $.ajaxSetup({
 $(function() {
     $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
 })
+

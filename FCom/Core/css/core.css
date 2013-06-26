@@ -1,0 +1,17 @@
+.fcom-datagrid__toolbar { padding: 5px; height: 20px; }
+.fcom-datagrid__toolbar > table { width:100%; }
+.fcom-datagrid__toolbar > table td { width:33%; }
+.fcom-datagrid__pager {  }
+.fcom-datagrid__rows-per-page { }
+.fcom-datagrid__rows-status {  }
+
+.fcom-datagrid__sort-labels th { padding:0; border-right: solid 1px #CCC; }
+.fcom-datagrid__sort-labels a { color:#888; display:block; background: #DDD; padding: 5px 10px; }
+.fcom-datagrid__sort-labels a.sort-asc:after { content: ' v'; }
+.fcom-datagrid__sort-labels a.sort-desc:after { content: ' ^'; }
+
+.fcom-datagrid__grid { width: 100%; }
+.fcom-datagrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
+.fcom-datagrid__grid tr.even td { background: #EEE; }
+.fcom-datagrid__grid tr.odd td { background: #FFF; }
+
