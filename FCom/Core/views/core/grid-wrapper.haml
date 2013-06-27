@@ -12,6 +12,7 @@
         var grid = new FCom.DataGrid({
             id: "#{$config['id']}",
             grid_url: "#{$config['grid_url']}",
-            selection: #{!empty($config['selection']) ? BUtil::toJson($config['selection']) : '{}'},
+            personalize_url: "#{BApp::href('my_account/personalize')}",
+            selection: #{!empty($config['selection']) ? BUtil::toJson($config['selection']) : '{}'}
         })
     })

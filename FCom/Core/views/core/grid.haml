@@ -18,9 +18,9 @@
                         = $this->_('Rows %s - %s of %s', array(1+$s['rs'], $s['rs']+$s['rc'], $s['c']))
 
                     %span.fcom-datagrid__rows-per-page<
-                        %select.js-change-url(data-href="#{$this->pageSizeHref()}")
-                            - echo BUtil::optionsHtml($this->pageSizeOptions(), $s['ps'])
-                        = $this->_('per page')
+                        - foreach ($this->pageSizeOptions() as $ps)
+                            %a.js-change-url(href="#{$this->gridUrl(array('ps'=>$ps))}" 
+                                class="#{$ps==$s['ps'] ? 'active' : ''}") = $ps
 
                 %td.a-center
                     %span.fcom-datagrid__pager<
@@ -31,8 +31,7 @@
 
                         %label = $this->_('Page')
 
-                        %select.js-change-url(data-href="#{$this->pageChangeHref()}")
-                            - echo BUtil::optionsHtml($this->pageOptions(), $s['p'])
+                        %input.fcom-datagrid__gotopage.js-change-url(data-href="#{$this->pageChangeHref()}" value="#{$s['p']}")
 
                         - echo $this->_('of %s', $s['mp'])
 
@@ -79,6 +78,7 @@
                         - elseif ($col['type'] === 'multiselect')
                             %select.js-sel
                                 - echo BUtil::optionsHtml($this->multiselectToggleOptions(), $this->multiselectCurrent())
+                -#%th
 
             - if (!empty($config['filters']))
                 %tr.fcom-datagrid__inline-filters(id="tr-filter-#{$config['id']}")

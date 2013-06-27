@@ -18,7 +18,6 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     public function pageSizeHref()
     {
         return BUtil::setUrlQuery(true, array('ps' => '-VALUE-'));
-
     }
 
     public function pageSizeOptions()
@@ -30,13 +29,6 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     public function pageChangeHref()
     {
         return BUtil::setUrlQuery(true, array('p' => '-VALUE-'));
-    }
-
-    public function pageOptions()
-    {
-        $url = BRequest::currentUrl();
-        $pages = range(1, $this->grid['result']['state']['mp']);
-        return array_combine($pages, $pages);
     }
 
     public function gridActions()
@@ -93,10 +85,102 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return '';
     }
 
+    protected function _processColumnsConfig()
+    {
+        $grid = $this->grid;
+        foreach ($grid['config']['columns'] as $cId => &$col) {
+            $col['id'] = $cId;
+            switch ($cId) {
+                case '_multiselect':
+                    $col['type'] = 'multiselect';
+                    $col['width'] = 50;
+                    $col['format'] = function($args) {
+                        return BUtil::tagHtml('input', array(
+                            'type'  => 'checkbox',
+                            //'name'  => "grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
+                            'class' => 'js-sel',
+                        ));
+                    };
+                    break;
+
+                case '_actions':
+                    $col['type'] = 'actions';
+                    $col['label'] = 'Actions';
+                    //$col['width'] = 50;
+                    $col['format'] = function($args) use($col) {
+                        $options = array('' => '');
+                        foreach ($col['options'] as $k => $opt) {
+                            if (!empty($opt['data-href'])) {
+                                $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
+                            }
+                            $options[$k] = $opt;
+                        }
+                        return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
+                    };
+                    break;
+            }
+        }
+        unset($col);
+        $this->grid = $grid;
+    }
+
+    protected function _processActionsConfig()
+    {
+        if (empty($this->grid['config']['actions'])) {
+            return;
+        }
+        $grid = $this->grid;
+        foreach ($grid['config']['actions'] as $k => &$action) {
+            if (true === $action && !empty(static::$_defaultActions[$k])) {
+                switch ($k) {
+                    case 'refresh':
+                        $action = array('html' => BUtil::tagHtml('a',
+                            array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh'),
+                            BLocale::_('Refresh')
+                        ));
+                        break;
+
+                    case 'link_to_page':
+                        $action = array('html' => BUtil::tagHtml('a',
+                            array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page'),
+                            BLocale::_('Link')
+                        ));
+                        break;
+
+                    default:
+                        $action = static::$_defaultActions[$k];
+                }
+            }
+            if (is_string($action)) {
+                $action = array('html' => $action);
+            }
+        }
+        unset($action);
+        $this->grid = $grid;
+    }
+
+    protected function _processPersonalization()
+    {
+        $grid = $this->grid;
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
+        if (!empty($pers['grid'][$gridId]['columns'])) {
+            $persCols = $pers['grid'][$gridId]['columns'];
+            foreach ($persCols as $k=>$c) {
+                if (empty($grid['config']['columns'][$k])) {
+                    unset($persCols[$k]);
+                }
+            }
+            $grid['config']['columns'] = BUtil::arrayMerge($grid['config']['columns'], $persCols);
+        }
+        $this->grid = $grid;
+    }
+
     public function gridConfig()
     {
         //TODO: remember processed config
-        $c = $this->grid['config'];
+        $grid = $this->grid;
+        $c =& $grid['config'];
 
         if (empty($c['grid_url'])) {
             $c['grid_url'] = BRequest::currentUrl();
@@ -119,75 +203,18 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         if (empty($c['row_id_column'])) {
             $c['row_id_column'] = 'id';
         }
-        foreach ($c['columns'] as $cId => &$col) {
-            $col['id'] = $cId;
-            switch ($cId) {
-                case '_multiselect':
-                    $col['type'] = 'multiselect';
-                    $col['width'] = 50;
-                    $col['format'] = function($args) {
-                        return BUtil::tagHtml('input', array(
-                            'type'  => 'checkbox',
-                            //'name'  => "grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
-                            'class' => 'js-sel',
-                        ));
-                    };
-                    break;
+        unset($c);
+        $this->grid = $grid;
 
-                case '_actions':
-                    $col['type'] = 'actions';
-                    $col['label'] = 'Actions';
-                    $col['width'] = 50;
-                    $col['format'] = function($args) use($col) {
-                        $options = array('' => '');
-                        foreach ($col['options'] as $k => $opt) {
-                            if (!empty($opt['data-href'])) {
-                                $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
-                            }
-                            $options[$k] = $opt;
-                        }
-                        return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
-                    };
-                    break;
-            }
-        }
-        unset($col);
-
-        if (!empty($c['actions'])) {
-            foreach ($c['actions'] as $k => &$action) {
-                if (true === $action && !empty(static::$_defaultActions[$k])) {
-                    switch ($k) {
-                        case 'refresh':
-                            $action = array('html' => BUtil::tagHtml('a',
-                                array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh'),
-                                BLocale::_('Refresh')
-                            ));
-                            break;
-
-                        case 'link_to_page':
-                            $action = array('html' => BUtil::tagHtml('a',
-                                array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page'),
-                                BLocale::_('Link')
-                            ));
-                            break;
-
-                        default:
-                            $action = static::$_defaultActions[$k];
-                    }
-                }
-                if (is_string($action)) {
-                    $action = array('html' => $action);
-                }
-            }
-            unset($action);
-        }
-
-        BEvents::i()->fire(__METHOD__.'.after', array('config' => &$c));
+        $this->_processColumnsConfig();
+        $this->_processActionsConfig();
+        $this->_processPersonalization();
 
         $grid = $this->grid;
-        $grid['config'] = $c;
+        BEvents::i()->fire(__METHOD__.'.after', array('grid' => &$grid));
         $this->grid = $grid;
-        return $c;
+
+        return $grid['config'];
     }
 
     public function gridData(array $options=array())
@@ -219,7 +246,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 
         $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
-        BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid'=>&$grid));
+        BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
 
         $this->grid = $grid;
         return $grid;

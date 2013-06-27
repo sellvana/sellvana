@@ -1471,7 +1471,7 @@ class BEvents extends BClass
     public function fire($eventName, $args=array())
     {
         $eventName = strtolower($eventName);
-        BDebug::debug('FIRE '.$eventName.(empty($this->_events[$eventName])?' (NO SUBSCRIBERS)':''), 1);
+        $profileStart = BDebug::debug('FIRE '.$eventName.(empty($this->_events[$eventName])?' (NO SUBSCRIBERS)':''), 1);
         $result = array();
         if (empty($this->_events[$eventName])) {
             return $result;
@@ -1544,6 +1544,7 @@ if (!class_exists($r[0])) {
                 BModuleRegistry::i()->popModule();
             }
         }
+        BDebug::profile($profileStart);
         return $result;
     }
 

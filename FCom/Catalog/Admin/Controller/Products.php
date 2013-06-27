@@ -19,7 +19,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'columns' => array(
                     '_multiselect' => array('index' => ''),
                     'id'           => array('label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true),
-                    'product_name' => array('label' => 'Name', 'index' => 'p.product_name', 'href' => BApp::href('catalog/products/form?id=:id')),
+                    'product_name' => array('label' => 'Name', 'index' => 'p.product_name', 'href' => BApp::href('catalog/products/form?id=:id'), 'width' => 250),
                     'local_sku'    => array('label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),
                     'create_dt'    => array('label' => 'Created', 'index' => 'p.create_dt', 'format' => 'date', 'width' => 100),
                     'update_dt'    => array('label' => 'Updated', 'index' => 'p.update_dt', 'format' => 'datetime', 'width' => 100),

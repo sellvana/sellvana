@@ -58,6 +58,7 @@ FCom.DataGrid = function(config) {
     var gridParent = gridEl.parent();
     var gridSelection = config.selection || {};
 
+    // update URL and load grid partial
     function load(url) {
         if (url) {
             config.grid_url = url;
@@ -67,73 +68,110 @@ FCom.DataGrid = function(config) {
         })
     }
 
+    // set multiselect selections
     function setSelection(selection)
     {
         var sel = selection || gridSelection;
         for (var i in sel) {
-            $('tr[data-id='+i+'] .js-sel', gridParent).prop('checked', sel[i]);
+            $('tbody tr[data-id='+i+'] .js-sel', gridParent).prop('checked', sel[i]);
             gridSelection[i] = sel[i];
         }
         $('#'+config.id+'-selection').val( Object.keys(gridSelection).join('|') );
     }
 
+    // initialize DOM after loading partial
     function initDOM() {
+        // initialize unsaved selections
         setSelection();
+
+        // resize columns
+        $('thead th', gridParent).resizable({ 
+            handles: 'e',
+            stop: function(ev, ui) {
+                console.log(ev, ui);
+                $.post(config.personalize_url, 
+                    { do: 'grid.col.width', grid: config.id, col: 'product_name', width: 357}, 
+                    function(response, status, xhr) {
+                        console.log(response, status, xhr);
+                    }
+                )
+            }
+        });
+
+        // reorder columns
+        $('thead', gridParent).sortable({ 
+            items: 'th', 
+            containment:'parent',
+            update: function(ev, ui) {
+                console.log(ev, ui);
+                $.post(config.personalize_url,
+                    { do: 'grid.col.order', grid: config.id, cols: {} },
+                    function(response, status, xhr) {
+                        console.log(response, status, xhr);
+                    }
+                );
+            }
+        });
     }
+    // initialize DOM first time on page load
     initDOM();
 
-    gridParent
-        .on('change', 'select.js-change-url', function(ev) {
-            load( $(this).data('href').replace('-VALUE-', this.value) );
-        })
+        // handle toolbar and pager selects and inputs
+    gridParent.on('change', 'select.js-change-url, input.js-change-url', function(ev) {
+        load( $(this).data('href').replace('-VALUE-', this.value) );
+    });
 
-        .on('click', 'a.js-change-url', function(ev) {
-            load( this.href );
-            return false;
-        })
+    // handle sort labels
+    gridParent.on('click', 'a.js-change-url', function(ev) {
+        load( this.href );
+        return false;
+    });
 
-        .on('change', 'thead select.js-sel', function(ev) {
-            var action = this.value, $cb;
-            switch (action) {
-                case 'show_all':
-                    load(setUrlParam(config.grid_url, { selected:false }));
-                    break;
+    // handle grid top multiselect toggle
+    gridParent.on('change', 'thead select.js-sel', function(ev) {
+        var action = this.value, $cb;
+        switch (action) {
+            case 'show_all':
+                load(setUrlParam(config.grid_url, { selected:false }));
+                break;
 
-                case 'show_sel':
-                    load(setUrlParam(config.grid_url, { selected:'sel' }));
-                    break;
+            case 'show_sel':
+                load(setUrlParam(config.grid_url, { selected:'sel' }));
+                break;
 
-                case 'show_unsel':
-                    load(setUrlParam(config.grid_url, { selected:'unsel' }));
-                    break;
+            case 'show_unsel':
+                load(setUrlParam(config.grid_url, { selected:'unsel' }));
+                break;
 
-                case 'upd_sel': case 'upd_unsel':
-                    var sel = {};
-                    $('tbody input.js-sel', gridParent).each(function(idx, el) {
-                        $cb = $(this);
-                        sel[ $cb.parents('tr').data('id') ] = action === 'upd_sel';
-                    });
-                    setSelection(sel);
-                    break;
-            }
-            $(this).val('');
-        })
+            case 'upd_sel': case 'upd_unsel':
+                var sel = {};
+                $('tbody input.js-sel', gridParent).each(function(idx, el) {
+                    $cb = $(this);
+                    sel[ $cb.parents('tr').data('id') ] = action === 'upd_sel';
+                });
+                setSelection(sel);
+                break;
+        }
+        $(this).val('');
+    });
 
-        .on('change', 'tbody input.js-sel', function(ev) {
-            var $cb = $(this), sel = {};
-            sel[ $cb.parents('tr').data('id') ] = $cb.prop('checked');
-            setSelection(sel);
-        })
+    // handle each row multiselect toggles
+    gridParent.on('change', 'tbody input.js-sel', function(ev) {
+        var $cb = $(this), sel = {};
+        sel[ $cb.parents('tr').data('id') ] = $cb.prop('checked');
+        setSelection(sel);
+    });
 
-        .on('change', 'tbody select.js-actions', function(ev) {
-            var $select = $(this), $option = $($('option', $select).get(this.selectedIndex));
-            var data = $option.data();
-            if (data.href) {
-                location.href = data.href;
-            } else if (data.eval) {
-                eval(data.eval);
-            }
-        })
+    // handle each row actions
+    gridParent.on('change', 'tbody select.js-actions', function(ev) {
+        var $select = $(this), $option = $($('option', $select).get(this.selectedIndex));
+        var data = $option.data();
+        if (data.href) {
+            location.href = data.href;
+        } else if (data.eval) {
+            eval(data.eval);
+        }
+    });
 }
 
 $(function() {

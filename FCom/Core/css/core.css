@@ -4,8 +4,10 @@
 .fcom-datagrid__toolbar > table { width:100%; }
 .fcom-datagrid__toolbar > table td { width:33%; }
 .fcom-datagrid__pager {  }
-.fcom-datagrid__rows-per-page { }
-.fcom-datagrid__rows-status {  }
+.fcom-datagrid__rows-per-page a { border:solid 1px #CCC; padding: 2px 5px; }
+.fcom-datagrid__rows-per-page a.active { background:#FFF; font-weight:bold; }
+.fcom-datagrid__rows-status { }
+.fcom-datagrid__gotopage { width:30px; }
 
 .fcom-datagrid__sort-labels th { padding:0; border-right: solid 1px #CCC; background: #DDD; }
 .fcom-datagrid__sort-labels a { color:#888; display:block; padding: 5px 10px; }
