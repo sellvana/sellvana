@@ -1,391 +1,565 @@
 /*!
- * dragtable
- *
- * @Version 2.0.4
- *
- * Copyright (c) 2010, Andres Koetter akottr@gmail.com
+ * dragtable - jquery ui widget to re-order table columns 
+ * version 3.0
+ * 
+ * Copyright (c) 2010, Jesse Baird <jebaird@gmail.com>
+ * 12/2/2010
+ * https://github.com/jebaird/dragtable
+ * 
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
+ * 
+ * 
+ * 
+ * Forked from https://github.com/akottr/dragtable - Andres Koetter akottr@gmail.com
+ * 
  *
- * Inspired by the the dragtable from Dan Vanderkam (danvk.org/dragtable/)
- * Thanks to the jquery and jqueryui comitters
- *
- * Any comment, bug report, feature-request is welcome
- * Feel free to contact me.
- */
-
-/* TOKNOW:
- * For IE7 you need this css rule:
- * table {
- *   border-collapse: collapse;
- * }
- * Or take a clean reset.css (see http://meyerweb.com/eric/tools/css/reset/)
- */
-
-/* TODO: investigate
- * Does not work properly with css rule:
- * html {
- *      overflow: -moz-scrollbars-vertical;
- *  }
- * Workaround:
- * Fixing Firefox issues by scrolling down the page
- * http://stackoverflow.com/questions/2451528/jquery-ui-sortable-scroll-helper-element-offset-firefox-issue
- *
- * var start = $.noop;
- * var beforeStop = $.noop;
- * if($.browser.mozilla) {
- * var start = function (event, ui) {
- *               if( ui.helper !== undefined )
- *                 ui.helper.css('position','absolute').css('margin-top', $(window).scrollTop() );
- *               }
- * var beforeStop = function (event, ui) {
- *              if( ui.offset !== undefined )
- *                ui.helper.css('margin-top', 0);
- *              }
- * }
- *
- * and pass this as start and stop function to the sortable initialisation
- * start: start,
- * beforeStop: beforeStop
- */
-
-/* TODO: support colgroups
- */
-
-/*
- * Thx to kriswill, https://github.com/akottr/dragtable/pull/9
+ * 
+ * 
+ * quick down and and dirty on how this works
+ * ###########################################
+ * so when a column is selected we grab all of the cells in that row and clone append them to a semi copy of the parent table and the 
+ * "real" cells get a place holder class witch is removed when the dragstop event is triggered
+ * 
+ * 
+ * make it easy to have a button swap columns
+ * 
+ * 
+ * Events - in order of trigger
+ * start - when the user mouses down on handle or th, use in favor of display helper
+ * beforechagne - called when a col will be moved
+ * change - called after the col has been moved
+ * stop - after the user mouses up and stops dragging
+ * 
+ * 
+ * 
+ * 
+ * IE notes
+ *  ie8 in quirks mode will only drag once after that the events are lost
+ * 
  */
 
 (function($) {
-  $.widget("akottr.dragtable", {
+  $.widget("jb.dragtable", {
+      //TODO: implement this
+      eventWidgetPrefix: 'dragtable',
     options: {
-      revert: false,               // smooth revert
-      dragHandle: '.table-handle', // handle for moving cols, if not exists the whole 'th' is the handle
-      maxMovingRows: 40,           // 1 -> only header. 40 row should be enough, the rest is usually not in the viewport
-      excludeFooter: false,        // excludes the footer row(s) while moving other columns. Make sense if there is a footer with a colspan. */
-      onlyHeaderThreshold: 100,    // TODO:  not implemented yet, switch automatically between entire col moving / only header moving
-      dragaccept: null,            // draggable cols -> default all
-      persistState: null,          // url or function -> plug in your custom persistState function right here. function call is persistState(originalTable)
-      restoreState: null,          // JSON-Object or function:  some kind of experimental aka Quick-Hack TODO: do it better
-      clickDelay: 10,              // ms to wait before rendering sortable list and delegating click event
-      containment: 'parent',       // @see http://api.jqueryui.com/sortable/#option-containment, use it if you want to move in 2 dimesnions (together with axis: null)
-      cursor: 'move',              // @see http://api.jqueryui.com/sortable/#option-cursor
-      cursorAt: false,             // @see http://api.jqueryui.com/sortable/#option-cursorAt
-      distance: 0,                 // @see http://api.jqueryui.com/sortable/#option-distance, for immediate feedback use "0"
-      tolerance: 'pointer',        // @see http://api.jqueryui.com/sortable/#option-tolerance
-      axis: 'x',                   // @see http://api.jqueryui.com/sortable/#option-axis, Only vertical moving is allowed. Use 'x' or null. Use this in conjunction with the 'containment' setting  
-      beforeStart: $.noop,
-      beforeMoving: $.noop,
-      beforeReorganize: $.noop,
-      beforeStop: $.noop
+      //used to the col headers, data contained in here is used to set / get the name of the col
+      dataHeader:'data-header',
+      //class name that handles have 
+      handle:'dragtable-drag-handle',
+      //draggable items in cols, .dragtable-drag-handle has to match the handle options
+      items: 'th:not( :has( .dragtable-drag-handle ) ), .dragtable-drag-handle',
+      //if a col header as this class, cols cant be dragged past it
+      boundary: 'dragtable-drag-boundary',
+      //classnames that get applied to the real td, th
+      placeholder: 'dragtable-col-placeholder',
+      //the drag display will be appended to this element, some reason this is blank, also if your body tag has been zeroed off it wont be exact
+      appendTarget: $(  document.body ),
+      //if true,this will scroll the appendTarget offsetParent when the dragDisplay is dragged past its boundaries
+      scroll: false
+      
     },
-    originalTable: {
-      el: null,
-      selectedHandle: null,
-      sortOrder: null,
-      startIndex: 0,
-      endIndex: 0
+    // when a col is dragged use this to find the semantic elements, for speed
+      tableElemIndex:{  
+      head: '0',
+      body: '1',
+      foot: '2'
     },
-    sortableTable: {
-      el: $(),
-      selectedHandle: $(),
-      movingRow: $()
-    },
-    persistState: function() {
-      var _this = this;
-      this.originalTable.el.find('th').each(function(i) {
-        if (this.id !== '') {
-          _this.originalTable.sortOrder[this.id] = i;
-        }
-      });
-      $.ajax({
-        url: this.options.persistState,
-        data: this.originalTable.sortOrder
-      });
-    },
-    /*
-     * persistObj looks like
-     * {'id1':'2','id3':'3','id2':'1'}
-     * table looks like
-     * |   id2  |   id1   |   id3   |
-     */
-    _restoreState: function(persistObj) {
-      for (var n in persistObj) {
-        this.originalTable.startIndex = $('#' + n).closest('th').prevAll().size() + 1;
-        this.originalTable.endIndex = parseInt(persistObj[n] + 1, 10);
-        this._bubbleCols();
-      }
-    },
-    // bubble the moved col left or right
-    _bubbleCols: function() {
-      var i, j, col1, col2;
-      var from = this.originalTable.startIndex;
-      var to = this.originalTable.endIndex;
-      /* Find children thead and tbody.
-       * Only to process the immediate tr-children. Bugfix for inner tables
-       */
-      var thtb = this.originalTable.el.children();
-      if (this.options.excludeFooter) {
-        thtb = thtb.not('tfoot');
-      }
-      if (from < to) {
-        for (i = from; i < to; i++) {
-          col1 = thtb.find('> tr > td:nth-child(' + i + ')')
-            .add(thtb.find('> tr > th:nth-child(' + i + ')'));
-          col2 = thtb.find('> tr > td:nth-child(' + (i + 1) + ')')
-            .add(thtb.find('> tr > th:nth-child(' + (i + 1) + ')'));
-          for (j = 0; j < col1.length; j++) {
-            swapNodes(col1[j], col2[j]);
-          }
-        }
-      } else {
-        for (i = from; i > to; i--) {
-          col1 = thtb.find('> tr > td:nth-child(' + i + ')')
-            .add(thtb.find('> tr > th:nth-child(' + i + ')'));
-          col2 = thtb.find('> tr > td:nth-child(' + (i - 1) + ')')
-            .add(thtb.find('> tr > th:nth-child(' + (i - 1) + ')'));
-          for (j = 0; j < col1.length; j++) {
-            swapNodes(col1[j], col2[j]);
-          }
-        }
-      }
-    },
-    _rearrangeTableBackroundProcessing: function() {
-      var _this = this;
-      return function() {
-        _this._bubbleCols();
-        _this.options.beforeStop(this.originalTable);
-        _this.sortableTable.el.remove();
-        restoreTextSelection();
-        // persist state if necessary
-        if (_this.options.persistState !== null) {
-          $.isFunction(_this.options.persistState) ? _this.options.persistState(_this.originalTable) : _this.persistState();
-        }
-      };
-    },
-    _rearrangeTable: function() {
-      var _this = this;
-      return function() {
-        // remove handler-class -> handler is now finished
-        _this.originalTable.selectedHandle.removeClass('dragtable-handle-selected');
-        // add disabled class -> reorgorganisation starts soon
-        _this.sortableTable.el.sortable("disable");
-        _this.sortableTable.el.addClass('dragtable-disabled');
-        _this.options.beforeReorganize(_this.originalTable, _this.sortableTable);
-        // do reorganisation asynchronous
-        // for chrome a little bit more than 1 ms because we want to force a rerender
-        _this.originalTable.endIndex = _this.sortableTable.movingRow.prevAll().size() + 1;
-        setTimeout(_this._rearrangeTableBackroundProcessing(), 50);
-      };
-    },
-    /*
-     * Disrupts the table. The original table stays the same.
-     * But on a layer above the original table we are constructing a list (ul > li)
-     * each li with a separate table representig a single col of the original table.
-     */
-    _generateSortable: function(e) {
-      !e.cancelBubble && (e.cancelBubble = true);
-      var _this = this;
-      // table attributes
-      var attrs = this.originalTable.el[0].attributes;
-      var attrsString = '';
-      for (var i = 0; i < attrs.length; i++) {
-        if (attrs[i].nodeValue && attrs[i].nodeName != 'id' && attrs[i].nodeName != 'width') {
-          attrsString += attrs[i].nodeName + '="' + attrs[i].nodeValue + '" ';
-        }
-      }
-
-      // row attributes
-      var rowAttrsArr = [];
-      //compute height, special handling for ie needed :-(
-      var heightArr = [];
-      this.originalTable.el.find('tr').slice(0, this.options.maxMovingRows).each(function(i, v) {
-        // row attributes
-        var attrs = this.attributes;
-        var attrsString = "";
-        for (var j = 0; j < attrs.length; j++) {
-          if (attrs[j].nodeValue && attrs[j].nodeName != 'id') {
-            attrsString += " " + attrs[j].nodeName + '="' + attrs[j].nodeValue + '"';
-          }
-        }
-        rowAttrsArr.push(attrsString);
-        heightArr.push($(this).height());
-      });
-
-      // compute width, no special handling for ie needed :-)
-      var widthArr = [];
-      // compute total width, needed for not wrapping around after the screen ends (floating)
-      var totalWidth = 0;
-      /* Find children thead and tbody.
-       * Only to process the immediate tr-children. Bugfix for inner tables
-       */
-      var thtb = _this.originalTable.el.children();
-      if (this.options.excludeFooter) {
-        thtb = thtb.not('tfoot');
-      }
-      thtb.find('> tr > th').each(function(i, v) {
-        // one extra px on right and left side
-        totalWidth += $(this).outerWidth() + 2;
-        widthArr.push($(this).width());
-      });
-
-      var sortableHtml = '<ul class="dragtable-sortable" style="position:absolute; width:' + totalWidth + 'px;">';
-      // assemble the needed html
-      thtb.find('> tr > th').each(function(i, v) {
-        sortableHtml += '<li>';
-        sortableHtml += '<table ' + attrsString + '>';
-        var row = thtb.find('> tr > th:nth-child(' + (i + 1) + ')');
-        if (_this.options.maxMovingRows > 1) {
-          row = row.add(thtb.find('> tr > td:nth-child(' + (i + 1) + ')').slice(0, _this.options.maxMovingRows - 1));
-        }
-        row.each(function(j) {
-          // TODO: May cause duplicate style-Attribute
-          var row_content = $(this).clone().wrap('<div></div>').parent().html();
-          if (row_content.toLowerCase().indexOf('<th') === 0) sortableHtml += "<thead>";
-          sortableHtml += '<tr ' + rowAttrsArr[j] + '" style="height:' + heightArr[j] + 'px;">';
-          sortableHtml += row_content;
-          if (row_content.toLowerCase().indexOf('<th') === 0) sortableHtml += "</thead>";
-          sortableHtml += '</tr>';
-        });
-        sortableHtml += '</table>';
-        sortableHtml += '</li>';
-      });
-      sortableHtml += '</ul>';
-      this.sortableTable.el = this.originalTable.el.before(sortableHtml).prev();
-      // set width if necessary
-      this.sortableTable.el.find('th').each(function(i, v) {
-        var _this = $(this);
-        if (widthArr[i] > _this.width()) {
-          _this.css({
-            'width': widthArr[i]
-          });
-        }
-      });
-
-      // assign this.sortableTable.selectedHandle
-      this.sortableTable.selectedHandle = this.sortableTable.el.find('th .dragtable-handle-selected');
-
-      var items = !this.options.dragaccept ? 'li' : 'li:has(' + this.options.dragaccept + ')';
-      this.sortableTable.el.sortable({
-        items: items,
-        stop: this._rearrangeTable(),
-        // pass thru options for sortable widget
-        revert: this.options.revert,
-        tolerance: this.options.tolerance,
-        containment: this.options.containment,
-        cursor: this.options.cursor,
-        cursorAt: this.options.cursorAt,
-        distance: this.options.distance,
-        axis: this.options.axis
-      });
-
-      // assign start index
-      this.originalTable.startIndex = $(e.target).closest('th').prevAll().size() + 1;
-
-      this.options.beforeMoving(this.originalTable, this.sortableTable);
-      // Start moving by delegating the original event to the new sortable table
-      this.sortableTable.movingRow = this.sortableTable.el.find('li:nth-child(' + this.originalTable.startIndex + ')');
-
-      // prevent the user from drag selecting "highlighting" surrounding page elements
-      disableTextSelection();
-      // clone the initial event and trigger the sort with it
-      this.sortableTable.movingRow.trigger($.extend($.Event(e.type), {
-        which: 1,
-        clientX: e.clientX,
-        clientY: e.clientY,
-        pageX: e.pageX,
-        pageY: e.pageY,
-        screenX: e.screenX,
-        screenY: e.screenY
-      }));
-
-      // Some inner divs to deliver the posibillity to style the placeholder more sophisticated
-      this.sortableTable.el.find('.ui-sortable-placeholder').html('<div class="outer" style="height:100%;"><div class="inner" style="height:100%;"></div></div>');
-    },
-    bindTo: {},
+    tbodyRegex: /(tbody|TBODY)/,
+    theadRegex: /(thead|THEAD)/,
+    tfootRegex: /(tfoot|TFOOT)/,
+      
     _create: function() {
-      this.originalTable = {
-        el: this.element,
-        selectedHandle: $(),
-        sortOrder: {},
-        startIndex: 0,
-        endIndex: 0
-      };
-      // bind draggable to 'th' by default
-      this.bindTo = this.originalTable.el.find('th');
-      // filter only the cols that are accepted
-      if (this.options.dragaccept) {
-        this.bindTo = this.bindTo.filter(this.options.dragaccept);
+      
+      //console.log(this);
+      //used start/end of drag
+      this.startIndex = null;
+      this.endIndex = null;
+      //the references to the table cells that are getting dragged
+      this.currentColumnCollection = [];
+      //the references the position of the first element in the currentColunmCollection position
+      this.currentColumnCollectionOffset = {};
+      //the div wrapping the drag display table
+      this.dragDisplay = $([])
+
+      
+      var self = this,
+        o = self.options,
+        el = self.element;
+    
+      //offsetappendTarget catch for this
+      if( o.appendTarget.length == 0 ){
+        o.appendTarget = $( document.body );
       }
-      // bind draggable to handle if exists
-      if (this.bindTo.find(this.options.dragHandle).size() > 0) {
-        this.bindTo = this.bindTo.find(this.options.dragHandle);
-      }
-      // restore state if necessary
-      if (this.options.restoreState !== null) {
-        $.isFunction(this.options.restoreState) ? this.options.restoreState(this.originalTable) : this._restoreState(this.options.restoreState);
-      }
-      var _this = this;
-      this.bindTo.mousedown(function(evt) {
-        clearTimeout(this.downTimer);
-        this.downTimer = setTimeout(function() {
-          _this.originalTable.selectedHandle = $(this);
-          _this.originalTable.selectedHandle.addClass('dragtable-handle-selected');
-          _this.options.beforeStart(this.originalTable);
-          _this._generateSortable(evt);
-        }, _this.options.clickDelay);
-      }).mouseup(function(evt) {
-        clearTimeout(this.downTimer);
+      //grab the ths and the handles and bind them 
+      el.delegate(o.items, 'mousedown.' + self.widgetEventPrefix, function(e){
+        
+        var $handle = $(this),
+          elementOffsetTop = self.element.position().top;
+
+        //make sure we are working with a th instead of a handle
+        if( $handle.hasClass( o.handle ) ){
+          
+          $handle = $handle.closest('th');
+          //change the target to the th, so the handler can pick up the offsetleft
+          e.currentTarget = $handle.closest('th')[0]
+        }
+        
+              
+      self.getCol( $handle.index() )
+          .attr( 'tabindex', -1 )
+                  .focus()
+          .disableSelection()
+          .css({
+                      top: elementOffsetTop,
+                      //need to account for the scroll left of the append target, other wise the display will be off by that many pix
+                      left: ( self.currentColumnCollectionOffset.left + o.appendTarget[0].scrollLeft )
+          })
+                  .appendTo( o.appendTarget )
+        
+
+        
+        self._mousemoveHandler( e );
+        //############
       });
+                
     },
+    
+    /*
+     * e.currentTarget is used for figuring out offsetLeft
+     * getCol must be called before this is 
+     * 
+     */
+    _mousemoveHandler: function( e ){
+      //call this first, catch any drag display issues
+      this._start( e )
+        
+      var self = this,
+        o = self.options,
+              prevMouseX = e.pageX,
+              dragDisplayWidth = self.dragDisplay.outerWidth(),
+              halfDragDisplayWidth = dragDisplayWidth / 2,
+              appendTargetOP = o.appendTarget.offsetParent()[0],
+              scroll = o.scroll,
+        //get the col count, used to contain col swap
+        colCount = self.element[ 0 ]
+                .getElementsByTagName( 'thead' )[ 0 ]
+                .getElementsByTagName( 'tr' )[ 0 ]
+                .getElementsByTagName( 'th' )
+                .length - 1;
+
+            $( document ).bind('mousemove.' + self.widgetEventPrefix, function( e ){
+              var columnPos = self._setCurrentColumnCollectionOffset(),
+                mouseXDiff = e.pageX - prevMouseX,
+                appendTarget = o.appendTarget[0],
+                left =  ( parseInt( self.dragDisplay[0].style.left ) + mouseXDiff  );
+                self.dragDisplay.css( 'left', left )
+                
+               /*
+                * when moving left and e.pageX and prevMouseX are the same it will trigger right when moving left
+                * 
+                * it should only swap cols when the col dragging is half over the prev/next col
+                */                    
+               if( e.pageX  < prevMouseX ){
+                   //move left
+                   var threshold = columnPos.left - halfDragDisplayWidth;
+                   
+                   
+                   //scroll left
+          if( left < ( appendTarget.clientWidth  - dragDisplayWidth ) && scroll == true ) {
+            var scrollLeft =  appendTarget.scrollLeft + mouseXDiff
+            /*
+             * firefox does scroll the body with target being body but chome does
+             */
+            if( appendTarget.tagName == 'BODY' ) {
+              window.scroll( window.scrollX + scrollLeft, window.scrollY );
+            } else {
+              appendTarget.scrollLeft = scrollLeft;
+            }
+            
+          }
+                   
+                   
+                   if( left  < threshold ){
+                      self._swapCol(self.startIndex-1);
+                   }
+
+        }else{
+         //move right
+          var threshold = columnPos.left + halfDragDisplayWidth ;
+          
+          //scroll right
+          if( left > (appendTarget.clientWidth - dragDisplayWidth ) && scroll == true ) {
+            //console.log(  o.appendTarget[0].clientWidth + (e.pageX - prevMouseX))
+            
+            var scrollLeft =  appendTarget.scrollLeft + mouseXDiff
+            /*
+             * firefox does scroll the body with target being body but chome does
+             */
+            if( appendTarget.tagName == 'BODY' ) {
+              window.scroll( window.scrollX + scrollLeft, window.scrollY );
+            } else {
+              appendTarget.scrollLeft = scrollLeft;
+            }
+            
+          }
+          
+                    //move to the right only if x is greater than threshold and the current col isn' the last one
+                    if( left  > threshold  && colCount != self.startIndex ){
+                      self._swapCol( self.startIndex + 1 );
+                    }
+        }
+        //update mouse position
+        prevMouseX = e.pageX;
+    
+            })
+            .one( 'mouseup.' + self.widgetEventPrefix ,function(e ){
+                self._stop( e );
+            });
+                          
+    },
+    
+    _start: function( e ){
+      
+      $( document )
+                  //move disableselection and cursor to default handlers of the start event
+                  .disableSelection()
+                  .css( 'cursor', 'move')
+
+        
+      return this._eventHelper('start',e,{
+          //'draggable': $dragDisplay
+        });
+                
+                
+    },
+    _stop: function( e ){
+
+      if( this._eventHelper('stop',e,{}) == true ){
+         $( document )
+         .unbind( 'mousemove.' + this.widgetEventPrefix )
+         .enableSelection()
+         .css( 'cursor', 'move')
+        
+        this.dropCol();
+        this.dragDisplay.remove()
+      };  
+                      
+    },
+    
+    _setOption: function(option, value) {
+      $.Widget.prototype._setOption.apply( this, arguments );
+           
+    },
+    
+    /*
+     * get the selected index cell out of table row
+     * needs to work as fast as possible. and performance gains in this method are worth the time
+     *  because its used to build the drag display and get the cells on col swap
+     * http://jsperf.com/binary-regex-vs-string-equality/4
+     */
+    _getCells: function( elem, index ){
+      //console.time('getcells');
+      var ei = this.tableElemIndex,
+        //TODO: clean up this format 
+        tds = {
+          //store where the cells came from
+          'semantic':{
+            '0': [],//head throws error if ei.head or ei['head']
+            '1': [],//body
+            '2': []//footer
+          },
+          //keep a ref in a flat array for easy access
+          'array':[]
+        },
+        //cache regex, reduces looking up the chain
+        tbodyRegex = this.tbodyRegex,
+        theadRegex = this.theadRegex,
+        //reduce looking up the chain, dont do it for the foot think thats more overhead since not many tables have a tfoot
+        tdsSemanticBody = tds.semantic[ei.body],
+        tdsSemanticHead = tds.semantic[ei.head];
+      
+      //console.log(index);
+      //check does this col exsist
+      if(index <= -1 || typeof elem.rows[0].cells[index] == undefined){
+        return tds;
+      }
+      
+      for(var i = 0, length = elem.rows.length; i < length; i++){
+        
+        var td = elem.rows[i].cells[index];
+        
+        //if the row has no cells dont error out;
+        if( td == undefined ){
+          continue;
+        }
+        
+        var parentNodeName = td.parentNode.parentNode.nodeName;
+        tds.array.push(td);
+        //faster to leave out ^ and $ in the regular expression
+        if( tbodyRegex.test( parentNodeName ) ){
+          
+          tdsSemanticBody.push( td );
+          
+        }else if( theadRegex.test( parentNodeName ) ){
+          
+          tdsSemanticHead.push( td );
+        
+        }else if( this.tfootRegex.test( parentNodeName ) ){
+          
+          tds.semantic[ei.foot].push( td );
+        }
+        
+              
+      }
+      //console.timeEnd('getcells');
+      return tds;
+    },
+    /*
+     * returns all element attrs in a string key="value" key2="value"
+     */
+    _getElementAttributes: function(element){
+      
+          var attrsString = '',
+            attrs = element.attributes;
+          for(var i=0, length = attrs.length; i < length; i++) {
+              attrsString += attrs[i].nodeName + '="' + attrs[i].nodeValue+'"';
+          }
+          return attrsString;
+    },
+
+      /*
+       * faster than swap nodes
+       * only works if a b parent are the same, works great for columns
+       */
+      _swapCells: function(a, b) {
+          a.parentNode.insertBefore(b, a);
+      },
+
+    /*
+     * used to trigger optional events
+     */
+    _eventHelper: function(eventName ,eventObj, additionalData){
+      return this._trigger( 
+        eventName, 
+        eventObj, 
+        $.extend({
+          column: this.currentColumnCollection,
+          order: this.order(),
+          startIndex: this.startIndex,
+          endIndex: this.endIndex,
+          dragDisplay: this.dragDisplay,
+          columnOffset: this.currentColumnCollectionOffset      
+        },additionalData)
+      );
+    },
+    /*
+     * build copy of table and attach the selected col to it, also removes the select col out of the table
+     * @returns copy of table with the selected col
+     * 
+     * populates self.dragDisplay
+     * TODO: name this something better, like select col or get dragDisplay
+     * 
+     */   
+    getCol: function(index){
+      //console.log('index of col '+index);
+      //drag display is just simple html
+      //console.profile('selectCol');
+      
+      //colHeader.addClass('ui-state-disabled')
+
+      var $table = this.element,
+        self = this,
+        eIndex = self.tableElemIndex,
+        placholderClassnames = ' ' + this.options.placeholder;
+        
+        //BUG: IE thinks that this table is disabled, dont know how that happend
+        self.dragDisplay = $('<table '+self._getElementAttributes($table[0])+'></table>')
+                  .addClass('dragtable-drag-col');
+      
+      //start and end are the same to start out with
+      self.startIndex = self.endIndex = index;
+    
+
+      var cells = self._getCells($table[0], index);
+      self.currentColumnCollection = cells.array;
+      //console.log(cells);
+      //################################
+      
+      //TODO: convert to for in // its faster than each
+      $.each(cells.semantic,function(k,collection){
+        //dont bother processing if there is nothing here
+        
+        if(collection.length == 0){
+          return;
+        }
+                
+                if ( k == '0' ){
+                    var target = document.createElement('thead');
+            self.dragDisplay[0].appendChild(target);
+
+                }else{ 
+                    var target = document.createElement('tbody');
+            self.dragDisplay[0].appendChild(target);
+
+                }
+
+        for(var i = 0,length = collection.length; i < length; i++){
+          
+          var clone = collection[i].cloneNode(true);
+          collection[i].className+=placholderClassnames;
+          var tr = document.createElement('tr');
+          tr.appendChild(clone);
+          //console.log(tr);
+          
+          
+          target.appendChild(tr);
+          //collection[i]=;
+        }
+      });
+        
+        
+        this._setCurrentColumnCollectionOffset();
+        
+        
+            self.dragDisplay  = $('<div class="dragtable-drag-wrapper"></div>').append(self.dragDisplay)
+        return self.dragDisplay;
+    },
+    
+    
+    _setCurrentColumnCollectionOffset: function(){
+      return this.currentColumnCollectionOffset = $( this.currentColumnCollection[0] ).position();
+    },
+    
+    /*
+     * move column left or right
+     */
+    _swapCol: function( to ){
+      
+      //cant swap if same position
+      if(to == this.startIndex){
+        return false;
+      }
+      
+      var from = this.startIndex;
+      this.endIndex = to;
+      //this col cant be moved past me
+      var th = this.element.find('th').eq( to );
+      //check on th
+      if( th.hasClass( this.options.boundary ) == true ){
+        return false;
+      }
+      //check handle element
+      if( th.find( '.' + this.options.handle ).hasClass( this.options.boundary ) == true ){
+        return false;
+      }
+      
+      if( this._eventHelper('breforechange',{}) === false ){
+        return false;
+      };
+      
+      
+          if(from < to) {
+            //console.log('move right');
+            for(var i = from; i < to; i++) {
+              var row2 = this._getCells(this.element[0],i+1);
+            //  console.log(row2)
+              for(var j = 0, length = row2.array.length; j < length; j++){
+                  this._swapCells(this.currentColumnCollection[j],row2.array[j]);
+                }
+              }
+          } else {
+            //console.log('move left');
+            for(var i = from; i > to; i--) {
+                var row2 = this._getCells(this.element[0],i-1);
+                for(var j = 0, length = row2.array.length; j < length; j++){
+                  this._swapCells(row2.array[j],this.currentColumnCollection[j]);
+                }
+            }
+          }
+          this._eventHelper('change',{});
+          
+          this.startIndex = this.endIndex;
+    },
+    /*
+     * called when drag start is finished
+     */
+    dropCol: function(){
+      //TODO: cache this when the option is set
+      var regex = new RegExp("(?:^|\\s)" + this.options.placeholder + "(?!\\S)",'g');
+      //remove placeholder class
+      //dont use jquery.fn.removeClass for performance reasons
+      for(var i = 0, length = this.currentColumnCollection.length; i < length; i++){
+        var td = this.currentColumnCollection[i];
+        
+        td.className = td.className.replace(regex,'')
+      }
+      
+
+    },
+    /*
+     * get / set the current order of the cols
+     */
+    order: function(order){
+      var self = this,
+        elem = self.element,
+        options = self.options,
+        headers = elem.find('thead tr:first').children('th');
+        
+      
+      if(order == undefined){
+        //get
+        var ret = [];
+        headers.each(function(){
+          var header = this.getAttribute(options.dataHeader);
+          if(header == null){
+            //the attr is missing so grab the text and use that
+            header = $(this).text();
+          }
+          
+          ret.push(header);
+          
+        });
+        
+        return ret;
+        
+      }else{
+        //set
+        //headers and order have to match up
+        if(order.length != headers.length){
+          //console.log('length not the same')
+          return self;
+        }
+        for(var i = 0, length = order.length; i < length; i++){
+           
+           var start = headers.filter('['+ options.dataHeader +'='+ order[i] +']').index();
+           if(start != -1){
+            //console.log('start index '+start+' - swap to '+i);
+            self.startIndex = start;
+            
+            self.currentColumnCollection = self._getCells(self.element[0], start).array;
+
+            self._swapCol(i);
+           }
+           
+           
+        }
+        return self;
+      }
+    },
+        
     destroy: function() {
-      this.bindTo.unbind('mousedown');
-      $.Widget.prototype.destroy.apply(this, arguments); // default destroy
-      // now do other stuff particular to this widget
+      var self = this,
+        o = self.options;
+      
+      this.element.undelegate( o.items, 'mousedown.' + self.widgetEventPrefix );
+      
+      $( document ).unbind('.' + self.widgetEventPrefix )
+            
     }
+
+        
   });
 
-  /** closure-scoped "private" functions **/
-
-  var body_onselectstart_save = $(document.body).attr('onselectstart'),
-    body_unselectable_save = $(document.body).attr('unselectable');
-
-  // css properties to disable user-select on the body tag by appending a <style> tag to the <head>
-  // remove any current document selections
-
-  function disableTextSelection() {
-    // jQuery doesn't support the element.text attribute in MSIE 8
-    // http://stackoverflow.com/questions/2692770/style-style-textcss-appendtohead-does-not-work-in-ie
-    var $style = $('<style id="__dragtable_disable_text_selection__" type="text/css">body { -ms-user-select:none;-moz-user-select:-moz-none;-khtml-user-select:none;-webkit-user-select:none;user-select:none; }</style>');
-    $(document.head).append($style);
-    $(document.body).attr('onselectstart', 'return false;').attr('unselectable', 'on');
-    if (window.getSelection) {
-      window.getSelection().removeAllRanges();
-    } else {
-      document.selection.empty(); // MSIE http://msdn.microsoft.com/en-us/library/ms535869%28v=VS.85%29.aspx
-    }
-  }
-
-  // remove the <style> tag, and restore the original <body> onselectstart attribute
-
-  function restoreTextSelection() {
-    $('#__dragtable_disable_text_selection__').remove();
-    if (body_onselectstart_save) {
-      $(document.body).attr('onselectstart', body_onselectstart_save);
-    } else {
-      $(document.body).removeAttr('onselectstart');
-    }
-    if (body_unselectable_save) {
-      $(document.body).attr('unselectable', body_unselectable_save);
-    } else {
-      $(document.body).removeAttr('unselectable');
-    }
-  }
-
-  function swapNodes(a, b) {
-    var aparent = a.parentNode;
-    var asibling = a.nextSibling === b ? a : a.nextSibling;
-    b.parentNode.insertBefore(a, b);
-    aparent.insertBefore(b, asibling);
-  }
 })(jQuery);

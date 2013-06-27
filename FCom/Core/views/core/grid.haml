@@ -69,11 +69,13 @@
                 %col(width="#{!empty($column['width']) ? $column['width'] : ''}")
 
         %thead
-            %tr.fcom-datagrid__sort-labels(id="tr-sort-#{$config['id']}")
+            %tr(id="tr-sort-#{$config['id']}")
                 - foreach ($config['columns'] as $colId => $col)
-                    %th(id="th-sort-#{$config['id'].'-'.$colId}" data-id="#{$colId}" style="#{$this->sortStyle($col)}"
+                    %th.label(id="th-sort-#{$config['id'].'-'.$colId}" data-id="#{$colId}" style="#{$this->sortStyle($col)}"
                              class="#{$this->sortClass($col, $s)}")
                         - if (empty($col['type']) || $col['type'] === 'default')
+                            - if (empty($col['no_reorder']))
+                                %div.drag-handle
                             %a.js-change-url(href="#{$this->sortUrl($col)}")<
                                 = $col['label']
                         - elseif ($col['type'] === 'multiselect')
