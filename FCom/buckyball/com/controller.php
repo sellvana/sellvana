@@ -276,9 +276,9 @@ class BRequest extends BClass
     public static function baseUrl($forceSecure=null, $includeQuery=false)
     {
         if (is_null($forceSecure)) {
-            $scheme = static::https() ? 'https:' : 'http:';
+            $scheme = static::https() ? 'https:' : '';
         } else {
-            $scheme = $forceSecure ? 'https:' : 'http:';
+            $scheme = $forceSecure ? 'https:' : '';
         }
         $url = $scheme.'//'.static::serverName().static::webRoot();
         if ($includeQuery && ($query = static::rawGet())) {

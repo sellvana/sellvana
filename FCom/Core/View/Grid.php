@@ -121,16 +121,34 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         }
         foreach ($c['columns'] as $cId => &$col) {
             $col['id'] = $cId;
-            if ($cId === '_multiselect') {
-                $col['type'] = 'multiselect';
-                $col['width'] = 50;
-                $col['format'] = function($args) use($c) {
-                    return BUtil::tagHtml('input', array(
-                        'type'  => 'checkbox',
-                        //'name'  => "grid[{$c['id']}][sel][{$args['row']->id}]",
-                        'class' => 'js-sel',
-                    ));
-                };
+            switch ($cId) {
+                case '_multiselect':
+                    $col['type'] = 'multiselect';
+                    $col['width'] = 50;
+                    $col['format'] = function($args) {
+                        return BUtil::tagHtml('input', array(
+                            'type'  => 'checkbox',
+                            //'name'  => "grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
+                            'class' => 'js-sel',
+                        ));
+                    };
+                    break;
+
+                case '_actions':
+                    $col['type'] = 'actions';
+                    $col['label'] = 'Actions';
+                    $col['width'] = 50;
+                    $col['format'] = function($args) use($col) {
+                        $options = array('' => '');
+                        foreach ($col['options'] as $k => $opt) {
+                            if (!empty($opt['data-href'])) {
+                                $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
+                            }
+                            $options[$k] = $opt;
+                        }
+                        return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
+                    };
+                    break;
             }
         }
         unset($col);
@@ -198,6 +216,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             'p' => !empty($config['page']) ? $config['page'] : null,
             'ps' => !empty($config['page_size']) ? $config['page_size'] : $config['page_size_options'][0],
         ));
+
         $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
         BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid'=>&$grid));
@@ -213,7 +232,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         $gridId = $grid['config']['id'];
         $columns = $grid['config']['columns'];
 
-        $trHtmlArr = array();
+        $trArr = array();
         foreach ($rows as $rowId => $row) {
             $row->_id = $rowId;
             $trAttr = array();
@@ -221,16 +240,35 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             $trAttr['data-id'] = $row->get($grid['config']['row_id_column']);
             $trAttr['class'][] = $rowId % 2 ? 'odd' : 'even';
 
-            $tdHtmlArr = array();
+            $tdArr = array();
             foreach ($columns as $colId => $col) {
                 $cellData = $this->cellData($row, $col);
-                $tdHtmlArr[] = BUtil::tagHtml('td', $cellData['attr'], $cellData['html']);
+                $tdArr[$colId] = array('attr' => $cellData['attr'], 'html' => $cellData['html']);
                 if (!empty($cellData['row_attr'])) {
                     $trAttr = array_merge_recursive($cellData['row_attr']);
                 }
             }
-            $trHtmlArr[] = BUtil::tagHtml('tr', $trAttr, join("\n", $tdHtmlArr));
+            $trArr[$rowId] = array('attr' => $trAttr, 'cells' =>$tdArr);
         }
+
+        if (!empty($grid['config']['format_callback'])) {
+            $cb = $grid['config']['format_callback'];
+            if (is_callable($cb)) {
+                call_user_func($cb, array('grid' => $grid, 'rows' => &$trArr));
+            } else {
+                BDebug::warning('Invalid grid format_callback');
+            }
+        }
+
+        $trHtmlArr = array();
+        foreach ($trArr as $rowId => $tr) {
+            $tdHtmlArr = array();
+            foreach ($tr['cells'] as $colId => $cell) {
+                $tdHtmlArr[] = BUtil::tagHtml('td', $cell['attr'], $cell['html']);
+            }
+            $trHtmlArr[] = BUtil::tagHtml('tr', $tr['attr'], join("\n", $tdHtmlArr));
+        }
+
         return join("\n", $trHtmlArr);
     }
 
@@ -240,19 +278,16 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         $args = array('grid' => $grid, 'row' => $row, 'col' => $col);
         $out = array();
 
-        if (empty($col['attr'])) {
-            $out['attr'] = array();
-        } elseif (is_callable($col['attr'])) {
-            $out['attr'] = call_user_func($col['attr'], $args);
-        } else {
-            $out['attr'] = (array)$row['attr'];
+        $out['attr'] = !empty($col['attr']) ? $col['attr'] : array();
+        if (!empty($col['attr_callback'])) {
+            $args['attr'] = $out['attr'];
+            $out['attr'] = call_user_func($col['attr_callback'], $args);
         }
-        if (empty($out['attr']['id'])) {
-            $out['attr']['data-col'] = $col['id'];
-            //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
-        }
+        $out['attr']['data-col'] = $col['id'];
+        //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
 
-        $value = $row->get($col['id']);
+        $field = !empty($col['field']) ? $col['field'] : $col['id'];
+        $value = $row->get($field);
 
         if (('' === $value || is_null($value)) && !empty($col['default'])) {
             $value = $col['default'];
@@ -280,6 +315,9 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             }
         }
 
+        if (!empty($col['row_attr_callback']) && is_callable($col['row_attr_callback'])) {
+            $out['row_attr'] = call_user_func($out['row_attr_callback'], $args);
+        }
 
         if (!empty($col['href'])) {
             $value = BUtil::tagHtml('a', array('href' => BUtil::injectVars($col['href'], $row->as_array())), $value);
@@ -287,9 +325,6 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 
         $out['html'] = $value;
 
-        if (!empty($col['row_attr']) && is_callable($col['row_attr'])) {
-            $out['row_attr'] = call_user_func($out['row_attr'], $args);
-        }
         return $out;
     }
 
