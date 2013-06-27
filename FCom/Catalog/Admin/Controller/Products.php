@@ -11,20 +11,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function action_test()
     {
-        $columns = array(
-            'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
-            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true),
-            'local_sku'=>array('label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
-            'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
-            'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
-        );
-
         $view = $this->view('core/grid');
         $view->set('grid', array(
             'config' => array(
                 'id' => 'products',
                 'orm' => FCom_Catalog_Model_Product::i()->orm(),
-                'columns' => $columns,
+                'columns' => array(
+                    '_multiselect' => array(),
+                    'id'           => array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
+                    'product_name' => array('label'=>'Name', 'index'=>'p.product_name'),
+                    'local_sku'    => array('label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
+                    'create_dt'    => array('label'=>'Created', 'index'=>'p.create_dt', 'format'=>'date', 'width'=>100),
+                    'update_dt'    => array('label'=>'Updated', 'index'=>'p.update_dt', 'format'=>'datetime', 'width'=>100),
+                    'uom'          => array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
+                ),
                 'actions' => array(
                     'refresh' => true,
                     'link_to_page' => true,

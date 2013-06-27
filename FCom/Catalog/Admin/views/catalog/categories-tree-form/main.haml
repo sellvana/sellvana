@@ -11,4 +11,4 @@
         %li.label-l
             %label(for="main-is_top_menu") = $this->_('Show in top menu')
             %select(name="model[is_top_menu")
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_top_menu)
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_top_menu)

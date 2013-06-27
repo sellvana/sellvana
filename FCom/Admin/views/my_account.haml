@@ -22,7 +22,7 @@
         %li
             %h4.label = $this->_('Status')
             %select(name="model[status]")
-                - echo $this->optionsHtml($hlp->fieldOptions('status'), $m->status)
+                - echo BUtil::optionsHtml($hlp->fieldOptions('status'), $m->status)
         %li
             %h4.label = $this->_('API Username')
             %input(type="text" id="model-api_username" name="model[api_username]" value="#{$m->api_username}")

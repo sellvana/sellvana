@@ -34,7 +34,7 @@
 
             - elseif ($field->admin_input_type == 'boolean')
                 %select(name="model[#{$field->field_code}]")
-                    - $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->{$field->field_code})
+                    - BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $m->{$field->field_code})
 
             - if (0==$field->system)
                 %br
@@ -76,5 +76,5 @@
         }).done(function() {
             $('#cf_field_'+field_id).remove();
         });
-        
+
     }

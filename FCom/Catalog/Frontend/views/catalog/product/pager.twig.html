@@ -39,13 +39,13 @@
         <div class="pager-rows">
             <label>{{ "Rows:" |_ }}</label>
             <select name="ps" onchange="this.form.submit()" class="select2">
-                {{ THIS.optionsHtml(psOptions, s.ps) | raw }}
+                {{ UTIL.optionsHtml(psOptions, s.ps) | raw }}
             </select>
         </div>
         <div class="pager-sort">
             <label>{{ "Sort:" |_ }}</label>
             <select name="sc" onchange="this.form.submit()" class="select2">
-                {{ THIS.optionsHtml(sortOptions, s.sc) | raw }}
+                {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
             </select>
         </div>
         <div class="pager-layout">

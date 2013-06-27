@@ -11,7 +11,7 @@
                         %td = $this->_('Theme')
                         %td
                             %select(name="config[modules][FCom_Frontend][theme]")
-                                - echo $this->optionsHtml(BLayout::i()->getThemes('FCom_Frontend', true), $c->get('modules/FCom_Frontend/theme'))
+                                - echo BUtil::optionsHtml(BLayout::i()->getThemes('FCom_Frontend', true), $c->get('modules/FCom_Frontend/theme'))
                     %tr
                         %td = $this->_('Additional JS Files')
                         %td
@@ -56,7 +56,7 @@
                         %td = $this->_('Select top menu')
                         %td
                             %select(name="config[modules][FCom_Frontend][nav_top][type]")
-                                - echo $this->optionsHtml(array(''=>'Select an option', 'cms'=>'CMS menu', 'categories_root'=>'Categories menu by root id', 'categories_custom'=>'Categories menu by custom selection'), $c->get('modules/FCom_Frontend/nav_top/type'))
+                                - echo BUtil::optionsHtml(array(''=>'Select an option', 'cms'=>'CMS menu', 'categories_root'=>'Categories menu by root id', 'categories_custom'=>'Categories menu by custom selection'), $c->get('modules/FCom_Frontend/nav_top/type'))
                     %tr
                         %td = $this->_('Root id cms')
                         %td

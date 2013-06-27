@@ -14,7 +14,7 @@
         %li
             %h4.label = $this->_('Content Format')
             %select(name="model[renderer]")
-                - echo $this->optionsHtml(BLayout::i()->getAllRenderers(true), $m->renderer)
+                - echo BUtil::optionsHtml(BLayout::i()->getAllRenderers(true), $m->renderer)
 :javascript
     $(function() {
         adminForm.wysiwygCreate('main-content');

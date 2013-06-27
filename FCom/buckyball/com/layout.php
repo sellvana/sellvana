@@ -1411,35 +1411,14 @@ class BView extends BClass
     }
 
     /**
+     * @deprecated by BUtil::optionsHtml()
      * @param        $options
      * @param string $default
      * @return string
      */
     public function optionsHtml($options, $default = '')
     {
-        if(!is_array($default)){
-            $default = (string)$default;
-        }
-        $htmlArr = array();
-        foreach ($options as $k => $v) {
-            $k = (string)$k;
-            if (is_array($v) && !empty($v[0])) {
-                $htmlArr[] = BUtil::tagHtml('optgroup', array('label' => $k), $this->selectOptions($v, $default));
-                continue;
-            }
-            if (is_array($v)) {
-                $attr = $v;
-                $v = !empty($attr['text']) ? $attr['text'] : '';
-                unset($attr['text']);
-            } else {
-                $attr = array();
-            }
-            $attr['value'] = $k;
-            $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
-            $htmlArr[] = BUtil::tagHtml('option', $attr, $v);
-        }
-
-        return join("\n", $htmlArr);
+        return BUtil::optionsHtml($options, $default);
     }
 
     /**

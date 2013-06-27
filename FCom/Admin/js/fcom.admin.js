@@ -876,6 +876,8 @@ function partialParent(el, params) {
 FCom.Admin.codeEditorThemeLoaded = {};
 
 FCom.Admin.initCodeEditors = function() {
+    if (typeof CodeMirror == 'undefined') return;
+
     var scriptBaseUrl = FCom.Admin.codemirrorBaseUrl;
 
     CodeMirror.modeURL = scriptBaseUrl + '/mode/%N/%N.js';
