@@ -5,7 +5,7 @@
 .fcom-datagrid-wrapper
     - echo $gridView
 
-%input(type="hidden" id="{$config['id']}-selection" name="datagrid[#{$config['id']}][selection]" value="#{$defSel}")
+%input(type="hidden" id="#{$config['id']}-selection" name="datagrid[#{$config['id']}][selection]" value="#{$defSel}")
 
 :javascript
     $(function() {

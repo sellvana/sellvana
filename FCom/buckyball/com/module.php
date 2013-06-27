@@ -931,17 +931,29 @@ class BModule extends BClass
         $src = $this->base_src;
         if ($full) {
             $r = BRequest::i();
-            $src = $r->scheme().'://'.$r->httpHost().$src;
+            $scheme = $r->scheme();
+            if ($scheme=='http') {
+                $scheme = ''; // don't force http
+            } else {
+                $scheme .= ':';
+            }
+            $src = $scheme.'//'.$r->httpHost().$src;
         }
         return $src;
     }
 
     public function baseHref($full=true)
     {
-        $href = $this->base_src;
+        $href = $this->base_href;
         if ($full) {
             $r = BRequest::i();
-            $href = $r->scheme().'://'.$r->httpHost().$href;
+            $scheme = $r->scheme();
+            if ($scheme=='http') {
+                $scheme = ''; // don't force http
+            } else {
+                $scheme .= ':';
+            }
+            $href = $scheme.'://'.$r->httpHost().$href;
         }
         return $href;
     }
