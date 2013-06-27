@@ -87,31 +87,55 @@ FCom.DataGrid = function(config) {
         // resize columns
         $('thead th', gridParent).resizable({ 
             handles: 'e',
+            minWidth: 20,
             stop: function(ev, ui) {
-                console.log(ev, ui);
+                var $el = ui.element;
                 $.post(config.personalize_url, 
-                    { do: 'grid.col.width', grid: config.id, col: 'product_name', width: 357}, 
+                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() }, 
                     function(response, status, xhr) {
-                        console.log(response, status, xhr);
+                        //console.log(response, status, xhr);
                     }
                 )
             }
         });
 
         // reorder columns
-        $('thead', gridParent).sortable({ 
-            items: 'th', 
-            containment:'parent',
-            update: function(ev, ui) {
-                console.log(ev, ui);
+        $('table.fcom-datagrid__grid', gridParent).dragtable({
+            dragaccept: '.js-draggable',
+            persistState: function(table) {
+                var cols = [];
+                $('thead th', gridParent).each(function(i, el) {
+                    cols.push({ name: $(el).data('id') });
+                });
                 $.post(config.personalize_url,
-                    { do: 'grid.col.order', grid: config.id, cols: {} },
+                    { do: 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
                     function(response, status, xhr) {
                         console.log(response, status, xhr);
                     }
                 );
             }
         });
+        /*
+        $('thead', gridParent).sortable({ 
+            items: 'th', 
+            containment:'parent',
+            update: function(ev, ui) {
+                var cols = [];
+                $('th', this).each(function(i, el) {
+                    cols.push({ name: $(el).data('id') });
+                });
+                $.post(config.personalize_url,
+                    { do: 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+                    function(response, status, xhr) {
+                        console.log(response, status, xhr);
+                        if (response.success) {
+                            load();
+                        }
+                    }
+                );
+            }
+        });
+        */
     }
     // initialize DOM first time on page load
     initDOM();

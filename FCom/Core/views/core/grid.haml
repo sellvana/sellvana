@@ -65,15 +65,16 @@
 
     %table.fcom-datagrid__grid
         %colgroup
-            - foreach ($config['columns'] as $colId => $column)
+            -# foreach ($config['columns'] as $colId => $column)
                 %col(width="#{!empty($column['width']) ? $column['width'] : ''}")
 
         %thead
             %tr.fcom-datagrid__sort-labels(id="tr-sort-#{$config['id']}")
                 - foreach ($config['columns'] as $colId => $col)
-                    %th(id="th-sort-#{$config['id'].'-'.$colId}")
+                    %th(id="th-sort-#{$config['id'].'-'.$colId}" data-id="#{$colId}" style="#{$this->sortStyle($col)}"
+                             class="#{$this->sortClass($col, $s)}")
                         - if (empty($col['type']) || $col['type'] === 'default')
-                            %a.js-change-url(href="#{$this->sortUrl($col)}" class="#{$this->sortClass($col, $s)}")<
+                            %a.js-change-url(href="#{$this->sortUrl($col)}")<
                                 = $col['label']
                         - elseif ($col['type'] === 'multiselect')
                             %select.js-sel

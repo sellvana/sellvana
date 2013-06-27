@@ -72,12 +72,20 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return $this->gridUrl($change);
     }
 
-    public function sortClass($col, $s = null)
+    public function sortStyle($col)
     {
-        if (!$s) {
-            $s = $this->grid['result']['state'];
-        }
-        return !empty($s['s']) && $s['s'] == $col['id'] ? 'sort-'.$s['sd'] : '';
+        return !empty($col['width']) ? "width:{$col['width']}px" : '';
+    }
+
+    public function sortClass($col)
+    {
+        $classArr = array();
+        if (empty($col['no_reorder'])) $classArr[] = 'js-draggable';
+
+        $s = $this->grid['result']['state'];
+        if (!empty($s['s']) && $s['s'] == $col['id']) $classArr[] = 'sort-'.$s['sd'];
+
+        return join(' ', $classArr);
     }
 
     public function colFilterHtml($col)
@@ -88,12 +96,15 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     protected function _processColumnsConfig()
     {
         $grid = $this->grid;
+        $pos = 0;
         foreach ($grid['config']['columns'] as $cId => &$col) {
             $col['id'] = $cId;
+            $col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
                     $col['type'] = 'multiselect';
                     $col['width'] = 50;
+                    $col['no_reorder'] = true;
                     $col['format'] = function($args) {
                         return BUtil::tagHtml('input', array(
                             'type'  => 'checkbox',
@@ -107,6 +118,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                     $col['type'] = 'actions';
                     $col['label'] = 'Actions';
                     //$col['width'] = 50;
+                    $col['no_reorder'] = true;
                     $col['format'] = function($args) use($col) {
                         $options = array('' => '');
                         foreach ($col['options'] as $k => $opt) {
@@ -162,8 +174,22 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     protected function _processPersonalization()
     {
         $grid = $this->grid;
-        $pers = FCom_Admin_Model_User::i()->personalize();
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
+
+        $pers = FCom_Admin_Model_User::i()->personalize();
+
+#var_dump($grid['request']['ps'], $pers['grid'][$gridId]['ps']);
+
+        if (!empty($grid['request']['ps']) && (
+                empty($pers['grid'][$gridId]['ps']) 
+                || $pers['grid'][$gridId]['ps'] != $grid['request']['ps']
+        )) {
+            $data = array('grid'=>array($gridId=>array('ps' => $grid['request']['ps'])));
+            FCom_Admin_Model_User::i()->personalize($data);
+        } elseif (!empty($pers['grid'][$gridId]['ps'])) {
+            $grid['config']['page_size'] = $pers['grid'][$gridId]['ps'];
+        }
+
         if (!empty($pers['grid'][$gridId]['columns'])) {
             $persCols = $pers['grid'][$gridId]['columns'];
             foreach ($persCols as $k=>$c) {
@@ -173,6 +199,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             }
             $grid['config']['columns'] = BUtil::arrayMerge($grid['config']['columns'], $persCols);
         }
+        uasort($grid['config']['columns'], function($a, $b) { return $a['position']-$b['position']; });
         $this->grid = $grid;
     }
 
@@ -204,6 +231,12 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             $c['row_id_column'] = 'id';
         }
         unset($c);
+
+        // fetch request parameters
+        if (empty($grid['request'])) {
+            $grid['request'] = BRequest::i()->get();
+        }
+
         $this->grid = $grid;
 
         $this->_processColumnsConfig();
@@ -222,11 +255,6 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         // fetch grid configuration
         $config = $this->gridConfig();
         $grid = $this->grid;
-
-        // fetch request parameters
-        if (empty($grid['request'])) {
-            $grid['request'] = BRequest::i()->get();
-        }
 
         $orm = $config['orm'];
 
