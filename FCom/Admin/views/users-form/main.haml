@@ -8,16 +8,16 @@
         %li
             %h4.label = $this->_('Super Admin')
             %select(name="model[is_superadmin]")
-                - echo $this->optionsHtml($hlp->fieldOptions('is_superadmin'), $m->is_superadmin)
+                - echo BUtil::optionsHtml($hlp->fieldOptions('is_superadmin'), $m->is_superadmin)
         %li
             %h4.label = $this->_('Role')
             %select(name="model[role_id]")
                 %option
-                - echo $this->optionsHtml(FCom_Admin_Model_Role::options(), $m->role_id)
+                - echo BUtil::optionsHtml(FCom_Admin_Model_Role::options(), $m->role_id)
         %li
             %h4.label = $this->_('Status')
             %select(name="model[status]")
-                - echo $this->optionsHtml($hlp->fieldOptions('status'), $m->status)
+                - echo BUtil::optionsHtml($hlp->fieldOptions('status'), $m->status)
         %li
             %h4.label = $this->_('Email')
             %input(type="text" id="model-email" name="model[email]" class="validate[required,custom[email]]" value="#{$m->email}")

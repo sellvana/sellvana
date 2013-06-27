@@ -1,12 +1,17 @@
 - $gridView = $this->view('core/grid')
 - $config = $gridView->gridConfig()
+- $defSel = !empty($config['selection']) ? join('|', $config['selection']) : '';
 
 .fcom-datagrid-wrapper
     - echo $gridView
 
+%input(type="hidden" id="{$config['id']}-selection" name="datagrid[#{$config['id']}][selection]" value="#{$defSel}")
+
 :javascript
     $(function() {
-        var grid = new FCom.Grid("##{$config['id']}", {
-            grid_url: "#{$config['grid_url']}"
+        var grid = new FCom.DataGrid({
+            id: "#{$config['id']}",
+            grid_url: "#{$config['grid_url']}",
+            selection: #{!empty($config['selection']) ? BUtil::toJson($config['selection']) : '{}'},
         })
     })

@@ -26,7 +26,7 @@
         %li
             %h4.label = $this->_('Hide Product')
             %select(name="model[is_hidden")
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_hidden)
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_hidden)
 
 :javascript
     $(function() {

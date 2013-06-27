@@ -3,7 +3,7 @@
 
 - if (!$info)
     %div = $this->_('Invalid file format, please go back and select another file')
-    
+
 - else
     %form#import-columns-form(method="post")
         %input(type="hidden" name="config[filename]" value="#{$this->file}")
@@ -11,32 +11,32 @@
         %table
             %tr
                 %td = $this->_('Field Delimiter')
-                %td 
+                %td
                     %input(type="text" name="config[delim]" value="#{$info['delim']}")
-            
+
             %tr
                 %td = $this->_('Skip First Lines')
-                %td 
+                %td
                     %input(type="text" name="config[skip_first]" value="#{$info['skip_first']}")
-            
+
             %tr
                 %td = $this->_('Batch Size')
-                %td 
-                    %input(type="text" name="config[batch_size]" 
+                %td
+                    %input(type="text" name="config[batch_size]"
                         value="#{!empty($info['batch_size']) ? $info['batch_size'] : 100}")
-            
+
             %tr
                 %td = $this->_('Multi Value Delimiter')
-                %td 
-                    %input(type="text" name="config[multivalue_separator]" 
+                %td
+                    %input(type="text" name="config[multivalue_separator]"
                         value="#{!empty($info['multivalue_separator']) ? $info['multivalue_separator'] : ';'}")
-            
+
             %tr
                 %td = $this->_('Nesting Level Delimiter')
-                %td 
-                    %input(type="text" name="config[nesting_separator]" 
+                %td
+                    %input(type="text" name="config[nesting_separator]"
                         value="#{!empty($info['nesting_separator']) ? $info['nesting_separator'] : '>'}")
-            
+
         %br
         %table
             %tr
@@ -53,7 +53,7 @@
                                     %td
                                         %select(name="config[columns][#{$i}]")
                                             %option
-                                            - echo $this->optionsHtml($hlp->getFieldOptions(), !empty($info['columns'][$i]) ? $info['columns'][$i] : '')
+                                            - echo BUtil::optionsHtml($hlp->getFieldOptions(), !empty($info['columns'][$i]) ? $info['columns'][$i] : '')
                 %td.col
                     %table.data-table
                         %thead
@@ -69,7 +69,7 @@
                                         - if (!empty($f['options']))
                                             %select(name="config[defaults][#{$k}]")
                                                 %option
-                                                - echo $this->optionsHtml($f['options'], $_default)
+                                                - echo BUtil::optionsHtml($f['options'], $_default)
                                         - else
                                             - $_input = !empty($f['input']) ? $f['input'] : 'text'
                                             - if ($_input=='text')

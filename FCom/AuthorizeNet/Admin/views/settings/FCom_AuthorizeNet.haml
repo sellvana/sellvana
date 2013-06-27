@@ -26,7 +26,7 @@
               %label{:for => $prefix . "active"} = $this->_("Enabled")
             %td
               %select{:name => $baseAimHtmlName . "[active]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/active'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/active'))
           %tr
             %td
               %label{:for => $prefix . "title"} = $this->_("Title")
@@ -47,19 +47,19 @@
               %label{:for => $prefix . "payment_action"} = $this->_("Payment Action")
             %td
               %select{:id => $prefix . "payment_action", :name => $baseAimHtmlName . "[payment_action]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::paymentActions(), $c->get($baseAimConfigPath . '/payment_action'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::paymentActions(), $c->get($baseAimConfigPath . '/payment_action'))
           %tr
             %td
               %label{:for => $prefix . "order_status"} = $this->_("New Order Status")
             %td
               %select{:id => $prefix . "order_status", :name => $baseAimHtmlName . "[order_status]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::orderStatuses(), $c->get($baseAimConfigPath . '/order_status'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::orderStatuses(), $c->get($baseAimConfigPath . '/order_status'))
           %tr
             %td
               %label{:for => $prefix . "test"} = $this->_("Test Mode")
             %td
               %select{:id => $prefix . "test", :name => $baseAimHtmlName . "[test]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/test'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/test'))
           %tr
             %td
               %label{:for => $prefix . "cgi_url"} = $this->_("Gateway URL")
@@ -70,19 +70,19 @@
               %label{:for => $prefix . "currency"} = $this->_("Accepted Currency")
             %td
               %select{:id => $prefix . "currency", :name => $baseAimHtmlName . "[currency]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::currencies(), $c->get($baseAimConfigPath . '/currency'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::currencies(), $c->get($baseAimConfigPath . '/currency'))
           %tr
             %td
               %label{:for => $prefix . "debug"} = $this->_("Debug")
             %td
               %select{:id => $prefix . "debug", :name => $baseAimHtmlName . "[debug]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/debug'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/debug'))
           %tr
             %td
               %label{:for => $prefix . "email_customer"} = $this->_("Email Customer")
             %td
               %select{:id => $prefix . "email_customer", :name => $baseAimHtmlName . "[email_customer]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/email_customer'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/email_customer'))
           %tr
             %td
               %label{:for => $prefix . "merchant_email"} = $this->_("Merchant's Email")
@@ -93,25 +93,25 @@
               %label{:for => $prefix . "cctypes"} = $this->_("Credit Card Types")
             %td
               %select{:multiple => "multiple", :id => $prefix . "cctypes", :name => $baseAimHtmlName . "[cctypes][]", :size => "10"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::cardTypes(), $c->get($baseAimConfigPath . '/cctypes'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::cardTypes(), $c->get($baseAimConfigPath . '/cctypes'))
           %tr
             %td
               %label{:for => $prefix . "useccv"} = $this->_("Credit Card Verification")
             %td
               %select{:id => $prefix . "useccv", :name => $baseAimHtmlName . "[useccv]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/useccv'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/useccv'))
           %tr
             %td
               %label{:for => $prefix . "allowspecific"} = $this->_("Payment from Applicable Countries")
             %td
               %select{:id => $prefix . "allowspecific", :name => $baseAimHtmlName . "[allowspecific]"}
-                - echo $this->optionsHtml(array(0=>'All Allowed Countries', 1=>'Specific Countries'), $c->get($baseAimConfigPath . '/allowspecific'))
+                - echo BUtil::optionsHtml(array(0=>'All Allowed Countries', 1=>'Specific Countries'), $c->get($baseAimConfigPath . '/allowspecific'))
           %tr
             %td
               %label{:for => $prefix . "specificcountry"} = $this->_("Payment from Specific Countries")
             %td
               %select{:multiple => "multiple", :id => $prefix . "specificcountry", :name => $baseAimHtmlName . "[specific_country][]", :size => "10"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::countries(), $c->get($baseAimConfigPath . '/specific_country'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::countries(), $c->get($baseAimConfigPath . '/specific_country'))
           %tr
             %td
               %label{:for => $prefix . "min_order_total"} = $this->_("Minimum Order Total")
@@ -132,19 +132,19 @@
               %label{:for => $prefix . "allow_partial_authorization"} = $this->_("Allow Partial Authorization")
             %td
               %select{:id => $prefix . "allow_partial_authorization", :name => $baseAimHtmlName . "[allow_partial_authorization]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/allow_partial_authorization'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/allow_partial_authorization'))
           %tr
             %td
               %label{:for => $prefix . "centinel"} = $this->_("3D Secure Card Validation")
             %td
               %select{:id => $prefix . "centinel", :name => $baseAimHtmlName . "[centinel]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/centinel'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/centinel'))
           %tr
             %td
               %label{:for => $prefix . "centinel_is_mode_strict"} = $this->_("Severe 3D Secure Card Validation")
             %td
               %select{:id => $prefix . "centinel_is_mode_strict", :name => $baseAimHtmlName . "[centinel_is_mode_strict]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/centinel_is_mode_strict'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseAimConfigPath . '/centinel_is_mode_strict'))
               %p
                 %span = $this->_("Severe Validation Removes Chargeback Liability on Merchant")
           %tr
@@ -164,7 +164,7 @@
               %label{:for => $prefix . "active"} = $this->_("Enabled")
             %td
               %select{:id => $prefix . "active", :name => $baseDpmHtmlName . "[active]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/active'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/active'))
           %tr
             %td
               %label{:for => $prefix . "title"} = $this->_("Title")
@@ -190,19 +190,19 @@
               %label{:for => $prefix . "payment_action"} = $this->_("Payment Action")
             %td
               %select{:id => $prefix . "payment_action", :name => $baseDpmHtmlName . "[payment_action]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::paymentActions(), $c->get($baseDpmConfigPath . '/payment_action'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::paymentActions(), $c->get($baseDpmConfigPath . '/payment_action'))
           %tr
             %td
               %label{:for => $prefix . "order_status"} = $this->_("New Order Status")
             %td
               %select{:id => $prefix . "order_status", :name => $baseDpmHtmlName . "[order_status]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::orderStatuses(), $c->get($baseDpmConfigPath . '/order_status'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::orderStatuses(), $c->get($baseDpmConfigPath . '/order_status'))
           %tr
             %td
               %label{:for => $prefix . "test"} = $this->_("Test Mode")
             %td
               %select{:id => $prefix . "test", :name => $baseDpmHtmlName . "[test]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/test'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/test'))
           %tr
             %td
               %label{:for => $prefix . "cgi_url"} = $this->_("Gateway URL")
@@ -213,19 +213,19 @@
               %label{:for => $prefix . "currency"} = $this->_("Accepted Currency")
             %td
               %select{:id => $prefix . "currency", :name => $baseDpmHtmlName . "[currency]"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::currencies(), $c->get($baseAimConfigPath . '/currency'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::currencies(), $c->get($baseAimConfigPath . '/currency'))
           %tr
             %td
               %label{:for => $prefix . "debug"} = $this->_("Debug")
             %td
               %select{:id => $prefix . "debug", :name => $baseDpmHtmlName . "[debug]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/debug'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/debug'))
           %tr
             %td
               %label{:for => $prefix . "email_customer"} = $this->_("Email Customer")
             %td
               %select{:id => $prefix . "email_customer", :name => $baseDpmHtmlName . "[email_customer]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/email_customer'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/email_customer'))
           %tr
             %td
               %label{:for => $prefix . "merchant_email"} Merchant's Email
@@ -236,25 +236,25 @@
               %label{:for => $prefix . "cctypes"} = $this->_("Credit Card Types")
             %td
               %select{:id => $prefix . "cctypes", :multiple => "multiple", :name => $baseDpmHtmlName . "[cctypes][]", :size => "10"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::cardTypes(), $c->get($baseDpmConfigPath . '/cctypes'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::cardTypes(), $c->get($baseDpmConfigPath . '/cctypes'))
           %tr
             %td
               %label{:for => $prefix . "useccv"} = $this->_("Credit Card Verification")
             %td
               %select{:id => $prefix . "useccv", :name => $baseDpmHtmlName . "[useccv]"}
-                - echo $this->optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/useccv'))
+                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get($baseDpmConfigPath . '/useccv'))
           %tr
             %td
               %label{:for => $prefix . "allowspecific"} = $this->_("Payment from Applicable Countries")
             %td
               %select{:id => $prefix . "allowspecific", :name => $baseDpmHtmlName . "[allowspecific]"}
-                - echo $this->optionsHtml(array(0=>'All Allowed Countries', 1=>'Specific Countries'), $c->get($baseDpmConfigPath . '/allowspecific'))
+                - echo BUtil::optionsHtml(array(0=>'All Allowed Countries', 1=>'Specific Countries'), $c->get($baseDpmConfigPath . '/allowspecific'))
           %tr
             %td
               %label{:for => $prefix . "specificcountry"} = $this->_("Payment from Specific Countries")
             %td
               %select{:id => $prefix . "specificcountry", :multiple => "multiple", :name => $baseDpmHtmlName . "[specificcountry][]", :size => "10"}
-                - echo $this->optionsHtml( FCom_AuthorizeNet_Model_Settings::countries(), $c->get($baseDpmConfigPath . '/specific_country'))
+                - echo BUtil::optionsHtml( FCom_AuthorizeNet_Model_Settings::countries(), $c->get($baseDpmConfigPath . '/specific_country'))
           %tr
             %td
               %label{:for => $prefix . "min_order_total"} = $this->_("Minimum Order Total")

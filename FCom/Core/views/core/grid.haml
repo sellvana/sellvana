@@ -19,7 +19,7 @@
 
                     %span.fcom-datagrid__rows-per-page<
                         %select.js-change-url(data-href="#{$this->pageSizeHref()}")
-                            - echo $this->optionsHtml($this->pageSizeOptions(), $s['ps'])
+                            - echo BUtil::optionsHtml($this->pageSizeOptions(), $s['ps'])
                         = $this->_('per page')
 
                 %td.a-center
@@ -32,7 +32,7 @@
                         %label = $this->_('Page')
 
                         %select.js-change-url(data-href="#{$this->pageChangeHref()}")
-                            - echo $this->optionsHtml($this->pageOptions(), $s['p'])
+                            - echo BUtil::optionsHtml($this->pageOptions(), $s['p'])
 
                         - echo $this->_('of %s', $s['mp'])
 
@@ -65,8 +65,9 @@
             - echo $s['description']
 
     %table.fcom-datagrid__grid
-        - foreach ($config['columns'] as $colId => $column)
-            %col(width="#{!empty($column['width']) ? $column['width'] : ''}")
+        %colgroup
+            - foreach ($config['columns'] as $colId => $column)
+                %col(width="#{!empty($column['width']) ? $column['width'] : ''}")
 
         %thead
             %tr.fcom-datagrid__sort-labels(id="tr-sort-#{$config['id']}")
@@ -75,6 +76,9 @@
                         - if (empty($col['type']) || $col['type'] === 'default')
                             %a.js-change-url(href="#{$this->sortUrl($col)}" class="#{$this->sortClass($col, $s)}")<
                                 = $col['label']
+                        - elseif ($col['type'] === 'multiselect')
+                            %select.js-sel
+                                - echo BUtil::optionsHtml($this->multiselectToggleOptions(), $this->multiselectCurrent())
 
             - if (!empty($config['filters']))
                 %tr.fcom-datagrid__inline-filters(id="tr-filter-#{$config['id']}")

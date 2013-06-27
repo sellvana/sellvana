@@ -1138,6 +1138,39 @@ class BUtil extends BClass
     }
 
     /**
+     * @param array $options
+     * @param string $default
+     * @return string
+     */
+    public static function optionsHtml($options, $default = '')
+    {
+        if(!is_array($default)){
+            $default = (string)$default;
+        }
+        $htmlArr = array();
+        foreach ($options as $k => $v) {
+            $k = (string)$k;
+            if (is_array($v) && $k[0] === '@') { // group
+                $label = trim(substr($k, 1));
+                $htmlArr[] = BUtil::tagHtml('optgroup', array('label' => $label), static::optionsHtml($v, $default));
+                continue;
+            }
+            if (is_array($v)) {
+                $attr = $v;
+                $v = !empty($attr['text']) ? $attr['text'] : '';
+                unset($attr['text']);
+            } else {
+                $attr = array();
+            }
+            $attr['value'] = $k;
+            $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
+            $htmlArr[] = BUtil::tagHtml('option', $attr, $v);
+        }
+
+        return join("\n", $htmlArr);
+    }
+
+    /**
     * Strip html tags and shorten to specified length, to the whole word
     *
     * @param string $text
@@ -1352,6 +1385,10 @@ class BUtil extends BClass
         }
         return $sorted;
     }
+}
+
+class BHTML extends BClass
+{
 
 }
 

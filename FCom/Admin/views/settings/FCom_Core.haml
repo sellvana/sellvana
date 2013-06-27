@@ -27,12 +27,12 @@
                         %td = $this->_('Enable Logging')
                         %td
                             %select(name="config[db][logging]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
                     %tr
                         %td = $this->_('Enable Implicit Migration')
                         %td
                             %select(name="config[db][implicit_migration]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))
         .group
             %h3
                 %a(href="#") = $this->_('Website')
@@ -62,7 +62,7 @@
                         %td = $this->_('Session Handler')
                         %td
                             %select(name="config[cookie][session_handler]")
-                                - echo $this->optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler'))
+                                - echo BUtil::optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler'))
                     %tr
                         %td = $this->_('Cookie Timeout')
                         %td
@@ -84,7 +84,7 @@
                         %td = $this->_('Verify Session IP')
                         %td
                             %select(name="config[cookie][session_check_ip]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip'))
         .group
             %h3
                 %a(href="#") = $this->_('System')
@@ -94,7 +94,7 @@
                         %td = $this->_('Hide script file name in URL')
                         %td
                             %select(name="config[web][hide_script_name]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))
 
         .group
             %h3
@@ -105,4 +105,4 @@
                         %td = $this->_('Check Method')
                         %td
                             %select(name="config[web][csrf_check_method]")
-                                - echo $this->optionsHtml(array('referrer'=>'Referrer', 'token'=>'Token'), $c->get('web/csrf_check_method'))
+                                - echo BUtil::optionsHtml(array('referrer'=>'Referrer', 'token'=>'Token'), $c->get('web/csrf_check_method'))

@@ -11,7 +11,7 @@
         %li.label-l
             %label(for="main-node_type") = $this->_('Node Type')
             %select#main-node_type(name="model[node_type]")
-                - echo $this->optionsHtml($this->node_types, $m->node_type)
+                - echo BUtil::optionsHtml($this->node_types, $m->node_type)
         %li.label-l
             %label(for="main-reference") = $this->_('Reference')
             %input#main-reference(type="text" name="model[reference]" value="#{$m->reference}")

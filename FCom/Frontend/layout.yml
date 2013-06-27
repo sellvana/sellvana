@@ -4,6 +4,7 @@ base:
     - { hook: head, views: head }
 
     - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend::layout }
 
     - view: head
         do:

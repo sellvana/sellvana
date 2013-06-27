@@ -13,9 +13,9 @@
                     %td = $this->_('Default Shipping Method')
                     %td
                         %select(name="config[modules][FCom_Sales][default_shipping_method]")
-                            - echo $this->optionsHtml($shippingMethods, $c->get('modules/FCom_Sales/default_shipping_method'))
+                            - echo BUtil::optionsHtml($shippingMethods, $c->get('modules/FCom_Sales/default_shipping_method'))
                 %tr
                     %td = $this->_('Default Payment Method')
                     %td
                         %select(name="config[modules][FCom_Sales][default_payment_method]")
-                            - echo $this->optionsHtml($paymentMethods, $c->get('modules/FCom_Sales/default_payment_method'))
+                            - echo BUtil::optionsHtml($paymentMethods, $c->get('modules/FCom_Sales/default_payment_method'))

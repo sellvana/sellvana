@@ -53,7 +53,7 @@
                     %li.label-l
                         %label(for="model-group") = $this->_('Customer Group')
                         %select#model-group(name="model[customer_group]")
-                            - echo $this->optionsHtml($customerGroups, $m->customer_group)
+                            - echo BUtil::optionsHtml($customerGroups, $m->customer_group)
                 %li.label-l
                     %label(for="model-phone") = $this->_('Daytime Phone')
                     %input#model-phone(type="text" name="model[phone]" value="#{$m->phone}")
@@ -63,7 +63,7 @@
                 %li.label-l
                     %label(for="model-status") = $this->_('Status')
                     %select#model-status(name="model[status]")
-                        - echo $this->optionsHtml($m->fieldOptions('status'), $m->status)
+                        - echo BUtil::optionsHtml($m->fieldOptions('status'), $m->status)
 
         #fieldset
             %h3.form-group-title = $this->_('Password Reset')

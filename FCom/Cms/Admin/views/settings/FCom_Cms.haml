@@ -11,7 +11,7 @@
                         %td = $this->_('Enable CMS Pages')
                         %td
                             %select(name="config[modules][FCom_Cms][page_enable]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('modules/FCom_Cms/page_enable'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('modules/FCom_Cms/page_enable'))
                     %tr
                         %td = $this->_('CMS Page URL Prefix')
                         %td
@@ -21,7 +21,7 @@
                         %td = $this->_('Enable CMS Nav')
                         %td
                             %select(name="config[modules][FCom_Cms][nav_enable]")
-                                - echo $this->optionsHtml(array(0=>'No',1=>'Yes'), $c->get('modules/FCom_Cms/nav_enable'))
+                                - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('modules/FCom_Cms/nav_enable'))
                     %tr
                         %td = $this->_('CMS Nav URL Prefix')
                         %td

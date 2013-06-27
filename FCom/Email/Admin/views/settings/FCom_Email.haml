@@ -21,4 +21,4 @@
                         %td = $this->_('Default Handler')
                         %td
                             %select(name="config[modules][FCom_Email][default_handler]")
-                                - echo $this->optionsHtml(BUtil::arrayToOptions(BEmail::i()->getHandlers(), 'description'), $c->get('modules/FCom_Email/default_handler'))
+                                - echo BUtil::optionsHtml(BUtil::arrayToOptions(BEmail::i()->getHandlers(), 'description'), $c->get('modules/FCom_Email/default_handler'))

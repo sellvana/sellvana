@@ -44,6 +44,28 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return $this->grid['config']['actions'];
     }
 
+    public function multiselectToggleOptions()
+    {
+        return array(
+            '' => 'Selection...',
+            '@Show' => array(
+                'show_all' => 'All',
+                'show_sel' => 'Only Selected',
+                'show_unsel' => 'Only Unselected',
+            ),
+            '@Change Selection' => array(
+                'upd_sel' => 'Select Visible',
+                'upd_unsel' => 'Unselect Visible',
+            ),
+        );
+    }
+
+    public function multiselectCurrent()
+    {
+        $grid = $this->get('grid');
+        return !empty($grid['request']['selected']) ? $grid['request']['selected'] : '';
+    }
+
     public function sortUrl($col)
     {
         $grid = $this->get('grid');
@@ -94,18 +116,21 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         if (!isset($c['sort_dir'])) {
             $c['sort_dir'] = 'asc';
         }
-        if (empty($c['fields'])) {
-            $c['fields'] = $c['columns'];
-            foreach ($c['columns'] as $cId=>$col) {
-                $c['columns'][$cId]['fields'] = array($cId);
-            }
+        if (empty($c['row_id_column'])) {
+            $c['row_id_column'] = 'id';
         }
-        foreach ($c['columns'] as $cId=>&$col) {
+        foreach ($c['columns'] as $cId => &$col) {
             $col['id'] = $cId;
-            if (!empty($col['fields'])) {
-                foreach ($col['fields'] as $fId) {
-                    $c['fields'][$fId]['col'] = $cId;
-                }
+            if ($cId === '_multiselect') {
+                $col['type'] = 'multiselect';
+                $col['width'] = 50;
+                $col['format'] = function($args) use($c) {
+                    return BUtil::tagHtml('input', array(
+                        'type'  => 'checkbox',
+                        //'name'  => "grid[{$c['id']}][sel][{$args['row']->id}]",
+                        'class' => 'js-sel',
+                    ));
+                };
             }
         }
         unset($col);
@@ -193,6 +218,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             $row->_id = $rowId;
             $trAttr = array();
             $trAttr['id'] = "data-row--{$gridId}--{$rowId}";
+            $trAttr['data-id'] = $row->get($grid['config']['row_id_column']);
             $trAttr['class'][] = $rowId % 2 ? 'odd' : 'even';
 
             $tdHtmlArr = array();
@@ -222,7 +248,8 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             $out['attr'] = (array)$row['attr'];
         }
         if (empty($out['attr']['id'])) {
-            $out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
+            $out['attr']['data-col'] = $col['id'];
+            //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
         }
 
         $value = $row->get($col['id']);
@@ -230,6 +257,8 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         if (('' === $value || is_null($value)) && !empty($col['default'])) {
             $value = $col['default'];
         }
+
+        $out['attr']['data-value'] = $value;
 
         if (isset($col['options'][$value])) {
             $value = $col['options'][$value];
@@ -240,27 +269,76 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                 switch ($col['format']) {
                     case 'boolean': $value = $value ? 1 : 0; break;
                     case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
+                    case 'datetime': $value = $value ? BLocale::i()->datetimeDbToLocal($value, true) : ''; break;
                     case 'currency': $value = $value ? '$'.number_format($value, 2) : ''; break;
                     default: BDebug::warning('Grid value format not implemented: '.$col['format']);
                 }
+                $value = nl2br($this->q($value));
             } elseif (is_callable($col['format'])) {
                 $args['value'] = $value;
                 $value = call_user_func($col['format'], $args);
             }
         }
 
-        $html = nl2br($this->q($value));
 
         if (!empty($col['href'])) {
-            $html = BUtil::tagHtml('a', array('href' => BUtil::injectVars($col['href'], $row->as_array())), $html);
+            $value = BUtil::tagHtml('a', array('href' => BUtil::injectVars($col['href'], $row->as_array())), $value);
         }
 
-        $out['html'] = $html;
+        $out['html'] = $value;
 
         if (!empty($col['row_attr']) && is_callable($col['row_attr'])) {
             $out['row_attr'] = call_user_func($out['row_attr'], $args);
         }
         return $out;
+    }
+
+    public function stateDescription($params=null)
+    {
+        $descrArr = array();
+        if (is_null($params)) {
+            $params = $this->grid['result']['state'];
+        }
+        if (!empty($params['search'])) {
+            $descr = $this->_("Filtered by:").' ';
+            foreach ($params['search'] as $k=>$s) {
+                if ($k==='_quick') {
+                    $filter = array('type'=>'quick');
+                    $descr .= '<b>'.$this->_('Quick search').'</b>';
+                } else {
+                    $filter = $this->grid['config']['filters'][$k];
+                    $descr .= '<b>'.$filter['label'].'</b>';
+                }
+                switch ($filter['type']) {
+                    case 'multiselect':
+                        $opts = array();
+                        $os = explode(',', $s);
+                        if (sizeof($os)==1) {
+                            $descr .= ' '.$this->_('is <u>%s</u>', $this->q($filter['options'][$os[0]]));
+                        } else {
+                            foreach ($os as $o) {
+                                $opts[] = $filter['options'][$o];
+                            }
+                            $descr .= ' '.$this->_('is one of <u>%s</u>', $this->q(join(', ', $opts)));
+                        }
+                        break;
+
+                    case 'text-range': case 'date-range':
+                        $descr .= ' '.$this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
+
+                        break;
+                    case 'quick':
+                        $descr .= ' '.$this->_('by <u>%s</u>', $this->q($s));
+                        break;
+
+                    default:
+                        $descr .= ' '.$this->_('contains <u>%s</u>', $this->q($s));
+                }
+                $descr .= '; ';
+            }
+            $descrArr[] = $descr;
+        }
+        return $descrArr ? join("; ", $descrArr) : '';
     }
 
     protected function _processGridJoins(&$config, &$mapColumns, $orm, $when='before_count')
@@ -376,51 +454,4 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         }
     }
 
-    public function stateDescription($params=null)
-    {
-        $descrArr = array();
-        if (is_null($params)) {
-            $params = $this->grid['result']['state'];
-        }
-        if (!empty($params['search'])) {
-            $descr = $this->_("Filtered by:").' ';
-            foreach ($params['search'] as $k=>$s) {
-                if ($k==='_quick') {
-                    $filter = array('type'=>'quick');
-                    $descr .= '<b>'.$this->_('Quick search').'</b>';
-                } else {
-                    $filter = $this->grid['config']['filters'][$k];
-                    $descr .= '<b>'.$filter['label'].'</b>';
-                }
-                switch ($filter['type']) {
-                    case 'multiselect':
-                        $opts = array();
-                        $os = explode(',', $s);
-                        if (sizeof($os)==1) {
-                            $descr .= ' '.$this->_('is <u>%s</u>', $this->q($filter['options'][$os[0]]));
-                        } else {
-                            foreach ($os as $o) {
-                                $opts[] = $filter['options'][$o];
-                            }
-                            $descr .= ' '.$this->_('is one of <u>%s</u>', $this->q(join(', ', $opts)));
-                        }
-                        break;
-
-                    case 'text-range': case 'date-range':
-                        $descr .= ' '.$this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
-
-                        break;
-                    case 'quick':
-                        $descr .= ' '.$this->_('by <u>%s</u>', $this->q($s));
-                        break;
-
-                    default:
-                        $descr .= ' '.$this->_('contains <u>%s</u>', $this->q($s));
-                }
-                $descr .= '; ';
-            }
-            $descrArr[] = $descr;
-        }
-        return $descrArr ? join("; ", $descrArr) : '';
-    }
 }
