@@ -5,4 +5,4 @@
 	%ul.form-list
 		%li
 			%h4.label = $this->_('Source')
-			.js-ace(name="source" style="width: 600px; height: 200px;") = $m->source
+			%textarea.js-code-editor(name="source" style="width: 600px; height: 200px;") = $m->source

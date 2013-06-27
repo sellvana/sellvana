@@ -4,6 +4,36 @@
     .settings-container
         .group
             %h3
+                %a(href="#") = $this->_('HTML')
+            %div
+                %table
+                    %tr
+                        %td = $this->_('Theme')
+                        %td
+                            %select(name="config[modules][FCom_Frontend][theme]")
+                                - echo $this->optionsHtml(BLayout::i()->getThemes('FCom_Frontend', true), $c->get('modules/FCom_Frontend/theme'))
+                    %tr
+                        %td = $this->_('Additional JS Files')
+                        %td
+                            %textarea(name="config[modules][FCom_Frontend][add_js_files]"
+                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_js_files')
+                    %tr
+                        %td = $this->_('Additional CSS Files')
+                        %td
+                            %textarea(name="config[modules][FCom_Frontend][add_css_files]"
+                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_css_files')
+                    %tr
+                        %td = $this->_('Additional JS Code')
+                        %td
+                            %textarea.js-code-editor(name="config[modules][FCom_Frontend][add_js_code]" data-mode="javascript"
+                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_js_code')
+                    %tr
+                        %td = $this->_('Additional CSS Style')
+                        %td
+                            %textarea.js-code-editor(name="config[modules][FCom_Frontend][add_css_style]" data-mode="css"
+                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_css_style')
+        .group
+            %h3
                 %a(href="#") = $this->_('Area Settings')
             %div
                 %table
@@ -17,36 +47,6 @@
                         %td
                             %input(type="text" name="config[recovery_modules][FCom_Frontend]"
                                 value="#{ $c->get('recovery_modules/FCom_Frontend') }")
-        .group
-            %h3
-                %a(href="#") = $this->_('HTML')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Theme')
-                        %td
-                            %select(name="config[modules][FCom_Frontend][theme]")
-                                - echo $this->optionsHtml(BLayout::i()->getThemes('FCom_Frontend', true), $c->get('modules/FCom_Frontend/theme'))
-                    %tr
-                        %td = $this->_('Additional JS Files')
-                        %td
-                            .js-ace(name="config[modules][FCom_Frontend][add_js_files]"
-                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_js_files')
-                    %tr
-                        %td = $this->_('Additional CSS Files')
-                        %td
-                            .js-ace(name="config[modules][FCom_Frontend][add_css_files]"
-                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_css_files')
-                    %tr
-                        %td = $this->_('Additional JS Code')
-                        %td
-                            .js-ace(name="config[modules][FCom_Frontend][add_js_code]" data-mode="javascript"
-                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_js_code')
-                    %tr
-                        %td = $this->_('Additional CSS Style')
-                        %td
-                            .js-ace(name="config[modules][FCom_Frontend][add_css_style]" data-mode="css"
-                                style="width:400px; height:100px") = $c->get('modules/FCom_Frontend/add_css_style')
         .group
             %h3
                 %a(href="#") = $this->_('Navigation')
@@ -69,4 +69,4 @@
                                 value="#{ $c->get('modules/FCom_Frontend/nav_top/root_category') }")
 
 :javascript
-    $(function() { FCom.Admin.initAce() })
+    $(function() { FCom.Admin.initCodeEditors() })

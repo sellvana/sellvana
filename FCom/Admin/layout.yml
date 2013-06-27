@@ -6,6 +6,7 @@ base:
   - { hook: before_body_end, views: bottom_scripts }
 
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+  - { callback: FCom_Admin_Admin::layout }
 
   - view: head
     do:
@@ -118,10 +119,14 @@ mcdropdown:
       - [ js, @FCom_Core/js/lib/jquery.mcdropdown.js ]
       - [ js, @FCom_Core/js/lib/jquery.bgiframe.js ]
 
-ace:
+codemirror:
+  - view: head
+    do:
+      - [ css, @FCom_Admin/js/codemirror/lib/codemirror.css ]
   - view: bottom_scripts
     do:
-      - [ js, @FCom_Admin/js/ace-src-min-noconflict/ace.js ]
+      - [ js, @FCom_Admin/js/codemirror/lib/codemirror.js ]
+      - [ js, @FCom_Admin/js/codemirror/addon/mode/loadmode.js ]
 
 form:
   - view: head
@@ -207,7 +212,7 @@ form:
 /settings:
     - { include: base }
     - { include: form }
-    - { include: ace }
+    - { include: codemirror }
     - { hook: main, views: settings }
     - { view: admin/nav, do: [[ setNav, admin/settings ]] }
     - view: settings

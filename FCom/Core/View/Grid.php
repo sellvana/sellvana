@@ -4,28 +4,39 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 {
     static protected $_defaultActions = array(
         'refresh' => true,
+        'link_to_page' => true,
     );
 
     public function gridUrl($changeRequest=array())
     {
+        if (!$changeRequest) {
+            return $this->grid['config']['grid_url'];
+        }
         return BUtil::setUrlQuery($this->grid['config']['grid_url'], $changeRequest);
     }
 
-    public function sortUrl($colId)
+    public function pageSizeHref()
     {
-        if (!empty($this->grid['request']['s']) && $this->grid['request']['s']==$colId) {
-            $change = array('sd'=>$this->grid['request']['sd']=='desc'?'asc':'desc');
-        } else {
-            $change = array('s'=>$colId, 'sd'=>'asc');
-        }
-        return $this->gridUrl($change);
+        return BUtil::setUrlQuery(true, array('ps' => '-VALUE-'));
+
     }
 
     public function pageSizeOptions()
     {
-        $options = $this->grid['config']['page_size_options'];
-        $options = array_combine($options, $options);
-        return $options;
+        $pageSizes = $this->grid['config']['page_size_options'];
+        return array_combine($pageSizes, $pageSizes);
+    }
+
+    public function pageChangeHref()
+    {
+        return BUtil::setUrlQuery(true, array('p' => '-VALUE-'));
+    }
+
+    public function pageOptions()
+    {
+        $url = BRequest::currentUrl();
+        $pages = range(1, $this->grid['result']['state']['mp']);
+        return array_combine($pages, $pages);
     }
 
     public function gridActions()
@@ -33,52 +44,31 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return $this->grid['config']['actions'];
     }
 
-    public function sortClass($colId)
+    public function sortUrl($col)
     {
-        $s = $this->grid['result']['state'];
-        return !empty($s['s']) && $s['s']==$colId ? 'sort-'.$s['sd'] : '';
+        $grid = $this->get('grid');
+        if (!empty($col['no_sort'])) {
+            return '#';
+        }
+        if (!empty($grid['request']['s']) && $grid['request']['s']==$col['id']) {
+            $change = array('sd'=>$grid['request']['sd']=='desc'?'asc':'desc');
+        } else {
+            $change = array('s'=>$col['id'], 'sd'=>'asc');
+        }
+        return $this->gridUrl($change);
     }
 
-    public function colFilterHtml($colId)
+    public function sortClass($col, $s = null)
+    {
+        if (!$s) {
+            $s = $this->grid['result']['state'];
+        }
+        return !empty($s['s']) && $s['s'] == $col['id'] ? 'sort-'.$s['sd'] : '';
+    }
+
+    public function colFilterHtml($col)
     {
         return '';
-    }
-
-    public function cellStyle($row, $colId)
-    {
-        $column = $this->grid['config']['columns'][$colId];
-        if (empty($column['style'])) {
-            return '';
-        }
-        return is_callable($column['style']) ? call_user_func($column['style'], $row, $colId) : $column['style'];
-    }
-
-    public function cellClass($row, $colId)
-    {
-        return !empty($row[$colId]['class']) ? $row[$colId]['class'] : '';
-    }
-
-    public function cellHtml($row, $colId)
-    {
-        return $row[$colId]['raw'];
-    }
-
-    public function cellData($cell, $rowId=null, $colId=null)
-    {
-        /*
-        if (empty($this->grid['data']['rows'][$rowId][$colId])) {
-            return '';
-        }
-        $cell = $this->grid['data']['rows'][$rowId][$colId];
-        */
-        if (!empty($this->grid['config']['columns'][$colId]['renderer'])) {
-            $renderer = $this->grid['config']['columns'][$colId]['renderer'];
-            if (is_callable($renderer)) {
-                return call_user_func($renderer, $cell, $rowId, $colId);
-            }
-        }
-
-        return nl2br($this->q(!empty($cell['value']) ? $cell['value'] : ''));
     }
 
     public function gridConfig()
@@ -110,26 +100,36 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
                 $c['columns'][$cId]['fields'] = array($cId);
             }
         }
-        foreach ($c['columns'] as $cId=>$col) {
+        foreach ($c['columns'] as $cId=>&$col) {
+            $col['id'] = $cId;
             if (!empty($col['fields'])) {
                 foreach ($col['fields'] as $fId) {
                     $c['fields'][$fId]['col'] = $cId;
                 }
             }
         }
+        unset($col);
+
         if (!empty($c['actions'])) {
             foreach ($c['actions'] as $k => &$action) {
-                if (true === $action && !empty(static::$_defaultActions[$action])) {
+                if (true === $action && !empty(static::$_defaultActions[$k])) {
                     switch ($k) {
                         case 'refresh':
-                            $action = BUtil::tagHtml('a',
+                            $action = array('html' => BUtil::tagHtml('a',
                                 array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh'),
                                 BLocale::_('Refresh')
-                            );
+                            ));
+                            break;
+
+                        case 'link_to_page':
+                            $action = array('html' => BUtil::tagHtml('a',
+                                array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page'),
+                                BLocale::_('Link')
+                            ));
                             break;
 
                         default:
-                            $action = static::$_defaultActions[$action];
+                            $action = static::$_defaultActions[$k];
                     }
                 }
                 if (is_string($action)) {
@@ -138,6 +138,7 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
             }
             unset($action);
         }
+
         BEvents::i()->fire(__METHOD__.'.after', array('config' => &$c));
 
         $grid = $this->grid;
@@ -149,14 +150,8 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
     public function gridData(array $options=array())
     {
         // fetch grid configuration
+        $config = $this->gridConfig();
         $grid = $this->grid;
-        /*
-        $config =& $grid['config'];
-        if (!empty($grid['serverConfig'])) {
-            $config = BUtil::arrayMerge($config, $grid['serverConfig']);
-        }
-        */
-        $config = $this->grid['config'];
 
         // fetch request parameters
         if (empty($grid['request'])) {
@@ -165,75 +160,107 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
 
         $orm = $config['orm'];
 
-        BEvents::i()->fire('BViewGrid::gridData.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
+        BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
         $mapColumns = array();
 
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
         $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
 
-        $result = $orm->paginate(null, array(
+        $grid['result'] = $orm->paginate($grid['request'], array(
             's' => !empty($config['sort']) ? $config['sort'] : null,
             'sd' => !empty($config['sort_dir']) ? $config['sort_dir'] : null,
-            'ps' => !empty($config['page_size']) ? $config['page_size'] : null,
+            'p' => !empty($config['page']) ? $config['page'] : null,
+            'ps' => !empty($config['page_size']) ? $config['page_size'] : $config['page_size_options'][0],
         ));
-        $state['description'] = $this->stateDescription($result['state']);
-        $grid['result'] = array(
-            'state' => $result['state'],
-            'raw' => empty($options['no_out']) ? $result['rows'] : null,
-            'out' => array(),
-            //'query' => $orm,
-        );
+        $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
-        foreach ($result['rows'] as $i => $model) {
-            $r = $model->as_array();
-            if (empty($options['no_raw'])) {
-                //$grid['result']['raw'][$i] = $r;
-            }
-            if (empty($options['no_out'])) {
-                foreach ($config['columns'] as $k=>$f) {
-                    $field = !empty($f['field']) ? $f['field'] : $k;
-                    $grid['result']['out'][$i][$k]['raw'] = isset($r[$field]) ? $r[$field] : null;
-                    $value = isset($r[$field]) ? $r[$field] : (isset($f['default']) ? $f['default'] : '');
-                    if (!empty($f['options'][$value])) $value = $f['options'][$value];
-                    if (!empty($f['format'])) {
-                        $value = $this->_formatGridValue($f['format'], $value);
-                    }
-                    $grid['result']['out'][$i][$k]['value'] = $value;
-                    if (!empty($f['href'])) {
-                        $grid['result']['out'][$i][$k]['href'] = BUtil::injectVars($f['href'], $r);
-                    }
-                }
-                if (!empty($config['map'])) {
-                    foreach ($config['map'] as $m) {
-                        $value = $r[$m['value']];
-                        if (!empty($m['format'])) {
-                            $value = $this->_formatGridValue($m['format'], $value);
-                        }
-                        $grid['result']['out'][$i][$m['field']][$m['prop']] = $value;
-                    }
-                }
-            }
-        }
-        BEvents::i()->fire('BGridView::gridData.after: '.$config['id'], array('grid'=>&$grid));
+        BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid'=>&$grid));
 
         $this->grid = $grid;
         return $grid;
     }
 
-    protected function _formatGridValue($format, $value)
+    public function rowsHtml()
     {
-        if (is_string($format)) {
-            switch ($format) {
-                case 'boolean': $value = !!$value; break;
-                case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
-                case 'currency': $value = $value ? '$'.number_format($value, 2) : ''; break;
-                default: BDebug::warning('Grid value format not implemented: '.$format);
+        $grid = $this->get('grid');
+        $rows = $grid['result']['rows'];
+        $gridId = $grid['config']['id'];
+        $columns = $grid['config']['columns'];
+
+        $trHtmlArr = array();
+        foreach ($rows as $rowId => $row) {
+            $row->_id = $rowId;
+            $trAttr = array();
+            $trAttr['id'] = "data-row--{$gridId}--{$rowId}";
+            $trAttr['class'][] = $rowId % 2 ? 'odd' : 'even';
+
+            $tdHtmlArr = array();
+            foreach ($columns as $colId => $col) {
+                $cellData = $this->cellData($row, $col);
+                $tdHtmlArr[] = BUtil::tagHtml('td', $cellData['attr'], $cellData['html']);
+                if (!empty($cellData['row_attr'])) {
+                    $trAttr = array_merge_recursive($cellData['row_attr']);
+                }
             }
-        } elseif (is_callable($format)) {
-            $value = $format($value);
+            $trHtmlArr[] = BUtil::tagHtml('tr', $trAttr, join("\n", $tdHtmlArr));
         }
-        return $value;
+        return join("\n", $trHtmlArr);
+    }
+
+    public function cellData($row, $col)
+    {
+        $grid = $this->get('grid');
+        $args = array('grid' => $grid, 'row' => $row, 'col' => $col);
+        $out = array();
+
+        if (empty($col['attr'])) {
+            $out['attr'] = array();
+        } elseif (is_callable($col['attr'])) {
+            $out['attr'] = call_user_func($col['attr'], $args);
+        } else {
+            $out['attr'] = (array)$row['attr'];
+        }
+        if (empty($out['attr']['id'])) {
+            $out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
+        }
+
+        $value = $row->get($col['id']);
+
+        if (('' === $value || is_null($value)) && !empty($col['default'])) {
+            $value = $col['default'];
+        }
+
+        if (isset($col['options'][$value])) {
+            $value = $col['options'][$value];
+        }
+
+        if (!empty($col['format'])) {
+            if (is_string($col['format'])) {
+                switch ($col['format']) {
+                    case 'boolean': $value = $value ? 1 : 0; break;
+                    case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
+                    case 'currency': $value = $value ? '$'.number_format($value, 2) : ''; break;
+                    default: BDebug::warning('Grid value format not implemented: '.$col['format']);
+                }
+            } elseif (is_callable($col['format'])) {
+                $args['value'] = $value;
+                $value = call_user_func($col['format'], $args);
+            }
+        }
+
+        $html = nl2br($this->q($value));
+
+        if (!empty($col['href'])) {
+            $html = BUtil::tagHtml('a', array('href' => BUtil::injectVars($col['href'], $row->as_array())), $html);
+        }
+
+        $out['html'] = $html;
+
+        if (!empty($col['row_attr']) && is_callable($col['row_attr'])) {
+            $out['row_attr'] = call_user_func($out['row_attr'], $args);
+        }
+        return $out;
     }
 
     protected function _processGridJoins(&$config, &$mapColumns, $orm, $when='before_count')

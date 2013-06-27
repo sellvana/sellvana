@@ -7,7 +7,8 @@ common_js_libs:
 
     - view: bottom_scripts
         do:
-            - [ js, @FCom_Core/js/lib/jquery.tools.min.js ]
+            - [ js, @FCom_Core/js/lib/underscore-min.js ]
+            #- [ js, @FCom_Core/js/lib/jquery.tools.min.js ]
             - [ js, @FCom_Core/js/lib/json2.js ]
             - [ js, @FCom_Core/js/lib/date.js ]
             - [ js, @FCom_Core/js/lib/jquery.cookie.js ]

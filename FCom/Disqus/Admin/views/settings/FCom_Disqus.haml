@@ -16,13 +16,7 @@
                     %tr
                         %td = $this->_('Javascript Code')
                         %td
-                            .js-ace(name="config[modules][FCom_Disqus][code]" data-mode="javascript"
+                            %textarea.js-code-editor(name="config[modules][FCom_Disqus][code]" data-mode="javascript"
                                 style="width:600px; height:200px")  = $c->get('modules/FCom_Disqus/code')
 :javascript
-    $('.js-ace').each(function(idx, el) {
-        var editor = ace.edit(el);
-        var theme = $(el).data('theme');
-        var mode = $(el).data('mode');
-        editor.setTheme("ace/theme/" + (theme ? theme : "monokai"));
-        editor.getSession().setMode("ace/mode/" + (mode ? mode : "text"));
-    });
+    $(function() { FCom.Admin.initCodeEditors() })

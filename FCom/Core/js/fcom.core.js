@@ -33,8 +33,13 @@ FCom.Grid = function(gridEl, config) {
     var gridParent = gridEl.parent();
 
     function initDOM() {
-        $('select.js-change-url', gridParent).on('change', function(ev) { load(this.value); });
-        $('a.js-change-url', gridParent).on('click', function(ev) { load(this.href); return false; });
+        $('select.js-change-url', gridParent).on('change', function(ev) {
+            load( $(this).data('href').replace('-VALUE-', this.value) );
+        });
+        $('a.js-change-url', gridParent).on('click', function(ev) {
+            load( this.href );
+            return false;
+        });
     }
     initDOM();
 

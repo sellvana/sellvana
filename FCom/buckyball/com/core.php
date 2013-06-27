@@ -337,6 +337,9 @@ class BApp extends BClass
     */
     public static function src($modName, $url='', $method='baseSrc')
     {
+        if ($modName[0]==='@' && !$url) {
+            list($modName, $url) = explode('/', substr($modName, 1), 2);
+        }
         $m = BApp::m($modName);
         if (!$m) {
             BDebug::error('Invalid module: '.$modName);
@@ -1403,7 +1406,7 @@ class BEvents extends BClass
 
     /**
      * Run callback on event only once, and remove automatically
-     * 
+     *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
      * @param mixed $callback
      * @param array|object $args
@@ -1419,7 +1422,7 @@ class BEvents extends BClass
         }
         $this->on($eventName, $callback, $args);
         $lastId = sizeof($this->_events[$eventName]['observers']);
-        $this->on($eventName, function() use ($eventName, $lastId) { 
+        $this->on($eventName, function() use ($eventName, $lastId) {
             BEvents::i()
                 ->off($eventName, $lastId-1) // remove the observer
                 ->off($eventName, $lastId) // remove the remover

@@ -1063,6 +1063,9 @@ class BUtil extends BClass
     */
     public static function setUrlQuery($url, $params)
     {
+        if (true === $url) {
+            $url = BRequest::currentUrl();
+        }
         $parsed = parse_url($url);
         $query = array();
         if (!empty($parsed['query'])) {
@@ -1111,6 +1114,23 @@ class BUtil extends BClass
             }
             if (true === $v) {
                 $v = $k;
+            } elseif (is_array($v)) {
+                switch ($k) {
+                    case 'class':
+                        $v = join(' ', $v);
+                        break;
+
+                    case 'style':
+                        $attrHtmlArr = array();
+                        foreach ($v as $k1 => $v1) {
+                            $attrHtmlArr[] = $k1.':'.$v1;
+                        }
+                        $v = join('; ', $attrHtmlArr);
+                        break;
+
+                    default:
+                        $v = join('', $v);
+                }
             }
             $attrsHtmlArr[] = $k.'="'.htmlspecialchars($v, ENT_QUOTES, 'UTF-8').'"';
         }

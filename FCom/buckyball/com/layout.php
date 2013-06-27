@@ -335,7 +335,7 @@ class BLayout extends BClass
      * If view already exists, will replace its params with provided ones.
      *
      * @param string|array $viewName
-     * @param array $params
+     * @param string|array $params if string - view class name
      * @param bool $reset
      * @return $this
      * @throws BException
@@ -351,6 +351,9 @@ class BLayout extends BClass
             }
 
             return $this;
+        }
+        if (is_string($params)) {
+            $params = array('view_class' => $params);
         }
         if (empty($params['module_name']) && ($moduleName = BModuleRegistry::currentModuleName())) {
             $params['module_name'] = $moduleName;
@@ -997,7 +1000,7 @@ class BView extends BClass
      * @param array  $params
      * @return BView
      */
-    static public function factory($viewName, array $params)
+    static public function factory($viewName, array $params = array())
     {
         $params['view_name'] = $viewName;
         $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
@@ -1414,31 +1417,29 @@ class BView extends BClass
      */
     public function optionsHtml($options, $default = '')
     {
-        $html    = '';
         if(!is_array($default)){
             $default = (string)$default;
         }
+        $htmlArr = array();
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && !empty($v[0])) {
-                $html .= '<optgroup label="' . $this->q($k) . '">'
-                         . $this->selectOptions($v, $default)
-                         . '</optgroup>';
+                $htmlArr[] = BUtil::tagHtml('optgroup', array('label' => $k), $this->selectOptions($v, $default));
                 continue;
             }
-            if (!is_array($v)) {
-                $v = array('text' => $v);
+            if (is_array($v)) {
+                $attr = $v;
+                $v = !empty($attr['text']) ? $attr['text'] : '';
+                unset($attr['text']);
+            } else {
+                $attr = array();
             }
-            $sel = '';
-            if((is_array($default) && in_array($k, $default)) || $default === $k){
-                $sel = " selected";
-            }
-            $html .= '<option value="' . $this->q($k) . '"' . $sel
-                     . (!empty($v['style']) ? ' style="' . $v['style'] . '"' : '')
-                     . '>' . $v['text'] . '</option>';
+            $attr['value'] = $k;
+            $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
+            $htmlArr[] = BUtil::tagHtml('option', $attr, $v);
         }
 
-        return $html;
+        return join("\n", $htmlArr);
     }
 
     /**
@@ -1841,6 +1842,9 @@ class BViewHead extends BView
     {
 //echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 //var_dump($type, $name, $args);
+        if (is_string($args)) {
+            $args = array('content' => $args);
+        }
         if (!empty($args['alias'])) {
             $args['file'] = trim($name);
             $name         = trim($args['alias']);
