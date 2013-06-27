@@ -9,11 +9,13 @@
 .fcom-datagrid__rows-status { }
 .fcom-datagrid__gotopage { width:30px; }
 
-.fcom-datagrid__sort-labels th { padding:3px 5px; border-right: solid 1px #CCC; background: #DDD; }
-.fcom-datagrid__sort-labels a { color:#888; /*display:block;*/ padding: 5px 10px; white-space: nowrap; }
-.fcom-datagrid__sort-labels a:hover { text-decoration: underline; }
-.fcom-datagrid__sort-labels th.sort-asc a:after { content: ' v'; font-size:8px; color:#F00; }
-.fcom-datagrid__sort-labels th.sort-desc a:after { content: ' ^'; font-size:10px; color:#F00; }
+.fcom-datagrid__grid th.label { padding:3px 5px; border-right: solid 1px #CCC; background: #DDD; }
+.fcom-datagrid__grid th.label a { color:#888; /*display:block;*/ padding: 5px 10px; white-space: nowrap; }
+.fcom-datagrid__grid th.label a:hover { text-decoration: underline; }
+.fcom-datagrid__grid th.sort-asc a:after { content: ' v'; font-size:8px; color:#F00; }
+.fcom-datagrid__grid th.sort-desc a:after { content: ' ^'; font-size:10px; color:#F00; }
+.fcom-datagrid__grid th.label .drag-handle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.fcom-datagrid__grid th.label:hover .drag-handle { display:block; }
 
 .fcom-datagrid__grid { width: 100%; }
 .fcom-datagrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }

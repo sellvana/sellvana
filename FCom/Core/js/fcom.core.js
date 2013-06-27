@@ -84,11 +84,29 @@ FCom.DataGrid = function(config) {
         // initialize unsaved selections
         setSelection();
 
+        var $table = $('table.fcom-datagrid__grid', gridParent);
+
         // resize columns
         $('thead th', gridParent).resizable({ 
             handles: 'e',
             minWidth: 20,
             stop: function(ev, ui) {
+                var $el = ui.element, width = $el.width();
+                //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
+                $.post(config.personalize_url, 
+                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: width }, 
+                    function(response, status, xhr) {
+                        //console.log(response, status, xhr);
+                    }
+                )
+            }
+        });
+        /*
+        $table.colResizable({
+            liveDrag: true,
+            draggingClass: 'dragging',
+            onResize: function(a, b, c) {
+console.log(a, b, c, this); return;
                 var $el = ui.element;
                 $.post(config.personalize_url, 
                     { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() }, 
@@ -98,11 +116,19 @@ FCom.DataGrid = function(config) {
                 )
             }
         });
+        */
 
         // reorder columns
-        $('table.fcom-datagrid__grid', gridParent).dragtable({
-            dragaccept: '.js-draggable',
-            persistState: function(table) {
+        
+        $table.dragtable({
+            handle: 'drag-handle',
+            items: 'thead .drag-handle',
+            scroll: true,
+            appendParent: $table,
+            change: function() {
+                console.log($('.dragtable-drag-wrapper').html());
+            },
+            stop: function() {
                 var cols = [];
                 $('thead th', gridParent).each(function(i, el) {
                     cols.push({ name: $(el).data('id') });
@@ -115,6 +141,7 @@ FCom.DataGrid = function(config) {
                 );
             }
         });
+
         /*
         $('thead', gridParent).sortable({ 
             items: 'th', 
