@@ -64,6 +64,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
 
+        if (!$this->get('create_dt'))  $this->set('create_dt', BDb::now());
+        $this->set('update_dt', BDb::now());
+
         return true;
     }
 

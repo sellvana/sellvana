@@ -1,4 +1,3 @@
-FCom.Admin = {};
 
 FCom.Admin.MediaLibrary = function(options) {
     var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
@@ -874,13 +873,37 @@ function partialParent(el, params) {
     partial($(el).closest('.include'), params);
 }
 
-FCom.Admin.initAce = function() {
-    $('.js-ace').each(function(idx, el) {
-        var editor = ace.edit(el);
-        var theme = $(el).data('theme');
-        var mode = $(el).data('mode');
-        editor.setTheme("ace/theme/" + (theme ? theme : "monokai"));
-        editor.getSession().setMode("ace/mode/" + (mode ? mode : "text"));
+FCom.Admin.codeEditorThemeLoaded = {};
+
+FCom.Admin.initCodeEditors = function() {
+    var scriptBaseUrl = FCom.Admin.codemirrorBaseUrl;
+
+    CodeMirror.modeURL = scriptBaseUrl + '/mode/%N/%N.js';
+
+    $('.js-code-editor').each(function(idx, el) {
+        var $el = $(el);
+        if ($el.data('editor')) return;
+
+        var theme = $el.data('theme') || 'monokai';
+        var mode = $el.data('mode');
+
+        if (!FCom.Admin.codeEditorThemeLoaded[theme]) {
+            var ss = scriptBaseUrl + '/theme/' + theme + '.css';
+            if (document.createStyleSheet) {
+                document.createStyleSheet(ss);
+            } else {
+                $('<link rel="stylesheet" type="text/css" media="screen" href="' + ss + '"/>').appendTo('head');
+            }
+            FCom.Admin.codeEditorThemeLoaded[theme] = true;
+        }
+
+        var options = { lineNumbers: true, mode: mode, theme: theme };
+        editor = CodeMirror.fromTextArea(el, options);
+        if (mode) {
+            //editor.setOption('mode', mode);
+            CodeMirror.autoLoadMode(editor, mode);
+        }
+        $(el).data('editor', editor);
     });
 }
 
@@ -952,7 +975,7 @@ $(function() {
         }, 100);
     });
 
-    FCom.Admin.initAce();
+    FCom.Admin.initCodeEditors();
 
     $('.js-resizable').each(function(idx, el) {
         $(el).resizable();

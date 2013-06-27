@@ -12,6 +12,9 @@
 
 .fcom-datagrid__grid { width: 100%; }
 .fcom-datagrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
-.fcom-datagrid__grid tr.even td { background: #EEE; }
+.fcom-datagrid__grid tr.even td { background: #FCFCFC; }
 .fcom-datagrid__grid tr.odd td { background: #FFF; }
 
+.a-left { text-align: left; }
+.a-center { text-align: center; }
+.a-right { text-align: right; }

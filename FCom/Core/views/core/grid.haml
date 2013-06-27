@@ -1,6 +1,7 @@
 - $data = $this->gridData()
-- $config = $this->gridConfig()
+- $config = $this->grid['config']
 - $s = $data['result']['state']
+
 -# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows
 
 .fcom-datagrid(id="#{$config['id']}")
@@ -12,17 +13,17 @@
 
         %table
             %tr
-                %td
-                    %span.fcom-datagrid__rows-status
+                %td.a-left
+                    %span.fcom-datagrid__rows-status<
                         = $this->_('Rows %s - %s of %s', array(1+$s['rs'], $s['rs']+$s['rc'], $s['c']))
 
-                    %span.fcom-datagrid__rows-per-page
-                        %select.js-change-url
+                    %span.fcom-datagrid__rows-per-page<
+                        %select.js-change-url(data-href="#{$this->pageSizeHref()}")
                             - echo $this->optionsHtml($this->pageSizeOptions(), $s['ps'])
                         = $this->_('per page')
 
-                %td
-                    %span.fcom-datagrid__pager
+                %td.a-center
+                    %span.fcom-datagrid__pager<
                         - if ($s['p'] > 1)
                             %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['p']-1))}") &laquo;
                         - else
@@ -30,14 +31,13 @@
 
                         %label = $this->_('Page')
 
-                        %select.js-change-url
-                            - for ($i = 1; $i <= $s['mp']; $i++)
-                                %option(value="#{$this->gridUrl(array('p' => $i))}" #{!empty($s['p']) && $s['p'] == $i ? 'selected="selected"' : ''}) = $i
+                        %select.js-change-url(data-href="#{$this->pageChangeHref()}")
+                            - echo $this->optionsHtml($this->pageOptions(), $s['p'])
 
                         - echo $this->_('of %s', $s['mp'])
 
                         - if ($s['p'] < $s['mp'])
-                            %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['p']+1))}") &raquo;
+                            %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['p']+1))}")> &raquo;
                         - else
                             &raquo;
 
@@ -52,7 +52,7 @@
                                 &hellip;
                             - if ($s['p'] <= $s['mp']-6)
                                 %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['mp']))}") = $s['mp']
-                %td
+                %td.a-right
                     %span.fcom-datagrid__actions
                         - foreach ($this->gridActions() as $action)
                             - if (!empty($action['renderer']))
@@ -65,27 +65,22 @@
             - echo $s['description']
 
     %table.fcom-datagrid__grid
+        - foreach ($config['columns'] as $colId => $column)
+            %col(width="#{!empty($column['width']) ? $column['width'] : ''}")
+
         %thead
             %tr.fcom-datagrid__sort-labels(id="tr-sort-#{$config['id']}")
-                - foreach ($config['columns'] as $colId => $column)
+                - foreach ($config['columns'] as $colId => $col)
                     %th(id="th-sort-#{$config['id'].'-'.$colId}")
-                        - if (empty($column['type']) || $column['type'] === 'default')
-                            - if (empty($column['no_sort']))
-                                %a.js-change-url(href="#{$this->sortUrl($colId)}" class="#{$this->sortClass($colId)}")><
-                                    = $column['label']
-                            - else
-                                %a(href="#") = $column['label']
+                        - if (empty($col['type']) || $col['type'] === 'default')
+                            %a.js-change-url(href="#{$this->sortUrl($col)}" class="#{$this->sortClass($col, $s)}")<
+                                = $col['label']
 
             - if (!empty($config['filters']))
                 %tr.fcom-datagrid__inline-filters(id="tr-filter-#{$config['id']}")
-                    - foreach ($config['columns'] as $colId => $column)
+                    - foreach ($config['columns'] as $colId => $col)
                         %th(id="th-filter-#{$config['id'].'-'.$colId}")
-                            - echo $this->colFilterHtml($colId)
+                            - echo $this->colFilterHtml($col)
 
         %tbody
-            - foreach ($data['result']['out'] as $rowId => $row)
-                %tr(id="tr-data-#{$config['id'].'-'.$rowId}" class="#{$rowId % 2 ? 'odd' : 'even'}")><
-                    - foreach ($config['columns'] as $colId => $column)
-                        %td(id="td-data-#{$config['id'].'-'.$rowId.'-'.$colId}" class="#{$this->cellClass($row, $colId)}"
-                                style="#{$this->cellStyle($row, $colId)}")><
-                            - echo $this->cellHtml($row, $colId)
+            - echo $this->rowsHtml()

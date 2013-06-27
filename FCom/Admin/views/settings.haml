@@ -88,3 +88,6 @@
                                                 #{empty($tab['async']) ? 'data-loaded="true"' : ''})
                         - if (empty($tab['async']))
                             - echo $this->view($tab['view'])
+
+:javascript
+    $(function() { FCom.Admin.initCodeEditors() })
