@@ -126,7 +126,7 @@ console.log(a, b, c, this); return;
             scroll: true,
             appendParent: $table,
             change: function() {
-                console.log($('.dragtable-drag-wrapper').html());
+                //console.log($('.dragtable-drag-wrapper').html());
             },
             stop: function() {
                 var cols = [];
@@ -136,7 +136,7 @@ console.log(a, b, c, this); return;
                 $.post(config.personalize_url,
                     { do: 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
                     function(response, status, xhr) {
-                        console.log(response, status, xhr);
+                        //console.log(response, status, xhr);
                     }
                 );
             }

@@ -93,6 +93,43 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         return '';
     }
 
+    protected function _processDefaults()
+    {
+        //TODO: remember processed config
+        $grid = $this->grid;
+        $c =& $grid['config'];
+
+        if (empty($c['grid_url'])) {
+            $c['grid_url'] = BRequest::currentUrl();
+        }
+        if (empty($c['page_size_options'])) {
+            $c['page_size_options'] = array(1, 25, 50, 100);
+        }
+        if (empty($c['page_size'])) {
+            $c['page_size'] = $c['page_size_options'][0];
+        }
+        if (empty($c['search'])) {
+            $c['search'] = new stdClass;
+        }
+        if (!isset($c['sort'])) {
+            $c['sort'] = '';
+        }
+        if (!isset($c['sort_dir'])) {
+            $c['sort_dir'] = 'asc';
+        }
+        if (empty($c['row_id_column'])) {
+            $c['row_id_column'] = 'id';
+        }
+        unset($c);
+
+        // fetch request parameters
+        if (empty($grid['request'])) {
+            $grid['request'] = BRequest::i()->get();
+        }
+
+        $this->grid = $grid;
+    }
+
     protected function _processColumnsConfig()
     {
         $grid = $this->grid;
@@ -176,75 +213,59 @@ class FCom_Core_View_Grid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
 
+        // retrieve current personalization
         $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
 
-#var_dump($grid['request']['ps'], $pers['grid'][$gridId]['ps']);
+        $req = $grid['request'];
 
-        if (!empty($grid['request']['ps']) && (
-                empty($pers['grid'][$gridId]['ps']) 
-                || $pers['grid'][$gridId]['ps'] != $grid['request']['ps']
-        )) {
-            $data = array('grid'=>array($gridId=>array('ps' => $grid['request']['ps'])));
-            FCom_Admin_Model_User::i()->personalize($data);
-        } elseif (!empty($pers['grid'][$gridId]['ps'])) {
-            $grid['config']['page_size'] = $pers['grid'][$gridId]['ps'];
+        // prepare array to update personalization
+        $personalize = array();
+        foreach (array('p'=>'page', 'ps'=>'page_size', 's'=>'sort', 'sd'=>'sort_dir', 'q'=>'query') as $k=>$cfgKey) {
+            if (!isset($pers[$k])) {
+                $pers[$k] = null;
+            }
+            if (isset($req[$k]) && $pers[$k] !== $req[$k]) {
+                $personalize[$k] = $req[$k];
+            } elseif (isset($pers[$k])) {
+                $grid['config'][$cfgKey] = $pers[$k];
+            }
+        }
+        // save personalization
+        if (!empty($personalize)) {
+            FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => $personalize)));
         }
 
-        if (!empty($pers['grid'][$gridId]['columns'])) {
-            $persCols = $pers['grid'][$gridId]['columns'];
+        // get columns personalization
+        if (!empty($pers['columns'])) {
+            $persCols = $pers['columns'];
             foreach ($persCols as $k=>$c) {
                 if (empty($grid['config']['columns'][$k])) {
                     unset($persCols[$k]);
                 }
             }
             $grid['config']['columns'] = BUtil::arrayMerge($grid['config']['columns'], $persCols);
+            uasort($grid['config']['columns'], function($a, $b) { return $a['position'] - $b['position']; });
         }
-        uasort($grid['config']['columns'], function($a, $b) { return $a['position']-$b['position']; });
+        // sort columns by user preference
+
         $this->grid = $grid;
     }
 
     public function gridConfig()
     {
-        //TODO: remember processed config
-        $grid = $this->grid;
-        $c =& $grid['config'];
-
-        if (empty($c['grid_url'])) {
-            $c['grid_url'] = BRequest::currentUrl();
-        }
-        if (empty($c['page_size_options'])) {
-            $c['page_size_options'] = array(1, 25, 50, 100);
-        }
-        if (empty($c['page_size'])) {
-            $c['page_size'] = $c['page_size_options'][0];
-        }
-        if (empty($c['search'])) {
-            $c['search'] = new stdClass;
-        }
-        if (!isset($c['sort'])) {
-            $c['sort'] = '';
-        }
-        if (!isset($c['sort_dir'])) {
-            $c['sort_dir'] = 'asc';
-        }
-        if (empty($c['row_id_column'])) {
-            $c['row_id_column'] = 'id';
-        }
-        unset($c);
-
-        // fetch request parameters
-        if (empty($grid['request'])) {
-            $grid['request'] = BRequest::i()->get();
+        if (!empty($this->grid['config']['_processed'])) {
+            return $this->grid['config'];
         }
 
-        $this->grid = $grid;
-
+        $this->_processDefaults();
         $this->_processColumnsConfig();
         $this->_processActionsConfig();
         $this->_processPersonalization();
 
         $grid = $this->grid;
         BEvents::i()->fire(__METHOD__.'.after', array('grid' => &$grid));
+        $grid['config']['_processed'] = true;
         $this->grid = $grid;
 
         return $grid['config'];
