@@ -1,23 +1,33 @@
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 %section.adm-login-form
-    %h3.app-logo = $this->q($storeName)
-    %form#login-form(method="post" action="#{BApp::href('login')}")
+    %form.fcom-admin-login#login-form(method="post" action="#{BApp::href('login')}")
         %fieldset
-            %header.section-title = $this->_('Log into Account')
+            %header.fcom-admin-login-header
+                %span.fcom-admin-login-logo.fulleron-logo-md  = $storeName
+                = $this->_('Log In')
             - echo $this->messagesHtml('admin')
-            %ul.form-list
-                %li.label-l
-                    %label(for="#") = $this->_('Email/Username')
-                    %input.sz1.required(type="text" name="login[username]")
-                %li.label-l
-                    %label(for="#") = $this->_('Password')
-                    %input.sz1.required(type="password" name="login[password]")
-            .btns-set
-                %input.btn.st1.sz1(type="submit" value="#{ $this->_('Login')}")
-                %p
-                    %a(href="#{ BApp::href('password/recover') }") = $this->_('Recover your password')
-    %p.copyright
-        &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
+            .fcom-admin-login-content
+                .control-group
+                    %label.control-label(for="inputUser") = $this->_('Email/Username')
+                    .controls
+                        %input.required#inputUser(type="text" name="login[username]"
+                            placeholder="#{$this->_('Enter Email/Username')}")
+                .control-group
+                    %label.control-label(for="#") = $this->_('Password')
+                    .controls
+                        %input.required#inputPassword(type="password" name="login[password]"
+                            placeholder="#{$this->_('Enter password')}")
+                .control-group
+                    .controls
+                        %label.checkbox
+                            %input(type="checkbox" value="remember-me") = $this->_('Keep me logged in')
+                .control-group
+                    .controls
+                        %em
+                            %a(href="#{ BApp::href('password/recover') }") = $this->_('Forgot your password?')
+                        %button.btn.btn-primary(type="submit") = $this->_('Log In')
+        %p.copyright.text-center
+            &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
 :javascript
     $(function() {

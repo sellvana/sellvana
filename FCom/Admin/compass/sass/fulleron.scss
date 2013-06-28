@@ -1,0 +1,144 @@
+/*
+ * Fulleron - Copyright 2013 Fulleron
+ * Licensed under the XXXXX
+ * License URL
+ */
+
+/* SASS VARIABLE */
+$bodyTextClr: #444;
+$baseLinkClr: #1b68cb;
+$baseLinkHoverClr: #175ab0;
+$baseBorderClr: #ddd;
+$baseBorder: 1px solid $baseBorderClr;
+
+
+/* BASE */
+body { 
+    background:#f9f9f9;
+    color:#444;
+    font-weight:400;
+    font-size:px; 
+    }
+body, .btn { 
+    font-family:'Open Sans', sans-serif; 
+    }
+body, label { 
+    font-weight:400; 
+    }
+
+
+/* FORMS */
+label { font-size:15px; }
+select, 
+textarea, 
+input[type="text"], 
+input[type="password"], 
+input[type="datetime"], 
+input[type="datetime-local"], 
+input[type="date"], 
+input[type="month"], 
+input[type="time"], 
+input[type="week"], 
+input[type="number"], 
+input[type="email"], 
+input[type="url"], 
+input[type="search"], 
+input[type="tel"], 
+input[type="color"], 
+.uneditable-input {
+    @include border-radius(3px);
+    height:25px;
+    padding:6px;
+    }
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+    @include box-shadow(none);
+    @include transition-property(none);
+    border-color:#888;
+    }
+.btn { 
+    border:none; 
+    background:#2f82e0; 
+    color:#fff; 
+    text-shadow:none; 
+    @include box-shadow(none);
+    padding:7px 18px;
+    }
+.btn {
+    &:hover { 
+        @include transition-property(background-color);
+        @include transition-timing-function(ease-in linear);
+        background-color:#1971d5;
+        } 
+    &:focus { background-color:#1971d5; } 
+    }
+
+
+/* BUTTONS */
+
+
+/* TABLES */
+
+
+/* NAVS */
+
+
+/* BREADCRUMBS */
+
+
+/* PAGINATION */
+
+
+/* ALERTS */
+.alert {
+    @include border-radius(0);
+    text-shadow:none;
+    }
+.alert-danger, .alert-error { 
+    border-color:#d98c8c;
+    background:#fadfdf;
+    color:#c83c3c;
+    }
+    
+    
+/* MISC */
+
+
+
+/* PAGE: LOGIN */
+.fcom-admin-login {
+    margin:165px auto;
+    width:390px;
+    }
+.fcom-admin-login-header { 
+    @include border-radius(4px 4px 0 0);
+    background:#fff;
+    border:1px solid #ddd;
+    padding:20px 35px;
+    font-size:1.65em; 
+    }
+.fcom-admin-login-content {
+    margin-bottom:13px;
+    padding:20px 35px; 
+    border:1px solid #ddd;
+    border-width:0 1px 1px 1px;
+    @include border-radius(0 0 4px p4x);
+    }
+    
+    
+    
+    
