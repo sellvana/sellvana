@@ -1293,7 +1293,7 @@ class BView extends BClass
         }
 
         if ($debug && BLayout::i()->getRootViewName()!==$viewName) {
-            $result .= "<!-- START VIEW: {$viewName} -->\n";
+            $result .= "<!-- START VIEW: @{$modName}/{$viewName} -->\n";
         }
         $result .= join('', BEvents::i()->fire('BView::render.before', array('view' => $this)));
 
@@ -1313,7 +1313,7 @@ class BView extends BClass
         $result .= join('', BEvents::i()->fire('BView::render.after', array('view' => $this)));
 
         if ($debug) {
-            $result .= "<!-- END VIEW: {$viewName} -->\n";
+            $result .= "<!-- END VIEW: @{$modName}/{$viewName} -->\n";
         }
         BDebug::profile($timer);
 
