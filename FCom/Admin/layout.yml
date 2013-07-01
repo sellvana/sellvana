@@ -8,14 +8,16 @@ base:
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
   - { callback: FCom_Admin_Admin::layout }
 
+  - { include: common_js_libs }
+
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
-      - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
-      - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
+      #- [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
+      #- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
       #- [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
       - [ css, @FCom_Core/js/select2/select2.css ]
       - [ css, @FCom_Core/css/core.css ]
@@ -29,15 +31,15 @@ base:
 
   - view: bottom_scripts
     do:
-      - [ js, @FCom_Core/js/lib/json2.js ]
-      - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
-      - [ js, @FCom_Core/js/lib/angular.min.js ]
+      #- [ js, @FCom_Core/js/lib/json2.js ]
+      #- [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
+      #- [ js, @FCom_Core/js/lib/angular.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
       - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
       - [ js, @FCom_Core/js/lib/jquery.hotkeys.js ]
       - [ js, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
-      - [ js, @FCom_Core/js/select2/select2.min.js ]
+      #- [ js, @FCom_Core/js/select2/select2.min.js ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
       #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
@@ -66,14 +68,14 @@ base:
     do:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-grid:
+backgrid:
   - view: head
     do:
-      - [ css, @FCom_Core/js/lib/css/dragtable-default.css ]
+      - [ css, @FCom_Core/js/lib/css/backgrid/backgrid.min.css ]
 
   - view: bottom_scripts
     do:
-      - [ js, @FCom_Core/js/lib/jquery.dragtable.js ]
+      - [ js, @FCom_Core/js/lib/backgrid.min.js ]
       #- [ js, @FCom_Core/js/lib/colResizable-1.3.source.js ]
 
 jqgrid:

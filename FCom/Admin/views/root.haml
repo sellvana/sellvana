@@ -6,7 +6,7 @@
         window.appConfig = {
             baseHref: '#{BApp::href()}'
         }
-%body(class="<#{$this->bodyClass}")
+%body(class="#{$this->bodyClass}")
     -# .top-message
         -# Something happened here!
 
@@ -46,3 +46,4 @@
             - echo $this->hook('main')
             
     - echo $this->hook('before_body_end')
+- echo '</html>'

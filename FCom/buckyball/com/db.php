@@ -2398,8 +2398,11 @@ class BModel extends Model
         }
     }
 
-    public function fieldOptions($field, $key=null)
+    public function fieldOptions($field=null, $key=null)
     {
+        if (is_null($field)) {
+            return static::$_fieldOptions;
+        }
         if (!isset(static::$_fieldOptions[$field])) {
             BDebug::warning('Invalid field options type: '.$field);
             return null;

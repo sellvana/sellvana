@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Controller_ApiServer_Abstract extends FCom_Admin_Controller_Abstract
+class FCom_Api_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
     protected static $_origClass;
     protected $_permission;

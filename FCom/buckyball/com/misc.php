@@ -1150,7 +1150,7 @@ class BUtil extends BClass
         $htmlArr = array();
         foreach ($options as $k => $v) {
             $k = (string)$k;
-            if (is_array($v) && $k[0] === '@') { // group
+            if (is_array($v) && $k!=='' && $k[0] === '@') { // group
                 $label = trim(substr($k, 1));
                 $htmlArr[] = BUtil::tagHtml('optgroup', array('label' => $label), static::optionsHtml($v, $default));
                 continue;
