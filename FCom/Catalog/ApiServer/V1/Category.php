@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer_Abstract
+class FCom_Catalog_ApiServer_V1_Category extends FCom_Api_Controller_Abstract
 {
     //protected $_authorizeActionsWhitelist = array('Put');
 

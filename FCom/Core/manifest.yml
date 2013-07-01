@@ -6,6 +6,9 @@ modules:
         run_level: REQUIRED
         description: "Base Fulleron classes and JS libraries"
         auto_use: [ layout, views ]
+        override:
+            class:
+                - [ BDbModule, FCom_Core_Model_Module ]
         views:
             - [ core/grid, { view_class: FCom_Core_View_Grid } ]
 
