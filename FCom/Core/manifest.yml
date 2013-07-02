@@ -11,6 +11,7 @@ modules:
                 - [ BDbModule, FCom_Core_Model_Module ]
         views:
             - [ core/grid, { view_class: FCom_Core_View_Grid } ]
+            - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
 
         default_config:
             db:

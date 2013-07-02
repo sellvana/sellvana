@@ -2,10 +2,13 @@
 
 class FCom_CatalogIndex_Main extends BClass
 {
+    protected static $_autoReindex = true;
     protected static $_filterParams;
-    protected static $_indexData;
-    protected static $_filterValues;
-    protected static $_maxChunkSize = 1000;
+
+    static public function autoReindex($flag)
+    {
+        static::$_autoReindex = $flag;
+    }
 
     static public function parseUrl()
     {
@@ -61,14 +64,18 @@ class FCom_CatalogIndex_Main extends BClass
 
     static public function onProductSaveAfter($args)
     {
-        FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
+        if (static::$_autoReindex) {
+            FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
+        }
     }
 
     static public function onCustomFieldSaveAfter($args)
     {
-        $indexField = FCom_CatalogIndex_Model_Field::i()->load('field_name', $args['field']->field_code);
-        if ($indexField) {
-            static::reindexField($indexField);
+        if (static::$_autoReindex) {
+            $indexField = FCom_CatalogIndex_Model_Field::i()->load('field_name', $args['field']->field_code);
+            if ($indexField) {
+                static::reindexField($indexField);
+            }
         }
     }
 }

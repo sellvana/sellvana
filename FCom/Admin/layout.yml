@@ -68,16 +68,6 @@ base:
     do:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-backgrid:
-  - view: head
-    do:
-      - [ css, @FCom_Core/js/lib/css/backgrid/backgrid.min.css ]
-
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Core/js/lib/backgrid.min.js ]
-      #- [ js, @FCom_Core/js/lib/colResizable-1.3.source.js ]
-
 jqgrid:
   - view: head
     do:
