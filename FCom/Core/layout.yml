@@ -20,3 +20,34 @@ common_js_libs:
             - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
             - [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
             - [ js, //ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js ]
+
+lib_backgrid:
+  - view: head
+    do:
+      - [ css, @FCom_Core/js/lib/css/dragtable-akottr.css ]
+      - [ css, @FCom_Core/js/lib/backgrid/backgrid.css ]
+      - [ css, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter.css ]
+      - [ css, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator.css ]
+      - [ css, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all.css ]
+      - [ css, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell.css ]
+
+  - view: bottom_scripts
+    do:
+      #- [ js, @FCom_Core/js/lib/colResizable-1.3.source.js ]
+      - [ js, @FCom_Core/js/lib/jquery.dragtable-akottr.js ]
+      - [ js, @FCom_Core/js/lib/backgrid/backgrid.js ]
+      - [ js, @FCom_Core/js/lib/backbone-pageable.js ]
+      - [ js, @FCom_Core/js/lib/lunr.min.js ]
+      - [ js, @FCom_Core/js/lib/moment.min.js ]
+      - [ js, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter.js ]
+      - [ js, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator.js ]
+      - [ js, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all.js ]
+      - [ js, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell.js ]
+
+lib_visualsearch:
+    - view: head
+        do:
+            - [ css, @FCom_Core/js/lib/css/visualsearch.min.css ]
+    - view: bottom_scripts
+        do:
+          - [ js, @FCom_Core/js/lib/visualsearch.min.js ]

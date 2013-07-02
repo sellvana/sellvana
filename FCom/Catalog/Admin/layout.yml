@@ -23,7 +23,7 @@ catalog_product_form_tabs:
 
 /catalog/test:
   - { include: base }
-  - { hook: main, views: core/grid-wrapper }
+  - { hook: main, views: core/backgrid }
 
 /catalog/products:
   - { include: base }

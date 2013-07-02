@@ -84,7 +84,7 @@ class BUtil extends BClass
     /**
     * Convert any data to JSON string
     *
-    * $data can be array of BModel objects, will be automatically converted to array
+    * $data can be BData instance, or array of BModel objects, will be automatically converted to array
     *
     * @param mixed $data
     * @return string
@@ -93,6 +93,8 @@ class BUtil extends BClass
     {
         if (is_array($data) && is_object(current($data)) && current($data) instanceof BModel) {
             $data = BDb::many_as_array($data);
+        } elseif (is_object($data) && $data instanceof BData) {
+            $data = $data->as_array(true);
         }
         return json_encode($data);
     }
@@ -1596,17 +1598,32 @@ class BData extends BClass implements ArrayAccess
 {
     protected $_data;
 
-    public function __construct($data)
+    public function __construct($data, $recursive = false)
     {
-        if(!is_array($data)){
+        if (!is_array($data)) {
             $data = array(); // not sure for here, should we try to convert data to array or do empty array???
+        }
+        if ($recursive) {
+            foreach ($data as $k => $v) {
+                if (is_array($v)) {
+                    $data[$k] = new BData($v, true);
+                }
+            }
         }
         $this->_data = $data;
     }
 
-    public function as_array()
+    public function as_array($recursive=false)
     {
-        return $this->_data;
+        $data = $this->_data;
+        if ($recursive) {
+            foreach ($data as $k => $v) {
+                if (is_object($v) && $v instanceof BData) {
+                    $data[$k] = $v->as_array();
+                }
+            }
+        }
+        return $data;
     }
 
     public function __get($name)

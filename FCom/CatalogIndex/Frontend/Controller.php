@@ -11,6 +11,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_test()
     {
         BResponse::i()->startLongResponse();
+        FCom_CatalogIndex_Main::i()->autoReindex(false);
 
         // create categories / subcategories
         if (false) {
@@ -32,6 +33,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         // create products
         $products = true;
         if (false) {
+
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
             FCom_CustomField_Main::i()->disable(true);
@@ -40,7 +42,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $maxId = $max->id;
 //            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = array();
-            for ($i=0; $i<100000; $i++) {
+            for ($i=0; $i<1000; $i++) {
                 ++$maxId;
                 $product = FCom_Catalog_Model_Product::i()->create(array(
                     'product_name' => 'Product '.$maxId,
@@ -64,7 +66,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         // assign products to categories
-        if (false) {
+        if (true) {
             BDb::run("TRUNCATE fcom_category_product");
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
