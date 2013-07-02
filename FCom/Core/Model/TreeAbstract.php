@@ -140,9 +140,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         if (!$this->id) $this->_new = true;
         if (!$this->sort_order) $this->generateSortOrder();
@@ -207,7 +207,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
         if ($this->_new) {
             $this->register(true);
@@ -215,12 +215,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         }
         $this->cacheStore();
 
-        parent::afterSave();
+        parent::onAfterSave();
     }
 
-    public function beforeDelete()
+    public function onBeforeDelete()
     {
-        if (!parent::beforeDelete()) return false;
+        if (!parent::onBeforeDelete()) return false;
         if (($d = $this->descendants())) {
             $this->delete_many(array('id'=>array_keys($d)));
         }

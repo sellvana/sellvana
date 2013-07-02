@@ -100,17 +100,17 @@ class FCom_Promo_Model_Promo extends BModel
         return $clone;
     }
 
-    public function afterCreate()
+    public function onAfterCreate()
     {
-        parent::afterCreate();
+        parent::onAfterCreate();
         $this->from_date = gmdate('Y-m-d');
         $this->to_date = gmdate('Y-m-d', time()+30*86400);
         $this->status = 'pending';
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        parent::afterSave();
+        parent::onAfterSave();
 
         $groups = array();
         if (!$this->_newRecord) {

@@ -57,9 +57,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
@@ -70,9 +70,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        if (!parent::afterSave()) return false;
+        if (!parent::onAfterSave()) return false;
 
         //todo: setup unique uniq_id
         if (!$this->get('local_sku')) {

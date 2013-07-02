@@ -1215,9 +1215,9 @@ exit;
         if ($class::origClass()) {
             $class = $class::origClass();
         }
-        BEvents::i()->fire($class.'::find_one.orm', array('orm'=>$this, 'class'=>$class, 'id'=>$id));
+        BEvents::i()->fire($class.'::find_one:orm', array('orm'=>$this, 'class'=>$class, 'id'=>$id));
         $result = parent::find_one($id);
-        BEvents::i()->fire($class.'::find_one.after', array('result'=>$result, 'class'=>$class, 'id'=>$id));
+        BEvents::i()->fire($class.'::find_one:after', array('result'=>$result, 'class'=>$class, 'id'=>$id));
         return $result;
     }
 
@@ -1232,9 +1232,9 @@ exit;
         if ($class::origClass()) {
             $class = $class::origClass();
         }
-        BEvents::i()->fire($class.'::find_many.orm', array('orm'=>$this, 'class'=>$class));
+        BEvents::i()->fire($class.'::find_many:orm', array('orm'=>$this, 'class'=>$class));
         $result = parent::find_many();
-        BEvents::i()->fire($class.'::find_many.after', array('result'=>$result, 'class'=>$class));
+        BEvents::i()->fire($class.'::find_many:after', array('result'=>$result, 'class'=>$class));
         return $result;
     }
 
@@ -1769,7 +1769,7 @@ class BModel extends Model
     public static function create($data=null)
     {
         $record = static::factory()->create($data);
-        $record->afterCreate();
+        $record->onAfterCreate();
         return $record;
     }
 
@@ -1778,8 +1778,9 @@ class BModel extends Model
     *
     * Called not after new object save, but after creation of the object in memory
     */
-    public function afterCreate()
+    public function onAfterCreate()
     {
+        BEvents::i()->fire($this->_origClass().'::onAfterCreate', array('model' => $this));
         return $this;
     }
 
@@ -1834,7 +1835,7 @@ class BModel extends Model
 
         $orm = static::factory();
         static::_loadORM($orm);
-        BEvents::i()->fire($class.'::load.orm', array('orm'=>$orm, 'class'=>$class, 'called_class'=>get_called_class()));
+        BEvents::i()->fire($class.'::load:orm', array('orm'=>$orm, 'class'=>$class, 'called_class'=>get_called_class()));
         if (is_array($id)) {
             $orm->where_complex($id);
         } else {
@@ -1844,17 +1845,17 @@ class BModel extends Model
             $orm->where($field, $id);
         }
         /** @var BModel $record */
-        $record = $orm->find_one();
-        if ($record) {
-            $record->afterLoad();
+        $model = $orm->find_one();
+        if ($model) {
+            $model->onAfterLoad();
             if ($cache
                 || static::$_cacheAuto===true
                 || is_array(static::$_cacheAuto) && in_array($field, static::$_cacheAuto)
             ) {
-                $record->cacheStore();
+                $model->cacheStore();
             }
         }
-        return $record;
+        return $model;
     }
 
     /**
@@ -1862,9 +1863,9 @@ class BModel extends Model
     *
     * @return BModel
     */
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        BEvents::i()->fire($this->_origClass().'::afterLoad', array('model'=>$this));
+        BEvents::i()->fire($this->_origClass().'::onAfterLoad', array('model'=>$this));
         return $this;
     }
 
@@ -1874,10 +1875,10 @@ class BModel extends Model
     * @param array $arr Model collection
     * @return BModel
     */
-    public function afterLoadAll($arr)
+    public function mapAfterLoad($arr)
     {
         foreach ($arr as $r) {
-            $r->afterLoad();
+            $r->onAfterLoad();
         }
         return $this;
     }
@@ -2047,9 +2048,10 @@ class BModel extends Model
     *
     * @return boolean whether to continue with save
     */
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        return $this;
+        BEvents::i()->fire($this->origClass().'::onBeforeSave', array('model'=>$this));
+        return true;
     }
 
     /**
@@ -2083,20 +2085,16 @@ class BModel extends Model
     * Save method returns the model object for chaining
     *
     *
-    * @param boolean $beforeAfter whether to run beforeSave and afterSave
+    * @param boolean $callBeforeAfter whether to call onBeforeSave and onAfterSave methods
     * @return BModel
     */
-    public function save($beforeAfter=true)
+    public function save($callBeforeAfter=true)
     {
-        if ($beforeAfter) {
+        if ($callBeforeAfter) {
             try {
-                if (!$this->beforeSave()) {
-                     $this->beforeSave();
+                if (!$this->onBeforeSave()) {
+                    return $this;
                 }
-                BEvents::i()->fire($this->origClass().'::beforeSave', array('model'=>$this)); //deprecated
-                BEvents::i()->fire($this->origClass().'::save.before', array('model'=>$this));
-                BEvents::i()->fire('BModel::beforeSave', array('model'=>$this)); //deprecated
-                BEvents::i()->fire('BModel::save.before', array('model'=>$this));
             } catch (BModelException $e) {
                 return $this;
             }
@@ -2106,12 +2104,8 @@ class BModel extends Model
 
         parent::save();
 
-        if ($beforeAfter) {
-            $this->afterSave();
-            BEvents::i()->fire($this->_origClass().'::afterSave', array('model'=>$this)); //deprecated
-            BEvents::i()->fire($this->_origClass().'::save.after', array('model'=>$this));
-            BEvents::i()->fire('BModel::afterSave', array('model'=>$this)); //deprecated
-            BEvents::i()->fire('BModel::save.after', array('model'=>$this));
+        if ($callBeforeAfter) {
+            $this->onAfterSave();
         }
 
         if (static::$_cacheAuto) {
@@ -2124,8 +2118,9 @@ class BModel extends Model
     * Placeholder for after save callback
     *
     */
-    public function afterSave()
+    public function onAfterSave()
     {
+        BEvents::i()->fire($this->_origClass().'::onAfterSave', array('model'=>$this));
         return $this;
     }
 
@@ -2144,18 +2139,18 @@ class BModel extends Model
     *
     * @return boolean whether to continue with delete
     */
-    public function beforeDelete()
+    public function onBeforeDelete()
     {
+        BEvents::i()->fire($this->_origClass().'::onBeforeDelete', array('model'=>$this));
         return true;
     }
 
     public function delete()
     {
         try {
-            if (!$this->beforeDelete()) {
+            if (!$this->onBeforeDelete()) {
                 return $this;
             }
-            BEvents::i()->fire($this->_origClass().'::beforeDelete', array('model'=>$this));
         } catch(BModelException $e) {
             return $this;
         }
@@ -2170,15 +2165,15 @@ class BModel extends Model
 
         parent::delete();
 
-        $this->afterDelete();
-        BEvents::i()->fire($this->_origClass().'::afterDelete', array('model'=>$this));
+        $this->onAfterDelete();
 
         return $this;
     }
 
-    public function afterDelete()
+    public function onAfterDelete()
     {
-        return;
+        BEvents::i()->fire($this->_origClass().'::onAfterDelete', array('model'=>$this));
+        return $this;
     }
 
     /**

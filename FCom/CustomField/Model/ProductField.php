@@ -60,9 +60,9 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         return $fields;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->product_id) return false;
         if (!$this->id && ($exists = static::i()->load($this->product_id, 'product_id'))) {
             return false;

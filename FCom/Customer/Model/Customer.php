@@ -39,9 +39,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         if ($this->password) {
@@ -50,9 +50,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        parent::afterSave();
+        parent::onAfterSave();
 
         if (self::sessionUser()) {
             BSession::i()->data('customer_user', serialize($this));

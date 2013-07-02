@@ -1713,9 +1713,9 @@ class BModelUser extends BModel
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         if ($this->password) {
