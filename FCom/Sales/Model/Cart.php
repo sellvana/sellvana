@@ -285,9 +285,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->getTotalRowInstances();
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) {
             $this->create_dt = BDb::now();
         }
@@ -308,9 +308,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : array();
     }
 

@@ -65,9 +65,9 @@ class FCom_Core_Model_Abstract extends BModel
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         if (($data = $this->get(static::$_dataField))) {
             $this->set(static::$_dataSerializedField, BUtil::toJson($data));

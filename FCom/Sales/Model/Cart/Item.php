@@ -38,18 +38,18 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->qty;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         $this->data_serialized = BUtil::toJson($this->data);
         return true;
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : array();
     }
 }

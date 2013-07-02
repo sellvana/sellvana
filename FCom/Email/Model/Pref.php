@@ -34,9 +34,9 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         return static::getToken($email, $salt) === $salt.'_'.$hash;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         return true;

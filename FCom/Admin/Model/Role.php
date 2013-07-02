@@ -95,17 +95,17 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         return $perms;
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $perms = explode("\n", trim($this->permissions_data));
         $this->permissions = array_combine($perms, array_fill(0, sizeof($perms), 1));
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (empty($this->create_dt)) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         $this->permissions_data = trim(join("\n", array_keys($this->permissions)));

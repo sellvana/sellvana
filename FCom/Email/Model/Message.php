@@ -5,16 +5,16 @@ class FCom_Email_Model_Message extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_email_message';
     static protected $_origClass = __CLASS__;
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
 
         $this->data = $this->data_serialized ? BUtil::fromJson($this->data_serialized) : array();
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         if (!$this->create_dt) $this->create_dt = BDb::now();
 

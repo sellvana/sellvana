@@ -62,14 +62,14 @@ class FCom_CatalogIndex_Main extends BClass
     }
 
 
-    static public function onProductSaveAfter($args)
+    static public function onProductAfterSave($args)
     {
         if (static::$_autoReindex) {
             FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
         }
     }
 
-    static public function onCustomFieldSaveAfter($args)
+    static public function onCustomFieldAfterSave($args)
     {
         if (static::$_autoReindex) {
             $indexField = FCom_CatalogIndex_Model_Field::i()->load('field_name', $args['field']->field_code);
