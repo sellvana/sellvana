@@ -1,0 +1,5 @@
+base:
+    - view: bottom_scripts
+        do:
+            - [ js, @FCom_Comet/js/jquery.comet.js ]
+            - [ js, @FCom_Comet/js/fcom.comet.js ]

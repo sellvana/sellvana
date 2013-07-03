@@ -1,4 +1,5 @@
 {% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
+{% set priceView = THIS.view('catalog/product/price') %}
 
 {% for p in THIS.get('products') %}
 <tr class="item" id="tr-product-{{ p.id() }}">
@@ -18,7 +19,7 @@
             {% endif %}
         </span>
         {% endif %}
-        {{ THIS.view('catalog/product/price').set('prod', p) | raw }}
+        {{ priceView.set('prod', p).render() | raw }}
         <div class="product-description">
             <p {{ THIS.view('frontendcp/editable', { type:'simple', entity:'product', id:p.id(), field:'short_description'}) | raw }}>{{ p.get('short_description') }}</p>
         </div>
