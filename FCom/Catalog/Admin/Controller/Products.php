@@ -9,44 +9,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
 
-    public function action_test()
-    {
-        $view = $this->view('core/grid');
-        $view->set('grid', array(
-            'config' => array(
-                'id' => 'products',
-                'orm' => FCom_Catalog_Model_Product::i()->orm(),
-                'columns' => array(
-                    '_multiselect' => array('index' => ''),
-                    'id'           => array('label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true),
-                    'product_name' => array('label' => 'Name', 'index' => 'p.product_name', 'href' => BApp::href('catalog/products/form?id=:id'), 'width' => 250),
-                    'local_sku'    => array('label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),
-                    'create_dt'    => array('label' => 'Created', 'index' => 'p.create_dt', 'format' => 'date', 'width' => 100),
-                    'update_dt'    => array('label' => 'Updated', 'index' => 'p.update_dt', 'format' => 'datetime', 'width' => 100),
-                    'uom'          => array('label' => 'UOM', 'index' => 'p.uom', 'width' => 60),
-                    '_actions'     => array('index' => '', 'options' => array(
-                        'edit' => array('text' => BLocale::_('Edit'), 'data-href' => BApp::href('catalog/products/form?id=:id')),
-                    )),
-                ),
-                'format_callback' => function($args) {
-                    foreach ($args['rows'] as $row) {
-
-                    }
-                },
-                'actions' => array(
-                    'refresh' => true,
-                    'link_to_page' => true,
-                ),
-            ),
-        ));
-
-        if (BRequest::i()->xhr()) {
-            BLayout::i()->setRootView('core/grid');
-        } else {
-            $this->layout('/catalog/test');
-        }
-    }
-
     public function gridColumns()
     {
         $columns = array(

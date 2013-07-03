@@ -1215,7 +1215,7 @@ class BMigrate extends BClass
                 }
             }
             BDb::connect($connectionName); // switch connection
-            BDbModule::init(); // Ensure modules table in current connection
+            BDbModule::i()->init(); // Ensure modules table in current connection
             // collect module db schema versions
             $dbModules = BDbModule::i()->orm()->find_many();
             foreach ($dbModules as $m) {
@@ -1229,6 +1229,9 @@ class BMigrate extends BClass
             foreach ($modules as $modName=>$mod) {
                 if (empty($mod['code_version'])) {
                     continue; // skip migration of registered module that is not current active
+                }
+                if (!empty($mod['schema_version']) && $mod['schema_version'] === $mod['code_version']) {
+                    continue; // no migration necessary
                 }
                 if (empty($mod['script'])) {
                     BDebug::warning('No migration script found: '.$modName);
@@ -1421,9 +1424,10 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
             $mod['schema_version'] = $toVersion;
             $module->set(array(
                 'schema_version' => $toVersion,
+                'last_status' => 'UPGRADED',
             ))->save();
         } catch (Exception $e) {
-            $module->set(array('last_status'=>'UPGRADED'))->save();
+            $module->set(array('last_status'=>'ERROR'))->save();
             throw $e;
         }
         return true;

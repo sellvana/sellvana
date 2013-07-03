@@ -13,18 +13,18 @@ class FCom_IndexTank_Admin extends BClass
         if( BConfig::i()->get('modules/FCom_IndexTank/api_url') ){
 
             if(0 == BConfig::i()->get('modules/FCom_IndexTank/disable_auto_indexing') ){
-                BEvents::i()->on('FCom_Catalog_Model_Product::afterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
-                    ->on('FCom_Catalog_Model_Product::beforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
+                BEvents::i()->on('FCom_Catalog_Model_Product::onAfterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+                    ->on('FCom_Catalog_Model_Product::onBeforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories
                     ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
                     ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST.move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
-                    ->on('FCom_Catalog_Model_Category::beforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
-                    ->on('FCom_Catalog_Model_CategoryProduct::afterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
-                    ->on('FCom_Catalog_Model_CategoryProduct::beforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
+                    ->on('FCom_Catalog_Model_Category::onBeforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
+                    ->on('FCom_Catalog_Model_CategoryProduct::onAfterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
+                    ->on('FCom_Catalog_Model_CategoryProduct::onBeforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')
                     //for custom fields
-                    ->on('FCom_CustomField_Model_Field::afterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
-                    ->on('FCom_CustomField_Model_Field::beforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
+                    ->on('FCom_CustomField_Model_Field::onAfterSave', 'FCom_IndexTank_Admin::onCustomFieldAfterSave')
+                    ->on('FCom_CustomField_Model_Field::onBeforeDelete', 'FCom_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
 

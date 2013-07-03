@@ -62,16 +62,16 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $keysOnly ? array_keys(static::$_fieldsCache[$type]) : static::$_fieldsCache[$type];
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $this->_oldTableFieldCode = $this->field_code;
         $this->_oldTableFieldType = $this->table_field_type;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         if (!$this->field_type) $this->field_type = 'product';
 
@@ -81,7 +81,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
         $fTable = $this->tableName();
         $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
@@ -114,12 +114,12 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             $this->save();
         }
 
-        parent::afterSave();
+        parent::onAfterSave();
     }
 
-    public function afterDelete()
+    public function onAfterDelete()
     {
-        parent::afterDelete();
+        parent::onAfterDelete();
         if ($this->table_field_type !== '_serialized') {
             BDb::ddlTableDef($this->tableName(), array('COLUMNS' => array($this->field_code => 'DROP')));
         }

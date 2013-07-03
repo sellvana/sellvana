@@ -2,6 +2,10 @@
 
 class FCom_CatalogIndex_Indexer extends BClass
 {
+    protected static $_maxChunkSize = 1000;
+    protected static $_indexData;
+    protected static $_filterValues;
+
     static public function indexProducts($products)
     {
         if ($products===true) {
