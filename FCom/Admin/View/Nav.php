@@ -70,8 +70,8 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
         foreach ($root['/'] as $k=>$node) {
             $key = !empty($node['key']) ? $node['key'] : $k;
             $nextPath = $path.($path?'/':'').$key;
-            
-            $node['li']['active'] = $this->_curNav===$nextPath || strpos($this->_curNav, $nextPath.'/')===0;
+
+            $node['active'] = $this->_curNav===$nextPath || strpos($this->_curNav, $nextPath.'/')===0;
 
             $node['children'] = $this->getNodes($node, $nextPath);
 
@@ -81,8 +81,8 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
             if (!empty($node['permission']) && !$node['children'] && !$user->getPermission($node['permission'])) {
                 continue;
             }
-            if (!isset($node['li']['class'])) {
-                $node['li']['class'] = '';
+            if (!isset($node['class'])) {
+                $node['class'] = '';
             }
             if (empty($node['label'])) {
                 $node['label'] = $k;

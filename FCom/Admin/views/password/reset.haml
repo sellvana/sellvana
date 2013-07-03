@@ -1,23 +1,22 @@
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
-
 %section.adm-login-form
-    %h3.app-logo = $storeName
-    %form#reset-form(method="post" action="#{BApp::href('password/reset')}")
+    %form.fcom-admin-login#reset-form(method="post" action="#{BApp::href('password/reset')}")
         %fieldset
-            %header.section-title = $this->_('Password Reset')
-            - echo $this->messagesHtml('admin')
-            %ul.form-list
-                %li.label-l
-                    %label(for="#") = $this->_('Password')
-                    %input.sz1.required(type="password" name="password")
-                %li.label-l
-                    %label(for="#") = $this->_('Confirm Password')
-                    %input.sz1.required(type="password" name="password_confirm")
-            .btns-set
+            %header.fcom-admin-login-header
+              %header.section-title = $this->_('Password Reset')
+            .fcom-admin-login-content
+                - echo $this->messagesHtml('admin')
+                .control-group
+                    %label(for="inputPassword") = $this->_('Password')
+                    .controls
+                        %input.required#inputPassword(type="password" name="password")
+                .control-group
+                    %label(for="inputPasswordConfirm") = $this->_('Confirm Password')
+                        %input.required#inputPasswordConfirm(type="password" name="password_confirm")
                 %input(type="hidden" name="token" value="#{BRequest::i()->request('token')}")
-                %input.btn.st1.sz1(type="submit" value="#{$this->_('Reset Password')}")
-    %p.copyright
-        &copy; #{date('Y')} #{$storeName} #{$this->_('All rights reserved.')}
+                %button.btn.btn-primary(type="submit") = $this->_('Reset Password')
+        %p.copyright.text-center
+            &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
 :javascript
     $(function() {

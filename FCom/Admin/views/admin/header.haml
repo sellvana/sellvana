@@ -1,20 +1,19 @@
 - $user = FCom_Admin_Model_User::sessionUser();
 - $modulesNotification = array();
 - $this->hook('hook_modules_notification', array('modulesNotification' => &$modulesNotification));
+- $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 
-.ui-layout-north
-    %header.adm-topbar
-        %nav.adm-nav
-            %a.start(href="#")
-                %span.adm-logo = $this->_('Fulleron Admin')
-            - echo $this->view('admin/nav')
-        %nav.sup-links
-            %ul
-                - if (!empty($this->_quickSearches))
-                    %li.sup-quicksearch
-                        %a(href="#")
-                            %span.icon
-                            %span.title = $this->_('Quicksearch')
+
+%header.fcom-admin-header
+    = $storeName
+    %nav.fcom-admin-header-util-links
+        %ul
+            - if (!empty($this->_quickSearches))
+                %li.dropdown
+                    %a.dropdown-toggle#utilnav-quicksearch(href="#" data-toggle="dropdown" data-target="#")
+                        %span.icon.entypo.search
+                        %span.title = $this->_('Quicksearch')
+                    %ul.dropdown-menu(role="menu" aria-labelledby="util-quicksearch")
                         %form.sub-section(action="#" method="post")
                             %fieldset
                                 %ul.form-list
@@ -26,59 +25,61 @@
                                         %input(type="text")
                                 %input.btn.st2.sz2(type="submit" value="Search")
 
-                - if (!empty($this->_shortcuts))
-                    %li.sup-shortcuts
-                        %a(href="#")
-                            %span.icon
-                            %span.title = $this->_('Shortcuts')
-                        %ul.sub-section
-                            - foreach ($this->_shortcuts as $sc)
-                                %li
-                                    %a(href="#{$sc['href']}") = $sc['label']
-
-                - if (!empty($this->_recent))
-                    %li.sup-recent
-                        %a(href="#")
-                            %span.icon
-                            %span.title = $this->_('Recent Activity')
-                        %ul.sub-section
-                            - foreach ($this->_recent as $sc)
-                                %li
-                                    %a(href="#{$sc['href']}") = $sc['label']
-
-                - if ($modulesNotification)
-                    %li.sup-updates
-                        %a(href="#{BApp::href('market/index')}")
-                            %span.icon
-                            %span.title
-                                = $this->_('Notifications')
-                                \&nbsp;
-                                %em.count = count($modulesNotification)
-                        %ul.sub-section(style="width:200px")
-                            - foreach ($modulesNotificationa as $notifyTitle => $notifications)
-                                %li
-                                    %a(style="text-decoration: none; font-weight: bold; color:black") = strtoupper($notifyTitle)
-                            - foreach ($notifications as $notify)
-                                - if ($notify->url)
-                                    %li
-                                        %a(href="#{BApp::href($notify->url)}" title="#{$notify->text}") = $notify->module
-                                - else
-                                    %li = $notify->module
-
-                %li.sup-account
-                    %a(href="#")
+            - if (!empty($this->_shortcuts))
+                %li.dropdown
+                    %a.dropdown-toggle#utilnav-shortcuts(href="#" data-toggle="dropdown" data-target="#")
+                        %span.icon.entypo.layout
+                        %span.title = $this->_('Shortcuts')
+                    %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-shortcuts")
+                        - foreach ($this->_shortcuts as $sc)
+                            %li
+                                %a(href="#{$sc['href']}") = $sc['label']
+            - if (!empty($this->_recent))
+                %li.dropdown
+                    %a.dropdown-toggle#utilnav-recent-activity(href="#" data-toggle="dropdown" data-target="#")
                         %span.icon
-                        %span.title = $user->fullname()
-                    %ul.sub-section
-                        %li
-                            %img(src="#{BUtil::gravatar($user->email)}" style="margin:3px 13px")
-                        %li
-                            %a(href="#{BApp::href('my_account')}") = $this->_('My Account')
-                            %a(href="#{BApp::href('reports')}") = $this->_('My Reports')
-                            %a(href="#{BApp::href('logout')}") = $this->_('Log Out')
+                        %span.title = $this->_('Recent Activity')
+                    %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-recent-activity")
+                        - foreach ($this->_recent as $sc)
+                            %li
+                                %a(href="#{$sc['href']}") = $sc['label']
 
-        %strong.adm-group-title
-            - if ($this->title)
-                = $this->title
-            - else
-                \&nbsp;
+            - if ($modulesNotification)
+                %li.dropdown
+                    %a.dropdown-toggle#utilnav-notifications(href="#" data-toggle="dropdown" data-target="#{BApp::href('market/index')}")
+                        %span.icon
+                        %span.title
+                            = $this->_('Notifications')
+                            \&nbsp;
+                            %em.count = count($modulesNotification)
+                    %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-notifications")
+                        - foreach ($modulesNotificationa as $notifyTitle => $notifications)
+                            %li
+                                %a(style="text-decoration: none; font-weight: bold; color:black") = strtoupper($notifyTitle)
+                        - foreach ($notifications as $notify)
+                            - if ($notify->url)
+                                %li
+                                    %a(href="#{BApp::href($notify->url)}" title="#{$notify->text}") = $notify->module
+                            - else
+                                %li = $notify->module
+
+            %li.dropdown
+                %a.dropdown-toggle#utilnav-account(href="#" data-toggle="dropdown" data-target="#")
+                    %span.icon.entypo.user
+                    %span = $user->fullname()
+                %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-account")
+                    %li
+                        %img(src="#{BUtil::gravatar($user->email)}" style="margin:3px 13px")
+                    %li
+                        %a(href="#{BApp::href('my_account')}") = $this->_('My Account')
+                        %a(href="#{BApp::href('reports')}") = $this->_('My Reports')
+                        %a(href="#{BApp::href('logout')}") = $this->_('Log Out')
+
+    %strong.adm-group-title
+        - if ($this->title)
+            = $this->title
+        - else
+            \&nbsp;
+
+%nav.fcom-admin-nav 
+    - echo $this->view('admin/nav')

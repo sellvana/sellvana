@@ -1,23 +1,22 @@
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
-
 %section.adm-login-form
-    %h3.app-logo = $storeName
-    %form#recovery-form(method="post" action="#{BApp::href('password/recover')}")
+    %form.fcom-admin-login#recovery-form(method="post" action="#{BApp::href('password/recover')}")
         %fieldset
-            %header.section-title = $this->_('Password Recover')
-            - echo $this->messagesHtml('admin')
-            %ul.form-list
-                %li.label-l
-                    %label(for="#") = $this->_('Email')
-                    %input.sz1.required(type="email" name="email")
-            .btns-set
-                %input.btn.st1.sz1(type="submit" value="#{$this->_('Send Recovery Instructions')}")
-                %p
+            %header.fcom-admin-login-header
+                %header.section-title = $this->_('Password Recover')
+            .fcom-admin-login-content
+                - echo $this->messagesHtml('admin')
+                .control-group
+                    %label(for="inputEmail") = $this->_('Email')
+                    .controls
+                        %input.required#inputEmail(type="email" name="email")
+                        %button.btn.btn-primary(type="submit") = $this->_('Send Recovery Instructions')
+                .control-group
                     %a(href="#{BApp::href()}")
                         &laquo;
                         = $this->_('Back to Login')
-    %p.copyright
-        &copy; #{date('Y')} #{$storeName} #{$this->_('All rights reserved.')}
+        %p.copyright.text-center
+            &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
 :javascript
     $(function() {
