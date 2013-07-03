@@ -22,9 +22,7 @@ base:
       - [ css, @FCom_Core/css/core.css ]
       - [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
       #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
-      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
-      #- [ css, @FCom_Core/bootstrap/css/bootstrap.min.css ]
-      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
+      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
 
   #- { include: foundation3 }
 
@@ -41,7 +39,7 @@ base:
       - [ js, @FCom_Core/js/select2/select2.min.js ]
       # highcharts
       - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
-      #- [ js, @FCom_Core/bootstrap/js/bootstrap.min.js ]
+      - [ js, @FCom_Admin/compass/js/bootstrap.min.js ]
       - [ js, @FCom_Core/js/fcom.core.js ]
       - [ js, @FCom_Admin/js/fcom.admin.js ]
 
@@ -60,7 +58,7 @@ base:
       - [ addNav, system, { label: System, pos: 900 } ]
       - [ addNav, system/users, { label: Users, href: /users } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles } ]
-      - [ addNav, system/settings, { label: Settings, href: /settings } ]
+      - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
       - [ addNav, system/modules, { label: Installed Modules, href: /modules } ]
 
   - view: admin/header

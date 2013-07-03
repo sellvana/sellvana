@@ -13,7 +13,7 @@
     - if (FCom_Admin_Model_User::i()->isLoggedIn())
         .ui-layout-center.adm-wrapper#root-layout
             - echo $this->view('admin/header')
-            .adm-middle.ui-layout-center#main-container
+            .fcom-admin-main.ui-layout-center#main-container
                 - echo $this->hook('main')
 
         :javascript

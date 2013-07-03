@@ -3,10 +3,11 @@
     %form.fcom-admin-login#login-form(method="post" action="#{BApp::href('login')}")
         %fieldset
             %header.fcom-admin-login-header
-                %span.fcom-admin-login-logo.fulleron-logo-md  = $storeName
+                -#%span.fcom-admin-login-logo.fulleron-logo-md  = $storeName
+                %img.fcom-admin-login-logo.fulleron-logo-md(alt="#{$storeName}" src="#{BApp::src('@FCom_Admin/compass/img/fcom_admin_logo.svg')}")
                 = $this->_('Log In')
-            - echo $this->messagesHtml('admin')
             .fcom-admin-login-content
+                - echo $this->messagesHtml('admin')
                 .control-group
                     %label.control-label(for="inputUser") = $this->_('Email/Username')
                     .controls
@@ -18,14 +19,12 @@
                         %input.required#inputPassword(type="password" name="login[password]"
                             placeholder="#{$this->_('Enter password')}")
                 .control-group
-                    .controls
-                        %label.checkbox
-                            %input(type="checkbox" value="remember-me") = $this->_('Keep me logged in')
-                .control-group
-                    .controls
+                    .controls.text-right
                         %em
                             %a(href="#{ BApp::href('password/recover') }") = $this->_('Forgot your password?')
-                        %button.btn.btn-primary(type="submit") = $this->_('Log In')
+                        %label.checkbox.pull-left
+                            %input(type="checkbox" value="remember-me") = $this->_('Keep me logged in')
+                %button.btn.btn-primary(type="submit") = $this->_('Log In')
         %p.copyright.text-center
             &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
@@ -33,3 +32,5 @@
     $(function() {
         $('#login-form').validate();
     })
+
+
