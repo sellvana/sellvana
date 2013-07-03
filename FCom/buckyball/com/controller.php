@@ -1382,7 +1382,7 @@ class BRouting extends BClass
         if (empty($args['module_name'])) {
             $args['module_name'] = BModuleRegistry::currentModuleName();
         }
-        BDebug::debug('ROUTE '.$route.': '.print_r($args,1));
+        BDebug::debug('ROUTE '.$route);
         if (empty($this->_routes[$route])) {
             $this->_routes[$route] = new BRouteNode(array('route_name'=>$route));
         }
@@ -1462,7 +1462,6 @@ class BRouting extends BClass
      */
     protected function _route($route, $verb, $callback = null, $args = null, $name = null, $multiple = true)
     {
-        BDebug::debug('ROUTE ' . $route . ':' . $verb . ': ' . print_r($args, 1));
         if (is_array($route)) {
             foreach ($route as $a) {
                 if (is_null($callback)) {

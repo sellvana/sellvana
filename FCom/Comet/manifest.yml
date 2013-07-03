@@ -2,3 +2,12 @@ modules:
     FCom_Comet:
         version: 0.1.0
         description: AJAX Comet Area
+        require: { module: { FCom_Core: 0.1.0 } }
+        areas:
+            FCom_Comet:
+                routing:
+                    - [ any, /, FCom_Comet_Controller.index ]
+                default_config:
+                    modules:
+                        FCom_Comet:
+                            delay_sec: 1

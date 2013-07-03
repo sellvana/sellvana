@@ -10,15 +10,15 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterCreate()
+    public function onAfterCreate()
     {
-        parent::afterCreate();
+        parent::onAfterCreate();
         $this->set('renderer', 'BTwig');
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         if (!$this->is_dirty()) {
             return false;
@@ -34,9 +34,9 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        parent::afterSave();
+        parent::onAfterSave();
 
         $user = FCom_Admin_Model_User::i()->sessionUser();
         $hist = FCom_Cms_Model_BlockHistory::i()->create(array(

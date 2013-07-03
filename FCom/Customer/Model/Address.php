@@ -23,8 +23,8 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     }
 
-    public function beforeDelete() {
-        if (!parent::beforeDelete()) return false;
+    public function onBeforeDelete() {
+        if (!parent::onBeforeDelete()) return false;
 
         $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);
 
@@ -99,9 +99,9 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if (!$this->create_dt) $this->create_dt = BDb::now();
         $this->update_dt = BDb::now();
         return true;

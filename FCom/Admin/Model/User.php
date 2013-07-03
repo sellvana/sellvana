@@ -43,9 +43,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }

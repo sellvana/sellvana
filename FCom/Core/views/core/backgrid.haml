@@ -1,0 +1,9 @@
+- $c = $this->grid['config'];
+
+.backgrid(id="#{$c['id']}")
+    
+:javascript
+    $(function() {
+        var grid = new FCom.BackgridView(#{$this->getBackgridConfigJson()});
+        grid.render();
+    });
