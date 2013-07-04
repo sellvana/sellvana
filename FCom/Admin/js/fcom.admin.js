@@ -1,8 +1,7 @@
 FCom.Admin.Accordion = function(containerId, options) {
     var $container = $('#'+containerId);
-    console.log('ACCORDION', $container);
-    $container.find('.accordion-heading a').each(function(i, headingEl) {
-        $(headingEl).attr('href', '#'+containerId+'-group'+i).addClass('accordion-toggle')
+    $container.find('.accordion-toggle').each(function(i, headingEl) {
+        $(headingEl).attr('href', '#'+containerId+'-group'+i)
             .attr('data-toggle', 'collapse').attr('data-parent', '#'+containerId);
     });
     $container.find('.accordion-body').each(function(i, bodyEl) {
