@@ -756,30 +756,6 @@ class BUtil extends BClass
     }
 
     /**
-    * Create or verify password hash using bcrypt
-    *
-    * @see http://bcrypt.sourceforge.net/
-    * @param string $plain
-    * @param string $hash
-    * @param string $prefix - 5 (SHA256) or 6 (SHA512)
-    * @return boolean|string if $hash is null, return hash, otherwise return verification flag
-    */
-    public static function bcrypt($plain, $hash=null, $prefix=null)
-    {
-        $plain = substr($plain, 0, 55);
-        if (is_null($hash)) {
-            $prefix = !empty($prefix) ? $prefix : (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a');
-            $cost = ($prefix=='5' || $prefix=='6') ? 'rounds=5000' : '10';
-            // speed up a bit salt generation, instead of:
-            // $salt = static::randomString(22);
-            $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 22);
-            return crypt($plain, '$'.$prefix.'$'.$cost.'$'.$salt.'$');
-        } else {
-            return crypt($plain, $hash) === $hash;
-        }
-    }
-
-    /**
     * Set or retrieve current hash algorithm
     *
     * @param string $algo
@@ -803,7 +779,7 @@ class BUtil extends BClass
     /**
     * Generate salted hash
     *
-    * @deprecated by BUtil::bcrypt()
+    * @deprecated by Bcrypt
     * @param string $string original text
     * @param mixed $salt
     * @param mixed $algo
@@ -820,7 +796,7 @@ class BUtil extends BClass
     *
     * Ex: $sha512$2$<salt1>$<salt2>$<double-hashed-string-here>
     *
-    * @deprecated by BUtil::bcrypt()
+    * @deprecated by Bcrypt
     * @param string $string
     * @param string $salt
     * @param string $algo
@@ -830,7 +806,7 @@ class BUtil extends BClass
     {
         $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
         if ('bcrypt'===$algo) {
-            return static::bcrypt($string);
+            return Bcrypt::i()->hash($string);
         }
         $iter = !is_null($iter) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
@@ -853,7 +829,7 @@ class BUtil extends BClass
     public static function validateSaltedHash($string, $storedHash)
     {
         if (strpos($storedHash, '$2a$')===0 || strpos($storedHash, '$2y$')===0) {
-            return static::bcrypt($string, $storedHash);
+            return Bcrypt::i()->verify($string, $storedHash);
         }
         if (!$storedHash) {
             return false;
@@ -3253,7 +3229,124 @@ class BYAML extends BCLass
     }
 }
 
-/** @see http://www.php.net/manual/en/function.htmlentities.php#106535 */
+/**
+ * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well
+ * 
+ * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
+ */
+class Bcrypt extends BClass
+{
+    public function __construct() 
+    {
+        if (CRYPT_BLOWFISH != 1) {
+            throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
+        }
+    }
+
+    public function hash($input) 
+    {
+        if (function_exists('password_hash')) {
+            return password_hash($input);
+        }
+        $hash = crypt($input, $this->getSalt());
+        if (strlen($hash) > 13) {
+            return $hash;
+        }
+
+        return false;
+    }
+
+    public function verify($input, $existingHash) 
+    {
+        if (function_exists('password_verify')) {
+            return password_verify($input, $existingHash);
+        }
+        $hash = crypt($input, $existingHash);
+
+        return $hash === $existingHash;
+    }
+
+    private function getSalt() 
+    {
+        $mode = version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a';
+        $bytes = $this->getRandomBytes(16);
+        $salt = '$' . $mode . '$12$';
+        $salt .= $this->encodeBytes($bytes);
+        return $salt;
+    }
+
+    private $randomState;
+    private function getRandomBytes($count) 
+    {
+        $bytes = '';
+
+        if (function_exists('openssl_random_pseudo_bytes') &&
+            (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
+            $bytes = openssl_random_pseudo_bytes($count);
+        }
+
+        if ($bytes === '' && is_readable('/dev/urandom') &&
+            ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
+            $bytes = fread($hRand, $count);
+            fclose($hRand);
+        }
+
+        if (strlen($bytes) < $count) {
+            $bytes = '';
+
+            if ($this->randomState === null) {
+                $this->randomState = microtime();
+                if (function_exists('getmypid')) {
+                    $this->randomState .= getmypid();
+                }
+            }
+
+            for ($i = 0; $i < $count; $i += 16) {
+                $this->randomState = md5(microtime() . $this->randomState);
+
+                $bytes .= md5($this->randomState, true);
+            }
+
+            $bytes = substr($bytes, 0, $count);
+        }
+
+        return $bytes;
+    }
+
+    private function encodeBytes($input) 
+    {
+        // The following is code from the PHP Password Hashing Framework
+        $itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        $output = '';
+        $i = 0;
+        do {
+            $c1 = ord($input[$i++]);
+            $output .= $itoa64[$c1 >> 2];
+            $c1 = ($c1 & 0x03) << 4;
+            if ($i >= 16) {
+                $output .= $itoa64[$c1];
+                break;
+            }
+
+            $c2 = ord($input[$i++]);
+            $c1 |= $c2 >> 4;
+            $output .= $itoa64[$c1];
+            $c1 = ($c2 & 0x0f) << 2;
+
+            $c2 = ord($input[$i++]);
+            $c1 |= $c2 >> 6;
+            $output .= $itoa64[$c1];
+            $output .= $itoa64[$c2 & 0x3f];
+        } while (1);
+
+        return $output;
+    }
+}
+
+/** 
+ * @see http://www.php.net/manual/en/function.htmlentities.php#106535 
+ */
 if( !function_exists( 'xmlentities' ) ) {
     function xmlentities( $string ) {
         $not_in_list = "A-Z0-9a-z\s_-";

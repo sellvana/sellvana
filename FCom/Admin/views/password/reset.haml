@@ -3,7 +3,7 @@
     %form.fcom-admin-login#reset-form(method="post" action="#{BApp::href('password/reset')}")
         %fieldset
             %header.fcom-admin-login-header
-              %header.section-title = $this->_('Password Reset')
+                %header.section-title = $this->_('Password Reset')
             .fcom-admin-login-content
                 - echo $this->messagesHtml('admin')
                 .control-group
@@ -12,6 +12,7 @@
                         %input.required#inputPassword(type="password" name="password")
                 .control-group
                     %label(for="inputPasswordConfirm") = $this->_('Confirm Password')
+                    .controls
                         %input.required#inputPasswordConfirm(type="password" name="password_confirm")
                 %input(type="hidden" name="token" value="#{BRequest::i()->request('token')}")
                 %button.btn.btn-primary(type="submit") = $this->_('Reset Password')
