@@ -1,3 +1,15 @@
+FCom.Admin.Accordion = function(containerId, options) {
+    var $container = $('#'+containerId);
+    console.log('ACCORDION', $container);
+    $container.find('.accordion-heading a').each(function(i, headingEl) {
+        $(headingEl).attr('href', '#'+containerId+'-group'+i).addClass('accordion-toggle')
+            .attr('data-toggle', 'collapse').attr('data-parent', '#'+containerId);
+    });
+    $container.find('.accordion-body').each(function(i, bodyEl) {
+        $(bodyEl).attr('id', containerId+'-group'+i).addClass('collapse');
+    });
+}
+
 
 FCom.Admin.MediaLibrary = function(options) {
     var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
