@@ -1,108 +1,108 @@
 - $c = $this->model
 
-%fieldset
-    .settings-container
-        .group
-            %h3
-                %a(href="#") = $this->_('DB Settings')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Host')
-                        %td
+%fieldset.form-horizontal
+    .accordion#settings-FCom_Core
+        .accordion-group
+            .accordion-heading
+                .accordion-toggle = $this->_('DB Settings')
+            .accordion-body.in
+                .accordion-inner
+                    .control-group
+                        %label.control-label = $this->_('Host')
+                        .controls
                             %input(type="text" name="config[db][host]" value="#{ $c->get('db/host') }")
-                    %tr
-                        %td = $this->_('DB Name')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('DB Name')
+                        .controls
                             %input(type="text" name="config[db][dbname]" value="#{ $c->get('db/dbname') }")
-                    %tr
-                        %td = $this->_('User')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('User')
+                        .controls
                             %input(type="text" name="config[db][username]" value="#{ $c->get('db/username') }")
-                    %tr
-                        %td = $this->_('Password')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Password')
+                        .controls
                             %input(type="text" name="config[db][password]" value="*****")
-                    %tr
-                        %td = $this->_('Enable Logging')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Enable Logging')
+                        .controls
                             %select(name="config[db][logging]")
                                 - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/logging'))
-                    %tr
-                        %td = $this->_('Enable Implicit Migration')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Enable Implicit Migration')
+                        .controls
                             %select(name="config[db][implicit_migration]")
                                 - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('db/impricit_migration'))
-        .group
-            %h3
-                %a(href="#") = $this->_('Website')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Store Name')
-                        %td
+        .accordion-group
+            .accordion-heading
+                .accordion-toggle = $this->_('Website')
+            .accordion-body
+                .accordion-inner
+                    .control-group
+                        %label.control-label = $this->_('Store Name')
+                        .controls
                             %input(type="text" name="config[modules][FCom_Core][store_name]"
                                 value="#{ $c->get('modules/FCom_Core/store_name') }")
-                    %tr
-                        %td = $this->_('Admin Email')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Admin Email')
+                        .controls
                             %input(type="text" name="config[modules][FCom_Core][admin_email]"
                                 value="#{ $c->get('modules/FCom_Core/admin_email') }")
-                    %tr
-                        %td = $this->_('Copyright Message')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Copyright Message')
+                        .controls
                             %input(type="text" name="config[modules][FCom_Core][copyright]"
                                 value="#{ $c->get('modules/FCom_Core/copyright') }")
-        .group
-            %h3
-                %a(href="#") = $this->_('Session')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Session Handler')
-                        %td
+        .accordion-group
+            .accordion-heading
+                .accordion-toggle = $this->_('Session')
+            .accordion-body
+                .accordion-inner
+                    .control-group
+                        %label.control-label = $this->_('Session Handler')
+                        .controls
                             %select(name="config[cookie][session_handler]")
                                 - echo BUtil::optionsHtml(BSession::i()->getHandlers(), $c->get('cookie/session_handler'))
-                    %tr
-                        %td = $this->_('Cookie Timeout')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Cookie Timeout')
+                        .controls
                             %input(type="text" name="config[cookie][timeout]" value="#{ $c->get('cookie/timeout') }")
-                    %tr
-                        %td = $this->_('Cookie Domain')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Cookie Domain')
+                        .controls
                             %input(type="text" name="config[cookie][domain]" value="#{ $c->get('cookie/domain') }")
-                    %tr
-                        %td = $this->_('Cookie Path')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Cookie Path')
+                        .controls
                             %input(type="text" name="config[cookie][path]" value="#{ $c->get('cookie/path') }")
-                    %tr
-                        %td = $this->_('Session Namespace')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Session Namespace')
+                        .controls
                             %input(type="text" name="config[cookie][session_namespace]"
                                 value="#{ $c->get('cookie/session_namespace') }")
-                    %tr
-                        %td = $this->_('Verify Session IP')
-                        %td
+                    .control-group
+                        %label.control-label = $this->_('Verify Session IP')
+                        .controls
                             %select(name="config[cookie][session_check_ip]")
                                 - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('cookie/session_check_ip'))
-        .group
-            %h3
-                %a(href="#") = $this->_('System')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Hide script file name in URL')
-                        %td
+        .accordion-group
+            .accordion-heading
+                .accordion-toggle = $this->_('System')
+            .accordion-body
+                .accordion-inner
+                    .control-group
+                        %label.control-label = $this->_('Hide script file name in URL')
+                        .controls
                             %select(name="config[web][hide_script_name]")
                                 - echo BUtil::optionsHtml(array(0=>'No',1=>'Yes'), $c->get('web/hide_script_name'))
 
-        .group
-            %h3
-                %a(href="#") = $this->_('CSRF Protection')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Check Method')
-                        %td
+        .accordion-group
+            .accordion-heading
+                .accordion-toggle = $this->_('CSRF Protection')
+            .accordion-body
+                .accordion-inner
+                    .control-group
+                        %label.control-label = $this->_('Check Method')
+                        .controls
                             %select(name="config[web][csrf_check_method]")
                                 - echo BUtil::optionsHtml(array('referrer'=>'Referrer', 'token'=>'Token'), $c->get('web/csrf_check_method'))

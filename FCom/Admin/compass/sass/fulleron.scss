@@ -55,7 +55,8 @@ input[type="tel"],
 input[type="color"], 
 .uneditable-input {
     @include border-radius(3px);
-    height:37px;
+    height:auto;
+    min-height:35px;
     padding:6px;
     width:100%;
     }
@@ -175,8 +176,43 @@ input.error {
     .fcom-admin-header-util-links .icon { display:inline-block; width:40px; color:#656978; font-size:50px; text-align:center; line-height:1;}
     .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
 .fcom-admin-nav { width:40px; background:#464d54; position:absolute; top:60px; left:0; bottom:0; }
+    .fcom-admin-nav .dropdown { background:#464d54; width:40px;}
+    .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
+    .fcom-admin-nav .dropdown > ul > li > a { 
+        display:block; 
+        height:40px;
+        @include border-radius(0);
+        border:none;
+        padding:0;
+        color:#a6acb2; 
+        font:normal 35px/40px 'EntypoRegular';
+        text-align:center; 
+        line-height:40px;
+    }
+    .fcom-admin-nav .dropdown-menu > li > a:hover, 
+    .fcom-admin-nav .dropdown-menu > li > a:focus, 
+    .fcom-admin-nav .dropdown-submenu:hover > a,
+    .fcom-admin-nav .dropdown-submenu:focus > a { background:#2c3237; }
+    .fcom-admin-nav .dropdown-submenu.active a, 
+    .fcom-admin-nav .dropdown-submenu.active a:hover, 
+    .fcom-admin-nav .dropdown-submenu.active a:focus { color:#52a3e8; border:none; background:none; }
+    .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #45515c; }
+    .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
+    .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
+    .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
+    
+    /* REVIEW AGAIN STARTS */
+    .nav-group-catalog:before{ content:'\1F4E6'; }
+    .nav-group-sales:before{ content:'\E73D'; }
+    .nav-group-customer:before{ content:'\1F465'; }
+    .nav-group-system:before{ content:'\2699'; }
+    .nav-group-cms:before{ content:'\E74D'; }
+    
+    /* REVIEW AGAIN ENDS */
 .fcom-admin-main { padding-left:40px; }
 .copyright { font-size:.9em; color:#777; }
+
+
 
 
 /* FCOM PAGE: LOGIN */
