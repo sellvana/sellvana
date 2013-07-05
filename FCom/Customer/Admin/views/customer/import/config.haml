@@ -46,9 +46,9 @@
 											- echo BUtil::optionsHtml($f['options'], !empty($info['defaults'][$k]) ? $info['defaults'][$k] : '')
 									- else
 										- if (empty($f['input']) || $f['input'] == 'text')
-											%input(type="text" name="config[defaults][#{$k}]" value="#{!empty($info['defaults'][$k]) ? $this->q($info['defaults'][$k]) : ''}"
+											%input(type="text" name="config[defaults][#{$k}]" value="#{!empty($info['defaults'][$k]) ? $this->q($info['defaults'][$k]) : ''}")
 										- elseif ($f['input'] == 'textarea')
-											%textarea(name="config[defaults][#{$k}]" style="width:400px; height:100px") <
+											%textarea(name="config[defaults][#{$k}]" style="width:400px; height:100px")<
 												= !empty($info['defaults'][$k]) ? $this->q($info['defaults'][$k]) : ''
 
 	%button.btw.st1.sz1(type="button") = $this->_('Save configuration and go to next step')

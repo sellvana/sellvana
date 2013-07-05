@@ -11,39 +11,13 @@
         -# Something happened here!
 
     - if (FCom_Admin_Model_User::i()->isLoggedIn())
-        .ui-layout-center.adm-wrapper#root-layout
+        .fcom-admin-container#root-layout
             - echo $this->view('admin/header')
-            .fcom-admin-main.ui-layout-center#main-container
+            .fcom-admin-main#main-container
                 - echo $this->hook('main')
-
-        :javascript
-            $(function() {
-                var $main = $('.adm-content-box'), $win = $(window), $doc = $(document);
-                if ($main.length) {
-                    $win.resize(function() {
-                        var h = $win.height(); //Math.max($doc.height(), $win.height());
-                        $main.height(h-$main.offset().top);
-                    }).trigger('resize');
-                }
-
-                //$('#root-layout > .ui-layout-west').width(180).height(1000).resizable({handles:'e'});
-                //var bodyLayout = $('body').layout();
-            /*
-                var rootLayout = $('#root-layout').layout({
-                    north__spacingOpen:0,
-                    north__resizable:false,
-                    west__spacingOpen:0
-                });
-
-                $('#root-layout > .ui-layout-north')
-                    .mouseover(function() { rootLayout.allowOverflow(this); })
-                    .mouseout(function() { rootLayout.resetOverflow(this); });
-            */
-            });
-
     - else
-        .adm-wrapper#root-layout
+        .fcom-admin-container#root-layout
             - echo $this->hook('main')
-            
+
     - echo $this->hook('before_body_end')
 - echo '</html>'

@@ -2,66 +2,71 @@
     %span.title = $this->_('Upload and Import Customers')
     .btns-set
 
-#import-accordion
-    %h3
-        %a(href="#") = $this->_('Step 1: Upload or select file')
-    %div
-        %form(method="post")
-            - echo $this->view('jqgrid')->set('config', FCom_Customer_Admin_Controller_CustomersImport::i()->customerFilesGridConfig())
-            %br
-            %button.btn.st1.sz2#step1-next(type="button") = $this->_('Select file and go to next step')
+.accordion#import-accordion
+    .accordion-group
+        .accordion-heading
+            .accordion-toggle = $this->_('Step 1: Upload or select file')
+        .accordion-body.in
+            .accordion-inner
+                %form(method="post")
+                    - echo $this->view('jqgrid')->set('config', FCom_Customer_Admin_Controller_CustomersImport::i()->customerFilesGridConfig())
+                    %br
+                    %button.btn.st1.sz2#step1-next(type="button") = $this->_('Select file and go to next step')
 
-    %h3
-        %a(href="#") = $this->_('Step 2: Configure columns and other options')
-    %div
-        #import-config
-    %h3
-        %a(href="#") = $this->_('Step 3: Proceed with Import')
-    %div
-        #import-status
-    %h3
-        %a(href="#") = $this->_('Step 4: Review Import results')
-    %div
-        #import-review
+    .accordion-group
+        .accordion-heading
+            .accordion-toggle = $this->_('Step 2: Configure columns and other options')
+        .accordion-body
+            .accordion-inner#import-config
+    .accordion-group
+        .accordion-heading
+            .accordion-toggle = $this->_('Step 3: Proceed with Import')
+        .accordion-body
+            .accordion-inner#import-status
+    .accordion-group
+        .accordion-heading
+            .accordion-toggle = $this->_('Step 4: Review Import results')
+        .accordion-body
+            .accordion-inner#import-review
 
 :javascript
     $(function() {
-        $('#import-accordion').accordion({});
+        FCom.Admin.Accordion('import-accordion');
 
         importsGrid = new FCom.Admin.MediaLibrary({
             grid:'#import_files',
-            url:'<?=BApp::href('media/grid')?>',
+            url:'#{BApp::href('media/grid')}',
             folder:'storage/import/customers'
         });
 
         $('#step1-next').click(function(ev) {
             var sel = importsGrid.getSelectedRows();
             if (!sel.length) {
-                alert('Please select one file');
-                return;
+                //alert('Please select one file');
+                //return;
             }
             var row = $('#import_files').jqGrid('getRowData', sel[0]);
-            $('#import-accordion').accordion('activate', 1);
+            $('#import-config').parent().collapse('show');
             $('#import-config').html('Please wait loading file configuration...');
-            $.getJSON('<?=BApp::href('customers/import/config')?>?file='+encodeURIComponent(row.file_name), function(data, status, xhr) {
+            $.getJSON('#{BApp::href('customers/import/config')}?file='+encodeURIComponent(row.file_name), function(data, status, xhr) {
                 $('#import-config').html(data.html);
             });
         });
 
-        $('#step2-next').live('click', function(ev) {
-            $('#import-accordion').accordion('activate', 2);
+        $(document).on('click', '#step2-next', function(ev) {
+            $('#import-status').parent().collapse('show');
             $('#import-status').html('Please wait starting import...');
-            $.post('<?=BApp::href('customers/import/config')?>', $('#import-columns-form').serialize(), function(data, status, xhr) {
+            $.post('#{BApp::href('customers/import/config')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                 $('#import-status').html(data);
             });
         });
 
-        $('#step3-start').live('click', function(ev) {
-            $('#import-status').load('<?=BApp::href('customers/import/status')?>?start=true');
+        $(document).on('click', '#step3-start', function(ev) {
+            $('#import-status').load('#{BApp::href('customers/import/status')}?start=true');
         });
 
-        $('#step3-stop').live('click', function(ev) {
-            $.post('<?=BApp::href('customers/import/stop')?>', $('#import-columns-form').serialize(), function(data, status, xhr) {
+        $(document).on('click', '#step3-stop', function(ev) {
+            $.post('#{BApp::href('customers/import/stop')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                 $('#import-status').html(data);
             });
         });

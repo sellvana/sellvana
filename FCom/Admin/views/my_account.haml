@@ -1,31 +1,43 @@
 - $m = $this->model; $hlp = FCom_Admin_Model_User::i()
-%fieldset.adm-section-group
-    %ul.form-list
-        %li
-            %h4.label = $this->_('User Name')
-            %input(type="text" id="model-username" name="model[username]" class="validate[required]" value="#{$m->username}")
-        %li
-            %h4.label = $this->_('Email')
-            %input(type="text" id="model-email" name="model[email]" class="validate[required,custom[email]]" value="#{$m->email}")
-        %li
-            %h4.label = $this->_('Password')
-            %input(type="password" id="model-password" name="model[password]")
-        %li
-            %h4.label = $this->_('Confirm Password')
-            %input(type="password" id="model-password_confirm" name="model[password_confirm]" class="validate[equals[model-password]]")
-        %li
-            %h4.label = $this->_('First Name')
-            %input(type="text" id="model-firstname" name="model[firstname]" class="validate[required]" value="#{$m->firstname}")
-        %li
-            %h4.label = $this->_('Last Name')
-            %input(type="text" id="model-lastname" name="model[lastname]" class="validate[required]" value="#{$m->lastname}")
-        %li
-            %h4.label = $this->_('Status')
-            %select(name="model[status]")
-                - echo BUtil::optionsHtml($hlp->fieldOptions('status'), $m->status)
-        %li
-            %h4.label = $this->_('API Username')
-            %input(type="text" id="model-api_username" name="model[api_username]" value="#{$m->api_username}")
-        %li
-            %h4.label = $this->_('API Password')
-            %input(type="password" id="model-api_password" name="model[api_password]")
+%header.fcom-admin-main-title
+    %span.title = $this->_('My Account')
+.fcom-admin-main-container
+    .fcom-admin-main-content
+        %fieldset.form-horizontal
+            .control-group
+                %label.control-label(for="model-username") = $this->_('User Name')
+                .controls
+                    %input(type="text" id="model-username" name="model[username]" class="validate[required]" value="#{$m->username}")
+            .control-group
+                %label.control-label(for="model-email") = $this->_('Email')
+                .controls
+                    %input(type="text" id="model-email" name="model[email]" class="validate[required,custom[email]]" value="#{$m->email}")
+            .control-group
+                %label.control-label(for="model-password") = $this->_('Password')
+                .controls
+                    %input(type="password" id="model-password" name="model[password]")
+            .control-group
+                %label.control-label(for="model-password_confirm") = $this->_('Confirm Password')
+                .controls
+                    %input(type="password" id="model-password_confirm" name="model[password_confirm]" class="validate[equals[model-password]]")
+            .control-group
+                %label.control-label(for="model-firstname") = $this->_('First Name')
+                .controls
+                    %input(type="text" id="model-firstname" name="model[firstname]" class="validate[required]" value="#{$m->firstname}")
+            .control-group
+                %label.control-label(for="model-lastname") = $this->_('Last Name')
+                .controls
+                    %input(type="text" id="model-lastname" name="model[lastname]" class="validate[required]" value="#{$m->lastname}")
+            .control-group
+                %label.control-label(for="model-status") = $this->_('Status')
+                .controls
+                    %select(id="model-status" name="model[status]")
+                        - echo BUtil::optionsHtml($hlp->fieldOptions('status'), $m->status)
+            .control-group
+                %label.control-label(for="model-api_username") = $this->_('API Username')
+                .controls
+                    %input(type="text" id="model-api_username" name="model[api_username]" value="#{$m->api_username}")
+            .control-group
+                %label.control-label(for="model-api_password") = $this->_('API Password')
+                .controls
+                    %input(type="password" id="model-api_password" name="model[api_password]")
