@@ -87,14 +87,14 @@ FCom.DataGrid = function(config) {
         var $table = $('table.fcom-datagrid__grid', gridParent);
 
         // resize columns
-        $('thead th', gridParent).resizable({ 
+        $('thead th', gridParent).resizable({
             handles: 'e',
             minWidth: 20,
             stop: function(ev, ui) {
                 var $el = ui.element, width = $el.width();
                 //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
-                $.post(config.personalize_url, 
-                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: width }, 
+                $.post(config.personalize_url,
+                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: width },
                     function(response, status, xhr) {
                         //console.log(response, status, xhr);
                     }
@@ -108,8 +108,8 @@ FCom.DataGrid = function(config) {
             onResize: function(a, b, c) {
 console.log(a, b, c, this); return;
                 var $el = ui.element;
-                $.post(config.personalize_url, 
-                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() }, 
+                $.post(config.personalize_url,
+                    { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() },
                     function(response, status, xhr) {
                         //console.log(response, status, xhr);
                     }
@@ -119,7 +119,7 @@ console.log(a, b, c, this); return;
         */
 
         // reorder columns
-        
+
         $table.dragtable({
             handle: 'drag-handle',
             items: 'thead .drag-handle',
@@ -143,8 +143,8 @@ console.log(a, b, c, this); return;
         });
 
         /*
-        $('thead', gridParent).sortable({ 
-            items: 'th', 
+        $('thead', gridParent).sortable({
+            items: 'th',
             containment:'parent',
             update: function(ev, ui) {
                 var cols = [];
@@ -238,8 +238,11 @@ if (typeof Backbone !== 'undefined') {
         }
     });
 
+    FCom.Backgrid = {};
+
     FCom.BackgridView = Backbone.View.extend({
         prepareConfig: function() {
+console.log(this.options.columns);
             _.map(this.options.columns, function(col, i) {
                 if (!col.name) col.name = '';
                 if (!col.cell) col.cell = 'string';
@@ -247,9 +250,11 @@ if (typeof Backbone !== 'undefined') {
             });
         },
 
-        render: function() {
+        initialize: function() {
 
-            var HeaderCell = Backgrid.HeaderCell.extend({render: function() {
+            Backgrid.Column.prototype.defaults.editable = false;
+
+            Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({render: function() {
                 Backgrid.HeaderCell.prototype.render.apply(this);
                 this.$el.width(this.column.get('width'));
                 return this;
@@ -261,10 +266,28 @@ if (typeof Backbone !== 'undefined') {
                 return this;
             }
 
-            Backgrid.Column.prototype.defaults.editable = false;
-            Backgrid.Column.prototype.defaults.headerCell = HeaderCell;
+            FCom.Backgrid.HrefCell = Backgrid.Cell.extend({
+              /** @property */
+              className: "href-cell",
 
+              render: function () {
+                this.$el.empty();
+                var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
+                var href = _.template(this.column.get('href'))(this.model);
+                this.$el.append($("<a>", {
+                  tabIndex: -1,
+                  href: href,
+                  title: formattedValue,
+                }).text(formattedValue));
+                this.delegateEvents();
+                return this;
+              }
 
+            });
+
+        },
+
+        render: function() {
             var self = this;
 
             this.prepareConfig();
@@ -311,7 +334,7 @@ if (typeof Backbone !== 'undefined') {
             $container.append(paginator.render().$el);
 
     /*
-            grid.$('thead th').resizable({ 
+            grid.$('thead th').resizable({
                 handles: 'e',
                 minWidth: 20,
                 resize: function(ev, ui) {
@@ -320,8 +343,8 @@ if (typeof Backbone !== 'undefined') {
                 stop: function(ev, ui) {
                     var $el = ui.element, width = $el.width();
                     //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
-                    $.post(self.options.personalize_url, 
-                        { do: 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width }, 
+                    $.post(self.options.personalize_url,
+                        { do: 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width },
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }

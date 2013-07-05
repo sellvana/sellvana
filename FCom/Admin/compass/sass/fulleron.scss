@@ -4,21 +4,38 @@
  * License URL
  */
 
+/* SASS mixin */
+@mixin clearfix() {
+    & {
+        *zoom: 1;
+    }
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+
 /* SASS VARIABLE */
-$bodyTextClr: #444;
-$baseLinkClr: #1b68cb;
-$baseLinkHoverClr: #175ab0;
-$baseBorderClr: #ddd;
-$baseBorder: 1px solid $baseBorderClr;
-$errorTextClr: #c83c3c; 
+$base-txt-clr: #444;
+$base-bg-clr: #f9f9f9;
+$base-link-clr: #1b68cb;
+$base-link-hover-clr: #175ab0;
+$base-head-clr: #2f2f2f;
+$base-border-clr: #ddd;
+$base-border: 1px solid $base-border-clr;
+$error-txt-clr: #c83c3c;
 
 /* BASE */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 body { 
     background:#f9f9f9;
-    color:$bodyTextClr;
+    color:$base-txt-clr;
     font-weight:400;
-    font-size:px; 
     }
 body, .btn { 
     font-family:'Open Sans', sans-serif; 
@@ -27,10 +44,10 @@ body, label {
     font-weight:400; 
     }
 a { 
-    color:$baseLinkClr; 
-    &:hover { color:$baseLinkHoverClr; text-decoration:none; }
-    &:focus { color:$baseLinkHoverClr; text-decoration:none; }
-    &:active { color:$baseLinkHoverClr; text-decoration:none; }
+    color:$base-link-clr; 
+    &:hover { color:$base-link-hover-clr; text-decoration:none; }
+    &:focus { color:$base-link-hover-clr; text-decoration:none; }
+    &:active { color:$base-link-hover-clr; text-decoration:none; }
     }
 nav ul { margin:0; }
 
@@ -58,7 +75,7 @@ input[type="color"],
     height:auto;
     min-height:35px;
     padding:6px;
-    width:100%;
+    width:350px;
     }
 textarea:focus,
 input[type="text"]:focus,
@@ -79,23 +96,6 @@ input[type="color"]:focus,
     @include box-shadow(none);
     @include transition-property(none);
     border-color:#888;
-    width:100%;
-    }
-.btn { 
-    border:none; 
-    background:#2f82e0; 
-    color:#fff; 
-    text-shadow:none; 
-    @include box-shadow(none);
-    padding:7px 18px;
-    }
-.btn {
-    &:hover { 
-        @include transition-property(background-color);
-        @include transition-timing-function(ease-in linear);
-        background-color:#1971d5;
-        } 
-    &:focus { background-color:#1971d5; } 
     }
 
 
@@ -113,13 +113,30 @@ input[type="color"]:focus,
 
 
 /* BUTTONS */
-
+.btn { 
+    border:none; 
+    background:#2f82e0; 
+    color:#fff; 
+    text-shadow:none; 
+    @include box-shadow(none);
+    padding:7px 18px;
+    }
+.btn {
+    &:hover { 
+        @include transition-property(background-color);
+        @include transition-timing-function(ease-in linear);
+        background-color:#1971d5;
+        color:#fff;
+        } 
+    &:focus { background-color:#1971d5; color:#fff; } 
+    }
+    
 
 /* TABLES */
 
 
 /* NAVS */
-
+.accordion-inner { padding:30px; }
 
 /* BREADCRUMBS */
 
@@ -135,13 +152,13 @@ input[type="color"]:focus,
 .alert-danger, .alert-error { 
     border-color:#d98c8c;
     background:#fadfdf;
-    color:$errorTextClr;
+    color:$error-txt-clr;
     }
-label.error { margin-bottom:.8em; color:$errorTextClr; font-size:.9em; font-weight:bold; }
+label.error { margin-bottom:.8em; color:$error-txt-clr; font-size:.9em; font-weight:bold; }
 input.error {
-    border-color:$errorTextClr; 
-    &:hover { border-color:$errorTextClr; }
-    &:focus { border-color:$errorTextClr; }
+    border-color:$error-txt-clr; 
+    &:hover { border-color:$error-txt-clr; }
+    &:focus { border-color:$error-txt-clr; }
     }
     
 /* MISC */
@@ -149,36 +166,47 @@ input.error {
 
 
 /* FCOM - LAYOUT */
-.fcom-admin-header { border-bottom:1px solid #d9d9d9; height:60px; padding:5px 15px; }
+.fcom-admin-header { border-bottom:1px solid #e6e6e6; height:60px; padding:10px 15px; }
+    .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
     .fcom-admin-header .dropdown { float:left;  }
     .fcom-admin-header .dropdown-menu { right:0; left:auto; font-size:.9em; }
-    .fcom-admin-header .dropdown-menu::before {
-        border-bottom: 9px solid #bbb;
-        border-left: 9px solid transparent;
-        border-right: 9px solid transparent;
-        content: "";
-        display: inline-block;
-        right: 13px;
-        position: absolute;
-        top: -9px;
-        }
-    .fcom-admin-header .dropdown-menu::after {
-        border-bottom: 8px solid #fff;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        content: "";
-        display: inline-block;
-        right: 14px;
-        position: absolute;
-        top: -8px;
-        }
     .fcom-admin-header-util-links { float:right; }
-    .fcom-admin-header-util-links .icon { display:inline-block; width:40px; color:#656978; font-size:50px; text-align:center; line-height:1;}
-    .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
-.fcom-admin-nav { width:40px; background:#464d54; position:absolute; top:60px; left:0; bottom:0; }
+        .fcom-admin-header-util-links .icon { 
+            display:inline-block; 
+            width:35px; 
+            color:lighten($base-txt-clr, 20%); 
+            font-size:50px; 
+            text-align:center; 
+            line-height:35px;
+            }
+        .fcom-admin-header-util-links a:hover .icon { color:$base-txt-clr; }
+        .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
+        .fcom-admin-header-util-links .user-name { display:inline-block; margin:-18px 0 0 -5px; color:#454a5a; vertical-align:middle; }
+        .fcom-admin-header-util-links .dropdown-menu { top:35px; }
+.fcom-admin-nav { width:40px; background:#464d54; position:absolute; top:60px; left:0; bottom:0; z-index:9; }
     .fcom-admin-nav .dropdown { background:#464d54; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
-    .fcom-admin-nav .dropdown > ul > li > a { 
+    .fcom-admin-nav .dropdown-submenu > a:after { border:none; }
+    
+    // Sets background hover color for all nav <li> <a>
+    .fcom-admin-nav .dropdown-menu > li > a:hover, 
+    .fcom-admin-nav .dropdown-menu > li > a:focus, 
+    .fcom-admin-nav .dropdown-submenu:hover > a,
+    .fcom-admin-nav .dropdown-submenu:focus > a,
+    .fcom-admin-nav > .dropdown > .nav > li > a:hover, 
+    .fcom-admin-nav > .dropdown > .nav > li > a:focus,
+    .fcom-admin-nav > .dropdown > .nav > li.active > a, 
+    .fcom-admin-nav > .dropdown > .nav > li.active > a:focus,
+    .dropdown-menu > .active > a,
+    .dropdown-menu > .active > a:hover,
+    .dropdown-menu > .active > a:focus { 
+        @include transition-property(background-color);
+        @include transition-timing-function(ease-in linear);
+        background:#2c3237;
+        }
+          
+    // Nav level 1 - <a> style
+    .fcom-admin-nav > .dropdown > .nav > li > a { 
         display:block; 
         height:40px;
         @include border-radius(0);
@@ -188,28 +216,58 @@ input.error {
         font:normal 35px/40px 'EntypoRegular';
         text-align:center; 
         line-height:40px;
-    }
-    .fcom-admin-nav .dropdown-menu > li > a:hover, 
-    .fcom-admin-nav .dropdown-menu > li > a:focus, 
-    .fcom-admin-nav .dropdown-submenu:hover > a,
-    .fcom-admin-nav .dropdown-submenu:focus > a { background:#2c3237; }
-    .fcom-admin-nav .dropdown-submenu.active a, 
-    .fcom-admin-nav .dropdown-submenu.active a:hover, 
-    .fcom-admin-nav .dropdown-submenu.active a:focus { color:#52a3e8; border:none; background:none; }
-    .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #45515c; }
-    .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
-    .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
-    .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
+        }
     
-    /* REVIEW AGAIN STARTS */
+    // Nav level 1 - <a> hover style
+    .fcom-admin-nav > .dropdown > .nav > li > a:hover, 
+    .fcom-admin-nav > .dropdown > .nav > li > a:focus,
+    .fcom-admin-nav > .dropdown > .nav > li.active > a, 
+    .fcom-admin-nav > .dropdown > .nav > li.active > a:focus { 
+        color:#52a3e8; 
+        }
+        
+    // Nav level 1 - icon styling
+    .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #303a43; }
+    .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
+    .nav-group-home:before{ content:'\2302'; }
     .nav-group-catalog:before{ content:'\1F4E6'; }
     .nav-group-sales:before{ content:'\E73D'; }
     .nav-group-customer:before{ content:'\1F465'; }
     .nav-group-system:before{ content:'\2699'; }
     .nav-group-cms:before{ content:'\E74D'; }
+
+    // Nav level 2+
+    .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
+    .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
     
-    /* REVIEW AGAIN ENDS */
-.fcom-admin-main { padding-left:40px; }
+    
+.fcom-admin-main { position:relative; padding-left:40px; width:100%; }
+    .fcom-admin-main-title { border-bottom:1px solid #ddd; @include clearfix(); background:#f5f5f5; padding:10px 15px; }
+    .fcom-admin-main-title .title { float:left; margin:6px 0 6px 5px; color:$base-head-clr; font-size:20px; }
+    .fcom-admin-main-title .btn-group { float:right; }
+    .fcom-admin-main-container { position:relative; padding:30px 20px; }
+    .fcom-admin-main-container.fcom-admin-main-flush { padding:0; margin-top:-1px; }
+        .fcom-admin-nav-sidebar { 
+            position:absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            width:165px;
+            background:#f2f2f2; 
+            padding: 20px 0;
+            }
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
+                @include border-radius(0); 
+                border:none; 
+                padding:6px 15px; 
+                background:none; 
+                color:lighten($base-txt-clr, 20%); 
+                font-size:1.1em; 
+                }
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
+                @include background(linear-gradient(#71b1f2, #4d96e9)); 
+                color:#fff; 
+                } 
 .copyright { font-size:.9em; color:#777; }
 
 
@@ -235,7 +293,4 @@ input.error {
     border-width:0 1px 1px 1px;
     @include border-radius(0 0 4px p4x);
     }
-    
-    
-    
     

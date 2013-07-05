@@ -75,29 +75,28 @@
 
 %form#settings-form(action="#{$formUrl}" method="post")
     %input#current_tab(type="hidden" name="current_tab" value="FCom_Admin")
-
-    %header.adm-page-title
+    
+    %header.fcom-admin-main-title
         %span.title = $this->_('Settings')
-        .btns-set
-            %button.st1.sz2.btn(type="submit" onclick="return adminForm.saveAll(this)")
+        .btn-group
+            %button.btn(type="submit" onclick="return adminForm.saveAll(this)")
                 %span = $this->_('Save All')
-
-    - echo $this->messagesHtml()
-
-    %section.adm-content-box
-        %ul.nav.nav-tabs
-            - foreach ($this->tab_groups as $gk => $group)
-                %li.dropdown
-                    %a.dropdown-toggle(href="#" data-toggle="dropdown") = $group['label']
-                    %ul.dropdown-menu(a="a" #{!empty($group['open']) ? '' : 'hidden'})
-                        - foreach ($group['tabs'] as $k => $tab)
-                            - if (empty($tab['disabled']))
-                                %li(id="settings-tab-#{$k}")
-                                    %a.js-settings-tab-toggle(href="#tab-#{$k}")
-                                        %span.icon
-                                        = $tab['label']
-        .tab-content
-            - foreach ($this->tabs as $k=>$tab)
-                .tab-pane(id="tab-#{$k}" #{empty($tab['async']) ? 'data-loaded="true"' : ''})
-                    - if (empty($tab['async']))
-                        - echo $this->view($tab['view'])
+    .fcom-admin-main-container
+        .fcom-admin-main-content
+            - echo $this->messagesHtml()
+            %ul.nav.nav-tabs
+                - foreach ($this->tab_groups as $gk => $group)
+                    %li.dropdown
+                        %a.dropdown-toggle(href="#" data-toggle="dropdown") = $group['label']
+                        %ul.dropdown-menu(a="a" #{!empty($group['open']) ? '' : 'hidden'})
+                            - foreach ($group['tabs'] as $k => $tab)
+                                - if (empty($tab['disabled']))
+                                    %li(id="settings-tab-#{$k}")
+                                        %a.js-settings-tab-toggle(href="#tab-#{$k}")
+                                            %span.icon
+                                            = $tab['label']
+            .tab-content
+                - foreach ($this->tabs as $k=>$tab)
+                    .tab-pane(id="tab-#{$k}" #{empty($tab['async']) ? 'data-loaded="true"' : ''})
+                        - if (empty($tab['async']))
+                            - echo $this->view($tab['view'])

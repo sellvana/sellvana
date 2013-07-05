@@ -63,14 +63,14 @@
     }
 
 %form#form-modules(method="post" name="form-modules" action="#{ BApp::href('modules') }")
-    %header.adm-page-title
+    %header.fcom-admin-main-title
         %span.title Modules
-        %div.btns-set
-            %button.st1.sz2.btn(type="button" onclick="location.href='#{BApp::href('modules/market')}'")
+        %div.btn-group
+            %button.btn(type="button" onclick="location.href='#{BApp::href('modules/market')}'")
                 %span = $this->_('Download new Modules')
-            %button.st1.sz2.btn(type="button" onclick="return runMigrationScripts()")
+            %button.btn(type="button" onclick="return runMigrationScripts()")
                 %span = $this->_('Run Migration Scripts')
-            %button.st1.sz2.btn(type="button" onclick="this.form.submit()")
+            %button.btn(type="button" onclick="this.form.submit()")
                 %span = $this->_('Save Changes')
 
     - echo $this->messagesHtml()

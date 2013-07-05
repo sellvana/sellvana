@@ -1,14 +1,18 @@
 - $m = $this->model; $hlp = FCom_Admin_Model_Role::i();
 
-%header.adm-main-header = $this->_('Permissions')
-%fieldset.adm-section-group
-    %ul.form-list
-        %li
-            %h4.label = $this->_('Role Name')
-            %input(type="text" id="model-role_name" name="model[role_name]" class="validate[required]" value="#{$m->role_name}")
-        %li
-            %h4.label = $this->_('Permissions')
-            #permissions
+%header.fcom-admin-main-title
+    %span.title = $this->_('Permissions')
+.fcom-admin-main-content-container
+    .fcom-admin-main-content
+        %fieldset.form-horizontal
+            .control-group
+                %label.control-label(for="model-role_name") = $this->_('Role Name')
+                .controls
+                    %input(type="text" id="model-role_name" name="model[role_name]" class="validate[required]" value="#{$m->role_name}")
+            .control-group
+                %label.control-label(for="model-permissions") = $this->_('Permissions')
+                .controls
+                    #permissions
 
 :javascript
     $(function() {

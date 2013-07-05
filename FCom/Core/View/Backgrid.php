@@ -51,15 +51,21 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $config['personalize_url'] = BApp::href('my_account/personalize');
         $config['container'] = '#'.$config['id'];
 
-        $pos = 0;        
+        $pos = 0;
         foreach ($config['columns'] as &$col) {
             $col['position'] = ($pos += 10);
+
+            if (empty($col['cell'])) {
+                if (!empty($col['href'])) {
+                    $col['cell'] = new BValue('FCom.Backgrid.HrefCell');
+                }
+            }
 
             if (!empty($col['cell'])) {
                 switch ($col['cell']) {
                 case 'date': case 'datetime': //TODO: locale specific display format
                     $col['cell'] = new BValue("Backgrid.Extension.MomentCell.extend({
-                        modelFormat:'YYYY-MM-DD', 
+                        modelFormat:'YYYY-MM-DD',
                         displayFormat: 'M/D/YYYY',
                         displayInUTC: false
                     })");
@@ -88,7 +94,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
                 if (!empty($col['cell']) && !empty($col['name'])) {
                     $field = $col['name'];
                     switch ($col['cell']) {
-                        case 'number': 
+                        case 'number':
                             $row->$field = floatval($row->$field);
                             break;
                         case 'integer':
