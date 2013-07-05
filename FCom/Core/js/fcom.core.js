@@ -225,140 +225,142 @@ console.log(a, b, c, this); return;
     });
 }
 
+if (typeof Backbone !== 'undefined') {
+    FCom.TransparencyView = Backbone.View.extend({
+        constructor: function() {
+            Backbone.View.prototype.constructor.apply(this, arguments);
+            this.setElement($(this.options.baseEl).clone());
+            this.model.on("change", this.render, this);
+        },
 
-FCom.TransparencyView = Backbone.View.extend({
-    constructor: function() {
-        Backbone.View.prototype.constructor.apply(this, arguments);
-        this.setElement($(this.options.baseEl).clone());
-        this.model.on("change", this.render, this);
-    },
-
-    render: function() {
-        Transparency.render(this.el, this.model.toJSON());
-    }
-});
-
-FCom.BackgridView = Backbone.View.extend({
-    prepareConfig: function() {
-        _.map(this.options.columns, function(col, i) {
-            if (!col.name) col.name = '';
-            if (!col.cell) col.cell = 'string';
-            return col;
-        });
-    },
-
-    render: function() {
-
-        var HeaderCell = Backgrid.HeaderCell.extend({render: function() {
-            Backgrid.HeaderCell.prototype.render.apply(this);
-            this.$el.width(this.column.get('width'));
-            return this;
-        }});
-        Backgrid.Extension.SelectRowCell.prototype.render = function() {
-            this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
-            this.delegateEvents();
-            this.$el.width(this.column.get('width')); //ADDED
-            return this;
+        render: function() {
+            Transparency.render(this.el, this.model.toJSON());
         }
+    });
 
-        Backgrid.Column.prototype.defaults.editable = false;
-        Backgrid.Column.prototype.defaults.headerCell = HeaderCell;
+    FCom.BackgridView = Backbone.View.extend({
+        prepareConfig: function() {
+            _.map(this.options.columns, function(col, i) {
+                if (!col.name) col.name = '';
+                if (!col.cell) col.cell = 'string';
+                return col;
+            });
+        },
 
+        render: function() {
 
-        var self = this;
-
-        this.prepareConfig();
-
-        var Model = Backbone.Model.extend({
-
-        });
-
-        var Collection = Backbone.PageableCollection.extend({
-            model: Model,
-            url: this.options.data_url,
-            state: this.options.state || { pageSize: 25 },
-            mode: this.options.data_mode || 'server',
-            queryParams: {
-                currentPage: 'p',
-                pageSize: 'ps',
-                totalPages: 'mp',
-                totalRecords: 'c',
-                sortKey: 's',
-                order: 'sd',
-                directions: { 'asc':'asc', 'desc':'desc' }
+            var HeaderCell = Backgrid.HeaderCell.extend({render: function() {
+                Backgrid.HeaderCell.prototype.render.apply(this);
+                this.$el.width(this.column.get('width'));
+                return this;
+            }});
+            Backgrid.Extension.SelectRowCell.prototype.render = function() {
+                this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
+                this.delegateEvents();
+                this.$el.width(this.column.get('width')); //ADDED
+                return this;
             }
-        });
-        var collection = new Collection(this.options);
 
-        var grid = new Backgrid.Grid({
-            columns: this.options.columns,
-            collection: collection
-        });
+            Backgrid.Column.prototype.defaults.editable = false;
+            Backgrid.Column.prototype.defaults.headerCell = HeaderCell;
 
-        var paginator = new Backgrid.Extension.Paginator({
-            collection: collection
-        });
 
-        var filter = new Backgrid.Extension.ServerSideFilter({
-            collection: collection,
-            fields: ['name']
-        });
+            var self = this;
 
-        var $container = $(this.options.container);
+            this.prepareConfig();
 
-        $container.append(filter.render().$el);
-        $container.append(grid.render().$el);
-        $container.append(paginator.render().$el);
+            var Model = Backbone.Model.extend({
 
-/*
-        grid.$('thead th').resizable({ 
-            handles: 'e',
-            minWidth: 20,
-            resize: function(ev, ui) {
-                grid.$el.get(0).className = grid.$el.get(0).className; //reflow
-            },
-            stop: function(ev, ui) {
-                var $el = ui.element, width = $el.width();
-                //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
-                $.post(self.options.personalize_url, 
-                    { do: 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width }, 
-                    function(response, status, xhr) {
-                        //console.log(response, status, xhr);
-                    }
-                )
-            }
-        });
+            });
 
-        grid.$el.dragtable({
-            scroll: true, //jebaird
-            appendParent: grid.$el, //jebaird
-            items: 'thead th', //jebaird
-            //handle: 'drag-handle', //jebaird
-            //change: function() { console.log($('.dragtable-drag-wrapper').html()); },//jebaird
-            //dragHandle: '', //akottr
-            //dragAccept: '', //akottr
-            persistState: function() { //akottr
-            //stop: function() { //jebaird
-                var cols = [];
-                grid.$('thead th').each(function(i, el) {
-                    cols.push({ name: $(el).data('id') });
-                });
-                $.post(self.options.personalize_url,
-                    { do: 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
-                    function(response, status, xhr) {
-                        //console.log(response, status, xhr);
-                    }
-                );
-            }
-        });
-*/
-        collection.fetch({ reset:true });
-    }
-})
+            var Collection = Backbone.PageableCollection.extend({
+                model: Model,
+                url: this.options.data_url,
+                state: this.options.state || { pageSize: 25 },
+                mode: this.options.data_mode || 'server',
+                queryParams: {
+                    currentPage: 'p',
+                    pageSize: 'ps',
+                    totalPages: 'mp',
+                    totalRecords: 'c',
+                    sortKey: 's',
+                    order: 'sd',
+                    directions: { 'asc':'asc', 'desc':'desc' }
+                }
+            });
+            var collection = new Collection(this.options);
 
+            var grid = new Backgrid.Grid({
+                columns: this.options.columns,
+                collection: collection
+            });
+
+            var paginator = new Backgrid.Extension.Paginator({
+                collection: collection
+            });
+
+            var filter = new Backgrid.Extension.ServerSideFilter({
+                collection: collection,
+                fields: ['name']
+            });
+
+            var $container = $(this.options.container);
+
+            $container.append(filter.render().$el);
+            $container.append(grid.render().$el);
+            $container.append(paginator.render().$el);
+
+    /*
+            grid.$('thead th').resizable({ 
+                handles: 'e',
+                minWidth: 20,
+                resize: function(ev, ui) {
+                    grid.$el.get(0).className = grid.$el.get(0).className; //reflow
+                },
+                stop: function(ev, ui) {
+                    var $el = ui.element, width = $el.width();
+                    //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
+                    $.post(self.options.personalize_url, 
+                        { do: 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width }, 
+                        function(response, status, xhr) {
+                            //console.log(response, status, xhr);
+                        }
+                    )
+                }
+            });
+
+            grid.$el.dragtable({
+                scroll: true, //jebaird
+                appendParent: grid.$el, //jebaird
+                items: 'thead th', //jebaird
+                //handle: 'drag-handle', //jebaird
+                //change: function() { console.log($('.dragtable-drag-wrapper').html()); },//jebaird
+                //dragHandle: '', //akottr
+                //dragAccept: '', //akottr
+                persistState: function() { //akottr
+                //stop: function() { //jebaird
+                    var cols = [];
+                    grid.$('thead th').each(function(i, el) {
+                        cols.push({ name: $(el).data('id') });
+                    });
+                    $.post(self.options.personalize_url,
+                        { do: 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
+                        function(response, status, xhr) {
+                            //console.log(response, status, xhr);
+                        }
+                    );
+                }
+            });
+    */
+            collection.fetch({ reset:true });
+        }
+    })
+}
 
 $(function() {
     $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
-    $('.select2').select2({width:'other values', minimumResultsForSearch:20, dropdownAutoWidth:true});
+    if ($.fn.select2) {
+        $('.select2').select2({width:'other values', minimumResultsForSearch:20, dropdownAutoWidth:true});
+    }
 })
 

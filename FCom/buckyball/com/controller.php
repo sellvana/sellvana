@@ -1374,7 +1374,7 @@ class BRouting extends BClass
                 if (is_null($callback)) {
                     $this->route($a[0], $a[1], isset($a[2])?$a[2]:null, isset($a[3])?$a[3]:null);
                 } else {
-                    $this->route($a, $callback, $args);
+                    $this->route($a, $callback, $args, $name, $multiple);
                 }
             }
             return $this;
@@ -1386,6 +1386,7 @@ class BRouting extends BClass
         if (empty($this->_routes[$route])) {
             $this->_routes[$route] = new BRouteNode(array('route_name'=>$route));
         }
+
         $this->_routes[$route]->observe($callback, $args, $multiple);
 
         if (!is_null($name)) {
@@ -1768,7 +1769,7 @@ class BRouteNode
             'args' => $args,
             'route_node' => $this,
         ));
-        if ($multiple || empty($this->_observers)) {
+        if ($multiple) {
             $this->_observers[] = $observer;
         } else {
             //$this->_observers = BUtil::arrayMerge($this->_observers[0], $observer);
