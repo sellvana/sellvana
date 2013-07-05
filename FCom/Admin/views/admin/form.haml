@@ -22,19 +22,19 @@
     });
 
 %form(id="#{ $this->form_id }" action="#{$this->form_url}" method="post")
-    %header.adm-page-title
+    %header.fcom-admin-main-title
         %span.title#tab-title = $this->title
-        .btns-set
+        .btn-group
             - echo join(' ', (array)$this->actions)
 
     - echo $this->messagesHtml('admin')
 
-    %section.adm-content-box.info-view-mode
-        %aside(class="#{$this->sidebar_img ? 'form-img-sidebar' : 'adm-sidebar'}")
+    .fcom-admin-main-content.info-view-mode
+        %aside(class="#{$this->sidebar_img ? 'fcom-admin-nav-sidebar' : 'fcom-admin-nav-sidebar'}")
             - if ($this->sidebar_img)
                 %img(src="#{$this->sidebar_img}" width="98" height="98")
-            %nav.adm-tabs-sidebar
-                %ul
+            %nav
+                %ul.nav.nav-tabs.nav-stacked
                     - foreach ($tabs as $k=>$tab)
                         - if (empty($tab['disabled']))
                             %li(class="#{$k===$this->cur_tab ? 'active' : ''}")

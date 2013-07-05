@@ -75,16 +75,14 @@
 
 %form#settings-form(action="#{$formUrl}" method="post")
     %input#current_tab(type="hidden" name="current_tab" value="FCom_Admin")
-
-    %header.adm-page-title
+    
+    %header.fcom-admin-main-title
         %span.title = $this->_('Settings')
-        .btns-set
-            %button.st1.sz2.btn(type="submit" onclick="return adminForm.saveAll(this)")
+        .btn-group
+            %button.btn(type="submit" onclick="return adminForm.saveAll(this)")
                 %span = $this->_('Save All')
-
-    - echo $this->messagesHtml()
-
-    %section.adm-content-box
+    .fcom-admin-main-content
+        - echo $this->messagesHtml()
         %ul.nav.nav-tabs
             - foreach ($this->tab_groups as $gk => $group)
                 %li.dropdown

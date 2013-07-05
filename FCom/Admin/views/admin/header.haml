@@ -5,7 +5,8 @@
 
 
 %header.fcom-admin-header
-    = $storeName
+    %a.fcom-admin-logo
+        %img(src="#{BApp::src('@FCom_Admin/compass/img/fcom-admin-logo.png')}" alt="#{$storeName}")
     %nav.fcom-admin-header-util-links
         %ul
             - if (!empty($this->_quickSearches))
@@ -66,7 +67,7 @@
             %li.dropdown
                 %a.dropdown-toggle#utilnav-account(href="#" data-toggle="dropdown" data-target="#")
                     %span.icon.entypo.user
-                    %span = $user->fullname()
+                    %span.user-name = $user->fullname()
                 %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-account")
                     %li
                         %img(src="#{BUtil::gravatar($user->email)}" style="margin:3px 13px")
