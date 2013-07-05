@@ -842,9 +842,9 @@ class BModule extends BClass
             $method = strtolower($r[0]);
             $route = $r[1];
             $callback = $r[2];
-            $args = !empty($r[3]) ? $r[3] : array();
-            $name = !empty($r[4]) ? $r[4] : null;
-            $multiple = !empty($r[5]) ? $r[5] : true;
+            $args = isset($r[3]) ? $r[3] : array();
+            $name = isset($r[4]) ? $r[4] : null;
+            $multiple = isset($r[5]) ? $r[5] : true;
             $hlp->$method($route, $callback, $args, $name, $multiple);
         }
     }
