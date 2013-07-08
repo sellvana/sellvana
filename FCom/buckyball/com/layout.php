@@ -1532,12 +1532,18 @@ class BViewHead extends BView
     /**
      * Support for head.js
      *
-     * Points to head.js record whenever it is loaded, proxies loading of other scripts through it.
-     *
      * @see http://headjs.com/
-     * @var string
+     * @var array
      */
-    protected $_headJs = array('enabled' => true, 'loaded' => false, 'jquery' => null, 'scripts' => array());
+    protected $_headJs = array('enabled' => false, 'loaded' => false, 'jquery' => null, 'scripts' => array());
+
+    /**
+     * Support for require.js
+     *
+     * @see http://requirejs.org/
+     * @var array
+     */
+    protected $_requireJs = array('config' => array(), 'run' => array());
 
     /**
      * Default tag templates for JS and CSS resources
@@ -1857,6 +1863,42 @@ class BViewHead extends BView
         return $this;
     }
 
+    public function src($file, $ts = false)
+    {
+        if (is_array($file)) {
+            $files = array();
+            foreach ($file as $k=>$f) {
+                $files[$k] = $this->src($f, $ts);
+            }
+            return $files;
+        }
+        if ($file[0] === '@') { // @Mod_Name/file.ext
+            preg_match('#^@([^/]+)(.*)$#', $file, $m);
+            $mod = BApp::m($m[1]);
+            if (!$mod) {
+                BDebug::notice('Module not found: ' . $file);
+                return '';
+            }
+            $fsFile = BApp::m($m[1])->root_dir . $m[2];
+            $file   = BApp::m($m[1])->baseSrc() . $m[2];
+            if ($ts && file_exists($fsFile)) {
+                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
+            }
+        } elseif (preg_match('#\{([A-Za-z0-9_]+)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
+            $mod = BApp::m($m[1]);
+            if (!$mod) {
+                BDebug::notice('Module not found: ' . $file);
+                return '';
+            }
+            $fsFile = str_replace('{' . $m[1] . '}', BApp::m($m[1])->root_dir, $file);
+            $file   = str_replace('{' . $m[1] . '}', BApp::m($m[1])->baseSrc(), $file);
+            if ($ts && file_exists($fsFile)) {
+                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
+            }
+        }
+        return $file;
+    }
+
     /**
      * @param $type
      * @param $name
@@ -1871,30 +1913,7 @@ class BViewHead extends BView
         $args = $this->_elements[$typeName];
 
         $file = !empty($args['file']) ? $args['file'] : $name;
-        if ($file[0] === '@') { // @Mod_Name/file.ext
-            preg_match('#^@([^/]+)(.*)$#', $file, $m);
-            $mod = BApp::m($m[1]);
-            if (!$mod) {
-                BDebug::notice('Module not found: ' . $file);
-                return '';
-            }
-            $fsFile = BApp::m($m[1])->root_dir . $m[2];
-            $file   = BApp::m($m[1])->baseSrc() . $m[2];
-            if (file_exists($fsFile)) {
-                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
-            }
-        } elseif (preg_match('#\{([A-Za-z0-9_]+)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
-            $mod = BApp::m($m[1]);
-            if (!$mod) {
-                BDebug::notice('Module not found: ' . $file);
-                return '';
-            }
-            $fsFile = str_replace('{' . $m[1] . '}', BApp::m($m[1])->root_dir, $file);
-            $file   = str_replace('{' . $m[1] . '}', BApp::m($m[1])->baseSrc(), $file);
-            if (file_exists($fsFile)) {
-                $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
-            }
-        }
+        $file = $this->src($file, true);
         if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
             $module  = !empty($args['module_name']) ? BModuleRegistry::i()->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : BApp::baseUrl();
@@ -1958,6 +1977,64 @@ class BViewHead extends BView
         return $this;
     }
 
+    public function requireModulePath($name = null, $path = null)
+    {
+        if (is_null($name)) {
+            $m = BApp::m();
+            $name = $m->name;
+        } else {
+            $m = BApp::m($name);
+        }
+        if (is_null($path)) {
+            $path = trim($m->base_src, '/').'/js';
+        }
+        BDebug::debug(__METHOD__.':'.$name.':'.$path);
+        $this->_requireJs['config']['paths'][$name] = $path;
+        return $this;
+    }
+
+    public function requireJs($name, $path, $shim = null)
+    {
+        $this->_requireJs['config']['paths'][$name] = $path;
+        if (!is_null($shim)) {
+            $this->_requireJs['config']['shim'][$name] = $shim;
+        }
+        return $this;
+    }
+
+    public function requireConfig($config)
+    {
+        $this->_requireJs['config'] = BUtil::arrayMerge($this->_requireJs['config'], $config);
+        return $this;
+    }
+
+    public function requireRun($names)
+    {
+        $this->_requireJs['run'] += (array)$names;
+        return $this;
+    }
+
+    public function renderRequireJs()
+    {
+        $jsArr = array();
+        if (!empty($this->_requireJs['config'])) {
+            $config = $this->_requireJs['config'];
+            if (empty($config['baseUrl'])) {
+                $config['baseUrl'] = BConfig::i()->get('web/base_src');
+            }
+            if (!empty($config['paths'])) {
+                foreach ($config['paths'] as $name => $file) {
+                    $config['paths'][$name] = $this->src($file);
+                }
+            }
+            $jsArr[] = "require.config(".BUtil::toJavaScript($config)."); ";
+        }
+        if (!empty($this->_requireJs['run'])) {
+            $jsArr[] = "require(['" . join("', '", $this->_requireJs['run']) . "']);";
+        }
+        return join("\n", $jsArr);
+    }
+
     /**
      * Render the view
      *
@@ -1972,15 +2049,23 @@ class BViewHead extends BView
         if (!$this->param('template')) {
             $html = $this->getTitle() . "\n" . $this->getMeta() . "\n" . $this->getAllElements();
 
+            $scriptsArr = array();
             if ($this->_headJs['scripts'] || $this->_headJs['jquery']) {
-                $scripts = '';
                 if ($this->_headJs['scripts']) {
-                    $scripts = 'head.js("' . join('", "', $this->_headJs['scripts']) . '");';
+                    $scriptsArr[] = 'head.js("' . join('", "', $this->_headJs['scripts']) . '");';
                 }
                 if ($this->_headJs['jquery']) {
-                    $scripts = 'head.js({jquery:"' . $this->_headJs['jquery'] . '"}, function() { jQuery.fn.ready = head; ' . $scripts . '});';
+                    $scriptsArr[] = 'head.js({jquery:"' . $this->_headJs['jquery'] . '"}, function() { jQuery.fn.ready = head; ' . $scripts . '});';
                 }
-                $html .= "<script>/*$ = head;*/ {$scripts}</script>";
+            }
+
+            $requireJs = $this->renderRequireJs();
+            if ($requireJs) {
+                $scriptsArr[] = $requireJs;
+            }
+
+            if ($scriptsArr) {
+                $html .= "<script>" . join("\n", $scriptsArr) . "</script>";
             }
 
             return $html;

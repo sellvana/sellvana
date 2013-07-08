@@ -1,5 +1,5 @@
 base:
-    - view: bottom_scripts
+    - view: head
         do:
-            - [ js, @FCom_Comet/js/jquery.comet.js ]
-            - [ js, @FCom_Comet/js/fcom.comet.js ]
+            - [ requireJs, @FCom_Comet/js/jquery.comet.js, { deps: [ jquery ] } ]
+            - [ requireJs, @FCom_Comet/js/fcom.comet.js, { deps: [ fcom.core ] } ]

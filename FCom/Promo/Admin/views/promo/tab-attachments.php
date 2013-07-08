@@ -33,26 +33,28 @@ $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
     </div>
 </div>
 <script>
-$(function() {
-    attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
-        useStateCookie: true,
-        west__minWidth:400,
-        west__spacing_open:20,
-        west__closable:false,
-        triggerEventsOnLoad: true,
-        onresize:function(pane, $Pane, paneState) {
-            $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
-                $(this).setGridWidth(paneState.innerWidth - 20);
-            });
-        }
-    });
+require(['jquery', 'fcom.admin'], function($) {
+    $(function() {
+        attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+            useStateCookie: true,
+            west__minWidth:400,
+            west__spacing_open:20,
+            west__closable:false,
+            triggerEventsOnLoad: true,
+            onresize:function(pane, $Pane, paneState) {
+                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                    $(this).setGridWidth(paneState.innerWidth - 20);
+                });
+            }
+        });
 
-    attachmentsGrid = new FCom.Admin.MediaLibrary({
-        grid:'#all_attachments',
-        url:'<?=BApp::href('media/grid')?>',
-        folder:'media/promo'
-    });
+        attachmentsGrid = new FCom.Admin.MediaLibrary({
+            grid:'#all_attachments',
+            url:'<?=BApp::href('media/grid')?>',
+            folder:'media/promo'
+        });
 
-    new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#promo_attachments'});
+        new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#promo_attachments'});
+    })
 })
 </script>

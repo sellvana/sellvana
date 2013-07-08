@@ -15,22 +15,24 @@
                     #permissions
 
 :javascript
-    $(function() {
-        $('#permissions').jstree({
-            plugins: ['themes', 'json_data','ui','hotkeys','checkbox','search'],
-            json_data: {
-                data: #{ BUtil::toJson($m->getAllPermissionsTree()) }
-            },
-            checkbox: {
-                override_ui:true,
-                real_checkboxes:true,
-                real_checkboxes_names: function(n) { return ['model[permissions]['+n.attr('path')+']', 1] }
-            },
-            search: { case_insensitive:true }
-        }).bind('loaded.jstree', function(event, data) {
-            var checked = #{ BUtil::toJson($m->getPermissionIds()) };
-            for (var id in checked) {
-                data.inst.check_node('#'+id);
-            }
-        });
+    require(['jquery', 'jstree'], function($) {
+        $(function() {
+            $('#permissions').jstree({
+                plugins: ['themes', 'json_data','ui','hotkeys','checkbox','search'],
+                json_data: {
+                    data: #{ BUtil::toJson($m->getAllPermissionsTree()) }
+                },
+                checkbox: {
+                    override_ui:true,
+                    real_checkboxes:true,
+                    real_checkboxes_names: function(n) { return ['model[permissions]['+n.attr('path')+']', 1] }
+                },
+                search: { case_insensitive:true }
+            }).bind('loaded.jstree', function(event, data) {
+                var checked = #{ BUtil::toJson($m->getPermissionIds()) };
+                for (var id in checked) {
+                    data.inst.check_node('#'+id);
+                }
+            });
+        })
     })

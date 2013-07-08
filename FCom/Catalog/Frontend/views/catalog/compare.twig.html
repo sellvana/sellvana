@@ -44,10 +44,14 @@ ul.compare li { display:block; float:left; width:240px; border-left:solid 1px #a
 </div>
 {% if not xhr %}
     <script>
-        var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});
+        require(['fcom.frontend'], function() {
+            var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});
+        })
     </script>
 {% else %}
     <script>
-        $('.rateit').rateit();
+        require(['jquery', 'jquery.rateit'], function($) {
+            $('.rateit').rateit();
+        })
     </script>
 {% endif %}

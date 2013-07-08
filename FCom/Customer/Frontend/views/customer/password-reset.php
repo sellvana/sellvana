@@ -32,7 +32,9 @@
     </div>
 </div>
 <script>
-$(function() {
-    $('#reset-form').validate();
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#reset-form').validate();
+    })
 })
 </script>

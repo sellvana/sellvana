@@ -46,7 +46,9 @@
     </div>
 </div>
 <script>
-$(function() {
-    $('#edit-form').validate();
-})
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#edit-form').validate();
+    })
+}
 </script>

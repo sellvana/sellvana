@@ -10,28 +10,30 @@
 
 :javascript
     var attachmentsLayout, attachmentsGrid;
-    $(function() {
-        attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
-            useStateCookie: true,
-            west__minWidth:'40%',
-            west__spacing_open:20,
-            west__closable:false,
-            triggerEventsOnLoad: true,
-            onresize:function(pane, $Pane, paneState) {
-                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
-                    $(this).setGridWidth(paneState.innerWidth - 20);
-                });
-            }
-        });
-        $('#attachments-layout').resizeWithWindow();
+    require(['jquery'], function($) {
+        $(function() {
+            attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+                useStateCookie: true,
+                west__minWidth:'40%',
+                west__spacing_open:20,
+                west__closable:false,
+                triggerEventsOnLoad: true,
+                onresize:function(pane, $Pane, paneState) {
+                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                        $(this).setGridWidth(paneState.innerWidth - 20);
+                    });
+                }
+            });
+            $('#attachments-layout').resizeWithWindow();
 
-        attachmentsGrid = new FCom.Admin.MediaLibrary({
-            grid:'#all_attachments',
-            url:'#{BApp::href('media/grid')}',
-            folder:'media/product/attachment'
-        });
+            attachmentsGrid = new FCom.Admin.MediaLibrary({
+                grid:'#all_attachments',
+                url:'#{BApp::href('media/grid')}',
+                folder:'media/product/attachment'
+            });
 
-        new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
+            new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
+        })
     })
 
 - echo $this->hook('catalog/products/tab/attachments', array('model'=>$this->model))

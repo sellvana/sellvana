@@ -5,12 +5,16 @@
 
     - if ($start)
         :javascript
-            $.post(#{BApp::href('catalog/products/import/start'))
+            require(['jquery'], function($) {
+                $.post(#{BApp::href('catalog/products/import/start'))
+            })
     - else
         :javascript
-            setTimeout(function() {
-                $('#import-status').load('#{BApp::href('catalog/products/import/status')}');
-            }, 2000);
+            require(['jquery'], function($) {
+                setTimeout(function() {
+                    $('#import-status').load('#{BApp::href('catalog/products/import/status')}');
+                }, 2000);
+            })
 - else
     %button.btn.st1.sz2#step3-start(type="button") = $this->_('Start Import with selected configuration')
     %hr

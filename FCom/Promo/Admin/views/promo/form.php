@@ -3,16 +3,18 @@
     $tabs = $this->sortedTabs();
 ?>
 <script>
-$(function() {
-    window.adminForm = FCom.Admin.form({
-        form:     '#<?=$this->form_id?>',
-        tabs:     '.adm-tabs-sidebar li',
-        panes:    '.adm-tabs-content',
-        url_get:  '<?=$this->form_url?>',
-        url_post: '<?=$this->form_url?>'
+require(['jquery', 'jquery.validate', 'fcom.admin'], function($) {
+    $(function() {
+        window.adminForm = FCom.Admin.form({
+            form:     '#<?=$this->form_id?>',
+            tabs:     '.adm-tabs-sidebar li',
+            panes:    '.adm-tabs-content',
+            url_get:  '<?=$this->form_url?>',
+            url_post: '<?=$this->form_url?>'
+        });
+        $("#<?=$this->form_id?>").validate();
     });
-    $("#<?=$this->form_id?>").validate();
-});
+})
 </script>
 <form id="<?=$this->form_id?>" action="<?=$this->form_url?>" method="post">
     <header class="adm-page-title">

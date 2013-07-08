@@ -1,7 +1,7 @@
 base:
-	- view: bottom_scripts
+	- view: head
 		do:
-			- [ js, @FCom_Catalog/Frontend/js/fcom.catalog.js ]
+			- [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
 
 /catalog/category:
 	- { include: base }

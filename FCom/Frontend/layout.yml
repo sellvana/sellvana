@@ -17,21 +17,15 @@ base:
             - [ css, @FCom_Core/js/lib/css/jquery.rateit.css, { alias: rating } ]
             - [ css, @FCom_Core/js/lib/css/lightbox/lightbox.css, { alias: lightbox } ]
             - [ css, @FCom_Core/js/select2/select2.css ]
-            #- [ js, @FCom_Core/js/lib/head.min.js ]
-            - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
-            - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-            #- [ js, @FCom_Core/js/lib/jquery.min.js ]
+
+            - [ requireJs, jquery.pnotify, @FCom_Core/js/lib/jquery.pnotify.min, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.rateit, @FCom_Core/js/lib/jquery.rateit.min.js, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.qtip, @FCom_Core/js/lib/jquery.qtip.min, { deps: [ jquery ] } ]
+            - [ requireJs, lightbox, @FCom_Core/js/lib/lightbox/lightbox ]
+
+            - [ requireJs, fcom.frontend, @FCom_Frontend/js/fcom.frontend, { deps: [ fcom.core ] } ]
 
     - { include: common_js_libs }
-
-    - view: bottom_scripts
-        do:
-            - [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
-            - [ js, @FCom_Core/js/lib/jquery.rateit.min.js ]
-            - [ js, @FCom_Core/js/lib/jquery.qtip.min.js ]
-            - [ js, @FCom_Core/js/lib/lightbox/lightbox.js ]
-            - [ js, @FCom_Core/js/fcom.core.js ]
-            - [ js, @FCom_Frontend/js/fcom.frontend.js ]
 
     - { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }

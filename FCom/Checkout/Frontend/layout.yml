@@ -1,7 +1,7 @@
 base:
-	- view: bottom_scripts
+	- view: head
 		do:
-			- [ js, @FCom_Checkout/Frontend/js/fcom.checkout.js ]
+			- [ requireJs, fcom.checkout, @FCom_Checkout/Frontend/js/fcom.checkout ]
 
 /checkout/cart:
 	- { include: base }

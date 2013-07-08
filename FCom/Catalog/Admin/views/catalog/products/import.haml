@@ -30,44 +30,46 @@
             .accordion-inner#import-review
 
 :javascript
-    $(function() {
-        FCom.Admin.Accordion('import-accordion');
+    require(['jquery', 'fcom.admin'], function($) {
+        $(function() {
+            FCom.Admin.Accordion('import-accordion');
 
-        importsGrid = new FCom.Admin.MediaLibrary({
-            grid:'#import_files',
-            url:'#{BApp::href('media/grid')}',
-            folder:'storage/import/products'
-        });
+            importsGrid = new FCom.Admin.MediaLibrary({
+                grid:'#import_files',
+                url:'#{BApp::href('media/grid')}',
+                folder:'storage/import/products'
+            });
 
-        $('#step1-next').click(function(ev) {
-            var sel = importsGrid.getSelectedRows();
-            if (!sel.length) {
-                alert('Please select one file');
-                return;
-            }
-            var row = $('#import_files').jqGrid('getRowData', sel[0]);
-            $('#import-config').parent().collapse('show');
-            $('#import-config').html('Please wait loading file configuration...');
-            $.getJSON('#{BApp::href('catalog/products/import/config')}?file='+encodeURIComponent(row.file_name), function(data, status, xhr) {
-                $('#import-config').html(data.html);
+            $('#step1-next').click(function(ev) {
+                var sel = importsGrid.getSelectedRows();
+                if (!sel.length) {
+                    alert('Please select one file');
+                    return;
+                }
+                var row = $('#import_files').jqGrid('getRowData', sel[0]);
+                $('#import-config').parent().collapse('show');
+                $('#import-config').html('Please wait loading file configuration...');
+                $.getJSON('#{BApp::href('catalog/products/import/config')}?file='+encodeURIComponent(row.file_name), function(data, status, xhr) {
+                    $('#import-config').html(data.html);
+                });
+            });
+
+            $('#import-accordion').on('click', '#step2-next', function(ev) {
+                $('#import-status').parent().collapse('show');
+                $('#import-status').html('Please wait starting import...');
+                $.post('#{BApp::href('catalog/products/import/config')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                    $('#import-status').html(data);
+                });
+            });
+
+            $('#import-accordion').on('click', '#step3-start', function(ev) {
+                $('#import-status').load('#{BApp::href('catalog/products/import/status')}?start=true');
+            });
+
+            $('#import-accordion').on('click', '#step3-stop', function(ev) {
+                $.post('#{BApp::href('catalog/products/import/stop')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                    $('#import-status').html(data);
+                });
             });
         });
-
-        $('#import-accordion').on('click', '#step2-next', function(ev) {
-            $('#import-status').parent().collapse('show');
-            $('#import-status').html('Please wait starting import...');
-            $.post('#{BApp::href('catalog/products/import/config')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
-                $('#import-status').html(data);
-            });
-        });
-
-        $('#import-accordion').on('click', '#step3-start', function(ev) {
-            $('#import-status').load('#{BApp::href('catalog/products/import/status')}?start=true');
-        });
-
-        $('#import-accordion').on('click', '#step3-stop', function(ev) {
-            $.post('#{BApp::href('catalog/products/import/stop')}', $('#import-columns-form').serialize(), function(data, status, xhr) {
-                $('#import-status').html(data);
-            });
-        });
-    });
+    })

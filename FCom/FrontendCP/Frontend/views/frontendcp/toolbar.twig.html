@@ -34,7 +34,7 @@
     </div>
 
     <script>
-        (function() {
+        require(['jquery'], function($) {
             window.mercuryPackages = {
                 fcom: { javascripts: 'js/mercury.js,js/mercury_dialogs.js', stylesheets: 'css/mercury.bundle.css' }
             }
@@ -75,6 +75,6 @@
             $(document).ajaxSuccess(function(event, xhr, settings) {
 console.log(event, xhr, settings);
             });
-        })();
+        })
     </script>
 {% endif %}

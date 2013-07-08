@@ -7,7 +7,6 @@ base:
     - view: head
         do:
             - [ css, @FCom_Install/css/styles.css ]
-            - [ js, @FCom_Core/js/fcom.core.js ]
 
 /:
     - { include: base }

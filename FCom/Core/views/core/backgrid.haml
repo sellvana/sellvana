@@ -3,9 +3,11 @@
 .backgrid(id="#{$c['id']}")
 
 :javascript
-    $(function() {
-        var config = #{$this->getBackgridConfigJson()};
-        console.log(JSON.stringify(config), config.columns[2]);
-        var grid = new FCom.BackgridView(config);
-        grid.render();
-    });
+    require(['jquery', 'fcom.admin'], function($) {
+        $(function() {
+            var config = #{$this->getBackgridConfigJson()};
+            console.log(JSON.stringify(config), config.columns[2]);
+            var grid = new FCom.BackgridView(config);
+            grid.render();
+        });
+    })

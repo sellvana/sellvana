@@ -29,8 +29,10 @@
                 - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_hidden)
 
 :javascript
-    $(function() {
-        adminForm.wysiwygCreate('general-info-description');
-    });
+    require(['jquery'], function($) {
+        $(function() {
+            adminForm.wysiwygCreate('general-info-description');
+        });
+    })
 
 - echo $this->hook('catalog/products/tab/main', array('model'=>$this->model))

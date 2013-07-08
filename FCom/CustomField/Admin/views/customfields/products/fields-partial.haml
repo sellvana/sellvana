@@ -22,9 +22,11 @@
                     .datepicker_wrapper
                         %input(type="text" name="model[#{$field->field_code}]" value="#{$m->{$field->field_code}}" id="datepicker")
                     :javascript
-                        $(function() {
-                            $( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd", constrainInput: false });
-                        });
+                        require(['jquery', 'jquery-ui'], function($) {
+                            $(function() {
+                                $( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd", constrainInput: false });
+                            });
+                        })
                 - else
                     %input(type="text" name="model[#{$field->field_code}]" value="#{$m->{$field->field_code}}")
 
