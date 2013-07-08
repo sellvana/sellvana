@@ -1,6 +1,6 @@
 - $c = $this->model
 
-%fieldset.form-horizontal 
+%fieldset.form-horizontal
     .accordion#settings-FCom_Frontend
         .accordion-group
             .accordion-heading
@@ -71,7 +71,4 @@
                         %td
                             %input(type="text" name="config[modules][FCom_Frontend][nav_top][root_category]"
                                 value="#{ $c->get('modules/FCom_Frontend/nav_top/root_category') }")
-                                
 
-:javascript
-    $(function() { FCom.Admin.initCodeEditors() })

@@ -2,83 +2,87 @@
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
     <fieldset>
-		<header class="page-title">
-			<h1 class="title">{{ "Shipping Address" |_ }}</h1>
-		</header>
-    	<table class="form-group row-label">
-    		<col width="50%"/>
-    		<col width="50%"/>
-    		<tr>
-    			<td>
-    				<label for="#">{{ "First name" |_ }}</label>
-		    		<input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}'" class="required">
-		    	</td>
-		    	<td>
-		    		<label for="#">{{ "Last name" |_ }}</label>
-		    		<input type="text" name="lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
-		    	</td>
-		    </tr>
-    		<tr>
-    			<td>
-    				<label for="#">{{ "E-mail" |_ }}</label>
-		    		<input type="text" name="email" value="{{ THIS.get('address').get('email') }}" class="required">
-		    	</td>
-		    	<td>&nbsp;</td>
-		    </tr>
-		    <tr>
-    			<td colspan="2">
-    				<label for="#">{{ "Street 1" |_ }}</label>
-		    		<input type="text" name="street1" value="{{ THIS.get('address').get('street1') }}" class="required">
-		    	</td>
-		    </tr>
-		    <tr>
-		    	<td colspan="2"><label for="#">{{ "Street 2" |_ }}</label>
-		    	<input type="text" name="street2" value="{{ THIS.get('address').get('street2') }}"></td>
-		    </tr>
-    		<tr>
-    			<td>
-    				<label for="#">{{ "City" |_ }}</label>
-		    		<input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
-		    	</td>
-		    	<td>
-				    {{ $this->view('geo/embed') | raw }}
-				    <script>
-				        $(function() {
-				            $('.geo-country').geoCountryRegion({country:'{{ THIS.get('address').get('country') }}', region:'{{ THIS.get('address').get('region') }}'});
-				        })
-				    </script>
-		    		<label for="#">{{ "Region" |_ }}</label>
-		    		<select class="geo-region required" name="region"  class="required">
-				        <option value="">{{ "Select an option" |_ }}</option>
-				    </select>
-				    <input type="text" class="geo-region" name="region"  class="required"/>
-		    	</td>
-		    </tr>
-    		<tr>
-    			<td>
-		  			<label for="#">{{ "Country |_ }}<em class="required">*</em></label>
-		    		<select class="geo-country" name="country" id="country" class="required">
-		        		<option value="">{{ "Select an option" |_ }}</option>
-		    		</select>
-		    	</td>
-		    	<td>
-		    		<label for="#">{{ "Zip / Postal Code" |_ }}</label>
-		    		<input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
-		    	</td>
-		    </tr>
-		</table>
-		{% if 's' == THIS.get('address_type') %}
-		<p class="checkbox-row">
-			<label for="address_equal">
-				<input type="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
-				{{ "Billing address is same as shipping" |_ }}</label>
-		</p>
-		{% endif %}
-    	<button class="button" type="submit"><span>{{ "Save address" |_ }}</span></button>
-	</fieldset>
+        <header class="page-title">
+            <h1 class="title">{{ "Shipping Address" |_ }}</h1>
+        </header>
+        <table class="form-group row-label">
+            <col width="50%"/>
+            <col width="50%"/>
+            <tr>
+                <td>
+                    <label for="#">{{ "First name" |_ }}</label>
+                    <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}'" class="required">
+                </td>
+                <td>
+                    <label for="#">{{ "Last name" |_ }}</label>
+                    <input type="text" name="lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="#">{{ "E-mail" |_ }}</label>
+                    <input type="text" name="email" value="{{ THIS.get('address').get('email') }}" class="required">
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <label for="#">{{ "Street 1" |_ }}</label>
+                    <input type="text" name="street1" value="{{ THIS.get('address').get('street1') }}" class="required">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><label for="#">{{ "Street 2" |_ }}</label>
+                <input type="text" name="street2" value="{{ THIS.get('address').get('street2') }}"></td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="#">{{ "City" |_ }}</label>
+                    <input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
+                </td>
+                <td>
+                    {{ $this->view('geo/embed') | raw }}
+                    <script>
+                        require(['jquery'], function($) {
+                            $(function() {
+                                $('.geo-country').geoCountryRegion({country:'{{ THIS.get('address').get('country') }}', region:'{{ THIS.get('address').get('region') }}'});
+                            })
+                        })
+                    </script>
+                    <label for="#">{{ "Region" |_ }}</label>
+                    <select class="geo-region required" name="region"  class="required">
+                        <option value="">{{ "Select an option" |_ }}</option>
+                    </select>
+                    <input type="text" class="geo-region" name="region"  class="required"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="#">{{ "Country |_ }}<em class="required">*</em></label>
+                    <select class="geo-country" name="country" id="country" class="required">
+                        <option value="">{{ "Select an option" |_ }}</option>
+                    </select>
+                </td>
+                <td>
+                    <label for="#">{{ "Zip / Postal Code" |_ }}</label>
+                    <input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
+                </td>
+            </tr>
+        </table>
+        {% if 's' == THIS.get('address_type') %}
+        <p class="checkbox-row">
+            <label for="address_equal">
+                <input type="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
+                {{ "Billing address is same as shipping" |_ }}</label>
+        </p>
+        {% endif %}
+        <button class="button" type="submit"><span>{{ "Save address" |_ }}</span></button>
+    </fieldset>
 </form>
 <script>
-$(function() {
-    $('#address-form').validate();
+require(['jquery'], function($) {
+    $(function() {
+        $('#address-form').validate();
+    })
 })
 </script>

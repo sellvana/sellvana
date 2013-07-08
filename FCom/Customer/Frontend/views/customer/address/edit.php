@@ -10,8 +10,10 @@
 
     <?=$this->view('geo/embed')?>
     <script>
-        $(function() {
-            $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
+        require(['jquery'], function($) {
+            $(function() {
+                $('.geo-country').geoCountryRegion({country:'<?=$this->address->country?>', region:'<?=$this->address->region?>'});
+            })
         })
     </script>
     <label for="#"><?= BLocale::_("Country") ?><em class="required">*</em></label>

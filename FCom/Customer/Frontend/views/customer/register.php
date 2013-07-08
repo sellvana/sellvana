@@ -50,7 +50,9 @@
     </div>
 </div>
 <script>
-$(function() {
-    $('#register-form').validate();
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#register-form').validate();
+    })
 })
 </script>

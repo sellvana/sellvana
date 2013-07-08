@@ -31,9 +31,9 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
                     <input type="hidden" name="rid" value="<?=$review->id?>">
                     <?= BLocale::_("Was this review helpful to you") ?>?
                     <button type="submit" name="review_helpful" value="yes"
-                        onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'yes');"><?= BLocale::_("Yes") ?></button>
+                        onclick="FCom.add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'yes');"><?= BLocale::_("Yes") ?></button>
                     <button type="submit" name="review_helpful" value="no"
-                        onclick="add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'no');"><?= BLocale::_("No") ?></button>
+                        onclick="FCom.add_review_rating('<?=Bapp::href('prodreviews/helpful')?>', <?=$review->id?>, 'no');"><?= BLocale::_("No") ?></button>
                 </form>
             </div>
             <span id="block_review_helpful_done_<?=$review->id?>" style="color:green"></span>
@@ -45,3 +45,4 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+<script>require(['fcom.productreviews'])</script>

@@ -1,5 +1,5 @@
 <?php
-$m = $this->model; 
+$m = $this->model;
 $promoCtrl = FCom_Promo_Admin_Controller::i();
 ?>
 <div id="details-layout">
@@ -42,45 +42,47 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
 </div>
 
 <script>
-$(function() {
-    var layout = $('#details-layout').height($('.adm-wrapper').height()).layout({
-        useStateCookie: true,
-        west__minWidth:400,
-        west__spacing_open:20,
-        west__closable:false,
-        triggerEventsOnLoad: true,
-        onresize:function(pane, $Pane, paneState) {
-            $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
-                $(this).setGridWidth(paneState.innerWidth - 20);
-            });
+require(['jquery', 'fcom.admin'], function($) {
+    $(function() {
+        var layout = $('#details-layout').height($('.adm-wrapper').height()).layout({
+            useStateCookie: true,
+            west__minWidth:400,
+            west__spacing_open:20,
+            west__closable:false,
+            triggerEventsOnLoad: true,
+            onresize:function(pane, $Pane, paneState) {
+                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                    $(this).setGridWidth(paneState.innerWidth - 20);
+                });
+            }
+        });
+        $(window).resize(function(ev) { $('#details-layout').height($('.adm-wrapper').height()); });
+
+        $('#details-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
+            new FCom.Admin.TargetGrid({source:'#productLibrary', target:el});
+        });
+
+        (function() {
+            var newId = 0, baseUrl = '<?=BApp::href('promo/form/'.$m->id.'/group') ?>';
+            function addGroup(type) {
+                var url = baseUrl+'?type='+type+'&group_id='+(--newId);
+                $.get(url, function(data, status, xhr) {
+                    $('#group-container-'+type).append(data);
+                    layout.resizeAll();
+                });
+                return false;
+            }
+            $('#add-group-buy').click(function(ev) { return addGroup('buy'); });
+            $('#add-group-get').click(function(ev) { return addGroup('get'); });
+        })();
+
+        function removeGroup(el) {
+            var grid = $(el).parents('.ui-jqgrid');
+            var gId = $('.ui-jqgrid-title input[name=_group_id]', grid).val();
+            var deleteIds = $('input[name=_del_group_ids]');
+            if (gId>0) deleteIds.val(deleteIds.val()+','+gId);
+            grid.remove();
         }
-    });
-    $(window).resize(function(ev) { $('#details-layout').height($('.adm-wrapper').height()); });
-
-    $('#details-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
-        new FCom.Admin.TargetGrid({source:'#productLibrary', target:el});
-    });
-
-    (function() {
-        var newId = 0, baseUrl = '<?=BApp::href('promo/form/'.$m->id.'/group') ?>';
-        function addGroup(type) {
-            var url = baseUrl+'?type='+type+'&group_id='+(--newId);
-            $.get(url, function(data, status, xhr) {
-                $('#group-container-'+type).append(data);
-                layout.resizeAll();
-            });
-            return false;
-        }
-        $('#add-group-buy').click(function(ev) { return addGroup('buy'); });
-        $('#add-group-get').click(function(ev) { return addGroup('get'); });
-    })();
-
-    function removeGroup(el) {
-        var grid = $(el).parents('.ui-jqgrid');
-        var gId = $('.ui-jqgrid-title input[name=_group_id]', grid).val();
-        var deleteIds = $('input[name=_del_group_ids]');
-        if (gId>0) deleteIds.val(deleteIds.val()+','+gId);
-        grid.remove();
-    }
+    })
 })
 </script>

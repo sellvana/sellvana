@@ -26,24 +26,21 @@ base:
       #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
       #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
 
-  #- { include: foundation3 }
-
-  - view: bottom_scripts
-    do:
       #- [ js, @FCom_Core/js/lib/json2.js ]
       #- [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
       #- [ js, @FCom_Core/js/lib/angular.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
-      - [ js, @FCom_Core/js/lib/jquery.cookie.js ]
-      - [ js, @FCom_Core/js/lib/jquery.hotkeys.js ]
-      - [ js, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
+      #- [ requireModulePath, FCom_Admin ]
+      - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.hotkeys, @FCom_Core/js/lib/jquery.hotkeys, { deps: [ jquery ] } ]
+      #- [ requireJs, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       #- [ js, @FCom_Core/js/select2/select2.min.js ]
       # highcharts
-      - [ js, @FCom_Admin/js/highcharts/highcharts.js ]
-      - [ js, @FCom_Admin/compass/js/bootstrap.min.js ]
-      - [ js, @FCom_Core/js/fcom.core.js ]
-      - [ js, @FCom_Admin/js/fcom.admin.js ]
+      - [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
+      - [ requireJs, bootstrap, @FCom_Admin/compass/js/bootstrap.min, { deps: [ jquery ] } ]
+      - [ requireJs, fcom.admin, @FCom_Admin/js/fcom.admin ]
+      - [ requireRun, fcom.admin ]
 
   - { include: grid }
   - { include: jqgrid }
@@ -77,13 +74,11 @@ jqgrid:
 
       # - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
 
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd.js ]
-      - [ js, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu.js ]
+      - [ requireJs, jqgrid.ui.multiselect, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect ]
+      - [ requireJs, jqgrid.i18n.en, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en, { deps: [ jquery ] } ]
+      - [ requireJs, jqgrid, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min, { deps: [ jquery, jqgrid.i18n.en ], exports: $.fn.jqgrid } ]
+      - [ requireJs, jqgrid.tablednd, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd, { deps: [ jqgrid ] } ]
+      - [ requireJs, jqgrid.contextmenu, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu, { deps: [ jqgrid ] } ]
 
       # - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
 
@@ -110,38 +105,29 @@ jstree:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/themes/default/style.css ]
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
+      - [ requireJs, jstree, @FCom_Core/js/lib/jquery.jstree, { deps: [ jquery ] } ]
 
 mcdropdown:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/css/jquery.mcdropdown.css ]
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Core/js/lib/jquery.mcdropdown.js ]
-      - [ js, @FCom_Core/js/lib/jquery.bgiframe.js ]
+      - [ requireJs, jquery.bgiframe, @FCom_Core/js/lib/jquery.bgiframe, { deps: [ jquery ] } ]
+      - [ requireJs, mcdropdown, @FCom_Core/js/lib/jquery.mcdropdown, { deps: [ jquery, jquery.bgiframe ] } ]
 
 codemirror:
   - view: head
     do:
       - [ css, @FCom_Admin/js/codemirror/lib/codemirror.css ]
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Admin/js/codemirror/lib/codemirror.js ]
-      - [ js, @FCom_Admin/js/codemirror/addon/mode/loadmode.js ]
+      - [ requireJs, codemirror, @FCom_Admin/js/codemirror/lib/codemirror ]
+      - [ requireJs, codemirror-loadmode, @FCom_Admin/js/codemirror/addon/mode/loadmode, { deps: [ coremirror ] } ]
 
 form:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/themes/default/style.css ]
-  - view: bottom_scripts
-    do:
-      - [ js, @FCom_Core/js/lib/ckeditor/ckeditor.js ]
-      - [ js, @FCom_Core/js/lib/ckeditor/adapters/jquery.js ]
-      - [ js, @FCom_Core/js/lib/jquery.jstree.js ]
-      - [ js, @FCom_Core/js/lib/jquery.validate.min.js ]
+      - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
+      - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
+  - { include: jstree }
 
 404:
   - { include: base }

@@ -39,8 +39,10 @@
     </ul>
 </fieldset>
 <script>
-$(function() {
-    adminForm.wysiwygCreate('model-details');
-    $('#model-from_date,#model-to_date').datepicker();
+require(['jquery', 'jquery-ui'], function($) {
+    $(function() {
+        adminForm.wysiwygCreate('model-details');
+        $('#model-from_date,#model-to_date').datepicker();
+    })
 })
 </script>

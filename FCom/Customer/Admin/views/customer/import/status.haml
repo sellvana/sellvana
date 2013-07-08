@@ -6,11 +6,15 @@
 
     - if ($start)
         :javascript
-            $.post('#{BApp::href('customers/import/start')}');
+            require(['jquery'], function($) {
+                $.post('#{BApp::href('customers/import/start')}');
+            })
     :javascript
-        setTimeout(function() {
-            $('#import-status').load('<?=BApp::href('customers/import/status')?>');
-        }, 2000);
+        require(['jquery'], function($) {
+            setTimeout(function() {
+                $('#import-status').load('<?=BApp::href('customers/import/status')?>');
+            }, 2000);
+        }
 
 - else
 
@@ -62,6 +66,6 @@
         %tr
             %th = $this->_('Memory Usage')
             %td = number_format($c['memory_usage'], 0)
-        %tr 
+        %tr
             %th = $this->_('Run Time')
             %td = number_format($c['run_time'], 4)

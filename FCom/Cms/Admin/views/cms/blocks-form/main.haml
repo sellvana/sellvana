@@ -16,6 +16,8 @@
             %select(name="model[renderer]")
                 - echo BUtil::optionsHtml(BLayout::i()->getAllRenderers(true), $m->renderer)
 :javascript
-    $(function() {
-        adminForm.wysiwygCreate('main-content');
-    });
+    require(['jquery'], function($) {
+        $(function() {
+            adminForm.wysiwygCreate('main-content');
+        });
+    })

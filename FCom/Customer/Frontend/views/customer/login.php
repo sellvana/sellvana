@@ -26,7 +26,9 @@
 	</div>
 </div>
 <script>
-$(function() {
-    $('#login-form').validate();
+require(['jquery', 'jquery.validate'], function($) {
+	$(function() {
+	    $('#login-form').validate();
+	})
 })
 </script>

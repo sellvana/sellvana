@@ -29,7 +29,7 @@
             &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
 :javascript
-    $(function() {
+    require(['jquery', 'jquery.validate'], function($) {
         $('#login-form').validate();
     })
 

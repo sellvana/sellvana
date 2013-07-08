@@ -2,10 +2,11 @@
 - echo '<html '.$this->getHtmlAttributes().'>'
 %head
     - echo $this->hook('head')
-    :javascript
-        window.appConfig = {
-            baseHref: '#{BApp::href()}'
-        }
+    -#
+        :javascript
+            window.appConfig = {
+                baseHref: '#{BApp::href()}'
+            }
 %body(class="#{$this->bodyClass}")
     -# .top-message
         -# Something happened here!

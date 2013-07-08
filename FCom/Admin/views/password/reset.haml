@@ -20,6 +20,8 @@
             &copy; #{date('Y').' '.$storeName.' '.$this->_('All rights reserved')}
 
 :javascript
-    $(function() {
-        $('#reset-form').validate();
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('#reset-form').validate();
+        })
     })

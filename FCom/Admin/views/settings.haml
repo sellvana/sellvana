@@ -6,76 +6,79 @@
     }*/
 
 :javascript
-    $(function() {
-        function onSortableStop(event, ui) {
-            var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
-            console.log(ui.item[0].id);
-            var handle = ui.item;
-            if (type=='tabs') handle = handle.children('h3');
-            handle.triggerHandler('focusout');
 
-            return; //TODO: figure out whether to personalize settings items order
+    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin'], function($) {
+        $(function() {
+            function onSortableStop(event, ui) {
+                var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
+                console.log(ui.item[0].id);
+                var handle = ui.item;
+                if (type=='tabs') handle = handle.children('h3');
+                handle.triggerHandler('focusout');
 
-            var url = '#{BApp::href('my_account/personalize')}';
+                return; //TODO: figure out whether to personalize settings items order
 
-            switch (type) {
-            case 'tabs':
-                var items = [];
-                ui.item.parent().children().each(function(idx, el) {
-                    items.push(el.id.replace(/^settings-tab-/, ''));
-                });
-                //$.post(url, {'do':'settings.'+type+'.order', items:items});
-                break;
+                var url = '#{BApp::href('my_account/personalize')}';
 
-            case 'sections':
-                var items = [];
-                break;
-            }
-        }
-
-        window.adminForm = FCom.Admin.form({
-            form:     '#settings-form',
-            tabs:     '.adm-tabs-sidebar li',
-            panes:    '.adm-tabs-content',
-            url_get:  '#{$formUrl}',
-            url_post: '#{$formUrl}'
-            //on_tab_load: initTabs
-        });
-        $('#settings-form').validate();
-        //initTabs.apply($('#settings-form'));
-        //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
-
-        var options = {
-            url_get: "#{$formUrl}"
-        }
-        $('.js-settings-tab-toggle').click(function(ev) {
-            ev.preventDefault();
-            var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
-            if (!pane.data('loaded')) {
-                var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
-                $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
-                    _.each(data.tabs, function(tabHtml, i) {
-                        $('#tab-'+i).html(tabHtml).data('loaded', true);
-                        $('#tab-'+i+' .collapse').collapse();
-                        FCom.Admin.Accordion('settings-'+i);
-                        FCom.Admin.initCodeEditors()
+                switch (type) {
+                case 'tabs':
+                    var items = [];
+                    ui.item.parent().children().each(function(idx, el) {
+                        items.push(el.id.replace(/^settings-tab-/, ''));
                     });
-                });
+                    //$.post(url, {'do':'settings.'+type+'.order', items:items});
+                    break;
+
+                case 'sections':
+                    var items = [];
+                    break;
+                }
             }
-            $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
-            $(this).tab('show');
-            console.log(this);
-        })
-        $('[href="#tab-#{$this->cur_tab}"]').tab('show');
-        $('.accordion').each(function(i, el) {
-            FCom.Admin.Accordion(el.id);
+
+            window.adminForm = FCom.Admin.form({
+                form:     '#settings-form',
+                tabs:     '.adm-tabs-sidebar li',
+                panes:    '.adm-tabs-content',
+                url_get:  '#{$formUrl}',
+                url_post: '#{$formUrl}'
+                //on_tab_load: initTabs
+            });
+            $('#settings-form').validate();
+            //initTabs.apply($('#settings-form'));
+            //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
+
+            var options = {
+                url_get: "#{$formUrl}"
+            }
+            $('.js-settings-tab-toggle').click(function(ev) {
+                ev.preventDefault();
+                var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
+                if (!pane.data('loaded')) {
+                    var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
+                    $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
+                        _.each(data.tabs, function(tabHtml, i) {
+                            $('#tab-'+i).html(tabHtml).data('loaded', true);
+                            $('#tab-'+i+' .collapse').collapse();
+                            FCom.Admin.Accordion('settings-'+i);
+                            FCom.Admin.initCodeEditors()
+                        });
+                    });
+                }
+                $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
+                $(this).tab('show');
+                console.log(this);
+            })
+            $('[href="#tab-#{$this->cur_tab}"]').tab('show');
+            $('.accordion').each(function(i, el) {
+                FCom.Admin.Accordion(el.id);
+            });
+            FCom.Admin.initCodeEditors()
         });
-        FCom.Admin.initCodeEditors()
-    });
+    })
 
 %form#settings-form(action="#{$formUrl}" method="post")
     %input#current_tab(type="hidden" name="current_tab" value="FCom_Admin")
-    
+
     %header.fcom-admin-main-title
         %span.title = $this->_('Settings')
         .btn-group

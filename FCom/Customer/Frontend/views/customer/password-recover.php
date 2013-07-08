@@ -23,7 +23,9 @@
     </div>
 </div>
 <script>
-$(function() {
-    $('#recovery-form').validate();
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#recovery-form').validate();
+    })
 })
 </script>
