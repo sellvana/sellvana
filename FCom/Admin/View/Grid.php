@@ -328,7 +328,7 @@ return [true, 'Testing error'];
                 $cfg['grid']['toppager'] = $pagerId;
                 $html .= "<div id=\"{$pagerId}\"></div>";
             }
-            $html .= "<script>$(function() { $('#{$id}')";
+            $html .= "<script>require(['jquery', 'jqgrid'], function($) { $(function() { $('#{$id}')";
         } else {
             $quotedPagerId = "'#'+pager_id";
             $html = "$('#'+subgrid_table_id)";
@@ -396,7 +396,7 @@ return [true, 'Testing error'];
         }
 
         if (!$isSubGrid) {
-            $html .= "; ".join("\n", $extraJS)." });</script>".join('', $extraHTML);
+            $html .= "; ".join("\n", $extraJS)." }) })</script>".join('', $extraHTML);
         }
 
         return $html;

@@ -1,7 +1,8 @@
-define(["jquery", "backbone", "backbone-pageable", "backgrid", "backgrid-select-all", "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell"],
+define(["jquery", "backbone", "backbone-pageable", "lunr",
+    "backgrid", "backgrid-filter", "backgrid-select-all",
+    "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell"],
 
-function($) {
-
+function($, Backbone, PageableCollection) {
     /*
     FCom.tabs = function(options) {
         var tabs = $(options.tabs);
@@ -242,7 +243,40 @@ function($) {
             }
         });
 
+        Backgrid.Column.prototype.defaults.editable = false;
+
+        Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({render: function() {
+            Backgrid.HeaderCell.prototype.render.apply(this);
+            this.$el.width(this.column.get('width'));
+            return this;
+        }});
+        Backgrid.Extension.SelectRowCell.prototype.render = function() {
+            this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
+            this.delegateEvents();
+            this.$el.width(this.column.get('width')); //ADDED
+            return this;
+        }
+
         FCom.Backgrid = {};
+
+        FCom.Backgrid.HrefCell = Backgrid.Cell.extend({
+          /** @property */
+          className: "href-cell",
+
+          render: function () {
+            this.$el.empty();
+            var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
+            var href = _.template(this.column.get('href'))(this.model);
+            this.$el.append($("<a>", {
+              tabIndex: -1,
+              href: href,
+              title: formattedValue,
+            }).text(formattedValue));
+            this.delegateEvents();
+            return this;
+          }
+
+        });
 
         FCom.BackgridView = Backbone.View.extend({
             prepareConfig: function() {
@@ -254,43 +288,6 @@ function($) {
                 });
             },
 
-            initialize: function() {
-
-                Backgrid.Column.prototype.defaults.editable = false;
-
-                Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({render: function() {
-                    Backgrid.HeaderCell.prototype.render.apply(this);
-                    this.$el.width(this.column.get('width'));
-                    return this;
-                }});
-                Backgrid.Extension.SelectRowCell.prototype.render = function() {
-                    this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
-                    this.delegateEvents();
-                    this.$el.width(this.column.get('width')); //ADDED
-                    return this;
-                }
-
-                FCom.Backgrid.HrefCell = Backgrid.Cell.extend({
-                  /** @property */
-                  className: "href-cell",
-
-                  render: function () {
-                    this.$el.empty();
-                    var formattedValue = this.formatter.fromRaw(this.model.get(this.column.get("name")));
-                    var href = _.template(this.column.get('href'))(this.model);
-                    this.$el.append($("<a>", {
-                      tabIndex: -1,
-                      href: href,
-                      title: formattedValue,
-                    }).text(formattedValue));
-                    this.delegateEvents();
-                    return this;
-                  }
-
-                });
-
-            },
-
             render: function() {
                 var self = this;
 
@@ -300,7 +297,7 @@ function($) {
 
                 });
 
-                var Collection = Backbone.PageableCollection.extend({
+                var Collection = PageableCollection.extend({
                     model: Model,
                     url: this.options.data_url,
                     state: this.options.state || { pageSize: 25 },
