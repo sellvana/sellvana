@@ -7,6 +7,7 @@ base:
     - view: head
         do:
             - [ css, @FCom_Install/css/styles.css ]
+            - [ requireRun, fcom.core ]
 
 /:
     - { include: base }
