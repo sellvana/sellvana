@@ -19,4 +19,4 @@ modules:
                 username: root
                 logging: false
             web:
-                csrf_check_method: token
+                csrf_check_method: referrer
