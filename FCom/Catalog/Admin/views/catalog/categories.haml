@@ -15,7 +15,7 @@
         .ui-layout-center.adm-main#categories-form-container
 
 :javascript
-    require(['jquery', 'fcom.admin', 'jstree'], function($) {
+    require(['jquery', 'fcom.admin', 'jstree', 'fcom.admin'], function($) {
         $(function() {
             FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'unlocked', label:'Unlocked'}, off:{icon:'locked', label:'Locked'}});
             FCom.Admin.checkboxButton('#categories-expand-collapse', {

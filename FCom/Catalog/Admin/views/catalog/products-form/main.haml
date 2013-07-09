@@ -28,11 +28,11 @@
             %select(name="model[is_hidden")
                 - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $m->is_hidden)
 
+- echo $this->hook('catalog/products/tab/main', array('model'=>$this->model))
+
 :javascript
-    require(['jquery'], function($) {
+    require(['jquery', 'fcom.admin.form'], function($) {
         $(function() {
-            adminForm.wysiwygCreate('general-info-description');
+            //adminForm.wysiwygCreate('general-info-description');
         });
     })
-
-- echo $this->hook('catalog/products/tab/main', array('model'=>$this->model))

@@ -3,7 +3,7 @@
     $tabs = $this->sortedTabs();
 ?>
 <script>
-require(['jquery', 'jquery.validate', 'fcom.admin'], function($) {
+require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
     $(function() {
         window.adminForm = FCom.Admin.form({
             form:     '#<?=$this->form_id?>',

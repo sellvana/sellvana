@@ -52,9 +52,9 @@
     <?php endif; ?>
 
 <script>
-require(['jquery'], function($) {
+require(['jquery', 'fcom.admin.form'], function($) {
     $(function() {
-        adminForm.wysiwygCreate('main-content');
+        //adminForm.wysiwygCreate('main-content');
     });
 })
 </script>

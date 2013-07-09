@@ -39,9 +39,9 @@
     </ul>
 </fieldset>
 <script>
-require(['jquery', 'jquery-ui'], function($) {
+require(['jquery', 'jquery-ui', 'fcom.admin.form'], function($) {
     $(function() {
-        adminForm.wysiwygCreate('model-details');
+        //adminForm.wysiwygCreate('model-details');
         $('#model-from_date,#model-to_date').datepicker();
     })
 })
