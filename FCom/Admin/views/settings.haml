@@ -1,12 +1,6 @@
 - $formUrl = BApp::href('settings');
 
-:css
-    /*ul.nav li.dropdown:hover > ul.dropdown-menu {
-        display: block;
-    }*/
-
 :javascript
-
     require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin'], function($) {
         $(function() {
             function onSortableStop(event, ui) {
@@ -95,7 +89,7 @@
                             - foreach ($group['tabs'] as $k => $tab)
                                 - if (empty($tab['disabled']))
                                     %li(id="settings-tab-#{$k}")
-                                        %a.js-settings-tab-toggle(href="#tab-#{$k}")
+                                        %a.js-settings-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
                                             %span.icon
                                             = $tab['label']
             .tab-content

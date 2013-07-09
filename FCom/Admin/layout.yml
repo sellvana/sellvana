@@ -39,7 +39,10 @@ base:
       # highcharts
       - [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
       - [ requireJs, bootstrap, @FCom_Admin/compass/js/bootstrap.min, { deps: [ jquery ] } ]
+      - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
+      - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/js/fcom.admin ]
+      - [ requireJs, fcom.admin.form, @FCom_Admin/js/fcom.admin.form ]
       - [ requireRun, fcom.admin ]
 
   - { include: grid }
@@ -125,8 +128,6 @@ form:
   - view: head
     do:
       - [ css, @FCom_Core/js/lib/themes/default/style.css ]
-      - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
-      - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
   - { include: jstree }
 
 404:

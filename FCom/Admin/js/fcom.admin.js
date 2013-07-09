@@ -1,4 +1,4 @@
-define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core"], function($, angular) {
+define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'ckeditor'], function($, angular) {
 
     FCom.Admin.Accordion = function(containerId, options) {
         var $container = $('#'+containerId);

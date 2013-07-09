@@ -9,6 +9,46 @@
 
 - $tabs = $this->sortedTabs()
 
+
+:javascript
+    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
+
+        $(function() {
+            window.adminForm = FCom.Admin.form({
+                form:     '##{$this->form_id}',
+                tabs:     '.adm-tabs-sidebar li',
+                panes:    '.adm-tabs-content',
+                url_get:  '#{$this->form_url}',
+                url_post: '#{$this->form_url}'
+            });
+            $("##{$this->form_id}").validate();
+
+            var options = {
+                url_get: "#{$this->form_url}"
+            }
+            $('.js-form-tab-toggle').click(function(ev) {
+                ev.preventDefault();
+                var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
+                if (!pane.data('loaded')) {
+                    var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
+                    $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
+                        _.each(data.tabs, function(tabHtml, i) {
+                            $('#tab-'+i).html(tabHtml).data('loaded', true);
+                            $('#tab-'+i+' .collapse').collapse();
+                            FCom.Admin.Accordion('settings-'+i);
+                            FCom.Admin.initCodeEditors()
+                        });
+                    });
+                }
+                $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
+                $(this).tab('show');
+            });
+            $('[href="#tab-#{$this->cur_tab}"]').tab('show');
+            
+        });
+    });
+
+
 %form(id="#{ $this->form_id }" action="#{$this->form_url}" method="post")
     %header.fcom-admin-main-title
         %span.title#tab-title = $this->title
@@ -24,28 +64,12 @@
                 %ul.nav.nav-tabs.nav-stacked#tabs
                     - foreach ($tabs as $k=>$tab)
                         - if (empty($tab['disabled']))
-                            %li(class="#{$k===$this->cur_tab ? 'active' : ''}" data-toggle="tab")
-                                %a(href="#tab-#{$k}")
+                            %li
+                                %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
                                     %span.icon
                                     = $tab['label']
         .fcom-admin-main-content.tab-content
             - foreach ($tabs as $k=>$tab)
-                .tab-pane(id="tab-#{$k}" #{ $k!==$this->cur_tab ? 'hidden' : '' } #{ empty($tab['async']) ? 'data-loaded="true"' : '' })
+                .tab-pane(id="tab-#{$k}" #{ empty($tab['async']) ? 'data-loaded="true"' : '' })
                     - if (empty($tab['async']))
                         - echo $this->view($tab['view'])
-
-:javascript
-    require(["jquery", "jquery.validate"], function($) {
-        $(function() {
-            window.adminForm = FCom.Admin.form({
-                form:     '##{$this->form_id}',
-                tabs:     '.adm-tabs-sidebar li',
-                panes:    '.adm-tabs-content',
-                url_get:  '#{$this->form_url}',
-                url_post: '#{$this->form_url}'
-            });
-            $("##{$this->form_id}").validate();
-
-            $('#tabs a:first').tab('show');
-        });
-    })
