@@ -4,6 +4,7 @@ modules:
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { de: de.php }
         description: "Authorize.net payment methods"
+        autoload: lib
 
         auto_use: [ bootstrap ]
         default_config:
@@ -13,6 +14,8 @@ modules:
                         title: "Credit Card (Authorize.net)"
                     dpm:
                         title: "Credit Card Direct Post (Authorize.net)"
+                    url: "https://secure.authorize.net/gateway/transact.dll"
+                    test_url: "https://test.authorize.net/gateway/transact.dll"
 
         areas:
             FCom_Admin:
