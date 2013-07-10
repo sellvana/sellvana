@@ -25,14 +25,17 @@ $base-txt-clr: #444;
 $base-bg-clr: #f9f9f9;
 $base-link-clr: #1b68cb;
 $base-link-hover-clr: #175ab0;
-$base-head-clr: #2f2f2f;
+$base-header-clr: #2f2f2f;
+$base-nav-bg-clr: #464d54;
 $base-border-clr: #ddd;
 $base-border: 1px solid $base-border-clr;
 $error-txt-clr: #c83c3c;
 
 /* BASE */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+html, body { height:100%; }
 body { 
+    position:relative;
     background:#f9f9f9;
     color:$base-txt-clr;
     font-weight:400;
@@ -166,6 +169,8 @@ input.error {
 
 
 /* FCOM - LAYOUT */
+.fcom-admin-container { @include clearfix(); }
+
 .fcom-admin-header { border-bottom:1px solid #e6e6e6; height:60px; padding:10px 15px; }
     .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
     .fcom-admin-header .dropdown { float:left;  }
@@ -183,8 +188,8 @@ input.error {
         .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
         .fcom-admin-header-util-links .user-name { display:inline-block; margin:-18px 0 0 -5px; color:#454a5a; vertical-align:middle; }
         .fcom-admin-header-util-links .dropdown-menu { top:35px; }
-.fcom-admin-nav { width:40px; background:#464d54; position:absolute; top:60px; left:0; bottom:0; z-index:9; }
-    .fcom-admin-nav .dropdown { background:#464d54; width:40px;}
+.fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:60px; left:0; bottom:0; z-index:9; }
+    .fcom-admin-nav .dropdown { background:$base-nav-bg-clr; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
     .fcom-admin-nav .dropdown-submenu > a:after { border:none; }
     
@@ -202,7 +207,7 @@ input.error {
     .dropdown-menu > .active > a:focus { 
         @include transition-property(background-color);
         @include transition-timing-function(ease-in linear);
-        background:#2c3237;
+        background:darken($base-nav-bg-clr, 7%);
         }
           
     // Nav level 1 - <a> style
@@ -229,45 +234,61 @@ input.error {
     // Nav level 1 - icon styling
     .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #303a43; }
     .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
-    .nav-group-home:before{ content:'\2302'; }
-    .nav-group-catalog:before{ content:'\1F4E6'; }
-    .nav-group-sales:before{ content:'\E73D'; }
-    .nav-group-customer:before{ content:'\1F465'; }
-    .nav-group-system:before{ content:'\2699'; }
-    .nav-group-cms:before{ content:'\E74D'; }
+    .nav-group-home:before { content:'\2302'; }
+    .nav-group-catalog:before { content:'\1F4E6'; }
+    .nav-group-sales:before { content:'\E73D'; }
+    .nav-group-customer:before { content:'\1F465'; }
+    .nav-group-system:before { content:'\2699'; }
+    .nav-group-cms:before { content:'\E736'; }
+    .nav-group-market:before { content:'\E778'; }
 
     // Nav level 2+
     .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
     .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
-    
+
     
 .fcom-admin-main { position:relative; padding-left:40px; width:100%; }
     .fcom-admin-main-title { border-bottom:1px solid #ddd; @include clearfix(); background:#f5f5f5; padding:10px 15px; }
-    .fcom-admin-main-title .title { float:left; margin:6px 0 6px 5px; color:$base-head-clr; font-size:20px; }
+    .fcom-admin-main-title .title { float:left; margin:6px 0 6px 5px; color:$base-header-clr; font-size:20px; }
     .fcom-admin-main-title .btn-group { float:right; }
     .fcom-admin-main-container { position:relative; padding:30px 20px; }
     .fcom-admin-main-container.fcom-admin-main-flush { padding:0; margin-top:-1px; }
-        .fcom-admin-nav-sidebar { 
-            position:absolute;
-            top:0;
-            left:0;
-            bottom:0;
+    .fcom-admin-main-container.fcom-admin-sidebar-view { /* Has sidebar tabs or tree */
+        margin-top:0;
+        padding:0;
+        min-height:100%; 
+        overflow:hidden; 
+        padding-left:166px; 
+        }
+        .fcom-admin-sidebar-view .fcom-admin-nav-sidebar {
+            float:right;
             width:165px;
-            background:#f2f2f2; 
-            padding: 20px 0;
+            margin-left:-200%;
+            border-right:1px solid #e6e6e6;
+            background:#f9f9f9;
+            padding:20px 0;
+            padding-bottom:999em;
+            margin-bottom:-999em;
             }
-            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
-                @include border-radius(0); 
-                border:none; 
-                padding:6px 15px; 
-                background:none; 
-                color:lighten($base-txt-clr, 20%); 
-                font-size:1.1em; 
-                }
-            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
-                @include background(linear-gradient(#71b1f2, #4d96e9)); 
-                color:#fff; 
-                } 
+                .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
+                    @include border-radius(0); 
+                    border:none; 
+                    padding:6px 15px; 
+                    background:none; 
+                    color:lighten($base-txt-clr, 20%); 
+                    font-size:1.1em; 
+                    }
+                .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
+                    @include background(linear-gradient(#71b1f2, #4d96e9)); 
+                    color:#fff; 
+                    } 
+        .fcom-admin-sidebar-view .fcom-admin-main-content { 
+            float: right;
+            width: 100%;
+            background:#fff;
+            padding-bottom:999em;
+            margin-bottom:-999em;
+            }
 .copyright { font-size:.9em; color:#777; }
 
 

@@ -56,8 +56,13 @@
             - echo join(' ', (array)$this->actions)
 
     - echo $this->messagesHtml('admin')
-    .fcom-admin-main-container
-        %aside(class="#{$this->sidebar_img ? 'fcom-admin-nav-sidebar' : 'fcom-admin-nav-sidebar'}")
+    .fcom-admin-main-container.fcom-admin-sidebar-view
+        .fcom-admin-main-content.tab-content
+            - foreach ($tabs as $k=>$tab)
+                .tab-pane(id="tab-#{$k}" #{ empty($tab['async']) ? 'data-loaded="true"' : '' })
+                    - if (empty($tab['async']))
+                        - echo $this->view($tab['view'])
+        %aside.fcom-admin-nav-sidebar
             - if ($this->sidebar_img)
                 %img(src="#{$this->sidebar_img}" width="98" height="98")
             %nav
@@ -68,8 +73,3 @@
                                 %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
                                     %span.icon
                                     = $tab['label']
-        .fcom-admin-main-content.tab-content
-            - foreach ($tabs as $k=>$tab)
-                .tab-pane(id="tab-#{$k}" #{ empty($tab['async']) ? 'data-loaded="true"' : '' })
-                    - if (empty($tab['async']))
-                        - echo $this->view($tab['view'])
