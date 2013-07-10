@@ -4,7 +4,7 @@
  * @project fulleron
  */
 
-class FCom_AuthorizeNet_Model_Settings
+class FCom_AuthorizeNet_Model_Settings extends BClass
 {
     protected static $gatewayUrl = "https://secure.authorize.net/gateway/transact.dll";
     protected static $testGatewayUrl = "https://test.authorize.net/gateway/transact.dll";
@@ -172,6 +172,7 @@ class FCom_AuthorizeNet_Model_Settings
         54 => "Requested Amount",
         55 => "Balance On Card"
     );
+    
     public static function countries()
     {
         $countries = array();
