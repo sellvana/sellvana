@@ -17,6 +17,12 @@
 :javascript
     require(['jquery', 'fcom.admin', 'jstree', 'fcom.admin'], function($) {
         $(function() {
+            $('.fcom-admin-nav-sidebar').resizable({
+                handles: 'e',
+                resize: function(ev, ui) { 
+                    $('#categories-layout').css('padding-left', ui.size.width+'px');
+                }
+            });
             FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'unlocked', label:'Unlocked'}, off:{icon:'locked', label:'Locked'}});
             FCom.Admin.checkboxButton('#categories-expand-collapse', {
                 off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
