@@ -3,20 +3,26 @@
     %span.title = $this->_('Categories')
     .btn-group
 
-.fcom-admin-main-container.fcom-admin-main-flush#categories-layout
-    .ui-layout-west.adm-sidebar
+.fcom-admin-main-container.fcom-admin-sidebar-view#categories-layout
+
+    %form.fcom-admin-main-content#categories-tree-form(action="#{$formUrl}" method="post")
+        #categories-form-container
+    %aside.fcom-admin-nav-sidebar
         .ui-widget-header
             = $this->_('Categories')
             %input#categories-tree-lock(type="checkbox")
             %input#categories-expand-collapse(type="checkbox")
         #categories
 
-    %form#categories-tree-form(action="#{$formUrl}" method="post")
-        .ui-layout-center.adm-main#categories-form-container
-
 :javascript
     require(['jquery', 'fcom.admin', 'jstree', 'fcom.admin'], function($) {
         $(function() {
+            $('.fcom-admin-nav-sidebar').resizable({
+                handles: 'e',
+                resize: function(ev, ui) { 
+                    $('#categories-layout').css('padding-left', ui.size.width+'px');
+                }
+            });
             FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'unlocked', label:'Unlocked'}, off:{icon:'locked', label:'Locked'}});
             FCom.Admin.checkboxButton('#categories-expand-collapse', {
                 off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},

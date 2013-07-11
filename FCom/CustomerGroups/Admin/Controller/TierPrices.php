@@ -104,6 +104,22 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      */
     public function getTierPricesGrid($model)
     {
+        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id);
+        $grid = array(
+            'config' => array(
+                'id' => 'tier-prices',
+                'columns' => array(
+                    array('name' => 'id', 'label' => 'ID'),
+                    array('name' => 'product_id', 'label' => 'Product'),
+                    array('name' => 'group_id', 'label' => 'Group', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true),
+                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true),
+                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true),
+                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true),
+                ),
+                'collection' => BDb::many_as_array($orm->find_many()),
+            ),
+        );
+        return $grid;
         $config = $this->gridConfig();
         if(!$model){
             return $config;

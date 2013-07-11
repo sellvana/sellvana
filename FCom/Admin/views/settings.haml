@@ -39,30 +39,17 @@
             });
             $('#settings-form').validate();
             //initTabs.apply($('#settings-form'));
+
             //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
 
-            var options = {
-                url_get: "#{$formUrl}"
-            }
-            $('.js-settings-tab-toggle').click(function(ev) {
-                ev.preventDefault();
-                var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
-                if (!pane.data('loaded')) {
-                    var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
-                    $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
-                        _.each(data.tabs, function(tabHtml, i) {
-                            $('#tab-'+i).html(tabHtml).data('loaded', true);
-                            $('#tab-'+i+' .collapse').collapse();
-                            FCom.Admin.Accordion('settings-'+i);
-                            FCom.Admin.initCodeEditors()
-                        });
-                    });
+            FCom.Admin.Tabs('.fcom-admin-main-container', { 
+                url_get: "#{$form_url}", 
+                cur_tab: "#{$this->cur_tab}",
+                tab_load_callback: function(i) {
+                    FCom.Admin.Accordion('settings-'+i);
+                    FCom.Admin.initCodeEditors();
                 }
-                $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
-                $(this).tab('show');
-                console.log(this);
-            })
-            $('[href="#tab-#{$this->cur_tab}"]').tab('show');
+            });
             $('.accordion').each(function(i, el) {
                 FCom.Admin.Accordion(el.id);
             });
@@ -89,7 +76,7 @@
                             - foreach ($group['tabs'] as $k => $tab)
                                 - if (empty($tab['disabled']))
                                     %li(id="settings-tab-#{$k}")
-                                        %a.js-settings-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
+                                        %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
                                             %span.icon
                                             = $tab['label']
             .tab-content

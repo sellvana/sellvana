@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Core_View_Grid extends FCom_Core_View_Abstract
+class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 {
     static protected $_defaultActions = array(
         'refresh' => true,
