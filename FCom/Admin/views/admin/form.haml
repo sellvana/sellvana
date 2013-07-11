@@ -23,28 +23,10 @@
             });
             $("##{$this->form_id}").validate();
 
-            var options = {
-                url_get: "#{$this->form_url}"
-            }
-            $('.js-form-tab-toggle').click(function(ev) {
-                ev.preventDefault();
-                var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
-                if (!pane.data('loaded')) {
-                    var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
-                    $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
-                        _.each(data.tabs, function(tabHtml, i) {
-                            $('#tab-'+i).html(tabHtml).data('loaded', true);
-                            $('#tab-'+i+' .collapse').collapse();
-                            FCom.Admin.Accordion('settings-'+i);
-                            FCom.Admin.initCodeEditors()
-                        });
-                    });
-                }
-                $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
-                $(this).tab('show');
+            FCom.Admin.Tabs('.fcom-admin-main-container', { 
+                url_get: "#{$this->form_url}", 
+                cur_tab: "#{$this->cur_tab}"
             });
-            $('[href="#tab-#{$this->cur_tab}"]').tab('show');
-            
         });
     });
 

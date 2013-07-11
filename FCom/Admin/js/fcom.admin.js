@@ -11,6 +11,30 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
         });
     }
 
+    FCom.Admin.Tabs = function(containerSel, options) {
+        var $container = $(containerSel);
+        $('.js-form-tab-toggle', $container).click(function(ev) {
+            ev.preventDefault();
+            var paneSel = ev.target.href.replace(/^[^#]*/, ''), pane = $(paneSel), tabId = paneSel.replace(/^#tab-/,'');
+            if (options.url_get && !pane.data('loaded')) {
+                var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
+                $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
+                    _.each(data.tabs, function(tabHtml, i) {
+                        $('#tab-'+i).html(tabHtml).data('loaded', true);
+                        $('#tab-'+i+' .collapse').collapse();
+                        if (options.tab_load_callback) {
+                            options.tab_load_callback(i, tabHtml);
+                        }
+                    });
+                });
+            }
+            $('#current_tab').val(ev.target.id.replace(/^tab-/, ''));
+            $(this).tab('show');
+        });
+        if (options.cur_tab) {
+            $('[href="#tab-' + options.cur_tab + '"]').tab('show');
+        }
+    }
 
     FCom.Admin.MediaLibrary = function(options) {
         var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
