@@ -289,50 +289,63 @@ function($, Backbone, PageableCollection) {
             },
 
             render: function() {
-                var self = this;
+                var self = this, paginator, filter;
 
                 this.prepareConfig();
 
                 var Model = Backbone.Model.extend({
 
                 });
+                if (this.options.data_url) {
+                    var Collection = PageableCollection.extend({
+                        model: Model,
+                        url: this.options.data_url,
+                        state: this.options.state || { pageSize: 25 },
+                        mode: this.options.data_mode || 'server',
+                        queryParams: {
+                            currentPage: 'p',
+                            pageSize: 'ps',
+                            totalPages: 'mp',
+                            totalRecords: 'c',
+                            sortKey: 's',
+                            order: 'sd',
+                            directions: { 'asc':'asc', 'desc':'desc' }
+                        }
+                    });
+                    var collection = new Collection();
+                    paginator = new Backgrid.Extension.Paginator({
+                        collection: collection
+                    });
 
-                var Collection = PageableCollection.extend({
-                    model: Model,
-                    url: this.options.data_url,
-                    state: this.options.state || { pageSize: 25 },
-                    mode: this.options.data_mode || 'server',
-                    queryParams: {
-                        currentPage: 'p',
-                        pageSize: 'ps',
-                        totalPages: 'mp',
-                        totalRecords: 'c',
-                        sortKey: 's',
-                        order: 'sd',
-                        directions: { 'asc':'asc', 'desc':'desc' }
-                    }
-                });
-                var collection = new Collection(this.options);
+                    filter = new Backgrid.Extension.ServerSideFilter({
+                        collection: collection,
+                        fields: ['name']
+                    });
+
+                } else {
+                    collection = new Backbone.Collection(this.options.collection);
+                }
 
                 var grid = new Backgrid.Grid({
                     columns: this.options.columns,
                     collection: collection
                 });
 
-                var paginator = new Backgrid.Extension.Paginator({
-                    collection: collection
-                });
-
-                var filter = new Backgrid.Extension.ServerSideFilter({
-                    collection: collection,
-                    fields: ['name']
-                });
 
                 var $container = $(this.options.container);
 
-                $container.append(filter.render().$el);
+                if (filter) {
+                    $container.append(filter.render().$el);
+                }
+
                 $container.append(grid.render().$el);
-                $container.append(paginator.render().$el);
+                
+                if (paginator) {
+                    $container.append(paginator.render().$el);
+                }
+                if (this.options.data_url) {
+                    collection.fetch({ reset:true });
+                }
 
         /*
                 grid.$('thead th').resizable({
@@ -376,7 +389,6 @@ function($, Backbone, PageableCollection) {
                     }
                 });
         */
-                collection.fetch({ reset:true });
             }
         })
     }
