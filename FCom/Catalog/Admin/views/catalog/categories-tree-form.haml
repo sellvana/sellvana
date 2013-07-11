@@ -1,6 +1,13 @@
 - $tabs = $this->sortedTabs()
 - $m = $this->model
 
+:javascript
+    FCom.Admin.Tabs('.fcom-admin-main-container', { 
+        //url_get: "#{$this->form_url}", 
+        cur_tab: "#{$this->cur_tab}"
+    });
+
+
 %header.fcom-admin-main-title
     .btn-group
         %button.btn(onclick="return adminForm.saveAll(this)")
@@ -8,17 +15,17 @@
     %h1 = str_replace('|', ' > ', $m->full_name)
 
 .fcom-admin-main-container.fcom-admin-main-flush
-    %nav.adm-tabs
-        %ul
+    %nav
+        %ul.nav.nav-tabs
             - foreach ($tabs as $k => $tab)
-                %li(class="#{$k===$this->cur_tab ? 'active' : ''}")
-                    %a(href="#tab-#{$k}")
+                %li
+                    %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
                         %span.icon
                         = $tab['label']
 
-    .fcom-admin-main-content
+    .tab-content.fcom-admin-main-content
         - foreach ($tabs as $k => $tab)
-        - if (!empty($tab['view']))
-            %section.adm-tabs-content(id="tab-#{$k}" #{$k!==$this->cur_tab ? 'hidden' : ''} #{empty($tab['async']) ? 'data-loaded="true"' : ''})
-                - if (empty($tab['async']))
-                    - echo $this->view($tab['view'])
+            - if (!empty($tab['view']))
+                .tab-pane(id="tab-#{$k}" #{empty($tab['async']) ? 'data-loaded="true"' : ''})
+                    - if (empty($tab['async']))
+                        - echo $this->view($tab['view'])
