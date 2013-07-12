@@ -101,11 +101,11 @@ input[type="color"]:focus,
     @include transition-property(none);
     border-color:#888;
     }
-
+textarea { min-height:150px; }
 
 /* DROPDOWNS */
-.dropdown-menu > li > a:hover, 
-.dropdown-menu > li > a:focus, 
+div.dropdown-menu > ul > li > a:hover, 
+div.dropdown-menu > ul > li > a:focus, 
 .dropdown-submenu:hover > a, 
 .dropdown-submenu:focus > a {
     @include background(linear-gradient(#71b1f2, #4d96e9));
@@ -134,13 +134,39 @@ input[type="color"]:focus,
         } 
     &:focus { background-color:#1971d5; color:#fff; } 
     }
-    
+.btn-info { }
+.btn-success { }
+.btn-warning { 
+    background:#f79560;
+    &:hover { background-color:#f07d3e; } 
+    &:focus { background-color:#f07d3e; }
+    }
+.btn-danger { }
+.btn-inverse { }
+.btn-link { 
+    color:$base-link-clr; 
+    background:none;
+    &:hover { background:none; color:darken($base-link-clr, 7%); text-decoration:none; } 
+    &:focus { background:none; color:darken($base-link-clr, 7%); text-decoration:none; } 
+    }
+.btn-group > .btn + .btn { @include border-radius(4px); margin-left:5px; }
+
 
 /* TABLES */
 
 
 /* NAVS */
 .accordion-inner { padding:30px; }
+.fcom-nav-st1 { margin-bottom:0; padding-left:10px; font-size:.95em; font-weight:600; text-transform:uppercase; }
+.fcom-nav-st1 > li > a { border:none; padding:5px 10px; color:lighten($base-txt-clr, 40%); }
+.fcom-nav-st1 > li > a:hover,
+.fcom-nav-st1 > li > a:focus { background:none; border:none; }
+.fcom-nav-st1 > .active > a { padding-top:6px; color:$base-txt-clr;}
+.fcom-nav-st1 > .active > a,
+.fcom-nav-st1 > .active > a:hover,
+.fcom-nav-st1 > .active > a:focus { border:none; }
+
+
 
 /* BREADCRUMBS */
 
@@ -168,10 +194,26 @@ input.error {
 /* MISC */
 
 
+/* ADD-ON: JSTREE */
+.fcom-admin-nav-sidebar .jstree-default a {
+    border:none;
+    @include border-radius(3px);
+    height:auto;
+    display:inline-block;
+    padding:2px;
+    font-size:.9em;
+    }
+.fcom-admin-nav-sidebar .jstree-default a.jstree-clicked {
+    @include background(linear-gradient(#71b1f2, #4d96e9)); 
+    color:#fff;
+    }
+
+
+
 
 /* FCOM - LAYOUT */
-.fcom-admin-container { @include clearfix(); }
-
+.fcom-admin-container { @include clearfix(); height:100%; }
+.fcom-admin-container > .fcom-admin-main > form { height:100%; }
 .fcom-admin-header { border-bottom:1px solid #e6e6e6; height:60px; padding:10px 15px; }
     .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
     .fcom-admin-header .dropdown { float:left;  }
@@ -189,6 +231,11 @@ input.error {
         .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
         .fcom-admin-header-util-links .user-name { display:inline-block; margin:-18px 0 0 -5px; color:#454a5a; vertical-align:middle; }
         .fcom-admin-header-util-links .dropdown-menu { top:35px; }
+        .fcom-admin-header-util-links div.dropdown-menu .fcom-dropdown-menu-title { margin-bottom:3px; padding:2px 15px; text-transform:uppercase; font-size:.9em; font-weight:600; }
+        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a { display:block; padding:2px 15px; line-height:20px; }
+        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover, 
+        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:focus { color:#fff; }
+
 .fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:60px; left:0; bottom:0; z-index:9; }
     .fcom-admin-nav .dropdown { background:$base-nav-bg-clr; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
@@ -248,17 +295,17 @@ input.error {
     .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
 
 
-.fcom-admin-main { position:relative; padding-left:40px; width:100%; }
+.fcom-admin-main { padding-left:40px; width:100%; height:100%; }
     .fcom-admin-main-title { border-bottom:1px solid #ddd; @include clearfix(); background:#f5f5f5; padding:10px 15px; }
     .fcom-admin-main-title .title { float:left; margin:6px 0 6px 5px; color:$base-header-clr; font-size:20px; }
     .fcom-admin-main-title .btn-group { float:right; }
-    .fcom-admin-main-container { @include clearfix(); position:relative; padding:30px 20px; }
+    .fcom-admin-main-container { @include clearfix(); padding:30px 20px; }
     .fcom-admin-main-container.fcom-admin-main-flush { padding:0; margin-top:-1px; }
     .fcom-admin-main-container.fcom-admin-sidebar-view { /* Has sidebar tabs or tree */
         margin-top:0;
         padding:0;
         min-height:100%; 
-        overflow:hidden; 
+        overflow:hidden;
         padding-left:166px; 
         }
         .fcom-admin-sidebar-view .fcom-admin-nav-sidebar {
@@ -268,29 +315,61 @@ input.error {
             border-right:1px solid #e6e6e6;
             background:#f9f9f9;
             padding:20px 0;
-            padding-bottom:999em;
-            margin-bottom:-999em;
+            padding-bottom:999em !important;
+            margin-bottom:-999em !important;
             }
-                .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
-                    @include border-radius(0); 
-                    border:none; 
-                    padding:6px 15px; 
-                    background:none; 
-                    color:lighten($base-txt-clr, 20%); 
-                    font-size:1.1em; 
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
+                @include border-radius(0); 
+                border:none; 
+                padding:6px 15px; 
+                background:none; 
+                color:lighten($base-txt-clr, 20%); 
+                font-size:1.1em; 
+                }
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
+                @include background(linear-gradient(#71b1f2, #4d96e9)); 
+                color:#fff; 
+                } 
+        .fcom-admin-sidebar-view .fcom-admin-tree-sidebar { padding:0; }
+            .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header {
+                border:none;
+                background:none;
+                padding:5px 5px 5px 15px;
+                color:lighten($base-nav-bg-clr, 7%);
+                font-weight:500;
+                text-transform:uppercase;
+                text-align:right;
+                }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .title {
+                    float:left;
                     }
-                .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
-                    @include background(linear-gradient(#71b1f2, #4d96e9)); 
-                    color:#fff; 
-                    } 
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .lock { color:#d40000; }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .lock-open { color:lighten($base-txt-clr, 50%); }
+            .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .fcom-admin-expand-toggles {
+                border: 1px solid #ddd;
+                border-width:1px 0;
+                padding:5px 15px;
+                font-size:.9em;
+                }
+            .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .jstree {
+                padding:10px 15px;
+                }
         .fcom-admin-sidebar-view .fcom-admin-main-content { 
             float: right;
             width: 100%;
             background:#fff;
-            padding:30px 20px;
-            padding-bottom:999em;
-            margin-bottom:-999em;
+            padding-bottom:999em !important;
+            margin-bottom:-999em !important;
             }
+        .fcom-admin-sidebar-view .tab-content { padding:25px 20px; }
+            .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title {
+                background:#f5f5f5;
+                @include box-shadow(0 2px 2px #eee inset);
+                }
+                .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title .title {
+                    font-size:22px;
+                    font-weight:400;
+                    }
 .copyright { font-size:.9em; color:#777; }
 
 

@@ -1,14 +1,15 @@
 - $m = $this->model
 
-%fieldset
-    %ul.form-list
-        %li.label-top
-            %label(for="main-content") = $this->_('Content')
+%fieldset.form-horizontal
+    .control-group
+        %label.control-label(for="main-content") = $this->_('Content')
+        .controls
             %textarea#main-content(name="model[content]") = $m->content
-        %li.label-top
-            %label(for="main-layout_update") = $this->_('Layout Update')
+    .control-group
+        %label.control-label(for="main-layout_update") = $this->_('Layout Update')
+        .controls
             %textarea#main-layout_update(name="model[layout_update]" style="width:90%; height:100px") = $m->layout_update
-
+            
 :javascript
     require(['jquery', 'ckeditor'], function($) {
         $(function() {
