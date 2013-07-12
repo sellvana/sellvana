@@ -247,7 +247,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->processCategoriesPost($model);
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
-        $this->processFamilyProductsPost($model, $data);
+        #$this->processFamilyProductsPost($model, $data);
     }
 
     public function processCategoriesPost($model)

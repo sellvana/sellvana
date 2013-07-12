@@ -10,15 +10,14 @@
     })
 
 
-%header.fcom-admin-main-title
-    .btn-group
-        %button.btn(onclick="return adminForm.saveAll(this)")
-            %span = $this->_('Save')
-    %h1 = str_replace('|', ' > ', $m->full_name)
-
-.fcom-admin-main-container.fcom-admin-main-flush
+.fcom-admin-main-content
+    %header.fcom-admin-main-title
+        .btn-group
+            %button.btn(onclick="return adminForm.saveAll(this)")
+                %span = $this->_('Save')
+        %span.title = str_replace('|', ' > ', $m->full_name)
     %nav
-        %ul.nav.nav-tabs
+        %ul.nav.nav-tabs.fcom-nav-st1
             - foreach ($tabs as $k => $tab)
                 %li
                     %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")

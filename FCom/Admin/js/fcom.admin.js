@@ -273,13 +273,13 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
         var cur = opt[opt.def ? 'on' : 'off'];
         var label = $('<label for="'+id.replace(/^#/,'')+'">'+(opt.text ? $(cur.label).html() : '')+'</label>');
         el.css({display:'none'}).after(label);
-        label.css({display:'inline-block'}).addClass('icon-btn ui-icon-'+cur.icon);
+        label.css({display:'inline-block'}).addClass(cur.icon);
         el.attr('checked', opt.def ? true : false)
             /*.button({text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})*/
             .click(function(ev) {
-                label.removeClass('ui-icon-'+cur.icon);
+                label.removeClass(cur.icon);
                 cur = opt[this.checked ? 'on' : 'off'];
-                label.addClass('ui-icon-'+cur.icon);
+                label.addClass(cur.icon);
                 //el.button('option', {text:!!cur.label, label:cur.label, icons: { primary:'ui-icon-'+cur.icon }})
                 if (opt.click) opt.click.bind(this)(ev);
             });
