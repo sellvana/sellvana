@@ -1,17 +1,18 @@
 - $formUrl = BApp::href('catalog/categories/tree_form/')
-%header.fcom-admin-main-title
-    %span.title = $this->_('Categories')
-    .btn-group
-
 .fcom-admin-main-container.fcom-admin-sidebar-view#categories-layout
 
     %form.fcom-admin-main-content#categories-tree-form(action="#{$formUrl}" method="post")
         #categories-form-container
-    %aside.fcom-admin-nav-sidebar
+            &nbsp;
+    %aside.fcom-admin-nav-sidebar.fcom-admin-tree-sidebar
         .ui-widget-header
-            = $this->_('Categories')
-            %input#categories-tree-lock(type="checkbox")
-            %input#categories-expand-collapse(type="checkbox")
+            %span.title
+                = $this->_('Categories')
+            %input.entypo.lock#categories-tree-lock(type="checkbox")
+            %input.entypo.lock-open#categories-expand-collapse(type="checkbox")
+        .fcom-admin-expand-toggles
+            %a(href='') = $this->_('Expand All')
+            %a(href='') = $this->_('Collapse All')
         #categories
 
 :javascript
@@ -23,7 +24,7 @@
                     $('#categories-layout').css('padding-left', ui.size.width+'px');
                 }
             });
-            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'unlocked', label:'Unlocked'}, off:{icon:'locked', label:'Locked'}});
+            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'entypo lock-open', label:'Unlocked'}, off:{icon:'entypo lock', label:'Locked'}});
             FCom.Admin.checkboxButton('#categories-expand-collapse', {
                 off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
                 click:function(ev) { $('#categories').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }

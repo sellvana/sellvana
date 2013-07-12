@@ -31,19 +31,23 @@
                     %a.dropdown-toggle#utilnav-shortcuts(href="#" data-toggle="dropdown" data-target="#")
                         %span.icon.entypo.layout
                         %span.title = $this->_('Shortcuts')
-                    %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-shortcuts")
-                        - foreach ($this->_shortcuts as $sc)
-                            %li
-                                %a(href="#{$sc['href']}") = $sc['label']
+                    %div.dropdown-menu(role="menu" aria-labelledby="utilnav-shortcuts")
+                        %span.fcom-dropdown-menu-title = $this->_('Shortcuts')
+                        %ul
+                            - foreach ($this->_shortcuts as $sc)
+                                %li
+                                    %a(href="#{$sc['href']}") = $sc['label']
             - if (!empty($this->_recent))
                 %li.dropdown
                     %a.dropdown-toggle#utilnav-recent-activity(href="#" data-toggle="dropdown" data-target="#")
                         %span.icon
                         %span.title = $this->_('Recent Activity')
-                    %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-recent-activity")
-                        - foreach ($this->_recent as $sc)
-                            %li
-                                %a(href="#{$sc['href']}") = $sc['label']
+                    %div.dropdown-menu(role="menu" aria-labelledby="utilnav-recent-activity")
+                        %span.fcom-dropdown-menu-title = $this->_('Recent Activity')
+                        %ul
+                            - foreach ($this->_recent as $sc)
+                                %li
+                                    %a(href="#{$sc['href']}") = $sc['label']
 
             - if ($modulesNotification)
                 %li.dropdown
