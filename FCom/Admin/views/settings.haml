@@ -42,8 +42,8 @@
 
             //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
 
-            FCom.Admin.Tabs('.fcom-admin-main-container', { 
-                url_get: "#{$form_url}", 
+            FCom.Admin.Tabs('.fcom-admin-main-container', {
+                url_get: "#{$formUrl}",
                 cur_tab: "#{$this->cur_tab}",
                 tab_load_callback: function(i) {
                     FCom.Admin.Accordion('settings-'+i);

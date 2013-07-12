@@ -1270,7 +1270,7 @@ class BView extends BClass
      */
     public function render(array $args = array(), $retrieveMetaData = true)
     {
-        $debug = BDebug::is('DEBUG');
+        $debug = BDebug::is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
 
         $timer = BDebug::debug('RENDER.VIEW ' . $viewName);
@@ -2010,7 +2010,7 @@ class BViewHead extends BView
 
     public function requireRun($names)
     {
-        $this->_requireJs['run'] += (array)$names;
+        $this->_requireJs['run'] = array_merge($this->_requireJs['run'], (array)$names);
         return $this;
     }
 

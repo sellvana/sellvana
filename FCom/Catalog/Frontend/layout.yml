@@ -2,6 +2,7 @@ base:
 	- view: head
 		do:
 			- [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
+			- [ requireRun, fcom.catalog ]
 
 /catalog/category:
 	- { include: base }
