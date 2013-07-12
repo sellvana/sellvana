@@ -4,7 +4,7 @@
 {% set siblings = false %}
 {% if category %}
     {% if category.get('parent_id') %}
-        {% set parent = APP.instance('FCom_Catalog_Model_Category').load(category.get('parent_id') %}
+        {% set parent = APP.instance('FCom_Catalog_Model_Category').load(category.get('parent_id')) %}
         {% set siblings = category.siblings() %}
     {% endif %}
     {% set children = category.children() %}
@@ -29,7 +29,7 @@
                     <a href="{{ c.url() ~ '?' ~ rawGet }}">{{ c.get('node_name') }}</a>
                 </li>
             {% endfor %}
-            
+
         {% endif %}
         {% if siblings %}
             {% for c in siblings %}
