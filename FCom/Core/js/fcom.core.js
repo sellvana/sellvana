@@ -99,7 +99,7 @@ function($, Backbone, PageableCollection) {
                     var $el = ui.element, width = $el.width();
                     //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
                     $.post(config.personalize_url,
-                        { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: width },
+                        { 'do': 'grid.col.width', grid: config.id, col: $el.data('id'), width: width },
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }
@@ -114,7 +114,7 @@ function($, Backbone, PageableCollection) {
     console.log(a, b, c, this); return;
                     var $el = ui.element;
                     $.post(config.personalize_url,
-                        { do: 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() },
+                        { 'do': 'grid.col.width', grid: config.id, col: $el.data('id'), width: $el.width() },
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }
@@ -139,7 +139,7 @@ function($, Backbone, PageableCollection) {
                         cols.push({ name: $(el).data('id') });
                     });
                     $.post(config.personalize_url,
-                        { do: 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }
@@ -157,7 +157,7 @@ function($, Backbone, PageableCollection) {
                         cols.push({ name: $(el).data('id') });
                     });
                     $.post(config.personalize_url,
-                        { do: 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
                         function(response, status, xhr) {
                             console.log(response, status, xhr);
                             if (response.success) {
@@ -270,7 +270,7 @@ function($, Backbone, PageableCollection) {
             this.$el.append($("<a>", {
               tabIndex: -1,
               href: href,
-              title: formattedValue,
+              title: formattedValue
             }).text(formattedValue));
             this.delegateEvents();
             return this;
@@ -358,7 +358,7 @@ function($, Backbone, PageableCollection) {
                         var $el = ui.element, width = $el.width();
                         //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
                         $.post(self.options.personalize_url,
-                            { do: 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width },
+                            { 'do': 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width },
                             function(response, status, xhr) {
                                 //console.log(response, status, xhr);
                             }
@@ -381,7 +381,7 @@ function($, Backbone, PageableCollection) {
                             cols.push({ name: $(el).data('id') });
                         });
                         $.post(self.options.personalize_url,
-                            { do: 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
+                            { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
                             function(response, status, xhr) {
                                 //console.log(response, status, xhr);
                             }
