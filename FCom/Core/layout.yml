@@ -3,6 +3,7 @@ common_js_libs:
         do:
             - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
             - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
+            - [ js, @FCom_Core/js/lib/json2.js, { if: lt IE 8 } ]
             - [ js, @FCom_Core/js/lib/require.js ]
 
             #- [ requireModulePath, FCom_Core ]
@@ -13,7 +14,6 @@ common_js_libs:
             - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ Backbone ], exports: Backbone.Marionette } ]
             #- [ js, @FCom_Core/js/lib/transparency.min.js ]
             - [ requireJs, jquery.tools, @FCom_Core/js/lib/jquery.tools.min, { deps: [ jquery ] } ]
-            - [ requireJs, json2, @FCom_Core/js/lib/json2, { exports: JSON } ]
             - [ requireJs, date, @FCom_Core/js/lib/date, { exports: Date } ]
             - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
             - [ requireJs, select2, @FCom_Core/js/select2/select2.min, { deps: [ jquery ] } ]
