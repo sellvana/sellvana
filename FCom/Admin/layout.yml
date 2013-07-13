@@ -48,7 +48,7 @@ base:
   - { include: grid }
   - { include: jqgrid }
   - { include: jstree }
-
+  - { include: lib_backgrid }
 
   - view: head
     do:
