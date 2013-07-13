@@ -163,7 +163,14 @@ class FCom_Core_Main extends BClass
 
         BDebug::adminEmail($config->get('admin_email'));
 
-        $modeByIp = trim($config->get('mode_by_ip/'.BApp::i()->get('area')));
+        $area = BApp::i()->get('area');
+
+        if ($area==='FCom_Admin' && BRequest::i()->get('RECOVERY')==='') {
+            BDebug::mode('RECOVERY');
+            return $this;
+        }
+
+        $modeByIp = trim($config->get('mode_by_ip/'.$area));
 
         if ($modeByIp) {
             $ipModes = array();

@@ -1,13 +1,14 @@
 - $c = $this->grid['config'];
 
-.backgrid(id="#{$c['id']}")
+.backgrid-container(id="#{$c['id']}")
 
 :javascript
-    require(['jquery', 'fcom.admin'], function($) {
+    require(['jquery', 'fcom.admin', 'jquery.dragtable'], function($) {
         $(function() {
             var config = #{$this->getBackgridConfigJson()};
-            console.log(JSON.stringify(config), config.columns[2]);
+            console.log('config', config);
             var grid = new FCom.BackgridView(config);
+            console.log('grid', grid);
             grid.render();
         });
     })
