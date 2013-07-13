@@ -26,6 +26,7 @@ $base-bg-clr: #f9f9f9;
 $base-link-clr: #1b68cb;
 $base-link-hover-clr: #175ab0;
 $base-header-clr: #2f2f2f;
+$base-header-bg-clr: #6483a3;
 $base-nav-bg-clr: #464d54;
 $base-border-clr: #ddd;
 $base-border: 1px solid $base-border-clr;
@@ -57,7 +58,7 @@ nav ul { margin:0; }
 
 /* FORMS */
 form { margin:0; }
-label { font-size:15px; }
+label { font-size:14px; }
 select, 
 textarea, 
 input[type="text"], 
@@ -118,20 +119,29 @@ div.dropdown-menu > ul > li > a:focus,
 
 /* BUTTONS */
 .btn { 
-    border:none; 
-    background:#2f82e0; 
-    color:#fff; 
-    text-shadow:none; 
-    @include box-shadow(none);
-    padding:7px 18px;
-    }
-.btn {
+    border:1px solid #999;
+    background:#fff;
+    padding:6px 17px;
     &:hover { 
         @include transition-property(background-color);
         @include transition-timing-function(ease-in linear);
-        background-color:#1971d5;
-        color:#fff;
-        } 
+        }
+    }
+.btn-primary,
+.btn-info,
+.btn-success,
+.btn-warning,
+.btn-danger,
+.btn-inverse,
+.btn-link {
+    border:none; 
+    padding:7px 18px;
+    text-shadow:none; 
+    }
+.btn-primary {
+    background:#2f82e0;
+    color:#fff; 
+    @include box-shadow(none);
     &:focus { background-color:#1971d5; color:#fff; } 
     }
 .btn-info { }
@@ -157,14 +167,40 @@ div.dropdown-menu > ul > li > a:focus,
 
 /* NAVS */
 .accordion-inner { padding:30px; }
-.fcom-nav-st1 { margin-bottom:0; padding-left:10px; font-size:.95em; font-weight:600; text-transform:uppercase; }
-.fcom-nav-st1 > li > a { border:none; padding:5px 10px; color:lighten($base-txt-clr, 40%); }
-.fcom-nav-st1 > li > a:hover,
-.fcom-nav-st1 > li > a:focus { background:none; border:none; }
-.fcom-nav-st1 > .active > a { padding-top:6px; color:$base-txt-clr;}
+.fcom-nav-st1 { 
+    border-color:#eee;
+    margin-bottom:0; 
+    padding-left:10px; 
+    font-size:.95em; 
+    }
+.fcom-nav-st1 > li > a { 
+    margin:0;
+    border:none; 
+    @include border-radius(0);
+    border-right:1px solid #eee; 
+    padding:5px 10px; 
+    color:lighten($base-txt-clr, 40%); 
+    @include transition-property(background-color);
+    @include transition-timing-function(ease-in linear);
+    }
+.fcom-nav-st1 > .active > a { color:$base-txt-clr; }
 .fcom-nav-st1 > .active > a,
 .fcom-nav-st1 > .active > a:hover,
-.fcom-nav-st1 > .active > a:focus { border:none; }
+.fcom-nav-st1 > .active > a:focus,
+.fcom-nav-st1 > li > a:hover,
+.fcom-nav-st1 > li > a:focus { 
+    margin:0; 
+    border-top:none; 
+    border-left:none;
+    border-color:#eee; 
+    }
+.fcom-nav-st1 > .active > a:hover,
+.fcom-nav-st1 > .active > a:focus,
+.fcom-nav-st1 > li > a:hover,
+.fcom-nav-st1 > li > a:focus { 
+    background:#f9f9f9; 
+    color:lighten($base-txt-clr, 20);
+    }
 
 
 
@@ -214,29 +250,32 @@ input.error {
 /* FCOM - LAYOUT */
 .fcom-admin-container { @include clearfix(); height:100%; }
 .fcom-admin-container > .fcom-admin-main > form { height:100%; }
-.fcom-admin-header { border-bottom:1px solid #e6e6e6; height:60px; padding:10px 15px; }
-    .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
+.fcom-admin-header { background:$base-header-bg-clr; border-bottom:1px solid #587898; height:50px; padding:10px 15px; }
+    .fcom-admin-header a { color:#fff; }
+    .fcom-admin-header .fcom-admin-logo { float:left; margin:4px 0 0 2px; color:#fff; font-size:1.25em; }
+        .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
     .fcom-admin-header .dropdown { float:left;  }
     .fcom-admin-header .dropdown-menu { right:0; left:auto; font-size:.9em; }
-    .fcom-admin-header-util-links { float:right; }
-        .fcom-admin-header-util-links .icon { 
+    .fcom-admin-header-util-links { float:right; margin-top:-8px; }
+        .fcom-admin-header-util-links [class^="icon-"] { 
             display:inline-block; 
             width:35px; 
-            color:lighten($base-txt-clr, 20%); 
-            font-size:50px; 
+            //color:lighten($base-txt-clr, 20%); 
+            font-size:23px; 
             text-align:center; 
+            vertical-align:middle;
             line-height:35px;
             }
-        .fcom-admin-header-util-links a:hover .icon { color:$base-txt-clr; }
+        .fcom-admin-header-util-links a:hover [class^="icon-"] { color:$base-txt-clr; }
         .fcom-admin-header-util-links .title { visibility:hidden; width:0; height:0; line-height:0; font-size:0; }
-        .fcom-admin-header-util-links .user-name { display:inline-block; margin:-18px 0 0 -5px; color:#454a5a; vertical-align:middle; }
+        .fcom-admin-header-util-links .user-name { display:inline-block; margin-top:10px; color:#454a5a; vertical-align:middle; }
         .fcom-admin-header-util-links .dropdown-menu { top:35px; }
         .fcom-admin-header-util-links div.dropdown-menu .fcom-dropdown-menu-title { margin-bottom:3px; padding:2px 15px; text-transform:uppercase; font-size:.9em; font-weight:600; }
-        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a { display:block; padding:2px 15px; line-height:20px; }
+        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a { display:block; padding:2px 15px; line-height:20px; color:$base-txt-clr; }
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover, 
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:focus { color:#fff; }
 
-.fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:60px; left:0; bottom:0; z-index:9; }
+.fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:50px; left:0; bottom:0; z-index:9; }
     .fcom-admin-nav .dropdown { background:$base-nav-bg-clr; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
     .fcom-admin-nav .dropdown-submenu > a:after { border:none; }
@@ -266,7 +305,7 @@ input.error {
         border:none;
         padding:0;
         color:#a6acb2; 
-        font:normal 35px/40px 'EntypoRegular';
+        font:normal 18px/40px 'fontello';
         text-align:center;
         vertical-align:middle;
         }
@@ -282,14 +321,14 @@ input.error {
     // Nav level 1 - icon styling
     .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #303a43; }
     .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
-    .nav-group-home:before { content:'\2302'; }
-    .nav-group-catalog:before { content:'\1F4E6'; }
-    .nav-group-sales:before { content:'\E73D'; }
-    .nav-group-customer:before { content:'\1F465'; }
-    .nav-group-system:before { content:'\2699'; }
-    .nav-group-cms:before { content:'\E736'; }
-    .nav-group-market:before { content:'\E778'; }
-
+    .nav-group-home:before { content:'\e81a'; }
+    .nav-group-catalog:before { content:'\e854'; }
+    .nav-group-sales:before { content:'\e85a'; }
+    .nav-group-customer:before { content:'\e80c'; }
+    .nav-group-system:before { content:'\e856'; }
+    .nav-group-cms:before { content:'\e847'; }
+    .nav-group-market:before { content:'\e8fb'; }
+.fcom-admin-nav > .dropdown > .nav > li > a { vertical-align:text-top; height:40px; }
     // Nav level 2+
     .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
     .fcom-admin-nav .dropdown-menu a { color:#ccd2d8; font-size:.9em; padding-top:5px; padding-bottom:5px; }
@@ -324,13 +363,13 @@ input.error {
                 padding:6px 15px; 
                 background:none; 
                 color:lighten($base-txt-clr, 20%); 
-                font-size:1.1em; 
+                font-size:1em; 
                 }
             .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
                 @include background(linear-gradient(#71b1f2, #4d96e9)); 
                 color:#fff; 
                 } 
-        .fcom-admin-sidebar-view .fcom-admin-tree-sidebar { padding:0; }
+        .fcom-admin-sidebar-view .fcom-admin-tree-sidebar { padding:0; min-width:150px; }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header {
                 border:none;
                 background:none;
@@ -343,15 +382,17 @@ input.error {
                 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .title {
                     float:left;
                     }
-                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .lock { color:#d40000; }
-                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .lock-open { color:lighten($base-txt-clr, 50%); }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header label { font-size:1em; padding-top:1px; }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock { color:#d40000; }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock-open { color:lighten($base-txt-clr, 50%); }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .fcom-admin-expand-toggles {
-                border: 1px solid #ddd;
+                border: 1px solid #eee;
                 border-width:1px 0;
                 padding:5px 15px;
-                font-size:.9em;
+                font-size:.8em;
                 }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .jstree {
+                overflow:hidden;
                 padding:10px 15px;
                 }
         .fcom-admin-sidebar-view .fcom-admin-main-content { 
@@ -364,7 +405,7 @@ input.error {
         .fcom-admin-sidebar-view .tab-content { padding:25px 20px; }
             .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title {
                 background:#f5f5f5;
-                @include box-shadow(0 2px 2px #eee inset);
+                //@include box-shadow(0 2px 2px #eee inset);
                 }
                 .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title .title {
                     font-size:22px;
@@ -372,6 +413,47 @@ input.error {
                     }
 .copyright { font-size:.9em; color:#777; }
 
+// REVISIT THIS START
+/* JS Tree */
+.jstree-default li, 
+.jstree-default ins, 
+#vakata-dragged.jstree-default .jstree-invalid, 
+#vakata-dragged.jstree-default .jstree-ok, 
+#jstree-marker.jstree-default { background:none !important; }
+
+.jstree ins { 
+    width:13px  !important;
+    height:13px !important; 
+    line-height:13px !important; 
+    }
+.jstree-default .jstree-closed > ins:before { 
+    content: '\e800'; 
+    color:lighten($base-nav-bg-clr,50); 
+    font-family:'fontello2'; 
+    }
+.jstree-default .jstree-open > ins:before { 
+    content: '\e806'; 
+    color:lighten($base-nav-bg-clr,50); 
+    font-family:'fontello2'; 
+    }
+.jstree-default a ins.jstree-icon { 
+    width:18px;
+    height:18px;
+    line-height:18px !important; 
+    margin-right:7px !important; 
+    }
+.jstree-default a ins.jstree-icon:before { 
+    font-size:1.3em; 
+    content: '\e802'; 
+    color:lighten($base-nav-bg-clr,40); 
+    font-family:'fontello2'; 
+    }
+
+// REVISIT THIS END
+
+
+/* BACKGRID */
+.backgrid thead th { background:#f5f5f5; }
 
 
 

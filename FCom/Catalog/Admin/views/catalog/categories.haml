@@ -24,7 +24,7 @@
                     $('#categories-layout').css('padding-left', ui.size.width+'px');
                 }
             });
-            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'entypo lock', label:'Locked'}, off:{icon:'entypo lock-open', label:'Unlocked'}});
+            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'icon-lock', label:'Locked'}, off:{icon:'icon-lock-open', label:'Unlocked'}});
             FCom.Admin.checkboxButton('#categories-expand-collapse', {
                 off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
                 click:function(ev) { $('#categories').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }
