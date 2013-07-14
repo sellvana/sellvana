@@ -716,6 +716,12 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
   */
   editor: InputCellEditor,
 
+  /**
+     @property {boolean} [editable=null] Whether the current model cell is editable.
+     If null, take configuration from column.
+  */
+  editable: null,
+
   /** @property */
   events: {
     "click": "enterEditMode"
@@ -779,7 +785,7 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     var model = this.model;
     var column = this.column;
 
-    if (column.get("editable")) {
+    if (this.editable === true || this.editable === null && column.get("editable")) {
 
       this.currentEditor = new this.editor({
         column: this.column,

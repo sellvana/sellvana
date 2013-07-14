@@ -6,7 +6,6 @@
 :javascript
     require(['jquery', 'fcom.admin', 'jstree'], function($) {
         $(function() {
-
             FCom.Admin.tree('#categories', {
                 url:'#{BApp::href('catalog/categories/tree_data?id='.$this->model->id())}',
                 checkbox: {
@@ -18,6 +17,7 @@
                 initially_open: #{$prodCtrl->linkedCategoriesData($this->model)}
             });
             $('#categories').bind('loaded.jstree', function(event, data) {
+                $('#categories').css({height:'auto'});
                 var checked = #{$prodCtrl->linkedCategoriesData($this->model) };
                 for (var id in checked) {
                     jQuery("<input>").attr("type", "hidden").attr("name", checked[id]).val(0).appendTo('#categories_unset');
