@@ -35,20 +35,20 @@ $error-txt-clr: #c83c3c;
 /* BASE */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 html, body { height:100%; }
-body { 
+body {
     position:relative;
     background:#f9f9f9;
     color:$base-txt-clr;
     font-weight:400;
     }
-body, .btn { 
-    font-family:'Open Sans', sans-serif; 
+body, .btn {
+    font-family:'Open Sans', sans-serif;
     }
-body, label { 
-    font-weight:400; 
+body, label {
+    font-weight:400;
     }
-a { 
-    color:$base-link-clr; 
+a {
+    color:$base-link-clr;
     &:hover { color:$base-link-hover-clr; text-decoration:none; }
     &:focus { color:$base-link-hover-clr; text-decoration:none; }
     &:active { color:$base-link-hover-clr; text-decoration:none; }
@@ -59,22 +59,22 @@ nav ul { margin:0; }
 /* FORMS */
 form { margin:0; }
 label { font-size:14px; }
-select, 
-textarea, 
-input[type="text"], 
-input[type="password"], 
-input[type="datetime"], 
-input[type="datetime-local"], 
-input[type="date"], 
-input[type="month"], 
-input[type="time"], 
-input[type="week"], 
-input[type="number"], 
-input[type="email"], 
-input[type="url"], 
-input[type="search"], 
-input[type="tel"], 
-input[type="color"], 
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
 .uneditable-input {
     @include border-radius(3px);
     height:auto;
@@ -105,24 +105,24 @@ input[type="color"]:focus,
 textarea { min-height:150px; }
 
 /* DROPDOWNS */
-div.dropdown-menu > ul > li > a:hover, 
-div.dropdown-menu > ul > li > a:focus, 
-.dropdown-submenu:hover > a, 
+div.dropdown-menu > ul > li > a:hover,
+div.dropdown-menu > ul > li > a:focus,
+.dropdown-submenu:hover > a,
 .dropdown-submenu:focus > a {
     @include background(linear-gradient(#71b1f2, #4d96e9));
-    } 
-.dropdown-menu { 
-    border-color:#b9b9b9; 
+    }
+.dropdown-menu {
+    border-color:#b9b9b9;
     @include border-radius(4px);
     }
 
 
 /* BUTTONS */
-.btn { 
+.btn {
     border:1px solid #999;
     background:#fff;
     padding:6px 17px;
-    &:hover { 
+    &:hover {
         @include transition-property(background-color);
         @include transition-timing-function(ease-in linear);
         }
@@ -134,30 +134,30 @@ div.dropdown-menu > ul > li > a:focus,
 .btn-danger,
 .btn-inverse,
 .btn-link {
-    border:none; 
+    border:none;
     padding:7px 18px;
-    text-shadow:none; 
+    text-shadow:none;
     }
 .btn-primary {
     background:#2f82e0;
-    color:#fff; 
+    color:#fff;
     @include box-shadow(none);
-    &:focus { background-color:#1971d5; color:#fff; } 
+    &:focus { background-color:#1971d5; color:#fff; }
     }
 .btn-info { }
 .btn-success { }
-.btn-warning { 
+.btn-warning {
     background:#f79560;
-    &:hover { background-color:#f07d3e; } 
+    &:hover { background-color:#f07d3e; }
     &:focus { background-color:#f07d3e; }
     }
 .btn-danger { }
 .btn-inverse { }
-.btn-link { 
-    color:$base-link-clr; 
+.btn-link {
+    color:$base-link-clr;
     background:none;
-    &:hover { background:none; color:darken($base-link-clr, 7%); text-decoration:none; } 
-    &:focus { background:none; color:darken($base-link-clr, 7%); text-decoration:none; } 
+    &:hover { background:none; color:darken($base-link-clr, 7%); text-decoration:none; }
+    &:focus { background:none; color:darken($base-link-clr, 7%); text-decoration:none; }
     }
 .btn-group > .btn + .btn { @include border-radius(4px); margin-left:5px; }
 
@@ -167,19 +167,19 @@ div.dropdown-menu > ul > li > a:focus,
 
 /* NAVS */
 .accordion-inner { padding:30px; }
-.fcom-nav-st1 { 
+.fcom-nav-st1 {
     border-color:#eee;
-    margin-bottom:0; 
-    padding-left:10px; 
-    font-size:.95em; 
+    margin-bottom:0;
+    padding-left:10px;
+    font-size:.95em;
     }
-.fcom-nav-st1 > li > a { 
+.fcom-nav-st1 > li > a {
     margin:0;
-    border:none; 
+    border:none;
     @include border-radius(0);
-    border-right:1px solid #eee; 
-    padding:5px 10px; 
-    color:lighten($base-txt-clr, 40%); 
+    border-right:1px solid #eee;
+    padding:5px 10px;
+    color:lighten($base-txt-clr, 40%);
     @include transition-property(background-color);
     @include transition-timing-function(ease-in linear);
     }
@@ -188,17 +188,17 @@ div.dropdown-menu > ul > li > a:focus,
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
 .fcom-nav-st1 > li > a:hover,
-.fcom-nav-st1 > li > a:focus { 
-    margin:0; 
-    border-top:none; 
+.fcom-nav-st1 > li > a:focus {
+    margin:0;
+    border-top:none;
     border-left:none;
-    border-color:#eee; 
+    border-color:#eee;
     }
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
 .fcom-nav-st1 > li > a:hover,
-.fcom-nav-st1 > li > a:focus { 
-    background:#f9f9f9; 
+.fcom-nav-st1 > li > a:focus {
+    background:#f9f9f9;
     color:lighten($base-txt-clr, 20);
     }
 
@@ -215,18 +215,18 @@ div.dropdown-menu > ul > li > a:focus,
     @include border-radius(0);
     text-shadow:none;
     }
-.alert-danger, .alert-error { 
+.alert-danger, .alert-error {
     border-color:#d98c8c;
     background:#fadfdf;
     color:$error-txt-clr;
     }
 label.error { margin-bottom:.8em; color:$error-txt-clr; font-size:.9em; font-weight:bold; }
 input.error {
-    border-color:$error-txt-clr; 
+    border-color:$error-txt-clr;
     &:hover { border-color:$error-txt-clr; }
     &:focus { border-color:$error-txt-clr; }
     }
-    
+
 /* MISC */
 
 
@@ -240,7 +240,7 @@ input.error {
     font-size:.9em;
     }
 .fcom-admin-nav-sidebar .jstree-default a.jstree-clicked {
-    @include background(linear-gradient(#71b1f2, #4d96e9)); 
+    @include background(linear-gradient(#71b1f2, #4d96e9));
     color:#fff;
     }
 
@@ -257,12 +257,12 @@ input.error {
     .fcom-admin-header .dropdown { float:left;  }
     .fcom-admin-header .dropdown-menu { right:0; left:auto; font-size:.9em; }
     .fcom-admin-header-util-links { float:right; margin-top:-8px; }
-        .fcom-admin-header-util-links [class^="icon-"] { 
-            display:inline-block; 
-            width:35px; 
-            //color:lighten($base-txt-clr, 20%); 
-            font-size:23px; 
-            text-align:center; 
+        .fcom-admin-header-util-links [class^="icon-"] {
+            display:inline-block;
+            width:35px;
+            //color:lighten($base-txt-clr, 20%);
+            font-size:23px;
+            text-align:center;
             vertical-align:middle;
             line-height:35px;
             }
@@ -272,52 +272,52 @@ input.error {
         .fcom-admin-header-util-links .dropdown-menu { top:35px; }
         .fcom-admin-header-util-links div.dropdown-menu .fcom-dropdown-menu-title { margin-bottom:3px; padding:2px 15px; text-transform:uppercase; font-size:.9em; font-weight:600; }
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a { display:block; padding:2px 15px; line-height:20px; color:$base-txt-clr; }
-        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover, 
+        .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover,
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:focus { color:#fff; }
 
 .fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:50px; left:0; bottom:0; z-index:9; }
     .fcom-admin-nav .dropdown { background:$base-nav-bg-clr; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
     .fcom-admin-nav .dropdown-submenu > a:after { border:none; }
-    
+
     // Sets background hover color for all nav <li> <a>
-    .fcom-admin-nav .dropdown-menu > li > a:hover, 
-    .fcom-admin-nav .dropdown-menu > li > a:focus, 
+    .fcom-admin-nav .dropdown-menu > li > a:hover,
+    .fcom-admin-nav .dropdown-menu > li > a:focus,
     .fcom-admin-nav .dropdown-submenu:hover > a,
     .fcom-admin-nav .dropdown-submenu:focus > a,
-    .fcom-admin-nav > .dropdown > .nav > li > a:hover, 
+    .fcom-admin-nav > .dropdown > .nav > li > a:hover,
     .fcom-admin-nav > .dropdown > .nav > li > a:focus,
-    .fcom-admin-nav > .dropdown > .nav > li.active > a, 
+    .fcom-admin-nav > .dropdown > .nav > li.active > a,
     .fcom-admin-nav > .dropdown > .nav > li.active > a:focus,
     .dropdown-menu > .active > a,
     .dropdown-menu > .active > a:hover,
-    .dropdown-menu > .active > a:focus { 
+    .dropdown-menu > .active > a:focus {
         @include transition-property(background-color);
         @include transition-timing-function(ease-in linear);
         background:darken($base-nav-bg-clr, 7%);
         }
-          
+
     // Nav level 1 - <a> style
-    .fcom-admin-nav > .dropdown > .nav > li > a { 
-        display:block; 
+    .fcom-admin-nav > .dropdown > .nav > li > a {
+        display:block;
         height:40px;
         @include border-radius(0);
         border:none;
         padding:0;
-        color:#a6acb2; 
+        color:#a6acb2;
         font:normal 18px/40px 'fontello';
         text-align:center;
         vertical-align:middle;
         }
-    
+
     // Nav level 1 - <a> hover style
-    .fcom-admin-nav > .dropdown > .nav > li > a:hover, 
+    .fcom-admin-nav > .dropdown > .nav > li > a:hover,
     .fcom-admin-nav > .dropdown > .nav > li > a:focus,
-    .fcom-admin-nav > .dropdown > .nav > li.active > a, 
-    .fcom-admin-nav > .dropdown > .nav > li.active > a:focus { 
-        color:#52a3e8; 
+    .fcom-admin-nav > .dropdown > .nav > li.active > a,
+    .fcom-admin-nav > .dropdown > .nav > li.active > a:focus {
+        color:#52a3e8;
         }
-        
+
     // Nav level 1 - icon styling
     .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #303a43; }
     .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
@@ -343,9 +343,9 @@ input.error {
     .fcom-admin-main-container.fcom-admin-sidebar-view { /* Has sidebar tabs or tree */
         margin-top:0;
         padding:0;
-        min-height:100%; 
+        min-height:100%;
         overflow:hidden;
-        padding-left:166px; 
+        padding-left:166px;
         }
         .fcom-admin-sidebar-view .fcom-admin-nav-sidebar {
             float:right;
@@ -357,18 +357,18 @@ input.error {
             padding-bottom:999em !important;
             margin-bottom:-999em !important;
             }
-            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a { 
-                @include border-radius(0); 
-                border:none; 
-                padding:6px 15px; 
-                background:none; 
-                color:lighten($base-txt-clr, 20%); 
-                font-size:1em; 
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a {
+                @include border-radius(0);
+                border:none;
+                padding:6px 15px;
+                background:none;
+                color:lighten($base-txt-clr, 20%);
+                font-size:1em;
                 }
-            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a { 
-                @include background(linear-gradient(#71b1f2, #4d96e9)); 
-                color:#fff; 
-                } 
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a {
+                @include background(linear-gradient(#71b1f2, #4d96e9));
+                color:#fff;
+                }
         .fcom-admin-sidebar-view .fcom-admin-tree-sidebar { padding:0; min-width:150px; }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header {
                 border:none;
@@ -395,7 +395,7 @@ input.error {
                 overflow:hidden;
                 padding:10px 15px;
                 }
-        .fcom-admin-sidebar-view .fcom-admin-main-content { 
+        .fcom-admin-sidebar-view .fcom-admin-main-content {
             float: right;
             width: 100%;
             background:#fff;
@@ -415,39 +415,45 @@ input.error {
 
 // REVISIT THIS START
 /* JS Tree */
-.jstree-default li, 
-.jstree-default ins, 
-#vakata-dragged.jstree-default .jstree-invalid, 
-#vakata-dragged.jstree-default .jstree-ok, 
+.jstree-default li,
+.jstree-default ins,
+#vakata-dragged.jstree-default .jstree-invalid,
+#vakata-dragged.jstree-default .jstree-ok,
 #jstree-marker.jstree-default { background:none !important; }
 
-.jstree ins { 
+.jstree ins {
     width:13px  !important;
-    height:13px !important; 
-    line-height:13px !important; 
+    height:13px !important;
+    line-height:13px !important;
     }
-.jstree-default .jstree-closed > ins:before { 
-    content: '\e800'; 
-    color:lighten($base-nav-bg-clr,50); 
-    font-family:'fontello2'; 
+.jstree-default .jstree-closed > ins:before {
+    content: '\e800';
+    color:lighten($base-nav-bg-clr,50);
+    font-family:'fontello2';
     }
-.jstree-default .jstree-open > ins:before { 
-    content: '\e806'; 
-    color:lighten($base-nav-bg-clr,50); 
-    font-family:'fontello2'; 
+.jstree-default .jstree-open > ins:before {
+    content: '\e806';
+    color:lighten($base-nav-bg-clr,50);
+    font-family:'fontello2';
     }
-.jstree-default a ins.jstree-icon { 
+.jstree-default a ins.jstree-icon {
     width:18px;
     height:18px;
-    line-height:18px !important; 
-    margin-right:7px !important; 
+    line-height:18px !important;
+    margin-right:7px !important;
     }
-.jstree-default a ins.jstree-icon:before { 
-    font-size:1.3em; 
-    content: '\e802'; 
-    color:lighten($base-nav-bg-clr,40); 
-    font-family:'fontello2'; 
+.jstree-default a ins.jstree-icon:before {
+    font-size:1.3em;
+    content: '\e802';
+    color:lighten($base-nav-bg-clr,40);
+    font-family:'fontello2';
     }
+
+/*
+.jstree-default .jstree-undetermined a .jstree-checkbox:before { }
+.jstree-default .jstree-checked a .jstree-checkbox:before { }
+.jstree-default .jstree-unchecked a .jstree-checkbox:before { }
+*/
 
 // REVISIT THIS END
 
@@ -462,21 +468,21 @@ input.error {
     margin:165px auto;
     width:390px;
     }
-.fcom-admin-login-header { 
+.fcom-admin-login-header {
     @include border-radius(4px 4px 0 0);
     background:#fff;
     border:1px solid #ddd;
     padding:20px 25px;
-    font-size:1.65em; 
+    font-size:1.65em;
     }
 .fcom-admin-login-logo { float:right; height:25px; }
 .fcom-admin-login-content {
     margin-bottom:13px;
-    padding:20px 35px; 
+    padding:20px 35px;
     border:1px solid #ddd;
     border-width:0 1px 1px 1px;
     @include border-radius(0 0 4px p4x);
     }
 .fcom-admin-login input[type='text'],
 .fcom-admin-login input[type='password'] { width:100%; }
-    
+

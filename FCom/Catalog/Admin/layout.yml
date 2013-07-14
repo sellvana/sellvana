@@ -35,6 +35,7 @@ catalog_product_form_tabs:
   - { include: base }
   - { include: form }
   - { include: lib_backgrid }
+  #- { include: jstree }
   - { include: catalog_product_form_tabs }
   - { hook: main, views: 'admin/form' }
   - { view: admin/nav, do: [[ setNav, catalog/products ]] }
