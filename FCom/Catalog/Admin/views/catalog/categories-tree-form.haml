@@ -13,7 +13,7 @@
 .fcom-admin-main-content
     %header.fcom-admin-main-title
         .btn-group
-            %button.btn(onclick="return adminForm.saveAll(this)")
+            .btn.btn-primary(onclick="return adminForm.saveAll(this)")
                 %span = $this->_('Save')
         %span.title = str_replace('|', ' > ', $m->full_name)
     %nav

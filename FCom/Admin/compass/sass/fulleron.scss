@@ -26,7 +26,7 @@ $base-bg-clr: #f9f9f9;
 $base-link-clr: #1b68cb;
 $base-link-hover-clr: #175ab0;
 $base-header-clr: #2f2f2f;
-$base-header-bg-clr: #6483a3;
+$base-header-bg-clr: #fff;
 $base-nav-bg-clr: #464d54;
 $base-border-clr: #ddd;
 $base-border: 1px solid $base-border-clr;
@@ -121,12 +121,13 @@ div.dropdown-menu > ul > li > a:focus,
 .btn { 
     border:1px solid #999;
     background:#fff;
-    padding:6px 17px;
+    padding:4px 12px;
     &:hover { 
         @include transition-property(background-color);
         @include transition-timing-function(ease-in linear);
         }
     }
+.btn span { font-size:.95em; }
 .btn-primary,
 .btn-info,
 .btn-success,
@@ -135,7 +136,7 @@ div.dropdown-menu > ul > li > a:focus,
 .btn-inverse,
 .btn-link {
     border:none; 
-    padding:7px 18px;
+    padding:5px 13px;
     text-shadow:none; 
     }
 .btn-primary {
@@ -172,27 +173,29 @@ div.dropdown-menu > ul > li > a:focus,
     margin-bottom:0; 
     padding-left:10px; 
     font-size:.95em; 
+    height:30px;
+    overflow:hidden;
     }
 .fcom-nav-st1 > li > a { 
     margin:0;
     border:none; 
-    @include border-radius(0);
-    border-right:1px solid #eee; 
+    @include border-radius(0); 
     padding:5px 10px; 
-    color:lighten($base-txt-clr, 40%); 
+    color:$base-link-clr; 
     @include transition-property(background-color);
     @include transition-timing-function(ease-in linear);
+    font-weight:600;
+    font-size:.9em;
+    text-transform: uppercase;
     }
-.fcom-nav-st1 > .active > a { color:$base-txt-clr; }
+.fcom-nav-st1 > .active > a { background:#f9f9f9; color:$base-txt-clr; }
 .fcom-nav-st1 > .active > a,
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
 .fcom-nav-st1 > li > a:hover,
 .fcom-nav-st1 > li > a:focus { 
     margin:0; 
-    border-top:none; 
-    border-left:none;
-    border-color:#eee; 
+    border:none; 
     }
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
@@ -250,17 +253,17 @@ input.error {
 /* FCOM - LAYOUT */
 .fcom-admin-container { @include clearfix(); height:100%; }
 .fcom-admin-container > .fcom-admin-main > form { height:100%; }
-.fcom-admin-header { background:$base-header-bg-clr; border-bottom:1px solid #587898; height:50px; padding:10px 15px; }
-    .fcom-admin-header a { color:#fff; }
-    .fcom-admin-header .fcom-admin-logo { float:left; margin:4px 0 0 2px; color:#fff; font-size:1.25em; }
+.fcom-admin-header { background:$base-header-bg-clr; border-bottom:1px solid #ddd; height:50px; padding:10px 15px; }
+    .fcom-admin-header .fcom-admin-logo { float:left; margin:-5px 0 0 2px; color:#fff; font-size:1.25em; }
         .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
+    .fcom-admin-header .avatar { margin-top:5px; width:35px; height:35px; @include border-radius(35px); }
     .fcom-admin-header .dropdown { float:left;  }
     .fcom-admin-header .dropdown-menu { right:0; left:auto; font-size:.9em; }
     .fcom-admin-header-util-links { float:right; margin-top:-8px; }
         .fcom-admin-header-util-links [class^="icon-"] { 
             display:inline-block; 
             width:35px; 
-            //color:lighten($base-txt-clr, 20%); 
+            color:lighten($base-txt-clr, 20%); 
             font-size:23px; 
             text-align:center; 
             vertical-align:middle;
