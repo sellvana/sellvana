@@ -1,9 +1,10 @@
 .dropdown.clearfix(data-spy="affix" data-offset-top="50")
-  /%ul.dropdown-menu(role="menu" style="display:block")
+  %ul.dropdown-menu(role="menu" style="display:block")
   %ul.nav.nav-tabs.nav-stacked
     - foreach ($this->getNodes() as $k1=>$n1)
       %li(class="#{$n1['class']} #{$n1['active']?'active':''} #{$n1['children']?'dropdown-submenu':''}")
         %a(href="#{$n1['href']}" class="#{'nav-group-'.$k1}")
+          %span(class="#{!empty($n1['icon_class']) ? $n1['icon_class'] : ''}" title="#{$n1['label']}")
           %span.title = $this->_($n1['label'])
         - if ($n1['children'])
           %ul.dropdown-menu

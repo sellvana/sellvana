@@ -340,7 +340,7 @@ function($, Backbone, PageableCollection) {
 
                 var $container = $(this.options.container);
 
-                if (filter) {
+                if (false && filter) {
                     $container.append(filter.render().$el);
                 }
 
