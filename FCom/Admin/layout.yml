@@ -124,6 +124,27 @@ codemirror:
       - [ requireJs, codemirror, @FCom_Admin/js/codemirror/lib/codemirror ]
       - [ requireJs, codemirror-loadmode, @FCom_Admin/js/codemirror/addon/mode/loadmode, { deps: [ coremirror ] } ]
 
+flot:
+  - view: head
+    do:
+      - [ requireJs, excanvas, @FCom_Admin/js/flot/excanvas.min ]
+      - [ requireJs, jquery.colorhelpers, @FCom_Admin/js/flot/jquery.colorhelpers.min, { deps: [ jquery ] } ]
+      - [ requireJs, flot, @FCom_Admin/js/flot/jquery.flot.min, { deps: [ jquery ] } ]
+      - [ requireJs, flot.canvas, @FCom_Admin/js/flot/jquery.flot.canvas.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.categories, @FCom_Admin/js/flot/jquery.flot.categories.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.crosshair, @FCom_Admin/js/flot/jquery.flot.crosshair.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.errorbars, @FCom_Admin/js/flot/jquery.flot.errorbars.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.fillbetween, @FCom_Admin/js/flot/jquery.flot.fillbetween.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.image, @FCom_Admin/js/flot/jquery.flot.image.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.navigate, @FCom_Admin/js/flot/jquery.flot.navigate.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.pie, @FCom_Admin/js/flot/jquery.flot.pie.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.resize, @FCom_Admin/js/flot/jquery.flot.resize.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.selection, @FCom_Admin/js/flot/jquery.flot.selection.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.stack, @FCom_Admin/js/flot/jquery.flot.stack.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.symbol, @FCom_Admin/js/flot/jquery.flot.symbol.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.time, @FCom_Admin/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.threshold, @FCom_Admin/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]
+
 form:
   - view: head
     do:

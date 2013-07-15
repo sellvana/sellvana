@@ -38,10 +38,3 @@ modules:
         version: 1.0.0
         root_dir: BMarkdown
         bootstrap: { file: BMarkdown.php, callback: BMarkdown::bootstrap }
-
-    BHighcharts:
-        version: 1.0.0
-        root_dir: BHighcharts
-        areas:
-            FCom_Admin:
-                bootstrap: { file: Highchart.php, callback: BHighcharts_Loader::bootstrap }
