@@ -1,5 +1,9 @@
 - $c = $this->grid['config'];
 
+#backgrid-template(style="display:none")
+    %div
+        These contents will be prepended to the following div:
+
 %div(id="#{$c['id']}")
 
 :javascript
@@ -10,5 +14,6 @@
             var grid = new FCom.BackgridView(config);
             console.log('grid', grid);
             grid.render();
+            $("##{$c['id']}").prepend($('#backgrid-template').html());
         });
     })
