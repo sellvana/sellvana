@@ -1205,10 +1205,11 @@ exit;
     }
 
     /**
-    * Find one row
-    *
-    * @return array
-    */
+     * Find one row
+     *
+     * @param int|null $id
+     * @return BModel
+     */
     public function find_one($id=null)
     {
         $class = $this->_class_name;
