@@ -9,14 +9,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
 
-    public function action_index()
+    public function gridView()
     {
-        $view = $this->view('core/backgrid');
+        $view = parent::gridView();
         $view->set('grid', array(
             'orm' => FCom_Catalog_Model_Product::i()->orm()->select('(1)', '_selected'),
             'config' => array(
                 'id' => 'backgrid',
-                'data_url' => BApp::href('catalog/products'),
+                'data_url' => BApp::href('catalog/products/grid_data'),
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true, 'cell'=>'integer'),
@@ -38,54 +38,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ),
             ),
         ));
-
-        if (BRequest::i()->xhr()) {
-            $view->outputData();
-        } else {
-            $this->layout('/catalog/products');
-        }
-    }
-
-    public function gridColumns()
-    {
-        $columns = array(
-            'id'=>array('label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true, 'frozen'=>true),
-            'product_name'=>array('label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'frozen'=>true),
-            'local_sku'=>array('label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
-            'create_dt'=>array('label'=>'Created', 'index'=>'p.create_dt', 'formatter'=>'date', 'width'=>100),
-            'uom'=>array('label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
-        );
-        BEvents::i()->fire(__METHOD__, array('columns'=>&$columns));
-        return $columns;
-    }
-
-    public function gridConfig()
-    {
-        $config = parent::gridConfig();
-        $config['grid']['id'] = __CLASS__;
-        $config['grid']['columns'] = $this->gridColumns();
-        return $config;
-    }
-
-    public function gridOrmConfig($orm)
-    {
-        parent::gridOrmConfig($orm);
-        $orm->use_index('primary');
+        return $view;
     }
 
     public function gridDataAfter($data)
     {
-        foreach ($data as $row) {
-            if (!empty($row['data_serialized'])) {
-                $unserialized = BUtil::fromJson($row['data_serialized']);
-                if (!empty($unserialized['custom_data'])) {
-                    foreach ($unserialized['custom_data'] as $k => $v) {
-                        $row[$k] = $v;
-                    }
-                }
-                unset($row['data_serialized']);
+        $data = parent::gridDataAfter($data);
+        foreach ($data['rows'] as $row) {
+            $customRowData = $row->getData();
+            if ($customRowData) {
+                $row->set($customRowData);
+                $row->set('data', null);
             }
         }
+        unset($row);
         return $data;
     }
 

@@ -245,11 +245,16 @@ function($, Backbone, PageableCollection) {
 
         Backgrid.Column.prototype.defaults.editable = false;
 
-        Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({render: function() {
-            Backgrid.HeaderCell.prototype.render.apply(this);
-            this.$el.width(this.column.get('width'));
-            return this;
-        }});
+        Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({
+            render: function() {
+                Backgrid.HeaderCell.prototype.render.apply(this, arguments);
+                this.$el.width(this.column.get('width'));
+                this.$el.attr('data-id', this.column.get('name'));
+                var dragHandle = $('<div class="drag-handle">');
+                this.$el.append(dragHandle);
+                return this;
+            }
+        });
         Backgrid.Extension.SelectRowCell.prototype.render = function() {
             this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
             this.delegateEvents();
@@ -280,7 +285,6 @@ function($, Backbone, PageableCollection) {
 
         FCom.BackgridView = Backbone.View.extend({
             prepareConfig: function() {
-    console.log(this.options.columns);
                 _.map(this.options.columns, function(col, i) {
                     if (!col.name) col.name = '';
                     if (!col.cell) col.cell = 'string';
@@ -293,9 +297,8 @@ function($, Backbone, PageableCollection) {
 
                 this.prepareConfig();
 
-                var Model = Backbone.Model.extend({
+                var Model = this.options.model || Backbone.Model;
 
-                });
                 if (this.options.data_url) {
                     var Collection = PageableCollection.extend({
                         model: Model,
@@ -323,7 +326,10 @@ function($, Backbone, PageableCollection) {
                     });
 
                 } else {
-                    collection = new Backbone.Collection(this.options.collection);
+                    var Collection = Backbone.Collection.extend({
+                        model: Model
+                    })
+                    collection = new Collection(this.options.collection);
                 }
 
                 var grid = new Backgrid.Grid({
@@ -334,12 +340,12 @@ function($, Backbone, PageableCollection) {
 
                 var $container = $(this.options.container);
 
-                if (filter) {
+                if (false && filter) {
                     $container.append(filter.render().$el);
                 }
 
                 $container.append(grid.render().$el);
-                
+
                 if (paginator) {
                     $container.append(paginator.render().$el);
                 }
@@ -347,7 +353,7 @@ function($, Backbone, PageableCollection) {
                     collection.fetch({ reset:true });
                 }
 
-        /*
+
                 grid.$('thead th').resizable({
                     handles: 'e',
                     minWidth: 20,
@@ -366,29 +372,44 @@ function($, Backbone, PageableCollection) {
                     }
                 });
 
-                grid.$el.dragtable({
-                    scroll: true, //jebaird
-                    appendParent: grid.$el, //jebaird
-                    items: 'thead th', //jebaird
-                    //handle: 'drag-handle', //jebaird
-                    //change: function() { console.log($('.dragtable-drag-wrapper').html()); },//jebaird
-                    //dragHandle: '', //akottr
-                    //dragAccept: '', //akottr
-                    persistState: function() { //akottr
-                    //stop: function() { //jebaird
-                        var cols = [];
-                        grid.$('thead th').each(function(i, el) {
-                            cols.push({ name: $(el).data('id') });
-                        });
-                        $.post(self.options.personalize_url,
-                            { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
-                            function(response, status, xhr) {
-                                //console.log(response, status, xhr);
-                            }
-                        );
-                    }
-                });
-        */
+                if (true) { // true = jebaird, false = akottr
+                    grid.$el.dragtable({
+                        scroll: true, //jebaird
+                        appendParent: grid.$el, //jebaird
+                        items: 'thead .drag-handle', //jebaird
+                        handle: 'drag-handle', //jebaird
+                        change: function() { console.log($('.dragtable-drag-wrapper').html()); },//jebaird
+                        stop: function() { //jebaird
+                            var cols = [];
+                            grid.$('thead th').each(function(i, el) {
+                                cols.push({ name: $(el).data('id') });
+                            });
+                            $.post(self.options.personalize_url,
+                                { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
+                                function(response, status, xhr) {
+                                    //console.log(response, status, xhr);
+                                }
+                            );
+                        }
+                    });
+                } else { // akottr looks better and works faster, but interferes with colResizable
+                    grid.$el.dragtable({
+                        dragHandle: '.drag-handle', //akottr
+                        dragAccept: '', //akottr
+                        persistState: function() { //akottr
+                            var cols = [];
+                            grid.$('thead th').each(function(i, el) {
+                                cols.push({ name: $(el).data('id') });
+                            });
+                            $.post(self.options.personalize_url,
+                                { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
+                                function(response, status, xhr) {
+                                    //console.log(response, status, xhr);
+                                }
+                            );
+                        }
+                    });
+                }
             }
         })
     }

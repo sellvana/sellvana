@@ -25,6 +25,7 @@
 
 .fcom-datagrid__actions a { border:solid 1px #AAA; margin: 2px; padding: 2px 5px; }
 
-.a-left { text-align: left; }
-.a-center { text-align: center; }
-.a-right { text-align: right; }
+.backgrid th { white-space: nowrap; }
+.backgrid th .drag-handle { visibility:hidden; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
+.backgrid th .ui-resizable-handle { z-index:1000; right:0; width:5px; }

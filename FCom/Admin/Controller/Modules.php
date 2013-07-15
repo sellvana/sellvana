@@ -11,6 +11,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = BModuleRegistry::i()->debug();
+        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,FCom_Frontend,FCom_Frontend_DefaultTheme'));
+
 
         try {
             $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
@@ -36,10 +38,11 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             }
             $r['requires'] = join(', ', $reqs);
             $r['required_by'] = join(', ', $mod->children_copy);
-            $r['run_level_core'] = !empty($coreLevels[$modName]) ? $coreLevels[$modName] : null;
-            $r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : null;
-            $r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : null;
-            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : null;
+            $r['auto_run_level'] = isset($autoRunLevelMods[$r['name']]);
+            $r['run_level_core'] = $r['auto_run_level'] ? 'AUTO' : (!empty($coreLevels[$modName]) ? $coreLevels[$modName] : '');
+            //$r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : '';
+            //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
+            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
             $data[] = $r;
         }
@@ -66,47 +69,67 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             BModule::LOADED  => 'LOADED',
             BModule::ERROR   => 'ERROR'
         );
-        $config = array(
-            'grid' => array(
+        $grid = array(
+            'config' => array(
                 'id'          => 'modules',
-                'datatype'    => 'local',
-                'data'        => $this->getModulesData(),
-                'editurl'     => BApp::href('/modules/grid_data'),
+                'model'       => new BValue('FCom.ModuleModel'),
+                'collection'  => $this->getModulesData(),
+                'edit_url'    => BApp::href('/modules/grid_data'),
                 'columns'     => array(
-                    'name'        => array('label' => 'Name', 'key'=>true, 'width'=>150),
-                    'description' => array('label' => 'Description', 'width'=>250),
-                    'version'     => array('label' => 'Code Version', 'width'=>50),
-                    'schema_version' => array('label' => 'Schema Version', 'width'=>50, 'formatter'=>new BValue('fmtSchemaVersion')),
-                    'run_status'  => array('label' => 'Run Status', 'options'=>$runStatusOptions, 'formatter'=>new BValue('fmtRunStatus'), 'width'=>80),
-                    'run_level' => array('label' => 'Run Level', 'options'=>$coreRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel()'), 'width'=>100),
-                    'run_level_core' => array('label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Core")'), 'width'=>120),
-                    'run_level_admin' => array('label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Admin")'), 'width'=>120, 'hidden'=>true),
-                    'run_level_frontend' => array('label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Frontend")'), 'width'=>120, 'hidden'=>true),
-                    'requires'     => array('label' => 'Requires', 'width'=>250),
-                    'required_by' => array('label' => 'Required By', 'width'=>250),
-                ),
-                'rowNum'      => 200,
-                'sortname'    => 'name',
-                'sortorder'   => 'asc',
-                //'multiselect' => true,
+                     array('name' => 'name', 'label' => 'Name', 'width'=>150),
 
+                     array('name' => 'description', 'label' => 'Description', 'width'=>250),
+
+                     array('name' => 'version', 'label' => 'Code Version', 'width'=>50),
+
+                     array('name' => 'schema_version', 'label' => 'Schema Version', 'width'=>50,
+                        'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
+
+                     array('name' => 'run_status', 'label' => 'Run Status', 'options'=>$runStatusOptions, 'width' => 80,
+                        'cell' => new BValue("FCom.Backgrid.RunStatusCell")),
+
+                     array('name' => 'run_level', 'label' => 'Run Level', 'options'=>$coreRunLevelOptions, 'width'=>100,
+                        'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
+
+                     array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions, 
+                        'width'=>120, 'editable' => true,
+                        'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
+/*
+                     array('name' => 'run_level_admin', 'label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 
+                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Admin', 'bgs' => new BValue("runLevelColors")), 
+                        'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
+
+                     array('name' => 'run_level_frontend', 'label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 
+                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Frontend', 'bgs' => new BValue("runLevelColors")), 
+                        'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
+*/
+                     array('name' => 'requires', 'label' => 'Requires', 'width'=>250),
+
+                     array('name' => 'required_by', 'label' => 'Required By', 'width'=>250),
+                ),
+                'state' => array('s' => 'name', 'sd' => 'asc'),
             ),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
-            'custom' => array('personalize'=>true, 'autoresize'=>true),
         );
-        BEvents::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
-        return $config;
+        #BEvents::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('grid'=>&$grid));
+        return $grid;
     }
 
     public function action_index()
     {
-        $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid'=>$grid));
+        BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
+        $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
+        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->messages('modules')->layout('/modules');
     }
 
     public function action_index__POST()
     {
+        if (BRequest::i()->xhr()) {
+            $r = BRequest::i()->post();
+            BConfig::i()->set('module_run_levels/FCom_Core/'.$r['module_name'], $r['run_level_core'], false, true);
+            FCom_Core_Main::i()->writeLocalConfig();
+            BResponse::i()->json(array('success'=>true));
+        }
         try {
             $areas = array('FCom_Core', 'FCom_Admin', 'FCom_Frontend');
             $levels = BRequest::i()->post('module_run_levels');

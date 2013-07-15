@@ -1,7 +1,7 @@
 base:
 	- view: admin/nav
 		do:
-			- [ addNav, market, { label: Market, pos: 100 } ]
+			- [ addNav, market, { label: Market, pos: 100, icon_class: icon-install } ]
 			- [ addNav, market/market, { label: Market Center, href: /market/market } ]
 			- [ addNav, market/index, { label: My Modules, href: /market/index } ]
 
