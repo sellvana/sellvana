@@ -17,9 +17,6 @@
 .fcom-datagrid__grid th.label .drag-handle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
 .fcom-datagrid__grid th.label:hover .drag-handle { display:block; cursor: move; }
 
-.backgrid th .drag-handle { visibility:hidden; float:right; background:#888; width:10px; height:10px; margin:2px; }
-.backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
-
 .fcom-datagrid__grid { width: 100%; }
 .fcom-datagrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
 .fcom-datagrid__grid tr.even td { background: #FCFCFC; }
@@ -28,6 +25,7 @@
 
 .fcom-datagrid__actions a { border:solid 1px #AAA; margin: 2px; padding: 2px 5px; }
 
-.a-left { text-align: left; }
-.a-center { text-align: center; }
-.a-right { text-align: right; }
+.backgrid th { white-space: nowrap; }
+.backgrid th .drag-handle { visibility:hidden; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
+.backgrid th .ui-resizable-handle { z-index:1000; right:0; width:5px; }
