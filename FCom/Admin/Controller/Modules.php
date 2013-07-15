@@ -11,6 +11,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = BModuleRegistry::i()->debug();
+        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,FCom_Frontend,FCom_Frontend_DefaultTheme'));
+
 
         try {
             $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
@@ -36,9 +38,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             }
             $r['requires'] = join(', ', $reqs);
             $r['required_by'] = join(', ', $mod->children_copy);
-            $r['run_level_core'] = !empty($coreLevels[$modName]) ? $coreLevels[$modName] : '';
-            $r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : '';
-            $r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
+            $r['auto_run_level'] = isset($autoRunLevelMods[$r['name']]);
+            $r['run_level_core'] = $r['auto_run_level'] ? 'AUTO' : (!empty($coreLevels[$modName]) ? $coreLevels[$modName] : '');
+            //$r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : '';
+            //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
             $data[] = $r;
@@ -66,7 +69,6 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             BModule::LOADED  => 'LOADED',
             BModule::ERROR   => 'ERROR'
         );
-        $runLevelBgs = "{'DISABLED':'#CCC', 'ONDEMAND':'#FFF', '':'#FFF', 'REQUESTED':'#CFC', 'REQUIRED':'#FFC'}";
         $grid = array(
             'config' => array(
                 'id'          => 'modules',

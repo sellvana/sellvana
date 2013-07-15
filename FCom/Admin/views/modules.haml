@@ -66,6 +66,9 @@
                     optionValues.push([v, k]);
                 })
                 this.optionValues = optionValues;
+                if (this.options.model.get('auto_run_level')) {
+                    this.editable = false;
+                }
                 return Backgrid.SelectCell.prototype.initialize.apply(this, arguments);
             },
 
@@ -73,6 +76,9 @@
 
             render: function() {
                 var val = this.model.get(this.column.get("name"));
+                if (val==='AUTO') {
+                    return Backgrid.Cell.prototype.render.apply(this, arguments);
+                }
                 this.$el.removeClass('run-level-DISABLED run-level-REQUESTED runl-level-DISABLED')
                 this.$el.addClass('run-level-' + val);
                 return Backgrid.SelectCell.prototype.render.apply(this, arguments);

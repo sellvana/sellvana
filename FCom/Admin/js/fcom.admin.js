@@ -387,6 +387,10 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
                 'initially_open': opt.initially_open
             },
             "plugins" : plugins,
+            'themes': {
+                //dots: false,
+                //icons: false
+            },
             "json_data" : {
                 "ajax" : {"url" : opt.url, "data" : function (n) {
                     return {
@@ -515,11 +519,15 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
                 });
             });
         })
+        .bind("select_node.jstree", function(e, data) {
+            if (typeof opt.on_click !== 'undefined') opt.on_click(data.rslt.obj);
+        })
         .bind("dblclick.jstree", function(ev) {
             var node = $(ev.target).closest('li');
             if (typeof opt.on_dblclick !== 'undefined') opt.on_dblclick(node);
         })
         .bind("select.jstree", function(ev, node) {
+            console.log(ev, node);
             if (typeof opt.on_select !== 'undefined') opt.on_select(node);
         })
     /*    .bind("check_node.jstree", function (e, data) {

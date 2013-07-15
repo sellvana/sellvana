@@ -9515,20 +9515,25 @@ input.error:focus {
   font-family: 'fontello2';
 }
 
+/*
+.jstree-default .jstree-undetermined a .jstree-checkbox:before { }
+.jstree-default .jstree-checked a .jstree-checkbox:before { }
+.jstree-default .jstree-unchecked a .jstree-checkbox:before { }
+*/
 /* BACKGRID */
-/* line 459, ../sass/fulleron.scss */
+/* line 465, ../sass/fulleron.scss */
 .backgrid thead th {
   background: #f5f5f5;
 }
 
 /* FCOM PAGE: LOGIN */
-/* line 464, ../sass/fulleron.scss */
+/* line 470, ../sass/fulleron.scss */
 .fcom-admin-login {
   margin: 165px auto;
   width: 390px;
 }
 
-/* line 468, ../sass/fulleron.scss */
+/* line 474, ../sass/fulleron.scss */
 .fcom-admin-login-header {
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
@@ -9541,13 +9546,13 @@ input.error:focus {
   font-size: 1.65em;
 }
 
-/* line 475, ../sass/fulleron.scss */
+/* line 481, ../sass/fulleron.scss */
 .fcom-admin-login-logo {
   float: right;
   height: 25px;
 }
 
-/* line 476, ../sass/fulleron.scss */
+/* line 482, ../sass/fulleron.scss */
 .fcom-admin-login-content {
   margin-bottom: 13px;
   padding: 20px 35px;
@@ -9560,7 +9565,7 @@ input.error:focus {
   border-radius: 0 0 4px p4x;
 }
 
-/* line 484, ../sass/fulleron.scss */
+/* line 490, ../sass/fulleron.scss */
 .fcom-admin-login input[type='text'],
 .fcom-admin-login input[type='password'] {
   width: 100%;
