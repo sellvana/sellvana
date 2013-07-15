@@ -466,8 +466,13 @@ class BLayout extends BClass
      */
     public function cloneView($from, $to = BNULL)
     {
-        if (BNULL === $to) $to = $from . '-copy';
-        $this->_views[$to]            = clone $this->_views[$from];
+        if (BNULL === $to) {
+            $to = $from . '-copy';
+            for ($i = 2; !empty($this->_views[$to]); $i++) {
+                $to = $from . '-copy' . $i;
+            }
+        }
+        $this->_views[$to] = clone $this->_views[$from];
         $this->_views[$to]->setParam('view_name', $to);
 
         return $this->_views[$to];

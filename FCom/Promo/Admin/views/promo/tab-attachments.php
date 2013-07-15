@@ -35,6 +35,7 @@ $mediaCtrl = FCom_Admin_Controller_MediaLibrary::i();
 <script>
 require(['jquery', 'fcom.admin'], function($) {
     $(function() {
+        /*
         attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
             useStateCookie: true,
             west__minWidth:400,
@@ -47,7 +48,7 @@ require(['jquery', 'fcom.admin'], function($) {
                 });
             }
         });
-
+        */
         attachmentsGrid = new FCom.Admin.MediaLibrary({
             grid:'#all_attachments',
             url:'<?=BApp::href('media/grid')?>',

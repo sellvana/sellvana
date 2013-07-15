@@ -10,7 +10,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_permission;# = 'feature/permission';
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
-    protected $_gridViewName = 'admin/grid';
+    #protected $_gridViewName = 'admin/grid';
+    protected $_gridViewName = 'core/backgrid';
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
@@ -26,11 +27,19 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
         if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
-        if (is_null($this->_gridViewName))   $this->_formViewName = 'admin/grid';
+        if (is_null($this->_gridViewName))   $this->_formViewName = 'core/backgrid';
         if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
         if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
     }
 
+    public function gridView()
+    {
+        $view = $this->view($this->_gridViewName);
+        BEvents::i()->fire(static::$_origClass.'::gridView', array('view'=>&$config));
+        return $view;
+    }
+
+/*
     public function gridConfig()
     {
         $gridDataUrl = BApp::href($this->_gridHref.'/grid_data');
@@ -50,18 +59,17 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'custom'=>array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id='),
             'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn', 'searchOperators' => true),
         );
-        BEvents::i()->fire(static::$_origClass.'::gridConfig', array('config'=>&$config));
         return $config;
     }
-
+*/
     public function action_index()
     {
-        $this->view('jqgrid')->config = $this->gridConfig();
+        //$this->view('jqgrid')->config = $this->gridConfig();
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
-        $view = $this->view($this->_gridViewName);
-        $this->gridViewBefore(array('view'=>$view));
+        $view = $this->gridView();
+        $this->gridViewBefore(array('view' => $view));
         $this->layout($this->_gridLayoutName);
     }
 
@@ -78,28 +86,31 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
-        $mc = $this->_modelClass;
-
-        $orm = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+        $view = $this->gridView();
+        $grid = $view->get('grid');
+        if (!empty($grid['orm'])) {
+            $orm = $grid['orm'];
+        } else {
+            $mc = $this->_modelClass;
+            $orm = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+        }
         $this->gridOrmConfig($orm);
-
-        $export = BRequest::i()->request('export');
 
         $oc = static::$_origClass;
 
-        $gridConfig = $this->gridConfig();
-        $gridId = $gridConfig['grid']['id'];
-        if (!$gridId) {
-            $gridId = $oc;
-        }
+        $config = $view->grid['config'];
+        $gridId = !empty($config['id']) ? $config['id'] : $oc;
 
-        $grid = FCom_Admin_View_Grid::i();
-        if ($export) {
-            $grid->set('config', $gridConfig)->export($orm, $oc);
+        if (BRequest::i()->request('export')) {
+            $view->export($orm, $oc);
         } else {
-            $data = $grid->processORM($orm, $oc.'::action_grid_data', $gridId);
-            $data = $this->gridDataAfter($data);
-            BResponse::i()->json($data);
+            //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
+            $data = $view->outputData();
+            //$data = $this->gridDataAfter($data);
+            BResponse::i()->json(array(
+                array('c' => $data['state']['c']),
+                BDb::many_as_array($data['rows']),
+            ));
         }
     }
 
