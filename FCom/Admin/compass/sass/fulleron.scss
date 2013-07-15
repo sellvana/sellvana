@@ -77,10 +77,10 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
     @include border-radius(3px);
-    height:auto;
-    min-height:35px;
-    padding:6px;
     width:350px;
+    -moz-box-sizing: content-box; 
+    -webkit-box-sizing: content-box; 
+    box-sizing: content-box;
     }
 textarea:focus,
 input[type="text"]:focus,
@@ -104,6 +104,12 @@ input[type="color"]:focus,
     }
 textarea { min-height:150px; }
 
+.input-append .add-on, .input-prepend .add-on {
+    -moz-box-sizing: content-box; 
+    -webkit-box-sizing: content-box; 
+    box-sizing: content-box;
+    }
+
 /* DROPDOWNS */
 div.dropdown-menu > ul > li > a:hover,
 div.dropdown-menu > ul > li > a:focus,
@@ -119,7 +125,7 @@ div.dropdown-menu > ul > li > a:focus,
 
 /* BUTTONS */
 .btn {
-    border:1px solid #999;
+    border:1px solid $base-link-clr;
     background:#fff;
     padding:4px 12px;
     &:hover { 
@@ -256,13 +262,14 @@ input.error {
 .fcom-admin-header { background:$base-header-bg-clr; border-bottom:1px solid #ddd; height:50px; padding:10px 15px; }
     .fcom-admin-header .fcom-admin-logo { float:left; margin:-5px 0 0 2px; color:#fff; font-size:1.25em; }
         .fcom-admin-header .fcom-admin-logo img { margin:10px 0; }
-    .fcom-admin-header .avatar { margin-top:5px; width:35px; height:35px; @include border-radius(35px); }
+    .fcom-admin-header .avatar { margin:5px 5px 0 5px; width:35px; height:35px; @include border-radius(35px); }
     .fcom-admin-header .dropdown { float:left;  }
     .fcom-admin-header .dropdown-menu { right:0; left:auto; font-size:.9em; }
     .fcom-admin-header-util-links { float:right; margin-top:-8px; }
         .fcom-admin-header-util-links [class^="icon-"] { 
             display:inline-block; 
             width:35px; 
+            margin-top:5px;
             color:lighten($base-txt-clr, 20%); 
             font-size:23px; 
             text-align:center; 
@@ -278,7 +285,7 @@ input.error {
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover,
         .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:focus { color:#fff; }
 
-.fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:50px; left:0; bottom:0; z-index:9; }
+.fcom-admin-nav { width:40px; background:$base-nav-bg-clr; position:absolute; top:50px; left:0; bottom:0; z-index:99; }
     .fcom-admin-nav .dropdown { background:$base-nav-bg-clr; width:40px;}
     .fcom-admin-nav .dropdown .dropdown-menu { margin-top:0; @include border-radius(0); border:none; padding:0; }
     .fcom-admin-nav .dropdown-submenu > a:after { border:none; }
@@ -302,15 +309,10 @@ input.error {
 
     // Nav level 1 - <a> style
     .fcom-admin-nav > .dropdown > .nav > li > a {
-        display:block;
-        height:40px;
         @include border-radius(0);
         border:none;
         padding:0;
         color:#a6acb2;
-        font:normal 18px/40px 'fontello';
-        text-align:center;
-        vertical-align:middle;
         }
 
     // Nav level 1 - <a> hover style
@@ -322,15 +324,19 @@ input.error {
         }
 
     // Nav level 1 - icon styling
-    .fcom-admin-nav .dropdown > ul > li > a:before { text-shadow:0 2px 1px #303a43; }
-    .fcom-admin-nav .dropdown > ul > li > a > span { display:none; }
-    .nav-group-home:before { content:'\e81a'; }
-    .nav-group-catalog:before { content:'\e854'; }
-    .nav-group-sales:before { content:'\e85a'; }
-    .nav-group-customer:before { content:'\e80c'; }
-    .nav-group-system:before { content:'\e856'; }
-    .nav-group-cms:before { content:'\e847'; }
-    .nav-group-market:before { content:'\e8fb'; }
+    .fcom-admin-nav .dropdown > ul > li > a > [class^="icon-"]:before {
+        
+        }
+    .fcom-admin-nav .dropdown > ul > li > a > [class^="icon-"] { 
+        display:block; 
+        font:normal 18px/40px 'fontello';
+        width:40px;
+        height:40px;
+        vertical-align:middle;
+        text-align:center;
+        text-shadow:0 2px 1px #303a43;
+        }
+    .fcom-admin-nav .dropdown > ul > li > a > .title { display:none; }
 .fcom-admin-nav > .dropdown > .nav > li > a { vertical-align:text-top; height:40px; }
     // Nav level 2+
     .fcom-admin-nav .dropdown > ul > li > ul { background:#373d43; background-color:rgba(55,61,67,0.95); }
@@ -368,6 +374,7 @@ input.error {
                 color:lighten($base-txt-clr, 20%);
                 font-size:1em;
                 }
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a:hover { color:darken($base-txt-clr,20%)}
             .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a {
                 @include background(linear-gradient(#71b1f2, #4d96e9));
                 color:#fff;
@@ -385,7 +392,7 @@ input.error {
                 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .title {
                     float:left;
                     }
-                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header label { font-size:1em; padding-top:1px; }
+                .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header label { font-size:1em; line-height:1em; padding-top:1px; }
                 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock { color:#d40000; }
                 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock-open { color:lighten($base-txt-clr, 50%); }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .fcom-admin-expand-toggles {
@@ -432,12 +439,12 @@ input.error {
 .jstree-default .jstree-closed > ins:before {
     content: '\e800';
     color:lighten($base-nav-bg-clr,50);
-    font-family:'fontello2';
+    font-family:'fontello';
     }
 .jstree-default .jstree-open > ins:before {
     content: '\e806';
     color:lighten($base-nav-bg-clr,50);
-    font-family:'fontello2';
+    font-family:'fontello';
     }
 .jstree-default a ins.jstree-icon {
     width:18px;
@@ -449,7 +456,7 @@ input.error {
     font-size:1.3em;
     content: '\e802';
     color:lighten($base-nav-bg-clr,40);
-    font-family:'fontello2';
+    font-family:'fontello';
     }
 
 /*
@@ -463,7 +470,18 @@ input.error {
 
 /* BACKGRID */
 .backgrid thead th { background:#f5f5f5; }
-
+.backgrid thead th a { 
+  color:lighten($base-txt-clr, 30%);
+  font-size:.85em;
+  text-transform:uppercase;
+  }
+.backgrid tbody th,
+.backgrid tbody td { background:#fff; }
+.backgrid tbody tr:hover td { 
+    background:darken(#ffffff,3%);
+    @include transition-property(background-color);
+    @include transition-timing-function(ease-in linear);
+    }
 
 
 /* FCOM PAGE: LOGIN */
