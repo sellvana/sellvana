@@ -3,8 +3,8 @@
 
 :javascript
     require(['fcom.admin'], function() {
-        FCom.Admin.Tabs('.fcom-admin-main-container', { 
-            //url_get: "#{$this->form_url}", 
+        FCom.Admin.Tabs('.fcom-admin-main-container', {
+            url_get: "#{$this->form_url}",
             cur_tab: "#{$this->cur_tab}"
         });
     })
