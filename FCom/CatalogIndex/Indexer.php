@@ -449,7 +449,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                         $orm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
                     }
                 }
-                $counts = $orm->find_one()->as_array();
+                if ($counts = $orm->find_one()) {
+                    $counts = $counts->as_array();
+                }
                 if ($counts) {
                     foreach ($counts as $vId=>$cnt) {
                         $v = $filterValues[$vId];
