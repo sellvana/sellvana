@@ -1,7 +1,7 @@
 base:
   - view: admin/nav
     do:
-      - [ addNav, catalog, { label: Catalog, pos: 100 } ]
+      - [ addNav, catalog, { label: Catalog, pos: 100, icon_class: icon-box-1 } ]
       - [ addNav, catalog/categories, { label: Categories, href: /catalog/categories } ]
       - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
       - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
@@ -35,6 +35,7 @@ catalog_product_form_tabs:
   - { include: base }
   - { include: form }
   - { include: lib_backgrid }
+  #- { include: jstree }
   - { include: catalog_product_form_tabs }
   - { hook: main, views: 'admin/form' }
   - { view: admin/nav, do: [[ setNav, catalog/products ]] }

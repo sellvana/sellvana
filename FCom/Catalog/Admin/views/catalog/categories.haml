@@ -9,31 +9,31 @@
             %span.title
                 = $this->_('Categories')
             %input.entypo.lock#categories-tree-lock(type="checkbox")
-            %input.entypo.lock-open#categories-expand-collapse(type="checkbox")
         .fcom-admin-expand-toggles
-            %a(href='') = $this->_('Expand All')
-            %a(href='') = $this->_('Collapse All')
+            %a.js-expand-all(href='') = $this->_('Expand All')
+            %a.js-collapse-all(href='') = $this->_('Collapse All')
         #categories
 
 :javascript
-    require(['jquery', 'fcom.admin', 'jstree', 'fcom.admin'], function($) {
+    require(['jquery', 'jstree', 'fcom.admin'], function($) {
         $(function() {
             $('.fcom-admin-nav-sidebar').resizable({
                 handles: 'e',
-                resize: function(ev, ui) { 
+                resize: function(ev, ui) {
                     $('#categories-layout').css('padding-left', ui.size.width+'px');
                 }
             });
-            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true, on:{icon:'entypo lock-open', label:'Unlocked'}, off:{icon:'entypo lock', label:'Locked'}});
-            FCom.Admin.checkboxButton('#categories-expand-collapse', {
-                off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
-                click:function(ev) { $('#categories').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }
-                //TODO: fetch ancestors only for root node
+            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
+                on:{icon:'icon-lock', label:'Editing Locked'},
+                off:{icon:'icon-lock-open', label:'Editing Unlocked'}
             });
+            $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
+            $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
 
             FCom.Admin.tree('#categories', {
                 url:'#{BApp::href('catalog/categories/tree_data')}'
-                , on_dblclick: function (n) { loadForm(n.attr('id')); }
+                , on_click: function (n) { loadForm(n.attr('id')); }
+                //, on_dblclick: function (n) { loadForm(n.attr('id')); }
                 , on_select: function (n) { loadForm(n.attr('id')); }
                 , lock_flag: '#categories-tree-lock'
             });

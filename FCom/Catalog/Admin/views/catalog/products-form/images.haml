@@ -12,6 +12,7 @@
     var imagesLayout, allImagesGrid;
     require(['jquery', 'fcom.admin'], function($) {
         $(function() {
+            /*
             imagesLayout = $('#images-layout').height($('.adm-wrapper').height()).layout({
                 useStateCookie: true,
                 west__minWidth:'40%',
@@ -24,6 +25,7 @@
                     });
                 }
             });
+            */
             $('#images-layout').resizeWithWindow();
 
             allImagesGrid = new FCom.Admin.MediaLibrary({

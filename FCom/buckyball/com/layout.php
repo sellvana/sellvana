@@ -466,8 +466,13 @@ class BLayout extends BClass
      */
     public function cloneView($from, $to = BNULL)
     {
-        if (BNULL === $to) $to = $from . '-copy';
-        $this->_views[$to]            = clone $this->_views[$from];
+        if (BNULL === $to) {
+            $to = $from . '-copy';
+            for ($i = 2; !empty($this->_views[$to]); $i++) {
+                $to = $from . '-copy' . $i;
+            }
+        }
+        $this->_views[$to] = clone $this->_views[$from];
         $this->_views[$to]->setParam('view_name', $to);
 
         return $this->_views[$to];
@@ -1270,7 +1275,7 @@ class BView extends BClass
      */
     public function render(array $args = array(), $retrieveMetaData = true)
     {
-        $debug = BDebug::is('DEBUG');
+        $debug = BDebug::is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
 
         $timer = BDebug::debug('RENDER.VIEW ' . $viewName);
@@ -2010,7 +2015,7 @@ class BViewHead extends BView
 
     public function requireRun($names)
     {
-        $this->_requireJs['run'] += (array)$names;
+        $this->_requireJs['run'] = array_merge($this->_requireJs['run'], (array)$names);
         return $this;
     }
 

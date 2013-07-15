@@ -24,6 +24,7 @@ base:
             - [ requireJs, lightbox, @FCom_Core/js/lib/lightbox/lightbox ]
 
             - [ requireJs, fcom.frontend, @FCom_Frontend/js/fcom.frontend, { deps: [ fcom.core ] } ]
+            - [ requireRun, [ select2, fcom.frontend ] ]
 
     - { include: common_js_libs }
 

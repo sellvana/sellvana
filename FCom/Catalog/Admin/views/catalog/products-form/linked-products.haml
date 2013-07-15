@@ -12,6 +12,7 @@
 :javascript
     require(['jquery', 'fcom.admin'], function($) {
         $(function() {
+            /*
             var linkedProductslayout = $('#linked-products-layout').height($('.adm-wrapper').height()).layout({
                 useStateCookie: true,
                 west__minWidth:'40%',
@@ -24,6 +25,7 @@
                     });
                 }
             });
+            */
             $('#linked-products-layout').resizeWithWindow();
 
             $('#linked-products-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {

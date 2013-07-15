@@ -12,6 +12,7 @@
     var attachmentsLayout, attachmentsGrid;
     require(['jquery'], function($) {
         $(function() {
+            /*
             attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
                 useStateCookie: true,
                 west__minWidth:'40%',
@@ -24,6 +25,7 @@
                     });
                 }
             });
+            */
             $('#attachments-layout').resizeWithWindow();
 
             attachmentsGrid = new FCom.Admin.MediaLibrary({
