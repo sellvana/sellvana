@@ -126,6 +126,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $data = array();
         switch ($r['do']) {
         case 'grid.col.width':
+            if (empty($r['grid']) || empty($r['width'])) {
+                break;
+            }
             $columns = array($r['col']=>array('width'=>$r['width']));
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
             break;
@@ -134,7 +137,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $cols = BUtil::fromJson($r['cols']);
             $columns = array();
             foreach ($cols as $i=>$col) {
-                if ($col['name']==='cb') continue;
+                if (empty($col['name']) || $col['name']==='cb') {
+                    continue;
+                }
                 $columns[$col['name']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
             }
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));

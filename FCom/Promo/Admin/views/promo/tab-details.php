@@ -44,6 +44,7 @@ $promoCtrl = FCom_Promo_Admin_Controller::i();
 <script>
 require(['jquery', 'fcom.admin'], function($) {
     $(function() {
+        /*
         var layout = $('#details-layout').height($('.adm-wrapper').height()).layout({
             useStateCookie: true,
             west__minWidth:400,
@@ -56,6 +57,7 @@ require(['jquery', 'fcom.admin'], function($) {
                 });
             }
         });
+        */
         $(window).resize(function(ev) { $('#details-layout').height($('.adm-wrapper').height()); });
 
         $('#details-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {

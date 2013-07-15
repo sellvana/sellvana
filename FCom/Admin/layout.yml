@@ -38,6 +38,7 @@ base:
       #- [ js, @FCom_Core/js/select2/select2.min.js ]
       # highcharts
       - [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
+
       - [ requireJs, bootstrap, @FCom_Admin/compass/js/bootstrap.min, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
@@ -157,6 +158,7 @@ form:
 
 /:
     - { include: base }
+    - { include: flot }
     - { hook: main, views: home }
     - { view: admin/nav, do: [[ setNav, home ]] }
 
