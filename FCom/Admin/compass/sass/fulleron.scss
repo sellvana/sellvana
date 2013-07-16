@@ -19,7 +19,6 @@
     }
 }
 
-
 /* SASS VARIABLE */
 $base-txt-clr: #444;
 $base-bg-clr: #f9f9f9;
@@ -33,7 +32,7 @@ $base-border: 1px solid $base-border-clr;
 $error-txt-clr: #c83c3c;
 
 /* BASE */
-* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+* { @include box-sizing(border-box); }
 html, body { height:100%; }
 body {
     position:relative;
@@ -78,10 +77,9 @@ input[type="color"],
 .uneditable-input {
     @include border-radius(3px);
     width:350px;
-    -moz-box-sizing: content-box; 
-    -webkit-box-sizing: content-box; 
-    box-sizing: content-box;
+    @include box-sizing(content-box)
     }
+select { @include box-sizing(border-box); }
 textarea:focus,
 input[type="text"]:focus,
 input[type="password"]:focus,
@@ -173,44 +171,51 @@ div.dropdown-menu > ul > li > a:focus,
 
 
 /* NAVS */
-.accordion-inner { padding:30px; }
+.accordion-inner { 
+    padding:30px; 
+    }
 .fcom-nav-st1 {
-    border-color:#eee;
+    border-color:#ddd;
+    background:#fafafa;
     margin-bottom:0; 
-    padding-left:10px; 
-    font-size:.95em; 
-    height:30px;
-    overflow:hidden;
+    padding-left:10px;
     }
 .fcom-nav-st1 > li > a {
     margin:0;
-    border:none; 
     @include border-radius(0); 
-    padding:5px 10px; 
-    color:$base-link-clr; 
+    padding:9px 15px; 
+    color:#777; 
     @include transition-property(background-color);
     @include transition-timing-function(ease-in linear);
-    font-weight:600;
-    font-size:.9em;
-    text-transform: uppercase;
-    }
-.fcom-nav-st1 > .active > a { background:#f9f9f9; color:$base-txt-clr; }
-.fcom-nav-st1 > .active > a,
-.fcom-nav-st1 > .active > a:hover,
-.fcom-nav-st1 > .active > a:focus,
-.fcom-nav-st1 > li > a:hover,
-.fcom-nav-st1 > li > a:focus { 
-    margin:0; 
+    font-size:.95em;
+    line-height:1em;
     border:none; 
+    border-left:1px solid #fafafa;
+    border-right:1px solid #fafafa;
+    }
+.fcom-nav-st1 > .active > a {
+    display:block; 
+    color:$base-txt-clr; 
+    margin:0; 
+    background:#fff;
+    border-left-color:#ddd;
+    border-right-color:#ddd;
+    border-top:none;
     }
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
 .fcom-nav-st1 > li > a:hover,
 .fcom-nav-st1 > li > a:focus {
-    background:#f9f9f9;
+    margin:0; 
     color:lighten($base-txt-clr, 20);
+    background:#fff;
+    border-top:none;
     }
-
+.fcom-nav-st1 > li > a:hover,
+.fcom-nav-st1 > li > a:focus { 
+    border-left-color:#fafafa;
+    border-right-color:#fafafa;
+    }
 
 
 /* BREADCRUMBS */
@@ -366,6 +371,7 @@ input.error {
             padding-bottom:999em !important;
             margin-bottom:-999em !important;
             }
+            .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li { margin-bottom:0; }
             .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a {
                 @include border-radius(0);
                 border:none;
@@ -373,11 +379,16 @@ input.error {
                 background:none;
                 color:lighten($base-txt-clr, 20%);
                 font-size:1em;
+                border-top:1px solid #f9f9f9;
+                border-bottom:1px solid #f9f9f9;
                 }
             .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a:hover { color:darken($base-txt-clr,20%)}
             .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a {
-                @include background(linear-gradient(#71b1f2, #4d96e9));
-                color:#fff;
+                border-top-color:#ddd;
+                border-bottom-color:#ddd;
+                margin-right:-1px;
+                background:#fff;
+                color:$base-txt-clr;
                 }
         .fcom-admin-sidebar-view .fcom-admin-tree-sidebar { padding:0; min-width:150px; }
             .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header {
@@ -505,5 +516,5 @@ input.error {
     @include border-radius(0 0 4px p4x);
     }
 .fcom-admin-login input[type='text'],
-.fcom-admin-login input[type='password'] { width:100%; }
+.fcom-admin-login input[type='password'] { width:300px; }
 
