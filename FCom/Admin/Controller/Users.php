@@ -13,7 +13,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     {
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
-            'username'    => array('label'=>'User Name', 'width'=>100),
+            'username'    => array('label'=>'User Name', 'width'=>100, 'href' => BApp::href('users/form/?id=<%=id%>')),
             'email'       => array('label'=>'Email', 'width'=>150),
             'firstname'   => array('label'=>'First Name', 'width'=>150),
             'lastname'    => array('label'=>'First Name', 'width'=>150),
@@ -21,7 +21,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 'options'=>FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
             'status'      => array('label'=>'Status', 'width'=>100,
                 'options'=>FCom_Admin_Model_User::i()->fieldOptions('status')),
-            'last_login ' => array('label'=>'Last Login', 'formatter'=>'date', 'width'=>100),
+            'last_login ' => array('label'=>'Last Login', 'cell'=>'date', 'width'=>100),
         );
         return $config;
     }

@@ -51,11 +51,18 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     {
         $config = $this->grid['config'];
         $config['personalize_url'] = BApp::href('my_account/personalize');
+
+        if (empty($config['id'])) {
+            $config['id'] = BUtil::simplifyString($this->param('view_name'));
+        }
         $config['container'] = '#'.$config['id'];
 
         $pos = 0;
-        foreach ($config['columns'] as &$col) {
-
+        $columns = array();
+        foreach ($config['columns'] as $k => $col) {
+            if (!is_numeric($k)) {
+                $col['name'] = $k;
+            }
             if (empty($col['cell'])) {
                 if (!empty($col['href'])) {
                     $col['cell'] = new BValue('FCom.Backgrid.HrefCell');
@@ -73,8 +80,9 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
                     break;
                 }
             }
+            $columns[] = $col;
         }
-        unset($col);
+        $config['columns'] = $columns;
 
         $this->_applyPersonalization($config);
 

@@ -13,7 +13,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $config = parent::gridConfig();
         $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
-            'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70),
+            'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=<%=id%>')),
             'purchased_dt' => array('index'=>'o.purchased_dt', 'label' => 'Purchased on'),
             'billing_name' => array('label'=>'Bill to Name', 'index'=>'ab.billing_name'),
             'billing_address' => array('label'=>'Bill to Address', 'index'=>'ab.billing_address'),
@@ -24,7 +24,6 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'discount' => array('label'=>'Discount', 'index'=>'o.coupon_code'),
             'os_name' => array('label'=>'Status', 'index'=>'os.name'),
         ));
-        $config['custom']['dblClickHref'] = BApp::href('orders/form/?id=');
 
         return $config;
     }
