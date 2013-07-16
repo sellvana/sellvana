@@ -17,32 +17,17 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
 
     public function gridConfig()
     {
-        $gridId = 'customer-groups';
         $config = array(
             'grid' => array(
-                'id' => $gridId,
-                'caption' => BLocale::_('Customer Groups'),
-                'url' => BApp::href('customer-groups/grid_data'),
-                'editurl' => BApp::href('customer-groups/grid_data/?id='),
+                'id' => 'customer-groups',
+                'data_url' => BApp::href('customer-groups/grid_data'),
+                'edit_url' => BApp::href('customer-groups/grid_data/?id='),
                 'columns' => array(
                     'id' => array('label'=>'ID', 'width'=>30, 'index' => 'cg.id'),
-                    'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true),
+                    'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href('customer-groups/form/?id=<%=id%>')),
                     'code' => array('label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
                 ),
-                'multiselect' => true,
-                'onSelectRow' => "function(id){
-                    if ( typeof lastcel2 == 'undefined')
-                       window.lastcel2 = id;
-                    if(id && id !== window.lastsel2){
-                        jQuery('#{$gridId}').restoreRow(window.lastsel2);
-                        jQuery('#{$gridId}').editRow(id,true);
-                        window.lastsel2=id;
-                    }
-                }",
             ),
-            'navGrid' => array('add'=>true, 'addtext'=>'New', 'addtitle'=>'Create new Field', 'edit'=>true, 'del'=>true),
-            'custom' => array('personalize'=>true),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
 
         );
         return $config;
