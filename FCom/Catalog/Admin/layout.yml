@@ -23,12 +23,12 @@ catalog_product_form_tabs:
 
 /catalog/test:
   - { include: base }
-  - { hook: main, views: core/backgrid }
+  - { hook: main, views: admin/grid }
 
 /catalog/products:
   - { include: base }
   - { include: lib_backgrid }
-  - { hook: main, views: core/backgrid }
+  - { hook: main, views: admin/grid }
   - { view: admin/nav, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/form:

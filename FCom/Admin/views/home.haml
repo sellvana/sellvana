@@ -2,12 +2,39 @@
 .home-icon = $this->_('Welcome.')
 
 #fcom-dashboard-container
-    #chart1(style="width:500px; height:400px")
+
+    .box.span4
+        .box-header
+            %h2
+                %i.icon-signal
+                %span.break
+                Order Status Distribution
+            .box-icon
+                %a.btn-setting(href="#")
+                    %i.icon-wrench
+                %a.btn-minimize(href="#")
+                    %i.icon-chevron-up
+                %a.btn-close(href="#")
+                    %i.icon-remove
+        .box-content
+            #chart1(style="width:300px; height:200px")
 
 :javascript
+    /*
     require(['highcharts'], function() {
         new Highcharts.Chart({"chart":{"renderTo":"chart1","plotBackgroundColor":null,"plotBorderWidth":null,"plotShadow":false},"title":{"text":"Browser market shares at a specific website, 2010"},"tooltip":{"formatter":function() {
         return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';}},"plotOptions":{"pie":{"allowPointSelect":1,"cursor":"pointer","dataLabels":{"enabled":1,"color":"#000000","connectorColor":"#000000","formatter":function() {
         return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %'; }}}},"series":[{"type":"pie","name":"Browser share","data":[["Firefox",45],["IE",26.8],{"name":"Chrome","y":12.8,"sliced":true,"selected":true},["Safari",8.5],["Opera",6.2],["Others",0.7]]}]});
+    })
+    */
+    require(['flot', 'flot.pie'], function() {
+        $.plot('#chart1', [
+            { label: "Pending", data: 20 },
+            { label: "New", data: 30 },
+            { label: "Shipped", data: 50 },
+            { label: "Declined", data: 10 }
+        ], {
+            series: { pie: { show: true } }
+        })
     })
 
