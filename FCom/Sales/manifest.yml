@@ -1,8 +1,8 @@
 modules:
-	FCom_Sales:
-		version: 0.2.3
-		require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
-		description: "Fundamental Sales functionality"
+    FCom_Sales:
+        version: 0.2.3
+        require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0, FCom_ShippingPlain: 0.1.0 } }
+        description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
         default_config:
