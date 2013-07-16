@@ -2,41 +2,44 @@
 
 class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract_GridForm
 {
-
     protected static $_origClass = __CLASS__;
-
-    protected $_gridHref = 'catalogindex/fields';
     protected $_modelClass = 'FCom_CatalogIndex_Model_Field';
+    protected $_gridHref = 'catalogindex/fields';
     protected $_gridTitle = 'Catalog Index Fields';
     protected $_recordName = 'Index Field';
     protected $_mainTableAlias = 'idxf';
 
-    public function gridConfig()
+    public function gridView()
     {
         $fieldHlp = FCom_CatalogIndex_Model_Field::i();
-        $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'],
-            array(
-                 'id'           => array('index' => 'idxf.id'),
-                 'field_name'   => array('label' => 'Name', 'index' => 'idxf.field_name'),
-                 'field_label'  => array('label' => 'Label', 'index' => 'idxf.field_label'),
-                 'field_type'   => array('label' => 'Type', 'index' => 'idxf.field_type', 'options'=>$fieldHlp->fieldOptions('field_type'), 'width'=>80),
-                 'filter_type'  => array('label' => 'Filter', 'index' => 'idxf.filter_type', 'options'=>$fieldHlp->fieldOptions('filter_type'), 'width'=>80),
-                 'filter_multivalue'  => array('label' => 'MultiValue', 'index' => 'idxf.filter_multivalue', 'options'=>$fieldHlp->fieldOptions('filter_multivalue'), 'width'=>80),
-                 'filter_counts'  => array('label' => 'Calc Counts', 'index' => 'idxf.filter_counts', 'options'=>$fieldHlp->fieldOptions('filter_counts'), 'width'=>80),
-                 'filter_show_empty'  => array('label' => 'Show Empty', 'index' => 'idxf.filter_show_empty', 'options'=>$fieldHlp->fieldOptions('filter_show_empty'), 'width'=>80),
-                 'filter_order'  => array('label' => 'Filter Order', 'index' => 'idxf.filter_order', 'width'=>80),
-                 'filter_custom_view' => array('label' => 'Filter Custom View', 'index' => 'idxf.filter_custom_view', 'width'=>80, 'hidden'=>true),
-                 'search_type'  => array('label' => 'Search', 'index' => 'idxf.search_type', 'options'=>$fieldHlp->fieldOptions('search_type'), 'width'=>80),
-                 'sort_type'  => array('label' => 'Sort', 'index' => 'idxf.sort_type', 'options'=>$fieldHlp->fieldOptions('sort_type'), 'width'=>80),
-                 'sort_label'  => array('label' => 'Sort Label', 'index' => 'idxf.sort_label', 'width'=>80),
-                 'sort_order'  => array('label' => 'Sort Order', 'index' => 'idxf.sort_order', 'width'=>80),
-                 'source_type'  => array('label' => 'Source', 'index' => 'idxf.source_type', 'options'=>$fieldHlp->fieldOptions('source_type'), 'width'=>80),
-                 'source_callback' => array('label' => 'Source Callback', 'index' => 'idxf.source_callback', 'width'=>80, 'hidden'=>true),
-            )
-        );
-        $config['custom']['dblClickHref'] = BApp::href('catalogindex/fields/form/?id=');
-        return $config;
+        $view = parent::gridView();
+        $view->set('grid', array(
+            'orm' => $fieldHlp::i()->orm(),
+            'config' => array(
+                'id' => __CLASS__,
+                'data_url' => BApp::href('catalogindex/fields/grid_data'),
+                'columns' => array(
+                     'id'           => array('index' => 'idxf.id'),
+                     'field_name'   => array('label' => 'Name', 'index' => 'idxf.field_name', 'href' => BApp::href('catalogindex/fields/form/?id=<%=id%>')),
+                     'field_label'  => array('label' => 'Label', 'index' => 'idxf.field_label'),
+                     'field_type'   => array('label' => 'Type', 'index' => 'idxf.field_type', 'options'=>$fieldHlp->fieldOptions('field_type'), 'width'=>80),
+                     'filter_type'  => array('label' => 'Filter', 'index' => 'idxf.filter_type', 'options'=>$fieldHlp->fieldOptions('filter_type'), 'width'=>80),
+                     'filter_multivalue'  => array('label' => 'MultiValue', 'index' => 'idxf.filter_multivalue', 'options'=>$fieldHlp->fieldOptions('filter_multivalue'), 'width'=>80),
+                     'filter_counts'  => array('label' => 'Calc Counts', 'index' => 'idxf.filter_counts', 'options'=>$fieldHlp->fieldOptions('filter_counts'), 'width'=>80),
+                     'filter_show_empty'  => array('label' => 'Show Empty', 'index' => 'idxf.filter_show_empty', 'options'=>$fieldHlp->fieldOptions('filter_show_empty'), 'width'=>80),
+                     'filter_order'  => array('label' => 'Filter Order', 'index' => 'idxf.filter_order', 'width'=>80),
+                     'filter_custom_view' => array('label' => 'Filter Custom View', 'index' => 'idxf.filter_custom_view', 'width'=>80, 'hidden'=>true),
+                     'search_type'  => array('label' => 'Search', 'index' => 'idxf.search_type', 'options'=>$fieldHlp->fieldOptions('search_type'), 'width'=>80),
+                     'sort_type'  => array('label' => 'Sort', 'index' => 'idxf.sort_type', 'options'=>$fieldHlp->fieldOptions('sort_type'), 'width'=>80),
+                     'sort_label'  => array('label' => 'Sort Label', 'index' => 'idxf.sort_label', 'width'=>80),
+                     'sort_order'  => array('label' => 'Sort Order', 'index' => 'idxf.sort_order', 'width'=>80),
+                     'source_type'  => array('label' => 'Source', 'index' => 'idxf.source_type', 'options'=>$fieldHlp->fieldOptions('source_type'), 'width'=>80),
+                     'source_callback' => array('label' => 'Source Callback', 'index' => 'idxf.source_callback', 'width'=>80, 'hidden'=>true),
+                     '_actions' => array('label' => 'Actions', 'sortable' => false),
+                ),
+            ),
+        ));
+        return $view;
     }
 
     public function formViewBefore($args)
