@@ -13,9 +13,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $view = parent::gridView();
         $view->set('grid', array(
-            'orm' => FCom_Catalog_Model_Product::i()->orm()->select('(1)', '_selected'),
             'config' => array(
-                'id' => 'backgrid',
+                'id' => __CLASS__,
                 'data_url' => BApp::href('catalog/products/grid_data'),
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),

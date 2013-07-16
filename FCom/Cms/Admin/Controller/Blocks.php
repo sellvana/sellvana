@@ -12,13 +12,12 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     {
         $config = parent::gridConfig();
         $config['grid']['columns'] += array(
-            'handle' => array('label'=>'Handle', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
-                'baseLinkUrl' => BApp::href('cms/blocks/form/'), 'idName' => 'id',
-            )),
+            'handle' => array('label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=<%=id%>')),
             'description' => array('label'=>'Description', 'editable'=>true),
             'version' => array('label'=>'Version'),
-            'create_dt' => array('label'=>'Created', 'formatter'=>'date'),
-            'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),
+            'create_dt' => array('label'=>'Created', 'cell'=>'date'),
+            'update_dt' => array('label'=>'Updated', 'cell'=>'date'),
+            '_actions' => array('label' => 'Actions', 'sortable' => false),
         );
         return $config;
     }

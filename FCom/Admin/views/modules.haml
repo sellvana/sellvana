@@ -1,24 +1,24 @@
 :css
-    tr.module-disabled td { background:#DDD; }
+    tr.module-disabled td { background:#DDD !important; }
     tr.module-requested {}
 
-    td.run-level-DISABLED, option[value="DISABLED"] { background:#CCC; }
-    td.run-level-REQUESTED, option[value="REQUESTED"] { background:#CFC; }
-    td.run-level-REQUIRED, option[value="REQUIRED"] { background:#FFC; }
-    td.run-status-LOADED { background:#CFC; }
-    td.run-status-ERROR { background:#FCC; }
-    td.schema-migration-available { background:#FCC; }
+    td.run-level-DISABLED, option[value="DISABLED"] { background:#CCC !important; }
+    td.run-level-REQUESTED, option[value="REQUESTED"] { background:#CFC !important; }
+    td.run-level-REQUIRED, option[value="REQUIRED"] { background:#FFC !important; }
+    td.run-status-LOADED { background:#CFC !important; }
+    td.run-status-ERROR { background:#FCC !important; }
+    td.schema-migration-available { background:#FCC !important; }
 
 :javascript
     function runMigrationScripts() {
         $('#form-modules').attr('action', '#{BApp::href('modules/migrate')}').submit();
     }
 
-    require(['jquery', 'backgrid', 'fcom.core'], function($) { 
+    require(['jquery', 'backgrid', 'fcom.core'], function($) {
         FCom.ModuleModel = Backbone.Model.extend({
             save: function(attributes, options) {
-                var data = { 
-                    module_name: this.attributes.name, 
+                var data = {
+                    module_name: this.attributes.name,
                     run_level_core: this.attributes.run_level_core,
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 };
