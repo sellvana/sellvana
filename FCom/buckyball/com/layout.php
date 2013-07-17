@@ -375,12 +375,12 @@ class BLayout extends BClass
             }
 
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
-            BEvents::i()->fire('BLayout::view.add: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view:add: ' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         } else {
             $this->_views[$viewAlias]->setParam($params);
-            BEvents::i()->fire('BLayout::view.update: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view:update: ' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         }
@@ -488,7 +488,7 @@ class BLayout extends BClass
      */
     public function hook($hookName, $callback, $args = array())
     {
-        BEvents::i()->on('BLayout::hook.' . $hookName, $callback, $args);
+        BEvents::i()->on('BLayout::hook:' . $hookName, $callback, $args);
 
         return $this;
     }
@@ -866,7 +866,7 @@ class BLayout extends BClass
         }
         BDebug::debug('THEME.LOAD ' . $themeName);
         $theme = $this->_themes[$themeName];
-        BEvents::i()->fire('BLayout::theme.load.before', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::theme:load.before', array('theme_name' => $themeName));
         $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir.'/' : '';
         if (!empty($theme['layout'])) {
             BLayout::i()->loadLayout($modRootDir.$theme['layout']);
@@ -877,7 +877,7 @@ class BLayout extends BClass
         if (!empty($theme['callback'])) {
             BUtil::i()->call($theme['callback']);
         }
-        BEvents::i()->fire('BLayout::theme.load.after', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::theme:load.after', array('theme_name' => $themeName));
 
         return $this;
     }
@@ -889,7 +889,7 @@ class BLayout extends BClass
      */
     public function afterTheme($callback)
     {
-        BEvents::i()->on('BLayout::theme.load.after', $callback);
+        BEvents::i()->on('BLayout::theme:load.after', $callback);
 
         return $this;
     }
@@ -1189,11 +1189,11 @@ class BView extends BClass
             $result .= "<!-- START HOOK: {$hookName} -->\n";
         }
 
-        $result .= join('', BEvents::i()->fire('BView::hook.before', array('view' => $this, 'name' => $hookName)));
+        $result .= join('', BEvents::i()->fire('BView::hook:before', array('view' => $this, 'name' => $hookName)));
 
-        $result .= join('', BEvents::i()->fire('BLayout::hook.' . $hookName, $args));
+        $result .= join('', BEvents::i()->fire('BLayout::hook:' . $hookName, $args));
 
-        $result .= join('', BEvents::i()->fire('BView::hook.after', array('view' => $this, 'name' => $hookName)));
+        $result .= join('', BEvents::i()->fire('BView::hook:after', array('view' => $this, 'name' => $hookName)));
 
         if ($debug) {
             $result .= "<!-- END HOOK: {$hookName} -->\n";
@@ -1300,7 +1300,7 @@ class BView extends BClass
         if ($debug && BLayout::i()->getRootViewName()!==$viewName) {
             $result .= "<!-- START VIEW: @{$modName}/{$viewName} -->\n";
         }
-        $result .= join('', BEvents::i()->fire('BView::render.before', array('view' => $this)));
+        $result .= join('', BEvents::i()->fire('BView::render:before', array('view' => $this)));
 
         $viewContent = $this->_render();
 
@@ -1315,7 +1315,7 @@ class BView extends BClass
             $this->setParam('meta_data', $metaData);
         }
         $result .= $viewContent;
-        $result .= join('', BEvents::i()->fire('BView::render.after', array('view' => $this)));
+        $result .= join('', BEvents::i()->fire('BView::render:after', array('view' => $this)));
 
         if ($debug) {
             $result .= "<!-- END VIEW: @{$modName}/{$viewName} -->\n";
