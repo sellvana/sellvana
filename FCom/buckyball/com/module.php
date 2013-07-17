@@ -342,6 +342,37 @@ class BModuleRegistry extends BClass
     }
 
     /**
+     * Find module dependencies recursively, used for detecting circular references
+     */
+    public function detectCircularReferences($mod, $depPathArr = array())
+    {
+        $circ = array();
+        if ($mod->parents) {
+            foreach ($mod->parents as $p) {
+                if (isset($depPathArr[$p])) {
+                    $found = false;
+                    $circPath = array();
+                    foreach ($depPathArr as $k => $_) {
+                        if ($p === $k) {
+                            $found = true;
+                        }
+                        if ($found) {
+                            $circPath[] = $k;
+                        }
+                    }
+                    $circPath[] = $p;
+                    $circ[] = $circPath;
+                } else {
+                    $depPathArr1 = $depPathArr;
+                    $depPathArr1[$p] = 1;
+                    $circ += $this->detectCircularReferences(static::$_modules[$p], $depPathArr1);
+                }
+            }
+        }
+        return $circ;
+    }
+
+    /**
     * Perform topological sorting for module dependencies
     *
     * @return BModuleRegistry
@@ -349,6 +380,36 @@ class BModuleRegistry extends BClass
     public function sortDepends()
     {
         $modules = static::$_modules;
+
+        $circRefsArr = array();
+        foreach ($modules as $modName => $mod) {
+            $circRefs = $this->detectCircularReferences($mod);
+            if ($circRefs) {
+                foreach ($circRefs as $circ) {
+                    $circRefsArr[join(' -> ', $circ)] = 1;
+
+                    $s = sizeof($circ);
+                    $mod1name = $circ[$s-1];
+                    $mod2name = $circ[$s-2];
+                    $mod1 = $modules[$mod1name];
+                    $mod2 = $modules[$mod2name];
+                    foreach ($mod1->parents as $i => $p) {
+                        if ($p === $mod2name) {
+                            unset($mod1->parents[$i]);
+                        }
+                    }
+                    foreach ($mod2->children as $i => $c) {
+                        if ($c === $mod1name) {
+                            unset($mod2->children[$i]);
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($circRefsArr as $circRef => $_) {
+            BDebug::warning('Circular reference detected: ' . $circRef);
+        }
+
         // take care of 'load_after' option
         foreach ($modules as $modName=>$mod) {
             $mod->children_copy = $mod->children;
@@ -376,7 +437,10 @@ class BModuleRegistry extends BClass
         $sorted = array();
         while ($modules) {
             // check for circular reference
-            if (!$rootModules) return false;
+            if (!$rootModules) {
+                BDebug::warning('Circular reference detected, aborting module sorting');
+                return false;
+            }
             // remove this node from root modules and add it to the output
             $n = array_pop($rootModules);
             $sorted[$n->name] = $n;
