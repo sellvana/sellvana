@@ -21,4 +21,4 @@ modules:
                     - [ GET, /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
                     - [ any, /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
                 observe:
-                    - [ FCom_Catalog_Frontend_Controller::action_product.addToCart, FCom_Checkout_Frontend_Controller::onAddToCart ]
+                    - [ FCom_Catalog_Frontend_Controller::action_product:addToCart, FCom_Checkout_Frontend_Controller::onAddToCart ]

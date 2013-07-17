@@ -15,9 +15,9 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         }
 
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter, $category);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsORM));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', array('data'=>$productsORM));
         $productsData = $productsORM->paginate(null, array('ps'=>25));
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
 
         BApp::i()
             ->set('current_category', $category)
@@ -58,9 +58,9 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $filter = BRequest::i()->get('f');
 
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsORM));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsORM));
         $productsData = $productsORM->paginate(null, array('ps'=>25));
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
 
         $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
         BApp::i()

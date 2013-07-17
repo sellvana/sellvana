@@ -60,7 +60,7 @@ class BModuleRegistry extends BClass
 
     public function __construct()
     {
-        //BEvents::i()->on('BFrontController::dispatch.before', array($this, 'onBeforeDispatch'));
+        //BEvents::i()->on('BFrontController::dispatch:before', array($this, 'onBeforeDispatch'));
     }
 
     /**
@@ -432,7 +432,7 @@ class BModuleRegistry extends BClass
             $mod->bootstrap();
             $this->popModule();
         }
-        BEvents::i()->fire('BModuleRegistry::bootstrap.after');
+        BEvents::i()->fire('BModuleRegistry::bootstrap:after');
         return $this;
     }
 
@@ -1082,7 +1082,7 @@ class BModule extends BClass
         $this->_processRouting();
         $this->_processObserve();
 
-        BEvents::i()->fire('BModule::bootstrap.before', array('module'=>$this));
+        BEvents::i()->fire('BModule::bootstrap:before', array('module'=>$this));
 
         if (!empty($this->bootstrap)) {
             if (!empty($this->bootstrap['file'])) {

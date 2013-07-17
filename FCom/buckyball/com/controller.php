@@ -1127,7 +1127,7 @@ class BResponse extends BClass
         } elseif (is_null($this->_content)) {
             $this->_content = BLayout::i()->render();
         }
-        BEvents::i()->fire('BResponse::output.before', array('content'=>&$this->_content));
+        BEvents::i()->fire('BResponse::output:before', array('content'=>&$this->_content));
 
         if ($this->_contentPrefix) {
             echo $this->_contentPrefix;
@@ -1139,7 +1139,7 @@ class BResponse extends BClass
             echo $this->_contentSuffix;
         }
 
-        BEvents::i()->fire('BResponse::output.after', array('content'=>$this->_content));
+        BEvents::i()->fire('BResponse::output:after', array('content'=>$this->_content));
 
         $this->shutdown(__METHOD__);
     }
