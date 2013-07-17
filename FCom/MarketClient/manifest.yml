@@ -11,4 +11,4 @@ modules:
                     - [ GET, /market, FCom_MarketClient_Admin_Controller.index ]
                     - [ any, /market/.action, FCom_MarketClient_Admin_Controller ]
                 observe:
-                    - [ BLayout::hook.hook_modules_notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
+                    - [ BLayout::hook:hook_modules_notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]

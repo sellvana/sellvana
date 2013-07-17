@@ -1461,7 +1461,7 @@ class BEmail extends BClass
     protected function _dispatch($emailData)
     {
         try {
-            $flags = BEvents::i()->fire('BEmail::send.before', array('email_data' => $emailData));
+            $flags = BEvents::i()->fire('BEmail::send:before', array('email_data' => $emailData));
             if ($flags===false) {
                 return false;
             } elseif (is_array($flags)) {
@@ -1485,7 +1485,7 @@ class BEmail extends BClass
         }
         $emailData['result'] = $result;
 
-        BEvents::i()->fire('BEmail::send.after', array('email_data' => $emailData));
+        BEvents::i()->fire('BEmail::send:after', array('email_data' => $emailData));
 
         return $result;
     }
@@ -1983,7 +1983,7 @@ class BDebug extends BClass
     public function __construct()
     {
         self::$_startTime = microtime(true);
-        BEvents::i()->on('BResponse::output.after', 'BDebug::afterOutput');
+        BEvents::i()->on('BResponse::output:after', 'BDebug::afterOutput');
     }
 
     /**
@@ -3231,19 +3231,19 @@ class BYAML extends BCLass
 
 /**
  * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well
- * 
+ *
  * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
  */
 class Bcrypt extends BClass
 {
-    public function __construct() 
+    public function __construct()
     {
         if (CRYPT_BLOWFISH != 1) {
             throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
         }
     }
 
-    public function hash($input) 
+    public function hash($input)
     {
         if (function_exists('password_hash')) {
             return password_hash($input);
@@ -3256,7 +3256,7 @@ class Bcrypt extends BClass
         return false;
     }
 
-    public function verify($input, $existingHash) 
+    public function verify($input, $existingHash)
     {
         if (function_exists('password_verify')) {
             return password_verify($input, $existingHash);
@@ -3266,7 +3266,7 @@ class Bcrypt extends BClass
         return $hash === $existingHash;
     }
 
-    private function getSalt() 
+    private function getSalt()
     {
         $mode = version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a';
         $bytes = $this->getRandomBytes(16);
@@ -3276,7 +3276,7 @@ class Bcrypt extends BClass
     }
 
     private $randomState;
-    private function getRandomBytes($count) 
+    private function getRandomBytes($count)
     {
         $bytes = '';
 
@@ -3313,7 +3313,7 @@ class Bcrypt extends BClass
         return $bytes;
     }
 
-    private function encodeBytes($input) 
+    private function encodeBytes($input)
     {
         // The following is code from the PHP Password Hashing Framework
         $itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -3344,8 +3344,8 @@ class Bcrypt extends BClass
     }
 }
 
-/** 
- * @see http://www.php.net/manual/en/function.htmlentities.php#106535 
+/**
+ * @see http://www.php.net/manual/en/function.htmlentities.php#106535
  */
 if( !function_exists( 'xmlentities' ) ) {
     function xmlentities( $string ) {
