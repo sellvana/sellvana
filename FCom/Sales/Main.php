@@ -48,10 +48,15 @@ class FCom_Sales_Main extends BClass
     protected function _getHeap($type, $name=null)
     {
         if (empty($this->_heap[$type])) {
-            foreach ($this->_registry[$type] as $n=>$class) {
-                $this->_heap[$type][$n] = $class::i();
+            $this->_heap[$type] = null; // make sure key exists
+            if (!empty($this->_registry[$type])) {
+                foreach ($this->_registry[$type] as $n => $class) {
+                    $this->_heap[$type][$n] = $class::i();
+                }
+                uasort($this->_heap[$type], function ($a, $b) {
+                    return $a->getSortOrder() - $b->getSortOrder();
+                });
             }
-            uasort($this->_heap[$type], function($a, $b) { return $a->getSortOrder() - $b->getSortOrder(); });
         }
         return is_null($name) ? $this->_heap[$type] :
             (!empty($this->_heap[$type][$name]) ? $this->_heap[$type][$name] : null);
@@ -75,6 +80,30 @@ class FCom_Sales_Main extends BClass
     public function getDiscountMethods()
     {
         return $this->_getHeap('discount_method');
+    }
+
+
+    public function checkDefaultShippingPayment($args)
+    {
+        $warnings = array();
+        if(!$this->getShippingMethods()){
+            $warnings[] = "shipping";
+        }
+        if(!$this->getPaymentMethods()){
+            $warnings[] = "payment";
+        }
+        if(!empty($warnings)){
+            $msg = "You have to enable at least one module for %s.";
+            $data = array();
+            foreach ($warnings as $type) {
+                $obj =  new stdClass();
+                $obj->text = sprintf($msg, $type);
+                $obj->url = null;
+                $data[] = $obj;
+            }
+
+            $args['modulesNotification']["FCom Sales"] = $data;
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 - $user = FCom_Admin_Model_User::sessionUser();
 - $modulesNotification = array();
-- $this->hook('hook_modules_notification', array('modulesNotification' => &$modulesNotification));
+- $this->hook('notification', array('modulesNotification' => &$modulesNotification));
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 
 
@@ -58,15 +58,17 @@
                             \&nbsp;
                             %em.count = count($modulesNotification)
                     %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-notifications")
-                        - foreach ($modulesNotificationa as $notifyTitle => $notifications)
+                        - foreach ($modulesNotification as $notifyTitle => $notifications)
                             %li
                                 %a(style="text-decoration: none; font-weight: bold; color:black") = strtoupper($notifyTitle)
                         - foreach ($notifications as $notify)
-                            - if ($notify->url)
-                                %li
+                            %li
+                                - if ($notify->url)
                                     %a(href="#{BApp::href($notify->url)}" title="#{$notify->text}") = $notify->module
-                            - else
-                                %li = $notify->module
+                                - else if($notify->text)
+                                    %span = $notify->text
+                                - else
+                                    %span = $notify->module
 
             %li.dropdown
                 %a.dropdown-toggle#utilnav-account(href="#" data-toggle="dropdown" data-target="#")
@@ -86,5 +88,5 @@
         - else
             \&nbsp;
 
-%nav.fcom-admin-nav 
+%nav.fcom-admin-nav
     - echo $this->view('admin/nav')

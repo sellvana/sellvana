@@ -1,7 +1,7 @@
 modules:
     FCom_Sales:
         version: 0.2.3
-        require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0, FCom_ShippingPlain: 0.1.0, FCom_PaymentBasic: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
@@ -19,6 +19,8 @@ modules:
                     - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
                     - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                observe:
+                    - [ BLayout::hook:notification, FCom_Sales_Main.checkDefaultShippingPayment ]
 
             FCom_Api:
                 routing:
@@ -34,5 +36,5 @@ modules:
                     - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
                 observe:
-                    - [ FCom_Customer_Model_Customer::login.after, FCom_Sales_Model_Cart::onUserLogin ]
-                    - [ FCom_Customer_Model_Customer::logout.before, FCom_Sales_Model_Cart::onUserLogout ]
+                    - [ FCom_Customer_Model_Customer::login:after, FCom_Sales_Model_Cart::onUserLogin ]
+                    - [ FCom_Customer_Model_Customer::logout:before, FCom_Sales_Model_Cart::onUserLogout ]
