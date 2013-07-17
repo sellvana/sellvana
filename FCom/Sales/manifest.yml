@@ -19,6 +19,8 @@ modules:
                     - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
                     - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                observe:
+                    - [ BLayout::hook:notification, FCom_Sales_Main.checkDefaultShippingPayment ]
 
             FCom_Api:
                 routing:
