@@ -10,6 +10,8 @@ modules:
             class:
                 - [ BDbModule, FCom_Core_Model_Module ]
         views:
+            - [ head, { view_class: FCom_Core_View_Head } ]
+            - [ bottom_scripts, { view_class: FCom_Core_View_Head } ]
             - [ core/htmlgrid, { view_class: FCom_Core_View_HtmlGrid } ]
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
 
