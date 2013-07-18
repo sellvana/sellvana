@@ -24,4 +24,4 @@ modules:
             FCom_Frontend:
                 auto_use: [ views ]
                 observe:
-                    - [ BLayout::hook.custom-fields-filters, FCom_CustomField_Main.hookCustomFieldFilters ]
+                    - [ BLayout::hook:custom-fields-filters, FCom_CustomField_Main.hookCustomFieldFilters ]

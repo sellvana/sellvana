@@ -10,4 +10,4 @@ modules:
             FCom_Frontend:
                 auto_use: [ bootstrap ]
                 observe:
-                    - [ BLayout::theme.load.after, FCom_Disqus_Frontend::layout ]
+                    - [ BLayout::theme:load.after, FCom_Disqus_Frontend::layout ]

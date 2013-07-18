@@ -11,7 +11,7 @@
             <tr>
                 <td>
                     <label for="#">{{ "First name" |_ }}</label>
-                    <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}'" class="required">
+                    <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}" class="required">
                 </td>
                 <td>
                     <label for="#">{{ "Last name" |_ }}</label>
@@ -41,7 +41,7 @@
                     <input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
                 </td>
                 <td>
-                    {{ $this->view('geo/embed') | raw }}
+                    {{ THIS.view('geo/embed') | raw }}
                     <script>
                         require(['jquery'], function($) {
                             $(function() {
@@ -58,7 +58,7 @@
             </tr>
             <tr>
                 <td>
-                    <label for="#">{{ "Country |_ }}<em class="required">*</em></label>
+                    <label for="#">{{ "Country" |_ }}<em class="required">*</em></label>
                     <select class="geo-country" name="country" id="country" class="required">
                         <option value="">{{ "Select an option" |_ }}</option>
                     </select>

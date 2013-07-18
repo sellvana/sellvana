@@ -3,7 +3,7 @@ modules:
 		version: 0.1.2
 		require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
 		description: "Promotions module"
-        
+
         areas:
             FCom_Admin:
                 auto_use: [ all ]
@@ -24,4 +24,4 @@ modules:
                 observe:
                     - [ FCom_Sales_Model_Cart::calculateTotals, FCom_Promo_Frontend::onPromoCartValidate ]
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ]
-                    - [ BLayout::hook.promotions, FCom_Promo_Frontend_Controller.hook_promotions ]
+                    - [ BLayout::hook:promotions, FCom_Promo_Frontend_Controller.hook_promotions ]

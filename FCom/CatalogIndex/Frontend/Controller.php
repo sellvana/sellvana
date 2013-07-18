@@ -122,14 +122,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $q = BRequest::i()->get('q');
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, null, array('category'=>$category));
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_orm', array('data'=>$productsData['orm']));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', array('data'=>$productsData['orm']));
         $r = BRequest::i()->get();
         $r['sc'] = '';
         $paginated = $productsData['orm']->paginate($r);
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
 
         BApp::i()
             ->set('current_category', $category)
@@ -174,11 +174,11 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $q = BRequest::i()->get('q');
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts();
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_orm', array('data'=>$productsData['orm']));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsData['orm']));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
 
         BApp::i()
             ->set('current_query', $q)

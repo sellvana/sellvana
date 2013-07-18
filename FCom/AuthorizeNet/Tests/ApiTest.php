@@ -8,13 +8,13 @@ class FCom_AuthorizeNet_Tests_ApiTest
     extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var FCom_AuthorizeNet_Api
+     * @var FCom_AuthorizeNet_AimApi
      */
     public $model;
 
     protected function setUp()
     {
-        $this->model = FCom_AuthorizeNet_Api::i(true);
+        $this->model = FCom_AuthorizeNet_AimApi::i(true);
     }
 
     public function testGetApi()
