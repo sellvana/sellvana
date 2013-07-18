@@ -182,7 +182,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     {
         $view = $this->getLayoutView();
         $test = $this;
-        BEvents::i()->on('BEmail::send.after', function($event) use ($view, $test) {
+        BEvents::i()->on('BEmail::send:after', function($event) use ($view, $test) {
             $ed = $event['email_data'];
             $test->assertArrayHasKey('body', $ed);
             $test->assertEquals($ed['body'], $view->render());

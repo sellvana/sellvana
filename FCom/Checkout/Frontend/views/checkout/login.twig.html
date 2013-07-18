@@ -6,11 +6,11 @@
                 <header class="page-title">
                     <h1 class="title">{{ 'Login' |_ }}</h1>
                 </header>
-                {{ $this->messagesHtml() | raw }}
+                {{ THIS.messagesHtml() | raw }}
                 <ul class="form-group">
                     <li class="row-label"><label for="#">{{ "Email" |_ }}</label>
                         <input type="email" name="login[email]" class="required"/></li>
-                    <li class="row-label"><label for="#">{{ "Password") |_ }}</label>
+                    <li class="row-label"><label for="#">{{ "Password" |_ }}</label>
                         <input type="password" name="login[password]" class="required"/></li>
                 </ul>
                 <p class="checkbox-row">
