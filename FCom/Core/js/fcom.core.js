@@ -264,6 +264,8 @@ function($, Backbone, PageableCollection) {
 
         FCom.Backgrid = {};
 
+        //FCom.Backgrid.
+
         FCom.Backgrid.HrefCell = Backgrid.Cell.extend({
           /** @property */
           className: "href-cell",
@@ -353,24 +355,27 @@ function($, Backbone, PageableCollection) {
                     collection.fetch({ reset:true });
                 }
 
-
-                grid.$('thead th').resizable({
-                    handles: 'e',
-                    minWidth: 20,
-                    resize: function(ev, ui) {
-                        grid.$el.get(0).className = grid.$el.get(0).className; //reflow
-                    },
-                    stop: function(ev, ui) {
-                        var $el = ui.element, width = $el.width();
-                        //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
-                        $.post(self.options.personalize_url,
-                            { 'do': 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width },
-                            function(response, status, xhr) {
-                                //console.log(response, status, xhr);
-                            }
-                        )
-                    }
-                });
+                if (true) { // true = jquery-ui resizable, false = colResizable
+                    grid.$('thead th').resizable({
+                        handles: 'e',
+                        minWidth: 20,
+                        resize: function(ev, ui) {
+                            grid.$el.get(0).className = grid.$el.get(0).className; //reflow
+                        },
+                        stop: function(ev, ui) {
+                            var $el = ui.element, width = $el.width();
+                            //$('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
+                            $.post(self.options.personalize_url,
+                                { 'do': 'grid.col.width', grid: self.options.id, col: $el.data('id'), width: width },
+                                function(response, status, xhr) {
+                                    //console.log(response, status, xhr);
+                                }
+                            )
+                        }
+                    });
+                } else { // interferes with dragtable
+                    grid.$el.colResizable();
+                }
 
                 if (true) { // true = jebaird, false = akottr
                     grid.$el.dragtable({
@@ -378,7 +383,9 @@ function($, Backbone, PageableCollection) {
                         appendParent: grid.$el, //jebaird
                         items: 'thead .drag-handle', //jebaird
                         handle: 'drag-handle', //jebaird
-                        change: function() { console.log($('.dragtable-drag-wrapper').html()); },//jebaird
+                        change: function() { //jebaird
+                            //console.log($('.dragtable-drag-wrapper').html());
+                        },
                         stop: function() { //jebaird
                             var cols = [];
                             grid.$('thead th').each(function(i, el) {
@@ -392,7 +399,7 @@ function($, Backbone, PageableCollection) {
                             );
                         }
                     });
-                } else { // akottr looks better and works faster, but interferes with colResizable
+                } else { // akottr looks better and works faster, but interferes with resizable or colResizable
                     grid.$el.dragtable({
                         dragHandle: '.drag-handle', //akottr
                         dragAccept: '', //akottr

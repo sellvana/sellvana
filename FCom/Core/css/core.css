@@ -25,6 +25,7 @@
 
 .fcom-datagrid__actions a { border:solid 1px #AAA; margin: 2px; padding: 2px 5px; }
 
+.backgrid td, .backgrid td { max-width:100px !important; }
 .backgrid th { white-space: nowrap; }
 .backgrid th .drag-handle { visibility:hidden; float:right; background:#888; width:10px; height:10px; margin:2px; }
 .backgrid th:hover .drag-handle { visibility:visible; cursor: move; }

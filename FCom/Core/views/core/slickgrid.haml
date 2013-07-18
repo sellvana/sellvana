@@ -7,7 +7,7 @@
 %div(id="#{$c['id']}")
 
 :javascript
-    require(['jquery', 'fcom.admin', 'jquery.dragtable'], function($) {
+    require(['jquery', 'slick.grid', 'slick.formatters', 'slick.editors'], function($) {
         $(function() {
             var config = #{$this->getBackgridConfigJson()};
             console.log('config', config);

@@ -12,6 +12,7 @@ modules:
         views:
             - [ core/htmlgrid, { view_class: FCom_Core_View_HtmlGrid } ]
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
+            - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
 
         default_config:
             db:
