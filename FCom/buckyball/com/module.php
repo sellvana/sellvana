@@ -119,6 +119,7 @@ class BModuleRegistry extends BClass
 
     public function saveManifestCache()
     {
+        $t = BDebug::debug('SAVE MANIFESTS');
         $cacheFile = BConfig::i()->get('fs/cache_dir').'/manifests.data';
         # file_put_contents($cacheFile, serialize(static::$_modules)); return;
 
@@ -127,6 +128,8 @@ class BModuleRegistry extends BClass
             $data[$modName] = (array)$mod;
         }
         file_put_contents($cacheFile, serialize($data));
+        BDebug::profile($t);
+        return true;
     }
 
     public function loadManifestCache()
@@ -139,6 +142,9 @@ class BModuleRegistry extends BClass
             foreach ($data as $modName => $params) {
                 $this->addModule($modName, $params);
             }
+            return true;
+        } else {
+            return false;
         }
     }
 

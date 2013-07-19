@@ -259,8 +259,11 @@ class FCom_Core_Main extends BClass
         $rootDir = $config->get('fs/root_dir');
 
         if ('STAGING' === $mode || 'PRODUCTION' === $mode) {
-            BModuleRegistry::i()->loadManifestCache();
+            $manifestsLoaded = BModuleRegistry::i()->loadManifestCache();
         } else {
+            $manifestsLoaded = false;
+        }
+        if (!$manifestsLoaded) {
             if (defined('BUCKYBALL_ROOT_DIR')) {
                 $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
@@ -274,9 +277,7 @@ class FCom_Core_Main extends BClass
             foreach ($this->_modulesDirs as $dir) {
                 BModuleRegistry::i()->scan($dir);
             }
-            $t = BDebug::debug('SAVE MANIFESTS');
-            BModuleRegistry::i()->saveManifestCache();
-            BDebug::profile($t);
+            BModuleRegistry::i()->saveManifestCache(); //TODO: call explicitly
         }
 #BDebug::profile($d);
 
