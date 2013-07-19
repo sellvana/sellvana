@@ -23,8 +23,8 @@ class FCom_Admin_Main extends BClass
 
         $ip = BRequest::i()->ip();
         foreach (array('Frontend','Admin') as $area) {
-            if (!empty($args['post']['config']['modules']['FCom_'.$area]['mode_by_ip'])) {
-                $modes =& $args['post']['config']['modules']['FCom_'.$area]['mode_by_ip'];
+            if (!empty($args['post']['config']['mode_by_ip']['FCom_'.$area])) {
+                $modes =& $args['post']['config']['mode_by_ip']['FCom_'.$area];
                 $modes = str_replace('@', $ip, $modes);
                 unset($modes);
             }

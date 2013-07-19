@@ -4,7 +4,7 @@ modules:
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
         observe:
-            - [ 'FCom_Admin_Controller_Settings::action_index__POST', 'FCom_Admin_Main.onSettingsPost' ]
+            - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Main.onSettingsPost ]
 
         default_config:
             modules:
