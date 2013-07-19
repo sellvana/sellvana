@@ -217,17 +217,17 @@ class FCom_Core_Main extends BClass
         $config = BConfig::i();
         $area = BApp::i()->get('area');
 
-        if (BDebug::is('DISABLED')) {
-            BResponse::i()->status('404', 'Page not found', 'Page not found');
-            die;
-        }
-
         $configDir = $config->get('fs/config_dir');
         if (file_exists($configDir.'/core.php')) {
             $config->addFile('core.php', true);
         }
 
         $this->initDebug();
+
+        if (BDebug::is('DISABLED')) {
+            BResponse::i()->status('404', 'Page not found', 'Page not found');
+            die;
+        }
 
         if ($config->get('install_status') === 'installed') {
             $runLevels = array($area => 'REQUIRED');
