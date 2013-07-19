@@ -608,11 +608,14 @@ class BUtil extends BClass
         return $result;
     }
 
-    static public function arrayToOptions(array $source, $labelField, $keyField=null, $emptyLabel=null)
+    static public function arrayToOptions($source, $labelField, $keyField=null, $emptyLabel=null)
     {
         $options = array();
         if (!is_null($emptyLabel)) {
             $options = array("" => $emptyLabel);
+        }
+        if (empty($source)) {
+            return array();
         }
         $isObject = is_object(current($source));
         foreach ($source as $k=>$item) {
