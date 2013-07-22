@@ -3,7 +3,7 @@
 
 <div class="product-view">
     <div class="product-main">
-        <form action="{{ prod.addToCartUrl() }}" method="post" onsubmit="return false;">
+        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="return false;">
             <input type="hidden" name="id" value="{{ prod.id() }}">
             <input type="hidden" name="action" value="add">
             <div class="col-product-shop">

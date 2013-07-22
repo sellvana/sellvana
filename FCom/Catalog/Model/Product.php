@@ -57,11 +57,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
     }
 
-    public function addToCartUrl()
-    {
-        return BApp::href('cart');
-    }
-
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
