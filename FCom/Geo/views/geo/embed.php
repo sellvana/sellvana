@@ -13,7 +13,7 @@ require(['jquery'], function($) {
             var country = opt.country || '';
             var region = opt.region || '';
             var regionDefHtml = $regionSelect.html();
-            for (i in geoCountries) {
+            for (var i in geoCountries) {
                 $country.append($('<option>').val(i).text(geoCountries[i]));
             }
             $country.val(country);

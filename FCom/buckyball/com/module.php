@@ -64,10 +64,12 @@ class BModuleRegistry extends BClass
     }
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BModuleRegistry
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BModuleRegistry
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
@@ -157,6 +159,7 @@ class BModuleRegistry extends BClass
     * @see BApp::i()->load() for examples
     *
     * @param string $source
+    * @return BModuleRegistry
     */
     public function scan($source)
     {
