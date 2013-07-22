@@ -11,6 +11,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public $addresses;
     public $items;
     public $totals;
+    protected $shipping_method;
 
     static public function sessionCartId($id=BNULL)
     {
@@ -294,11 +295,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$this->customer_id && FCom_Customer_Model_Customer::i()->isLoggedIn()) {
             $this->customer_id = FCom_Customer_Model_Customer::i()->sessionUserId();
         }
-        if (!$this->shipping_method) {
-            $this->shipping_method = BConfig::i()->get('modules/FCom_Sales/default_shipping_method');
-            $services = $this->getShippingMethod()->getDefaultService();
+        $shippingMethod = $this->getShippingMethod();
+        if ($shippingMethod) {
+            $services = $shippingMethod->getDefaultService();
             $this->shipping_service = key($services);
+        } else {
+            throw new BException("No shipping methods configured.");
         }
+
         if (!$this->payment_method) {
             $this->payment_method = BConfig::i()->get('modules/FCom_Sales/default_payment_method');
         }
@@ -373,7 +377,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getShippingMethod()
     {
         if (!$this->shipping_method) {
-            return null;
+            $shippingMethod = BConfig::i()->get('modules/FCom_Sales/default_shipping_method');
+            if(!$shippingMethod){
+                return null;
+            }
+            $this->shipping_method = $shippingMethod;
         }
         $methods = FCom_Sales_Main::i()->getShippingMethods();
         return $methods[$this->shipping_method];

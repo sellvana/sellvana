@@ -3,8 +3,9 @@
 
 <div class="product-view">
     <div class="product-main">
-        <form action="" method="post" onsubmit="return false;">
+        <form action="{{ prod.addToCartUrl() }}" method="post" onsubmit="return false;">
             <input type="hidden" name="id" value="{{ prod.id() }}">
+            <input type="hidden" name="action" value="add">
             <div class="col-product-shop">
                 <h1 class="product-name"
                     {{ THIS.view('frontendcp/editable', { type:'simple', entity:'product', id:prod.id(), field:'product_name' }) | raw }}
