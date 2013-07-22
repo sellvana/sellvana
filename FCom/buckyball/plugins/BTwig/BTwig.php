@@ -46,6 +46,10 @@ class BTwig extends BClass
         static::$_stringLoader = new Twig_Loader_String();
         static::$_stringTwig = new Twig_Environment(static::$_stringLoader, $options);
 
+        if ($options['debug']) {
+            static::$_fileTwig->addExtension(new Twig_Extension_Debug());
+            static::$_stringTwig->addExtension(new Twig_Extension_Debug());
+        }
         $i18nFilter = new Twig_SimpleFilter('_', 'BLocale::_');
         static::$_fileTwig->addFilter($i18nFilter);
         static::$_stringTwig->addFilter($i18nFilter);
