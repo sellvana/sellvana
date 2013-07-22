@@ -11,7 +11,7 @@
         <header class="page-title">
             <h1 class="title">{{ "Shopping Cart" |_ }}</h1>
         </header>
-        <form name="cart" action="{{ APP.href('cart') }}" method="post">
+        <form name="cart" action="{{ APP.href('cart/add') }}" method="post">
             <table>
                 <col width="30"/>
                 <col width="60"/>
@@ -68,12 +68,12 @@
             </table>
         </form>
         <section class="col2-set sub-cart">
-            <form action="{{ APP.href('cart') }}" method="post" class="col first">
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col first">
                 <header>{{ "Promo Code" |_ }}</header>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 <p><input type="text"/><button class="button btn-aux"><span>{{ "Submit" |_ }}</span></button></p>
             </form>
-            <form action="{{ APP.href('cart') }}" method="post" class="col last">
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col last">
                 <header>{{ "Shipping Estimate" |_ }}</header>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 {% if (shipping_estimates) %}
