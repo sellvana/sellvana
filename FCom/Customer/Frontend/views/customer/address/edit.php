@@ -17,11 +17,11 @@
         })
     </script>
     <label for="#"><?= BLocale::_("Country") ?><em class="required">*</em></label>
-    <select class="geo-country" name="country" id="country">
+    <select class="geo-country select2" name="country" id="country">
         <option value=""><?= BLocale::_("Select an option") ?></option>
     </select>
 
-    <select class="geo-region required" name="region" >
+    <select class="geo-region required select2" name="region" id="region">
         <option value=""><?= BLocale::_("Select an option") ?></option>
     </select>
     <input type="text" class="geo-region" name="region" />
