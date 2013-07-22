@@ -1,3 +1,5 @@
+<pre>{{ dump(THIS) }}</pre>
+
 <form action="{{ APP.href('checkout/address') }}" method="post" class="address-form" id="address-form">
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
