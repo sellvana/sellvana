@@ -8,6 +8,8 @@ require(['jquery'], function($) {
             opt = opt || {};
             var $country = this;
             var $regionSelect = $(opt.regionSelectEl || 'select.geo-region');
+            var $regionSelect2 = $('#s2id_' + $regionSelect.attr('id') );
+            console.log($regionSelect2);
             var regionLeave = $('option', $regionSelect).length;
             var $regionInput = $(opt.regionInputEl || 'input.geo-region');
             var country = opt.country || '';
@@ -28,8 +30,10 @@ require(['jquery'], function($) {
                     }
                     $regionSelect.val(region);
                     $regionSelect.show().removeAttr('disabled');
+                    $regionSelect2.show();
                     $regionInput.hide().attr('disabled', 'disabled');
                 } else {
+                    $regionSelect2.hide();
                     $regionSelect.hide().attr('disabled', 'disabled');
                     $regionInput.show().removeAttr('disabled');
                 }

@@ -15,13 +15,14 @@ base:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
+      - [ css, @FCom_Core/css/bootstrap.min.css ]
       - [ css, @FCom_Admin/compass/css/screen.css ]
       #- [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
       #- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
       #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
       #- [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
       - [ css, @FCom_Core/js/select2/select2.css ]
-      - [ css, @FCom_Core/css/core.css ]
+      - [ css, @FCom_Core/css/fcom.core.css ]
       - [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
       #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
       #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
@@ -39,7 +40,6 @@ base:
       # highcharts
       - [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
 
-      - [ requireJs, bootstrap, @FCom_Admin/compass/js/bootstrap.min, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/js/fcom.admin ]
