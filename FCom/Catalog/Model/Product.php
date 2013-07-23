@@ -33,7 +33,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public static function stockStatusOptions($onlyAvailable=false)
     {
-        $options = $this->fieldOptions('stock_status');
+        $options = static::fieldOptions('stock_status');
         if ($onlyAvailable) {
             return BUtil::arrayMask($options, 'in_stock,backorder,special_order');
         }
@@ -55,11 +55,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function thumbUrl($w, $h=null, $full=false)
     {
         return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
-    }
-
-    public function addToCartUrl()
-    {
-        return BApp::href('cart');
     }
 
     public function onBeforeSave()
