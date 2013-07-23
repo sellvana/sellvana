@@ -15,7 +15,7 @@ base:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
-      - [ css, @FCom_Core/css/bootstrap.min.css ]
+      #- [ css, @FCom_Core/css/bootstrap.min.css ]
       - [ css, @FCom_Admin/compass/css/screen.css ]
       #- [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
       #- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
