@@ -55,8 +55,7 @@
                         %span.icon-bell
                         %span.title
                             = $this->_('Notifications')
-                            \&nbsp;
-                            %em.count = count($modulesNotification)
+                        %span.badge.badge-warning = count($modulesNotification)
                     %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-notifications")
                         - foreach ($modulesNotification as $notifyTitle => $notifications)
                             %li
