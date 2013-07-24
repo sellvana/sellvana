@@ -11,7 +11,7 @@ base:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
             - [ icon, @FCom_Core/favicon.ico ]
 
-            - [ css, @FCom_Frontend/compass/css/screen.css ]
+            #- [ css, @FCom_Frontend/compass/css/screen.css ]
 
             - [ css, @FCom_Frontend/css/boilerplate_pre.css ]
 

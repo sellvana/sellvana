@@ -1,13 +1,21 @@
-- $c = $this->grid['config'];
+{% $c = $this->grid['config'] %}
 
-#backgrid-toolbar-template(style="display:none")
-    %div
+<script id="backgrid-toolbar-template" type="text/template">
+    <div class="row">
+        <div class="span6">
+            <label>
+                <select>
+                    <option></option>
+                </select>
+            </label>
+        </div>
+    </div>
+</script>
 
+<div id="{{ $c['id'] }}"></div>
 
-%div(id="#{$c['id']}")
-
-:javascript
-    require(['jquery', 'fcom.admin', 'jquery.dragtable'/*, 'jquery.colResizable'*/], function($) {
+<script>
+    require(['jquery', 'fcom.admin', 'jquery.dragtable'/*, 'jquery.colResizable'*/, 'fcom.backgrid.toolbar'], function($) {
         $(function() {
             var config = #{$this->getBackgridConfigJson()};
             console.log('config', config);
@@ -28,3 +36,4 @@
             */
         });
     })
+</script>
