@@ -123,7 +123,7 @@
                 <label for="#">{{ "Create an account?" |_ }}</label>
                 <input type="checkbox" name="create_account" value="1" class="required"><br/>
                 <label for="#">{{ 'E-mail' |_ }}</label>
-                <input type="text" name="account[email]" value="<?=$this->billing_address->email?>" class="required"><br/>
+                <input type="text" name="account[email]" value="{{ THIS.billing_address.email }}" class="required"><br/>
                 <label for="#">{{ "Password" |_ }}</label>
                 <input type="password" name="account[password]" class="required" id="model-password"/><br/>
                 <label for="#">{{ "Confirm Password" |_ }}</label>
