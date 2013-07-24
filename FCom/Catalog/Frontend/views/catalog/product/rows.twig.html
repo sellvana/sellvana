@@ -1,6 +1,6 @@
 {% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
 {% set priceView = THIS.view('catalog/product/price') %}
-{% set addToCartUrl = THIS.url('cart') %}
+{% set addToCartUrl = THIS.url('cart/add') %}
 {% for p in THIS.get('products') %}
 <tr class="item" id="tr-product-{{ p.id() }}">
     <td>
