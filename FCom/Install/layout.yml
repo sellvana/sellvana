@@ -1,11 +1,12 @@
 base:
-    - { include: common_js_libs }
     - { hook: head, views: head }
 
     - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+    - { include: common_js_libs }
 
     - view: head
         do:
+            - [ css, @FCom_Core/css/bootstrap.min.css ]
             - [ css, @FCom_Install/css/styles.css ]
             - [ requireRun, fcom.core ]
 
