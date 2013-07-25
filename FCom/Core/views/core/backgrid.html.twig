@@ -1,4 +1,4 @@
-{% $c = $this->grid['config'] %}
+{% set c = THIS.grid['config'] %}
 
 <script id="backgrid-toolbar-template" type="text/template">
     <div class="row">
@@ -12,15 +12,15 @@
     </div>
 </script>
 
-<div id="{{ $c['id'] }}"></div>
+<div id="{{ c['id'] }}"></div>
 
 <script>
     require(['jquery', 'fcom.admin', 'jquery.dragtable'/*, 'jquery.colResizable'*/, 'fcom.backgrid.toolbar'], function($) {
         $(function() {
-            var config = #{$this->getBackgridConfigJson()};
+            var config = {{ THIS.getBackgridConfigJson() | raw }}
             console.log('config', config);
             var grid = new FCom.BackgridView(config);
-            var $container = $("##{$c['id']}");
+            var $container = $("#{{ c['id'] }}");
             console.log('grid', grid);
             grid.render();
             $container.prepend($('#backgrid-toolbar-template').html());

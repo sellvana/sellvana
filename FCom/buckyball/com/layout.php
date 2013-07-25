@@ -191,7 +191,7 @@ class BLayout extends BClass
             static::$_extRenderers[$ext] = $params;
         }
         static::$_extRegex = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
-        BDebug::debug('ADD RENDERER: '.$ext);
+        BDebug::debug('ADD RENDERER: '.join('; ', $params['file_ext']));
         return $this;
     }
 
@@ -580,7 +580,7 @@ class BLayout extends BClass
                 $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
             }
         }
-        $this->afterTheme(function() use($layoutFilename) {
+        $this->onAfterTheme(function() use($layoutFilename) {
             BLayout::i()->loadLayout($layoutFilename);
         });
         return $this;
@@ -641,6 +641,9 @@ class BLayout extends BClass
                             break;
                         }
                     }
+                }
+                if (empty($d['type'])) {
+                    BDebug::dump($d);
                 }
             }
             $d['type'] = trim($d['type']);
@@ -850,23 +853,41 @@ class BLayout extends BClass
             foreach ($themeName as $n) {
                 $this->applyTheme($n);
             }
-
             return $this;
         }
+        BDebug::debug('THEME.APPLY ' . $themeName);
+        BEvents::i()->fire('BLayout::applyTheme:before', array('theme_name' => $themeName));
+        $this->loadTheme($themeName);
+        BEvents::i()->fire('BLayout::applyTheme:after', array('theme_name' => $themeName));
+
+        return $this;
+    }
+
+    public function loadTheme($themeName)
+    {
         if (empty($this->_themes[$themeName])) {
-            BDebug::error('Invalid theme name: ' . $themeName);
-
-            return $this;
+            BDebug::warning('Invalid theme name: ' . $themeName);
+            return false;
         }
-        $area = BApp::i()->get('area');
-        if (!empty($params['area']) && !in_array($area, (array)$params['area'])) {
-            BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
 
-            return $this;
-        }
-        BDebug::debug('THEME.LOAD ' . $themeName);
         $theme = $this->_themes[$themeName];
-        BEvents::i()->fire('BLayout::theme:load.before', array('theme_name' => $themeName));
+
+        $area = BApp::i()->get('area');
+        if (!empty($theme['area']) && !in_array($area, (array)$theme['area'])) {
+            BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
+            return false;
+        }
+
+        if (!empty($theme['parent'])) {
+            foreach ((array)$theme['parent'] as $parentThemeName) {
+                if ($this->loadTheme($parentThemeName)) {
+                    break; // load the first available parent theme
+                }
+            }
+        }
+
+        BEvents::i()->fire('BLayout::loadTheme:before', array('theme_name' => $themeName, 'theme' => $theme));
+
         $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir.'/' : '';
         if (!empty($theme['layout'])) {
             BLayout::i()->loadLayout($modRootDir.$theme['layout']);
@@ -877,9 +898,10 @@ class BLayout extends BClass
         if (!empty($theme['callback'])) {
             BUtil::i()->call($theme['callback']);
         }
-        BEvents::i()->fire('BLayout::theme:load.after', array('theme_name' => $themeName));
 
-        return $this;
+        BEvents::i()->fire('BLayout::loadTheme:after', array('theme_name' => $themeName, 'theme' => $theme));
+
+        return true;
     }
 
     /**
@@ -887,9 +909,9 @@ class BLayout extends BClass
      * @param $callback
      * @return $this
      */
-    public function afterTheme($callback)
+    public function onAfterTheme($callback)
     {
-        BEvents::i()->on('BLayout::theme:load.after', $callback);
+        BEvents::i()->on('BLayout::applyTheme:after', $callback);
 
         return $this;
     }

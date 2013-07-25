@@ -13,9 +13,6 @@
                             %select(name="config[modules][FCom_Frontend][theme]")
                                 - echo BUtil::optionsHtml(BLayout::i()->getThemes('FCom_Frontend', true), $c->get('modules/FCom_Frontend/theme'))
                     .control-group
-                        %label.control-label = $this->_('Theme')
-                        .controls
-                    .control-group
                         %label.control-label = $this->_('Additional JS Files')
                         .controls
                             %textarea(name="config[modules][FCom_Frontend][add_js_files]"

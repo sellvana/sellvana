@@ -1,0 +1,27 @@
+{% set w = SESSION.data('w') %}
+<h1>Step 3</h1>
+<form class="wizard" method="post" action="{{APP.href('install/step3')}}">
+
+    <fieldset>
+        <h3>Initial configuration</h3>
+        {{ THIS.messagesHtml() |raw }}
+<!--
+        <label for="config-run_mode_admin">Run Mode for Admin:</label>
+        <select id="config-run_mode_admin" name="w[config][run_mode_admin]" value="{{w.config.run_mode_admin}}">
+        </select>
+
+        <label for="config-run_mode_frontend">Run Mode for Frontend:</label>
+        <input type="text" id="config-run_mode_frontend" name="w[config][run_mode_frontend]" value="{{w.config.run_mode_frontend}}"/><br/>
+
+        <label for="config-run_levels_bundle">Run Levels Bundle:</label>
+        <input type="text" id="config-run_levels_bundle" name="w[config][run_levels_bundle]" value="{{w.config.run_levels_bundle}}"/><br/>
+
+        <label for="config-username">User name:</label>
+        <input type="text" id="config-username" name="w[config][username]" value="{{w.config.username}}"/><br/>
+
+        <label for="config-password">Password:</label>
+        <input type="password" id="config-password" name="w[config][password]" value="{{w.config.password}}"/><br/>
+-->
+        <button type="submit">Proceed to the next step</button>
+    </fieldset>
+</form>
