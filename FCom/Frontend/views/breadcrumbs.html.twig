@@ -1,0 +1,14 @@
+{% if THIS.getCrumbs() %}
+    <ul class="breadcrumb">
+{% for c in THIS.getCrumbs() %}
+        <li {{ c.li_class ? 'class="#{ c.li_class }"' : '' }}>
+{% if c.href %}
+            <a href="{{ c.href }}" {{ c.title ? 'title="#{ c.title }"' : ''}}>{{ c.label }}</a>
+            <span class="divider">/</span>
+{% else %}
+            <strong>{{ c.label }}</strong>
+{% endif %}
+        </li>
+{% endfor %}
+    </ul>
+{% endif %}

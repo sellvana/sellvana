@@ -17,7 +17,7 @@ class BTwig extends BClass
         BLayout::i()->addRenderer('BTwig', array(
             'description' => 'Twig (HTML)',
             'callback' => 'BTwig::renderer',
-            'file_ext' => array('.twig', '.twig.html', '.html.twig'),
+            'file_ext' => array('.html.twig', '.twig.html'),
         ));
 
         BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
