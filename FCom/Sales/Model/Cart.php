@@ -400,78 +400,15 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $cart = $this->orm ? $this : static::sessionCart();
         /* @var $cart FCom_Sales_Model_Cart */
-
-        $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
-        $shippingMethod = $shippingMethods[$cart->shipping_method];
-        $shippingServiceTitle = '';
-        if (is_object($shippingMethod)) {
-            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
-        }
-        //todo: create order
-        //redirect to payment page
-        $orderData = array();
-        $orderData['cart_id'] = $cart->id();
-        $orderData['customer_id'] = $cart->customer_id;
-        $orderData['item_qty']  = $cart->item_qty;
-        $orderData['subtotal']  = $cart->subtotal;
-        $orderData['shipping_method'] = $cart->shipping_method;
-        $orderData['shipping_service'] = $cart->shipping_service;
-        $orderData['shipping_service_title'] = $shippingServiceTitle;
-        $orderData['payment_method'] = $cart->payment_method;
-        $orderData['payment_details'] = $cart->payment_details;
-        $orderData['coupon_code'] = $cart->coupon_code;
-        $orderData['tax'] = $cart->tax;
-        $orderData['total_json'] = $cart->total_json;
-        $orderData['balance'] = $cart->grand_total - $cart->discount; //grand total minus discount, which have to be paid
-        $orderData['gt_base'] = $cart->grand_total; //full grand total
-        $orderData['created_dt'] = BDb::now();
-
-        //create sales order
-        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
-        if ($salesOrder) {
-            $salesOrder->update($orderData);
-        } else {
-            $salesOrder = FCom_Sales_Model_Order::i()->addNew($orderData);
-        }
-        //copy order items
-        foreach ($cart->items() as $item) {
-            /* @var $item FCom_Sales_Model_Cart_Item */
-            $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
-            if (!$product) {
-                continue;
-            }
-            $orderItem = array();
-            $orderItem['order_id'] = $salesOrder->id();
-            $orderItem['product_id'] = $item->product_id;
-            $orderItem['qty'] = $item->qty;
-            $orderItem['total'] = $item->rowTotal();
-            $orderItem['product_info'] = BUtil::toJson($product->as_array());
-
-            $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($salesOrder->id(), $item->product_id);
-            if ($testItem) {
-                $testItem->update($orderItem);
-            } else {
-                FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
-            }
+        $salesOrder = FCom_Sales_Model_Order::i();
+        try {
+            $salesOrder->createFromCart($cart);
+            $cart->set('status', 'ordered')->save();
+        } catch (Exception $e) {
+            // if something failed, like bad payment method
+            // set some error message in session and do nothing
         }
 
-        //copy addresses
-        $shippingAddress = $cart->getAddressByType('shipping');
-        if ($shippingAddress) {
-            FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $shippingAddress);
-        }
-        $billingAddress = $cart->getAddressByType('billing');
-        if ($billingAddress) {
-            FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $billingAddress);
-        }
-
-        //Made payment
-        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
-        if (is_object($paymentMethods[$cart->payment_method])) {
-            $paymentMethods[$cart->payment_method]->payOnCheckout();
-        }
-
-        $cart->set('status', 'ordered')->save();
         return $salesOrder;
     }
 
