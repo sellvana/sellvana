@@ -61,7 +61,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         return FCom_Sales_Model_Order_Status::i()->orm()->where('id', $this->status_id)->find_one();
     }
-    
+
 
     /**
      * Return total UNIQUE number of items in the order
@@ -153,6 +153,97 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $data['coupon_code'] = $post['coupon_code'];
         }
         return $data;
+    }
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @param array $options
+     */
+    public function createFromCart($cart, $options = array())
+    {
+        $shippingMethod       = $cart->getShippingMethod();
+        $shippingServiceTitle = '';
+        if (is_object($shippingMethod)) {
+            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
+        }
+        $orderData                           = array();
+        $orderData['cart_id']                = $cart->id();
+        $orderData['customer_id']            = $cart->customer_id;
+        $orderData['item_qty']               = $cart->item_qty;
+        $orderData['subtotal']               = $cart->subtotal;
+        $orderData['shipping_method']        = $cart->shipping_method;
+        $orderData['shipping_service']       = $cart->shipping_service;
+        $orderData['shipping_service_title'] = $shippingServiceTitle;
+        $orderData['payment_method']         = $cart->payment_method;
+        $orderData['payment_details']        = $cart->payment_details;
+        $orderData['coupon_code']            = $cart->coupon_code;
+        $orderData['tax']                    = $cart->tax;
+//        $orderData['total_json']             = $cart->total_json;
+        $orderData['balance']                = $cart->grand_total; //grand total minus discount, which have to be paid
+        $orderData['gt_base']                = $cart->grand_total; //full grand total
+        $orderData['created_dt']             = BDb::now();
+
+        //create sales order
+        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+        if ($salesOrder) {
+            $salesOrder->update($orderData);
+        } else {
+            $salesOrder = FCom_Sales_Model_Order::i()->addNew($orderData);
+        }
+        //copy order items
+        foreach ($cart->items() as $item) {
+            if (!$this->itemAllowed($options, $item)) {
+                continue;
+            }
+            /* @var $item FCom_Sales_Model_Cart_Item */
+            $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
+            if (!$product) {
+                continue;
+            }
+            $orderItem                 = array();
+            $orderItem['order_id']     = $salesOrder->id();
+            $orderItem['product_id']   = $item->product_id;
+            $orderItem['qty']          = $item->qty;
+            $orderItem['total']        = $item->rowTotal();
+            $orderItem['product_info'] = BUtil::toJson($product->as_array());
+
+            $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($salesOrder->id(), $item->product_id);
+            if ($testItem) {
+                $testItem->update($orderItem);
+            } else {
+                FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+            }
+        }
+
+        //copy addresses
+        $shippingAddress = $cart->getAddressByType('shipping');
+        if ($shippingAddress) {
+            FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $shippingAddress);
+        }
+        $billingAddress = $cart->getAddressByType('billing');
+        if ($billingAddress) {
+            FCom_Sales_Model_Order_Address::i()->newAddress($salesOrder->id(), $billingAddress);
+        }
+
+        //Made payment
+        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
+        if (is_object($paymentMethods[$cart->payment_method])) {
+            $paymentMethods[$cart->payment_method]->payOnCheckout();
+        }
+    }
+
+    private function itemAllowed($options, $item)
+    {
+        if(isset($options['items'])){
+            foreach ($options['items'] as $i) {
+                if($i['id'] == $item->id){
+                    return true; // item id matches
+                }
+            }
+            return false; // item is not with passed filter
+        }
+
+        return true; // no items filter passed
     }
 
 }
