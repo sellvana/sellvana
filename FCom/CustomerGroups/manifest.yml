@@ -8,6 +8,6 @@ modules:
             FCom_Admin:
                 auto_use: all
                 routing:
-                    - [ GET, /customer-groups, FCom_CustomerGroups_Admin_Controller_CustomerGroups.index ]
+                    - [ get, /customer-groups, FCom_CustomerGroups_Admin_Controller_CustomerGroups.index ]
                     - [ any, /customer-groups/.action, FCom_CustomerGroups_Admin_Controller_CustomerGroups ]
                     - [ any, /tier-prices/.action, FCom_CustomerGroups_Admin_Controller_TierPrices ]

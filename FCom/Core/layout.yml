@@ -22,10 +22,11 @@ common_js_libs:
             - [ requireJs, underscore, @FCom_Core/js/lib/underscore.min, { exports: _ } ]
             - [ requireJs, bacon, @FCom_Core/js/lib/bacon.min, { exports: Bacon } ]
             - [ requireJs, backbone, @FCom_Core/js/lib/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
+            - [ requireJs, backbone.modelbinder, @FCom_Core/js/lib/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
             - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ Backbone ], exports: Backbone.Marionette } ]
             - [ requireJs, backbone-pageable, @FCom_Core/js/lib/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
 
-            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap.min, { deps: [ jquery ] } ]
+            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
             - [ requireJs, jquery.bootstrap-growl, @FCom_Core/js/lib/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
             #- [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source.js, { deps: [ jquery ] } ]
@@ -36,6 +37,13 @@ common_js_libs:
             - [ requireJs, angular, //ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min, { deps: [ jquery ], exports: angular } ]
 
             - [ requireJs, fcom.core, @FCom_Core/js/fcom.core ]
+
+            - [ requireJs, backgrid, @FCom_Core/js/lib/backgrid/backgrid, { deps: [ backbone ], exports: Backgrid } ]
+            - [ requireJs, backgrid-filter, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter, { deps: [ backgrid ] } ]
+            - [ requireJs, backgrid-paginator, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator, { deps: [ backgrid, backbone-pageable ] } ]
+            - [ requireJs, backgrid-select-all, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all, { deps: [ backgrid ] } ]
+            - [ requireJs, backgrid-moment-cell, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell, { deps: [ backgrid, moment ] } ]
+            - [ requireJs, fcom.backgrid.toolbar, @FCom_Core/js/fcom.backgrid.toolbar ]
 
 lib_backgrid:
     - view: head
@@ -48,12 +56,6 @@ lib_backgrid:
             - [ css, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all.css ]
             - [ css, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell.css ]
 
-            - [ requireJs, backgrid, @FCom_Core/js/lib/backgrid/backgrid, { deps: [ backbone ], exports: Backgrid } ]
-            - [ requireJs, backgrid-filter, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter, { deps: [ backgrid ] } ]
-            - [ requireJs, backgrid-paginator, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator, { deps: [ backgrid, backbone-pageable ] } ]
-            - [ requireJs, backgrid-select-all, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all, { deps: [ backgrid ] } ]
-            - [ requireJs, backgrid-moment-cell, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell, { deps: [ backgrid, moment ] } ]
-            - [ requireJs, fcom.backgrid.toolbar, @FCom_Core/js/fcom.backgrid.toolbar ]
 
 
 lib_slickgrid:

@@ -8,7 +8,7 @@ modules:
             FCom_Admin:
                 auto_use: all
                 routing:
-                    - [ GET, /market, FCom_MarketClient_Admin_Controller.index ]
+                    - [ get, /market, FCom_MarketClient_Admin_Controller.index ]
                     - [ any, /market/.action, FCom_MarketClient_Admin_Controller ]
                 observe:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
