@@ -2,12 +2,22 @@
 
 <script id="backgrid-toolbar-template" type="text/template">
     <div class="row">
-        <div class="span6">
+        <div class="span4">
             <label>
                 <select>
                     <option></option>
                 </select>
             </label>
+        </div>
+        <div class="span4">
+            <a href="#">&laquo;</a>
+            <select>
+                <option></option>
+            </select>
+            <a href="#">&raquo;</a>
+        </div>
+        <div class="span4">
+
         </div>
     </div>
 </script>
@@ -15,15 +25,14 @@
 <div id="{{ c['id'] }}"></div>
 
 <script>
-    require(['jquery', 'fcom.admin', 'jquery.dragtable'/*, 'jquery.colResizable'*/, 'fcom.backgrid.toolbar'], function($) {
+    require(['jquery', 'fcom.core', 'jquery.dragtable'/*, 'jquery.colResizable'*/], function($) {
         $(function() {
             var config = {{ THIS.getBackgridConfigJson() | raw }}
-            console.log('config', config);
+            //console.log('config', config);
             var grid = new FCom.BackgridView(config);
             var $container = $("#{{ c['id'] }}");
-            console.log('grid', grid);
+            //console.log('grid', grid);
             grid.render();
-            $container.prepend($('#backgrid-toolbar-template').html());
             /*
             var $thead = $container.find('.backgrid thead');
             var $copy = $thead.clone(true).css({position:'fixed', top:0, left: $thead.offset().left});
