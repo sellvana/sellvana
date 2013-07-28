@@ -1,6 +1,6 @@
 {% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
 {% set priceView = THIS.view('catalog/product/price') %}
-{% set addToCartUrl = THIS.url('cart') %}
+{% set addToCartUrl = THIS.url('cart/add') %}
 {% for p in THIS.get('products') %}
 <tr class="item" id="tr-product-{{ p.id() }}">
     <td>
@@ -29,7 +29,7 @@
             <input type="hidden" name="id" value="{{ p.id() }}">
             <input type="hidden" name="action" value="add"/>
             <input type="hidden" name="qty" value="1"/>
-            <button class="button btn-add-to-cart" onclick="FCom.cart.add({{ p.id() }}, 1)"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
+            <button type="submit" class="button btn btn-add-to-cart" onclick="FCom.cart.add({{ p.id() }}, 1); return false"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
         </form>
         <label for="wishlist-{{ p.id() }}" class="checkbox">
           <input type="checkbox" id="wishlist-{{ p.id() }}"/> {{ 'Wishlist' |_ }}</label>

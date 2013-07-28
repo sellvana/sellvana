@@ -1009,12 +1009,19 @@ class BResponse extends BClass
 
     /**
     * Send json data as a response (for json API implementation)
+    * 
+    * Supports JSON-P
     *
     * @param mixed $data
     */
     public function json($data)
     {
-        $this->setContentType('application/json')->set(BUtil::toJson($data))->render();
+        $response = BUtil::toJson($data);
+        $callback = BRequest::i()->get('callback');
+        if ($callback) {
+            $response = $callback.'('.$response.')';
+        }
+        $this->setContentType('application/json')->set($response)->render();
     }
 
     public function fileContentType($fileName)

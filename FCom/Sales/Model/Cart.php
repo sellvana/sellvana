@@ -399,6 +399,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function placeOrder()
     {
         $cart = $this->orm ? $this : static::sessionCart();
+        /* @var $cart FCom_Sales_Model_Cart */
 
         $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
         $shippingMethod = $shippingMethods[$cart->shipping_method];
@@ -421,8 +422,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $orderData['coupon_code'] = $cart->coupon_code;
         $orderData['tax'] = $cart->tax;
         $orderData['total_json'] = $cart->total_json;
-        $orderData['balance'] = $cart->calc_balance; //grand total minus discount, which have to be paid
-        $orderData['gt_base'] = $cart->calc_balance; //full grand total
+        $orderData['balance'] = $cart->grand_total - $cart->discount; //grand total minus discount, which have to be paid
+        $orderData['gt_base'] = $cart->grand_total; //full grand total
         $orderData['created_dt'] = BDb::now();
 
         //create sales order
@@ -434,6 +435,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         //copy order items
         foreach ($cart->items() as $item) {
+            /* @var $item FCom_Sales_Model_Cart_Item */
             $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
             if (!$product) {
                 continue;
