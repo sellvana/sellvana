@@ -2,8 +2,8 @@
 {% set cat = THIS.get('category') %}
 
 <div class="product-view">
-    <div class="product-main">
-        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="return false;">
+    <div class="product-main clearfix">
+        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="return false;" >
             <input type="hidden" name="id" value="{{ prod.id() }}">
             <input type="hidden" name="action" value="add">
             <div class="col-product-shop">
@@ -52,19 +52,18 @@
                     </ul>
                 </div>
             </div>
-            <div class="clearer"></div>
         </form>
     </div>
     <div class="product-more-info">
-        <ul class="tabs">
-            <li><a href="#overview">{{ "Overview" |_ }}</a></li>
-            <li><a href="#specifications">{{ "Specifications" |_ }}</a></li>
-            <li><a href="#similar">{{ "Similar Products" |_ }}</a></li>
-            <li><a href="#accessories">{{ "Accessories" |_ }}</a></li>
-            <li><a href="#reviews">{{ "Reviews" |_ }}</a></li>
+        <ul class="nav nav-tabs">
+            <li><a href="#overview" data-toggle="tab">{{ "Overview" |_ }}</a></li>
+            <li><a href="#specifications" data-toggle="tab">{{ "Specifications" |_ }}</a></li>
+            <li><a href="#similar" data-toggle="tab">{{ "Similar Products" |_ }}</a></li>
+            <li><a href="#accessories" data-toggle="tab">{{ "Accessories" |_ }}</a></li>
+            <li><a href="#reviews" data-toggle="tab">{{ "Reviews" |_ }}</a></li>
         </ul>
-        <div class="panes">
-            <div class="tab-content tab-overview">
+        <div class="tab-content">
+            <div class="tab-pane tab-overview">
                 <header>{{ "Overview" |_ }}</header>
                     Tray Acrylic Material
 
@@ -72,10 +71,10 @@
 
                     3 lb package contains: 3 lbs powder, 16oz liquid.
             </div>
-            <div class="tab-content tab-specifications">
+            <div class="tab-pane tab-specifications">
                 <header>{{ "Specifications" |_ }}</header>
             </div>
-            <div class="tab-content tab-similar-products">
+            <div class="tab-pane tab-similar-products">
                 <header>{{ "Similar Products" |_ }}</header>
                 <table class="product-list">
                     <colgroup><col width="30">
@@ -87,7 +86,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="tab-content tab-accessories">
+            <div class="tab-pane tab-accessories">
                 <header>{{ "Accessories" |_ }}</header>
                 <table class="product-list">
                     <colgroup><col width="30">
@@ -99,7 +98,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="tab-content tab-reviews">
+            <div class="tab-pane tab-reviews">
                 <header>{{ "Reviews" |_ }}</header>
                 {{ THIS.hook('prodreviews-reviews', {'product': prod}) | raw }}
             </div>
@@ -109,7 +108,6 @@
 <script>
 require(['jquery', 'bootstrap'], function($) {
     $(function() {
-        // setup ul.tabs to work as tabs for each div directly under div.panes
         $(".tabs").tabs("div.panes > div");
     });
 })

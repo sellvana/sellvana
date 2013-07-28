@@ -1,6 +1,7 @@
 {% set category = APP.get('current_category') %}
-<header class="page-title category-title">
-    <h1 class="title" {{ THIS.view('frontendcp/editable', { type:'simple', entity:'category', id:category.id(), field:'node_name', no_debug:true }) | raw }} >
-    {{ category.get('node_name') }}</h1>
+<header class="main-title">
+  <h1 class="title" {{ THIS.view('frontendcp/editable', { type:'simple', entity:'category', id:category.id(), field:'node_name', no_debug:true }) | raw }} >
+    {{ category.get('node_name') }}
+  </h1>
 </header>
 {{ THIS.hook('main_products') | raw }}

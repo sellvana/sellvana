@@ -24,15 +24,17 @@
             <p {{ THIS.view('frontendcp/editable', { type:'simple', entity:'product', id:p.id(), field:'short_description'}) | raw }}>{{ p.get('short_description') }}</p>
         </div>
     </td>
-    <td class="actions last a-left">
+    <td class="actions text-left">
         <form action="{{ addToCartUrl }}" method="post">
             <input type="hidden" name="id" value="{{ p.id() }}">
             <input type="hidden" name="action" value="add"/>
             <input type="hidden" name="qty" value="1"/>
             <button class="button btn-add-to-cart" onclick="FCom.cart.add({{ p.id() }}, 1)"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
         </form>
-        <p><label for="wishlist-{{ p.id() }}"><input type="checkbox" id="wishlist-{{ p.id() }}"/> {{ 'Wishlist' |_ }}</label></p>
-        <p><label for="compare-{{ p.id() }}"><input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{ p.id() }}" value="{{ p.id() }}"/> {{ 'Compare' |_ }}</label></p>
+        <label for="wishlist-{{ p.id() }}" class="checkbox">
+          <input type="checkbox" id="wishlist-{{ p.id() }}"/> {{ 'Wishlist' |_ }}</label>
+        <label for="compare-{{ p.id() }}" class="checkbox">
+          <input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{ p.id() }}" value="{{ p.id() }}"/> {{ 'Compare' |_ }}</label>
     </td>
 </tr>
 {% endfor %}
