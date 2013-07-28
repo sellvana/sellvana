@@ -6,7 +6,7 @@ $validToken = $hlp->validateToken($email, $r->get('token'));
 $pref = $hlp->load($email, 'email');
 $formUrl = BUtil::setUrlQuery($r->currentUrl(), array('unsub_all'=>null));
 ?>
-<header class="page-title">
+<header class="main-title">
     <h1><?= BLocale::_("Subscription Preferences") ?></h1>
 </header>
 <div class="main col1-layout">
@@ -18,11 +18,11 @@ $formUrl = BUtil::setUrlQuery($r->currentUrl(), array('unsub_all'=>null));
             <fieldset>
                 <p><?= BLocale::_("Your email") ?>: <strong><?=$this->q($email)?></strong></p>
                 <input type="hidden" name="model[email]" value="<?=$this->q($email)?>"/>
-                <p><label><input type="checkbox" name="model[unsub_all]" value="1"
+                <div class="checkbox">
+                  <label><input type="checkbox" name="model[unsub_all]" value="1"
                     <?=$pref && $pref->unsub_all || $r->get('unsub_all')?'checked':''?>
-                /> <?= BLocale::_("Unsubscribe from all non-transactional emails") ?></label></p>
-
-                <p><input type="submit" value="<?= BLocale::_("Save Preferences") ?>"/></p>
+                /> <?= BLocale::_("Unsubscribe from all non-transactional emails") ?></label></div>
+                <p><input type="submit" class="btn btn-primary" value="<?= BLocale::_("Save Preferences") ?>"/></p>
             </fieldset>
         </form>
 <?php else: ?>

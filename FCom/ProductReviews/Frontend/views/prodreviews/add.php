@@ -8,5 +8,5 @@
     <br/>
     <input type="text" name="review[title]" placeholder="<?= BLocale::_("Title") ?>" /><br/>
     <textarea name="review[text]" placeholder="<?= BLocale::_("Your review here") ?>"></textarea><br/>
-    <input type="submit">
+    <input type="submit" class="btn">
 </form>
