@@ -5,6 +5,6 @@ if (!$loggedIn) {
     return;
 }
 ?>
-<button type="submit" title="<?= BLocale::_("Add to Wishlist") ?>" class="button btn-add-to-cart"
+<button type="submit" title="<?= BLocale::_("Add to Wishlist") ?>" class="btn btn-primary"
                                     onclick="add_wishlist(<?=$prod->id?>)" name="add2wishlist" value="<?=$prod->id?>"
-                                    ><span>+ <?= BLocale::_("Add to Wishlist") ?></span></button>
+                                    >+ <?= BLocale::_("Add to Wishlist") ?></button>

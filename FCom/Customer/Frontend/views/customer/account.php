@@ -1,9 +1,9 @@
 <h2><?= BLocale::_("My account") ?></h2>
 
-<?= BLocale::_("Hello") ?> <b><?=$this->customer->firstname?></b><br/>
-E-mail: <b><?=$this->customer->email?></b><br/>
-<a href="<?=BApp::href('customer/myaccount/edit')?>"><?= BLocale::_("Edit") ?></a><br/>
-<a href="<?=BApp::href('customer/myaccount/editpassword')?>"><?= BLocale::_("Edit password") ?></a>
+<p><?= BLocale::_("Hello") ?> <strong><?=$this->customer->firstname?></strong>
+E-mail: <strong><?=$this->customer->email?></strong></p>
+<p><a href="<?=BApp::href('customer/myaccount/edit')?>"><?= BLocale::_("Edit") ?></a><br/>
+<a href="<?=BApp::href('customer/myaccount/editpassword')?>"><?= BLocale::_("Edit password") ?></a></p>
 
 <br/>
 <br/>
