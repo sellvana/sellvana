@@ -1,11 +1,11 @@
 {{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
 {% if not THIS.get('products_data').state.c %}
-    <p class="note-msg">{{ "There are no products matching the selection." |_ }}</p>
+    <div class="alert">{{ "There are no products matching the selection." |_ }}</div>
 
 {% else %}
     {{ THIS.view('catalog/compare/block') | raw }}
     <div class="product-listing">
-        <table>
+        <table class="table">
             <col width="60"/>
             <col/>
             <col width="100"/>

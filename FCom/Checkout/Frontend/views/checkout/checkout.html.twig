@@ -3,15 +3,15 @@
 <div class="page-checkout-review">
     <form action="{{ APP.href('checkout') }}" method="post">
         <div class="col-checkout-review-left">
-            <header class="page-title">
+            <header class="main-title">
                 <h1 class="title">{{ 'Review and Place Order'|_ }}</h1>
             </header>
             {% if THIS.messagesHtml() %}
-                <p class="error">{{ THIS.messagesHtml() | raw }}</p>
+                <div class="alert alert-error">{{ THIS.messagesHtml() | raw }}</div>
             {% endif %}
             <h2>{{ 'Review the information below then click "Place your order"' |_ }}</h2>
-            <div class="col2-set">
-                <div class="col first">
+            <div class="row">
+                <div class="span6">
                     <h4>{{ "Shipping to" |_}}</h4>
                     {{ THIS.get('shipping_address').as_html() | raw }}
                     {% if THIS.get('guest_checkout') %}
@@ -21,7 +21,7 @@
                     {% endif %}
                 </div>
             {% if THIS.get('shipping_methods') %}
-                <div class="col last">
+                <div class="span6">
                     <h4>{{ "Shipping Options" |_ }}:</h4>
                     <ul>
                         {% for shippingMethod, shippingClass in THIS.get('shipping_methods') %}
@@ -37,13 +37,13 @@
                         </li>
                         {% endfor %}
                     </ul>
-                    <button type="submit" name="update" class="button btn-aux btn-sz1"><span>{{ "Apply changes" |_ }}</span></button>
+                    <button type="submit" name="update" class="btn btn-small">{{ "Apply changes" |_ }}</button>
                 </div>
             {% endif %}
             </div>
             <div class="divider"></div>
-            <div class="col2-set">
-                <div class="col first">
+            <div class="row">
+                <div class="span6">
                     <h4>{{ "Billing address" |_ }}</h4>
                     {% if cart.get('shipping_same') %}
                         <p>{{ 'Same as shipping' |_ }}</p>
@@ -57,7 +57,7 @@
                         <small><a href="{{ APP.href('customer/address/choose?t=b') }}">{{ "Change" |_ }}</a></small>
                     {% endif %}
                 </div>
-                <div class="col last">
+                <div class="span6">
                     <h4>{{ "Payment method" |_ }}</h4>
                     {% if THIS.get('payment_method') %}
                         <small><a href="{{ APP.href('checkout/payment') }}">{{ "Change" |_ }}</a></small><br/>
@@ -70,64 +70,78 @@
                 </div>
             </div>
             <div class="divider"></div>
-            <section class="data-table">
-                <table>
-                    <col width="500"/>
-                    <col width="70"/>
-                    <col width="70"/>
-                    <col width="70"/>
-                    <thead>
-                        <tr>
-                            <th class="a-left">{{ "Product" |_ }}</th>
-                            <th class="a-right">{{ "Price" |_ }}</th>
-                            <th class="a-center">{{ "Qty" |_ }}</th>
-                            <th class="a-right">{{ "Subtotal" |_ }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                {% for item in cart.items() %}
-                    {% set p = item.product() %}
-                    {% if p %}
-                        <tr id="tr-product-{{p.get('id')}}">
-                            <td class="a-left">
-                                <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
-                            </td>
-                            <td class="a-right">
-                                <div class="price-box">
-                                    {{ p.get('base_price') | currency }}
-                                </div>
-                            </td>
-                            <td class="a-center">
-                                <div class="price-box">
-                                    {{ item.get('qty') | number_format }}
-                                </div>
-                            </td>
-                            <td class="a-right">
-                                <span class="price">{{ item.rowTotal() | currency }}</span>
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tfoot>
-                </table>
-            </section>
+            <table class="table">
+                <col width="500"/>
+                <col width="70"/>
+                <col width="70"/>
+                <col width="70"/>
+                <thead>
+                    <tr>
+                        <th class="text-left">{{ "Product" |_ }}</th>
+                        <th class="text-right">{{ "Price" |_ }}</th>
+                        <th class="text-center">{{ "Qty" |_ }}</th>
+                        <th class="text-right">{{ "Subtotal" |_ }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for item in cart.items() %}
+                {% set p = item.product() %}
+                {% if p %}
+                    <tr id="tr-product-{{p.get('id')}}">
+                        <td class="text-left">
+                            <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
+                        </td>
+                        <td class="text-right">
+                            <div class="price-box">
+                                {{ p.get('base_price') | currency }}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="price-box">
+                                {{ item.get('qty') | number_format }}
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <span class="price">{{ item.rowTotal() | currency }}</span>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+                </tbody>
+                <tfoot>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tfoot>
+            </table>
             <p><a href="{{APP.href('cart')}}">{{ "Need to change quantities or remove items?" |_ }}</a></p>
 
             {% if THIS.get('guest_checkout') %}
-                <label for="#">{{ "Create an account?" |_ }}</label>
-                <input type="checkbox" name="create_account" value="1" class="required"><br/>
-                <label for="#">{{ 'E-mail' |_ }}</label>
-                <input type="text" name="account[email]" value="<?=$this->billing_address->email?>" class="required"><br/>
-                <label for="#">{{ "Password" |_ }}</label>
-                <input type="password" name="account[password]" class="required" id="model-password"/><br/>
-                <label for="#">{{ "Confirm Password" |_ }}</label>
-                <input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/><br/>
+                <div class="control-group">
+                  <label for="#" class="checkbox">
+                    <input type="checkbox" name="create_account" value="1" class="required">
+                    {{ "Create an account?" |_ }}
+                  </label>
+                </div>
+                <div class="control-group">
+                  <label for="#" class="control-label">{{ 'E-mail' |_ }}</label>
+                  <div class="controls">
+                    <input type="text" name="account[email]" value="<?=$this->billing_address->email?>" class="required">
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="#" class="control-label">{{ "Password" |_ }}</label>
+                  <div class="controls">
+                    <input type="password" name="account[password]" class="required" id="model-password"/>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
+                  <div class="controls">
+                    <input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/>
+                  </div>
+                </div>
             {% endif %}
         </div>
         <!-- .col-checkout-left ends -->
@@ -149,7 +163,7 @@
             </div>
             {% endif %}
             <ul class="checkout-btns">
-                <li><button type="submit" name="place_order" value="new_order" class="button btn-sz2"><span>{{ "Place your order" |_ }}</span></button></li>
+                <li><button type="submit" name="place_order" value="new_order" class="btn btn-primary btn-large">{{ "Place your order" |_ }}</span></li>
             </ul>
         </div>
         <!-- .col-checkout-right ends -->

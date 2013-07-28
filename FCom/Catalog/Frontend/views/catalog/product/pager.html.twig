@@ -15,7 +15,7 @@
     } %}
 {% endif %}
 
-<div class="pager">
+<div class="pager-row">
     <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
         {% if THIS.get('query') %}
             <input type="hidden" name="q" value="{{ THIS.get('query') }}" />
