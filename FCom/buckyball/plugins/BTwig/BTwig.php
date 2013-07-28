@@ -63,7 +63,7 @@ class BTwig extends BClass
         });
         static::$_fileTwig->addFilter($debugFilter);
 
-        foreach (array('app', 'config', 'layout', 'request', 'session', 'util') as $var) {
+        foreach (array('app', 'config', 'layout', 'request', 'session', 'util', 'debug') as $var) {
             $global   = strtoupper($var);
             $class    = 'B'.ucfirst($var);
             $instance = $class::i();

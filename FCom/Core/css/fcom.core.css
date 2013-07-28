@@ -1,3 +1,6 @@
+.container-low { margin-top: 100px; }
+form label.required:after { color:#e32; content:' *'; display:inline; }
+
 .fcom-datagrid-wrapper { margin: 20px; }
 
 .fcom-datagrid__toolbar { padding: 5px; height: 20px; }

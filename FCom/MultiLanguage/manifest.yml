@@ -8,5 +8,5 @@ modules:
                 auto_use: [ views, layout ]
                 require: { module: { FCom_Admin: 0.1.4 } }
                 routing:
-                    - [ GET, /translations, FCom_MultiLanguage_Admin_Controller_Translations.index ]
+                    - [ get, /translations, FCom_MultiLanguage_Admin_Controller_Translations.index ]
                     - [ any, /translations/.action, FCom_MultiLanguage_Admin_Controller_Translations ]

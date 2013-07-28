@@ -17,5 +17,5 @@ modules:
 
             FCom_Cron:
                 routing:
-                    - [ GET, /, FCom_Cron_Controller.run ]
-                    - [ GET, /*task, FCom_Cron_Controller.run ]
+                    - [ get, /, FCom_Cron_Controller.run ]
+                    - [ get, /*task, FCom_Cron_Controller.run ]
