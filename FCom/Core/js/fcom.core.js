@@ -232,7 +232,7 @@ function($, Backbone, PageableCollection) {
 
     if (typeof Backbone !== 'undefined') {
         FCom.TransparencyView = Backbone.View.extend({
-            constructor: function() {
+            constructor: function(options) {
                 Backbone.View.prototype.constructor.apply(this, arguments);
                 this.setElement($(this.options.baseEl).clone());
                 this.model.on("change", this.render, this);
@@ -299,8 +299,8 @@ function($, Backbone, PageableCollection) {
                 _.each(['page_sizes', 'page_numbers'], function(selectName) {
                     var options = self.model.get(selectName);
                     if (options) {
-                        this.bindings[selectName] = { 
-                            selector:'[name='+selectName+']', 
+                        this.bindings[selectName] = {
+                            selector:'[name='+selectName+']',
                             converter: new Backbone.ModelBinder.CollectionConverter(self.model.get(selectName))
                         }
                     }
@@ -309,7 +309,7 @@ function($, Backbone, PageableCollection) {
             },
 
             render: function() {
-                this.modelBinder.bind(this.model, this.el, this.bindings);
+                //this.modelBinder.bind(this.model, this.el, this.bindings);
                 return this;
             }
         })
