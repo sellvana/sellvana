@@ -76,7 +76,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         BResponse::i()->redirect($cartHref);
     }
 
-    public function action_addxhr_POST()
+    public function action_addxhr__POST()
     {
         $post = BRequest::i()->post();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();

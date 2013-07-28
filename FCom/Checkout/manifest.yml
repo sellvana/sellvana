@@ -13,8 +13,7 @@ modules:
             FCom_Frontend:
                 auto_use: [ bootstrap, layout ]
                 routing:
-                    - [ any, /cart, FCom_Checkout_Frontend_Controller_Cart.index ]
-                    - [ any, /cart/.action, FCom_Checkout_Frontend_Controller_Cart ]
+                    - [ any, /cart/?.action, FCom_Checkout_Frontend_Controller_Cart ]
                     - [ any, /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]
                     - [ get, /checkout/login, FCom_Checkout_Frontend_Controller_Checkout.checkout_login ]
                     - [ any, /checkout/payment, FCom_Checkout_Frontend_Controller_Checkout.payment ]

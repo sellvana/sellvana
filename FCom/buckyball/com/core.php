@@ -1385,13 +1385,16 @@ class BEvents extends BClass
     * @param array|object $args
     * @return BEvents
     */
-    public function on($eventName, $callback=null, $args=array())
+    public function on($eventName, $callback = null, $args = array())
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
                 $this->on($obs[0], $obs[1], !empty($obs[2]) ? $obs[2] : array());
             }
             return $this;
+        }
+        if (empty($args['alias']) && is_string($callback)) {
+            $args['alias'] = $callback;
         }
         $observer = array('callback'=>$callback, 'args'=>$args);
         if (($moduleName = BModuleRegistry::currentModuleName())) {
@@ -1438,20 +1441,20 @@ class BEvents extends BClass
     * @param callback $callback
     * @return BEvents
     */
-    public function off($eventName, $callback=null)
+    public function off($eventName, $alias = null)
     {
         $eventName = strtolower($eventName);
-        if (true === $callback) {
+        if (true === $alias) { //TODO: null too?
             unset($this->_events[$eventName]);
             return $this;
         }
-        if (is_numeric($callback)) {
-            unset($this->_events[$eventName]['observers'][$callback]);
+        if (is_numeric($alias)) {
+            unset($this->_events[$eventName]['observers'][$alias]);
             return $this;
         }
         if (!empty($this->_events[$eventName]['observers'])) {
             foreach ($this->_events[$eventName]['observers'] as $i=>$observer) {
-                if ($observer['callback']==$callback) {
+                if ($observer['alias'] === $alias) {
                     unset($this->_events[$eventName]['observers'][$i]);
                 }
             }
