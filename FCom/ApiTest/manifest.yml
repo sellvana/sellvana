@@ -6,5 +6,5 @@ modules:
         areas:
             FCom_Api:
                 routing:
-                    - [ GET, /v1/apitest/test, FCom_ApiTest_ApiServer_V1_Test.list ]
+                    - [ get, /v1/apitest/test, FCom_ApiTest_ApiServer_V1_Test.list ]
                     - [ any, /v1/apitest/test/.action, FCom_ApiTest_ApiServer_V1_Test ]

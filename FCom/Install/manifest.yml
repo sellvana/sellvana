@@ -6,7 +6,8 @@ modules:
 
         auto_use: [ views ]
         routing:
-            - [ GET, /, FCom_Install_Controller.index ]
+            - [ get, /, FCom_Install_Controller.index ]
+            - [ get, /*catchall, FCom_Install_Controller.index ]
             - [ any, /install, FCom_Install_Controller.index ]
             - [ any, /install/.action, FCom_Install_Controller ]
 

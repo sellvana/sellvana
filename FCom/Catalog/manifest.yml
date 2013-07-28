@@ -12,13 +12,13 @@ modules:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
                     - [ any, /catalog/test, FCom_Catalog_Admin_Controller_Products.test ]
-                    - [ GET, /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
+                    - [ get, /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
                     - [ any, /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
 
-                    - [ GET, /catalog/products, FCom_Catalog_Admin_Controller_Products.index ]
+                    - [ get, /catalog/products, FCom_Catalog_Admin_Controller_Products.index ]
                     - [ any, /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
 
-                    - [ GET, /catalog/families, FCom_Catalog_Admin_Controller_Families.index ]
+                    - [ get, /catalog/families, FCom_Catalog_Admin_Controller_Families.index ]
                     - [ any, /catalog/families/.action, FCom_Catalog_Admin_Controller_Families ]
 
                     - [ any, /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
@@ -26,12 +26,12 @@ modules:
             FCom_Frontend:
                 require: { module: { FCom_Frontend: 0.1.0 } }
                 routing:
-                    - [ GET, /*category, FCom_Catalog_Frontend_Controller_Search.category ]
-                    - [ GET, /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
-                    - [ GET, /*manuf, FCom_Catalog_Frontend_Controller.manuf ]
+                    - [ get, /*category, FCom_Catalog_Frontend_Controller_Search.category ]
+                    - [ get, /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
+                    - [ get, /*manuf, FCom_Catalog_Frontend_Controller.manuf ]
                     - [ any, /:product, FCom_Catalog_Frontend_Controller.product ]
-                    - [ GET, /*category/:product, FCom_Catalog_Frontend_Controller.product ]
-                    - [ GET, /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
+                    - [ get, /*category/:product, FCom_Catalog_Frontend_Controller.product ]
+                    - [ get, /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
 
                 observe:
                     - [ FCom_FrontendCP_Frontend_Controller::action_update:after, FCom_Catalog_Frontend_ControlPanel::onAfterUpdate ]
