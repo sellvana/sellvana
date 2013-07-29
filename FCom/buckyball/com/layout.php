@@ -486,9 +486,9 @@ class BLayout extends BClass
      * @param array  $args
      * @return $this
      */
-    public function hook($hookName, $callback, $args = array())
+    public function hook($hookName, $callback, $args = array(), $alias = null)
     {
-        BEvents::i()->on('BLayout::hook:' . $hookName, $callback, $args);
+        BEvents::i()->on('BLayout::hook:' . $hookName, $callback, $args, $alias);
 
         return $this;
     }
@@ -517,10 +517,7 @@ class BLayout extends BClass
             return $this;
         }
         //$view->set($args);
-        if (empty($args['alias'])) {
-            $args['alias'] = $viewName;
-        }
-        return $this->hook($hookName, $view, $args);
+        return $this->hook($hookName, $view, $args, $viewName);
     }
 
     public function hookClear($hookName, $viewNames)
@@ -531,7 +528,7 @@ class BLayout extends BClass
         if (true === $viewNames || 'ALL' === $viewNames) {
             $eventHlp->off($eventName, true);
         } else {
-            foreach ((array)$dviewNames as $clearViewName) {
+            foreach ((array)$viewNames as $clearViewName) {
                 $eventHlp->off($eventName, $clearViewName);
             }
         }
