@@ -110,7 +110,7 @@ class BModuleRegistry extends BClass
         }
 
         if (!empty(static::$_modules[$modName])) {
-            BDebug::debug('MODULE UPDATE: '.$this->name);
+            BDebug::debug('MODULE UPDATE: '.static::$_modules[$modName]->name);
             static::$_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
