@@ -1,1 +1,1 @@
-<b><?=$this->product['product_name']?></b><br/>
+<strong><?=$this->product['product_name']?></strong><br/>

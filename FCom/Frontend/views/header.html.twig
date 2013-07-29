@@ -26,14 +26,14 @@
 	<div class="header-nav-wrapper">
 	    <div class="header-nav">
             <nav class="site-nav">
-                <ul>
+                <ul class="nav navbar-nav">
                     <li><a href="{{ APP.baseUrl() }}">{{ 'Home' |_ }}</a>
                     {{ THIS.view('nav') | raw }}
                 </ul>
             </nav>
-                <form class="site-search" action="{{ APP.href('catalog/search') }}">
+            <form class="site-search" action="{{ APP.href('catalog/search') }}">
             	<fieldset>
-            		<input type="text" placeholder="{{ 'Search entire store' |_ }}" name="q" value="{{ REQUEST.get('q') }}"/><button class="icon-button"><span>{{ 'Search' |_ }}</span></button>
+            		<input type="text" placeholder="{{ 'Search entire store' |_ }}" name="q" value="{{ REQUEST.get('q') }}"/><button class="btn">{{ 'Search' |_ }}</button>
             	</fieldset>
             </form>
 	    </div>
