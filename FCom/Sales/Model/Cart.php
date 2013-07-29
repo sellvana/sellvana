@@ -410,10 +410,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function placeOrder()
     {
         $cart = $this->orm ? $this : static::sessionCart();
-        /* @var $cart FCom_Sales_Model_Cart */
-        $salesOrder = FCom_Sales_Model_Order::i();
         try {
-            $salesOrder->createFromCart($cart);
+            /* @var $cart FCom_Sales_Model_Cart */
+            $salesOrder = FCom_Sales_Model_Order::createFromCart($cart);
             $cart->set('status', 'ordered')->save();
         } catch (Exception $e) {
             // if something failed, like bad payment method
