@@ -78,6 +78,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
 
     public function action_addxhr__POST()
     {
+        $cartHref = BApp::href('cart');
         $post = BRequest::i()->post();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         $result = array();
