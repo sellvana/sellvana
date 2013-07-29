@@ -29,7 +29,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $errors = BDebug::i()->getCollectedErrors();
         BLayout::i()->view('index')->errors = $errors;
 
-        $this->messages('index', 'install');
+        $this->messages('root', 'install');
     }
 
     public function action_index__POST()
@@ -48,11 +48,14 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (empty($sData['w']['db'])) {
             $sData['w']['db'] = array('host'=>'127.0.0.1', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
         }
-        $this->messages('step1', 'install');
+        $this->messages('root', 'install');
     }
 
     public function action_step1__POST()
     {
+        if (BRequest::i()->post('do')==='back') {
+            BResponse::i()->redirect('install/index');
+        }
         try {
             $w = BRequest::i()->post('w');
             BConfig::i()->add(array('db'=>$w['db']), true);
@@ -84,11 +87,14 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (empty($sData['w']['admin'])) {
             $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
         }
-        $this->messages('step2', 'install');
+        $this->messages('root', 'install');
     }
 
     public function action_step2__POST()
     {
+        if (BRequest::i()->post('do')==='back') {
+            BResponse::i()->redirect('install/step1');
+        }
         try {
             $w = BRequest::i()->post('w');
             BMigrate::i()->migrateModules('FCom_Admin');
@@ -107,15 +113,81 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step3()
     {
+        $this->view('step3')->set(array(
+            'debug_modes' => array('PRODUCTION' => 'PRODUCTION', 'DEBUG' => 'DEBUG'),
+            'run_level_bundles' => array('min' => 'Minimal', 'all' => 'All Bundled'),
+        ));
         BLayout::i()->applyLayout('/step3');
-        $this->messages('step3', 'install');
+        $this->messages('root', 'install');
     }
 
     public function action_step3__POST()
     {
+        if (BRequest::i()->post('do')==='back') {
+            BResponse::i()->redirect('install/step2');
+        }
+
+        $w = BRequest::i()->post('w');
+        $runLevels = array();
+        if (!empty($w['config']['run_levels_bundle'])) {
+            switch ($w['config']['run_levels_bundle']) {
+                case 'min':
+                    $runLevels = array(
+                        'FCom_MarketClient' => 'REQUESTED',
+                    );
+                    break;
+
+                case 'all':
+                    $runLevels = array(
+                        'FCom_Api' => 'REQUESTED',
+                        'FCom_AuthorizeNet' => 'REQUESTED',
+                        'FCom_Catalog' => 'REQUESTED',
+                        'FCom_CatalogIndex' => 'REQUESTED',
+                        'FCom_Checkout' => 'REQUESTED',
+                        'FCom_Cms' => 'REQUESTED',
+                        'FCom_Comet' => 'REQUESTED',
+                        'FCom_Cron' => 'REQUESTED',
+                        'FCom_Customer' => 'REQUESTED',
+                        'FCom_CustomerGroups' => 'REQUESTED',
+                        'FCom_CustomField' => 'REQUESTED',
+                        'FCom_Disqus' => 'REQUESTED',
+                        'FCom_EasyPost' => 'REQUESTED',
+                        'FCom_Email' => 'REQUESTED',
+                        'FCom_FreshBooks' => 'REQUESTED',
+                        'FCom_FrontendCP' => 'REQUESTED',
+                        'FCom_FrontendThemeBlue' => 'REQUESTED',
+                        'FCom_FrontendThemeBootstrap' => 'REQUESTED',
+                        'FCom_Geo' => 'REQUESTED',
+                        'FCom_MarketClient' => 'REQUESTED',
+                        'FCom_MultiCurrency' => 'REQUESTED',
+                        'FCom_MultiLanguage' => 'REQUESTED',
+                        'FCom_MultiSite' => 'REQUESTED',
+                        'FCom_MultiVendor' => 'REQUESTED',
+                        'FCom_MultiWarehouse' => 'REQUESTED',
+                        'FCom_Ogone' => 'REQUESTED',
+                        'FCom_PaymentBasic' => 'REQUESTED',
+                        'FCom_PaymentCC' => 'REQUESTED',
+                        'FCom_PayPal' => 'REQUESTED',
+                        'FCom_ProductReviews' => 'REQUESTED',
+                        'FCom_Promo' => 'REQUESTED',
+                        'FCom_Sales' => 'REQUESTED',
+                        'FCom_Seo' => 'REQUESTED',
+                        'FCom_ShippingPlain' => 'REQUESTED',
+                        'FCom_ShippingUps' => 'REQUESTED',
+                        'FCom_Test' => 'REQUESTED',
+                        'FCom_Wishlist' => 'REQUESTED',
+                    );
+                    break;
+            }
+        }
         BConfig::i()->add(array(
             'install_status' => 'installed',
             'db' => array('implicit_migration' => 1),
+            'module_run_levels' => array('FCom_Core' => $runLevels),
+            'mode_by_ip' => array(
+                'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'PRODUCTION',
+                'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'PRODUCTION',
+            ),
         ), true);
         FCom_Core_Main::i()->writeDbConfig();
         FCom_Core_Main::i()->writeLocalConfig();

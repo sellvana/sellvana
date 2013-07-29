@@ -1,20 +1,45 @@
 {% set w = SESSION.data('w') %}
-<style>
-.wizard label { display:block; width:80px; float:left; }
-</style>
-<h1>Step 1</h1>
-<form class="wizard" method="post" action="{{APP.href('install/step1')}}">
-    <fieldset>
-        <h3>DB Connection</h3>
-        {{ THIS.messagesHtml() |raw }}
-        <label for="host">Host:</label><input type="text" id="host" name="w[db][host]" value="{{w.db.host}}"/><br/>
-        <label for="dbname">DB name:</label><input type="text" id="dbname" name="w[db][dbname]" value="{{w.db.dbname}}"/><br/>
-        <label for="db-username">User name:</label><input type="text" id="db-username" name="w[db][username]" value="{{w.db.username}}"/><br/>
-        <label for="db-password">Password:</label><input type="password" id="db-password" name="w[db][password]" value="{{w.db.password}}"/><br/>
-        <label for="dbname">Table prefix:</label><input type="text" id="dbname" name="w[db][table_prefix]" value="{{w.db.table_prefix}}"/><br/>
-    </fieldset>
 
-    <fieldset>
-        <button type="submit">Proceed to the next step</button>
-    </fieldset>
+<form method="post" action="{{APP.href('install/step1')}}" class="form-horizontal">
+    <div class="panel-heading">
+        <h1 class="panel-title">{{ 'Step 1 of 3: Database Connection' |_ }}</h1>
+    </div>
+
+    <div class="form-group">
+        <label for="db-host" class="control-label col-lg-4 required">{{ 'Host' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-host" name="w[db][host]" value="{{w.db.host}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-dbname" class="control-label col-lg-4 required">{{ 'DB name' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-dbname" name="w[db][dbname]" value="{{w.db.dbname}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-username" class="control-label col-lg-4 required">{{ 'User name' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-username" name="w[db][username]" value="{{w.db.username}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-password" class="control-label col-lg-4">{{ 'Password' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="password" class="form-control" id="db-password" name="w[db][password]" value="{{w.db.password}}" placeholder="*****">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="dbname" class="control-label col-lg-4">{{ 'Table prefix' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="dbname" name="w[db][table_prefix]" value="{{w.db.table_prefix}}">
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item clearfix">
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/index')}}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+        </li>
+    </ul>
 </form>

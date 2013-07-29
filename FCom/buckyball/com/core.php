@@ -1385,7 +1385,7 @@ class BEvents extends BClass
     * @param array|object $args
     * @return BEvents
     */
-    public function on($eventName, $callback=null, $args=array())
+    public function on($eventName, $callback = null, $args = array(), $alias = null)
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1393,7 +1393,10 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $observer = array('callback'=>$callback, 'args'=>$args);
+        if (is_null($alias) && is_string($callback)) {
+            $alias = $callback;
+        }
+        $observer = array('callback' => $callback, 'args' => $args, 'alias' => $alias);
         if (($moduleName = BModuleRegistry::currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
@@ -1412,7 +1415,7 @@ class BEvents extends BClass
      * @param array|object $args
      * @return BEvents
      */
-    public function once($eventName, $callback=null, $args=array())
+    public function once($eventName, $callback=null, $args=array(), $alias = null)
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1420,7 +1423,7 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $this->on($eventName, $callback, $args);
+        $this->on($eventName, $callback, $args, $alias);
         $lastId = sizeof($this->_events[$eventName]['observers']);
         $this->on($eventName, function() use ($eventName, $lastId) {
             BEvents::i()
@@ -1438,20 +1441,20 @@ class BEvents extends BClass
     * @param callback $callback
     * @return BEvents
     */
-    public function off($eventName, $callback=null)
+    public function off($eventName, $alias = null)
     {
         $eventName = strtolower($eventName);
-        if (true === $callback) {
+        if (true === $alias) { //TODO: null too?
             unset($this->_events[$eventName]);
             return $this;
         }
-        if (is_numeric($callback)) {
-            unset($this->_events[$eventName]['observers'][$callback]);
+        if (is_numeric($alias)) {
+            unset($this->_events[$eventName]['observers'][$alias]);
             return $this;
         }
         if (!empty($this->_events[$eventName]['observers'])) {
             foreach ($this->_events[$eventName]['observers'] as $i=>$observer) {
-                if ($observer['callback']==$callback) {
+                if (!empty($observer['alias']) && $observer['alias'] === $alias) {
                     unset($this->_events[$eventName]['observers'][$i]);
                 }
             }

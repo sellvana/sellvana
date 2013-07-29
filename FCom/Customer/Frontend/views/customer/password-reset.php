@@ -8,25 +8,23 @@
         <?php echo $this->messagesHtml() ?>
         <!--<div class="msg success-msg">Something went wrong</div>-->
         <form action="<?php echo BApp::href('customer/password/reset')?>" method="post" id="reset-form">
-            <fieldset class="form-group">
-                <ul>
-                    <li class="form-row">
-                        <div class="form-field">
-                            <label for="#"><?= BLocale::_("Password") ?></label>
-                            <input type="password" name="password" class="required"/>
-                        </div>
-                    </li>
-                    <li class="form-row">
-                        <div class="form-field">
-                            <label for="#"><?= BLocale::_("Confirm") ?></label>
-                            <input type="password" name="password_confirm" class="required"/>
-                        </div>
-                    </li>
-                </ul>
-                <div class="form-buttons">
-                    <input type="hidden" name="token" value="<?=$this->q(BRequest::i()->request('token'))?>"/>
-                    <input type="submit" value="<?= BLocale::_("Reset Password") ?>"/>
-                </div>
+            <fieldset>
+      				<div class="control-group">
+      					<label for="#" class="control-label required"><?= BLocale::_("Password") ?></label>
+      					<div class="controls">
+      					  <input type="password" name="password" class="required"/>
+      					</div>
+      				</div>
+      				<div class="control-group">
+      					<label for="#" class="control-label required"><?= BLocale::_("Confirm Password") ?></label>
+      					<div class="controls">
+      					  <input type="password" name="password_confirm" class="required"/>
+      					</div>
+      				</div>
+              <div class="btn-group">
+                  <input type="hidden" name="token" value="<?=$this->q(BRequest::i()->request('token'))?>"/>
+                  <input type="submit" class="btn btn-primary" value="<?= BLocale::_("Reset Password") ?>"/>
+              </div>
             </fieldset>
         </form>
     </div>
