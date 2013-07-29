@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * @property mixed shipping_service
+ * @property mixed customer_id
+ * @property mixed item_qty
+ * @property mixed subtotal
+ * @property mixed payment_method
+ * @property mixed payment_details
+ * @property mixed coupon_code
+ * @property mixed tax
+ * @property mixed grand_total
+ */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart';
