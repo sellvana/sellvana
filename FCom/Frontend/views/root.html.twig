@@ -5,7 +5,7 @@
     </head>
     <body class="{{ THIS.getBodyClass() }}">
         {{ THIS.hook('body_start') | raw }}
-        <div class="page-wrapper">
+        <div class="page-wrapper container">
             {{ THIS.hook('header') | raw }}
 {% if REQUEST.rawPath() != '/' %}
 	           	<div class="page-main-wrapper {{ THIS.get('show_left_col') ? 'col2-layout-left' : (THIS.get('show_right_col') ? 'col2-layout-right' : 'col1-layout') }} {{ THIS.get('layout_class') }}">

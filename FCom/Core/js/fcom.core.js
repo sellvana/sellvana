@@ -1,4 +1,4 @@
-define(["jquery", "backbone", "backbone-pageable", "lunr", "transparency",
+define(["jquery", "backbone", "backbone-pageable", "backbone.modelbinder", "lunr", "transparency",
     "backgrid", "backgrid-filter", "backgrid-select-all",
     "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell"],
 
@@ -232,7 +232,7 @@ function($, Backbone, PageableCollection) {
 
     if (typeof Backbone !== 'undefined') {
         FCom.TransparencyView = Backbone.View.extend({
-            constructor: function() {
+            constructor: function(options) {
                 Backbone.View.prototype.constructor.apply(this, arguments);
                 this.setElement($(this.options.baseEl).clone());
                 this.model.on("change", this.render, this);
@@ -288,23 +288,28 @@ function($, Backbone, PageableCollection) {
         FCom.Backgrid.Toolbar = Backbone.View.extend({
             className: 'fcom-backgrid-toolbar',
 
-            constructor: function(options) {
-                Backbone.View.prototype.constructor.apply(this, arguments);
-                this.setElement($(options.template).clone());
-                this.model.on('change', this.render, this);
+            bindings: {
             },
 
-            templateData: function() {
+            initialize: function() {
+                this.model = new Backbone.Model(this.options);
+                this.template = _.template($(this.options.template).html());
+                var self = this;
+
+                _.each(['page_sizes', 'page_numbers'], function(selectName) {
+                    var options = self.model.get(selectName);
+                    if (options) {
+                        this.bindings[selectName] = {
+                            selector:'[name='+selectName+']',
+                            converter: new Backbone.ModelBinder.CollectionConverter(self.model.get(selectName))
+                        }
+                    }
+                });
 
             },
 
             render: function() {
-                var template = $(this.options.template);
-                this.$el.empty();
-                if (template.length) {
-                    this.$el.append($(this.options.template).html()).render(this.templateData());
-                }
-                this.delegateEvents();
+                //this.modelBinder.bind(this.model, this.el, this.bindings);
                 return this;
             }
         })
@@ -325,21 +330,22 @@ function($, Backbone, PageableCollection) {
 
                 var Model = this.options.model || Backbone.Model;
 
+                var paramsMap = {
+                    currentPage: 'p',
+                    pageSize: 'ps',
+                    totalPages: 'mp',
+                    totalRecords: 'c',
+                    sortKey: 's',
+                    order: 'sd'
+                };
+
                 if (this.options.data_url) {
                     var Collection = PageableCollection.extend({
                         model: Model,
                         url: this.options.data_url,
                         state: this.options.state || { pageSize: 25 },
                         mode: this.options.data_mode || 'server',
-                        queryParams: {
-                            currentPage: 'p',
-                            pageSize: 'ps',
-                            totalPages: 'mp',
-                            totalRecords: 'c',
-                            sortKey: 's',
-                            order: 'sd',
-                            directions: { 'asc':'asc', 'desc':'desc' }
-                        }
+                        queryParams: paramsMap
                     });
                     var collection = new Collection();
                     /*

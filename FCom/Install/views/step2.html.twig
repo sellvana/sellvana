@@ -1,18 +1,51 @@
 {% set w = SESSION.data('w') %}
-<h1>Step 2</h1>
-<form class="wizard" method="post" action="{{APP.href('install/step2')}}">
 
-    <fieldset>
-        <h3>Admin User</h3>
-        {{ THIS.messagesHtml() |raw }}
-        <label for="admin-firstname">First Name:</label><input type="text" id="admin-firstname" name="w[admin][firstname]" value="{{w.admin.firstname}}"/><br/>
-        <label for="admin-lastname">Last Name:</label><input type="text" id="admin-lastname" name="w[admin][lastname]" value="{{w.admin.lastname}}"/><br/>
-        <label for="admin-email">Email:</label><input type="text" id="admin-email" name="w[admin][email]" value="{{w.admin.email}}"/><br/>
-        <label for="admin-username">User name:</label><input type="text" id="admin-username" name="w[admin][username]" value="{{w.admin.username}}"/><br/>
-        <label for="admin-password">Password:</label><input type="password" id="admin-password" name="w[admin][password]" value="{{w.admin.password}}"/><br/>
-    </fieldset>
+<form class="form-horizontal" method="post" action="{{APP.href('install/step2')}}">
+    <div class="panel-heading">
+        <h1 class="panel-title">{{ 'Step 2 of 3: First Admin User' |_ }}</h1>
+    </div>
 
-    <fieldset>
-        <button type="submit">Proceed to the next step</button>
-    </fieldset>
+    <div class="form-group">
+        <label for="admin-firstname" class="control-label col-lg-4 required">{{ 'First Name' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="admin-firstname" name="w[admin][firstname]" value="{{w.admin.firstname}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="admin-lastname" class="control-label col-lg-4 required">{{ 'Last Name' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="admin-lastname" name="w[admin][lastname]" value="{{w.admin.lastname}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-username" class="control-label col-lg-4 required">{{ 'Email' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="admin-email" name="w[admin][email]" value="{{w.admin.email}}" placeholder="ex:john@example.com" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="admin-username" class="control-label col-lg-4 required">{{ 'User Name' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="admin-username" name="w[admin][username]" value="{{w.admin.username}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="admin-password" class="control-label col-lg-4 required">{{ 'Password' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="password" class="form-control" id="admin-password" name="w[admin][password]" value="{{w.admin.password}}" placeholder="*****" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="admin-password_confirm" class="control-label col-lg-4 required">{{ 'Confirm Password' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="password" class="form-control" id="admin-password_confirm" name="w[admin][password_confirm]" value="{{w.admin.password_confirm}}" placeholder="*****" required>
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item clearfix">
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/step1')}}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+        </li>
+    </ul>
 </form>
