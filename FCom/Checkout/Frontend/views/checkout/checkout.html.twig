@@ -127,7 +127,7 @@
                 <div class="control-group">
                   <label for="#" class="control-label">{{ 'E-mail' |_ }}</label>
                   <div class="controls">
-                    <input type="text" name="account[email]" value="<?=$this->billing_address->email?>" class="required">
+                    <input type="text" name="account[email]" value="{{ THIS.billing_address.email }}" class="required">
                   </div>
                 </div>
                 <div class="control-group">

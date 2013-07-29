@@ -3,25 +3,31 @@ Feature: Order process
   As a website user
   I need to be able to place an order
 
-  Scenario: Opening main page
-    Given I am on "/"
-    Then I should see "Hello there"
-
-  Scenario: Opening test cat page
-    Given I am on "/"
-    Then I should see "Hello there"
-    Then I should see "Test Cat"
-    When I follow "Test Cat"
-    Then I should see "Test Product"
-
-  Scenario: Open product page
-    Given I am on "/index.php/test"
-    Then I should see "Test Product"
-    When I follow "Test Product"
-    Then I should see "Overview"
-    Then I should be on "/index.php/test/test-product"
-
-  Scenario: Add product to cart from its page
+  Scenario: Perform order placement process as guest
     Given I am on "/index.php/test/test-product"
     When I press "Add to Cart"
     Then I should be on "/index.php/cart"
+    When I follow "Proceed to Checkout"
+    Then I should be on "/index.php/checkout/login"
+    And should see "Login"
+    And should see "Email"
+    And should see "Password"
+    And should see "No Account? Checkout as a guest"
+    When I follow "Checkout as a guest"
+    Then I should be on "/index.php/checkout/address"
+    And I should see "Shipping Address"
+    When I fill in "firstname" with "Test"
+    And I fill in "lastname" with "User"
+    And I fill in "email" with "petar.dev@gmail.com"
+    And I fill in "street1" with "Gulf dr. 123"
+    And I fill in "city" with "Panama City"
+    And I fill in "region" with "FL"
+    And I fill in "postcode" with "12345"
+    And I check "Billing address is same as shipping"
+    And I press "Save address"
+    Then I should be on "/index.php/checkout"
+    And I should see "Review and Place Order"
+    Then I should be on "/index.php/checkout"
+    And I should see "Review and Place Order"
+    When I press "Place your order"
+    Then I should be on "/index.php/checkout/success"
