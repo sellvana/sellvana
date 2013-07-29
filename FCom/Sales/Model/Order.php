@@ -158,9 +158,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     /**
      * @param FCom_Sales_Model_Cart $cart
      * @param array $options
+     * @return FCom_Sales_Model_Order
      */
-    public function createFromCart($cart, $options = array())
+    public static function createFromCart($cart, $options = array())
     {
+        $cart->calculateTotals();
         $shippingMethod       = $cart->getShippingMethod();
         $shippingServiceTitle = '';
         if (is_object($shippingMethod)) {
@@ -179,8 +181,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData['coupon_code']            = $cart->coupon_code;
         $orderData['tax']                    = $cart->tax;
 //        $orderData['total_json']             = $cart->total_json;
-        $orderData['balance']                = $cart->grand_total; //grand total minus discount, which have to be paid
-        $orderData['gt_base']                = $cart->grand_total; //full grand total
+        $orderData['balance']                = $cart->grand_total; // this has been calculated in cart
+        $orderData['gt_base']                = $cart->grand_total; // full grand total
         $orderData['created_dt']             = BDb::now();
 
         //create sales order
@@ -192,7 +194,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
         //copy order items
         foreach ($cart->items() as $item) {
-            if (!$this->itemAllowed($options, $item)) {
+            if (!static::itemAllowed($options, $item)) {
                 continue;
             }
             /* @var $item FCom_Sales_Model_Cart_Item */
@@ -226,13 +228,14 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
 
         //Made payment
-        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
-        if (is_object($paymentMethods[$cart->payment_method])) {
-            $paymentMethods[$cart->payment_method]->payOnCheckout();
+        $paymentMethod = $cart->getPaymentMethod();
+        if (is_object($paymentMethod)) {
+            $paymentMethod->payOnCheckout();
         }
+        return $salesOrder;
     }
 
-    private function itemAllowed($options, $item)
+    protected static function itemAllowed($options, $item)
     {
         if(isset($options['items'])){
             foreach ($options['items'] as $i) {
