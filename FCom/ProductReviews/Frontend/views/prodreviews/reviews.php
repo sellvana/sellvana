@@ -4,12 +4,12 @@ $reviews = $this->product_reviews;
 $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
 ?>
 <?php if (!$reviews) :?>
-    <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Be the first to review this product") ?></a><br/><br/>
+    <p><a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Be the first to review this product") ?></a></p>
 <?php else:?>
     <a href="<?=Bapp::href('prodreviews/add')?>?pid=<?=$prod->id?>"><?= BLocale::_("Review the product") ?></a><br/><br/>
     Total reviews: <?=$prod->num_reviews?><br/>
     <?php foreach ($reviews as $review) :?>
-        <div style="border:1 px solid black;">
+    <div>
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="1" <?=$review->rating == 1 ? 'checked': ''?>/>
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="2" <?=$review->rating == 2 ? 'checked': ''?> />
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="3" <?=$review->rating == 3 ? 'checked': ''?>/>
@@ -23,8 +23,8 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
         <?php if ($isLoggedIn): ?>
             <a href="javascript:void(0)"
                 onclick="$.get('<?=Bapp::href('prodreviews/offensive')?>?rid=<?=$review->id?>');$('#offensive_msg_<?=$review->id?>').show()"
-                style="color:red">Offensive review</a>
-            <div id="offensive_msg_<?=$review->id?>" style="display:none; color: green;">Thank you for your feedback!</div>
+                class="error">Offensive review</a>
+            <div id="offensive_msg_<?=$review->id?>" class="alert alert-success">Thank you for your feedback!</div>
             <div id="block_review_helpful_<?=$review->id?>">
                 <form action="<?=Bapp::href('prodreviews/helpful')?>" method="post"  onsubmit="return false;">
                     <input type="hidden" name="pid" value="<?=$prod->id?>">

@@ -1,9 +1,9 @@
 <div class="col-main">
-        <div class="page-title category-title">
+        <div class="main-title category-title">
             <h1><?= BLocale::_("Wishlist") ?></h1>
         </div>
 <?php if (!$this->wishlist || !$this->wishlist->items()): ?>
-    <p class="note-msg"><?= BLocale::_("There are no products in wishlist") ?>.</p>
+    <p class="alert"><?= BLocale::_("There are no products in wishlist") ?>.</p>
 <?php else: ?>
      <form name="cart" action="<?=BApp::href('wishlist')?>" method="post">
         <table class="product-list">
@@ -23,7 +23,7 @@
             <tbody>
 <?php foreach ($this->wishlist->items() as $item): $p = $item->product() ?>
                 <tr id="tr-product-<?=$p->id?>">
-                    <td class="first a-center">
+                    <td class="first text-center">
                         <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="<?=$item->id?>"></label>
                     </td>
                     <td>
@@ -32,7 +32,7 @@
                     <td>
                         <h3 class="product-name"><a href="<?=$this->q($p->url($this->category))?>"><?=$this->q($p->product_name)?></a></h3>
                     </td>
-                    <td class="actions last a-left">
+                    <td class="actions last text-left">
                         <div class="price-box">
                             <span class="price">$<?=number_format($p->base_price)?></span>
                         </div>
@@ -44,7 +44,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="submit" class="button" value="<?= BLocale::_("Update Wishlist") ?>"/></td>
+                <td><input type="submit" class="btn btn-primary" value="<?= BLocale::_("Update Wishlist") ?>"/></td>
             </tfoot>
         </table>
     </form>

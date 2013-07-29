@@ -1,7 +1,7 @@
 <h2><?= BLocale::_("Orders history") ?></h2>
 
 <?php if ($this->orders) :?>
-    <table border="1">
+    <table class="table">
         <tr>
             <th width="50px;">ID</th>
             <th width="200px;"><?= BLocale::_("Shipping") ?></th>

@@ -1,7 +1,7 @@
 {% set order = THIS.get('order') %}
 {% set billing = order.billing() %}
 <header class="main-title">
-  <h1>{{ "Payment is done successfully" |_ }}</h2>
+  <h1>{{ "Payment is done successfully" |_ }}</h1>
 {% if THIS.get('user') %}
     {{ "Order" |_ }} #<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>
     <br/>

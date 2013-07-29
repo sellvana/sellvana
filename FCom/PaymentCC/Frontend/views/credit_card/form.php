@@ -1,14 +1,35 @@
     <h4><?= BLocale::_("Credit Card") ?></h4>
-    <ul class="form-group row-label">
-    	<li><label for="#"><?= BLocale::_("Card Type") ?></label>
-   			<label for="#">Visa <input type="radio" name="payment[card_type]" value="visa" /></label>
-    		<label for="#">MasterCard <input type="radio" name="payment[card_type]" value="master_card" /></label></li>
-    	<li><label for="#"><?= BLocale::_("Card number") ?></label>
-    		<input type="text" name="payment[card_number]"  /></li>
-    	<li><label for="#"><?= BLocale::_("Name on card") ?></label>
-    		<input type="text" name="payment[name_on_card]"  /></li>
-    	<li><label for="#"><?= BLocale::_("Expires") ?></label>	
-		    <select id="expiration_month" name="payment[expiration_month]" class="month">
+    <div class="control-group">
+      <label for="#" class="control-label"><?= BLocale::_("Card Type") ?></label>
+      <div class="controls">
+   			<div class="radio">
+   			  <label for="#">Visa 
+   			    <input type="radio" name="payment[card_type]" value="visa" />
+   			  </label>
+   			</div>
+   			<div class="radio">
+   			  <label for="#">MasterCard 
+   			    <input type="radio" name="payment[card_type]" value="master_card" />
+   			  </label>
+   			</div>
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="#" class="control-label"><?= BLocale::_("Card number") ?></label>
+      <div class="controls">
+        <input type="text" name="payment[card_number]"  />
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="#"><?= BLocale::_("Name on card") ?></label>
+      <div class="controls">
+        <input type="text" name="payment[name_on_card]"  />
+      </div>
+    </div>
+    <div class="form-inline control-group">
+      <label for="#"><?= BLocale::_("Expires") ?></label>
+      <div class="controls">
+        <select id="expiration_month" name="payment[expiration_month]" class="month">
 		    <option value=""><?= BLocale::_("Choose") ?>...</option>
 		    <?php for($i = 0; $i <12; $i++):
 		        if ($i < 10) $i = '0'.$i; ?>
@@ -20,8 +41,13 @@
 		    <?php for($i = date("Y"); $i < date("Y")+11; $i++) :?>
 		        <option value="<?=$i?>"><?=$i?></option>
 		    <?php endfor; ?>
-		    </select></li>
-    	<li><label for="#">CVV</label>
-    		<input type="text" name="payment[cvv]" /></li>
-  	</ul>
-	<p><button type="submit" name="update" class="button btn-aux btn-sz1"><span><?= BLocale::_("Apply changes") ?></span></button></p>
+		    </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="#"><?= BLocale::_("CVV") ?></label>
+      <div class="controls">
+        <input type="text" name="payment[cvv]" />
+      </div>
+    </div>
+    <p><button type="submit" name="update" class="btn"><span><?= BLocale::_("Apply changes") ?></span></button></p>
