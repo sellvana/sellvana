@@ -22,7 +22,7 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
         if (!$seq) {
             $seq = static::create(array(
                 'entity_type' => $entityType,
-                'current_seq_id' => static::getFirstSeqId($entityType);
+                'current_seq_id' => static::getFirstSeqId($entityType)
             ))->save();
         }
         $nextId = BUtil::nextStringValue($seq->current_seq_id, static::getAllowedChars());
