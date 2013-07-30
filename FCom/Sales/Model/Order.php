@@ -17,6 +17,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
     }
 
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
+        if (!$this->unique_id) {
+            $this->set('unique_id', FCom_Core_Model_Seq::i()->getNextSeqId('order'));
+        }
+
+        return true;
+    }
+
     public function billing()
     {
         return FCom_Sales_Model_Cart_Address::i()->orm('a')
