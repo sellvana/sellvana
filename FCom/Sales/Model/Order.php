@@ -55,7 +55,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $data = array();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        $data['purchased_dt'] = date("Y-m-d H:i:s");
+        $data['updated_at'] = date("Y-m-d H:i:s");
         $this->set($data)->save();
     }
 
@@ -179,6 +179,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if (is_object($shippingMethod)) {
             $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
         }
+
         $orderData                           = array();
         $orderData['cart_id']                = $cart->id();
         $orderData['customer_id']            = $cart->customer_id;
@@ -188,13 +189,16 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData['shipping_service']       = $cart->shipping_service;
         $orderData['shipping_service_title'] = $shippingServiceTitle;
         $orderData['payment_method']         = $cart->payment_method;
-        $orderData['payment_details']        = $cart->payment_details;
         $orderData['coupon_code']            = $cart->coupon_code;
         $orderData['tax']                    = $cart->tax;
 //        $orderData['total_json']             = $cart->total_json;
         $orderData['balance']                = $cart->grand_total; // this has been calculated in cart
         $orderData['gt_base']                = $cart->grand_total; // full grand total
-        $orderData['created_dt']             = BDb::now();
+        $orderData['created_at']             = BDb::now();
+        $data_serialized = array(
+            'totals' => $cart->data['totals']
+        );
+
 
         //create sales order
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');

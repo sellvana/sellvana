@@ -360,6 +360,9 @@ function($, Backbone, PageableCollection) {
                         queryParams: paramMap
                     });
                     var collection = new Collection();
+                    if(this.options.collection){
+                        collection.set(this.options.collection);
+                    }
                 } else {
                     var Collection = Backbone.Collection.extend({
                         model: Model,

@@ -289,7 +289,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         //TODO: price invalidate
         if (empty($this->data['totals']) || empty($this->data['last_calc_at'])
-            || $this->data['last_calc_at']<time()-86400
+            || $this->data['last_calc_at'] < time() - 86400
         ) {
             $this->calculateTotals()->save();
         }
