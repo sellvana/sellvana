@@ -274,7 +274,7 @@
 
       var state = this.state = _extend({}, PageableProto.state, this.state,
                                        options.state || {});
-
+console.log(this.url, this.state, state, options);
       state.currentPage = state.currentPage == null ?
         state.firstPage :
         state.currentPage;

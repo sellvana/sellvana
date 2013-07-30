@@ -196,7 +196,7 @@ class BModuleRegistry extends BClass
                     BDebug::error(BLocale::_("Unknown manifest file format: %s", $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                BDebug::error(BLocale::_("Could not read manifest file: %s", $file));
+                BDebug::error(BLocale::_("Invalid or empty manifest file: %s", $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName=>$params) {

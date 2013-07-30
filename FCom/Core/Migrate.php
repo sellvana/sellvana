@@ -27,4 +27,19 @@ class FCom_Core_Migrate extends BClass
             ");
         }
     }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        BDb::ddlTableDef(FCom_Core_Model_Seq::table(), array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'entity_type' => 'varchar(15) not null',
+                'current_seq_id' => 'varchar(15) not null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_entity_type' => 'UNIQUE (entity_type)',
+            ),
+        ));
+    }
 }

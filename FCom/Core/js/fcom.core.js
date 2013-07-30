@@ -329,41 +329,54 @@ function($, Backbone, PageableCollection) {
                 this.prepareConfig();
 
                 var Model = this.options.model || Backbone.Model;
+                if (this.options.data_url || this.options.pageable) {
 
-                var paramsMap = {
-                    currentPage: 'p',
-                    pageSize: 'ps',
-                    totalPages: 'mp',
-                    totalRecords: 'c',
-                    sortKey: 's',
-                    order: 'sd'
-                };
-
-                if (this.options.data_url) {
+                    var paramMap = {
+                        currentPage: 'p',
+                        pageSize: 'ps',
+                        totalPages: 'mp',
+                        totalRecords: 'c',
+                        sortKey: 's',
+                        order: 'sd',
+                        directions: {
+                            '-1': 'asc',
+                            '1': 'desc'
+                        }
+                    }
+                    var state = { pageSize: 25 }, invDirs = {'asc':'-1', 'desc':'1'};
+                    _.each(paramMap, function(k, v) {
+                        if (self.options.state[k]) {
+                            var val = self.options.state[k];
+                            if ('order' === v) val = invDirs[val];
+                            state[v] = val;
+                        }
+                    });
+                    console.log(state);
                     var Collection = PageableCollection.extend({
                         model: Model,
                         url: this.options.data_url,
-                        state: this.options.state || { pageSize: 25 },
+                        state: state,
                         mode: this.options.data_mode || 'server',
-                        queryParams: paramsMap
+                        queryParams: paramMap
                     });
                     var collection = new Collection();
-                    /*
-                    paginator = new Backgrid.Extension.Paginator({
-                        collection: collection
-                    });
-
-                    filter = new Backgrid.Extension.ServerSideFilter({
-                        collection: collection,
-                        fields: ['name']
-                    });
-                    */
                 } else {
                     var Collection = Backbone.Collection.extend({
-                        model: Model
-                    })
+                        model: Model,
+                    });
                     var collection = new Collection(this.options.collection);
                 }
+
+                /*
+                paginator = new Backgrid.Extension.Paginator({
+                    collection: collection
+                });
+
+                filter = new Backgrid.Extension.ServerSideFilter({
+                    collection: collection,
+                    fields: ['name']
+                });
+                */
 
                 var toolbarOptions = this.options.toolbar;
                 toolbarOptions.columns = this.options.columns;
