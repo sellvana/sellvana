@@ -1,3 +1,4 @@
+@javascript
 Feature: Order process
   To be able to buy a product
   As a website user
@@ -6,9 +7,8 @@ Feature: Order process
   Scenario: Perform order placement process as guest
     Given I am on "/index.php/test/test-product"
     When I press "Add to Cart"
-    Then I should be on "/index.php/cart"
-    When I follow "Proceed to Checkout"
-    Then I should be on "/index.php/checkout/login"
+    And I go to "/index.php/cart"
+    And I go to "/index.php/checkout/login"
     And should see "Login"
     And should see "Email"
     And should see "Password"
@@ -21,27 +21,11 @@ Feature: Order process
     And I fill in "email" with "petar.dev@gmail.com"
     And I fill in "street1" with "Gulf dr. 123"
     And I fill in "city" with "Panama City"
-    And I fill in "region" with "FL"
+    And I select "USA" from "country"
+    And I select "FL" from "region"
     And I fill in "postcode" with "12345"
     And I check "Billing address is same as shipping"
     And I press "Save address"
-    Then I should be on "/index.php/checkout"
-    And I should see "Review and Place Order"
-    Then I should be on "/index.php/checkout"
-    And I should see "Review and Place Order"
-    When I press "Place your order"
-    Then I should be on "/index.php/checkout/success"
-
-  Scenario: Perform order placement process as logged in user
-    Given I am on "/index.php/test/test-product"
-    When I press "Add to Cart"
-    Then I should be on "/index.php/cart"
-    When I follow "Proceed to Checkout"
-    Then I should be on "/index.php/checkout/login"
-    And should see "Login"
-    When I fill in "login[email]" with "petar.dev@gmail.com"
-    And I fill in "login[password]" with "123456"
-    And I press "Login"
     Then I should be on "/index.php/checkout"
     And I should see "Review and Place Order"
     Then I should be on "/index.php/checkout"
