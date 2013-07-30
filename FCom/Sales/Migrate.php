@@ -336,4 +336,24 @@ class FCom_Sales_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        // todo update created at fields
+
+        BDb::ddlTableDef(FCom_Sales_Model_Order::table(), array(
+            'COLUMNS' => array(
+                'created_dt' => 'RENAME created_at datetime DEFAULT NULL',
+                'purchased_dt' => 'RENAME updated_at datetime DEFAULT NULL',
+                'gt_base' => 'RENAME grandtotal decimal(12,2) NOT NULL',
+                'tax' => 'decimal(10,2) NULL',
+                'unique_id' => 'varchar(15) NOT NULL',
+                'status' => 'varchar(50) NOT NULL',
+                'shippping_service' => 'DROP',
+                'payment_details' => 'DROP',
+                'status_id' => 'DROP',
+                'totals_json' => 'DROP',
+            ),
+        ));
+    }
 }
