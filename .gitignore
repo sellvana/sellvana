@@ -30,3 +30,10 @@ __db.php
 /storage/config/core1.php
 /storage/config/db.php
 /storage/config/db1.php
+/storage/
+/bin/
+*.phar
+*.lock
+*.log
+*.sql
+composer.*
