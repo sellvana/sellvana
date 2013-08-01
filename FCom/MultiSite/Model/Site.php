@@ -45,7 +45,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static public function findByDomain($domain=null)
     {
         if (is_null($domain)) {
-            $domain = BRequest::i()->httpHost();
+            $domain = BRequest::i()->httpHost(false);
         }
         $domain = strtolower($domain);
         $map = (array)static::i()->getDomainMap();
