@@ -1189,6 +1189,9 @@ class BResponse extends BClass
     {
         BSession::i()->close();
         $this->status($status, null, false);
+        if (!BUtil::isUrlFull($url)) {
+            $url = BApp::href($url);
+        }
         header("Location: {$url}", null, $status);
         $this->shutdown(__METHOD__);
     }
