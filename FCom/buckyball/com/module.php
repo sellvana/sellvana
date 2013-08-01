@@ -828,7 +828,7 @@ class BModule extends BClass
         $c = BConfig::i();
         static::$_env['doc_root'] = $r->docRoot();
         static::$_env['web_root'] = $r->webRoot();
-        static::$_env['http_host'] = $r->httpHost();
+        //static::$_env['http_host'] = $r->httpHost();
         if (($rootDir = $c->get('fs/root_dir'))) {
             static::$_env['root_dir'] = str_replace('\\', '/', $rootDir);
         } else {

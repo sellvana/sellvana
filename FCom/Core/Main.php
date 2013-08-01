@@ -340,7 +340,8 @@ class FCom_Core_Main extends BClass
         if (empty($url[$full])) {
             $url[$full] = rtrim(BConfig::i()->get('web/base_href'), '/').'/resize.php';
             if ($full) {
-                $url[$full] = '//'.BRequest::i()->httpHost().$url[$full];
+                $r = BRequest::i();
+                $url[$full] = BApp::baseUrl(true).$url[$full];
             }
         }
         return $url[$full];
