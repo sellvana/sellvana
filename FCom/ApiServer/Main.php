@@ -14,13 +14,3 @@ class FCom_ApiServer_Main extends BClass
         ));
     }
 }
-
-class FCom_ApiServer_Controller_Abstract extends FCom_Core_Controller_Abstract
-{
-
-}
-
-class FCom_ApiServer_Controller_RestAbstract extends FCom_Api_Controller_Abstract
-{
-
-}
