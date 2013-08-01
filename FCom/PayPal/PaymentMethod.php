@@ -2,9 +2,9 @@
 
 class FCom_PayPal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
-    public function getName()
+    public function __construct()
     {
-        return 'PayPal Express Checkout';
+        $this->_name = 'PayPal Express Checkout';
     }
 
     public function getCheckoutFormView()
