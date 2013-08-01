@@ -365,7 +365,7 @@ function($, Backbone, PageableCollection) {
                     }
                 } else {
                     var Collection = Backbone.Collection.extend({
-                        model: Model,
+                        model: Model
                     });
                     var collection = new Collection(this.options.collection);
                 }

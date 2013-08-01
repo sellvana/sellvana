@@ -398,6 +398,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $methods[$this->shipping_method];
     }
 
+    /**
+     * @return null|FCom_Sales_Method_Payment_Interface
+     */
     public function getPaymentMethod()
     {
         if (!$this->payment_method) {
