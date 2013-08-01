@@ -48,8 +48,8 @@ class FCom_Catalog_Migrate extends BClass
                 'uom'           => "VARCHAR(10) NOT NULL DEFAULT 'EACH'",
                 'thumb_url'     => 'TEXT',
                 'images_data'   => 'TEXT',
-                'create_at'     => 'DATETIME DEFAULT NULL',
-                'update_at'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'create_dt'     => 'DATETIME DEFAULT NULL',
+                'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -149,6 +149,17 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef(FCom_Catalog_Model_Category::table(), array(
             'COLUMNS' => array(
                 'data_serialized' => 'mediumtext null',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        $table = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at DATETIME DEFAULT NULL',
+                  'update_dt'      => 'RENAME update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
             ),
         ));
     }
