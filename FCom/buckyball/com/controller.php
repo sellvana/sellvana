@@ -100,9 +100,26 @@ class BRequest extends BClass
     *
     * @return string
     */
-    public static function httpHost()
+    public static function httpHost($includePort = true)
     {
-        return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+        if (empty($_SERVER['HTTP_HOST'])) {
+            return null;
+        }
+        if ($includePort) {
+            return $_SERVER['HTTP_HOST'];
+        }
+        $a = explode(':', $_SERVER['HTTP_HOST']);
+        return $a[0];
+    }
+
+    /**
+    * Port from request headers
+    *
+    * @return string
+    */
+    public static function httpPort()
+    {
+        return !empty($_SERVER['HTTP_PORT']) ? $_SERVER['HTTP_PORT'] : null;
     }
 
     /**
@@ -429,7 +446,7 @@ class BRequest extends BClass
         $config = BConfig::i()->get('cookie');
         $lifespan = !is_null($lifespan) ? $lifespan : $config['timeout'];
         $path = !is_null($path) ? $path : (!empty($config['path']) ? $config['path'] : static::webRoot());
-        $domain = !is_null($domain) ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost());
+        $domain = !is_null($domain) ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost(false));
 
         setcookie($name, $value, time()+$lifespan, $path, $domain);
     }
@@ -546,7 +563,7 @@ class BRequest extends BClass
                 $p = parse_url($ref);
                 $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
                 $webRoot = static::webRoot();
-                if ($p['host']!==static::httpHost() || $webRoot && strpos($p['path'], $webRoot)!==0) {
+                if ($p['host']!==static::httpHost(false) || $webRoot && strpos($p['path'], $webRoot)!==0) {
                     return true; // referrer host or doc root path do not match, high prob. csrf
                 }
                 return false; // not csrf
@@ -575,7 +592,7 @@ class BRequest extends BClass
     {
         $ip = static::ip();
         if (!$host) {
-            $host = static::httpHost();
+            $host = static::httpHost(false);
         }
         $origin = static::httpOrigin();
         $hostIPs = gethostbynamel($host);
@@ -599,7 +616,9 @@ class BRequest extends BClass
     public static function currentUrl()
     {
         $webroot = rtrim(static::webRoot(), '/');
-        $url = static::scheme().'://'.static::httpHost();
+        $scheme = static::scheme();
+        $port = static::httpPort();
+        $url = $scheme.'://'.static::httpHost();
         if (!BConfig::i()->get('web/hide_script_name')) {
             $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
         } else {
