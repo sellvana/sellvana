@@ -97,4 +97,21 @@ class FCom_Promo_Migrate extends BClass
         $tCart = FCom_Promo_Model_Cart::table();
         BDb::ddlAddColumns($tCart, array('updated_dt' => "datetime"));
     }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $table = FCom_Promo_Model_Cart::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'updated_dt'      => 'RENAME updated_at datetime NULL',
+            ),
+        ));
+        $table = FCom_Promo_Model_Promo::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NULL',
+            ),
+        ));
+    }
 }

@@ -356,4 +356,26 @@ class FCom_Sales_Migrate extends BClass
             ),
         ));
     }
+    public function upgrade__0_2_4__0_2_5()
+    {
+        foreach (array(FCom_Sales_Model_Cart_Item::table(),
+                       FCom_Sales_Model_Cart_Address::table(),
+                       FCom_Sales_Model_Order_Address::table(),
+                 )
+                 as $table) {
+            BDb::ddlTableDef($table, array(
+                        'COLUMNS' => array(
+                            'create_dt' => 'RENAME create_at datetime NOT NULL',
+                            'update_dt' => 'RENAME update_at datetime NOT NULL',
+                        ),
+                    ));
+        }
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
+            'COLUMNS' => array(
+                'create_dt' => 'RENAME create_at datetime NULL',
+                'update_dt' => 'RENAME update_at datetime NULL',
+            ),
+        ));
+
+    }
 }

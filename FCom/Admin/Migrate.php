@@ -132,4 +132,16 @@ class FCom_Admin_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        $table = FCom_Admin_Model_User::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'  => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'  => 'RENAME update_at datetime DEFAULT NULL',
+                  'token_dt'   => 'RENAME token_at datetime DEFAULT NULL',
+            ),
+        ));
+    }
 }

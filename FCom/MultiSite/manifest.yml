@@ -1,6 +1,6 @@
 modules:
 	FCom_MultiSite:
-		version: 0.1.0
+		version: 0.1.1
 		translations: { de: de.php }
 		description: "Enable multiple website management from the same instance"
 		before_bootstrap: { callback: FCom_MultiSite_Main::beforeBootstrap }

@@ -36,4 +36,22 @@ class FCom_Seo_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $table = FCom_Seo_Model_UrlAlias::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime',
+                  'update_dt'      => 'RENAME update_at datetime',
+            )
+        ));
+        $table = FCom_Seo_Model_Sitemap::table();
+        BDb::ddlTableDef($table, array (
+            'COLUMNS' => array (
+                  'create_dt'      => 'RENAME create_at datetime',
+                  'update_dt'      => 'RENAME update_at datetime',
+            ),
+        ));
+    }
 }

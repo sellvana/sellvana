@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.1.4
+        version: 0.1.5
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
         observe:

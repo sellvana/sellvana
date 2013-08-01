@@ -1695,8 +1695,8 @@ class BModelUser extends BModel
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }

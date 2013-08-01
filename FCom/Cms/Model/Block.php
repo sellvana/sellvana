@@ -24,12 +24,12 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             return false;
         }
 
-        if (!$this->get('create_dt')) {
-            $this->set('create_dt', BDb::now());
+        if (!$this->get('create_at')) {
+            $this->set('create_at', BDb::now());
         }
         $this->set('version', $this->version ? $this->version + 1 : '1');
 //        $this->set('version_comments', $this->version ? $this->version : '1');
-        $this->set('update_dt', BDb::now());
+        $this->set('update_at', BDb::now());
         $this->set('modified_time', time()); // attempt to compare with filemtime() for caching
         return true;
     }

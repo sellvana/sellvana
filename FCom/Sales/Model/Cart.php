@@ -128,7 +128,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function recentItems($limit=3)
     {
         $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id)
-            ->order_by_desc('ci.update_dt')->limit($limit);
+            ->order_by_desc('ci.update_at')->limit($limit);
         BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
         $items = $orm->find_many();
         BEvents::i()->fire(__METHOD__.'.data', array('items'=>&$items));
@@ -300,8 +300,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_dt) {
-            $this->create_dt = BDb::now();
+        if (!$this->create_at) {
+            $this->create_at = BDb::now();
         }
         if (!$this->customer_id && FCom_Customer_Model_Customer::i()->isLoggedIn()) {
             $this->customer_id = FCom_Customer_Model_Customer::i()->sessionUserId();
@@ -318,7 +318,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->payment_method = BConfig::i()->get('modules/FCom_Sales/default_payment_method');
         }
 
-        $this->update_dt = BDb::now();
+        $this->update_at = BDb::now();
         $this->data_serialized = BUtil::toJson($this->data);
         return true;
     }
