@@ -15,8 +15,8 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             'handle' => array('label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=<%=id%>')),
             'description' => array('label'=>'Description', 'editable'=>true),
             'version' => array('label'=>'Version'),
-            'create_dt' => array('label'=>'Created', 'cell'=>'date'),
-            'update_dt' => array('label'=>'Updated', 'cell'=>'date'),
+            'create_at' => array('label'=>'Created', 'cell'=>'date'),
+            'update_at' => array('label'=>'Updated', 'cell'=>'date'),
             '_actions' => array('label' => 'Actions', 'sortable' => false),
         );
         return $config;

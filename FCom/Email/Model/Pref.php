@@ -25,7 +25,7 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     {
         $pref = static::load($email, 'email');
         if (!$salt) $salt = BUtil::randomString(8);
-        return $salt.'_'.sha1($salt.'|'.$email.'|'.($pref ? $pref->update_dt : ''));
+        return $salt.'_'.sha1($salt.'|'.$email.'|'.($pref ? $pref->update_at : ''));
     }
 
     public static function validateToken($email, $token)
@@ -37,8 +37,8 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         return true;
     }
 }

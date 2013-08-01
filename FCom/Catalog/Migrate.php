@@ -48,8 +48,8 @@ class FCom_Catalog_Migrate extends BClass
                 'uom'           => "VARCHAR(10) NOT NULL DEFAULT 'EACH'",
                 'thumb_url'     => 'TEXT',
                 'images_data'   => 'TEXT',
-                'create_dt'     => 'DATETIME DEFAULT NULL',
-                'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'create_at'     => 'DATETIME DEFAULT NULL',
+                'update_at'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(

@@ -119,4 +119,24 @@ class FCom_Customer_Migrate extends BClass
         ));
     }
 
+    public function upgrade__0_1_5__0_1_6()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+            ),
+          )
+        );
+        $table = FCom_Customer_Model_Address::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+            ),
+          )
+        );
+    }
+
 }

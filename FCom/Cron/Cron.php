@@ -58,7 +58,7 @@ class FCom_Cron_Cron extends BClass
         $time = strtotime(BDb::now());
         $timeout = $time-$timeoutSecs;
         foreach ($dbTasks as $h=>$task) {
-            $task->last_start_time = strtotime($task->last_start_dt);
+            $task->last_start_time = strtotime($task->last_start_at);
             if ($task->status==='running' && $task->last_start_time < $timeout) {
                 $task->set('status', 'timeout')->save();
             }
@@ -115,8 +115,8 @@ class FCom_Cron_Cron extends BClass
             // mark task as running
             $dbTask->set(array(
                 'status'=>'running',
-                'last_start_dt'=>BDb::now(),
-                'last_finish_dt'=>null,
+                'last_start_at'=>BDb::now(),
+                'last_finish_at'=>null,
             ))->save();
             $task = $this->_tasks[$dbTask->handle];
 
@@ -130,7 +130,7 @@ class FCom_Cron_Cron extends BClass
                 $dbTask->set(array('status'=>'error', 'last_error_msg'=>$e->getMessage()));
             }
             // set finishing time and save task
-            $dbTask->set(array('last_finish_dt'=>BDb::now()))->save();
+            $dbTask->set(array('last_finish_at'=>BDb::now()))->save();
         }
         return $this;
     }

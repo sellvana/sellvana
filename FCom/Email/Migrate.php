@@ -41,4 +41,22 @@ class FCom_Email_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $table = FCom_Email_Model_Message::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'resent_dt'      => 'RENAME resent_at datetime NULL',
+            ),
+        ));
+        $table = FCom_Email_Model_Pref::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+            ),
+        ));
+    }
 }

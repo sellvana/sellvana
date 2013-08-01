@@ -50,7 +50,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
                 ->addView('cms_nav', array(
                     'renderer'    => 'BPHPTAL::renderer',
                     'source'      => $this->content ? $this->content : ' ',
-                    'source_name' => 'cms_nav:'.$this->url_path.':'.strtotime($this->update_dt),
+                    'source_name' => 'cms_nav:'.$this->url_path.':'.strtotime($this->update_at),
                 ))
                 ->hookView('main', 'cms_nav')
             ;
