@@ -7,6 +7,7 @@ class FCom_Promo_Migrate extends BClass
         BMigrate::install('0.1.0', array($this, 'install'));
         BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
         BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
+        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
     }
 
     public function install()
@@ -98,7 +99,7 @@ class FCom_Promo_Migrate extends BClass
         BDb::ddlAddColumns($tCart, array('updated_dt' => "datetime"));
     }
 
-    public function upgrade__0_1_2__0_1_3()
+    public function upgrade_0_1_3()
     {
         $table = FCom_Promo_Model_Cart::table();
         BDb::ddlTableDef($table, array(
