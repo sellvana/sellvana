@@ -2,17 +2,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.2', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-    }
-
-    public function install()
+    public function install__0_1_2()
     {
         $tRole = FCom_Admin_Model_Role::table();
         BDb::run("
@@ -68,7 +58,7 @@ class FCom_Admin_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tUser = FCom_Admin_Model_User::table();
 
@@ -93,7 +83,7 @@ class FCom_Admin_Migrate extends BClass
         ");
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tUser = FCom_Admin_Model_User::table();
         BDb::ddlClearCache();
@@ -107,7 +97,7 @@ class FCom_Admin_Migrate extends BClass
         } catch (Exception $e) { }
     }
 
-    public function upgrade_0_1_3()
+    public function upgrade__0_1_2__0_1_3()
     {
         $tUser = FCom_Admin_Model_User::table();
         BDb::ddlClearCache();
@@ -124,7 +114,7 @@ class FCom_Admin_Migrate extends BClass
         } catch (Exception $e) { }
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         BDb::ddlTableDef(FCom_Admin_Model_User::table(), array(
             'COLUMNS' => array(
@@ -134,7 +124,7 @@ class FCom_Admin_Migrate extends BClass
         ));
     }
 
-    public function upgrade_0_1_5()
+    public function upgrade__0_1_4__0_1_5()
     {
         $table = FCom_Admin_Model_User::table();
         BDb::ddlTableDef($table, array(

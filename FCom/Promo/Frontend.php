@@ -242,7 +242,7 @@ class FCom_Promo_Frontend extends BClass
         //check cart promos
         $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
         foreach($allCartPromo as $cartPromo) {
-            if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->updated_at) + 3600) {
+            if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->update_at) + 3600) {
                 $cartPromo->delete();
             }
         }
@@ -254,7 +254,7 @@ class FCom_Promo_Frontend extends BClass
                 if (!$promoCart) {
                     $promoCart = FCom_Promo_Model_Cart::i()->create(array('cart_id'=>$cart->id, 'promo_id'=>$promo->id));
                 }
-                $promoCart->set('updated_at', date("Y-m-d H:i:s"));
+                $promoCart->set('update_at', date("Y-m-d H:i:s"));
                 $promoCart->save();
             }
         }

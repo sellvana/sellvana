@@ -63,4 +63,14 @@ class FCom_ProductReviews_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        $table = FCom_ProductReviews_Model_Review::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+            ),
+        ));
+    }
 }

@@ -55,7 +55,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $data = array();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        $data['updated_at'] = date("Y-m-d H:i:s");
+        $data['update_at'] = date("Y-m-d H:i:s");
         $this->set($data)->save();
     }
 
@@ -192,7 +192,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         //        $orderData['total_json']             = $cart->total_json;
         $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
         $orderData['grandtotal'] = $cart->grand_total; // full grand total
-        $orderData['created_at'] = $orderData['updated_at'] = BDb::now();
+        $orderData['create_at'] = $orderData['update_at'] = BDb::now();
 
         $data_serialized = array(
             'totals'           => $cart->data['totals'],
