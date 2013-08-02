@@ -1,12 +1,17 @@
 modules:
     FCom_Blog:
         version: 0.1.0
-        require: { module: { FCom_Core: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_Cms: 0.1.0 } }
+        auto_use: [ bootstrap, layout, views ]
 
         areas:
             FCom_Frontend:
                 routing:
                     - [ get, /blog/?, FCom_Blog_Frontend_Controller.index ]
-                    - [ get, /blog/:article, FCom_Blog_Frontend_Controller.article ]
+                    - [ get, /blog/*article, FCom_Blog_Frontend_Controller.article ]
                     - [ get, /blog/tag/:tag, FCom_Blog_Frontend_Controller.tag ]
                     - [ get, /blog/archive/:year/?:month, FCom_Blog_Frontend_Controller.archive ]
+
+            FCom_Admin:
+                routing:
+                    - [ any, /blog/?.action, FCom_Blog_Admin_Controller ]

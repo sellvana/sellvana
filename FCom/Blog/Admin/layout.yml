@@ -1,0 +1,18 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, cms/blog, { label: Blog, href: /blog, pos: 100 } ]
+
+/blog:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+
+/blog/form:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, cms/blog ]] }
+    - view: admin/form
+        set: { tab_view_prefix: blog-form/ }
+        do:
+            - [ addTab, main, { label: Blog Post, pos: 10 } ]
