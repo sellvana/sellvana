@@ -1,15 +1,7 @@
 <?php
 class FCom_CatalogIndex_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.6', array($this, 'install'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
-    }
-
-    public function install()
+    public function install__0_1_6()
     {
         $tCustField = FCom_CustomField_Model_Field::table();
         $tProduct = FCom_Catalog_Model_Product::table();
@@ -130,7 +122,7 @@ class FCom_CatalogIndex_Migrate extends BClass
         $this->upgrade_0_1_4();
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         //$this->install();
         BDb::run("
@@ -148,7 +140,7 @@ VALUES
         ");
     }
 
-    public function upgrade_0_1_5()
+    public function upgrade__0_1_4__0_1_5()
     {
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
@@ -162,7 +154,7 @@ VALUES
         );
     }
 
-    public function upgrade_0_1_6()
+    public function upgrade__0_1_5__0_1_6()
     {
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(

@@ -2,13 +2,7 @@
 
 class FCom_MultiSite_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::i()->install('0.1.0', array($this, 'install'));
-        BMigrate::i()->upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tSite = FCom_MultiSite_Model_Site::table();
 
@@ -33,7 +27,7 @@ class FCom_MultiSite_Migrate extends BClass
             ),
         ));
     }
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $table = FCom_MultiSite_Model_Site::table();
         BDb::ddlTableDef($table, array(

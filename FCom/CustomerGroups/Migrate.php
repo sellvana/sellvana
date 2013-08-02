@@ -8,13 +8,7 @@
 class FCom_CustomerGroups_Migrate
     extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
 
@@ -48,7 +42,7 @@ class FCom_CustomerGroups_Migrate
         );
     } // end install
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
 

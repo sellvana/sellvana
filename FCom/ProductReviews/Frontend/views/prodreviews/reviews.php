@@ -16,7 +16,7 @@ $isLoggedIn = FCom_Customer_Model_Customer::isLoggedIn();
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="4" <?=$review->rating == 4 ? 'checked': ''?>/>
         <input name="review[rating<?=$review->id?>]" type="radio" class="star" disabled="disabled" value="5" <?=$review->rating == 5 ? 'checked': ''?>/>
         <span style="font-weight: bold; padding-left: 15px;"><?=$review->title?></span>
-        <?=date("F d, Y", strtotime($review->created_at))?>
+        <?=date("F d, Y", strtotime($review->create_at))?>
     <br/>
         <?=nl2br($review->text)?><br/>
 
