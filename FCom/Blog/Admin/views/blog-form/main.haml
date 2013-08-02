@@ -1,0 +1,19 @@
+- $m = $this->model
+
+%fieldset.form-horizontal
+    .control-group
+        %label.control-label(for="model-title") = $this->_('Title')
+        .controls
+            %input(type="text" id="model-title" name="model[title]" value="#{$m->title}")
+    .control-group
+        %label.control-label(for="model-url-key") = $this->_('URL Key').' '.$this->_('(optional)')
+        .controls
+            %input(type="text" id="model-url-key" name="model[url_key]" value="#{$m->url_key}")
+    .control-group
+        %label.control-label(for="model-preview") = $this->_('Preview')
+        .controls
+            %textarea(type="text" id="model-preview" name="model[preview]") = $m->preview
+    .control-group
+        %label.control-label(for="model-content") = $this->_('Content')
+        .controls
+            %textarea(id="model-content" name="model[content]") = $m->content

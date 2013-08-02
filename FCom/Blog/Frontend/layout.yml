@@ -1,0 +1,16 @@
+/blog/index:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/tag:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/archive:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/article:
+    - { include: base }
+    - { hook: main, views: blog/article }
+
