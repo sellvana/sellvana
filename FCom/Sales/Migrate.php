@@ -388,4 +388,36 @@ class FCom_Sales_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_6__0_2_7()
+    {
+        $oTable = FCom_Sales_Model_Order::table();
+        BDb::ddlTableDef(FCom_Sales_Model_Order_Payment::table(), array(
+            'COLUMNS' => array(
+                'id'               => 'int (10) unsigned not null auto_increment',
+                'create_at'        => 'datetime not null',
+                'update_at'        => 'datetime null',
+                'method'           => 'varchar(50) not null',
+                'parent_id'        => 'int(10) null',
+                'order_id'         => 'int(10) unsigned not null',
+                'amount'           => 'decimal(12,2)',
+                'data_serialized'  => 'text',
+                'status'           => 'varchar(50)',
+                'transaction_id'   => 'varchar(50)',
+                'transaction_type' => 'varchar(50)',
+                'online'           => 'BOOL',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS'  => array(
+                'method'           => '(method)',
+                'order_id'         => '(order_id)',
+                'status'           => '(status)',
+                'transaction_id'   => '(transaction_id)',
+                'transaction_type' => '(transaction_type)',
+            ),
+            'CONSTRAINTS' => array(
+                'fk_payment_order' => "FOREIGN KEY (order_id) REFERENCES {$oTable}(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+            ),
+        ));
+    }
 }
