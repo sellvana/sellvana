@@ -2188,7 +2188,7 @@ class BActionController extends BClass
         return self::origClass();
     }
 
-    public function viewProxy($viewPrefix, $defaultView='index', $hookName = 'main')
+    public function viewProxy($viewPrefix, $defaultView='index', $hookName = 'main', $baseLayout = null)
     {
         $viewPrefix = trim($viewPrefix, '/').'/';
         $page = BRequest::i()->params('view');
@@ -2200,24 +2200,42 @@ class BActionController extends BClass
             $this->forward(false);
             return false;
         }
+
+        if ($baseLayout) {
+            $this->layout($baseLayout);
+        }
         BLayout::i()->applyLayout('view-proxy')->applyLayout($viewPrefix.$page);
+
         $view->render();
         $metaData = $view->param('meta_data');
-        if ($metaData && ($head = $this->view('head'))) {
-            foreach ($metaData as $k=>$v) {
-                $k = strtolower($k);
-                switch ($k) {
-                case 'title':
-                    $head->addTitle($v); break;
-                case 'meta_title': case 'meta_description': case 'meta_keywords':
-                    $head->meta(str_replace('meta_','',$k), $v); break;
+        if ($metaData) {
+            if (!empty($metaData['layout.yml'])) {
+                BLayout::i()->addLayout('viewproxy-metadata', BYAML::i()->parse(trim($metaData['layout.yml'])))
+                    ->applyLayout('viewproxy-metadata');
+            }
+            if (($head = $this->view('head'))) {
+                foreach ($metaData as $k=>$v) {
+                    $k = strtolower($k);
+                    switch ($k) {
+                    case 'title':
+                        $head->addTitle($v); break;
+                    case 'meta_title': case 'meta_description': case 'meta_keywords':
+                        $head->meta(str_replace('meta_','',$k), $v); break;
+                    }
                 }
             }
         }
+
         if (($root = BLayout::i()->view('root'))) {
             $root->addBodyClass('page-'.$page);
         }
+
         BLayout::i()->hookView($hookName, $viewPrefix . $page);
+
+        if (!empty($metaData['http_status'])) {
+            BResponse::i()->status($metaData['http_status']);
+        }
+
         return $page;
     }
 
