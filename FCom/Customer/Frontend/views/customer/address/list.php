@@ -3,10 +3,10 @@
 
 <?php foreach($this->addresses as $address): ?>
     <?php if ($address->id == $this->customer->default_shipping_id): ?>
-        <b><?= BLocale::_("Default shipping address") ?></b><br/>
+        </trong><?= BLocale::_("Default shipping address") ?></strong><br/>
     <?php endif; ?>
     <?php if ($address->id == $this->customer->default_billing_id): ?>
-        <b><?= BLocale::_("Default billing address") ?></b><br/>
+        </trong><?= BLocale::_("Default billing address") ?></strong><br/>
     <?php endif; ?>
 
     <?=FCom_Customer_Model_Address::i()->as_html($address)?>

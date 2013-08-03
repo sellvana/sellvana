@@ -1,0 +1,12 @@
+modules:
+    FCom_FrontendThemeBlue:
+        version: 0.1.0
+        description: First homegrown theme
+        require: { module: { FCom_Frontend_DefaultTheme: 0.1.0 } }
+
+        provides:
+            themes:
+                FCom_FrontendThemeBlue:
+                    area: FCom_Frontend
+                    layout: layout.yml
+                    parent: FCom_Frontend_DefaultTheme

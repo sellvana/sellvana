@@ -1010,11 +1010,18 @@ class BResponse extends BClass
     /**
     * Send json data as a response (for json API implementation)
     *
+    * Supports JSON-P
+    *
     * @param mixed $data
     */
     public function json($data)
     {
-        $this->setContentType('application/json')->set(BUtil::toJson($data))->render();
+        $response = BUtil::toJson($data);
+        $callback = BRequest::i()->get('callback');
+        if ($callback) {
+            $response = $callback.'('.$response.')';
+        }
+        $this->setContentType('application/json')->set($response)->render();
     }
 
     public function fileContentType($fileName)
@@ -2159,14 +2166,15 @@ class BActionController extends BClass
         return self::origClass();
     }
 
-    public function viewProxy($viewPrefix, $defaultView='index')
+    public function viewProxy($viewPrefix, $defaultView='index', $hookName = 'main')
     {
         $viewPrefix = trim($viewPrefix, '/').'/';
         $page = BRequest::i()->params('view');
         if (!$page) {
             $page = $defaultView;
         }
-        if (!$page || !($view = $this->view($viewPrefix.$page))) {
+        $view = $this->view($viewPrefix.$page);
+        if ($view instanceof BViewEmpty) {
             $this->forward(false);
             return false;
         }
@@ -2184,7 +2192,10 @@ class BActionController extends BClass
                 }
             }
         }
-        BLayout::i()->hookView('main', $viewPrefix.$page);
+        if (($root = BLayout::i()->view('root'))) {
+            $root->addBodyClass('page-'.$page);
+        }
+        BLayout::i()->hookView($hookName, $viewPrefix . $page);
         return $page;
     }
 

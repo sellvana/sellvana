@@ -6,17 +6,23 @@
 					<h1 class="title">Login</h1>
 				</header>
 		        <?php echo $this->messagesHtml() ?>
-				<ul class="form-group">
-					<li class="row-label"><label for="#"><?= BLocale::_("Email") ?></label>
-						<input type="email" name="login[email]" class="required"/></li>
-					<li class="row-label"><label for="#"><?= BLocale::_("Password") ?></label>
-						<input type="password" name="login[password]" class="required"/></li>
-				</ul>
-				<p class="checkbox-row">
+				<div class="control-group">
+					<label for="#" class="control-label"><?= BLocale::_("Email") ?></label>
+					<div class="controls">
+					  <input type="email" name="login[email]" class="required"/>
+					</div>
+				</div>
+				<div class="control-group">
+					<label for="#" class="control-label"><?= BLocale::_("Password") ?></label>
+					<div class="controls">
+					  <input type="password" name="login[password]" class="required"/>
+					</div>
+				</div>
+				<div class="checkbox">
 					<label for="remember-me"><input type="checkbox" id="remember-me"/>Remember Me</label>
-				</p>
-				<div class="buttons-set">
-					<button class="button" type="submit"><span>Login</span></button>
+				</div>
+				<div class="btn-group">
+					<button class="btn btn-primary" type="submit"><span>Login</span></button>
 					<a href="<?php echo BApp::href('customer/password/recover')?>">Forgot your password?</a></a>
 				</div>
 				<div class="divider"></div>

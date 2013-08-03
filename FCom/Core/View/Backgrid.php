@@ -84,6 +84,17 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         }
         $config['columns'] = $columns;
 
+        if (empty($config['toolbar'])) {
+            $config['toolbar'] = array(
+                'template' => '#backgrid-toolbar-template',
+                'show_page_sizes' => true,
+                'show_pages' => true,
+                'show_filters' => true,
+                'show_column_chooser' => true,
+                'show_actions' => true,
+            );
+        }
+
         $this->_applyPersonalization($config);
 
         if (empty($config['state'])) {

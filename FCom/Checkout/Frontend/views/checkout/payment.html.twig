@@ -1,0 +1,15 @@
+{% set curMethod = THIS.get('cart').get('payment_method') %}
+<form action="{{ APP.href('checkout/payment') }}" method="post" class="payment-method-form">
+    <header class="main-title">
+    	<h1 class="title">{{ "Payment method" |_ }}</h1>
+    </header>
+    <fieldset>
+		    {% for method, class in THIS.get('payment_methods') %}
+		    <label class="radio">
+		      <input type="radio" class="radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' : '' }}>
+		        {{ class.getName() }}
+        </label>
+		    {% endfor %}
+    	<button type="submit" class="btn btn-primary">{{ "Continue to checkout" |_ }}</button>
+    </fieldset>
+</form>

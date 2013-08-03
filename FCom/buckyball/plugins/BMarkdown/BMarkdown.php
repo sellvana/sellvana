@@ -20,7 +20,7 @@ class BMarkdown extends BClass
         if (!static::$_parser) {
             require_once __DIR__.'/lib/markdown.php';
             static::$_parser = new MarkdownExtra_Parser;
-            static::$_cacheDir = $c->get('fs/cache_dir').'/markdown';
+            static::$_cacheDir = BConfig::i()->get('fs/cache_dir').'/markdown';
             BUtil::ensureDir(static::$_cacheDir);
         }
         return static::$_parser;
@@ -53,7 +53,7 @@ class BMarkdown extends BClass
             $output = $parser->transform($source);
             file_put_contents($cacheFilename, $output);
         } else {
-            $ouput = file_get_contents($cacheFilename);
+            $output = file_get_contents($cacheFilename);
         }
         BDebug::profile($pId);
 

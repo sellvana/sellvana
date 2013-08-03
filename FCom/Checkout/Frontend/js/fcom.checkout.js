@@ -4,7 +4,7 @@ define(["jquery", "fcom.frontend"], function($) {
         opt = opt || {};
         var cartActiveTimeout;
         function add(id, qty) {
-            if (!opt.apiUrl) opt.apiUrl = FCom.base_href + "cart";
+            if (!opt.apiUrl) opt.apiUrl = FCom.base_href + "cart/addxhr";
             $.post(opt.apiUrl, {action:'add', id:id, qty:qty||1}, function(data) {
                 //console.log(data);
                 /*

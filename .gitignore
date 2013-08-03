@@ -20,3 +20,13 @@ FCom/Foundation/lib4/.sass-cache
 index.local.php
 .idea
 __db.php
+/nbproject/private/
+.sass-cache/
+*.scssc
+
+/nbproject/project.properties
+/nbproject/project.xml
+/storage/config/core.php
+/storage/config/core1.php
+/storage/config/db.php
+/storage/config/db1.php

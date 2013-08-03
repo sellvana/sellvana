@@ -1,7 +1,7 @@
 - $m = $this->model
 %fieldset.form-horizontal
     .control-group
-        %label.control-label(for="model-cost") = $this->_('Product Name')
+        %label.control-label(for="model-cost") = $this->_('Cost')
         .controls
             %input(type="text" name="model[cost]" id="model-cost" value="#{$m->cost}")
     .control-group
@@ -15,13 +15,13 @@
     .control-group
         %label.control-label(for="model-base-price") = $this->_('Default Base Price')
         .controls
-            %input(type="text" name="model[base_price]" id="model-" value="#{$m->base_price}")
+            %input(type="text" name="model[base_price]" id="model-base_price" value="#{$m->base_price}")
     .control-group
         %label.control-label(for="model-sales-price") = $this->_('Default Sale Price')
         .controls
-            %input(type="text" name="model[sale_price]" id="model-" value="#{$m->sale_price}")
+            %input(type="text" name="model[sale_price]" id="model-sale_price" value="#{$m->sale_price}")
     .control-group
         %label.control-label(for="model-markup") = $this->_('Default Markup')
         .controls
-            %input(type="text" name="model[markup]" id="model-" value="#{$m->markup}")
+            %input(type="text" name="model[markup]" id="model-markup" value="#{$m->markup}")
 - echo $this->hook('catalog/products-form/prices', array('model'=>$m))

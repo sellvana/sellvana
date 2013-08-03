@@ -17,7 +17,7 @@ class BTwig extends BClass
         BLayout::i()->addRenderer('BTwig', array(
             'description' => 'Twig (HTML)',
             'callback' => 'BTwig::renderer',
-            'file_ext' => array('.twig', '.twig.html', '.html.twig'),
+            'file_ext' => array('.html.twig', '.twig.html'),
         ));
 
         BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
@@ -46,6 +46,10 @@ class BTwig extends BClass
         static::$_stringLoader = new Twig_Loader_String();
         static::$_stringTwig = new Twig_Environment(static::$_stringLoader, $options);
 
+        if ($options['debug']) {
+            static::$_fileTwig->addExtension(new Twig_Extension_Debug());
+            static::$_stringTwig->addExtension(new Twig_Extension_Debug());
+        }
         $i18nFilter = new Twig_SimpleFilter('_', 'BLocale::_');
         static::$_fileTwig->addFilter($i18nFilter);
         static::$_stringTwig->addFilter($i18nFilter);
@@ -59,7 +63,7 @@ class BTwig extends BClass
         });
         static::$_fileTwig->addFilter($debugFilter);
 
-        foreach (array('app', 'config', 'layout', 'request', 'session', 'util') as $var) {
+        foreach (array('app', 'config', 'layout', 'request', 'session', 'util', 'debug') as $var) {
             $global   = strtoupper($var);
             $class    = 'B'.ucfirst($var);
             $instance = $class::i();

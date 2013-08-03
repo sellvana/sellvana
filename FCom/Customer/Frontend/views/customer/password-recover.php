@@ -6,17 +6,15 @@
         <?php echo $this->messagesHtml() ?>
         <!--<div class="msg success-msg">Something went wrong</div>-->
         <form action="<?php echo BApp::href('customer/password/recover')?>" method="post" id="recovery-form">
-            <fieldset class="form-group">
-                <ul>
-                    <li class="form-row">
-                        <div class="form-field">
-                            <label for="#"><?= BLocale::_("Email") ?></label>
-                            <input type="email" name="email" class="required"/>
-                        </div>
-                    </li>
-                </ul>
-                <div class="form-buttons">
-                    <input type="submit" value="<?= BLocale::_("Send Recovery Instructions") ?>"/>
+            <fieldset>
+                <div class="control-group">
+                  <label for="#" class="control-label required"><?= BLocale::_("Email") ?></label>
+                  <div class="controls">
+                    <input type="email" name="email" class="required"/>
+                  </div>
+                </div>
+                <div class="btn-group">
+                    <input class="btn btn-primary" type="submit" value="<?= BLocale::_("Send Recovery Instructions") ?>"/>
                 </div>
             </fieldset>
         </form>
