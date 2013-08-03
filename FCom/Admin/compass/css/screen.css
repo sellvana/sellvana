@@ -10755,19 +10755,19 @@ a.label:hover, a.label:focus, a.badge:hover, a.badge:focus {
 /* SASS mixin */
 /* SASS VARIABLE */
 /* BASE */
-/* line 35, ../sass/fulleron.scss */
+/* line 35, ../sass/fcom.admin.scss */
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
-/* line 36, ../sass/fulleron.scss */
+/* line 36, ../sass/fcom.admin.scss */
 html, body {
   height: 100%;
 }
 
-/* line 37, ../sass/fulleron.scss */
+/* line 37, ../sass/fcom.admin.scss */
 body {
   position: relative;
   background: #f9f9f9;
@@ -10775,53 +10775,53 @@ body {
   font-weight: 400;
 }
 
-/* line 43, ../sass/fulleron.scss */
+/* line 43, ../sass/fcom.admin.scss */
 body, .btn {
   font-family: 'Open Sans', sans-serif;
 }
 
-/* line 46, ../sass/fulleron.scss */
+/* line 46, ../sass/fcom.admin.scss */
 body, label {
   font-weight: 400;
 }
 
-/* line 49, ../sass/fulleron.scss */
+/* line 49, ../sass/fcom.admin.scss */
 a {
   color: #1b68cb;
 }
-/* line 51, ../sass/fulleron.scss */
+/* line 51, ../sass/fcom.admin.scss */
 a:hover {
   color: #175ab0;
   text-decoration: none;
 }
-/* line 52, ../sass/fulleron.scss */
+/* line 52, ../sass/fcom.admin.scss */
 a:focus {
   color: #175ab0;
   text-decoration: none;
 }
-/* line 53, ../sass/fulleron.scss */
+/* line 53, ../sass/fcom.admin.scss */
 a:active {
   color: #175ab0;
   text-decoration: none;
 }
 
-/* line 55, ../sass/fulleron.scss */
+/* line 55, ../sass/fcom.admin.scss */
 nav ul {
   margin: 0;
 }
 
 /* FORMS */
-/* line 59, ../sass/fulleron.scss */
+/* line 59, ../sass/fcom.admin.scss */
 form {
   margin: 0;
 }
 
-/* line 60, ../sass/fulleron.scss */
+/* line 60, ../sass/fcom.admin.scss */
 label {
   font-size: 14px;
 }
 
-/* line 77, ../sass/fulleron.scss */
+/* line 77, ../sass/fcom.admin.scss */
 select,
 textarea,
 input[type="text"],
@@ -10850,14 +10850,14 @@ input[type="color"],
   box-sizing: content-box;
 }
 
-/* line 82, ../sass/fulleron.scss */
+/* line 82, ../sass/fcom.admin.scss */
 select {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
-/* line 98, ../sass/fulleron.scss */
+/* line 98, ../sass/fcom.admin.scss */
 textarea:focus,
 input[type="text"]:focus,
 input[type="password"]:focus,
@@ -10884,12 +10884,12 @@ input[type="color"]:focus,
   border-color: #888;
 }
 
-/* line 103, ../sass/fulleron.scss */
+/* line 103, ../sass/fcom.admin.scss */
 textarea {
   min-height: 150px;
 }
 
-/* line 105, ../sass/fulleron.scss */
+/* line 105, ../sass/fcom.admin.scss */
 .input-append .add-on, .input-prepend .add-on {
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box;
@@ -10897,7 +10897,7 @@ textarea {
 }
 
 /* DROPDOWNS */
-/* line 115, ../sass/fulleron.scss */
+/* line 115, ../sass/fcom.admin.scss */
 div.dropdown-menu > ul > li > a:hover,
 div.dropdown-menu > ul > li > a:focus,
 .dropdown-submenu:hover > a,
@@ -10909,7 +10909,7 @@ div.dropdown-menu > ul > li > a:focus,
   background: linear-gradient(#71b1f2, #4d96e9);
 }
 
-/* line 118, ../sass/fulleron.scss */
+/* line 118, ../sass/fcom.admin.scss */
 .dropdown-menu {
   border-color: #b9b9b9;
   -webkit-border-radius: 4px;
@@ -10920,13 +10920,13 @@ div.dropdown-menu > ul > li > a:focus,
 }
 
 /* BUTTONS */
-/* line 125, ../sass/fulleron.scss */
+/* line 125, ../sass/fcom.admin.scss */
 .btn {
   border: 1px solid #1b68cb;
   background: #fff;
   padding: 4px 12px;
 }
-/* line 129, ../sass/fulleron.scss */
+/* line 129, ../sass/fcom.admin.scss */
 .btn:hover {
   -webkit-transition-property: background-color;
   -moz-transition-property: background-color;
@@ -10938,12 +10938,12 @@ div.dropdown-menu > ul > li > a:focus,
   transition-timing-function: ease-in linear;
 }
 
-/* line 134, ../sass/fulleron.scss */
+/* line 134, ../sass/fcom.admin.scss */
 .btn span {
   font-size: .95em;
 }
 
-/* line 141, ../sass/fulleron.scss */
+/* line 141, ../sass/fcom.admin.scss */
 .btn-primary,
 .btn-info,
 .btn-success,
@@ -10956,7 +10956,7 @@ div.dropdown-menu > ul > li > a:focus,
   text-shadow: none;
 }
 
-/* line 146, ../sass/fulleron.scss */
+/* line 146, ../sass/fcom.admin.scss */
 .btn-primary {
   background: #2f82e0;
   color: #fff;
@@ -10964,44 +10964,44 @@ div.dropdown-menu > ul > li > a:focus,
   -moz-box-shadow: none;
   box-shadow: none;
 }
-/* line 150, ../sass/fulleron.scss */
+/* line 150, ../sass/fcom.admin.scss */
 .btn-primary:focus {
   background-color: #1971d5;
   color: #fff;
 }
 
-/* line 154, ../sass/fulleron.scss */
+/* line 154, ../sass/fcom.admin.scss */
 .btn-warning {
   background: #f79560;
 }
-/* line 156, ../sass/fulleron.scss */
+/* line 156, ../sass/fcom.admin.scss */
 .btn-warning:hover {
   background-color: #f07d3e;
 }
-/* line 157, ../sass/fulleron.scss */
+/* line 157, ../sass/fcom.admin.scss */
 .btn-warning:focus {
   background-color: #f07d3e;
 }
 
-/* line 161, ../sass/fulleron.scss */
+/* line 161, ../sass/fcom.admin.scss */
 .btn-link {
   color: #1b68cb;
   background: none;
 }
-/* line 164, ../sass/fulleron.scss */
+/* line 164, ../sass/fcom.admin.scss */
 .btn-link:hover {
   background: none;
   color: #1758ab;
   text-decoration: none;
 }
-/* line 165, ../sass/fulleron.scss */
+/* line 165, ../sass/fcom.admin.scss */
 .btn-link:focus {
   background: none;
   color: #1758ab;
   text-decoration: none;
 }
 
-/* line 167, ../sass/fulleron.scss */
+/* line 167, ../sass/fcom.admin.scss */
 .btn-group > .btn + .btn {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -11013,12 +11013,12 @@ div.dropdown-menu > ul > li > a:focus,
 
 /* TABLES */
 /* NAVS */
-/* line 174, ../sass/fulleron.scss */
+/* line 174, ../sass/fcom.admin.scss */
 .accordion-inner {
   padding: 30px;
 }
 
-/* line 177, ../sass/fulleron.scss */
+/* line 177, ../sass/fcom.admin.scss */
 .fcom-nav-st1 {
   border-color: #ddd;
   background: #fafafa;
@@ -11026,7 +11026,7 @@ div.dropdown-menu > ul > li > a:focus,
   padding-left: 10px;
 }
 
-/* line 183, ../sass/fulleron.scss */
+/* line 183, ../sass/fcom.admin.scss */
 .fcom-nav-st1 > li > a {
   margin: 0;
   -webkit-border-radius: 0;
@@ -11051,7 +11051,7 @@ div.dropdown-menu > ul > li > a:focus,
   border-right: 1px solid #fafafa;
 }
 
-/* line 196, ../sass/fulleron.scss */
+/* line 196, ../sass/fcom.admin.scss */
 .fcom-nav-st1 > .active > a {
   display: block;
   color: #444444;
@@ -11062,7 +11062,7 @@ div.dropdown-menu > ul > li > a:focus,
   border-top: none;
 }
 
-/* line 208, ../sass/fulleron.scss */
+/* line 208, ../sass/fcom.admin.scss */
 .fcom-nav-st1 > .active > a:hover,
 .fcom-nav-st1 > .active > a:focus,
 .fcom-nav-st1 > li > a:hover,
@@ -11073,7 +11073,7 @@ div.dropdown-menu > ul > li > a:focus,
   border-top: none;
 }
 
-/* line 215, ../sass/fulleron.scss */
+/* line 215, ../sass/fcom.admin.scss */
 .fcom-nav-st1 > li > a:hover,
 .fcom-nav-st1 > li > a:focus {
   border-left-color: #fafafa;
@@ -11083,7 +11083,7 @@ div.dropdown-menu > ul > li > a:focus,
 /* BREADCRUMBS */
 /* PAGINATION */
 /* ALERTS */
-/* line 228, ../sass/fulleron.scss */
+/* line 228, ../sass/fcom.admin.scss */
 .alert {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -11093,14 +11093,14 @@ div.dropdown-menu > ul > li > a:focus,
   text-shadow: none;
 }
 
-/* line 232, ../sass/fulleron.scss */
+/* line 232, ../sass/fcom.admin.scss */
 .alert-danger, .alert-error {
   border-color: #d98c8c;
   background: #fadfdf;
   color: #c83c3c;
 }
 
-/* line 237, ../sass/fulleron.scss */
+/* line 237, ../sass/fcom.admin.scss */
 label.error {
   margin-bottom: .8em;
   color: #c83c3c;
@@ -11108,22 +11108,22 @@ label.error {
   font-weight: bold;
 }
 
-/* line 238, ../sass/fulleron.scss */
+/* line 238, ../sass/fcom.admin.scss */
 input.error {
   border-color: #c83c3c;
 }
-/* line 240, ../sass/fulleron.scss */
+/* line 240, ../sass/fcom.admin.scss */
 input.error:hover {
   border-color: #c83c3c;
 }
-/* line 241, ../sass/fulleron.scss */
+/* line 241, ../sass/fcom.admin.scss */
 input.error:focus {
   border-color: #c83c3c;
 }
 
 /* MISC */
 /* ADD-ON: JSTREE */
-/* line 248, ../sass/fulleron.scss */
+/* line 248, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .jstree-default a {
   border: none;
   -webkit-border-radius: 3px;
@@ -11137,7 +11137,7 @@ input.error:focus {
   font-size: .9em;
 }
 
-/* line 256, ../sass/fulleron.scss */
+/* line 256, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .jstree-default a.jstree-clicked {
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #71b1f2), color-stop(100%, #4d96e9));
   background: -webkit-linear-gradient(#71b1f2, #4d96e9);
@@ -11148,30 +11148,30 @@ input.error:focus {
 }
 
 /* FCOM - LAYOUT */
-/* line 265, ../sass/fulleron.scss */
+/* line 265, ../sass/fcom.admin.scss */
 .fcom-admin-container {
   height: 100%;
 }
-/* line 9, ../sass/fulleron.scss */
+/* line 9, ../sass/fcom.admin.scss */
 .fcom-admin-container {
   *zoom: 1;
 }
-/* line 13, ../sass/fulleron.scss */
+/* line 13, ../sass/fcom.admin.scss */
 .fcom-admin-container:before, .fcom-admin-container:after {
   content: "";
   display: table;
 }
-/* line 17, ../sass/fulleron.scss */
+/* line 17, ../sass/fcom.admin.scss */
 .fcom-admin-container:after {
   clear: both;
 }
 
-/* line 266, ../sass/fulleron.scss */
+/* line 266, ../sass/fcom.admin.scss */
 .fcom-admin-container > .fcom-admin-main > form {
   height: 100%;
 }
 
-/* line 267, ../sass/fulleron.scss */
+/* line 267, ../sass/fcom.admin.scss */
 .fcom-admin-header {
   background: white;
   border-bottom: 1px solid #ddd;
@@ -11179,7 +11179,7 @@ input.error:focus {
   padding: 10px 15px;
 }
 
-/* line 268, ../sass/fulleron.scss */
+/* line 268, ../sass/fcom.admin.scss */
 .fcom-admin-header .fcom-admin-logo {
   float: left;
   margin: -5px 0 0 2px;
@@ -11187,12 +11187,12 @@ input.error:focus {
   font-size: 1.25em;
 }
 
-/* line 269, ../sass/fulleron.scss */
+/* line 269, ../sass/fcom.admin.scss */
 .fcom-admin-header .fcom-admin-logo img {
   margin: 10px 0;
 }
 
-/* line 270, ../sass/fulleron.scss */
+/* line 270, ../sass/fcom.admin.scss */
 .fcom-admin-header .avatar {
   margin: 5px 5px 0 5px;
   width: 35px;
@@ -11204,25 +11204,25 @@ input.error:focus {
   border-radius: 35px;
 }
 
-/* line 271, ../sass/fulleron.scss */
+/* line 271, ../sass/fcom.admin.scss */
 .fcom-admin-header .dropdown {
   float: left;
 }
 
-/* line 272, ../sass/fulleron.scss */
+/* line 272, ../sass/fcom.admin.scss */
 .fcom-admin-header .dropdown-menu {
   right: 0;
   left: auto;
   font-size: .9em;
 }
 
-/* line 273, ../sass/fulleron.scss */
+/* line 273, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links {
   float: right;
   margin-top: -8px;
 }
 
-/* line 274, ../sass/fulleron.scss */
+/* line 274, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links [class^="icon-"] {
   display: inline-block;
   width: 35px;
@@ -11234,12 +11234,12 @@ input.error:focus {
   line-height: 35px;
 }
 
-/* line 284, ../sass/fulleron.scss */
+/* line 284, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links a:hover [class^="icon-"] {
   color: #444444;
 }
 
-/* line 285, ../sass/fulleron.scss */
+/* line 285, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links .title {
   visibility: hidden;
   width: 0;
@@ -11248,7 +11248,7 @@ input.error:focus {
   font-size: 0;
 }
 
-/* line 286, ../sass/fulleron.scss */
+/* line 286, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links .user-name {
   display: inline-block;
   margin-top: 10px;
@@ -11256,12 +11256,12 @@ input.error:focus {
   vertical-align: middle;
 }
 
-/* line 287, ../sass/fulleron.scss */
+/* line 287, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links .dropdown-menu {
   top: 35px;
 }
 
-/* line 288, ../sass/fulleron.scss */
+/* line 288, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links div.dropdown-menu .fcom-dropdown-menu-title {
   margin-bottom: 3px;
   padding: 2px 15px;
@@ -11270,7 +11270,7 @@ input.error:focus {
   font-weight: 600;
 }
 
-/* line 289, ../sass/fulleron.scss */
+/* line 289, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links div.dropdown-menu > ul > li > a {
   display: block;
   padding: 2px 15px;
@@ -11278,13 +11278,13 @@ input.error:focus {
   color: #444444;
 }
 
-/* line 291, ../sass/fulleron.scss */
+/* line 291, ../sass/fcom.admin.scss */
 .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:hover,
 .fcom-admin-header-util-links div.dropdown-menu > ul > li > a:focus {
   color: #fff;
 }
 
-/* line 293, ../sass/fulleron.scss */
+/* line 293, ../sass/fcom.admin.scss */
 .fcom-admin-nav {
   width: 40px;
   background: #464d54;
@@ -11295,13 +11295,13 @@ input.error:focus {
   z-index: 99;
 }
 
-/* line 294, ../sass/fulleron.scss */
+/* line 294, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown {
   background: #464d54;
   width: 40px;
 }
 
-/* line 295, ../sass/fulleron.scss */
+/* line 295, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown .dropdown-menu {
   margin-top: 0;
   -webkit-border-radius: 0;
@@ -11313,12 +11313,12 @@ input.error:focus {
   padding: 0;
 }
 
-/* line 296, ../sass/fulleron.scss */
+/* line 296, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown-submenu > a:after {
   border: none;
 }
 
-/* line 309, ../sass/fulleron.scss */
+/* line 309, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown-menu > li > a:hover,
 .fcom-admin-nav .dropdown-menu > li > a:focus,
 .fcom-admin-nav .dropdown-submenu:hover > a,
@@ -11341,7 +11341,7 @@ input.error:focus {
   background: #363b41;
 }
 
-/* line 316, ../sass/fulleron.scss */
+/* line 316, ../sass/fcom.admin.scss */
 .fcom-admin-nav > .dropdown > .nav > li > a {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -11353,7 +11353,7 @@ input.error:focus {
   color: #a6acb2;
 }
 
-/* line 327, ../sass/fulleron.scss */
+/* line 327, ../sass/fcom.admin.scss */
 .fcom-admin-nav > .dropdown > .nav > li > a:hover,
 .fcom-admin-nav > .dropdown > .nav > li > a:focus,
 .fcom-admin-nav > .dropdown > .nav > li.active > a,
@@ -11361,7 +11361,7 @@ input.error:focus {
   color: #52a3e8;
 }
 
-/* line 335, ../sass/fulleron.scss */
+/* line 335, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown > ul > li > a > [class^="icon-"] {
   display: block;
   font: normal 18px/40px 'fontello';
@@ -11372,24 +11372,24 @@ input.error:focus {
   text-shadow: 0 2px 1px #303a43;
 }
 
-/* line 344, ../sass/fulleron.scss */
+/* line 344, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown > ul > li > a > .title {
   display: none;
 }
 
-/* line 345, ../sass/fulleron.scss */
+/* line 345, ../sass/fcom.admin.scss */
 .fcom-admin-nav > .dropdown > .nav > li > a {
   vertical-align: text-top;
   height: 40px;
 }
 
-/* line 347, ../sass/fulleron.scss */
+/* line 347, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown > ul > li > ul {
   background: #373d43;
   background-color: rgba(55, 61, 67, 0.95);
 }
 
-/* line 348, ../sass/fulleron.scss */
+/* line 348, ../sass/fcom.admin.scss */
 .fcom-admin-nav .dropdown-menu a {
   color: #ccd2d8;
   font-size: .9em;
@@ -11397,34 +11397,34 @@ input.error:focus {
   padding-bottom: 5px;
 }
 
-/* line 351, ../sass/fulleron.scss */
+/* line 351, ../sass/fcom.admin.scss */
 .fcom-admin-main {
   padding-left: 40px;
   width: 100%;
   height: 100%;
 }
 
-/* line 352, ../sass/fulleron.scss */
+/* line 352, ../sass/fcom.admin.scss */
 .fcom-admin-main-title {
   border-bottom: 1px solid #ddd;
   background: #f5f5f5;
   padding: 10px 15px;
 }
-/* line 9, ../sass/fulleron.scss */
+/* line 9, ../sass/fcom.admin.scss */
 .fcom-admin-main-title {
   *zoom: 1;
 }
-/* line 13, ../sass/fulleron.scss */
+/* line 13, ../sass/fcom.admin.scss */
 .fcom-admin-main-title:before, .fcom-admin-main-title:after {
   content: "";
   display: table;
 }
-/* line 17, ../sass/fulleron.scss */
+/* line 17, ../sass/fcom.admin.scss */
 .fcom-admin-main-title:after {
   clear: both;
 }
 
-/* line 353, ../sass/fulleron.scss */
+/* line 353, ../sass/fcom.admin.scss */
 .fcom-admin-main-title .title {
   float: left;
   margin: 6px 0 6px 5px;
@@ -11432,36 +11432,36 @@ input.error:focus {
   font-size: 20px;
 }
 
-/* line 354, ../sass/fulleron.scss */
+/* line 354, ../sass/fcom.admin.scss */
 .fcom-admin-main-title .btn-group {
   float: right;
 }
 
-/* line 355, ../sass/fulleron.scss */
+/* line 355, ../sass/fcom.admin.scss */
 .fcom-admin-main-container {
   padding: 30px 20px;
 }
-/* line 9, ../sass/fulleron.scss */
+/* line 9, ../sass/fcom.admin.scss */
 .fcom-admin-main-container {
   *zoom: 1;
 }
-/* line 13, ../sass/fulleron.scss */
+/* line 13, ../sass/fcom.admin.scss */
 .fcom-admin-main-container:before, .fcom-admin-main-container:after {
   content: "";
   display: table;
 }
-/* line 17, ../sass/fulleron.scss */
+/* line 17, ../sass/fcom.admin.scss */
 .fcom-admin-main-container:after {
   clear: both;
 }
 
-/* line 356, ../sass/fulleron.scss */
+/* line 356, ../sass/fcom.admin.scss */
 .fcom-admin-main-container.fcom-admin-main-flush {
   padding: 0;
   margin-top: -1px;
 }
 
-/* line 357, ../sass/fulleron.scss */
+/* line 357, ../sass/fcom.admin.scss */
 .fcom-admin-main-container.fcom-admin-sidebar-view {
   /* Has sidebar tabs or tree */
   margin-top: 0;
@@ -11471,7 +11471,7 @@ input.error:focus {
   padding-left: 166px;
 }
 
-/* line 364, ../sass/fulleron.scss */
+/* line 364, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-nav-sidebar {
   float: right;
   width: 166px;
@@ -11483,12 +11483,12 @@ input.error:focus {
   margin-bottom: -999em !important;
 }
 
-/* line 374, ../sass/fulleron.scss */
+/* line 374, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li {
   margin-bottom: 0;
 }
 
-/* line 375, ../sass/fulleron.scss */
+/* line 375, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -11504,12 +11504,12 @@ input.error:focus {
   border-bottom: 1px solid #f9f9f9;
 }
 
-/* line 385, ../sass/fulleron.scss */
+/* line 385, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li > a:hover {
   color: #111111;
 }
 
-/* line 386, ../sass/fulleron.scss */
+/* line 386, ../sass/fcom.admin.scss */
 .fcom-admin-nav-sidebar .nav-tabs.nav-tabs > li.active > a {
   border-top-color: #ddd;
   border-bottom-color: #ddd;
@@ -11518,13 +11518,13 @@ input.error:focus {
   color: #444444;
 }
 
-/* line 393, ../sass/fulleron.scss */
+/* line 393, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar {
   padding: 0;
   min-width: 150px;
 }
 
-/* line 394, ../sass/fulleron.scss */
+/* line 394, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header {
   border: none;
   background: none;
@@ -11535,29 +11535,29 @@ input.error:focus {
   text-align: right;
 }
 
-/* line 403, ../sass/fulleron.scss */
+/* line 403, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .title {
   float: left;
 }
 
-/* line 406, ../sass/fulleron.scss */
+/* line 406, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header label {
   font-size: 1em;
   line-height: 1em;
   padding-top: 1px;
 }
 
-/* line 407, ../sass/fulleron.scss */
+/* line 407, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock {
   color: #d40000;
 }
 
-/* line 408, ../sass/fulleron.scss */
+/* line 408, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .ui-widget-header .icon-lock-open {
   color: #c4c4c4;
 }
 
-/* line 409, ../sass/fulleron.scss */
+/* line 409, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .fcom-admin-expand-toggles {
   border: 1px solid #eee;
   border-width: 1px 0;
@@ -11565,13 +11565,13 @@ input.error:focus {
   font-size: .8em;
 }
 
-/* line 415, ../sass/fulleron.scss */
+/* line 415, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-tree-sidebar .jstree {
   overflow: hidden;
   padding: 10px 15px;
 }
 
-/* line 419, ../sass/fulleron.scss */
+/* line 419, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-main-content {
   float: right;
   width: 100%;
@@ -11580,30 +11580,30 @@ input.error:focus {
   margin-bottom: -999em !important;
 }
 
-/* line 426, ../sass/fulleron.scss */
+/* line 426, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .tab-content {
   padding: 25px 20px;
 }
 
-/* line 427, ../sass/fulleron.scss */
+/* line 427, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title {
   background: #f5f5f5;
 }
 
-/* line 431, ../sass/fulleron.scss */
+/* line 431, ../sass/fcom.admin.scss */
 .fcom-admin-sidebar-view .fcom-admin-main-content .fcom-admin-main-title .title {
   font-size: 22px;
   font-weight: 400;
 }
 
-/* line 435, ../sass/fulleron.scss */
+/* line 435, ../sass/fcom.admin.scss */
 .copyright {
   font-size: .9em;
   color: #777;
 }
 
 /* JS Tree */
-/* line 443, ../sass/fulleron.scss */
+/* line 443, ../sass/fcom.admin.scss */
 .jstree-default li,
 .jstree-default ins,
 #vakata-dragged.jstree-default .jstree-invalid,
@@ -11612,28 +11612,28 @@ input.error:focus {
   background: none !important;
 }
 
-/* line 445, ../sass/fulleron.scss */
+/* line 445, ../sass/fcom.admin.scss */
 .jstree ins {
   width: 13px  !important;
   height: 13px !important;
   line-height: 13px !important;
 }
 
-/* line 450, ../sass/fulleron.scss */
+/* line 450, ../sass/fcom.admin.scss */
 .jstree-default .jstree-closed > ins:before {
   content: '\e800';
   color: #c8cdd1;
   font-family: 'fontello';
 }
 
-/* line 455, ../sass/fulleron.scss */
+/* line 455, ../sass/fcom.admin.scss */
 .jstree-default .jstree-open > ins:before {
   content: '\e806';
   color: #c8cdd1;
   font-family: 'fontello';
 }
 
-/* line 460, ../sass/fulleron.scss */
+/* line 460, ../sass/fcom.admin.scss */
 .jstree-default a ins.jstree-icon {
   width: 18px;
   height: 18px;
@@ -11641,7 +11641,7 @@ input.error:focus {
   margin-right: 7px !important;
 }
 
-/* line 466, ../sass/fulleron.scss */
+/* line 466, ../sass/fcom.admin.scss */
 .jstree-default a ins.jstree-icon:before {
   font-size: 1.3em;
   content: '\e802';
@@ -11655,25 +11655,25 @@ input.error:focus {
 .jstree-default .jstree-unchecked a .jstree-checkbox:before { }
 */
 /* BACKGRID */
-/* line 483, ../sass/fulleron.scss */
+/* line 483, ../sass/fcom.admin.scss */
 .backgrid thead th {
   background: #f5f5f5;
 }
 
-/* line 484, ../sass/fulleron.scss */
+/* line 484, ../sass/fcom.admin.scss */
 .backgrid thead th a {
   color: #919191;
   font-size: .85em;
   text-transform: uppercase;
 }
 
-/* line 490, ../sass/fulleron.scss */
+/* line 490, ../sass/fcom.admin.scss */
 .backgrid tbody th,
 .backgrid tbody td {
   background: #fff;
 }
 
-/* line 491, ../sass/fulleron.scss */
+/* line 491, ../sass/fcom.admin.scss */
 .backgrid tbody tr:hover td {
   background: #f7f7f7;
   -webkit-transition-property: background-color;
@@ -11687,13 +11687,13 @@ input.error:focus {
 }
 
 /* FCOM PAGE: LOGIN */
-/* line 499, ../sass/fulleron.scss */
+/* line 499, ../sass/fcom.admin.scss */
 .fcom-admin-login {
   margin: 165px auto;
   width: 390px;
 }
 
-/* line 503, ../sass/fulleron.scss */
+/* line 503, ../sass/fcom.admin.scss */
 .fcom-admin-login-header {
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
@@ -11706,13 +11706,13 @@ input.error:focus {
   font-size: 1.65em;
 }
 
-/* line 510, ../sass/fulleron.scss */
+/* line 510, ../sass/fcom.admin.scss */
 .fcom-admin-login-logo {
   float: right;
   height: 25px;
 }
 
-/* line 511, ../sass/fulleron.scss */
+/* line 511, ../sass/fcom.admin.scss */
 .fcom-admin-login-content {
   margin-bottom: 13px;
   padding: 20px 35px;
@@ -11725,7 +11725,7 @@ input.error:focus {
   border-radius: 0 0 4px p4x;
 }
 
-/* line 519, ../sass/fulleron.scss */
+/* line 519, ../sass/fcom.admin.scss */
 .fcom-admin-login input[type='text'],
 .fcom-admin-login input[type='password'] {
   width: 300px;

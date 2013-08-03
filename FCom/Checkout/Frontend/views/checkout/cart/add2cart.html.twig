@@ -1,0 +1,8 @@
+{% set prod = THIS.get('prod') %}
+<div class="add-to-cart-box">
+	<label for="qty">{{ "Qty" |_ }}:</label>
+	<input type="text" name="qty" id="qty" maxlength="12" value="1" title="{{ "Qty" |_ }}" class="input-text qty">
+	<button type="submit" title="{{ "Add to Cart" |_ }}" class="btn btn-primary btn-add-to-cart"
+        onclick="FCom.cart.add({{ prod.get('id') }}, this.form.qty.value); return false" name="add2cart"
+        value="{{ prod.get('id') }}"><span class="icon"></span>{{ "Add to Cart" |_ }}</button>
+</div>

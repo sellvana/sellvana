@@ -1,0 +1,19 @@
+{{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
+{% if not THIS.get('products_data').state.c %}
+    <div class="alert">{{ "There are no products matching the selection." |_ }}</div>
+
+{% else %}
+    {{ THIS.view('catalog/compare/block') | raw }}
+    <div class="product-listing">
+        <table class="table">
+            <col width="60"/>
+            <col/>
+            <col width="100"/>
+            <tbody>
+                {{ THIS.view('catalog/product/rows')
+                    .set('products', THIS.get('products_data').rows)
+                    .set('category', THIS.get('category')) | raw }}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

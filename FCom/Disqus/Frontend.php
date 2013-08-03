@@ -4,7 +4,7 @@ class FCom_Disqus_Frontend extends BClass
 {
     static public function bootstrap()
     {
-        BLayout::i()->afterTheme('FCom_Disqus_Frontend::layout');
+        BLayout::i()->onAfterTheme('FCom_Disqus_Frontend::layout');
     }
 
     static public function layout()

@@ -3,7 +3,7 @@
             <header class="block-sub-title"><span class="title"><?= BLocale::_("Selected filters") ?></span></header>
             <a href="<?=BRequest::baseUrl().BRequest::rawPath()?>"><?= BLocale::_("Clear filters") ?></a> <br/>
     <?php foreach($this->selected_filters as $label => $filterGroup):?>
-        <b><?=$label?></b>
+        <strong><?=$label?></strong>
         <ul>
             <?php foreach($filterGroup as $filter):?>
                 <?php if(is_array($filter['value'])):?>
@@ -24,7 +24,7 @@
     <section class="block-sub">
             <header class="block-sub-title"><span class="title"><?= BLocale::_("Filters") ?></span></header>
     <?php foreach($this->groups as $label => $groupValues):?>
-        <b><?=$label?></b>
+        <strong><?=$label?></strong>
         <ul>
             <?php foreach($groupValues['values'] as $gv):?>
                 <?php if('Inclusive' == $groupValues['facet_select']):?>

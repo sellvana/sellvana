@@ -11,9 +11,9 @@
         -# %input(type="text" name="search[_quick]" value="#{!empty($s['search']['_quick']) ? $s['search']['_quick'] : ''}")
         -# %input(type="submit" value="#{$this->_('Search')}")
 
-        %table
+        %table.table
             %tr
-                %td.a-left
+                %td.text-left
                     %span.fcom-datagrid__rows-status<
                         = $this->_('Rows %s - %s of %s', array(1+$s['rs'], $s['rs']+$s['rc'], $s['c']))
 
@@ -22,7 +22,7 @@
                             %a.js-change-url(href="#{$this->gridUrl(array('ps'=>$ps))}" 
                                 class="#{$ps==$s['ps'] ? 'active' : ''}") = $ps
 
-                %td.a-center
+                %td.text-center
                     %span.fcom-datagrid__pager<
                         - if ($s['p'] > 1)
                             %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['p']-1))}") &laquo;
@@ -51,7 +51,7 @@
                                 &hellip;
                             - if ($s['p'] <= $s['mp']-6)
                                 %a.js-change-url(href="#{$this->gridUrl(array('p' => $s['mp']))}") = $s['mp']
-                %td.a-right
+                %td.text-right
                     %span.fcom-datagrid__actions
                         - foreach ($this->gridActions() as $action)
                             - if (!empty($action['renderer']))
@@ -63,7 +63,7 @@
         .fcom-datagrid__status-description
             - echo $s['description']
 
-    %table.fcom-datagrid__grid
+    %table.fcom-datagrid__grid.table
         %colgroup
             -# foreach ($config['columns'] as $colId => $column)
                 %col(width="#{!empty($column['width']) ? $column['width'] : ''}")

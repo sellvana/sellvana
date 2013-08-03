@@ -11,7 +11,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = BModuleRegistry::i()->debug();
-        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,FCom_Frontend,FCom_Frontend_DefaultTheme'));
+        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,'.
+            'FCom_Frontend,FCom_Frontend_DefaultTheme,FCom_Install'));
 
 
         try {
@@ -91,16 +92,16 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                      array('name' => 'run_level', 'label' => 'Run Level', 'options'=>$coreRunLevelOptions, 'width'=>100,
                         'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
 
-                     array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions, 
+                     array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions,
                         'width'=>120, 'editable' => true,
                         'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
 /*
-                     array('name' => 'run_level_admin', 'label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 
-                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Admin', 'bgs' => new BValue("runLevelColors")), 
+                     array('name' => 'run_level_admin', 'label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions,
+                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Admin', 'bgs' => new BValue("runLevelColors")),
                         'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
 
-                     array('name' => 'run_level_frontend', 'label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 
-                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Frontend', 'bgs' => new BValue("runLevelColors")), 
+                     array('name' => 'run_level_frontend', 'label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions,
+                        'width'=>120, 'editable' => true, 'hidden'=>true, 'cell_options' => array('area' => 'FCom_Frontend', 'bgs' => new BValue("runLevelColors")),
                         'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
 */
                      array('name' => 'requires', 'label' => 'Requires', 'width'=>250),

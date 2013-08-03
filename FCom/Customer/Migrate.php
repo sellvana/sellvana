@@ -109,4 +109,14 @@ class FCom_Customer_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'email' => 'VARCHAR(100) NOT NULL AFTER customer_id',
+            ),
+        ));
+    }
+
 }

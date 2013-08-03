@@ -2,8 +2,8 @@
 
 class FCom_MarketClient_Model_Modules extends FCom_Core_Model_Abstract
 {
-    protected static $_table = 'FCom_MarketClient_modules';
-
+    protected static $_table = 'marketc_modules';
+    protected static $_origClass = __CLASS__;
 
     public function addModule($module)
     {

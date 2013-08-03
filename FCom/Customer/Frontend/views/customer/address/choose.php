@@ -3,11 +3,11 @@
 <?php foreach($this->addresses as $address): ?>
     <?php if ('s' == $this->type) :?>
         <?php if ($address->id == $this->customer->default_shipping_id): ?>
-            <b><?= BLocale::_("Default shipping address") ?></b><br/>
+            <strong><?= BLocale::_("Default shipping address") ?></strong><br/>
         <?php endif; ?>
     <?php else :?>
         <?php if ($address->id == $this->customer->default_billing_id): ?>
-            <b><?= BLocale::_("Default billing address") ?></b><br/>
+            <strong><?= BLocale::_("Default billing address") ?></strong><br/>
         <?php endif; ?>
     <?php endif; ?>
 

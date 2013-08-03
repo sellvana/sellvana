@@ -29,7 +29,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $cartHref = BApp::href('cart');
         $post = BRequest::i()->post();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        if (BRequest::i()->xhr()) {
+        if (BRequest::i()->xhr() || (isset($post['action']) && $post['action'] == 'add')) {
             $result = array();
             switch ($post['action']) {
             case 'add':
@@ -56,7 +56,11 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 );
                 break;
             }
-            BResponse::i()->json($result);
+            if (BRequest::i()->xhr()) {
+                BResponse::i()->json($result);
+            } else {
+                BResponse::i()->redirect($cartHref); // not sure if this is the best way to go (most likely it is not)
+            }
         } else {
             $cart->items();
             if (!empty($post['remove'])) {

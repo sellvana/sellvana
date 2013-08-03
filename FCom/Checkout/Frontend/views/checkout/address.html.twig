@@ -1,0 +1,91 @@
+<form action="{{ APP.href('checkout/address') }}" method="post" class="address-form" id="address-form">
+    <input type="hidden" name="address_equal" value="0">
+    <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
+    <fieldset class="form-horizontal">
+        <header class="main-title">
+            <h1 class="title">{{ "Shipping Address" |_ }}</h1>
+        </header>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "First name" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Last name" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "E-mail" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="email" value="{{ THIS.get('address').get('email') }}" class="required">
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Street 1" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="street1" value="{{ THIS.get('address').get('street1') }}" class="required">
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Street 2" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="street2" value="{{ THIS.get('address').get('street2') }}">
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "City" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
+          </div>
+        </div>
+          {{ THIS.view('geo/embed') | raw }}
+          <script>
+              require(['jquery'], function($) {
+                  $(function() {
+                      $('.geo-country').geoCountryRegion({country:'{{ THIS.get('address').get('country') }}', region:'{{ THIS.get('address').get('region') }}'});
+                  })
+              })
+          </script>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Region" |_ }}</label>
+          <div class="controls">
+            <select class="geo-region required" name="region"  class="required">
+                <option value="">{{ "Select an option" |_ }}</option>
+            </select>
+            <input type="text" class="geo-region" name="region"  class="required"/>
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
+          <div class="controls">
+            <select class="geo-country" name="country" id="country" class="required">
+              <option value="">{{ "Select an option" |_ }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="#" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
+          <div class="controls">
+            <input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
+          </div>
+        </div>          
+          
+        {% if 's' == THIS.get('address_type') %}
+        <label for="address_equal" class="checkbox">
+          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
+                {{ "Billing address is same as shipping" |_ }}
+        </label>
+        {% endif %}
+        <button class="btn btn-primary" type="submit">{{ "Save address" |_ }}</span></button>
+    </fieldset>
+</form>
+<script>
+require(['jquery'], function($) {
+    $(function() {
+        $('#address-form').validate();
+    })
+})
+</script>

@@ -3,18 +3,17 @@
 
 #fcom-dashboard-container
 
-    .box.span4
-        .box-header
-            %h2
+    .widget-box
+        .widget-title
+            %span.icon
                 %i.icon-signal
-                %span.break
-                Order Status Distribution
-            .box-icon
-                %a.btn-setting(href="#")
+            %h5 = $this->_('Order Status Distribution')
+            .buttons
+                %a.btn.btn-setting(href="#")
                     %i.icon-wrench
-                %a.btn-minimize(href="#")
+                %a.btn.btn-minimize(href="#")
                     %i.icon-chevron-up
-                %a.btn-close(href="#")
+                %a.btn.btn-close(href="#")
                     %i.icon-remove
         .box-content
             #chart1(style="width:300px; height:200px")

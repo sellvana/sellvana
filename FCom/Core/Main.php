@@ -216,15 +216,17 @@ class FCom_Core_Main extends BClass
     {
         $config = BConfig::i();
         $area = BApp::i()->get('area');
-
-        $configDir = $config->get('fs/config_dir');
+        
+	$configDir = $config->get('fs/config_dir');
         if (file_exists($configDir.'/core.php')) {
             $config->addFile('core.php', true);
         }
 
         $this->initDebug();
 
-        if (BDebug::is('DISABLED')) {
+        $mode = BDebug::mode();
+
+        if ('DISABLED' === $mode) {
             BResponse::i()->status('404', 'Page not found', 'Page not found');
             die;
         }
@@ -236,7 +238,7 @@ class FCom_Core_Main extends BClass
             $runLevels = array('FCom_Install' => 'REQUIRED');
         }
 
-        if (BDebug::is('RECOVERY')) { // load manifests for RECOVERY mode
+        if ('RECOVERY' === $mode) { // load manifests for RECOVERY mode
             $recoveryModules = BConfig::i()->get('recovery_modules/'.$area);
             if ($recoveryModules) {
                 $moduleNames = preg_split('#\s*(,|\n)\s*#', $recoveryModules);
@@ -254,20 +256,29 @@ class FCom_Core_Main extends BClass
         //FCom::i()->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
 
-        if (defined('BUCKYBALL_ROOT_DIR')) {
-            $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
-            // if minified version used, need to load plugins manually
-        }
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
-        $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
-        $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
-        $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
-        $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
-        $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
 
-        foreach ($this->_modulesDirs as $dir) {
-            BModuleRegistry::i()->scan($dir);
+        if ('STAGING' === $mode || 'PRODUCTION' === $mode) {
+            $manifestsLoaded = BModuleRegistry::i()->loadManifestCache();
+        } else {
+            $manifestsLoaded = false;
+        }
+        if (!$manifestsLoaded) {
+            if (defined('BUCKYBALL_ROOT_DIR')) {
+                $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
+                // if minified version used, need to load plugins manually
+            }
+            $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
+            $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
+            $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
+            $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
+            $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
+
+            foreach ($this->_modulesDirs as $dir) {
+                BModuleRegistry::i()->scan($dir);
+            }
+            BModuleRegistry::i()->saveManifestCache(); //TODO: call explicitly
         }
 #BDebug::profile($d);
 

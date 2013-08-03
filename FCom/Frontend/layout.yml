@@ -2,36 +2,21 @@
 base:
     - { root: root }
     - { hook: head, views: head }
-
-    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-    - { callback: FCom_Frontend_Frontend::layout }
+    - { hook: before_body_end, views: bottom_scripts }
 
     - view: head
         do:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
             - [ icon, @FCom_Core/favicon.ico ]
-            - [ css, @FCom_Frontend/css/boilerplate_pre.css ]
-            - [ css, @FCom_Frontend/css/skin_default.css ]
-            - [ css, @FCom_Frontend/css/boilerplate_post.css, { alias: boilerplate_post } ]
-            - [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css, { alias: pnotify } ]
-            - [ css, @FCom_Core/js/lib/css/jquery.rateit.css, { alias: rating } ]
-            - [ css, @FCom_Core/js/lib/css/lightbox/lightbox.css, { alias: lightbox } ]
-            - [ css, @FCom_Core/js/select2/select2.css ]
 
-            - [ requireJs, jquery.pnotify, @FCom_Core/js/lib/jquery.pnotify.min, { deps: [ jquery ] } ]
-            - [ requireJs, jquery.rateit, @FCom_Core/js/lib/jquery.rateit.min.js, { deps: [ jquery ] } ]
-            - [ requireJs, jquery.qtip, @FCom_Core/js/lib/jquery.qtip.min, { deps: [ jquery ] } ]
-            - [ requireJs, lightbox, @FCom_Core/js/lib/lightbox/lightbox ]
-
-            - [ requireJs, fcom.frontend, @FCom_Frontend/js/fcom.frontend, { deps: [ fcom.core ] } ]
-            - [ requireRun, [ select2, fcom.frontend ] ]
+    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend::layout }
 
     - { include: common_js_libs }
 
     - { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
     - { hook: footer, views: footer }
-    - { hook: before_body_end, views: bottom_scripts }
 
 404:
     - { include: base }
