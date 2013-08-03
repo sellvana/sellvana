@@ -53,4 +53,24 @@ class FCom_ProductReviews_Migrate extends BClass
             ) ENGINE = InnoDB;"
         );
     }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $table = FCom_ProductReviews_Model_Review::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'created_dt'  => 'RENAME created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        $table = FCom_ProductReviews_Model_Review::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+            ),
+        ));
+    }
 }

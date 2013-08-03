@@ -110,7 +110,7 @@ class BModuleRegistry extends BClass
         }
 
         if (!empty(static::$_modules[$modName])) {
-            BDebug::debug('MODULE UPDATE: '.$this->name);
+            BDebug::debug('MODULE UPDATE: '.static::$_modules[$modName]->name);
             static::$_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
@@ -196,7 +196,7 @@ class BModuleRegistry extends BClass
                     BDebug::error(BLocale::_("Unknown manifest file format: %s", $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                BDebug::error(BLocale::_("Could not read manifest file: %s", $file));
+                BDebug::error(BLocale::_("Invalid or empty manifest file: %s", $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName=>$params) {
@@ -828,7 +828,7 @@ class BModule extends BClass
         $c = BConfig::i();
         static::$_env['doc_root'] = $r->docRoot();
         static::$_env['web_root'] = $r->webRoot();
-        static::$_env['http_host'] = $r->httpHost();
+        //static::$_env['http_host'] = $r->httpHost();
         if (($rootDir = $c->get('fs/root_dir'))) {
             static::$_env['root_dir'] = str_replace('\\', '/', $rootDir);
         } else {

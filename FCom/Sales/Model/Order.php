@@ -17,6 +17,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
     }
 
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
+        if (!$this->unique_id) {
+            $this->set('unique_id', FCom_Core_Model_Seq::i()->getNextSeqId('order'));
+        }
+
+        return true;
+    }
+
     public function billing()
     {
         return FCom_Sales_Model_Cart_Address::i()->orm('a')
@@ -29,13 +40,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
         BEvents::i()->fire(__CLASS__.'.addNew', array('order'=>$data));
-        return $this->create($data)->save();
+        return $this->create($data);//->save();
     }
 
     public function update($data)
     {
         BEvents::i()->fire(__CLASS__.'.update', array('order'=>$data));
-        return $this->set($data)->save();
+        return $this->set($data);//->save();
     }
 
     public function paid()
@@ -44,7 +55,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $data = array();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        $data['purchased_dt'] = date("Y-m-d H:i:s");
+        $data['update_at'] = date("Y-m-d H:i:s");
         $this->set($data)->save();
     }
 
@@ -61,7 +72,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         return FCom_Sales_Model_Order_Status::i()->orm()->where('id', $this->status_id)->find_one();
     }
-    
+
 
     /**
      * Return total UNIQUE number of items in the order
@@ -153,6 +164,154 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $data['coupon_code'] = $post['coupon_code'];
         }
         return $data;
+    }
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @return FCom_Sales_Model_Order
+     */
+    protected static function _createFromCart($cart)
+    {
+        $shippingMethod       = $cart->getShippingMethod();
+        $shippingServiceTitle = '';
+        if (is_object($shippingMethod)) {
+            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
+        }
+
+        $orderData                    = array();
+        $orderData['cart_id']         = $cart->id();
+        $orderData['customer_id']     = $cart->customer_id;
+        $orderData['item_qty']        = $cart->item_qty;
+        $orderData['subtotal']        = $cart->subtotal;
+        $orderData['shipping_method'] = $cart->shipping_method;
+        //        $orderData['shipping_service']       = $cart->shipping_service;
+        $orderData['shipping_service_title'] = $shippingServiceTitle;
+        $orderData['payment_method']         = $cart->payment_method;
+        $orderData['coupon_code']            = $cart->coupon_code;
+        $orderData['tax']                    = $cart->tax;
+        //        $orderData['total_json']             = $cart->total_json;
+        $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
+        $orderData['grandtotal'] = $cart->grand_total; // full grand total
+        $orderData['create_at'] = $orderData['update_at'] = BDb::now();
+
+        $data_serialized = array(
+            'totals'           => $cart->data['totals'],
+            'shipping_service' => $cart->shipping_service
+        );
+        $orderData['data_serialized'] = $data_serialized;
+
+        /* @var $salesOrder FCom_Sales_Model_Order */
+        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+        if ($salesOrder) {
+            $salesOrder->update($orderData);
+        } else {
+            $salesOrder = FCom_Sales_Model_Order::i()->addNew($orderData);
+        }
+        return $salesOrder;
+    }
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @param array $options
+     * @return FCom_Sales_Model_Order
+     */
+    public static function createFromCart($cart, $options = array())
+    {
+        $cart->calculateTotals();
+        $salesOrder = self::_createFromCart($cart);
+
+        $salesOrder->save(); // save to have valid unique_id
+        if(isset($options['all_components']) && $options['all_components']){
+            $options['order_id'] = $salesOrder->unique_id ? $salesOrder->unique_id: $salesOrder->id();
+            static::createOrderItems($cart, $options);
+            static::createOrderAddress($cart, $options);
+
+            //Made payment
+            $paymentMethod = $cart->getPaymentMethod();
+            static::createOrderPayment($paymentMethod, $salesOrder, $options);
+        }
+        return $salesOrder;
+    }
+
+    /**
+     * @param FCom_Sales_Method_Payment_Abstract $payment
+     * @param FCom_Sales_Model_Order $salesOrder
+     * @param array $options
+     */
+    public static function createOrderPayment($payment, $salesOrder, $options)
+    {
+        if(!$payment instanceof FCom_Sales_Method_Payment_Interface){
+            return;
+        }
+        $payment->setSalesEntity($salesOrder, $options)
+                ->payOnCheckout();
+        $salesOrder->setData('payment_details', $payment->asArray());
+    }
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @param array                 $options
+     */
+    public static function createOrderAddress($cart, $options)
+    {
+        $orderId = isset($options['order_id'])? $options['order_id']: $cart->id(); // ???
+        $shippingAddress = $cart->getAddressByType('shipping');
+        if ($shippingAddress) {
+            FCom_Sales_Model_Order_Address::i()->newAddress($orderId, $shippingAddress);
+        }
+        $billingAddress = $cart->getAddressByType('billing');
+        if ($billingAddress) {
+            FCom_Sales_Model_Order_Address::i()->newAddress($orderId, $billingAddress);
+        }
+    }
+
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @param array $options
+     */
+    public static function createOrderItems($cart, $options)
+    {
+        foreach ($cart->items() as $item) {
+            /* @var $item FCom_Sales_Model_Cart_Item */
+            if (!static::itemAllowed($options, $item)) {
+                continue;
+            }
+
+            $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
+            $orderId = isset($options['order_id'])? $options['order_id']: $cart->id(); // ???
+            if (!$product) {
+                continue;
+            }
+            $orderItem                 = array();
+            $orderItem['order_id']     = $orderId;
+            $orderItem['product_id']   = $item->product_id;
+            $orderItem['qty']          = $item->qty;
+            $orderItem['total']        = $item->rowTotal();
+            $orderItem['product_info'] = BUtil::toJson($product->as_array());
+
+            /* @var $testItem FCom_Sales_Model_Order_Item */
+            $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($orderId, $item->product_id);
+            if ($testItem) {
+                $testItem->update($orderItem);
+            } else {
+                FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+            }
+        }
+    }
+
+    protected static function itemAllowed($options, $item)
+    {
+        if(isset($options['items'])){
+            foreach ($options['items'] as $i) {
+                if($i['id'] == $item->id){
+                    return true; // item id matches
+                }
+            }
+            return false; // item is not with passed filter
+        }
+
+        return true; // no items filter passed
     }
 
 }

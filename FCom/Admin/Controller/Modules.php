@@ -74,6 +74,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             'config' => array(
                 'id'          => 'modules',
                 'model'       => new BValue('FCom.ModuleModel'),
+                'pageable'    => true,
                 'collection'  => $this->getModulesData(),
                 'edit_url'    => BApp::href('/modules/grid_data'),
                 'columns'     => array(

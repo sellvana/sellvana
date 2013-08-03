@@ -1028,7 +1028,7 @@ class BView extends BClass
     /**
      * @var string
      */
-    protected static $_metaDataRegex = '#<!--\{\s*(.*?):\s*(.*?)\s*\}-->#i';
+    protected static $_metaDataRegex = '#<!--\s*\{\s*([^:]+):\s*(.*?)\s*\}\s*-->#';
 
     /**
      * View parameters

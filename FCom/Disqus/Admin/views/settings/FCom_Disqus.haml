@@ -10,13 +10,17 @@
                     %tr
                         %td = $this->_('Show on all pages')
                         %td
-                            %input(type="hidden" name="config[modules][FCom_Disqus][show_on_all_pages]" value="0")
-                            %input(type="checkbox" name="config[modules][FCom_Disqus][show_on_all_pages]" value="1"
-                                checked = $c->get('modules/FCom_Disqus/show_on_all_pages') )
+                            %select(name="config[modules][FCom_Disqus][show_on_all_pages]")
+                                - echo BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get('modules/FCom_Disqus/show_on_all_pages'))
                     %tr
-                        %td = $this->_('Javascript Code')
+                        %td = $this->_('Comments Javascript Code')
                         %td
-                            %textarea.js-code-editor(name="config[modules][FCom_Disqus][code]" data-mode="javascript"
-                                style="width:600px; height:200px")  = $c->get('modules/FCom_Disqus/code')
+                            %textarea.js-code-editor(name="config[modules][FCom_Disqus][comments_code]" data-mode="javascript"
+                                style="width:600px; height:200px")  = $c->get('modules/FCom_Disqus/comments_code')
+                    %tr
+                        %td = $this->_('Counts Javascript Code')
+                        %td
+                            %textarea.js-code-editor(name="config[modules][FCom_Disqus][counts_code]" data-mode="javascript"
+                                style="width:600px; height:200px")  = $c->get('modules/FCom_Disqus/counts_code')
 :javascript
     $(function() { FCom.Admin.initCodeEditors() })

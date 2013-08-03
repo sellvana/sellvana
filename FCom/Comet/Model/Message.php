@@ -13,8 +13,8 @@ class FCom_Comet_Model_Message extends FCom_Core_Model_Abstract
      * - recipient_id
      * - data_serialized
      * - status
-     * - created_at
-     * - updated_at
+     * - create_at
+     * - update_at
      */
 
 }

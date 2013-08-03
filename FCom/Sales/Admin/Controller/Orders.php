@@ -14,12 +14,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $config = parent::gridConfig();
         $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
             'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=<%=id%>')),
-            'purchased_dt' => array('index'=>'o.purchased_dt', 'label' => 'Purchased on'),
+            'create_at' => array('index'=>'o.create_at', 'label' => 'Purchased on'),
             'billing_name' => array('label'=>'Bill to Name', 'index'=>'ab.billing_name'),
             'billing_address' => array('label'=>'Bill to Address', 'index'=>'ab.billing_address'),
             'shipping_name' => array('label'=>'Ship to Name', 'index'=>'as.shipping_name'),
             'shipping_address' => array('label'=>'Ship to Address', 'index'=>'as.shipping_address'),
-            'gt_base' => array('label'=>'GT (base)', 'index'=>'o.gt_base'),
+            'grandtotal' => array('label'=>'GT (base)', 'index'=>'o.grandtotal'),
             'balance' => array('label'=>'GT (paid)', 'index'=>'o.balance'),
             'discount' => array('label'=>'Discount', 'index'=>'o.coupon_code'),
             'os_name' => array('label'=>'Status', 'index'=>'os.name'),
@@ -40,7 +40,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
             ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address')
         ;
-        $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status_id = os.id', 'os')
+        $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os')
             ->select(array('os_name' => 'os.name'))
         ;
     }

@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.1.4
+        version: 0.1.5
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
         observe:
@@ -23,6 +23,7 @@ modules:
                 routing:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ get, /, FCom_Admin_Controller.index ]
+                    - [ get, /*view, FCom_Admin_Controller.static ]
                     - [ get, /blank, FCom_Admin_Controller.blank ]
                     - [ post, /login, FCom_Admin_Controller.login ]
                     - [ any, /password/recover, FCom_Admin_Controller.password_recover ]

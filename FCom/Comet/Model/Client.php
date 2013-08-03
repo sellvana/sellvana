@@ -7,8 +7,8 @@ class FCom_Comet_Model_Client extends FCom_Core_Model_Abstract
     /**
      * - id
      * - session_id
-     * - created_at
-     * - updated_at
+     * - create_at
+     * - update_at
      * - data_serialized
      *   - admin_user_id
      *   - customer_id
@@ -43,12 +43,12 @@ class FCom_Comet_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Check in the client and receive request from browser
-     * 
+     *
      * @param string $request
      */
     public function checkIn($request)
     {
-        
+
     }
 
     /**
@@ -85,7 +85,7 @@ class FCom_Comet_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Receive a message to be sent to browser
-     * 
+     *
      */
     public function receive($message)
     {

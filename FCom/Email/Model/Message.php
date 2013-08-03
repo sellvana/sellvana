@@ -16,7 +16,7 @@ class FCom_Email_Model_Message extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        if (!$this->create_dt) $this->create_dt = BDb::now();
+        if (!$this->create_at) $this->create_at = BDb::now();
 
         $this->data_serialized = BUtil::toJson($this->data);
 

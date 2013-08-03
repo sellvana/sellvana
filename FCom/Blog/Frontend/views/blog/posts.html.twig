@@ -1,0 +1,19 @@
+{% set posts = THIS.get('posts') %}
+{% if posts %}
+    {% for post in posts %}
+        <div id="post-{{ post.get('url_key') }}">
+            <h2 class="entry-title"><a href="{{ post.getUrl() }}">{{ post.get('title') }}</a></h2>
+            <p class="entry-headline-meta">
+                by <a class="author vcard" href="{{ APP.href('blog') ~ '/author/' ~ post.getAuthor().username }}">{{ post.getAuthorName() }}</a>
+                on <abbr class="published" title="{{ post.get('create_at') }}">{{ post.get('create_at') | date('F jS') }}</abbr>
+            </p>
+            <p>{{ 'Tags:'|_ }} {% for tag in post.getTags() %}<a href="{{ tag.getUrl() }}" class="label">{{ tag.get('tag_name') }}</a>{% endfor %}</p>
+            <div class="entry-preview">
+                {{ post.get('preview') | raw }}
+            </div>
+            <p><a href="{{ post.getUrl() }}">Read the full post &raquo;</a> <a href="{{ post.getUrl() }}#disqus_thread"></a></p>
+        </div>
+    {% endfor %}
+{% else %}
+    <h2>No posts found</h2>
+{% endif %}

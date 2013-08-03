@@ -21,8 +21,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true, 'cell'=>'integer'),
                     array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'href' => BApp::href('catalog/products/form?id=<%=id%>'), 'width' => 250),
                     array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),
-                    array('name' => 'create_dt', 'label' => 'Created', 'index' => 'p.create_dt', 'cell' => 'date', 'width' => 100),
-                    array('name' => 'update_dt', 'label' => 'Updated', 'index' => 'p.update_dt', 'cell' => 'date', 'width' => 100),
+                    array('name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'cell' => 'date', 'width' => 100),
+                    array('name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'cell' => 'date', 'width' => 100),
                     array('name' => 'uom', 'label' => 'UOM', 'index' => 'p.uom', 'width' => 60),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false),
                 ),
@@ -82,7 +82,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $columns = $this->gridColumns();
         unset($columns['product_name']['formatter'], $columns['product_name']['formatoptions']);
-        $columns['create_dt']['hidden'] = true;
+        $columns['create_at']['hidden'] = true;
         $config = $this->gridConfig();
         if ($gridId) {
             $config['grid']['id'] = $gridId;

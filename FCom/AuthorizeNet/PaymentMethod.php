@@ -2,9 +2,10 @@
 
 class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
-    public function getName()
+
+    function __construct()
     {
-        return 'Authorize.net';
+        $this->_name = 'Authorize.net';
     }
 
     public function getCheckoutFormView()

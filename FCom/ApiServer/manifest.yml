@@ -1,8 +1,8 @@
 modules:
-    FCom_Api:
+    FCom_ApiServer:
         version: 0.1.0
         require: { module: { FCom_Core: 0.1.0 } }
-        description: "API area"
+        description: "API Server area"
         auto_use: [ bootstrap ]
 
         areas:
