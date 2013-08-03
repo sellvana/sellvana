@@ -1,3 +1,4 @@
-{% for article in articles %}
-    <div></div>
-{% endfor %}
+<div class="">
+    {{ THIS.view('blog/posts') | raw }}
+</div>
+{{ THIS.view('disqus/counts') | raw }}

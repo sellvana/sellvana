@@ -19,6 +19,8 @@ common_js_libs:
             - [ requireJs, jquery-ui, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, { deps: [ jquery ] } ]
             - [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-jebaird, { deps: [ jquery, jquery-ui ] } ]
 
+            - [ requireJs, nicedit, @FCom_Core/js/lib/nicEdit ]
+
             - [ requireJs, underscore, @FCom_Core/js/lib/underscore.min, { exports: _ } ]
             - [ requireJs, bacon, @FCom_Core/js/lib/bacon.min, { exports: Bacon } ]
             - [ requireJs, backbone, @FCom_Core/js/lib/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
@@ -100,3 +102,10 @@ lib_visualsearch:
         do:
             - [ css, @FCom_Core/js/lib/css/visualsearch.min.css ]
             - [ requireJs, visualsearch, @FCom_Core/js/lib/visualsearch.min, { deps: [ backbone ] } ]
+
+lib_tokeninput:
+    - view: head
+        do:
+            - [ css, @FCom_Core/js/lib/css/token-input.css ]
+            - [ css, @FCom_Core/js/lib/css/token-input-facebook.css ]
+            - [ requireJs, jquery.tokeninput, @FCom_Core/js/lib/jquery.tokeninput, { deps: [ jquery ] } ]

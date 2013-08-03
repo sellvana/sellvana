@@ -2,14 +2,14 @@
 
 class FCom_Blog_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
-        $tArticle = FCom_Blog_Model_Article::table();
+        $tPost = FCom_Blog_Model_Post::table();
         $tTag = FCom_Blog_Model_Tag::table();
-        $tArticleTag = FCom_Blog_Model_ArticleTag::table();
+        $tPostTag = FCom_Blog_Model_PostTag::table();
         $tUser = FCom_Admin_Model_User::table();
 
-        BDb::ddlTableDef($tArticle, array(
+        BDb::ddlTableDef($tPost, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'author_user_id' => 'int unsigned not null',
@@ -18,10 +18,11 @@ class FCom_Blog_Migrate extends BClass
                 'url_key' => 'varchar(255) not null',
                 'preview' => 'text',
                 'content' => 'text',
+                'data_serialized' => 'text',
                 'meta_title' => 'text',
                 'meta_description' => 'text',
                 'meta_keywords' => 'text',
-                'year_month' => 'char(6)',
+                'create_ym' => 'char(6)',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime',
             ),
@@ -29,10 +30,10 @@ class FCom_Blog_Migrate extends BClass
             'KEYS' => array(
                 'UNQ_url_key' => '(url_key)',
                 'IDX_status_create_at' => '(status, create_at)',
-                'IDX_year_month' => '(status, year_month)',
+                'IDX_create_ym' => '(status, create_ym)',
             ),
             'CONSTRAINTS' => array(
-                "FK_{$tArticle}_author" => "FOREIGN KEY (author_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tPost}_author" => "FOREIGN KEY (author_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
 
@@ -48,20 +49,32 @@ class FCom_Blog_Migrate extends BClass
             ),
         ));
 
-        BDb::ddlTableDef($tArticleTag, array(
+        BDb::ddlTableDef($tPostTag, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'tag_id' => 'int unsigned not null',
-                'article_id' => 'int unsigned not null',
+                'post_id' => 'int unsigned not null',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
-                'UNQ_article_tag' => '(article_id, tag_id)',
+                'UNQ_post_tag' => '(post_id, tag_id)',
             ),
             'CONSTRAINTS' => array(
-                "FK_{$tArticleTag}_article" => "FOREIGN KEY (article_id) REFERENCES {$tArticle} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tArticleTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tPostTag}_post" => "FOREIGN KEY (post_id) REFERENCES {$tPost} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tPostTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        BDb::run("
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE IF EXISTS fcom_blog_article_tag;
+DROP TABLE IF EXISTS fcom_blog_tag;
+DROP TABLE IF EXISTS fcom_blog_article;
+SET FOREIGN_KEY_CHECKS=1;
+        ");
+        $this->install__0_1_1();
     }
 }
