@@ -20,8 +20,8 @@ class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abstrac
             'match_domains' => array('label'=>'Match Domains', 'index'=>'a.match_domains'),
             'default_theme' => array('label'=>'Default Theme', 'index'=>'a.default_theme'),
             'mode_by_ip' => array('label'=>'Mode by IP', 'index'=>'a.mode_by_ip'),
-            'create_dt' => array('label'=>'Created', 'index'=>'a.create_dt', 'formatter'=>'date'),
-            'update_dt' => array('label'=>'Updated', 'index'=>'a.update_dt', 'formatter'=>'date'),
+            'create_at' => array('label'=>'Created', 'index'=>'a.create_at', 'formatter'=>'date'),
+            'update_at' => array('label'=>'Updated', 'index'=>'a.update_at', 'formatter'=>'date'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('multisite/form/?id=');
         return $config;

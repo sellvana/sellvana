@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, FCom_ApiServer, { label: Fulleron API, group: areas, async: true } ]

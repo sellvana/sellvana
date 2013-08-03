@@ -152,4 +152,15 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        $table = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at DATETIME DEFAULT NULL',
+                  'update_dt'      => 'RENAME update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+            ),
+        ));
+    }
 }

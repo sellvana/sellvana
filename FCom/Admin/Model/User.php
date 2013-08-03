@@ -105,7 +105,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUserId()
     {
         $user = self::sessionUser();
-        return !empty($user) ? $user['id'] : false;
+        return !empty($user) ? $user->id : false;
     }
 
     static public function isLoggedIn()
@@ -171,14 +171,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function recoverPassword()
     {
-        $this->set(array('token'=>BUtil::randomString(), 'token_dt'=>BDb::now()))->save();
+        $this->set(array('token'=>BUtil::randomString(), 'token_at'=>BDb::now()))->save();
         BLayout::i()->view('email/admin/user-password-recover')->set('user', $this)->email();
         return $this;
     }
 
     public function resetPassword($password)
     {
-        $this->set(array('token'=>null, 'token_dt'=>null))->setPassword($password)->save()->login();
+        $this->set(array('token'=>null, 'token_at'=>null))->setPassword($password)->save()->login();
         BLayout::i()->view('email/admin/user-password-reset')->set('user', $this)->email();
         return $this;
     }

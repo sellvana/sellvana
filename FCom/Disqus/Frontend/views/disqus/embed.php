@@ -1,1 +1,1 @@
-<?php echo BConfig::i()->get('modules/FCom_Disqus/code')?>
+<?php echo BConfig::i()->get('modules/FCom_Disqus/comments_code')?>

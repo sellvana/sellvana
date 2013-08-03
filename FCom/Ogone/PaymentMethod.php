@@ -2,9 +2,9 @@
 
 class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
-    public function getName()
+    function __construct()
     {
-        return 'Ogone';
+        $this->_name = 'Ogone';
     }
 
     public function getCheckoutFormView()

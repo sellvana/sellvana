@@ -96,6 +96,16 @@ class FCom_Cms_Migrate extends BClass
         BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $table = FCom_Cms_Model_Block::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime DEFAULT NULL',
+                  'update_dt'      => 'RENAME update_at datetime DEFAULT NULL',
+            ),
+        ));
+    }
     public function upgrade__0_1_0__0_1_1()
     {
         BDb::ddlTableDef(FCom_Cms_Model_Block::table(), array(

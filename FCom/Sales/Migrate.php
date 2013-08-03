@@ -336,4 +336,88 @@ class FCom_Sales_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        // todo update created at fields
+
+        BDb::ddlTableDef(FCom_Sales_Model_Order::table(), array(
+            'COLUMNS' => array(
+                'created_dt' => 'RENAME created_at datetime DEFAULT NULL',
+                'purchased_dt' => 'RENAME updated_at datetime DEFAULT NULL',
+                'gt_base' => 'RENAME grandtotal decimal(12,2) NOT NULL',
+                'tax' => 'decimal(10,2) NULL',
+                'unique_id' => 'varchar(15) NOT NULL',
+                'status' => 'varchar(50) NOT NULL',
+                'shippping_service' => 'DROP',
+                'payment_details' => 'DROP',
+                'status_id' => 'DROP',
+                'totals_json' => 'DROP',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_4__0_2_5()
+    {
+        foreach (array(FCom_Sales_Model_Cart_Item::table(),
+           FCom_Sales_Model_Cart_Address::table(),
+           FCom_Sales_Model_Order_Address::table(),
+        ) as $table) {
+            BDb::ddlTableDef($table, array(
+                'COLUMNS' => array(
+                    'create_dt' => 'RENAME create_at datetime NOT NULL',
+                    'update_dt' => 'RENAME update_at datetime NOT NULL',
+                ),
+            ));
+        }
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
+            'COLUMNS' => array(
+                'create_dt' => 'RENAME create_at datetime NULL',
+                'update_dt' => 'RENAME update_at datetime NULL',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_5__0_2_6()
+    {
+
+        BDb::ddlTableDef(FCom_Sales_Model_Order::table(), array(
+            'COLUMNS' => array(
+                'created_at' => 'RENAME create_at datetime DEFAULT NULL',
+                'updated_at' => 'RENAME update_at datetime DEFAULT NULL',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_6__0_2_7()
+    {
+        $oTable = FCom_Sales_Model_Order::table();
+        BDb::ddlTableDef(FCom_Sales_Model_Order_Payment::table(), array(
+            'COLUMNS' => array(
+                'id'               => 'int (10) unsigned not null auto_increment',
+                'create_at'        => 'datetime not null',
+                'update_at'        => 'datetime null',
+                'method'           => 'varchar(50) not null',
+                'parent_id'        => 'int(10) null',
+                'order_id'         => 'int(10) unsigned not null',
+                'amount'           => 'decimal(12,2)',
+                'data_serialized'  => 'text',
+                'status'           => 'varchar(50)',
+                'transaction_id'   => 'varchar(50)',
+                'transaction_type' => 'varchar(50)',
+                'online'           => 'BOOL',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS'  => array(
+                'method'           => '(method)',
+                'order_id'         => '(order_id)',
+                'status'           => '(status)',
+                'transaction_id'   => '(transaction_id)',
+                'transaction_type' => '(transaction_type)',
+            ),
+            'CONSTRAINTS' => array(
+                'fk_payment_order' => "FOREIGN KEY (order_id) REFERENCES {$oTable}(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+            ),
+        ));
+    }
 }

@@ -1,0 +1,20 @@
+/blog/index:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/tag:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/author:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/archive:
+    - { include: base }
+    - { hook: main, views: blog/index }
+
+/blog/post:
+    - { include: base }
+    - { hook: main, views: blog/post }
+

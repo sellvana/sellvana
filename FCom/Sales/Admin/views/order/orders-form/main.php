@@ -47,7 +47,7 @@
             </li>
             <li>
                 <h4 class="label">Order Date </h4>
-                <input type="text" name="model[purchased_dt]" value="<?=$m->purchased_dt?>">
+                <input type="text" name="model[create_at]" value="<?=$m->create_at?>">
             </li>
             <li>
                 <h4 class="label">Order Status</h4>
@@ -209,7 +209,7 @@
                 <h4 class="label">Order: <?=$m->id?> </h4>
             </li>
             <li>
-                <h4 class="label">Order Date: <?=$m->purchased_dt?> </h4>
+                <h4 class="label">Order Date: <?=$m->create_at?> </h4>
             </li>
             <li>
                 <h4 class="label">Order Status: <?=$m->status() ? $m->status()->name : $m->status?> </h4>

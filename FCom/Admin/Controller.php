@@ -31,6 +31,11 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         //BLayout::i()->layout('/');
     }
 
+    public function action_static()
+    {
+        $this->viewProxy('static', 'index', 'main', 'base');
+    }
+
     public function action_blank()
     {
         exit;

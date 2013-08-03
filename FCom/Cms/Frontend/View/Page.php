@@ -47,7 +47,7 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
         $view->setParam(array(
             //'renderer'    => $block->renderer ? $block->renderer : 'BTwig::renderer',
             'source'      => $page->content ? $page->content : ' ',
-            'source_name' => 'cms_block:'.$page->handle.':'.strtotime($page->update_dt),
+            'source_name' => 'cms_block:'.$page->handle.':'.strtotime($page->update_at),
         ));
 
         $content = call_user_func($renderer, $view);

@@ -651,7 +651,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $fieldsList = FCom_IndexTank_Model_ProductField::i()->getSearchList();
         $searches = $this->_processFields($fieldsList, $product, 'search');
         //add two special fields
-        $searches['timestamp'] = strtotime($product->update_dt);
+        $searches['timestamp'] = strtotime($product->update_at);
         $searches['match'] = "all";
 
         return $searches;

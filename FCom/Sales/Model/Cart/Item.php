@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @property mixed product_id
+ * @property mixed qty
+ */
 class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
@@ -41,8 +45,8 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         $this->data_serialized = BUtil::toJson($this->data);
         return true;
     }

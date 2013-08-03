@@ -8,8 +8,8 @@ class FCom_Comet_Model_Channel extends FCom_Core_Model_Abstract
     /**
      * - id
      * - channel_name
-     * - created_at
-     * - updated_at
+     * - create_at
+     * - update_at
      * - data_serialized
      *   - permissions
      *     - can_subscribe
@@ -28,7 +28,7 @@ class FCom_Comet_Model_Channel extends FCom_Core_Model_Abstract
 
     public function getChannel($channel, $create=false)
     {
-        
+
     }
 
     public function subscribe($client)

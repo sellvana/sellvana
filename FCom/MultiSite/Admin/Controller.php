@@ -19,8 +19,8 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             'match_domains' => array('label'=>'Match Domains', 'index'=>'s.match_domains'),
             'default_theme' => array('label'=>'Default Theme', 'index'=>'s.default_theme'),
             'mode_by_ip' => array('label'=>'Mode by IP', 'index'=>'s.mode_by_ip'),
-            'create_dt' => array('label'=>'Created', 'index'=>'s.create_dt', 'formatter'=>'date'),
-            'update_dt' => array('label'=>'Updated', 'index'=>'s.update_dt', 'formatter'=>'date'),
+            'create_at' => array('label'=>'Created', 'index'=>'s.create_at', 'formatter'=>'date'),
+            'update_at' => array('label'=>'Updated', 'index'=>'s.update_at', 'formatter'=>'date'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('multisite/form/?id=');
         return $config;
