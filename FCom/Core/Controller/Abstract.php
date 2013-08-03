@@ -19,6 +19,9 @@ class FCom_Core_Controller_Abstract extends BActionController
         BResponse::i()->render();
     }
 
+    /**
+     * Apply current area theme and layouts supplied as parameter
+     */
     public function layout($name)
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
