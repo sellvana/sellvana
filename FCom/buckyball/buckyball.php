@@ -28,16 +28,16 @@ define('BUCKYBALL_ROOT_DIR', __DIR__);
 * Load all components immediately
 */
 
-require $comDir.'core.php';
-require $comDir.'lib/idiorm.php';
-require $comDir.'lib/paris.php';
-require $comDir.'db.php';
-require $comDir.'cache.php';
-require $comDir.'module.php';
-require $comDir.'controller.php';
-require $comDir.'layout.php';
-require $comDir.'misc.php';
-require $comDir.'import.php';
+require_once $comDir.'core.php';
+require_once $comDir.'misc.php';
+require_once $comDir.'lib/idiorm.php';
+require_once $comDir.'lib/paris.php';
+require_once $comDir.'db.php';
+require_once $comDir.'cache.php';
+require_once $comDir.'module.php';
+require_once $comDir.'controller.php';
+require_once $comDir.'layout.php';
+require_once $comDir.'import.php';
 
 /**
 * Minify all components into 1 compact file.
@@ -48,7 +48,7 @@ require $comDir.'import.php';
 
 if (getopt('c')) {
     $minified = array();
-    foreach (array('core','lib/idiorm','lib/paris','db','cache','module','controller','layout','misc','cache') as $f) {
+    foreach (array('core','misc','lib/idiorm','lib/paris','db','cache','module','controller','layout','cache') as $f) {
         list(, $minified[]) = explode(' ', php_strip_whitespace($comDir.$f.'.php'), 2);
     }
     file_put_contents('buckyball.min.php', '<?php '.join(' ', $minified));

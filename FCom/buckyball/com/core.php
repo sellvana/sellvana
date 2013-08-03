@@ -459,8 +459,12 @@ class BConfig extends BClass
     {
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 #echo "<pre>"; print_r($this); echo "</pre>";
-        if (!BUtil::isPathAbsolute($filename) && ($dir = $this->get('fs/config_dir'))) {
-            $filename = $dir.'/'.$filename;
+        if (!BUtil::isPathAbsolute($filename)) {
+            $configDir = $this->get('fs/config_dir');
+            if (!$configDir) {
+                $configDir = BConfig::i()->get('fs/config_dir');
+            }
+            $filename = $configDir.'/'.$filename;
         }
         if (!is_readable($filename)) {
             BDebug::error(BLocale::_('Invalid configuration file name: %s', $filename));
@@ -570,7 +574,11 @@ class BConfig extends BClass
         }
 
         if (!BUtil::isPathAbsolute($filename)) {
-            $filename = BConfig::i()->get('fs/config_dir').'/'.$filename;
+            $configDir = $this->get('fs/config_dir');
+            if (!$configDir) {
+                $configDir = BConfig::i()->get('fs/config_dir');
+            }
+            $filename = $configDir . '/' . $filename;
         }
         BUtil::ensureDir(dirname($filename));
         // Write contents

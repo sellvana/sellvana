@@ -76,7 +76,7 @@ class FCom_Core_Main extends BClass
         if (!$mediaDir) {
             $mediaDir = $rootDir.'/media';
             if (!is_writable($mediaDir)) {
-                $permissionErrors[] = '/media';
+                $permissionErrors[] = $mediaDir;
             }
             $config->set('fs/media_dir', $mediaDir);
         }
@@ -94,6 +94,9 @@ class FCom_Core_Main extends BClass
         $dlcDir = $config->get('fs/dlc_dir');
         if (!$dlcDir) {
             $dlcDir = $rootDir.'/dlc';
+            if (!is_writable($dlcDir)) {
+                $permissionErrors[] = $dlcDir;
+            }
             $config->set('fs/dlc_dir', $dlcDir);
         }
 
@@ -101,7 +104,7 @@ class FCom_Core_Main extends BClass
         if (!$storageDir) {
             $storageDir = $rootDir.'/storage';
             if (!is_writable($storageDir)) {
-                $permissionErrors[] = '/storage';
+                $permissionErrors[] = $storageDir;
             }
             $config->set('fs/storage_dir', $storageDir);
         }
@@ -273,6 +276,7 @@ class FCom_Core_Main extends BClass
             $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
             $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
             $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
+            $this->_modulesDirs[] = $rootDir.'/storage/custom'; // Custom module
 
             foreach ($this->_modulesDirs as $dir) {
                 BModuleRegistry::i()->scan($dir);
@@ -286,8 +290,13 @@ class FCom_Core_Main extends BClass
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
         }
+        //TODO: Temporary, remove after we're certain that everyone is migrated
         if (file_exists($configDir.'/local.yml')) {
-            $config->addFile('local.yml', true);
+            BConfig::i(true)->addFile('local.yml', true)->writeFile('local.php');
+            unlink($configDir.'/local.yml');
+        }
+        if (file_exists($configDir.'/local.php')) {
+            $config->addFile('local.php', true);
         }
 
         BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
