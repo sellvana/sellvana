@@ -5,12 +5,12 @@
 
 Hello,
 
-There has been a new story submitted:
+A new customer registration:
 
 Name: <?=$d->firstname.' '.$d->lastname?>
 
 Email: <?=$d->email?>
 
 Direct link to approve or decline:
-<?=FCom_Admin_Main::i()->href('customers/form?id='.$d->id)?>
+<?=FCom_Frontend_Main::i()->adminHref('customers/form?id='.$d->id)?>
 
