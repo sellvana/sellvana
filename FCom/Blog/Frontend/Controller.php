@@ -49,6 +49,10 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $r = BRequest::i();
         $y = $r->param('year');
+        if (!$y) {
+            $this->forward(false);
+            return;
+        }
         $m = $r->param('month');
         $postsOrm = FCom_Blog_Model_Post::i()->getPostsOrm();
         if ($m) {

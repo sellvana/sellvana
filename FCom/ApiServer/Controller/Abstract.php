@@ -79,8 +79,8 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
             return true;
         }
 
-        $password = BRequest::i()->headers('PHP_AUTH_PW');
-        $username = BRequest::i()->headers('PHP_AUTH_USER');
+        $password = BRequest::i()->server('PHP_AUTH_PW');
+        $username = BRequest::i()->server('PHP_AUTH_USER');
         $user = FCom_Admin_Model_User::i()->sessionUser();
         if ($user) {
             return true;

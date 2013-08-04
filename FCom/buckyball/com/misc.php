@@ -859,6 +859,7 @@ class BUtil extends BClass
     /**
     * Send simple POST request to external server and retrieve response
     *
+    * @param string $method
     * @param string $url
     * @param array $data
     * @return string

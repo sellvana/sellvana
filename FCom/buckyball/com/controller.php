@@ -988,9 +988,9 @@ class BResponse extends BClass
         return $this;
     }
 
-    public function setContentPrefix($type)
+    public function setContentPrefix($string)
     {
-        $this->_contentPrefix = $type;
+        $this->_contentPrefix = $string;
         return $this;
     }
 
@@ -1015,9 +1015,9 @@ class BResponse extends BClass
         return $this;
     }
 
-    public function setContentSuffix($type)
+    public function setContentSuffix($string)
     {
-        $this->_contentSuffix = $type;
+        $this->_contentSuffix = $string;
         return $this;
     }
 
