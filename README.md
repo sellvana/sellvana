@@ -18,4 +18,4 @@ Installation
 Documentation
 -------------
 
-https://github.com/fulleron/fulleron/wiki
+https://github.com/fulleron/FulleronDoc

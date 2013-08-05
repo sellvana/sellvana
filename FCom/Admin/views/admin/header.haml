@@ -1,6 +1,5 @@
 - $user = FCom_Admin_Model_User::sessionUser();
-- $modulesNotification = array();
-- $this->hook('notification', array('modulesNotification' => &$modulesNotification));
+- $notifications = $this->getNotifications();
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 
 
@@ -49,25 +48,20 @@
                                 %li
                                     %a(href="#{$sc['href']}") = $sc['label']
 
-            - if ($modulesNotification)
+            - if ($notifications)
                 %li.dropdown
                     %a.dropdown-toggle#utilnav-notifications(href="#" data-toggle="dropdown" data-target="#")
                         %span.icon-bell
                         %span.title
                             = $this->_('Notifications')
-                        %span.badge.badge-warning = count($modulesNotification)
+                        %span.badge.badge-warning = $notifications['count']
                     %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-notifications")
-                        - foreach ($modulesNotification as $notifyTitle => $notifications)
-                            %li
-                                %a(style="text-decoration: none; font-weight: bold; color:black") = strtoupper($notifyTitle)
-                        - foreach ($notifications as $notify)
-                            %li
-                                - if ($notify->url)
-                                    %a(href="#{BApp::href($notify->url)}" title="#{$notify->text}") = $notify->module
-                                - else if($notify->text)
-                                    %span = $notify->text
-                                - else
-                                    %span = $notify->module
+                        - foreach ($notifications['groups'] as $group => $items)
+                            %li.dropdown-header = $this->_($group)
+                            - foreach ($items as $item)
+                                %li(class="#{$item['type']}")
+                                    - echo $item['html']
+                            %li.dropdown-divider
 
             %li.dropdown
                 %a.dropdown-toggle#utilnav-account(href="#" data-toggle="dropdown" data-target="#")
