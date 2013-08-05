@@ -66,11 +66,17 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_post()
     {
-        $post = FCom_Blog_Model_Post::i()->load(BRequest::i()->param('post'), 'url_key');
+        $postKey = BRequest::i()->param('post');
+        // allow "2013/08/05/post-url-key" format
+        if (preg_match('#^([0-9]{4})/([0-9]{2})/([0-9]{2})/(.*)#', $postKey, $m)) {
+            $postKey = $m[4];
+        }
+        $post = FCom_Blog_Model_Post::i()->load($postKey, 'url_key');
         if (!$post) {
             $this->forward(false);
             return;
         }
+        $this->view('head')->canonical($post->getUrl());
         $this->view('blog/post')->set('post', $post);
         $this->layout('/blog/post');
     }

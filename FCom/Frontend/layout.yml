@@ -28,4 +28,4 @@ base:
 
 /:
     - { include: base }
-    - { hook: main, views: home }
+    - { hook: main, views: static/index }

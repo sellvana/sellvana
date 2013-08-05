@@ -720,7 +720,6 @@ class BModule extends BClass
         $this->_normalizeManifestRequireFormat();
     }
 
-
     protected function _normalizeManifestRequireFormat()
     {
         // normalize require format
