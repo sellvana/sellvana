@@ -25,7 +25,7 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if (is_null($this->get('data'))) {
             $dataJson = $this->get(static::$_dataSerializedField);
-            $this->set(static::$_dataField, $dataJson ? BUtil::from($dataJson) : array());
+            $this->set(static::$_dataField, $dataJson ? BUtil::fromJson($dataJson) : array());
         }
         $data = $this->get(static::$_dataField);
         if (is_null($path)) {

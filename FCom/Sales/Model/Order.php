@@ -194,11 +194,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData['grandtotal'] = $cart->grand_total; // full grand total
         $orderData['create_at'] = $orderData['update_at'] = BDb::now();
 
-        $data_serialized = array(
+        $data_ = array(
             'totals'           => $cart->data['totals'],
             'shipping_service' => $cart->shipping_service
         );
-        $orderData['data_serialized'] = $data_serialized;
+        $orderData[static::$_dataField] = $data_;
 
         /* @var $salesOrder FCom_Sales_Model_Order */
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
@@ -222,7 +222,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         $salesOrder->save(); // save to have valid unique_id
         if(isset($options['all_components']) && $options['all_components']){
-            $options['order_id'] = $salesOrder->unique_id ? $salesOrder->unique_id: $salesOrder->id();
+            $options['order_id'] = $salesOrder->id();
             static::createOrderItems($cart, $options);
             static::createOrderAddress($cart, $options);
 
@@ -243,6 +243,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if(!$payment instanceof FCom_Sales_Method_Payment_Interface){
             return;
         }
+        /**/
         $payment->setSalesEntity($salesOrder, $options)
                 ->payOnCheckout();
         $salesOrder->setData('payment_details', $payment->asArray());

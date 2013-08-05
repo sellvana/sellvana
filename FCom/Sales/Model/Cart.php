@@ -437,7 +437,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         } catch (Exception $e) {
             // if something failed, like bad payment method
             // set some error message in session and do nothing
-
+var_dump($e);
         }
 
     }
