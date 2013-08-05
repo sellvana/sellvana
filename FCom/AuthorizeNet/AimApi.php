@@ -10,17 +10,18 @@ class FCom_AuthorizeNet_AimApi extends BClass
     protected $api;
 
     /**
-     * @param $payment
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
      * @return AuthorizeNetAIM_Response
      */
     public function sale($payment)
     {
         $api           = $this->getApi();
+        /* @var $order FCom_Sales_Model_Order */
         $order         = $payment->getOrder();
         $api->amount   = $payment->amount_due;
         $api->card_num = $payment->getCardNumber();
         $api->exp_date = $payment->card_exp_date;
-        $api->invoice_num = $payment->order_id;
+        $api->invoice_num = $order->id();
         $api->description = $order->getTextDescription();
 
         if(BConfig::i()->get('modules/FCom_AuthorizeNet/aim/useccv')){
@@ -36,7 +37,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         if($billing->company){
             $api->company = $billing->company;
         }
-        $api->address = $billing->getAddress();
+        $api->address = $billing->getFullAddress();
         if ($billing->city) {
             $api->city = $billing->city;
         }
@@ -61,9 +62,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         if ($order->customer_id) {
             $api->cust_id = $order->customer_id;
         }
-//        if ($billing->ip) {
-//            $api->customer_ip = $billing->ip;
-//        }
+
         $api->po_num = $payment->po_number;
         $response      = $api->authorizeAndCapture();
         return $response;
