@@ -375,12 +375,12 @@ class BLayout extends BClass
             }
 
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
-            BEvents::i()->fire('BLayout::view:add: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view:add:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         } else {
             $this->_views[$viewAlias]->setParam($params);
-            BEvents::i()->fire('BLayout::view:update: ' . $viewAlias, array(
+            BEvents::i()->fire('BLayout::view:update:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
         }
@@ -975,7 +975,7 @@ class BLayout extends BClass
      */
     public function render($routeName = null, $args = array())
     {
-        $this->dispatch('render.before', $routeName, $args);
+        $this->dispatch('render:before', $routeName, $args);
 
         $rootView = $this->getRootView();
         BDebug::debug('LAYOUT.RENDER ' . var_export($rootView, 1));
@@ -985,7 +985,7 @@ class BLayout extends BClass
         $result = $rootView->render($args);
 
         $args['output'] =& $result;
-        $this->dispatch('render.after', $routeName, $args);
+        $this->dispatch('render:after', $routeName, $args);
 
         //BSession::i()->dirty(false); // disallow session change during layout render
 

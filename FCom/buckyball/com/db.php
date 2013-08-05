@@ -1218,7 +1218,7 @@ exit;
         }
         BEvents::i()->fire($class.'::find_one:orm', array('orm'=>$this, 'class'=>$class, 'id'=>$id));
         $result = parent::find_one($id);
-        BEvents::i()->fire($class.'::find_one:after', array('result'=>$result, 'class'=>$class, 'id'=>$id));
+        BEvents::i()->fire($class.'::find_one:after', array('result'=>&$result, 'class'=>$class, 'id'=>$id));
         return $result;
     }
 
@@ -1235,7 +1235,7 @@ exit;
         }
         BEvents::i()->fire($class.'::find_many:orm', array('orm'=>$this, 'class'=>$class));
         $result = parent::find_many();
-        BEvents::i()->fire($class.'::find_many:after', array('result'=>$result, 'class'=>$class));
+        BEvents::i()->fire($class.'::find_many:after', array('result'=>&$result, 'class'=>$class));
         return $result;
     }
 
@@ -2532,7 +2532,7 @@ class BModelUser extends BModel
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire(__METHOD__.'.after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__.':after', array('user'=>$this));
         return $this;
     }
 
@@ -2550,7 +2550,7 @@ class BModelUser extends BModel
     {
         BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
         static::$_sessionUser = null;
-        BEvents::i()->fire(__METHOD__.'.after');
+        BEvents::i()->fire(__METHOD__.':after', array('user' => $this));
     }
 
     public function recoverPassword($emailView='email/user-password-recover')
