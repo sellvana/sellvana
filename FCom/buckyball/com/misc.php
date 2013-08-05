@@ -2908,9 +2908,9 @@ class BLoginThrottle extends BClass
                     $this->_rec['brute_attempts_cnt']++;
                 }
                 $this->_save();
-                $this->_fire('init.brute');
+                $this->_fire('init:brute');
                 if ($this->_rec['brute_attempts_cnt'] == $c['brute_attempts_max']) {
-                    $this->_fire('init.brute_max');
+                    $this->_fire('init:brute_max');
                 }
                 return false; // currently locked
             }
@@ -2931,7 +2931,7 @@ class BLoginThrottle extends BClass
         $now = time();
         $c = $this->_config;
 
-        $this->_fire('fail.before');
+        $this->_fire('fail:before');
 
         if (empty($this->_rec['attempt_cnt'])) {
             $this->_rec['attempt_cnt'] = 1;
@@ -2941,14 +2941,14 @@ class BLoginThrottle extends BClass
         $this->_rec['last_attempt'] = $now;
         $this->_rec['status'] = 'FAILED';
         $this->_save();
-        $this->_fire('fail.wait');
+        $this->_fire('fail:wait');
 
         $this->_gc();
         sleep($c['sleep_sec']);
 
         $this->_rec['status'] = '';
         $this->_save();
-        $this->_fire('fail.after');
+        $this->_fire('fail:after');
 
         return true; // normal response
     }
