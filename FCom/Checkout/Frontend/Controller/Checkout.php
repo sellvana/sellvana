@@ -138,12 +138,18 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout = BLayout::i();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
+        $paymentMethodsHtml = array();
+        foreach ($paymentMethods as $code => $method) {
+            $paymentMethodsHtml[$code] = $method->getCheckoutFormView()->render();
+        }
+
         $layout->view('breadcrumbs')->crumbs = array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
             array('label'=>'Payment methods', 'active'=>true));
-        $layout->view('checkout/payment')->payment_methods = $paymentMethods;
-        $layout->view('checkout/payment')->cart = $cart;
+        $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
+                                         ->set('payment_html', $paymentMethodsHtml)
+                                         ->set('cart', $cart);
         $this->layout('/checkout/payment');
     }
 
