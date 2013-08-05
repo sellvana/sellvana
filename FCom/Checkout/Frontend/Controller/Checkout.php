@@ -125,7 +125,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->redirect(BApp::href('checkout'));
         }
         $order = $cart->placeOrder();
-
         FCom_Sales_Model_Cart::i()->sessionCartId(false);
 
         $sData =& BSession::i()->dataToUpdate();

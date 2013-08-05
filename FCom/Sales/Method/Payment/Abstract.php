@@ -46,4 +46,9 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
         $this->cart = $cart;
         return $this;
     }
+
+    public function asArray()
+    {
+        return array("name" => $this->getName());
+    }
 }
