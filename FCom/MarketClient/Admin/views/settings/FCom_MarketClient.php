@@ -6,7 +6,7 @@
         <div>
             <table>
                 <tr>
-                    <td>API url (we can get rid of this later)</td>
+                    <td>API URL</td>
                     <td>
                         <input size="50" type="text" name="config[modules][FCom_MarketClient][market_url]"
                                value="<?php echo $this->q($c->get('modules/FCom_MarketClient/market_url'))?>"/>
@@ -23,9 +23,9 @@
                 <tr>
                     <td>Salt</td>
                     <td>
-                        <input size="50" type="text" name="config[modules][FCom_MarketClient][salt]"
-                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/salt'))?>"/> <br/>
-                        <span style="color:red">Keep ID and SALT in secret</span>
+                        <input size="50" type="text" name="config[modules][FCom_MarketClient][secret]"
+                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/secret'))?>"/> <br/>
+                        <span style="color:red">Keep ID and SECRET in secret</span>
                     </td>
                 </tr>
             </table>

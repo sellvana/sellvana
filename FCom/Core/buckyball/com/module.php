@@ -772,7 +772,8 @@ class BModule extends BClass
         if (empty($params['update'])) {
             $rootDir = $this->root_dir;
             $file = $this->bootstrap['file'];
-            throw new BException(BLocale::_('Module is already registered: %s (%s)', array($modName, $rootDir.'/'.$file)));
+            BDebug::debug(BLocale::_('Module is already registered: %s (%s)', array($this->name, $rootDir.'/'.$file)));
+            return $this;
         }
         unset($params['update']);
         foreach ($params as $k=>$v) {

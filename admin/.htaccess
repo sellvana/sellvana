@@ -1,22 +1,7 @@
-<FilesMatch "(attachments)">
-Satisfy Any
-Order allow,deny
-Allow from all
-Deny from none
-</FilesMatch>
-
-Header unset ETag
-FileETag None
-#Header unset If-Modified-Since
-#Header unset If-None-Match
-
-Options +FollowSymLinks -MultiViews
-RewriteEngine on
-
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-l
-
-RewriteRule ^(.*)$ index.php/$1 [L]
+<IfModule mod_rewrite.c>
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>

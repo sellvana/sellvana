@@ -4,6 +4,11 @@ modules:
 		require: { module: { FCom_Core: 0.1.0 } }
 		description: "Fulleron Extension Market Client"
 
+        default_config:
+            modules:
+                FCom_MarketClient:
+                    market_url: //fulleron.com
+
         areas:
             FCom_Admin:
                 auto_use: all
