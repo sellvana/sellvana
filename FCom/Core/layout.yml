@@ -11,7 +11,8 @@ common_js_libs:
             - [ requireJs, transparency, @FCom_Core/js/lib/transparency.min ]
             - [ requireJs, date, @FCom_Core/js/lib/date, { exports: Date } ]
 
-            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
+            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery, @FCom_Core/js/lib/jquery ], { exports: [ $, jQuery ] } ]
+#            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
             - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
             - [ requireJs, select2, @FCom_Core/js/select2/select2, { deps: [ jquery ] } ]
             - [ requireJs, jquery.form, @FCom_Core/js/lib/jquery.form, { deps: [ jquery ] } ]
@@ -28,7 +29,8 @@ common_js_libs:
             - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ Backbone ], exports: Backbone.Marionette } ]
             - [ requireJs, backbone-pageable, @FCom_Core/js/lib/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
 
-            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
+            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
+#            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
             - [ requireJs, jquery.bootstrap-growl, @FCom_Core/js/lib/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
             #- [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source.js, { deps: [ jquery ] } ]

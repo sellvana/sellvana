@@ -1,1 +1,19 @@
-Authorize.net checkout form
+<h4>Authorize.net checkout form</h4>
+<label for="authnet_cc_type">Credit card type</label>
+<select name="payment[authorizenet][cc_type]" id="authnet_cc_type">
+    <option value="">Select Card Type</option>
+</select>
+<br/>
+<label for="authnet_cc_number">Credit Card Number</label>
+<input type="text" id="authnet_cc_number" value="" name="payment[authorizenet][cc_num]">
+<label for="authnet_cc_expiration_date">Expiration date</label>
+<div class="authnet_expiration_date_group">
+    <select name="payment[authorizenet][expire][month]" id="authnet_cc_expiration_date">
+        <option value="">Select Expiration Month</option>
+    </select>&nbsp;
+    <select name="payment[authorizenet][expire][year]" id="authnet_cc_expiration_date_year">
+        <option value="">Select Expiration Year</option>
+    </select>
+    {#todo add verification number and rest of form#}
+    {#todo make form dynamic#}
+</div>
