@@ -3142,7 +3142,7 @@ class Bcrypt extends BClass
 
     public function verify($input, $existingHash)
     {
-        return $crypt($input, $existingHash) === $existingHash;
+        return crypt($input, $existingHash) === $existingHash;
     }
 
     private function getSalt()
