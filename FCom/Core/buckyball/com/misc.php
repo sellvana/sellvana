@@ -911,7 +911,7 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $content = curl_exec($ch);
-            $response = curl_getinfo($ch);
+            $info = curl_getinfo($ch);
             //$response = array();
             curl_close($ch);
 
@@ -934,10 +934,10 @@ class BUtil extends BClass
                     ."Content-Length: ".strlen($request)."\r\n";
             }
             $content = file_get_contents($url, false, stream_context_create($opts));
-            $response = array(); //TODO: emulate curl data?
+            $info = array(); //TODO: emulate curl data?
         }
 
-        return array($content, $response);
+        return array($content, $info);
     }
 
     /**
@@ -1366,6 +1366,32 @@ class BUtil extends BClass
             unset($nodes[$n['key']]);
         }
         return $sorted;
+    }
+
+    /**
+     * Wrapper for ZipArchive::open+extractTo
+     *
+     * @param string $filename
+     * @param string $targetDir
+     * @return boolean Result
+     */
+    public function zipExtract($filename, $targetDir)
+    {
+        if (!class_exists('ZipArchive')) {
+            throw new BException("Class ZipArchive doesn't exist");
+        }
+        $zip = new ZipArchive;
+        $res = $zip->open($filename);
+        if (!$res) {
+            throw new BException("Can't open zip archive: " . $filename);
+        }
+        BUtil::ensureDir($targetDir);
+        $res = $zip->extractTo($targetDir);
+        $zip->close();
+        if (!$res) {
+            throw new BException("Can't extract zip archive: " . $filename . " to " . $targetDir);
+        }
+        return true;
     }
 }
 
@@ -2787,7 +2813,7 @@ class BFtpClient extends BClass
         }
     }
 
-    public function ftpUpload($from, $to)
+    public function upload($from, $to)
     {
         if (!extension_loaded('ftp')) {
             new BException('FTP PHP extension is not installed');
@@ -2807,13 +2833,13 @@ class BFtpClient extends BClass
             throw new BException('Could not navigate to '. $to);
         }
 
-        $errors = $this->ftpUploadDir($conn, $from.'/');
+        $errors = $this->uploadDir($conn, $from.'/');
         ftp_close($conn);
 
         return $errors;
     }
 
-    public function ftpUploadDir($conn, $source, $ftpPath='')
+    public function uploadDir($conn, $source, $ftpPath='')
     {
         $errors = array();
         $dir = opendir($source);
@@ -2840,7 +2866,7 @@ class BFtpClient extends BClass
                 $errors[] = ftp_pwd($conn).'/'.$file.'/';
                 continue;
             }
-            $errors += $this->ftpUploadDir($conn, $source.$file.'/', $ftpPath.$file.'/');
+            $errors += $this->uploadDir($conn, $source.$file.'/', $ftpPath.$file.'/');
             ftp_chdir($conn, '..');
         }
         return $errors;
@@ -3110,33 +3136,19 @@ class Bcrypt extends BClass
 
     public function hash($input)
     {
-        if (function_exists('password_hash')) {
-            return password_hash($input);
-        }
         $hash = crypt($input, $this->getSalt());
-        if (strlen($hash) > 13) {
-            return $hash;
-        }
-
-        return false;
+        return strlen($hash) > 13 ? $hash : false;
     }
 
     public function verify($input, $existingHash)
     {
-        if (function_exists('password_verify')) {
-            return password_verify($input, $existingHash);
-        }
-        $hash = crypt($input, $existingHash);
-
-        return $hash === $existingHash;
+        return $crypt($input, $existingHash) === $existingHash;
     }
 
     private function getSalt()
     {
-        $mode = version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a';
-        $bytes = $this->getRandomBytes(16);
-        $salt = '$' . $mode . '$12$';
-        $salt .= $this->encodeBytes($bytes);
+        $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
+        $salt .= $this->encodeBytes($this->getRandomBytes(16));
         return $salt;
     }
 
@@ -3209,10 +3221,10 @@ class Bcrypt extends BClass
     }
 }
 
-/**
- * @see http://www.php.net/manual/en/function.htmlentities.php#106535
- */
 if( !function_exists( 'xmlentities' ) ) {
+    /**
+     * @see http://www.php.net/manual/en/function.htmlentities.php#106535
+     */
     function xmlentities( $string ) {
         $not_in_list = "A-Z0-9a-z\s_-";
         return preg_replace_callback( "/[^{$not_in_list}]/" , 'get_xml_entity_at_index_0' , $string );
@@ -3230,5 +3242,138 @@ if( !function_exists( 'xmlentities' ) ) {
     }
     function numeric_entity_4_char( $char ) {
         return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
+    }
+}
+
+if (!function_exists('password_hash')) {
+    /**
+     * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well
+     *
+     * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
+     */
+    function password_hash($password)
+    {
+        return Bcrypt::i()->hash($password);
+    }
+
+    function password_verify($password, $hash)
+    {
+        return Bcrypt::i()->verify($password, $hash);
+    }
+}
+
+if (!function_exists('hash_hmac')) {
+    /**
+     * HMAC hash, works if hash extension is not installed
+     *
+     * Supports SHA1 and MD5 algos
+     *
+     * @see http://www.php.net/manual/en/function.hash-hmac.php#93440
+     *
+     * @param string  $data       Data to be hashed.
+     * @param string  $key        Hash key.
+     * @param boolean $raw_output Return raw or hex
+     *
+     * @access public
+     * @static
+     *
+     * @return string Hash
+     */
+    function hash_hmac($algo, $data, $key, $raw_output = false)
+    {
+        $algo = strtolower($algo);
+        $pack = 'H'.strlen($algo('test'));
+        $size = 64;
+        $opad = str_repeat(chr(0x5C), $size);
+        $ipad = str_repeat(chr(0x36), $size);
+
+        if (strlen($key) > $size) {
+            $key = str_pad(pack($pack, $algo($key)), $size, chr(0x00));
+        } else {
+            $key = str_pad($key, $size, chr(0x00));
+        }
+
+        for ($i = 0; $i < strlen($key) - 1; $i++) {
+            $opad[$i] = $opad[$i] ^ $key[$i];
+            $ipad[$i] = $ipad[$i] ^ $key[$i];
+        }
+
+        $output = $algo($opad.pack($pack, $algo($ipad.$data)));
+
+        return ($raw_output) ? pack($pack, $output) : $output;
+    }
+}
+
+if (!function_exists('hash_pbkdf2')) {
+    /**
+     * PBKDF2 key derivation function as defined by RSA's PKCS #5: https://www.ietf.org/rfc/rfc2898.txt
+     *
+     * Test vectors can be found here: https://www.ietf.org/rfc/rfc6070.txt
+     *
+     * This implementation of PBKDF2 was originally created by defuse.ca
+     * With improvements by variations-of-shadow.com
+     *
+     * @see http://www.php.net/manual/en/function.hash-hmac.php#109260
+     *
+     * @param string $algorithm - The hash algorithm to use. Recommended: SHA256
+     * @param string $password - The password.
+     * @param string $salt - A salt that is unique to the password.
+     * @param integer $count - Iteration count. Higher is better, but slower. Recommended: At least 1024.
+     * @param integer $key_length - The length of the derived key in bytes.
+     * @param boolean $raw_output - If true, the key is returned in raw binary format. Hex encoded otherwise.
+     * @return A $key_length-byte key derived from the password and salt.
+     */
+    function hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output = false)
+    {
+        $algorithm = strtolower($algorithm);
+        if(!in_array($algorithm, hash_algos(), true))
+            die('PBKDF2 ERROR: Invalid hash algorithm.');
+        if($count <= 0 || $key_length <= 0)
+            die('PBKDF2 ERROR: Invalid parameters.');
+
+        $hash_length = strlen(hash($algorithm, "", true));
+        $block_count = ceil($key_length / $hash_length);
+
+        $output = "";
+        for($i = 1; $i <= $block_count; $i++) {
+            // $i encoded as 4 bytes, big endian.
+            $last = $salt . pack("N", $i);
+            // first iteration
+            $last = $xorsum = hash_hmac($algorithm, $last, $password, true);
+            // perform the other $count - 1 iterations
+            for ($j = 1; $j < $count; $j++) {
+                $xorsum ^= ($last = hash_hmac($algorithm, $last, $password, true));
+            }
+            $output .= $xorsum;
+        }
+
+        if($raw_output)
+            return substr($output, 0, $key_length);
+        else
+            return bin2hex(substr($output, 0, $key_length));
+    }
+}
+
+if (!function_exists('oath_hotp')) {
+    /**
+     * Yet another OATH HOTP function. Has a 64 bit counter.
+     *
+     * @see http://www.php.net/manual/en/function.hash-hmac.php#108978
+     *
+     * @param string $secret Shared secret
+     * @param string $crt Counter
+     * @param integer $len OTP length
+     * @return string
+     */
+    function oath_hotp($secret, $counter, $len = 8)
+    {
+        $binctr = pack ('NNC*', $counter>>32, $counter & 0xFFFFFFFF);
+        $hash = hash_hmac ("sha1", $binctr, $secret);
+        // This is where hashing stops and truncation begins
+        $ofs = 2*hexdec (substr ($hash, 39, 1));
+        $int = hexdec (substr ($hash, $ofs, 8)) & 0x7FFFFFFF;
+        $pin = substr ($int, -$len);
+        $pin = str_pad ($pin, $len, "0", STR_PAD_LEFT);
+        return $pin;
     }
 }

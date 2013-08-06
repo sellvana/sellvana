@@ -1,15 +1,16 @@
-#Header unset ETag
-#FileETag None
-
-AddHandler application/x-httpd-php55 .php
+#AddHandler application/x-httpd-php55 .php
 
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 months"
 </IfModule>
 
-#Header unset If-Modified-Since
-#Header unset If-None-Match
+<IfModule mod_header.c>
+    Header unset If-Modified-Since
+    Header unset If-None-Match
+    Header unset ETag
+    FileETag None
+</IfModule>
 
 Options +FollowSymLinks -MultiViews
 

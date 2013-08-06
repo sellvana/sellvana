@@ -47,6 +47,9 @@ common_js_libs:
             - [ requireJs, backgrid-moment-cell, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell, { deps: [ backgrid, moment ] } ]
             - [ requireJs, fcom.backgrid.toolbar, @FCom_Core/js/fcom.backgrid.toolbar ]
 
+            - [ requireJs, wysihtml5, @FCom_Core/js/lib/wysihtml5/wysihtml5-0.4.0pre ]
+            - [ requireJs, bootstrap-wysihtml5, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5, { deps: [ jquery, bootstrap, wysihtml5 ] } ]
+
 lib_backgrid:
     - view: head
         do:
@@ -109,3 +112,8 @@ lib_tokeninput:
             - [ css, @FCom_Core/js/lib/css/token-input.css ]
             - [ css, @FCom_Core/js/lib/css/token-input-facebook.css ]
             - [ requireJs, jquery.tokeninput, @FCom_Core/js/lib/jquery.tokeninput, { deps: [ jquery ] } ]
+
+lib_wysihtml5:
+    - view: head
+        do:
+            - [ css, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5.css ]

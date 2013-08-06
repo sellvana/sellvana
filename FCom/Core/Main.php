@@ -4,9 +4,7 @@ if (!defined('FULLERON_ROOT_DIR')) {
     define('FULLERON_ROOT_DIR', dirname(dirname(__DIR__)));
 }
 
-if (!defined('BUCKYBALL_ROOT_DIR')) {
-    require_once FULLERON_ROOT_DIR.'/FCom/buckyball/buckyball.php';
-}
+require_once __DIR__ . '/buckyball/buckyball.php';
 
 class FCom_Core_Main extends BClass
 {
@@ -219,7 +217,7 @@ class FCom_Core_Main extends BClass
     {
         $config = BConfig::i();
         $area = BApp::i()->get('area');
-        
+
 	$configDir = $config->get('fs/config_dir');
         if (file_exists($configDir.'/core.php')) {
             $config->addFile('core.php', true);
@@ -272,12 +270,10 @@ class FCom_Core_Main extends BClass
                 $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
             }
-            $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
-            $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
-            $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
-            $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
-            $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
             $this->_modulesDirs[] = $rootDir.'/storage/custom'; // Custom module
+            $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
+            $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Downloaded modules
+            $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
 
             foreach ($this->_modulesDirs as $dir) {
                 BModuleRegistry::i()->scan($dir);

@@ -95,7 +95,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
 
     public function getTagsString()
     {
-        return join(' ', array_column(BDb::many_as_array($this->getTags()), 'tag_name'));
+        return join(' ', BUtil::arrayToOptions(BDb::many_as_array($this->getTags()), 'tag_name'));
     }
 
     public function getRelatedPosts()

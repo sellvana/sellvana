@@ -2,7 +2,6 @@
 - $notifications = $this->getNotifications();
 - $storeName = BConfig::i()->get('modules/FCom_Core/store_name')
 
-
 %header.fcom-admin-header
     %a.fcom-admin-logo
         %img(src="#{BApp::src('@FCom_Admin/compass/img/fcom-admin-logo.png')}" alt="#{$storeName}")
@@ -48,7 +47,7 @@
                                 %li
                                     %a(href="#{$sc['href']}") = $sc['label']
 
-            - if ($notifications)
+            - if ($notifications['count'])
                 %li.dropdown
                     %a.dropdown-toggle#utilnav-notifications(href="#" data-toggle="dropdown" data-target="#")
                         %span.icon-bell
