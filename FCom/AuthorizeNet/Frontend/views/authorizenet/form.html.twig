@@ -27,7 +27,7 @@
 {#
 todo get session variables for cctype and expiration and preload them if they are set
 #}
-{{ dump(config['cctypes']) }}
+{#{{ dump(config) }}#}
 <h4>{{ config['title'] }}</h4>
 <label for="authnet_cc_type">Credit card type</label>
 <select name="payment[authorizenet][cc_type]" id="authnet_cc_type">
@@ -49,6 +49,9 @@ todo get session variables for cctype and expiration and preload them if they ar
         <option value="">Select Expiration Month</option>
         {{ el.month_options() }}
     </select>
-    {#todo add verification number and rest of form#}
-    {#todo make form dynamic#}
+    {% if config['useccv'] %}
+        <br>
+        <label for="authnet_cc_cid">Card Verification Number</label>
+        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[authorizenet][cc_cid]" value="" />
+    {% endif %}
 </div>
