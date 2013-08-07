@@ -1,19 +1,57 @@
-<h4>Authorize.net checkout form</h4>
+{% macro year_options(start, end, selected) %}
+    {% set y = date().format('y') %}
+    {% for year in range(start|default(1900), end|default(2100)) %}
+        {% if year == selected|default(y) %}
+        <option selected="selected">{{ year }}</option>
+        {% else %}
+        <option>{{ year }}</option>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+{% macro month_options(selected) %}
+    {% set d = date().format('n') %}
+    {% for month in range(1,12) %}
+        {% if month == selected|default(d) %}
+    <option value="{{ month }}" selected="selected">{{ month }}</option>
+        {% else %}
+    <option value="{{ month }}">{{ month }}</option>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% import _self as el %}
+{% set cart = THIS.get('cart') %}
+{% set method = THIS.get('method') %}
+{% set config = method.config() %}
+{% set cctypes = method.cardTypes() %}
+{#
+todo get session variables for cctype and expiration and preload them if they are set
+#}
+{#{{ dump(config) }}#}
+<h4>{{ config['title'] }}</h4>
 <label for="authnet_cc_type">Credit card type</label>
 <select name="payment[authorizenet][cc_type]" id="authnet_cc_type">
     <option value="">Select Card Type</option>
+    {% for ccode in config['cctypes'] %}
+        <option value="{{ ccode }}">{{ cctypes[ccode] }}</option>
+    {% endfor %}
 </select>
 <br/>
 <label for="authnet_cc_number">Credit Card Number</label>
 <input type="text" id="authnet_cc_number" value="" name="payment[authorizenet][cc_num]">
 <label for="authnet_cc_expiration_date">Expiration date</label>
 <div class="authnet_expiration_date_group">
-    <select name="payment[authorizenet][expire][month]" id="authnet_cc_expiration_date">
-        <option value="">Select Expiration Month</option>
-    </select>&nbsp;
     <select name="payment[authorizenet][expire][year]" id="authnet_cc_expiration_date_year">
         <option value="">Select Expiration Year</option>
+        {{ el.year_options(date().format('y'), date("+20years").format('y')) }}
+    </select>&nbsp;
+    <select name="payment[authorizenet][expire][month]" id="authnet_cc_expiration_date">
+        <option value="">Select Expiration Month</option>
+        {{ el.month_options() }}
     </select>
-    {#todo add verification number and rest of form#}
-    {#todo make form dynamic#}
+    {% if config['useccv'] %}
+        <br>
+        <label for="authnet_cc_cid">Card Verification Number</label>
+        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[authorizenet][cc_cid]" value="" />
+    {% endif %}
 </div>

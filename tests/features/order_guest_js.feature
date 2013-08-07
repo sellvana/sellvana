@@ -21,7 +21,7 @@ Feature: Order process
     And I fill in "email" with "petar.dev@gmail.com"
     And I fill in "street1" with "Gulf dr. 123"
     And I fill in "city" with "Panama City"
-    And I select "USA" from "country"
+    And I select "US" from "country"
     And I select "FL" from "region"
     And I fill in "postcode" with "12345"
     And I check "Billing address is same as shipping"
