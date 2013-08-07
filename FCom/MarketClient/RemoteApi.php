@@ -2,13 +2,13 @@
 
 class FCom_MarketClient_RemoteApi extends BClass
 {
-    public function getUrl($path, $params = array())
+    public function getUrl($path = '', $params = array())
     {
         $config = BConfig::i()->get('modules/FCom_MarketClient');
         $timestamp = microtime(true);
         $id = !empty($config['id']) ? $config['id'] : null;
         $secret = !empty($config['secret']) ? $config['secret'] : null;
-        if ($id && $salt) {
+        if ($id && $secret) {
             $hash = sha1($id . $secret . $timestamp);
         } else {
             $hash = '';
@@ -28,28 +28,28 @@ class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModules($modules)
     {
-        $url = $this->getUrl('market/api/list', array('modules' => BUtil::toJson($modules)));
+        $url = $this->getUrl('api/v1/market/list', array('modules' => BUtil::toJson($modules)));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function getMyModules()
     {
-        $url = $this->getUrl('market/api/mylist');
+        $url = $this->getUrl('api/v1/market/mylist');
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function getModuleById($moduleId)
     {
-        $url =  $this->getUrl('market/api/info', array('modid' => $moduleId));
+        $url =  $this->getUrl('api/v1/market/info', array('modid' => $moduleId));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function downloadPackage($moduleName)
     {
-        $url =  $this->getUrl('market/api/download', array('mod_name' => $moduleName));
+        $url =  $this->getUrl('api/v1/market/download', array('mod_name' => $moduleName));
         $response = BUtil::remoteHttp("GET", $fulleronUrl);
         $data = $response[0];
         $dir = BConfig::i()->get('fs/storage_dir') . '/dlc/packages';
