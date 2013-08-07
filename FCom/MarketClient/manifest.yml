@@ -1,6 +1,6 @@
 modules:
 	FCom_MarketClient:
-		version: 0.1.4
+		version: 0.2.0
 		require: { module: { FCom_Core: 0.1.0 } }
 		description: "Fulleron Extension Market Client"
 
