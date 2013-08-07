@@ -140,7 +140,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         $paymentMethodsHtml = array();
         foreach ($paymentMethods as $code => $method) {
-            $paymentMethodsHtml[$code] = $method->getCheckoutFormView()->render();
+            $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
+                                         ->set('cart', $cart)
+                                         ->set('method', $method)
+                                         ->render();
         }
 
         $layout->view('breadcrumbs')->crumbs = array(
