@@ -1,29 +1,35 @@
 {% set curMethod = THIS.get('cart').get('payment_method') %}
 {% set payment_html = THIS.get('payment_html') %}
-<form action="{{ APP.href('checkout/payment') }}" method="post" class="payment-method-form">
-    <header class="main-title">
-        <h1 class="title">{{ "Payment method" |_ }}</h1>
-    </header>
-    <fieldset>
-            {% for method, class in THIS.get('payment_methods') %}
-            <label class="radio">
-              <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' : '' }}>
-                {{ class.getName() }}
-            </label><br>
-                {% if payment_html[method] %}
-                 <div class="payment_html{{ method != curMethod ? ' hidden' : '' }}" id="payment_html_{{ method }}">
-                     {{ payment_html[method] |raw}}
-                 </div>
-                {% endif %}
-            {% endfor %}
-        <button type="submit" class="btn btn-primary">{{ "Continue to checkout" |_ }}</button>
-    </fieldset>
-</form>
+<header class="main-title">
+    <h1 class="title">{{ "Payment methods" |_ }}</h1>
+</header>
+<fieldset>
+        {% for method, class in THIS.get('payment_methods') %}
+        <label class="radio">
+          <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' : '' }}>
+            {{ class.getName()|_ }}
+        </label><br>
+            {% if payment_html[method] %}
+             <div class="payment_html" id="payment_html_{{ method }}">
+                 {{ payment_html[method] |raw}}
+             </div>
+            {% endif %}
+        {% endfor %}
+</fieldset>
 <script type="text/javascript">
     require(['jquery'], function($){
         $('.payment_method').click(function(){
             $('.payment_html').addClass('hidden').find('input, select, textarea').prop('disabled', true);
             $('#payment_html_' + this.value).removeClass('hidden').find('input, select, textarea').prop('disabled', false);
+        });
+        $('.payment_html').each(function(idx,el){
+            var currentMethod = '{{ curMethod }}';
+                    //{{ method != curMethod ? ' hidden' : '' }}
+            var id = el.id;
+            var method = id.replace('payment_html_','');
+            if(method != currentMethod){
+                $(el).addClass('hidden');
+            }
         });
     });
 </script>
