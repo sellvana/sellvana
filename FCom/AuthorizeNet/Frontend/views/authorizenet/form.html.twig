@@ -24,13 +24,14 @@
 {% set method = THIS.get('method') %}
 {% set config = method.config() %}
 {% set cctypes = method.cardTypes() %}
+{% set key = THIS.get('key') %}
 {#
 todo get session variables for cctype and expiration and preload them if they are set
 #}
 {#{{ dump(config) }}#}
 <h4>{{ config['title'] }}</h4>
 <label for="authnet_cc_type">Credit card type</label>
-<select name="payment[authorizenet][cc_type]" id="authnet_cc_type">
+<select name="payment[{{ key }}][cc_type]" id="authnet_cc_type">
     <option value="">Select Card Type</option>
     {% for ccode in config['cctypes'] %}
         <option value="{{ ccode }}">{{ cctypes[ccode] }}</option>
@@ -38,20 +39,20 @@ todo get session variables for cctype and expiration and preload them if they ar
 </select>
 <br/>
 <label for="authnet_cc_number">Credit Card Number</label>
-<input type="text" id="authnet_cc_number" value="" name="payment[authorizenet][cc_num]">
+<input type="text" id="authnet_cc_number" value="" name="payment[{{ key }}][cc_num]">
 <label for="authnet_cc_expiration_date">Expiration date</label>
 <div class="authnet_expiration_date_group">
-    <select name="payment[authorizenet][expire][year]" id="authnet_cc_expiration_date_year">
+    <select name="payment[{{ key }}][expire][year]" id="authnet_cc_expiration_date_year">
         <option value="">Select Expiration Year</option>
         {{ el.year_options(date().format('y'), date("+20years").format('y')) }}
     </select>&nbsp;
-    <select name="payment[authorizenet][expire][month]" id="authnet_cc_expiration_date">
+    <select name="payment[{{ key }}][expire][month]" id="authnet_cc_expiration_date">
         <option value="">Select Expiration Month</option>
         {{ el.month_options() }}
     </select>
     {% if config['useccv'] %}
         <br>
         <label for="authnet_cc_cid">Card Verification Number</label>
-        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[authorizenet][cc_cid]" value="" />
+        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[{{ key }}][cc_cid]" value="" />
     {% endif %}
 </div>

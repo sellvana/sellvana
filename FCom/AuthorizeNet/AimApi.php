@@ -18,14 +18,14 @@ class FCom_AuthorizeNet_AimApi extends BClass
         $api           = $this->getApi();
         /* @var $order FCom_Sales_Model_Order */
         $order         = $payment->getOrder();
-        $api->amount   = $payment->amount_due;
+        $api->amount   = $payment->getDetail('amount_due');
         $api->card_num = $payment->getCardNumber();
-        $api->exp_date = $payment->card_exp_date;
-        $api->invoice_num = $order->id();
+        $api->exp_date = $payment->getDetail('card_exp_date');
+        $api->invoice_num = $order->unique_id;
         $api->description = $order->getTextDescription();
 
         if(BConfig::i()->get('modules/FCom_AuthorizeNet/aim/useccv')){
-            $api->card_code = $payment->card_code;
+            $api->card_code = $payment->getDetail('card_code');
         }
         $billing = $order->billing();
         if($billing->firstname){
@@ -63,14 +63,21 @@ class FCom_AuthorizeNet_AimApi extends BClass
             $api->cust_id = $order->customer_id;
         }
 
-        $api->po_num = $payment->po_number;
+        $api->po_num = $order->unique_id;
         $response      = $api->authorizeAndCapture();
         return $response;
     }
 
-    public function authorize()
+    /**
+     * @param $payment
+     * @return AuthorizeNetAIM_Response
+     */
+    public function authorize($payment)
     {
-        //
+        $api = $this->getApi();
+        // todo add payment details to $api
+        $response = $api->authorizeOnly();
+        return $response;
     }
 
     public function capture()

@@ -448,4 +448,24 @@ var_dump($e);
         $this->items = null;
         $this->totals = null;
     }
+
+    public function setPaymentDetails($data = array())
+    {
+        if(!empty($data)){
+            $paymentMethod = $this->getPaymentMethod();
+            if($paymentMethod){
+                $paymentMethod->setDetails($data);
+                $cart->payment_details = BUtil::toJson($paymentMethod->getPublicData());
+            }
+        }
+        return $this;
+    }
+    public function setPaymentToUser()
+    {
+        if (FCom_Customer_Model_Customer::isLoggedIn()) {
+            $user = FCom_Customer_Model_Customer::i()->sessionUser();
+            $user->setPaymentDetails($post['payment']);
+        }
+
+    }
 }

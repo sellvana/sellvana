@@ -6,6 +6,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     protected $cart;
     protected $salesOptions;
     protected $salesEntity;
+    protected $details;
     protected $_sortOrder = 50;
     protected $_name;
 
@@ -34,6 +35,27 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
         $this->salesOptions = $options;
 
         return $this;
+    }
+
+    /**
+     * Set any details gathered during checkout process
+     * @param array $details
+     * @return $this
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+    }
+
+    /**
+     * Get public data
+     *
+     * Get data which can be saved, should not include any sensitive data such as credit card numbers, personal ids, etc.
+     * @return array
+     */
+    public function getPublicData()
+    {
+        return $this->details;
     }
 
     /**
