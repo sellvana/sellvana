@@ -880,8 +880,9 @@ class BUtil extends BClass
                 CURLOPT_ENCODING => '',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_CAINFO => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
@@ -932,6 +933,13 @@ class BUtil extends BClass
                 }
                 $opts['http']['header'] .= "Content-Type: {$contentType}\r\n"
                     ."Content-Length: ".strlen($request)."\r\n";
+                if (preg_match('#^(ssl|ftps|https):#', $url)) {
+                    $opts['ssl'] = array(
+                        'verify_peer' => true,
+                        'cafile' => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                        'verify_depth' => 5,
+                    );
+                }
             }
             $content = file_get_contents($url, false, stream_context_create($opts));
             $info = array(); //TODO: emulate curl data?

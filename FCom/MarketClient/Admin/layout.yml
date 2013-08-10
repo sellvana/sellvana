@@ -1,25 +1,21 @@
 base:
 	- view: admin/nav
 		do:
-			- [ addNav, market, { label: Market, pos: 100, icon_class: icon-install } ]
-			- [ addNav, market/remote, { label: Market Center, href: /market/remote } ]
-			- [ addNav, market/index, { label: My Modules, href: /market/index } ]
+			- [ addNav, modules/remote, { label: Download from Market, href: /market/remote } ]
+			- [ addNav, modules/publish, { label: Publish on Market, href: /market/index } ]
 
 /market:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/nav, do: [[ setNav, market ]] }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
 
 /market/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/nav, do: [[ setNav, market ]] }
-	- view: admin/form
-		set: { tab_view_prefix: market/ }
-		do:
-			- [ addTab, main, { label: Market, pos: 10 } ]
+	- { view: admin/nav, do: [[ setNav, modules ]] }
 
 /market/remote:
 	- { include: base }
 	- { hook: main, views: market/remote }
+	- { view: admin/nav, do: [[ setNav, modules ]] }

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_MarketClient_RemoteApi extends BClass
+final class FCom_MarketClient_RemoteApi extends BClass
 {
     public function getUrl($path = '', $params = array())
     {
@@ -13,8 +13,9 @@ class FCom_MarketClient_RemoteApi extends BClass
         } else {
             $hash = '';
         }
-        $url = !empty($config['market_url']) ? $config['market_url'] : 'http://fulleron.com';
-        $url = rtrim($url, '/') . '/' . ltrim($path, '/') . "?id={$id}&ts={$timestamp}&hash={$hash}";
+        #$url = !empty($config['market_url']) ? $config['market_url'] : 'http://fulleron.com';
+        $url = 'http://127.0.0.1/fulleron/'; # 'https://fulleron.com/';
+        $url .= ltrim($path, '/') . "?id={$id}&ts={$timestamp}&hash={$hash}";
         if ($params) {
             $url = BUtil::setUrlQuery($url, $params);
         }
@@ -28,28 +29,28 @@ class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModules($modules)
     {
-        $url = $this->getUrl('api/v1/market/list', array('modules' => BUtil::toJson($modules)));
+        $url = $this->getUrl('api/v1/market/module/list', array('modules' => BUtil::toJson($modules)));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function getMyModules()
     {
-        $url = $this->getUrl('api/v1/market/mylist');
+        $url = $this->getUrl('api/v1/market/site/modules');
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function getModuleById($moduleId)
     {
-        $url =  $this->getUrl('api/v1/market/info', array('modid' => $moduleId));
+        $url =  $this->getUrl('api/v1/market/module/info', array('modid' => $moduleId));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response[0]);
     }
 
     public function downloadPackage($moduleName)
     {
-        $url =  $this->getUrl('api/v1/market/download', array('mod_name' => $moduleName));
+        $url =  $this->getUrl('api/v1/market/module/download', array('mod_name' => $moduleName));
         $response = BUtil::remoteHttp("GET", $fulleronUrl);
         $data = $response[0];
         $dir = BConfig::i()->get('fs/storage_dir') . '/dlc/packages';
