@@ -856,6 +856,7 @@ class BUtil extends BClass
         return base64_encode(pack('H*', hash('sha512', $str)));
     }
 
+    static protected $_lastRemoteHttpInfo;
     /**
     * Send simple POST request to external server and retrieve response
     *
@@ -911,9 +912,8 @@ class BUtil extends BClass
             }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
-            $content = curl_exec($ch);
-            $info = curl_getinfo($ch);
-            //$response = array();
+            $response = curl_exec($ch);
+            static::$_lastRemoteHttpInfo = curl_getinfo($ch);
             curl_close($ch);
 
         } else {
@@ -941,34 +941,16 @@ class BUtil extends BClass
                     );
                 }
             }
-            $content = file_get_contents($url, false, stream_context_create($opts));
-            $info = array(); //TODO: emulate curl data?
+            $response = file_get_contents($url, false, stream_context_create($opts));
+            static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
         }
 
-        return array($content, $info);
-    }
-
-    /**
-    * put your comment there...
-    *
-    * @deprecated legacy use
-    * @param mixed $url
-    * @param mixed $data
-    * @return string
-    */
-    public static function post($url, $data)
-    {
-        list($content) = static::remoteHttp('POST', $url, $data);
-        parse_str($content, $response);
         return $response;
     }
 
-    public static function httpClient($method, $url, $data)
+    public static function lastRemoteHttpInfo()
     {
-        $method = strtoupper($method);
-        list($content) = static::remoteHttp($method, $url, $data);
-        parse_str($content, $response);
-        return $response;
+        return static::$_lastRemoteHttpInfo;
     }
 
     public static function normalizePath($path)
