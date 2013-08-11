@@ -31,28 +31,27 @@ final class FCom_MarketClient_RemoteApi extends BClass
     {
         $url = $this->getUrl('api/v1/market/module/list', array('modules' => BUtil::toJson($modules)));
         $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response[0]);
+        return BUtil::fromJson($response);
     }
 
     public function getMyModules()
     {
         $url = $this->getUrl('api/v1/market/site/modules');
         $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response[0]);
+        return BUtil::fromJson($response);
     }
 
     public function getModuleById($moduleId)
     {
         $url =  $this->getUrl('api/v1/market/module/info', array('modid' => $moduleId));
         $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response[0]);
+        return BUtil::fromJson($response);
     }
 
     public function downloadPackage($moduleName)
     {
         $url =  $this->getUrl('api/v1/market/module/download', array('mod_name' => $moduleName));
-        $response = BUtil::remoteHttp("GET", $fulleronUrl);
-        $data = $response[0];
+        $data = BUtil::remoteHttp("GET", $fulleronUrl);
         $dir = BConfig::i()->get('fs/storage_dir') . '/dlc/packages';
         BUtil::ensureDir($dir);
         if (!is_writable($dir)) {

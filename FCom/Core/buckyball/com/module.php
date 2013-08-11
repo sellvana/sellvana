@@ -595,6 +595,7 @@ class BModule extends BClass
     public $before_bootstrap;
     public $bootstrap;
     public $version;
+    public $branch = 'ga';
     public $db_connection_name;
     public $root_dir;
     public $view_root_dir;

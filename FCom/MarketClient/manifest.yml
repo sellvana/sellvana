@@ -9,6 +9,8 @@ modules:
                 FCom_MarketClient:
                     market_url: //fulleron.com
 
+
+
         areas:
             FCom_Admin:
                 auto_use: all
