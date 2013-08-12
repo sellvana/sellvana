@@ -50,8 +50,14 @@ class FCom_Core_Model_Abstract extends BModel
      * @param $value mixed
      * @return FCom_Core_Model_Abstract
      */
-    public function setData($path, $value)
+    public function setData($path, $value = null)
     {
+        if (is_array($path)) {
+            foreach ($path as $p=>$v) {
+                $this->setData($p, $v);
+            }
+            return $this;
+        }
         $data = $this->getData();
         $pathArr = explode('/', $path);
         $last = sizeof($pathArr)-1;

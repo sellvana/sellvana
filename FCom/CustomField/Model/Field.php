@@ -69,13 +69,26 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $this->_oldTableFieldType = $this->table_field_type;
     }
 
+    public function addField($data)
+    {
+        $field = static::load(BUtil::arrayMask($data, 'field_type,field_code'));
+        if (!$field) {
+            $field = static::create($data)->save();
+        } else {
+            $field->set($data)->save();
+        }
+        return $field;
+    }
+
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
 
         if (!$this->field_type) $this->field_type = 'product';
 
-        if ($fType==='_serialized' && !empty($this->_oldTableFieldCode) && $this->_oldTableFieldCode!==$this->field_code) {
+        if ($this->_oldTableFieldCode !== $this->field_code &&
+            $this->field_type === '_serialized' && !empty($this->_oldTableFieldCode)
+        ) {
             $this->field_code = $this->_oldTableFieldCode; // TODO: disallow code change in UI
         }
         return true;

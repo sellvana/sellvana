@@ -58,11 +58,12 @@ base:
   - view: admin/nav
     do:
       - [ addNav, home, { label: Dashboard, href: /, pos: 10, icon_class: icon-home-1 } ]
+      - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle } ]
+      - [ addNav, modules/installed, { label: Installed Modules, href: /modules } ]
       - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog-1 } ]
       - [ addNav, system/users, { label: Users, href: /users  } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
       - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
-      - [ addNav, system/modules, { label: Installed Modules, href: /modules } ]
 
   - view: admin/header
     do:
@@ -195,12 +196,12 @@ form:
 /users:
     - { include: base }
     - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, admin/users ]] }
+    - { view: admin/nav, do: [[ setNav, system/users ]] }
 
 /users/form:
     - { include: base }
     - { include: form }
-    - { view: admin/nav, do: [[ setNav, admin/users ]] }
+    - { view: admin/nav, do: [[ setNav, system/users ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
       set: { tab_view_prefix: users-form/ }
@@ -211,12 +212,12 @@ form:
 /roles:
     - { include: base }
     - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, admin/roles ]] }
+    - { view: admin/nav, do: [[ setNav, system/roles ]] }
 
 /roles/form:
     - { include: base }
     - { include: form }
-    - { view: admin/nav, do: [[ setNav, admin/roles ]] }
+    - { view: admin/nav, do: [[ setNav, system/roles ]] }
     - { hook: main, views: admin/form }
     - view: admin/form
       set: { tab_view_prefix: roles-form/ }
@@ -229,7 +230,7 @@ form:
     - { include: form }
     - { include: codemirror }
     - { hook: main, views: settings }
-    - { view: admin/nav, do: [[ setNav, admin/settings ]] }
+    - { view: admin/nav, do: [[ setNav, system/settings ]] }
     - view: settings
       set: { tab_view_prefix: settings/ }
       do:
@@ -242,4 +243,4 @@ form:
 /modules:
     - { include: base }
     - { hook: main, views: modules }
-    - { view: admin/nav, do: [[ setNav, admin/modules ]] }
+    - { view: admin/nav, do: [[ setNav, modules/installed ]] }

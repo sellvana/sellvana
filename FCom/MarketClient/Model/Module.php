@@ -1,9 +1,20 @@
 <?php
 
-class FCom_MarketClient_Model_Modules extends FCom_Core_Model_Abstract
+class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_marketclient_module';
     protected static $_origClass = __CLASS__;
+
+    static public function onFindOrm($args)
+    {
+        $args['orm']
+            ->join('FCom_Core_Model_Module', array('m.id','=','core_module_id'), 'm')
+            ->select('m.module_name')
+            ->select('m.schema_version')
+            ->select('m.data_version')
+            ->select('m.last_upgrade')
+        ;
+    }
 
     public function addModule($module)
     {

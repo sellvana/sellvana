@@ -631,6 +631,20 @@ class BUtil extends BClass
         return $options;
     }
 
+    static public function arrayMakeAssoc($source, $keyField)
+    {
+        $isObject = is_object(current($source));
+        $assocArray = array();
+        foreach ($source as $k => $item) {
+            if ($isObject) {
+                $assocArray[$item->$keyField] = $item;
+            } else {
+                $assocArray[$item[$keyField]] = $item;
+            }
+        }
+        return $assocArray;
+    }
+
     /**
     * Create IV for mcrypt operations
     *
@@ -856,6 +870,7 @@ class BUtil extends BClass
         return base64_encode(pack('H*', hash('sha512', $str)));
     }
 
+    static protected $_lastRemoteHttpInfo;
     /**
     * Send simple POST request to external server and retrieve response
     *
@@ -880,8 +895,9 @@ class BUtil extends BClass
                 CURLOPT_ENCODING => '',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_CAINFO => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
@@ -910,9 +926,8 @@ class BUtil extends BClass
             }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
-            $content = curl_exec($ch);
-            $info = curl_getinfo($ch);
-            //$response = array();
+            $response = curl_exec($ch);
+            static::$_lastRemoteHttpInfo = curl_getinfo($ch);
             curl_close($ch);
 
         } else {
@@ -932,35 +947,24 @@ class BUtil extends BClass
                 }
                 $opts['http']['header'] .= "Content-Type: {$contentType}\r\n"
                     ."Content-Length: ".strlen($request)."\r\n";
+                if (preg_match('#^(ssl|ftps|https):#', $url)) {
+                    $opts['ssl'] = array(
+                        'verify_peer' => true,
+                        'cafile' => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                        'verify_depth' => 5,
+                    );
+                }
             }
-            $content = file_get_contents($url, false, stream_context_create($opts));
-            $info = array(); //TODO: emulate curl data?
+            $response = file_get_contents($url, false, stream_context_create($opts));
+            static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
         }
 
-        return array($content, $info);
-    }
-
-    /**
-    * put your comment there...
-    *
-    * @deprecated legacy use
-    * @param mixed $url
-    * @param mixed $data
-    * @return string
-    */
-    public static function post($url, $data)
-    {
-        list($content) = static::remoteHttp('POST', $url, $data);
-        parse_str($content, $response);
         return $response;
     }
 
-    public static function httpClient($method, $url, $data)
+    public static function lastRemoteHttpInfo()
     {
-        $method = strtoupper($method);
-        list($content) = static::remoteHttp($method, $url, $data);
-        parse_str($content, $response);
-        return $response;
+        return static::$_lastRemoteHttpInfo;
     }
 
     public static function normalizePath($path)
