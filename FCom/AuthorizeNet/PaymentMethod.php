@@ -18,7 +18,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     public function payOnCheckout()
     {
         $config = $this->config();
-        if(!$config['enabled']){
+        if (!$config['enabled']) {
             // log this and eventually show a message
             return null;
         }
@@ -38,6 +38,8 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
                 return null;
                 break;
         }
+        $this->setDetail($response['transaction_id'], $response);
+        $this->setDetail('transaction_id', $response['transaction_id']);
         $this->clear();
         return $response;
     }
@@ -49,7 +51,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCardNumber()
     {
-        if(isset($this->details['cc_num'])){
+        if (isset($this->details['cc_num'])) {
             return $this->details['cc_num'];
         }
         return null;
@@ -57,10 +59,15 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getDetail($key)
     {
-        if(isset($this->details[$key])){
+        if (isset($this->details[$key])) {
             return $this->details[$key];
         }
         return null;
+    }
+
+    public function setDetail($key, $value)
+    {
+        $this->details[$key] = $value;
     }
 
     /**
@@ -68,7 +75,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
      */
     public function cardTypes()
     {
-        return FCom_AuthorizeNet_Model_Settings::cardTypes();
+        return FCom_AuthorizeNet_Model_Settings::i()->cardTypes();
     }
 
     /**
@@ -82,7 +89,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function setDetails($details)
     {
-        $details = isset($details[static::PAYMENT_METHOD_KEY]) ?$details[static::PAYMENT_METHOD_KEY]: array();
+        $details = isset($details[static::PAYMENT_METHOD_KEY]) ? $details[static::PAYMENT_METHOD_KEY] : array();
 
         return parent::setDetails($details);
     }
@@ -90,7 +97,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     public function getPublicData()
     {
         $data = $this->details;
-        if(!empty($data)){
+        if (!empty($data) && isset($data['cc_num'])) {
             $ccFour = substr($data['cc_num'], -4);
             unset($data['cc_num']);
             $data['last_four'] = $ccFour;
@@ -101,6 +108,13 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     protected function clear()
     {
         unset($this->details['cc_num']);
+    }
+
+    public function asArray()
+    {
+        $data = parent::asArray();
+        $data = array_merge($data, $this->getPublicData());
+        return array( static::PAYMENT_METHOD_KEY => $data);
     }
 
 }
