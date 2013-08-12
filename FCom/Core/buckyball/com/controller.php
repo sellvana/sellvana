@@ -2029,7 +2029,7 @@ class BActionController extends BClass
     */
     public function tryDispatch($actionName, $args)
     {
-        if (is_callable($actionName)) {
+        if (!is_string($actionName) && is_callable($actionName)) {
             try {
                 call_user_func($actionName);
             } catch (Exception $e) {

@@ -631,6 +631,20 @@ class BUtil extends BClass
         return $options;
     }
 
+    static public function arrayMakeAssoc($source, $keyField)
+    {
+        $isObject = is_object(current($source));
+        $assocArray = array();
+        foreach ($source as $k => $item) {
+            if ($isObject) {
+                $assocArray[$item->$keyField] = $item;
+            } else {
+                $assocArray[$item[$keyField]] = $item;
+            }
+        }
+        return $assocArray;
+    }
+
     /**
     * Create IV for mcrypt operations
     *
