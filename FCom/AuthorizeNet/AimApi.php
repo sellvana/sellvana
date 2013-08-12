@@ -3,6 +3,7 @@
 class FCom_AuthorizeNet_AimApi extends BClass
 {
     const AUTHORIZENET_LOG_FILE = "authorize.net.log";
+    protected $response_vars = array();
 
     /**
      * @var AuthorizeNetAIM
@@ -11,30 +12,106 @@ class FCom_AuthorizeNet_AimApi extends BClass
 
     /**
      * @param FCom_AuthorizeNet_PaymentMethod $payment
-     * @return AuthorizeNetAIM_Response
+     * @return array
      */
     public function sale($payment)
     {
         $api           = $this->getApi();
         /* @var $order FCom_Sales_Model_Order */
         $order         = $payment->getOrder();
-        $api->amount   = $payment->getDetail('amount_due');
-        $api->card_num = $payment->getCardNumber();
-        $api->exp_date = $payment->getDetail('card_exp_date');
+        $this->setSaleDetails($api, $payment, $order);
+        $response      = $api->authorizeAndCapture();
+        return $this->responseAsArray($response);
+    }
+
+    /**
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @return array
+     */
+    public function authorize($payment)
+    {
+        $api = $this->getApi();
+        /* @var $order FCom_Sales_Model_Order */
+        $order         = $payment->getOrder();
+        $this->setSaleDetails($api, $payment, $order);
+
+        $response = $api->authorizeOnly();
+        return $this->responseAsArray($response);
+    }
+
+    /**
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @return array
+     */
+    public function capture($payment)
+    {
+        $api = $this->getApi();
+        /* @var $order FCom_Sales_Model_Order */
+        $order         = $payment->getOrder();
+        // if we're going to allow multiple same method transactions, then we can namespace them with trans_id
+        $api->trans_id = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        // todo add amount to capture if needed
+        $response = $api->priorAuthCapture();
+        return $this->responseAsArray($response);
+    }
+
+    /**
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @return array
+     */
+    public function credit($payment)
+    {
+        $api = $this->getApi();
+        /* @var $order FCom_Sales_Model_Order */
+        $order         = $payment->getOrder();
+        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        $api->trans_id = $trId;
+        // todo, get refund amount from order or credit object
+        $api->amount = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/' . $trId . '/amount');
+        $api->card_num = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/last_four');
+        $api->exp_date = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/card_exp_date');
+        $response = $api->credit();
+        return $this->responseAsArray($response);
+    }
+
+    /**
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @return array
+     */
+    public function void($payment)
+    {
+        $api = $this->getApi();
+        $order = $payment->getOrder();
+        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        $response = $api->void($trId);
+
+        return $this->responseAsArray($response);
+    }
+
+    /**
+     * @param AuthorizeNetAIM $api
+     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order $order
+     */
+    protected function setSaleDetails($api, $payment, $order)
+    {
+        $api->amount      = $payment->getDetail('amount_due');
+        $api->card_num    = $payment->getCardNumber();
+        $api->exp_date    = $payment->getDetail('card_exp_date');
         $api->invoice_num = $order->unique_id;
         $api->description = $order->getTextDescription();
 
-        if(BConfig::i()->get('modules/FCom_AuthorizeNet/aim/useccv')){
+        if (BConfig::i()->get('modules/FCom_AuthorizeNet/aim/useccv')) {
             $api->card_code = $payment->getDetail('card_code');
         }
         $billing = $order->billing();
-        if($billing->firstname){
+        if ($billing->firstname) {
             $api->first_name = $billing->firstname;
         }
-        if($billing->lastname){
+        if ($billing->lastname) {
             $api->last_name = $billing->lastname;
         }
-        if($billing->company){
+        if ($billing->company) {
             $api->company = $billing->company;
         }
         $api->address = $billing->getFullAddress();
@@ -64,35 +141,6 @@ class FCom_AuthorizeNet_AimApi extends BClass
         }
 
         $api->po_num = $order->unique_id;
-        $response      = $api->authorizeAndCapture();
-        return $response;
-    }
-
-    /**
-     * @param $payment
-     * @return AuthorizeNetAIM_Response
-     */
-    public function authorize($payment)
-    {
-        $api = $this->getApi();
-        // todo add payment details to $api
-        $response = $api->authorizeOnly();
-        return $response;
-    }
-
-    public function capture()
-    {
-        //
-    }
-
-    public function cancel()
-    {
-        //
-    }
-
-    public function void()
-    {
-        //
     }
 
     /**
@@ -102,7 +150,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     public function getApi()
     {
         if (null == $this->api) {
-            $conf = new BData(BConfig::i()->get('modules/FCom_AuthorizeNet'));
+            $conf = $this->getConfig();
             if (!$data = $conf->get('aim')) {
                 throw new BException("Invalid Authorize.net settings.");
             }
@@ -130,5 +178,49 @@ class FCom_AuthorizeNet_AimApi extends BClass
             }
         }
         return $this->api;
+    }
+
+    /**
+     * @return BData
+     */
+    public function getConfig()
+    {
+        return new BData(BConfig::i()->get('modules/FCom_AuthorizeNet'));
+    }
+
+    /**
+     * @param AuthorizeNetAIM_Response $response
+     * @return array
+     */
+    public function responseAsArray($response)
+    {
+        $result = array();
+        foreach ($this->getResponseVariables($response) as $name) {
+            if (!empty($response->{$name})) {
+                $result[$name] = $response->{$name};
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get reposnse object variables
+     *
+     * Since they are the same for each response, try to cache them
+     *
+     * @param AuthorizeNetAIM_Response $response
+     * @return array
+     */
+    protected function getResponseVariables($response)
+    {
+        if(empty($this->response_vars)){
+            $vars = get_object_vars($response);
+            if ($vars) {
+                foreach (array_keys($vars) as $k) {
+                    $this->response_vars[] = $k;
+                }
+            }
+        }
+        return $this->response_vars;
     }
 }
