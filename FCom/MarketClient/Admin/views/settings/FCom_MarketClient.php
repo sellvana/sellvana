@@ -2,32 +2,27 @@
 <fieldset>
 <div class="settings-container">
     <div class="group">
+
         <h3><a href="#">API information</a></h3>
         <div>
             <table>
                 <tr>
-                    <td>API URL</td>
+                    <td>Auto-Login to marketplace</td>
                     <td>
-                        <input size="50" type="text" name="config[modules][FCom_MarketClient][market_url]"
-                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/market_url'))?>"/>
+                        <select name="config[modules][FCom_MarketClient][auto_login]">
+                            <?=BUtil::optionsHtml(array(0=>'No', 1=>'Yes'), $c->get('modules/FCom_MarketClient/auto_login'))?>
+                        </select>
                     </td>
                 </tr>
+                <!--
                 <tr>
-                    <td>ID</td>
+                    <td>Site Key</td>
                     <td>
-                        <input size="50" type="text" name="config[modules][FCom_MarketClient][id]"
-                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/id'))?>"/> <br/>
-                        <input type="button" onclick="location.href='http://fulleron.com/market/account'" value="Get one" />
+                        <input size="50" type="text" name="config[modules][FCom_MarketClient][site_key1]"
+                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/site_key1'))?>"/>
                     </td>
                 </tr>
-                <tr>
-                    <td>Salt</td>
-                    <td>
-                        <input size="50" type="text" name="config[modules][FCom_MarketClient][secret]"
-                               value="<?php echo $this->q($c->get('modules/FCom_MarketClient/secret'))?>"/> <br/>
-                        <span style="color:red">Keep ID and SECRET in secret</span>
-                    </td>
-                </tr>
+                -->
             </table>
         </div>
         <h3><a href="#">FTP/SFTP settings: connection Information</a></h3>

@@ -33,7 +33,8 @@ class FCom_PayPal_RemoteApi extends BClass
             'SIGNATURE' => $apiConfig['signature'],
         ), $nvpArr);
 
-        $resArr = BUtil::httpClient('GET', self::$_apiUrl, $nvpArr);
+        $result = BUtil::remoteHttp('GET', self::$_apiUrl, $nvpArr);
+        parse_str($result, $resArr);
 
         $ack = 'undefined';
         if (!empty($resArr['ACK'])) {
@@ -41,7 +42,7 @@ class FCom_PayPal_RemoteApi extends BClass
             if ($ack == 'SUCCESS' || $ack=='SUCCESSWITHWARNING') {
                 return $resArr;
             }
-        } 
+        }
         $errorArr = array(
             'type' => 'API',
             'ack' => $ack,
