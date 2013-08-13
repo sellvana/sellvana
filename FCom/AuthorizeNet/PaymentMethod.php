@@ -26,6 +26,7 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
         /* @var $api FCom_AuthorizeNet_AimApi */
         $api = FCom_AuthorizeNet_AimApi::i();
+
         switch ($action) {
             case 'AUTH_ONLY':
                 $response = $api->authorize($this);
@@ -40,7 +41,26 @@ class FCom_AuthorizeNet_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         }
         $this->setDetail($response['transaction_id'], $response);
         $this->setDetail('transaction_id', $response['transaction_id']);
+        $success = $response['response_code'] == 1;
+        if($success){
+            $status = $action == 'AUTH_ONLY'? 'authorized': 'paid';
+        } else {
+            $status = 'error';
+        }
+        $paymentData = array(
+            'method'           => static::PAYMENT_METHOD_KEY,
+            'parent_id'        => $response['transaction_id'],
+            'order_id'         => $this->getOrder()->id(),
+            'amount'           => $this->getDetail('amount_due'),
+            'status'           => $status,
+            'transaction_id'   => $response['transaction_id'],
+            'transaction_type' => $action == 'AUTH_ONLY'? 'authorize': 'sale',
+            'online'           => 1,
+        );
         $this->clear();
+        $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
+        $paymentModel->setData('response', $response);
+        $paymentModel->save();
         return $response;
     }
 
