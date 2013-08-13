@@ -32,8 +32,8 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
 
     public function action_remote()
     {
-        $this->view('market/remote')->url = FCom_MarketClient_RemoteApi::i()->getUrl('/market');
-        $this->layout('/market/remote');
+        $this->view('marketclient/remote')->url = FCom_MarketClient_RemoteApi::i()->getUrl('/market');
+        $this->layout('/marketclient/remote');
     }
 
     public function action_form()
@@ -155,19 +155,19 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect("market/form?mod_name={$modName}");
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         try {
             $moduleFile = FCom_MarketClient_Main::i()->downloadPackage($modName);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect("market/form?mod_name={$modName}");
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         if (!$moduleFile) {
             BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
-            BResponse::i()->redirect("market/form?mod_name={$modName}");
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         try {
@@ -176,7 +176,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             foreach (explode("\n", $e->getMessage()) as $error) {
                 BSession::i()->addMessage($error, 'error');
             }
-            BResponse::i()->redirect("market/form?mod_name={$modName}");
+            BResponse::i()->redirect("marketclient3/form?mod_name={$modName}");
         }
 
         if ($res) {
@@ -192,7 +192,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
+        BResponse::i()->redirect(BApp::href("marketclient/form")."?mod_name={$modName}");
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }
