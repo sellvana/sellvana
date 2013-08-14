@@ -14,11 +14,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function requestSiteNonce()
     {
-        $siteKey = BConfig::i()->get('module/FCom_MarketClient/site_key');
+        $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
         $url = $this->getUrl('api/v1/market/site/nonce', array(
             'admin_url' => BApp::href(),
             'site_key' => $siteKey,
-            'auto_login' => BConfig::i()->get('module/FCom_MarketClient/auto_login'),
         ));
         $response = BUtil::remoteHttp('GET', $url);
         return BUtil::fromJson($response);
@@ -30,32 +29,6 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'nonce' => $nonce,
         ));
         $response = BUtil::remoteHttp('GET', $url);
-        return BUtil::fromJson($response);
-    }
-
-    public function getSsoUrl()
-    {
-        return  $this->getUrl('market/sso');
-    }
-
-    public function getModules($modules)
-    {
-        $url = $this->getUrl('api/v1/market/module/list', array('modules' => BUtil::toJson($modules)));
-        $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response);
-    }
-
-    public function getMyModules()
-    {
-        $url = $this->getUrl('api/v1/market/site/modules');
-        $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response);
-    }
-
-    public function getModuleById($moduleId)
-    {
-        $url =  $this->getUrl('api/v1/market/module/info', array('modid' => $moduleId));
-        $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response);
     }
 
@@ -76,4 +49,28 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
     }
 
+    public function publishModule($data)
+    {
+        $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
+        $url = $this->getUrl('api/v1/market/module/publish', array(
+            'site_key' => $siteKey,
+        ));
+        $response = BUtil::remoteHttp('POST', $url, $data);
+        return BUtil::fromJson($response);
+    }
+
+    public function uploadPackage($moduleName)
+    {
+        $mod = BModuleRegistry::i()->module($moduleName);
+        $packageDir = BConfig::i()->get('fs/storage_dir') . '/marketclient/upload';
+        BUtil::ensureDir($packageDir);
+        $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
+        BUtil::zipCreateFromDir($packageFilename, $mod->root_dir);
+        $url = $this->getUrl('api/v1/market/module/upload', array('mod_name' => $moduleName));
+        $data = array(
+            'package_zip' => '@'.$packageFilename,
+        );
+        $response = BUtil::remoteHttp('POST', $url, $data);
+        return BUtil::fromJson($response);
+    }
 }

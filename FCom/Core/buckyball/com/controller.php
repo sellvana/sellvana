@@ -501,14 +501,14 @@ class BRequest extends BClass
                 $name = $source['name'];
                 $type = $source['type'];
                 if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
-                    $result = array('error'=>'invalid_type', 'tp'=>4, 'type'=>$type, 'pattern'=>$typesRegex, 'source'=>$source, 'name'=>$name);
+                    $result[] = array('error'=>'invalid_type', 'tp'=>4, 'type'=>$type, 'pattern'=>$typesRegex, 'source'=>$source, 'name'=>$name);
                 } else {
                     BUtil::ensureDir($targetDir);
                     move_uploaded_file($tmpName, $targetDir.'/'.$name);
-                    $result = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                    $result[] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
                 }
             } else {
-                $result = array('error'=>$error, 'tp'=>5);
+                $result[] = array('error'=>$error, 'tp'=>5);
             }
         }
         return $result;

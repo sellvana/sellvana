@@ -2,7 +2,7 @@ base:
 	- view: admin/nav
 		do:
 			- [ addNav, modules/remote, { label: Download from Market, href: /marketclient/remote } ]
-			- [ addNav, modules/publish, { label: Publish on Market, href: /marketclient/index } ]
+			- [ addNav, modules/publish, { label: Publish on Market, href: /marketclient/publish } ]
 
 /marketclient:
 	- { include: base }
@@ -18,4 +18,14 @@ base:
 /marketclient/remote:
 	- { include: base }
 	- { hook: main, views: marketclient/remote }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish:
+	- { include: base }
+	- { hook: main, views: marketclient/publish }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish/module:
+	- { include: base }
+	- { hook: main, views: marketclient/publish/module }
 	- { view: admin/nav, do: [[ setNav, modules ]] }

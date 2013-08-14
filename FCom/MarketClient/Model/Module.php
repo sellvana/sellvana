@@ -45,4 +45,17 @@ class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
         }
         return $modules;
     }
+
+    public function getLocalModules()
+    {
+        $allModules = BModuleRegistry::i()->debug();
+        $localModules = array();
+        $localDir = BConfig::i()->get('fs/local_dir');
+        foreach ($allModules as $modName => $mod) {
+            if (strpos($mod->root_dir, $localDir)===0) {
+                $localModules[$modName] = $mod;
+            }
+        }
+        return $localModules;
+    }
 }
