@@ -4,9 +4,6 @@ class FCom_MarketClient_Admin extends BClass
 {
     static public function bootstrap()
     {
-        if (!BConfig::i()->get('modules/FCom_MarketClient/market_url')) {
-            BConfig::i()->set('modules/FCom_MarketClient/market_url', 'http://fulleron.com');
-        }
     }
 
     public function hookFindModulesForUpdates($args)
@@ -24,7 +21,7 @@ class FCom_MarketClient_Admin extends BClass
         $data = array();
         foreach($res as $r) {
             $obj = new stdClass();
-            $obj->url = 'market/form?id='.$r->id;
+            $obj->url = 'marketclient/form?id='.$r->id;
             $obj->module = $r->mod_name;
             $obj->text = $r->mod_name . ' have a new version';
             $data[] = $obj;

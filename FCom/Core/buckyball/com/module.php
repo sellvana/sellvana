@@ -173,6 +173,7 @@ class BModuleRegistry extends BClass
         if (!preg_match('/\.(json|yml|php)$/', $source)) {
             $source .= '/manifest.{json,yml,php}';
         }
+        $source = str_replace('\\', '/', $source);
         $manifests = glob($source, GLOB_BRACE);
         BDebug::debug('MODULE.SCAN '.$source.': '.print_r($manifests, 1));
         if (!$manifests) {

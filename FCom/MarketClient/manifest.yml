@@ -17,9 +17,9 @@ modules:
             FCom_Admin:
                 auto_use: all
                 routing:
-                    - [ get, /market/?.action, FCom_MarketClient_Admin_Controller_Market ]
-                    - [ any, /market/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
-                    - [ any, /market/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
-                    - [ any, /market/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
+                    - [ get, /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
+                    - [ any, /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
+                    - [ any, /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
+                    - [ any, /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
                 observe:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
