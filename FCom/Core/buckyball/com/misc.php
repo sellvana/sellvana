@@ -879,20 +879,21 @@ class BUtil extends BClass
     * @param array $data
     * @return string
     */
-    public static function remoteHttp($method, $url, $data=array())
+    public static function remoteHttp($method, $url, $data = array())
     {
-        $request = is_array($data) ? http_build_query($data) : $data;
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
             $url .= (strpos($url, '?')===false ? '?' : '&').$request;
         }
 
-        if (function_exists('curl_init')) {
+        // curl disabled because file upload doesn't work for some reason. TODO: figure out why
+        if (false && function_exists('curl_init')) {
             $curlOpt = array(
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => '',
+                CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
@@ -909,18 +910,17 @@ class BUtil extends BClass
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += array(
                     CURLOPT_COOKIEJAR => $cookie,
-                    CURLOPT_FOLLOWLOCATION => true,
                 );
             }
 
             if ($method==='POST') {
                 $curlOpt += array(
-                    CURLOPT_POSTFIELDS => $request,
+                    CURLOPT_POSTFIELDS => $data,
                     CURLOPT_POST => 1,
                 );
             } elseif ($method==='PUT') {
                 $curlOpt += array(
-                    CURLOPT_POSTFIELDS => $request,
+                    CURLOPT_POSTFIELDS => $data,
                     CURLOPT_PUT => 1,
                 );
             }
@@ -937,16 +937,41 @@ class BUtil extends BClass
                 'header' => "User-Agent: {$userAgent}\r\n",
             ));
             if ($method==='POST' || $method==='PUT') {
-                $opts['http']['content'] = $request;
-                $contentType = 'application/x-www-form-urlencoded';
-                foreach ($request as $k=>$v) {
+                $multipart = false;
+                foreach ($data as $k=>$v) {
                     if (is_string($v) && $v[0]==='@') {
-                        $contentType = 'multipart/form-data';
+                        $multipart = true;
                         break;
                     }
                 }
-                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n"
-                    ."Content-Length: ".strlen($request)."\r\n";
+                if (!$multipart) {
+                    $contentType = 'application/x-www-form-urlencoded';
+                    $opts['http']['content'] = $request;
+                } else {
+                    $boundary = '--------------------------'.microtime(true);
+                    $contentType = 'multipart/form-data; boundary='.$boundary;
+                    $opts['http']['content'] = '';
+                    //TODO: implement recursive forms
+                    foreach ($data as $k =>$v) {
+                        if (is_string($v) && $v[0]==='@') {
+                            $filename = substr($v, 1);
+                            $fileContents = file_get_contents($filename);
+                            $opts['http']['content'] .= "--{$boundary}\r\n".
+                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"".basename($filename)."\"\r\n".
+                                "Content-Type: application/zip\r\n".
+                                "\r\n".
+                                "{$fileContents}\r\n";
+                        } else {
+                            $opts['http']['content'] .= "--{$boundary}\r\n".
+                                "Content-Disposition: form-data; name=\"{$k}\"\r\n".
+                                "\r\n".
+                                "{$v}\r\n";
+                        }
+                    }
+                    $opts['http']['content'] .= "--{$boundary}--\r\n";
+                }
+                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n";
+                    //."Content-Length: ".strlen($request)."\r\n";
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {
                     $opts['ssl'] = array(
                         'verify_peer' => true,
@@ -1379,7 +1404,7 @@ class BUtil extends BClass
      * @param string $targetDir
      * @return boolean Result
      */
-    public function zipExtract($filename, $targetDir)
+    static public function zipExtract($filename, $targetDir)
     {
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
@@ -1387,7 +1412,7 @@ class BUtil extends BClass
         $zip = new ZipArchive;
         $res = $zip->open($filename);
         if (!$res) {
-            throw new BException("Can't open zip archive: " . $filename);
+            throw new BException("Can't open zip archive for reading: " . $filename);
         }
         BUtil::ensureDir($targetDir);
         $res = $zip->extractTo($targetDir);
@@ -1395,6 +1420,32 @@ class BUtil extends BClass
         if (!$res) {
             throw new BException("Can't extract zip archive: " . $filename . " to " . $targetDir);
         }
+        return true;
+    }
+
+    static public function zipCreateFromDir($filename, $sourceDir)
+    {
+        if (!class_exists('ZipArchive')) {
+            throw new BException("Class ZipArchive doesn't exist");
+        }
+        $files = BUtil::globRecursive($sourceDir.'/*');
+        if (!$files) {
+            throw new BException('Invalid or empty source dir');
+        }
+        $zip = new ZipArchive;
+        $res = $zip->open($filename, ZipArchive::CREATE);
+        if (!$res) {
+            throw new BException("Can't open zip archive for writing: " . $filename);
+        }
+        foreach ($files as $file) {
+            $packedFile = str_replace($sourceDir.'/', '', $file);
+            if (is_dir($file)) {
+                $zip->addEmptyDir($packedFile);
+            } else {
+                $zip->addFile($file, $packedFile);
+            }
+        }
+        $zip->close();
         return true;
     }
 }

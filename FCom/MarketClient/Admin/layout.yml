@@ -1,21 +1,31 @@
 base:
 	- view: admin/nav
 		do:
-			- [ addNav, modules/remote, { label: Download from Market, href: /market/remote } ]
-			- [ addNav, modules/publish, { label: Publish on Market, href: /market/index } ]
+			- [ addNav, modules/remote, { label: Download from Market, href: /marketclient/remote } ]
+			- [ addNav, modules/publish, { label: Publish on Market, href: /marketclient/publish } ]
 
-/market:
+/marketclient:
 	- { include: base }
 	- { hook: main, views: admin/grid }
 	- { view: admin/nav, do: [[ setNav, modules ]] }
 
-/market/form:
+/marketclient/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/nav, do: [[ setNav, modules ]] }
 
-/market/remote:
+/marketclient/remote:
 	- { include: base }
-	- { hook: main, views: market/remote }
+	- { hook: main, views: marketclient/remote }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish:
+	- { include: base }
+	- { hook: main, views: marketclient/publish }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish/module:
+	- { include: base }
+	- { hook: main, views: marketclient/publish/module }
 	- { view: admin/nav, do: [[ setNav, modules ]] }
