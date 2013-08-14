@@ -53,13 +53,14 @@
                         %span.icon-bell
                         %span.title
                             = $this->_('Notifications')
-                        %span.badge.badge-warning = $notifications['count']
+                        %span.badge.badge-warning#notifications-count = $notifications['count']
                     %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-notifications")
                         - foreach ($notifications['groups'] as $group => $items)
                             %li.dropdown-header = $this->_($group)
                             - foreach ($items as $item)
                                 %li(class="#{$item['type']}")
                                     - echo $item['html']
+                                    %a.dismiss-notification(href="#{BApp::href('settings/dismiss')}?code=#{$item['code']}" data-target="#{$item['code']}") = $this->_('Dismiss')
                             %li.dropdown-divider
 
             %li.dropdown
@@ -82,3 +83,32 @@
 
 %nav.fcom-admin-nav
     - echo $this->view('admin/nav')
+
+- if ($notifications['count'])
+    :javascript
+        require(["jquery"], function($){
+            $(function(){
+                var notificationsCount = parseInt(#{$notifications['count']});
+                $(".dismiss-notification").click(function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var url = $(this).attr("href");
+                    var $self = $(this);
+                    if(url) {
+                        $.get(url, function(data){
+                            if (data == 'success') {
+                                $self.parent().hide();
+                                var $badge = $("#notifications-count");
+                                notificationsCount--;
+                                if(notificationsCount > 0)
+                                    $badge.html(notificationsCount)
+                                else {
+                                    $badge.hide('slow');
+                                    $badge.parent().click();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        });
