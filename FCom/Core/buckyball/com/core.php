@@ -1641,11 +1641,12 @@ class BSession extends BClass
     }
 
     /**
-    * Open session
-    *
-    * @param string|null $id Optional session ID
-    * @param bool $close Close and unlock PHP session immediately
-    */
+     * Open session
+     *
+     * @param string|null $id Optional session ID
+     * @param bool        $autoClose
+     * @return $this
+     */
     public function open($id=null, $autoClose=false)
     {
         if (!is_null($this->data)) {
