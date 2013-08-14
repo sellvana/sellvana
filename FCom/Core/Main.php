@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('FULLERON_ROOT_DIR')) {
-    define('FULLERON_ROOT_DIR', dirname(dirname(__DIR__)));
+    define('FULLERON_ROOT_DIR', str_replace('\\', '/', dirname(dirname(__DIR__))));
 }
 
 require_once __DIR__ . '/buckyball/buckyball.php';
@@ -51,8 +51,9 @@ class FCom_Core_Main extends BClass
         $rootDir = $config->get('fs/root_dir');
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
-            $localConfig['fs']['root_dir'] = $rootDir = BRequest::i()->scriptDir();
+            $rootDir = BRequest::i()->scriptDir();
         }
+        $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
         BDebug::debug('ROOTDIR='.$rootDir);
 
@@ -96,6 +97,12 @@ class FCom_Core_Main extends BClass
                 $permissionErrors[] = $dlcDir;
             }
             $config->set('fs/dlc_dir', $dlcDir);
+        }
+
+        $localDir = $config->get('fs/local_dir');
+        if (!$localDir) {
+            $localDir = $rootDir.'/local';
+            $config->set('fs/local_dir', $localDir);
         }
 
         $storageDir = $config->get('fs/storage_dir');
@@ -259,6 +266,7 @@ class FCom_Core_Main extends BClass
 
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
+        $dirConf = $config->get('fs');
 
         if ('STAGING' === $mode || 'PRODUCTION' === $mode) {
             $manifestsLoaded = BModuleRegistry::i()->loadManifestCache();
@@ -270,10 +278,10 @@ class FCom_Core_Main extends BClass
                 $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
             }
-            $this->_modulesDirs[] = $rootDir.'/storage/custom'; // Custom module
-            $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
-            $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Downloaded modules
-            $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
+            $this->_modulesDirs[] = $dirConf['storage_dir'].'/custom'; // Custom module
+            $this->_modulesDirs[] = $dirConf['local_dir'].'/*/*'; // Local modules
+            $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
+            $this->_modulesDirs[] = $dirConf['root_dir'].'/FCom/*'; // Core modules
 
             foreach ($this->_modulesDirs as $dir) {
                 BModuleRegistry::i()->scan($dir);
@@ -296,9 +304,9 @@ class FCom_Core_Main extends BClass
             $config->addFile('local.php', true);
         }
 
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/dlc'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['local_dir']));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['dlc_dir']));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['root_dir']));
 
         return $this;
     }

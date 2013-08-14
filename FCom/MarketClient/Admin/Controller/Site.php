@@ -7,10 +7,12 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
         $hlp = FCom_MarketClient_RemoteApi::i();
         $data = $hlp->requestSiteNonce();
         $response = array(
-            'nonce' => $data['nonce'],
-            'url' => $hlp->getUrl('market/site/setup', array(
+            'nonce' => !empty($data['nonce']) ? $data['nonce'] : null,
+            'login_required' => !empty($data['login_required']) ? $data['login_required'] : null,
+            'setup_url' => $hlp->getUrl('market/site/setup', array(
                 'nonce' => $data['nonce'],
                 'target' => $hlp->getUrl(),
+                'auto_login' => BConfig::i()->get('modules/FCom_MarketClient/auto_login'),
             )),
         );
         BResponse::i()->json($response);
