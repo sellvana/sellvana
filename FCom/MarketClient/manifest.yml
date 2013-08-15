@@ -1,8 +1,9 @@
 modules:
-	FCom_MarketClient:
-		version: 0.2.1
-		require: { module: { FCom_Core: 0.1.0 } }
-		description: "Fulleron Extension Market Client"
+    FCom_MarketClient:
+        version: 0.2.1
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: "Fulleron Extension Market Client"
 
         default_config:
             modules:

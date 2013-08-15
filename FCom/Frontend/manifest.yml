@@ -1,6 +1,7 @@
 modules:
     FCom_Frontend:
         version: 0.1.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Base Frontend functionality"
         before_bootstrap: FCom_Frontend_Frontend::beforeBootstrap
@@ -24,6 +25,7 @@ modules:
 
     FCom_Frontend_DefaultTheme:
         version: 0.1.0
+        channel: beta
         require: { module: { FCom_Frontend: 0.1.0 } }
         description: "Default Frontend theme"
         provides:

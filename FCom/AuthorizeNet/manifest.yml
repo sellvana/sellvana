@@ -1,6 +1,7 @@
 modules:
     FCom_AuthorizeNet:
         version: 0.1.0
+        channel: beta
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { de: de.php }
         description: "Authorize.net payment methods"
