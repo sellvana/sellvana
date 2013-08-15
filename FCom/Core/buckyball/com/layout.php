@@ -355,7 +355,7 @@ class BLayout extends BClass
         if (is_string($params)) {
             $params = array('view_class' => $params);
         }
-        if (empty($params['module_name']) && ($moduleName = BModuleRegistry::currentModuleName())) {
+        if (empty($params['module_name']) && ($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $params['module_name'] = $moduleName;
         }
         $viewAlias = !empty($params['view_alias']) ? $params['view_alias'] : $viewName;
@@ -1884,7 +1884,7 @@ class BViewHead extends BView
             $args['file'] = trim($name);
             $name         = trim($args['alias']);
         }
-        if (!isset($args['module_name']) && ($moduleName = BModuleRegistry::currentModuleName())) {
+        if (!isset($args['module_name']) && ($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $args['module_name'] = $moduleName;
         }
         if (!isset($args['if']) && $this->_currentIfContext) {

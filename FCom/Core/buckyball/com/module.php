@@ -27,6 +27,11 @@
 class BModuleRegistry extends BClass
 {
     /**
+     * Local static singleton instance for performance optimization
+     */
+    protected static $_singleton;
+
+    /**
     * Local cache for BApp::i()->get('area');
     *
     * @todo make sure handling is case insensitive
@@ -39,7 +44,7 @@ class BModuleRegistry extends BClass
     *
     * @var array
     */
-    protected static $_modules = array();
+    protected $_modules = array();
 
     /**
     * Current module name, not BNULL when:
@@ -49,14 +54,14 @@ class BModuleRegistry extends BClass
     *
     * @var string
     */
-    protected static $_currentModuleName = null;
+    protected $_currentModuleName = null;
 
     /**
     * Current module stack trace
     *
     * @var array
     */
-    protected static $_currentModuleStack = array();
+    protected $_currentModuleStack = array();
 
     public function __construct()
     {
@@ -66,23 +71,31 @@ class BModuleRegistry extends BClass
     /**
      * Shortcut to help with IDE autocompletion
      *
+     * Singleton performance optimization
+     *
      * @param bool  $new
      * @param array $args
      * @return BModuleRegistry
      */
     public static function i($new=false, array $args=array())
     {
+        if (!$new) {
+            if (!static::$_singleton) {
+                static::$_singleton = BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+            }
+            return static::$_singleton;
+        }
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
     }
 
-    public static function getAllModules()
+    public function getAllModules()
     {
-        return static::$_modules;
+        return $this->_modules;
     }
 
-    public static function isLoaded($modName)
+    public function isLoaded($modName)
     {
-        return !empty(static::$_modules[$modName]) && static::$_modules[$modName]->run_status===BModule::LOADED;
+        return !empty($this->_modules[$modName]) && $this->_modules[$modName]->run_status===BModule::LOADED;
     }
 
     /**
@@ -96,7 +109,7 @@ class BModuleRegistry extends BClass
     public function module($modName, $params=null)
     {
         if (is_null($params)) {
-            return isset(static::$_modules[$modName]) ? static::$_modules[$modName] : null;
+            return isset($this->_modules[$modName]) ? $this->_modules[$modName] : null;
         }
         return $this->addModule($modName, $params);
     }
@@ -109,12 +122,12 @@ class BModuleRegistry extends BClass
             $params = (array)$params;
         }
 
-        if (!empty(static::$_modules[$modName])) {
-            BDebug::debug('MODULE UPDATE: '.static::$_modules[$modName]->name);
-            static::$_modules[$modName]->update($params);
+        if (!empty($this->_modules[$modName])) {
+            BDebug::debug('MODULE UPDATE: '.$this->_modules[$modName]->name);
+            $this->_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
-            static::$_modules[$modName] = BModule::i(true, $params);
+            $this->_modules[$modName] = BModule::i(true, $params);
         }
         return $this;
     }
@@ -129,10 +142,10 @@ class BModuleRegistry extends BClass
     {
         $t = BDebug::debug('SAVE MANIFESTS');
         $cacheFile = $this->_getManifestCacheFilename();
-        # file_put_contents($cacheFile, serialize(static::$_modules)); return;
+        # file_put_contents($cacheFile, serialize($this->_modules)); return;
 
         $data = array();
-        foreach (static::$_modules as $modName => $mod) {
+        foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
         }
         file_put_contents($cacheFile, serialize($data));
@@ -144,7 +157,7 @@ class BModuleRegistry extends BClass
     {
         $cacheFile = $this->_getManifestCacheFilename();
         if (is_readable($cacheFile)) {
-            # static::$_modules = unserialize(file_get_contents($cacheFile)); return;
+            # $this->_modules = unserialize(file_get_contents($cacheFile)); return;
 
             $data = unserialize(file_get_contents($cacheFile));
             foreach ($data as $modName => $params) {
@@ -225,15 +238,15 @@ class BModuleRegistry extends BClass
         // validate required modules
         $requestRunLevels = (array)BConfig::i()->get('module_run_levels/request');
         foreach ($requestRunLevels as $modName=>$runLevel) {
-            if (!empty(static::$_modules[$modName])) {
-                static::$_modules[$modName]->run_level = $runLevel;
+            if (!empty($this->_modules[$modName])) {
+                $this->_modules[$modName]->run_level = $runLevel;
             } elseif ($runLevel===BModule::REQUIRED) {
                 BDebug::warning('Module is required but not found: '.$modName);
             }
         }
         // scan for require
 
-        foreach (static::$_modules as $modName=>$mod) {
+        foreach ($this->_modules as $modName=>$mod) {
             // is currently iterated module required?
             if ($mod->run_level === BModule::REQUIRED) {
                 $mod->run_status = BModule::PENDING; // only 2 options: PENDING or ERROR
@@ -241,7 +254,7 @@ class BModuleRegistry extends BClass
             // iterate over require for modules
             if (!empty($mod->require['module'])) {
                 foreach ($mod->require['module'] as &$req) {
-                    $reqMod = !empty(static::$_modules[$req['name']]) ? static::$_modules[$req['name']] : false;
+                    $reqMod = !empty($this->_modules[$req['name']]) ? $this->_modules[$req['name']] : false;
                     // is the module missing
                     if (!$reqMod) {
                         $mod->errors[] = array('type'=>'missing', 'mod'=>$req['name']);
@@ -279,7 +292,7 @@ class BModuleRegistry extends BClass
             }
         }
 
-        foreach (static::$_modules as $modName=>$mod) {
+        foreach ($this->_modules as $modName=>$mod) {
             if (!is_object($mod)) {
                 var_dump($mod); exit;
             }
@@ -291,7 +304,7 @@ class BModuleRegistry extends BClass
                 $this->propagateDepends($mod);
             }
         }
-        #var_dump(static::$_modules);exit;
+        #var_dump($this->_modules);exit;
         return $this;
     }
 
@@ -307,10 +320,10 @@ class BModuleRegistry extends BClass
         $mod->run_status = BModule::ERROR;
         $mod->errors_propagated = true;
         foreach ($mod->children as $childName) {
-            if (empty(static::$_modules[$childName])) {
+            if (empty($this->_modules[$childName])) {
                 continue;
             }
-            $child = static::$_modules[$childName];
+            $child = $this->_modules[$childName];
             if ($child->run_level===BModule::REQUIRED && $child->run_status!==BModule::ERROR) {
                 $this->propagateDependErrors($child);
             }
@@ -327,10 +340,10 @@ class BModuleRegistry extends BClass
     public function propagateDepends($mod)
     {
         foreach ($mod->parents as $parentName) {
-            if (empty(static::$_modules[$parentName])) {
+            if (empty($this->_modules[$parentName])) {
                 continue;
             }
-            $parent = static::$_modules[$parentName];
+            $parent = $this->_modules[$parentName];
             if ($parent->run_status===BModule::PENDING) {
                 continue;
             }
@@ -364,7 +377,7 @@ class BModuleRegistry extends BClass
                 } else {
                     $depPathArr1 = $depPathArr;
                     $depPathArr1[$p] = 1;
-                    $circ += $this->detectCircularReferences(static::$_modules[$p], $depPathArr1);
+                    $circ += $this->detectCircularReferences($this->_modules[$p], $depPathArr1);
                 }
             }
         }
@@ -378,7 +391,7 @@ class BModuleRegistry extends BClass
     */
     public function sortDepends()
     {
-        $modules = static::$_modules;
+        $modules = $this->_modules;
 
         $circRefsArr = array();
         foreach ($modules as $modName => $mod) {
@@ -430,7 +443,7 @@ class BModuleRegistry extends BClass
                 $rootModules[] = $mod;
             }
         }
-#echo "<pre>"; print_r(static::$_modules); echo "</pre>";
+#echo "<pre>"; print_r($this->_modules); echo "</pre>";
 #echo "<pre>"; print_r($rootModules); echo "</pre>";
         // begin algorithm
         $sorted = array();
@@ -457,7 +470,7 @@ class BModuleRegistry extends BClass
             // remove processed module from list
             unset($modules[$n->name]);
         }
-        static::$_modules = $sorted;
+        $this->_modules = $sorted;
         return $this;
     }
 
@@ -470,8 +483,8 @@ class BModuleRegistry extends BClass
 
     public function processDefaultConfig()
     {
-        //BUtil::arrayWalk(static::$_modules, 'processDefaultConfig');
-        foreach (static::$_modules as $mod) {
+        //BUtil::arrayWalk($this->_modules, 'processDefaultConfig');
+        foreach ($this->_modules as $mod) {
             $mod->processDefaultConfig();
         }
         return $this;
@@ -485,12 +498,12 @@ class BModuleRegistry extends BClass
     */
     public function bootstrap()
     {
-        foreach (static::$_modules as $mod) {
+        foreach ($this->_modules as $mod) {
             $this->pushModule($mod->name);
             $mod->beforeBootstrap();
             $this->popModule();
         }
-        foreach (static::$_modules as $mod) {
+        foreach ($this->_modules as $mod) {
             $this->pushModule($mod->name);
             $mod->bootstrap();
             $this->popModule();
@@ -515,43 +528,43 @@ class BModuleRegistry extends BClass
     {
         if (is_null($name)) {
 #echo '<hr><pre>'; debug_print_backtrace(); echo static::$_currentModuleName.' * '; print_r($this->module(static::$_currentModuleName)); #echo '</pre>';
-            $name = static::currentModuleName();
+            $name = $this->currentModuleName();
             return $name ? $this->module($name) : false;
         }
-        static::$_currentModuleName = $name;
+        $this->_currentModuleName = $name;
         return $this;
     }
 
     public function setCurrentModule($name)
     {
-        static::$_currentModuleName = $name;
+        $this->_currentModuleName = $name;
         return $this;
     }
 
     public function pushModule($name)
     {
-        array_push(self::$_currentModuleStack, $name);
+        array_push($this->_currentModuleStack, $name);
         return $this;
     }
 
     public function popModule()
     {
-        array_pop(self::$_currentModuleStack);
+        array_pop($this->_currentModuleStack);
         return $this;
     }
 
-    static public function currentModuleName()
+    public function currentModuleName()
     {
-        if (!empty(self::$_currentModuleStack)) {
-            return self::$_currentModuleStack[sizeof(self::$_currentModuleStack)-1];
+        if (!empty($this->_currentModuleStack)) {
+            return $this->_currentModuleStack[sizeof($this->_currentModuleStack)-1];
         }
-        return static::$_currentModuleName;
+        return $this->_currentModuleName;
     }
 /*
     public function onBeforeDispatch()
     {
         $routing = BRouting::i();
-        foreach (static::$_modules as $module) {
+        foreach ($this->_modules as $module) {
             if ($module->run_status===BModule::LOADED && ($prefix = $module->url_prefix)) {
                 $routing->redirect('GET /'.$prefix, $prefix.'/');
             }
@@ -560,7 +573,7 @@ class BModuleRegistry extends BClass
 */
     public function debug()
     {
-        return static::$_modules;
+        return $this->_modules;
     }
 }
 
@@ -1235,7 +1248,7 @@ class BMigrate extends BClass
     public static function getMigrationData()
     {
         $migration = array();
-        foreach (BModuleRegistry::getAllModules() as $modName=>$mod) {
+        foreach (BModuleRegistry::i()->getAllModules() as $modName=>$mod) {
             if (empty($mod->migrate) && class_exists($mod->name.'_Migrate')) {
                 $mod->migrate = $mod->name.'_Migrate';
             }
@@ -1263,7 +1276,7 @@ class BMigrate extends BClass
     public static function migrate($script='migrate.php', $moduleName=null)
     {
         if (is_null($moduleName)) {
-            $moduleName = BModuleRegistry::currentModuleName();
+            $moduleName = BModuleRegistry::i()->currentModuleName();
         }
         $module = BModuleRegistry::i()->module($moduleName);
         $connectionName = $module->db_connection_name ? $module->db_connection_name : 'DEFAULT';
@@ -1281,7 +1294,7 @@ class BMigrate extends BClass
     public static function uninstall($script, $moduleName=null)
     {
         if (is_null($moduleName)) {
-            $moduleName = BModuleRegistry::currentModuleName();
+            $moduleName = BModuleRegistry::i()->currentModuleName();
         }
         static::$_uninstall[$moduleName]['script'] = $script;
     }
@@ -1491,7 +1504,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException(BLocale::_("Can't upgrade, module schema doesn't exist yet: %s", BModuleRegistry::currentModuleName()));
+            throw new BException(BLocale::_("Can't upgrade, module schema doesn't exist yet: %s", BModuleRegistry::i()->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 
@@ -1546,7 +1559,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
     public static function runUninstallScript($modName=null)
     {
         if (is_null($modName)) {
-            $modName = BModuleRegistry::currentModuleName();
+            $modName = BModuleRegistry::i()->currentModuleName();
         }
         $mod =& static::$_migratingModule;
 

@@ -20,6 +20,17 @@ Options +FollowSymLinks -MultiViews
     php_value zlib.output_compression Off
 
     php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+</IfModule>
+
+<IfModule mod_php5.c>
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
+
+    php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
 </IfModule>
 
 <IfModule mod_rewrite.c>

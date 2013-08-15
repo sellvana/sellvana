@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Cron_Cron extends BClass
+class FCom_Cron_Main extends BClass
 {
     protected $_tasks = array();
 
@@ -19,7 +19,7 @@ class FCom_Cron_Cron extends BClass
         $args['cron_expr_arr'] = $exprArr;
         $args['callback'] = $callback;
         if (empty($args['module_name'])) {
-            $args['module_name'] = BModuleRegistry::currentModuleName();
+            $args['module_name'] = BModuleRegistry::i()->currentModuleName();
         }
         if (empty($args['handle'])) {
             $args['handle'] = $args['module_name'];

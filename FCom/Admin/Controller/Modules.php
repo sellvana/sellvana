@@ -10,7 +10,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $coreLevels = $config->get('module_run_levels/FCom_Core');
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
-        $modules = BModuleRegistry::i()->debug();
+        $modules = BModuleRegistry::i()->getAllModules();
         $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,'.
             'FCom_Frontend,FCom_Frontend_DefaultTheme,FCom_Install'));
 

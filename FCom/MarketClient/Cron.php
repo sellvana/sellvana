@@ -12,7 +12,7 @@ class FCom_MarketClient_Cron extends BClass
     {
         set_time_limit(0);
 
-        $localModules = BModuleRegistry::i()->debug();
+        $localModules = BModuleRegistry::i()->getAllModules();
         $remoteModules = FCom_MarketClient_Main::i()->getModules(array_keys($localModules));
 
 
