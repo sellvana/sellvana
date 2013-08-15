@@ -53,4 +53,24 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
         BResponse::i()->redirect(BApp::href('settings').'?tab='.$tab);
     }
+
+    public function action_dismiss() {
+        $code = BRequest::i()->get('code');
+        $conf      = BConfig::i();
+        $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
+        $dirty = false;
+        if(!$dismissed){
+            $dismissed = array($code);
+            $dirty = true;
+        } elseif(!in_array($code, $dismissed)) {
+            $dismissed[] = $code;
+            $dirty = true;
+        }
+        if ($dirty) {
+            $conf->set('modules/FCom_Core/dismissed/notifications', $dismissed, false, true);
+            FCom_Core_Main::i()->writeLocalConfig();
+        }
+
+        BResponse::i()->json("success");
+    }
 }

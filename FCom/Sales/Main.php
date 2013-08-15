@@ -90,6 +90,7 @@ class FCom_Sales_Main extends BClass
                 'type' => 'warning',
                 'group' => 'FCom Sales',
                 'message' => 'You have to enable at least one shipping module',
+                'code' => "sales_missing_shipping",
             );
         }
         if(!$this->getPaymentMethods()){
@@ -97,6 +98,7 @@ class FCom_Sales_Main extends BClass
                 'type' => 'warning',
                 'group' => 'FCom Sales',
                 'message' => 'You have to enable at least one payment module',
+                'code' => "sales_missing_payment",
             );
         }
     }

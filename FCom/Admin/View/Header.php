@@ -21,8 +21,14 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     {
         $notifications = array();
         BEvents::i()->fire(__METHOD__, array('notifications' => &$notifications));
+        $conf      = BConfig::i();
+        $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = array();
-        foreach ($notifications as &$item) {
+        foreach ($notifications as $k => &$item) {
+            if($dismissed && in_array($item['code'], $dismissed)){
+                unset($notifications[$k]);
+                continue;
+            }
             if (empty($item['group'])) {
                 $item['group'] = 'other';
             }

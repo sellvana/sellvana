@@ -48,6 +48,7 @@ modules:
                     - [ post, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
 
                     - [ get, /test, FCom_Admin_Controller.test ]
+                    - [ get, /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
     FCom_Admin_DefaultTheme:
         version: 0.1.0
