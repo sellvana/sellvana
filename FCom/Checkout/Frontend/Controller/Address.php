@@ -86,6 +86,10 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$address) {
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
         }
+        if(!$address->validate($r)) {
+            // todo add notification that something is wrong
+            BResponse::i()->redirect(BApp::href("checkout/address?t=". $atype));
+        }
         if ($address) {
             $address->set($r);
             $address->atype = $addressType;

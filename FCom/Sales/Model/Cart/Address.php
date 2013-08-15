@@ -30,4 +30,48 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         $this->update_at = BDb::now();
         return true;
     }
+
+    /**
+     * Validate provided address data
+     * Very basic validation for presence of required fields
+     * @todo add element validators
+     * @param array $data
+     * @param bool  $breakOnFail
+     * @return bool
+     */
+    public function validate($data, $breakOnFail = true)
+    {
+        $valid  = true;
+        $failed = array();
+
+        BEvents::i()->fire(__CLASS__."validate", array("failed" => &$failed, 'valid' => &$valid));
+        $required = BConfig::i()->get("modules/FCom_Sales/required_address_fields");
+        if(!$required){
+            $required = array(
+                "firstname",
+                "lastname",
+                "email",
+                "street1",
+                "city",
+                "country",
+                "region",
+                "postcode"
+            );
+        }
+
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || empty($data[$field])) {
+                if($breakOnFail){
+                    return false;
+                }
+                $valid = false;
+                $failed['required'][] = $field;
+            }
+        }
+        if (!$valid) {
+            BEvents::i()->fire(__CLASS__."validation_failed", array("failed" => $failed));
+        }
+
+        return $valid;
+    }
 }
