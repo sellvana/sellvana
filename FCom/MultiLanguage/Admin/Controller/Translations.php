@@ -32,7 +32,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         //$data = BLocale::getTranslations();
         //print_r($data);exit;
         $data = array();
-        $modules = BModuleRegistry::getAllModules();
+        $modules = BModuleRegistry::i()->getAllModules();
         foreach($modules as $module){
             if (!empty($module->translations)) {
                 foreach($module->translations as $trlocale => $trfile) {

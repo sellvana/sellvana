@@ -4,6 +4,9 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 {
     public function action_index()
     {
+        $moduleNames = join(',', array_keys(BModuleRegistry::i()->getAllModules()));
+        $result = FCom_MarketClient_RemoteApi::i()->getModulesStatus($moduleNames);
+        $this->view('marketclient/publish')->set('modules', $result);
         $this->layout('/marketclient/publish');
     }
 
@@ -31,7 +34,12 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
             BResponse::i()->redirect('marketclient/publish/module?mod='.$form['mod_name']);
         }
         */
-        FCom_MarketClient_RemoteApi::i()->uploadPackage($modName);
+        $hlp = FCom_MarketClient_RemoteApi::i();
+        $result = $hlp->uploadPackage($modName);
+        //TODO: handle $result
+        $result = $hlp->requestSiteNonce();
+        $url = $hlp->getUrl('market/module/edit', array('mod' => $modName));
+        BResponse::i()->redirect($url);
     }
 
     public function action_upload()
