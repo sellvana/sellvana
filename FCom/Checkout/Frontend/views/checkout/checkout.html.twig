@@ -58,17 +58,7 @@
                     {% endif %}
                 </div>
                 <div class="span6">
-                    {#<h4>{{ "Payment method" |_ }}</h4>#}
-{#                    {% if THIS.get('payment_method') %}
-                        <small><a href="{{ APP.href('checkout/payment') }}">{{ "Change" |_ }}</a></small><br/>
-
-                        <i>{{ THIS.get('payment_method').getName() }}</i><br/>
-                        {{ THIS.get('payment_method').getCheckoutFormView().set('payment_details', THIS.get('payment_details')) | raw }}
-                    {% else %}
-                        <a href="/checkout/payment" style="color:red">{{ "Select payment method" |_ }}</a><br/>
-                    {% endif %}
-#}
-                    {% include '@FCom_Checkout/checkout/payment.html.twig' %}
+                    {{ THIS.view('checkout/payment') | raw }}
                 </div>
             </div>
             <div class="divider"></div>

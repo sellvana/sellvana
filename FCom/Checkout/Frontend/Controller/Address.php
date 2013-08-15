@@ -11,12 +11,11 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         $layout = BLayout::i();
         $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
-        $countriesList = '';
-        foreach ($countries as $country) {
-            $countriesList .= $country->iso.',';
-        }
-        $countriesList = substr($countriesList, 0, -1);
-
+        $countriesList = array_map(function ($el) {
+            return $el->get('iso');
+        }, $countries);
+        $countriesList = implode(',', $countriesList);
+        $countries = FCom_Geo_Model_Country::options($countriesList);
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (!$cart->id()){
             $href = BApp::href('cart');
@@ -56,6 +55,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
         $layout->view('checkout/address')->address = $address;
         $layout->view('checkout/address')->address_type = $atype;
+        $layout->view('checkout/address')->countries = $countries;
         $this->layout('/checkout/address');
     }
 
