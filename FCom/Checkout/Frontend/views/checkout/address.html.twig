@@ -50,29 +50,33 @@
               })
           </script>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Region" |_ }}</label>
+            {% set countries = THIS.get('countries') %}
+          <label for="#" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
           <div class="controls">
-            <select class="geo-region required" name="region"  class="required">
-                <option value="">{{ "Select an option" |_ }}</option>
+            <select class="geo-country required" name="country" id="country">
+              <option value="">{{ "Select an option" |_ }}</option>
+                {% for iso, country in countries %}
+                <option value="{{ iso }}">{{ country }}</option>
+                {% endfor %}
             </select>
-            <input type="text" class="geo-region" name="region"  class="required"/>
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
-          <div class="controls">
-            <select class="geo-country" name="country" id="country" class="required">
-              <option value="">{{ "Select an option" |_ }}</option>
-            </select>
-          </div>
+            <label for="#" class="control-label">{{ "Region" |_ }}<em class="required">*</em></label>
+            <div class="controls">
+                <select class="geo-region required" style="display: none" name="region">
+                    <option value="">{{ "Select an option" |_ }}</option>
+                </select>
+                <input type="text" class="geo-region required" name="region"/>
+            </div>
         </div>
         <div class="control-group">
           <label for="#" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
           <div class="controls">
             <input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
           </div>
-        </div>          
-          
+        </div>
+
         {% if 's' == THIS.get('address_type') %}
         <label for="address_equal" class="checkbox">
           <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
