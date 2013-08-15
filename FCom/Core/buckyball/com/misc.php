@@ -1129,6 +1129,12 @@ class BUtil extends BClass
             .'" class="'.$class.' '.($state['s']==$field ? $state['sd'] : '').'"';
     }
 
+    /**
+     * @param string $tag
+     * @param array  $attrs
+     * @param null   $content
+     * @return string
+     */
     public static function tagHtml($tag, $attrs = array(), $content = null)
     {
         $attrsHtmlArr = array();

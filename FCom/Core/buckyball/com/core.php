@@ -490,12 +490,14 @@ class BConfig extends BClass
     }
 
     /**
-    * Set configuration data in $path location
-    *
-    * @param string $path slash separated path to the config node
-    * @param mixed $value scalar or array value
-    * @param boolean $merge merge new value to old?
-    */
+     * Set configuration data in $path location
+     *
+     * @param string  $path slash separated path to the config node
+     * @param mixed   $value scalar or array value
+     * @param boolean $merge merge new value to old?
+     * @param bool    $toSave
+     * @return $this
+     */
     public function set($path, $value, $merge=false, $toSave=false)
     {
         if (is_string($toSave) && $toSave==='_configToSave') { // limit?
@@ -1641,11 +1643,12 @@ class BSession extends BClass
     }
 
     /**
-    * Open session
-    *
-    * @param string|null $id Optional session ID
-    * @param bool $close Close and unlock PHP session immediately
-    */
+     * Open session
+     *
+     * @param string|null $id Optional session ID
+     * @param bool        $autoClose
+     * @return $this
+     */
     public function open($id=null, $autoClose=false)
     {
         if (!is_null($this->data)) {
