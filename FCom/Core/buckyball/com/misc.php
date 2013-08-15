@@ -903,6 +903,7 @@ class BUtil extends BClass
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_HTTPHEADER, array('Expect:'), //Fixes the HTTP/1.1 417 Expectation Failed
+                CURLOPT_HEADER => true,
             );
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = BConfig::i()->get('fs/storage_dir').'/cache';
@@ -926,8 +927,10 @@ class BUtil extends BClass
             }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
-            $response = curl_exec($ch);
+            $rawResponse = curl_exec($ch);
+            list($response, $headers) = explode("\r\n\r\n", $rawResponse, 2);
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
+            $respHeaders = explode("\r\n", $headers);
             curl_close($ch);
 
         } else {
@@ -981,7 +984,17 @@ class BUtil extends BClass
                 }
             }
             $response = file_get_contents($url, false, stream_context_create($opts));
+
             static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
+            $respHeaders = $http_response_header;
+        }
+        foreach ($respHeaders as $i => $line) {
+            if ($i) {
+                $arr = explode(':', $line, 2);
+            } else {
+                $arr = array(0, $line);
+            }
+            static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
         }
 
         return $response;
@@ -2077,7 +2090,7 @@ class BDebug extends BClass
 
         $message = "{$e['level']}: {$e['msg']}".(isset($e['file'])?" ({$e['file']}:{$e['line']})":'');
 
-        if (($moduleName = BModuleRegistry::currentModuleName())) {
+        if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $e['module'] = $moduleName;
         }
 
@@ -2442,7 +2455,7 @@ class BLocale extends BClass
     */
     public static function importTranslations($data, $params=array())
     {
-        $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::currentModuleName();
+        $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::i()->currentModuleName();
         if (is_string($data)) {
             if (!BUtil::isPathAbsolute($data)) {
                 $data = BApp::m($module)->root_dir.'/i18n/'.$data;

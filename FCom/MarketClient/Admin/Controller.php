@@ -57,7 +57,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 //check requirements with current state
                 //1. check modules
                 if (!empty($module['require']['module'])) {
-                    $installedmodules = BModuleRegistry::i()->debug();
+                    $installedmodules = BModuleRegistry::i()->getAllModules();
                     foreach($module['require']['module'] as &$modreq) {
                         if (!isset($installedmodules[$modreq['name']])) {
                             $modreq['error'] = 'Required module not exist';

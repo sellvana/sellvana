@@ -32,7 +32,7 @@ class FCom_MarketClient_Admin extends BClass
 
         // find modules with dependencies errors
         //todo: probably need to move this code somewhere else
-        $modules = BModuleRegistry::i()->debug();
+        $modules = BModuleRegistry::i()->getAllModules();
         $data = array();
         foreach($modules as $modName => $mod) {
             if (!empty($mod->errors)) {
