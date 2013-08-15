@@ -1,9 +1,10 @@
 modules:
-	FCom_Checkout:
-		version: 0.2.1
-		require: { module: { FCom_Catalog: 0.2.1, FCom_Geo: 0.1.0, FCom_Sales: 0.1.10 } }
-		translations: { de: de.php }
-		description: "Base cart and checkout functionality"
+    FCom_Checkout:
+        version: 0.2.1
+        channel: beta
+        require: { module: { FCom_Catalog: 0.2.1, FCom_Geo: 0.1.0, FCom_Sales: 0.1.10 } }
+        translations: { de: de.php }
+        description: "Base cart and checkout functionality"
         auto_use: [ views ]
 
         areas:

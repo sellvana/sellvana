@@ -1,9 +1,10 @@
 modules:
-	FCom_Disqus:
-		version: 0.1.0
-		require: { module: { FCom_Core: 0.1.0 } }
-		translations: { de: de.php }
-		description: Embed Disqus comments on any page
+    FCom_Disqus:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        translations: { de: de.php }
+        description: Embed Disqus comments on any page
         auto_use: [ views ]
 
         areas:
