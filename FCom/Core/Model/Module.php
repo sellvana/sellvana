@@ -31,7 +31,7 @@ class FCom_Core_Model_Module extends BDbModule
         $coreLevels = $config['FCom_Core'];
         $adminLevels = $config['FCom_Admin'];
         $frontendLevels = $config['FCom_Frontend'];
-        $modules = BModuleRegistry::i()->debug();
+        $modules = BModuleRegistry::i()->getAllModules();
 
         try {
             $schemaVersions = static::orm()->find_many_assoc('module_name');

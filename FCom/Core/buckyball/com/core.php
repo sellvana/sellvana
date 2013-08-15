@@ -713,7 +713,7 @@ class BClassRegistry extends BClass
     {
         $this->_classes[$class] = array(
             'class_name' => $newClass,
-            'module_name' => BModuleRegistry::currentModuleName(),
+            'module_name' => BModuleRegistry::i()->currentModuleName(),
         );
         BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
         if ($replaceSingleton && !empty($this->_singletons[$class]) && get_class($this->_singletons[$class])!==$newClass) {
@@ -743,7 +743,7 @@ class BClassRegistry extends BClass
             $rel = 'is';
         }
         $this->_methods[$method][$static ? 1 : 0]['override'][$rel][$class] = array(
-            'module_name' => BModuleRegistry::currentModuleName(),
+            'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
         );
         return $this;
@@ -823,7 +823,7 @@ class BClassRegistry extends BClass
     public function augmentMethod($class, $method, $callback, $static=false)
     {
         $this->_methods[$method][$static ? 1 : 0]['augment']['is'][$class][] = array(
-            'module_name' => BModuleRegistry::currentModuleName(),
+            'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
         );
         $this->_decoratedClasses[$class] = true;
@@ -864,7 +864,7 @@ class BClassRegistry extends BClass
             BDebug::error(BLocale::_('Invalid property augmentation type: %s', $type));
         }
         $entry = array(
-            'module_name' => BModuleRegistry::currentModuleName(),
+            'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
         );
         if ($type==='override') {
@@ -1407,7 +1407,7 @@ class BEvents extends BClass
             $alias = $callback;
         }
         $observer = array('callback' => $callback, 'args' => $args, 'alias' => $alias);
-        if (($moduleName = BModuleRegistry::currentModuleName())) {
+        if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers

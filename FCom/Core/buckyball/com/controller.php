@@ -1409,7 +1409,7 @@ class BRouting extends BClass
             return $this;
         }
         if (empty($args['module_name'])) {
-            $args['module_name'] = BModuleRegistry::currentModuleName();
+            $args['module_name'] = BModuleRegistry::i()->currentModuleName();
         }
         BDebug::debug('ROUTE '.$route);
         if (empty($this->_routes[$route])) {
@@ -2249,7 +2249,7 @@ class BActionController extends BClass
     public function _($string, $params=array(), $module=null)
     {
         if (empty($module)) {
-            $module = BModuleRegistry::currentModuleName();
+            $module = BModuleRegistry::i()->currentModuleName();
         }
         return BLocale::_($string, $params, $module);
     }
