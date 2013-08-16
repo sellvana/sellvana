@@ -32,9 +32,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return BUtil::fromJson($response);
     }
 
-    public function getModulesStatus($moduleName)
+    public function getModulesInfo($moduleName)
     {
-        $url = $this->getUrl('api/v1/market/module/status', array(
+        $url = $this->getUrl('api/v1/market/module/info', array(
             'mod_name' => $moduleName,
         ));
         $response = BUtil::remoteHttp("GET", $url);
@@ -83,7 +83,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         BUtil::ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
         BUtil::zipCreateFromDir($packageFilename, $mod->root_dir);
-        $url = $this->getUrl('api/v1/market/module/upload', array('mod_name' => $moduleName));
+        $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
+        $url = $this->getUrl('api/v1/market/module/upload', array(
+            'mod_name' => $moduleName,
+            'site_key' => $siteKey,
+        ));
         $data = array(
             'package_zip' => '@'.$packageFilename,
         );

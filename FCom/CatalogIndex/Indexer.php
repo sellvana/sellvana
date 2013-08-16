@@ -395,7 +395,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
         }
 
-        if (BModuleRegistry::isLoaded('FCom_CustomField')) {
+        if (BModuleRegistry::i()->isLoaded('FCom_CustomField')) {
             FCom_CustomField_Main::i()->disable(true);
         }
 
@@ -475,7 +475,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
         }
 
-        if (BModuleRegistry::isLoaded('FCom_CustomField')) {
+        if (BModuleRegistry::i()->isLoaded('FCom_CustomField')) {
             FCom_CustomField_Main::i()->disable(false);
         }
 

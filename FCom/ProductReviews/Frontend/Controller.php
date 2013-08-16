@@ -12,7 +12,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             BResponse::i()->redirect(BApp::href());
         }
 
-        if (BModuleRegistry::isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
+        if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
             BResponse::i()->redirect(Bapp::href("login"));
         }
 
@@ -31,7 +31,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         if (!empty($post['review'])) {
             $customerId = 0;
-            if (BModuleRegistry::isLoaded('FCom_Customer')) {
+            if (BModuleRegistry::i()->isLoaded('FCom_Customer')) {
                 $customer = FCom_Customer_Model_Customer::i()->sessionUser();
                 $customerId = $customer->id();
             }
@@ -44,7 +44,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $post = BRequest::i()->post();
 
-        if (BModuleRegistry::isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
+        if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
             BResponse::i()->json(array('redirect' => BApp::href('login')));
         }
 
@@ -64,7 +64,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             $customer = FCom_Customer_Model_Customer::i()->sessionUser();
             $record = FCom_ProductReviews_Model_ReviewFlag::i()->load(array(
-                'customer_id' => $customer->id, 
+                'customer_id' => $customer->id,
                 'review_id' => $review->id,
             ));
 
