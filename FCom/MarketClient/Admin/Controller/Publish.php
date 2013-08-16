@@ -5,7 +5,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
     public function action_index()
     {
         $moduleNames = join(',', array_keys(BModuleRegistry::i()->getAllModules()));
-        $result = FCom_MarketClient_RemoteApi::i()->getModulesStatus($moduleNames);
+        $result = FCom_MarketClient_RemoteApi::i()->getModulesInfo($moduleNames);
         $this->view('marketclient/publish')->set('modules', $result);
         $this->layout('/marketclient/publish');
     }

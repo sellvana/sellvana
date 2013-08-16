@@ -1,8 +1,9 @@
 modules:
-	FCom_CatalogIndex:
-		version: 0.1.6
-		require: { module: { FCom_Catalog: 0.2.1, FCom_CustomField: 0.1.4 } }
-		description: "Catalog search and facets indexing engine"
+    FCom_CatalogIndex:
+        version: 0.1.6
+        channel: beta
+        require: { module: { FCom_Catalog: 0.2.1, FCom_CustomField: 0.1.4 } }
+        description: "Catalog search and facets indexing engine"
         auto_use: [ views, layout ]
         observe:
             - [ FCom_Catalog_Model_Product::onAfterSave, FCom_CatalogIndex_Main::onProductAfterSave ]

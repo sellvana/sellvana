@@ -1,6 +1,7 @@
 modules:
     FCom_Admin:
         version: 0.1.5
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
         observe:
@@ -52,6 +53,7 @@ modules:
 
     FCom_Admin_DefaultTheme:
         version: 0.1.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Default Admin theme"
         provides:
