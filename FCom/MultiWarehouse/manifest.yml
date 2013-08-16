@@ -1,7 +1,8 @@
 modules:
-	FCom_MultiWarehouse:
-		version: 0.1.0
-		require: { module: { FCom_Core: 0.1.0 } }
+    FCom_MultiWarehouse:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
 
         areas:
             FCom_Admin:
