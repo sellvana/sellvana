@@ -68,6 +68,7 @@ class FCom_Core_Model_Abstract extends BModel
                 $data[$k] = array();
             }
         }
+        $this->set(static::$_dataField, $data);
         return $this;
     }
 

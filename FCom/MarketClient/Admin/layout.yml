@@ -29,3 +29,11 @@ base:
 	- { include: base }
 	- { hook: main, views: marketclient/publish/module }
 	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/install:
+	- { include: base }
+	- { hook: header, remove: true }
+	- { hook: footer, remove: true }
+	- { hook: main, views: marketclient/install }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+

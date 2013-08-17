@@ -32,10 +32,19 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return BUtil::fromJson($response);
     }
 
-    public function getModulesInfo($moduleName)
+    public function getModulesVersions($modules)
     {
-        $url = $this->getUrl('api/v1/market/module/info', array(
-            'mod_name' => $moduleName,
+        $url = $this->getUrl('api/v1/market/module/version', array(
+            'mod_name' => $modules,
+        ));
+        $response = BUtil::remoteHttp("GET", $url);
+        return BUtil::fromJson($response);
+    }
+
+    public function getModuleInstallInfo($modules)
+    {
+        $url = $this->getUrl('api/v1/market/module/install_info', array(
+            'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response);
