@@ -32,8 +32,8 @@ base:
 
 /marketclient/install:
 	- { include: base }
-	- { hook: header, remove: true }
-	- { hook: footer, remove: true }
+	- { hook: header, remove: ALL }
+	- { hook: footer, remove: ALL }
 	- { hook: main, views: marketclient/install }
 	- { view: admin/nav, do: [[ setNav, modules ]] }
 

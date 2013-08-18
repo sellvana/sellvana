@@ -50,19 +50,17 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return BUtil::fromJson($response);
     }
 
-    public function downloadPackage($moduleName)
+    public function downloadPackage($moduleName, $version = null)
     {
-        $url =  $this->getUrl('api/v1/market/module/download', array(
-            'mod_name' => $moduleName,
-        ));
+        $url =  $this->getUrl('market/download/'.$moduleName.($version ? '/'.$version : ''));
         $data = BUtil::remoteHttp("GET", $url);
         $dir = BConfig::i()->get('fs/storage_dir') . '/marketclient/download';
         BUtil::ensureDir($dir);
         if (!is_writable($dir)) {
             return false;
         }
-        $filename = $dir . '/' . $moduleName . '.zip';
 
+        $filename = $dir . '/' . $moduleName . '.zip';
         $reqInfo = BUtil::lastRemoteHttpInfo();
         if (preg_match('#;\s*filename=(.*)$#i', $reqInfo['headers']['content-disposition'], $m)) {
             $filename = $m[1];
@@ -101,6 +99,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'package_zip' => '@'.$packageFilename,
         );
         $response = BUtil::remoteHttp('POST', $url, $data);
+#BDebug::dump($response); exit;
         return BUtil::fromJson($response);
     }
 }
