@@ -16,7 +16,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: all
+                auto_use: [ all ]
                 routing:
                     - [ get, /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
                     - [ any, /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
