@@ -1475,6 +1475,9 @@ class BHTML extends BClass
 
 }
 
+/**
+ * @todo Verify license compatibility and integrate with https://github.com/PHPMailer/PHPMailer
+ */
 class BEmail extends BClass
 {
     static protected $_handlers = array();
@@ -1508,7 +1511,7 @@ class BEmail extends BClass
 
     public function send($data)
     {
-        static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|x-.*)$/';
+        static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|list-unsubscribe|x-.*)$/';
 
         $data = array_change_key_case($data, CASE_LOWER);
 
@@ -2492,6 +2495,10 @@ class BLocale extends BClass
                         foreach ($translations as $word => $tr) {
                             static::addTranslation(array($word,$tr), $module);
                         }
+                        break;
+
+                    case 'po':
+                        //TODO: implement https://github.com/clinisbut/PHP-po-parser
                         break;
                 }
             } else {
