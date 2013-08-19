@@ -19,4 +19,17 @@ class FCom_Core_View_Abstract extends BView
         }
         return $html;
     }
+
+    protected $_validators = array();
+
+    public function validator($formName, $data = null)
+    {
+        if (empty($this->_validators[$formName])) {
+            $this->_validators[$formName] = BValidateViewHelper::i(true, array(
+                'form' => $formName,
+                'data' => $data,
+            ));
+        }
+        return $this->_validators[$formName];
+    }
 }

@@ -6,39 +6,39 @@
             <h1 class="title">{{ "Shipping Address" |_ }}</h1>
         </header>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "First name" |_ }}</label>
+          <label for="address-firstname" class="control-label">{{ "First name" |_ }}</label>
           <div class="controls">
-            <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+            <input type="text" name="firstname" id="address-firstname" value="{{ THIS.get('address').get('firstname') }}" class="required">
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Last name" |_ }}</label>
+          <label for="address-lastname" class="control-label">{{ "Last name" |_ }}</label>
           <div class="controls">
-            <input type="text" name="lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+            <input type="text" name="lastname" id="address-lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "E-mail" |_ }}</label>
+          <label for="address-email" class="control-label">{{ "E-mail" |_ }}</label>
           <div class="controls">
-            <input type="text" name="email" value="{{ THIS.get('address').get('email') }}" class="required">
+            <input type="text" name="email" id="address-email" value="{{ THIS.get('address').get('email') }}" class="required">
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Street 1" |_ }}</label>
+          <label for="address-street1" class="control-label">{{ "Street 1" |_ }}</label>
           <div class="controls">
-            <input type="text" name="street1" value="{{ THIS.get('address').get('street1') }}" class="required">
+            <input type="text" name="street1" id="address-street1" value="{{ THIS.get('address').get('street1') }}" class="required">
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Street 2" |_ }}</label>
+          <label for="address-street2" class="control-label">{{ "Street 2" |_ }}</label>
           <div class="controls">
-            <input type="text" name="street2" value="{{ THIS.get('address').get('street2') }}">
+            <input type="text" name="street2" id="address-street2" value="{{ THIS.get('address').get('street2') }}">
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "City" |_ }}</label>
+          <label for="address-city" class="control-label">{{ "City" |_ }}</label>
           <div class="controls">
-            <input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
+            <input type="text" name="city" id="address-city" value="{{ THIS.get('address').get('city') }}" class="required">
           </div>
         </div>
           {{ THIS.view('geo/embed') | raw }}
@@ -51,9 +51,9 @@
           </script>
         <div class="control-group">
             {% set countries = THIS.get('countries') %}
-          <label for="#" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
+          <label for="address-country" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
           <div class="controls">
-            <select class="geo-country required" name="country" id="country">
+            <select class="geo-country required" name="country" id="address-country">
               <option value="">{{ "Select an option" |_ }}</option>
                 {% for iso, country in countries %}
                 <option value="{{ iso }}">{{ country }}</option>
@@ -62,18 +62,18 @@
           </div>
         </div>
         <div class="control-group">
-            <label for="#" class="control-label">{{ "Region" |_ }}<em class="required">*</em></label>
+            <label for="address-region" class="control-label">{{ "Region" |_ }}<em class="required">*</em></label>
             <div class="controls">
-                <select class="geo-region required" style="display: none" name="region">
+                <select class="geo-region required" style="display: none" name="region" id="address-region">
                     <option value="">{{ "Select an option" |_ }}</option>
                 </select>
-                <input type="text" class="geo-region required" name="region"/>
+                <input type="text" class="geo-region required" name="region" id="address-region"/>
             </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
+          <label for="address-postcode" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
           <div class="controls">
-            <input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
+            <input type="text" name="postcode" id="address-postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
           </div>
         </div>
 
