@@ -842,6 +842,7 @@ class BUtil extends BClass
     * @deprecated by BUtil::bcrypt()
     * @param string $string original text
     * @param string $storedHash fully composed salted hash
+    * @return bool
     */
     public static function validateSaltedHash($string, $storedHash)
     {
@@ -3292,6 +3293,156 @@ class Bcrypt extends BClass
         } while (1);
 
         return $output;
+    }
+}
+
+/**
+ * Class BValidateViewHelper
+ *
+ *
+ */
+class BValidateViewHelper extends BClass
+{
+    protected $_errors = array();
+    protected $_data = array();
+
+    public function __construct($args)
+    {
+        if(!isset($args['form'])){
+            return;
+        }
+        if (isset($args['data'])) {
+            if (is_object($args['data'])) {
+                $args['data'] = $args['data']->as_array();
+            }
+            $this->_data = $args['data'];
+        }
+
+        $sessionHlp = BSession::i();
+        $errors     = $sessionHlp->messages('validator-errors:' . $args['form']);
+        $formData   = $sessionHlp->get('validator-data:' . $args['form']);
+        $sessionHlp->set('validator-data:' . $args['form'], null);
+
+        foreach ($errors as $error) {
+            $field                 = $error['msg']['field'];
+            $error['value']        = !empty($formData[$field]) ? $formData[$field] : null;
+            $this->_errors[$field] = $error['msg'];
+        }
+    }
+
+    public function fieldClass($field)
+    {
+        if (empty($this->_errors[$field]['type'])) {
+            return '';
+        }
+        return $this->_errors[$field]['type'];
+    }
+
+    public function fieldValue($field)
+    {
+        if (empty($this->_errors[$field]['value'])) {
+            return $this->_data[$field];
+        }
+        return $this->_errors[$field]['value'];
+    }
+
+    public function messageClass($field)
+    {
+        if (empty($this->_errors[$field]['type'])) {
+            return '';
+        }
+        return $this->_errors[$field]['type'];
+    }
+
+    public function messageText($field)
+    {
+        if (empty($this->_errors[$field]['message'])) {
+            return '';
+        }
+        return $this->_errors[$field]['message'];
+    }
+}
+
+class BValidate
+{
+    protected $_rules = array(
+        'required' => array(
+            'rules'   => '/^./',
+            'message' => 'Missing field: %s',
+        ),
+        'url'       => array(
+            'rules'   => '/(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?/',
+            'message' => 'Invalid URL',
+        ),
+        'email'     => array(
+            'rules'   => '/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
+            'message' => 'Invalid Email',
+        ),
+        'numeric'   => array(
+            'rules'   => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
+            'message' => 'Invalid number: %s',
+        ),
+        'integer'   => array(
+            'rules'   => '/^[+-][0-9]+$/',
+            'message' => 'Invalid integer: %s',
+        ),
+        'alphanum'  => array(
+            'rules'   => '/^[a-zA-Z0-9 ]+$/',
+            'message' => 'Invalid alphanumeric: %s',
+        ),
+    );
+    protected $_validateErrors = array();
+
+    public function addValidator($name, $rule)
+    {
+        $this->_rules[$name] = $rule;
+        return $this;
+    }
+
+    protected function _expandRule($rule)
+    {
+        $rules = array();
+        foreach ($rule as $r) {
+            // todo finish this
+            $rules += $this->_expandRule($r);
+        }
+        return $rules;
+    }
+
+    protected function _validateRule($data, $rule)
+    {
+        $errors = array();
+        $rules  = $this->_expandRule($rule);
+        foreach ($rules as $k => $r) {
+            if (preg_match('#^\[(.*)\]$#', $r, $m)) {
+            // todo finish this
+                $result = BUtil::call($m[1], $data);
+            } elseif (preg_match('#^/(.*)/[a-zA-Z]+$#', $r, $m)) {
+                $result = preg_match($m[0], $k);
+            }
+
+        }
+        return $errors;
+    }
+
+    public function validateInput($data, $fieldRules, $formName = null)
+    {
+        $errors = array();
+        foreach ($fieldRules as $field => $fieldRule) {
+            $errors += $this->_validateRule($data, $field, $fieldRule);
+        }
+        if ($errors && $formName) {
+            BSession::i()->set('validator-data:' . $formName, $data);
+            foreach ($errors as $error) {
+                BSession::i()->addMessage($error, $error['type'], 'validator-errors:' . $formName);
+            }
+        }
+        return $errors ? false : true;
+    }
+
+    public function validateErrors()
+    {
+        return $this->_validateErrors;
     }
 }
 
