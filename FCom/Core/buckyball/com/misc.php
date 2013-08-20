@@ -3391,7 +3391,7 @@ class BValidate extends BClass
 
             if (!$result) {
                 $this->_validateErrors[$r['field']][] = BUtil::injectVars($r['message'], $r['args']);
-                if (!empty($r['break'])) {
+                if (!empty($r['args']['break'])) {
                     break;
                 }
             }
