@@ -3303,6 +3303,136 @@ class Bcrypt extends BClass
     }
 }
 
+class BValidate extends BClass
+{
+    protected $_reRegex = '#^([/\#~&,%])(.*)(\1)[imsxADSUXJu]*$#';
+    protected $_defaultRules = array(
+        'required' => array(
+            'rule'    => 'BValidate::ruleRequired',
+            'message' => 'Missing field: :label',
+        ),
+        'url'       => array(
+            'rule'    => '#(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(\#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?#',
+            'message' => 'Invalid URL',
+        ),
+        'email'     => array(
+            'rule'    => '/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
+            'message' => 'Invalid Email',
+        ),
+        'numeric'   => array(
+            'rule'    => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
+            'message' => 'Invalid number: :label',
+        ),
+        'integer'   => array(
+            'rule'    => '/^[+-][0-9]+$/',
+            'message' => 'Invalid integer: :label',
+        ),
+        'alphanum'  => array(
+            'rule'    => '/^[a-zA-Z0-9 ]+$/',
+            'message' => 'Invalid alphanumeric: :label',
+        ),
+        'password_confirm' => array(
+            'rule'    => 'BValidate::rulePasswordConfirm',
+            'message' => 'Password confirmation does not match',
+            'args'    => array('original' => 'password'),
+        ),
+    );
+
+    protected $_expandedRules = array();
+    
+    protected $_validateErrors = array();
+
+    public function addValidator($name, $rule)
+    {
+        $this->_defaultRules[$name] = $rule;
+        return $this;
+    }
+
+    protected function _expandRules($rules)
+    {
+        $this->_expandedRules = array();
+        foreach ($rules as $rule) {
+            if (!empty($rule[0]) && !empty($rule[1])) {
+                $r = $rule;
+                $rule = array('field' => $r[0], 'rule' => $r[1]);
+                if (isset($r[2])) $rule['message'] = $r[2];
+                if (isset($r[3])) $rule['args'] = $r[3];
+                if (isset($rule['args']) && is_string($rule['args'])) {
+                    $rule['args'] = array($rule['args'] => true);
+                }
+            }
+            if (is_string($rule['rule']) && $rule['rule'][0] === '@') {
+                $ruleName = substr($rule['rule'], 1);
+                if (empty($this->_defaultRules[$ruleName])) {
+                    throw new BException('Invalid rule name: ' . $ruleName);
+                }
+                $defRule = $this->_defaultRules[$ruleName];
+                $rule = BUtil::arrayMerge($defRule, $rule);
+                $rule['rule'] = $defRule['rule'];
+            }
+
+            $this->_expandedRules[] = $rule;
+        }
+    }
+
+    protected function _validateRules($data)
+    {
+        $this->_validateErrors = array();
+        foreach ($this->_expandedRules as $r) {
+            $args = !empty($r['args']) ? $r['args'] : array();
+            $r['args']['field'] = $r['field']; // for callback and message vars
+            if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
+                $result = !empty($data[$r['field']]) && preg_match($m[0], $data[$r['field']]);
+            } elseif (is_callable($r['rule'])) {
+                $result = BUtil::call($r['rule'], array($data, $r['args']), true);
+            } else {
+                throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+            }
+
+            if (!$result) {
+                $this->_validateErrors[$r['field']][] = BUtil::injectVars($r['message'], $r['args']);
+                if (!empty($r['break'])) {
+                    break;
+                }
+            }
+        }
+    }
+
+    public function validateInput($data, $rules, $formName = null)
+    {
+        $this->_expandRules($rules);
+
+        $this->_validateRules($data);
+
+        if ($this->_validateErrors && $formName) {
+            BSession::i()->set('validator-data:' . $formName, $data);
+            foreach ($this->_validateErrors as $field => $errors) {
+                foreach ($errors as $error) {
+                    $msg = compact('error', 'field');
+                    BSession::i()->addMessage($msg, 'error', 'validator-errors:' . $formName);
+                }
+            }
+        }
+        return $this->_validateErrors ? false : true;
+    }
+
+    public function validateErrors()
+    {
+        return $this->_validateErrors;
+    }
+
+    static public function ruleRequired($data, $args) 
+    { 
+        return !empty($data[$args['field']]); 
+    }
+
+    static public function rulePasswordConfirm($data, $args) 
+    {
+        return empty($data[$args['original']]) 
+            || !empty($data[$args['field']]) && $data[$args['field']] === $data[$args['original']];
+    }
+}
+
 /**
  * Class BValidateViewHelper
  *
@@ -3333,7 +3463,7 @@ class BValidateViewHelper extends BClass
         foreach ($errors as $error) {
             $field                 = $error['msg']['field'];
             $error['value']        = !empty($formData[$field]) ? $formData[$field] : null;
-            $this->_errors[$field] = $error['msg'];
+            $this->_errors[$field] = $error;
         }
     }
 
@@ -3348,7 +3478,7 @@ class BValidateViewHelper extends BClass
     public function fieldValue($field)
     {
         if (empty($this->_errors[$field]['value'])) {
-            return $this->_data[$field];
+            return !empty($this->_data[$field]) ? $this->_data[$field] : null;
         }
         return $this->_errors[$field]['value'];
     }
@@ -3363,93 +3493,10 @@ class BValidateViewHelper extends BClass
 
     public function messageText($field)
     {
-        if (empty($this->_errors[$field]['message'])) {
+        if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->_errors[$field]['message'];
-    }
-}
-
-class BValidate
-{
-    protected $_rules = array(
-        'required' => array(
-            'rules'   => '/^./',
-            'message' => 'Missing field: %s',
-        ),
-        'url'       => array(
-            'rules'   => '/(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?/',
-            'message' => 'Invalid URL',
-        ),
-        'email'     => array(
-            'rules'   => '/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
-            'message' => 'Invalid Email',
-        ),
-        'numeric'   => array(
-            'rules'   => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
-            'message' => 'Invalid number: %s',
-        ),
-        'integer'   => array(
-            'rules'   => '/^[+-][0-9]+$/',
-            'message' => 'Invalid integer: %s',
-        ),
-        'alphanum'  => array(
-            'rules'   => '/^[a-zA-Z0-9 ]+$/',
-            'message' => 'Invalid alphanumeric: %s',
-        ),
-    );
-    protected $_validateErrors = array();
-
-    public function addValidator($name, $rule)
-    {
-        $this->_rules[$name] = $rule;
-        return $this;
-    }
-
-    protected function _expandRule($rule)
-    {
-        $rules = array();
-        foreach ($rule as $r) {
-            // todo finish this
-            $rules += $this->_expandRule($r);
-        }
-        return $rules;
-    }
-
-    protected function _validateRule($data, $rule)
-    {
-        $errors = array();
-        $rules  = $this->_expandRule($rule);
-        foreach ($rules as $k => $r) {
-            if (preg_match('#^\[(.*)\]$#', $r, $m)) {
-            // todo finish this
-                $result = BUtil::call($m[1], $data);
-            } elseif (preg_match('#^/(.*)/[a-zA-Z]+$#', $r, $m)) {
-                $result = preg_match($m[0], $k);
-            }
-
-        }
-        return $errors;
-    }
-
-    public function validateInput($data, $fieldRules, $formName = null)
-    {
-        $errors = array();
-        foreach ($fieldRules as $field => $fieldRule) {
-            $errors += $this->_validateRule($data, $field, $fieldRule);
-        }
-        if ($errors && $formName) {
-            BSession::i()->set('validator-data:' . $formName, $data);
-            foreach ($errors as $error) {
-                BSession::i()->addMessage($error, $error['type'], 'validator-errors:' . $formName);
-            }
-        }
-        return $errors ? false : true;
-    }
-
-    public function validateErrors()
-    {
-        return $this->_validateErrors;
+        return $this->_errors[$field]['msg']['error'];
     }
 }
 
