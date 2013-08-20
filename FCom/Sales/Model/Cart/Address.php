@@ -31,7 +31,7 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
-    protected $validationRules = array(
+    protected $_validationRules = array(
         array('firstname', '@required'),
         array('firstname', '@alphanum'),
         array('lastname', '@required'),
