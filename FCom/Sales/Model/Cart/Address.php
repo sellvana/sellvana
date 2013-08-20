@@ -50,15 +50,16 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
      * Very basic validation for presence of required fields
      * @todo add element validators
      * @param array $data
+     * @param array $rules
      * @return bool
      */
-    public function validate($data)
+    public function validate($data, $rules = array())
     {
-        $rules = $this->validationRules;
-        BEvents::i()->fire(__CLASS__."validateBefore", array("rules" => &$rules, "data" => &$data));
+        $rules = array_merge($this->validationRules, $rules);
+        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
         $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
         if (!$valid) {
-            BEvents::i()->fire(__CLASS__."validation_failed", array("rules" => &$rules, "data" => &$data));
+            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
         }
 
         return $valid;
