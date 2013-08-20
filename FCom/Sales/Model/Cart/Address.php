@@ -31,45 +31,34 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
+    protected $validationRules = array(
+        array('firstname', '@required'),
+        array('firstname', '@alphanum'),
+        array('lastname', '@required'),
+        array('lastname', '@alphanum'),
+        array('email', '@required'),
+        array('email', '@email'),
+        array("street1", '@required', "Missing required field"),
+        array("city", '@required'),
+        array("country", '@required'),
+        array("region", '@required'),
+        array("postcode", '@required'),
+    );
+
     /**
      * Validate provided address data
      * Very basic validation for presence of required fields
      * @todo add element validators
      * @param array $data
-     * @param bool  $breakOnFail
      * @return bool
      */
-    public function validate($data, $breakOnFail = true)
+    public function validate($data)
     {
-        $valid  = true;
-        $failed = array();
-
-        BEvents::i()->fire(__CLASS__."validate", array("failed" => &$failed, 'valid' => &$valid));
-        $required = BConfig::i()->get("modules/FCom_Sales/required_address_fields");
-        if(!$required){
-            $required = array(
-                "firstname",
-                "lastname",
-                "email",
-                "street1",
-                "city",
-                "country",
-                "region",
-                "postcode"
-            );
-        }
-
-        foreach ($required as $field) {
-            if (!isset($data[$field]) || empty($data[$field])) {
-                if($breakOnFail){
-                    return false;
-                }
-                $valid = false;
-                $failed['required'][] = $field;
-            }
-        }
+        $rules = $this->validationRules;
+        BEvents::i()->fire(__CLASS__."validateBefore", array("rules" => &$rules, "data" => &$data));
+        $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
         if (!$valid) {
-            BEvents::i()->fire(__CLASS__."validation_failed", array("failed" => $failed));
+            BEvents::i()->fire(__CLASS__."validation_failed", array("rules" => &$rules, "data" => &$data));
         }
 
         return $valid;
