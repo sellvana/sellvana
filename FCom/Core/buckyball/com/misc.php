@@ -3360,7 +3360,7 @@ class BValidate extends BClass
             if (!empty($rule[0]) && !empty($rule[1])) {
                 $r = $rule;
                 $rule = array('field' => $r[0], 'rule' => $r[1]);
-                $rule['message'] = isset($r[2]) ? $r[2] : $this->_defaultMessage;
+                if (isset($r[2])) $rule['message'] = $r[2];
                 if (isset($r[3])) $rule['args'] = $r[3];
                 if (isset($rule['args']) && is_string($rule['args'])) {
                     $rule['args'] = array($rule['args'] => true);
@@ -3375,7 +3375,7 @@ class BValidate extends BClass
                 $rule = BUtil::arrayMerge($defRule, $rule);
                 $rule['rule'] = $defRule['rule'];
             }
-
+            if(empty($rule['message'])) $rule['message'] = $this->_defaultMessage
             $this->_expandedRules[] = $rule;
         }
     }
