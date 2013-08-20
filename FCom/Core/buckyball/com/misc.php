@@ -3309,7 +3309,7 @@ class BValidate extends BClass
     protected $_defaultRules = array(
         'required' => array(
             'rule'    => 'BValidate::ruleRequired',
-            'message' => 'Missing field: :label',
+            'message' => 'Missing field: :field',
         ),
         'url'       => array(
             'rule'    => '#(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(\#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?#',
@@ -3321,15 +3321,15 @@ class BValidate extends BClass
         ),
         'numeric'   => array(
             'rule'    => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
-            'message' => 'Invalid number: :label',
+            'message' => 'Invalid number: :field',
         ),
         'integer'   => array(
             'rule'    => '/^[+-][0-9]+$/',
-            'message' => 'Invalid integer: :label',
+            'message' => 'Invalid integer: :field',
         ),
         'alphanum'  => array(
             'rule'    => '/^[a-zA-Z0-9 ]+$/',
-            'message' => 'Invalid alphanumeric: :label',
+            'message' => 'Invalid alphanumeric: :field',
         ),
         'password_confirm' => array(
             'rule'    => 'BValidate::rulePasswordConfirm',
@@ -3382,7 +3382,7 @@ class BValidate extends BClass
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
-                $result = !empty($data[$r['field']]) && preg_match($m[0], $data[$r['field']]);
+                $result = empty($data[$r['field']]) || preg_match($m[0], $data[$r['field']]);
             } elseif (is_callable($r['rule'])) {
                 $result = BUtil::call($r['rule'], array($data, $r['args']), true);
             } else {
