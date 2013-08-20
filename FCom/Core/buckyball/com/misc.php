@@ -3331,6 +3331,10 @@ class BValidate extends BClass
             'rule'    => '/^[a-zA-Z0-9 ]+$/',
             'message' => 'Invalid alphanumeric: :field',
         ),
+        'alpha'  => array(
+            'rule'    => '/^[a-zA-Z ]+$/',
+            'message' => 'Invalid alphabet field: :field',
+        ),
         'password_confirm' => array(
             'rule'    => 'BValidate::rulePasswordConfirm',
             'message' => 'Password confirmation does not match',
@@ -3338,8 +3342,9 @@ class BValidate extends BClass
         ),
     );
 
+    protected $_defaultMessage = "Validation failed for: :field";
     protected $_expandedRules = array();
-    
+
     protected $_validateErrors = array();
 
     public function addValidator($name, $rule)
@@ -3355,7 +3360,7 @@ class BValidate extends BClass
             if (!empty($rule[0]) && !empty($rule[1])) {
                 $r = $rule;
                 $rule = array('field' => $r[0], 'rule' => $r[1]);
-                if (isset($r[2])) $rule['message'] = $r[2];
+                $rule['message'] = isset($r[2]) ? $r[2] : $this->_defaultMessage;
                 if (isset($r[3])) $rule['args'] = $r[3];
                 if (isset($rule['args']) && is_string($rule['args'])) {
                     $rule['args'] = array($rule['args'] => true);
@@ -3383,6 +3388,8 @@ class BValidate extends BClass
             $r['args']['field'] = $r['field']; // for callback and message vars
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
                 $result = empty($data[$r['field']]) || preg_match($m[0], $data[$r['field']]);
+            } elseif($r['rule'] instanceof Closure){
+                $result = $r['rule']($data, $r['args']);
             } elseif (is_callable($r['rule'])) {
                 $result = BUtil::call($r['rule'], array($data, $r['args']), true);
             } else {
@@ -3398,6 +3405,46 @@ class BValidate extends BClass
         }
     }
 
+    /**
+     * Validate passed data
+     *
+     * $data is an array of key value pairs.
+     * Keys will be matched against rules.
+     * <code>
+     * // data
+     * array (
+     *  'firstname' => 'John',
+     *  'lastname' => 'Doe',
+     *  'email' => 'test@example.com',
+     *  'url' => 'http://example.com/test?foo=bar#baz',
+     *  'password' => '12345678',
+     *  'password_confirm' => '12345678',
+     * );
+     *
+     * // rules in format: ['field', 'rule', ['message'], [ 'break' | 'arg1' => 'val1' ] ]
+     * $rules = array(
+     *   array('email', '@required'),
+     *   array('email', '@email'),
+     *   array('url', '@url'),
+     *   array('firstname', '@required', 'Missing First Name'),
+     *   array('firstname', '/^[A-Za-z]+$/', 'Invalid First Name', 'break'),
+     *   array('password', '@required', 'Missing Password'),
+     *   array('password_confirm', '@password_confirm'),
+     * );
+     * </code>
+     *
+     * Rule can be either string that resolves to callback or regular expression.
+     * Allowed pattern delimiters for regular expression are: /\#~&,%
+     * Allowed regular expression modifiers are: i m s x A D S U X J u
+     * e and E modifiers are NOT allowed. Any exptression using them will not work.
+     *
+     * Callbacks can be either: Class::method for static method call or Class.method | Class->method for instance call
+     *
+     * @param array $data
+     * @param array $rules
+     * @param null  $formName
+     * @return bool
+     */
     public function validateInput($data, $rules, $formName = null)
     {
         $this->_expandRules($rules);
@@ -3421,14 +3468,14 @@ class BValidate extends BClass
         return $this->_validateErrors;
     }
 
-    static public function ruleRequired($data, $args) 
-    { 
-        return !empty($data[$args['field']]); 
+    static public function ruleRequired($data, $args)
+    {
+        return !empty($data[$args['field']]);
     }
 
-    static public function rulePasswordConfirm($data, $args) 
+    static public function rulePasswordConfirm($data, $args)
     {
-        return empty($data[$args['original']]) 
+        return empty($data[$args['original']])
             || !empty($data[$args['field']]) && $data[$args['field']] === $data[$args['original']];
     }
 }
