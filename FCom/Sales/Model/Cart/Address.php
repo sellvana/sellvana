@@ -38,7 +38,7 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         array('lastname', '@alphanum'),
         array('email', '@required'),
         array('email', '@email'),
-        array("street1", '@required', "Missing required field"),
+        array("street1", '@required'),
         array("city", '@required'),
         array("country", '@required'),
         array("region", '@required'),
@@ -55,7 +55,7 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
      */
     public function validate($data, $rules = array())
     {
-        $rules = array_merge($this->validationRules, $rules);
+        $rules = array_merge($this->_validationRules, $rules);
         BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
         $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
         if (!$valid) {

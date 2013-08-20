@@ -39,6 +39,10 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
         }
 
+        if($r = BSession::i()->get('address-form-data')){
+            $address->set($r);
+        }
+
         //$address->save();
         //$address = FCom_Sales_Model_Cart_Address::i()->load($address->id());
         if ('shipping' == $address->atype) {
@@ -87,10 +91,12 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
         }
         if(!$address->validate($r)) {
-            // todo add notification that something is wrong
+            BSession::i()->set("address-form-data", $r);
             BResponse::i()->redirect(BApp::href("checkout/address?t=". $atype));
         }
+
         if ($address) {
+            BSession::i()->set('address-form-data', null);
             $address->set($r);
             $address->atype = $addressType;
             $address->cart_id = $cart->id();
