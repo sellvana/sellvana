@@ -1624,6 +1624,13 @@ class BModel extends Model
     protected $_newRecord;
 
     /**
+     * Rules for model data validation using BValidate
+     * 
+     * @var array
+     */
+    protected $_validationRules = array();
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -2412,6 +2419,26 @@ class BModel extends Model
             return $options[$key];
         }
         return $options;
+    }
+
+    /**
+     * Validate provided address data
+     * Very basic validation for presence of required fields
+     * @todo add element validators
+     * @param array $data
+     * @param array $rules
+     * @return bool
+     */
+    public function validate($data, $rules = array())
+    {
+        $rules = array_merge($this->_validationRules, $rules);
+        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
+        $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
+        if (!$valid) {
+            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
+        }
+
+        return $valid;
     }
 
     public function __call($name, $args)
