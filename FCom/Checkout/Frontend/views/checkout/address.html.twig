@@ -1,4 +1,5 @@
 {% set validator = THIS.validator('address-form', THIS.get('address')) %}
+
 <form action="{{ APP.href('checkout/address') }}" method="post" class="address-form" id="address-form">
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
@@ -10,78 +11,64 @@
           <label for="address-firstname" class="control-label">{{ "First name" |_ }}</label>
           <div class="controls">
             <input type="text" name="firstname" id="address-firstname" value="{{ validator.fieldValue('firstname') }}" class="required{{ ' ' ~ validator.fieldClass('firstname') }}">
-              {% if validator.messageClass('firstname') %}
-              <label for="address-firstname" class="{{ validator.messageClass('firstname') }}">{{ validator.messageText('firstname') }}</label>
-              {% endif %}
+            {{ validator.errorHtml("firstname", "address-firstname") | raw }}
           </div>
         </div>
         <div class="control-group">
           <label for="address-lastname" class="control-label">{{ "Last name" |_ }}</label>
           <div class="controls">
             <input type="text" name="lastname" id="address-lastname" value="{{ validator.fieldValue('lastname') }}" class="required{{ ' ' ~ validator.fieldClass('lastname') }}">
-              {% if validator.messageClass('lastname') %}
-              <label for="address-firstname" class="{{ validator.messageClass('lastname') }}">{{ validator.messageText('lastname') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("lastname", "address-lastname") | raw }}
           </div>
         </div>
         <div class="control-group">
           <label for="address-email" class="control-label">{{ "E-mail" |_ }}</label>
           <div class="controls">
             <input type="text" name="email" id="address-email" value="{{ validator.fieldValue('email') }}" class="required{{ ' ' ~ validator.fieldClass('email') }}">
-              {% if validator.messageClass('email') %}
-              <label for="address-firstname" class="{{ validator.messageClass('email') }}">{{ validator.messageText('email') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("email", "address-email") | raw }}
           </div>
         </div>
         <div class="control-group">
           <label for="address-street1" class="control-label">{{ "Street 1" |_ }}</label>
           <div class="controls">
             <input type="text" name="street1" id="address-street1" value="{{ validator.fieldValue('street1') }}" class="required{{ ' ' ~ validator.fieldClass('street1') }}">
-              {% if validator.messageClass('street1') %}
-              <label for="address-firstname" class="{{ validator.messageClass('street1') }}">{{ validator.messageText('street1') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("street1", "address-street1") | raw }}
           </div>
         </div>
         <div class="control-group">
           <label for="address-street2" class="control-label">{{ "Street 2" |_ }}</label>
           <div class="controls">
             <input type="text" name="street2" id="address-street2" value="{{ validator.fieldValue('street2') }}" class="{{ ' ' ~ validator.fieldClass('street2') }}">
-              {% if validator.messageClass('street2') %}
-              <label for="address-firstname" class="{{ validator.messageClass('street2') }}">{{ validator.messageText('street2') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("street2", "address-street2") | raw }}
           </div>
         </div>
         <div class="control-group">
           <label for="address-city" class="control-label">{{ "City" |_ }}</label>
           <div class="controls">
             <input type="text" name="city" id="address-city" value="{{ validator.fieldValue('city') }}" class="required{{ ' ' ~ validator.fieldClass('city') }}">
-              {% if validator.messageClass('city') %}
-              <label for="address-firstname" class="{{ validator.messageClass('city') }}">{{ validator.messageText('city') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("city", "address-city") | raw }}
           </div>
         </div>
           {{ THIS.view('geo/embed') | raw }}
           <script>
               require(['jquery'], function($) {
                   $(function() {
-                      $('.geo-country').geoCountryRegion({country:'{{ THIS.get('address').get('country') }}', region:'{{ THIS.get('address').get('region') }}'});
+                      $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue('country') }}', region:'{{ validator.fieldValue('region') }}'});
                   })
               })
           </script>
         <div class="control-group">
-            {% set countries = THIS.get('countries') %}
           <label for="address-country" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
           <div class="controls">
-              {% set defC = validator.fieldValue('country') %}
+            {% set countries = THIS.get('countries') %}
+            {% set defC = validator.fieldValue('country') %}
             <select class="geo-country required{{ ' ' ~ validator.fieldClass('country') }}" name="country" id="address-country">
               <option value="">{{ "Select an option" |_ }}</option>
                 {% for iso, country in countries %}
                 <option value="{{ iso }}" {{ defC == iso ? "selected" }}>{{ country }}</option>
                 {% endfor %}
             </select>
-              {% if validator.messageClass('country') %}
-              <label for="address-firstname" class="{{ validator.messageClass('country') }}">{{ validator.messageText('country') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("country", "address-country") | raw }}
           </div>
         </div>
         <div class="control-group">
@@ -91,24 +78,20 @@
                     <option value="">{{ "Select an option" |_ }}</option>
                 </select>
                 <input type="text" class="geo-region required{{ ' ' ~ validator.fieldClass('region') }}" name="region" id="address-region" value="{{ validator.fieldValue('region') }}"/>
-                {% if validator.messageClass('region') %}
-                <label for="address-firstname" class="{{ validator.messageClass('region') }}">{{ validator.messageText('region') }}</label>
-                {% endif %}
+                {{ validator.errorHtml("region", "address-region") | raw }}
             </div>
         </div>
         <div class="control-group">
           <label for="address-postcode" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
           <div class="controls">
             <input type="text" name="postcode" id="address-postcode" value="{{ validator.fieldValue('postcode') }}" class="required{{ ' ' ~ validator.fieldClass('postcode') }}">
-              {% if validator.messageClass('postcode') %}
-              <label for="address-firstname" class="{{ validator.messageClass('postcode') }}">{{ validator.messageText('postcode') }}</label>
-              {% endif %}
+              {{ validator.errorHtml("postcode", "address-postcode") | raw }}
           </div>
         </div>
 
         {% if 's' == THIS.get('address_type') %}
         <label for="address_equal" class="checkbox">
-          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
+          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ validator.fieldValue('address_equal') ? 'checked' : '' }}>
                 {{ "Billing address is same as shipping" |_ }}
         </label>
         {% endif %}
