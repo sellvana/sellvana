@@ -1,0 +1,43 @@
+<h2>{{"Orders" | _ }} #{{ THIS.get('order').get('id') }}</h2>
+
+<a href="{{ APP.href('customer/order') }}">{{"Back" | _ }}</a>
+
+<table class="table">
+    <tr>
+        <th width="200px;">{{"Shipping method" | _ }}</th>
+        <td class="text-center">{{ THIS.get('order').get('shipping_method') }} </td>
+    </tr>
+    <tr>
+        <th width="200px;">{{"Payment method" | _ }}</th>
+        <td class="text-center">{{ THIS.get('order').get('payment_method') }} </td>
+    </tr>
+    <tr>
+        <th width="200px;">{{"Status" | _ }}</th>
+        <td class="text-center">{{ THIS.get('order').get('status') }} </td>
+    </tr>
+    <tr>
+        <th width="200px;">{{"Balance" | _ }}</th>
+        <td class="text-center">{{ THIS.get('order').get('balance') }} </td>
+    </tr>
+</table>
+
+
+{% if THIS.get('orderItems') %}
+<h2>{{"Order items" | _ }}</h2>
+    <table class="table">
+        <tr>
+            <th width="50px;">ID</th>
+            <th width="200px;">{{"Info" | _ }}</th>
+            <th width="200px;">{{"Qty" | _ }}</th>
+            <th width="200px;">{{"Total" | _ }}</th>
+        </tr>
+    {% for item in THIS.get('orderItems') %}
+        <tr>
+            <td class="text-center">{{ item.get('id') }}</td>
+            <td class="text-center">{{ THIS.view('customer/order/item').set('product', APP.instance('BUtil').fromJson(item.get('product_info'))) | raw}} </td>
+            <td class="text-center">{{ item.get('qty') }} </td>
+            <td class="text-center">{{ item.get('total') }} </td>
+        </tr>
+    {% endfor  %}
+    </table>
+{% endif %}

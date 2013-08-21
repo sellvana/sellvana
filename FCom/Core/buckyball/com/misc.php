@@ -3433,7 +3433,7 @@ class BValidate extends BClass
      * );
      * </code>
      *
-     * Rule can be either string that resolves to callback or regular expression.
+     * Rule can be either string that resolves to callback, regular expression or closure.
      * Allowed pattern delimiters for regular expression are: /\#~&,%
      * Allowed regular expression modifiers are: i m s x A D S U X J u
      * e and E modifiers are NOT allowed. Any exptression using them will not work.
@@ -3505,6 +3505,7 @@ class BValidateViewHelper extends BClass
         $sessionHlp = BSession::i();
         $errors     = $sessionHlp->messages('validator-errors:' . $args['form']);
         $formData   = $sessionHlp->get('validator-data:' . $args['form']);
+        $this->_data = BUtil::arrayMerge($this->_data, $formData);
         $sessionHlp->set('validator-data:' . $args['form'], null);
 
         foreach ($errors as $error) {
@@ -3524,10 +3525,7 @@ class BValidateViewHelper extends BClass
 
     public function fieldValue($field)
     {
-        if (empty($this->_errors[$field]['value'])) {
-            return !empty($this->_data[$field]) ? $this->_data[$field] : null;
-        }
-        return $this->_errors[$field]['value'];
+        return !empty($this->_data[$field]) ? $this->_data[$field] : null;
     }
 
     public function messageClass($field)
@@ -3543,7 +3541,23 @@ class BValidateViewHelper extends BClass
         if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->_errors[$field]['msg']['error'];
+        return BLocale::_($this->_errors[$field]['msg']['error']);
+    }
+
+    /**
+     * @param string $field form field name
+     * @param string $fieldId form field ID
+     * @return string
+     */
+    public function errorHtml($field, $fieldId)
+    {
+        $html = '';
+
+        if(!empty($this->_errors[$field]['type'])){
+            $html .= BUtil::tagHtml('label', array('for' => $fieldId, 'class' => $this->messageClass($field)),$this->messageText($field));
+        }
+
+        return $html;
     }
 }
 
