@@ -20,3 +20,8 @@ modules:
                 routing:
                     - [ get, /, FCom_Cron_Controller.run ]
                     - [ get, /*task, FCom_Cron_Controller.run ]
+                observe:
+                    - [ BModuleRegistry::bootstrap:after, FCom_Cron_Main::onBootstrapAfter ]
+
+        #crontab:
+            #- [ * * * * *, FCom_Cron_Main::callback ]
