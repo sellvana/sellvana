@@ -1625,7 +1625,7 @@ class BModel extends Model
 
     /**
      * Rules for model data validation using BValidate
-     * 
+     *
      * @var array
      */
     protected $_validationRules = array();
@@ -2422,9 +2422,14 @@ class BModel extends Model
     }
 
     /**
-     * Validate provided address data
-     * Very basic validation for presence of required fields
-     * @todo add element validators
+     * Model validation
+     *
+     * Validate provided data using model rules and parameter rules.
+     * Parameter rules will be merged with model rules and can override them.
+     * Event will be fired prior validation which will enable adding of rules or editing data
+     * Event will be fired if validation fails.
+     *
+     * @see BValidate::validateInput()
      * @param array $data
      * @param array $rules
      * @return bool
