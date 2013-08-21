@@ -44,24 +44,4 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         array("region", '@required'),
         array("postcode", '@required'),
     );
-
-    /**
-     * Validate provided address data
-     * Very basic validation for presence of required fields
-     * @todo add element validators
-     * @param array $data
-     * @param array $rules
-     * @return bool
-     */
-    public function validate($data, $rules = array())
-    {
-        $rules = array_merge($this->_validationRules, $rules);
-        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
-        $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
-        if (!$valid) {
-            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
-        }
-
-        return $valid;
-    }
 }
