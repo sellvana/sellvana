@@ -3505,6 +3505,7 @@ class BValidateViewHelper extends BClass
         $sessionHlp = BSession::i();
         $errors     = $sessionHlp->messages('validator-errors:' . $args['form']);
         $formData   = $sessionHlp->get('validator-data:' . $args['form']);
+        $this->_data = BUtil::arrayMerge($this->_data, $formData);
         $sessionHlp->set('validator-data:' . $args['form'], null);
 
         foreach ($errors as $error) {
@@ -3524,10 +3525,7 @@ class BValidateViewHelper extends BClass
 
     public function fieldValue($field)
     {
-        if (empty($this->_errors[$field]['value'])) {
-            return !empty($this->_data[$field]) ? $this->_data[$field] : null;
-        }
-        return $this->_errors[$field]['value'];
+        return !empty($this->_data[$field]) ? $this->_data[$field] : null;
     }
 
     public function messageClass($field)
