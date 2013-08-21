@@ -38,6 +38,19 @@ class FCom_Cron_Main extends BClass
         return $this;
     }
 
+    static public function onBootstrapAfter()
+    {
+        $modules = BModuleRegistry::i()->getAllModules();
+        $hlp = static::i();
+        foreach ($modules as $modName => $mod) {
+            if ($mod->crontab) {
+                foreach ($mod->crontab as $task) {
+                    $hlp->task($task[0], $task[1], !empty($task[2]) ? $task[2] : array());
+                }
+            }
+        }
+    }
+
     public function run($handles=null, $force=false)
     {
         // get associated array of task handles, if specified
