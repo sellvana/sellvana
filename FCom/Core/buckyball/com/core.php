@@ -558,7 +558,7 @@ class BConfig extends BClass
 
                 // Additional check for allowed tokens
 
-                if ($this->invalidManifestPHP($contents)) {
+                if ($this->isInvalidManifestPHP($contents)) {
                     throw new BException('Invalid tokens in configuration found');
                 }
 
@@ -594,7 +594,7 @@ class BConfig extends BClass
         $this->_config = array();
     }
 
-    public function invalidManifestPHP($contents)
+    public function isInvalidManifestPHP($contents)
     {
         $tokens = token_get_all($contents);
         $allowed = array(T_OPEN_TAG=>1, T_RETURN=>1, T_WHITESPACE=>1, T_COMMENT=>1,
