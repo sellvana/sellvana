@@ -3541,7 +3541,23 @@ class BValidateViewHelper extends BClass
         if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->_errors[$field]['msg']['error'];
+        return BLocale::_($this->_errors[$field]['msg']['error']);
+    }
+
+    /**
+     * @param string $field form field name
+     * @param string $fieldId form field ID
+     * @return string
+     */
+    public function errorHtml($field, $fieldId)
+    {
+        $html = '';
+
+        if(!empty($this->_errors[$field]['type'])){
+            $html .= BUtil::tagHtml('label', array('for' => $fieldId, 'class' => $this->messageClass($field)),$this->messageText($field));
+        }
+
+        return $html;
     }
 }
 
