@@ -3433,7 +3433,7 @@ class BValidate extends BClass
      * );
      * </code>
      *
-     * Rule can be either string that resolves to callback or regular expression.
+     * Rule can be either string that resolves to callback, regular expression or closure.
      * Allowed pattern delimiters for regular expression are: /\#~&,%
      * Allowed regular expression modifiers are: i m s x A D S U X J u
      * e and E modifiers are NOT allowed. Any exptression using them will not work.
