@@ -639,6 +639,7 @@ class BModule extends BClass
     public $override;
     public $default_config;
     public $autoload;
+    public $crontab;
 
     const
         // run_level

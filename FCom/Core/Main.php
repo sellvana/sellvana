@@ -295,11 +295,6 @@ class FCom_Core_Main extends BClass
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
         }
-        //TODO: Temporary, remove after we're certain that everyone is migrated
-        if (file_exists($configDir.'/local.yml')) {
-            BConfig::i(true)->addFile('local.yml', true)->writeFile('local.php');
-            unlink($configDir.'/local.yml');
-        }
         if (file_exists($configDir.'/local.php')) {
             $config->addFile('local.php', true);
         }
