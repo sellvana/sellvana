@@ -1,0 +1,22 @@
+<h2>{{ "Orders history" | _ }}</h2>
+
+{% if THIS.get('orders') %}
+    <table class="table">
+        <tr>
+            <th width="50px;">{{ "ID" }}</th>
+            <th width="200px;">{{ "Shipping" | _ }}</th>
+            <th width="200px;">{{ "Payment" | _ }}</th>
+            <th width="200px;">{{ "Status" | _ }}</th>
+            <th width="200px;">{{ "Balance" | _ }}</th>
+        </tr>
+    {% for order in THIS.get('orders')  %}
+        <tr>
+            <td align="center"><a href="{{ APP.href('customer/order/view') }}?id={{ order.get('id') }}">{{ order.get('id') }}</a> </td>
+            <td align="center">{{ order.get('shipping_method') }} </td>
+            <td align="center">{{ order.get('payment_method') }} </td>
+            <td align="center">{{ order.get('status') }} </td>
+            <td align="center">{{ order.get('balance') }} </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
