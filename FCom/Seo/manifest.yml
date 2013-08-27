@@ -15,6 +15,7 @@ modules:
                     - [ any, /urlaliases/.action, FCom_Seo_Admin_Controller_UrlAliases ]
 
             FCom_Frontend:
+                auto_use: [ bootstrap ]
                 routing:
                     - [ get, /sitemap, FCom_Seo_Frontend_Controller_Sitemaps.sitemap ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=71453
