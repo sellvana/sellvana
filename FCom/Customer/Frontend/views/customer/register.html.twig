@@ -3,7 +3,7 @@
         <header class="portal-login-header">
             <strong class="logo">{{"Fulleron"|_}}</strong>
         </header>
-        {{ THIS.messagesHtml() }}
+        {{ THIS.messagesHtml() | raw }}
         <!--<div class="msg success-msg">Something went wrong</div>-->
         <form action="{{ APP.href('customer/register') }}" method="post" id="register-form">
             <fieldset>

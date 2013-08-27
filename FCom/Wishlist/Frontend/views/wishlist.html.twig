@@ -26,10 +26,10 @@
                         <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.get('id')}}"></label>
                     </td>
                     <td>
-                        <img src="{{ THIS->q(p.thumbUrl(85, 60)) }}" width="85" height="60" class="product-img" alt="{{ THIS->q(p.get('product_name')) }}"/>
+                        <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.get('product_name') }}"/>
                     </td>
                     <td>
-                        <h3 class="product-name"><a href="{{ THIS->q(p.url(THIS.get('category'))) }}">{{ THIS->q(p.get('product_name')) }}</a></h3>
+                        <h3 class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></h3>
                     </td>
                     <td class="actions last text-left">
                         <div class="price-box">

@@ -5,7 +5,7 @@
                 {{ "Reset Your Password" | _ }}
             </strong>
         </header>
-        {{ THIS.messagesHtml() }}
+        {{ THIS.messagesHtml() | raw }}
         <!--<div class="msg success-msg">Something went wrong</div>-->
         <form action="{{ APP.href('customer/password/reset') }}" method="post" id="reset-form">
             <fieldset>
@@ -22,7 +22,7 @@
                         </div>
                     </div>
               <div class="btn-group">
-                  <input type="hidden" name="token" value="{{ THIS.q(REQUEST.request('token')) }}"/>
+                  <input type="hidden" name="token" value="{{ REQUEST.request('token') }}"/>
                   <input type="submit" class="btn btn-primary" value="{{ "Reset Password" | _ }}"/>
               </div>
             </fieldset>
