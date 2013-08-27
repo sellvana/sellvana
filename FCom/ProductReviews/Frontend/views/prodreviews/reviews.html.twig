@@ -9,11 +9,11 @@
         {% set id = review.get("id") %}
         {% set rating = review.get("id") %}
     <div>
-        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="1" {{ rating == 1 ? 'checked': '' }}/>
-        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="2" {{ rating == 2 ? 'checked': '' }} />
-        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="3" {{ rating == 3 ? 'checked': '' }}/>
-        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="4" {{ rating == 4 ? 'checked': '' }}/>
-        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="5" {{ rating == 5 ? 'checked': '' }}/>
+        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="1" {{ rating == 1 ? 'checked' }}/>
+        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="2" {{ rating == 2 ? 'checked' }} />
+        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="3" {{ rating == 3 ? 'checked' }}/>
+        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="4" {{ rating == 4 ? 'checked' }}/>
+        <input name="review[rating{{ id }}]" type="radio" class="star" disabled="disabled" value="5" {{ rating == 5 ? 'checked' }}/>
         <span style="font-weight: bold; padding-left: 15px;">{{ review.get('title') }}</span>
         {{ review.get('create_at') | date("F d, Y") }}
     <br/>

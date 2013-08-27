@@ -180,7 +180,7 @@ class BModuleRegistry extends BClass
     * @param string $source
     * @return BModuleRegistry
     */
-    public function scan($source)
+    public function scan($source, $validateManifests = false)
     {
         // if $source does not end with .json, assume it is a folder
         if (!preg_match('/\.(json|yml|php)$/', $source)) {
@@ -196,6 +196,11 @@ class BModuleRegistry extends BClass
             $info = pathinfo($file);
             switch ($info['extension']) {
                 case 'php':
+                    if ($validateManifests) {
+                        if (BConfig::i()->isInvalidManifestPHP(file_get_contents($file))) {
+                            throw new BException('Invalid PHP Manifest File');
+                        }
+                    }
                     $manifest = include($file);
                     break;
                 case 'yml':
@@ -207,10 +212,10 @@ class BModuleRegistry extends BClass
 
                     break;
                 default:
-                    BDebug::error(BLocale::_("Unknown manifest file format: %s", $file));
+                    throw new BException(BLocale::_("Unknown manifest file format: %s", $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                BDebug::error(BLocale::_("Invalid or empty manifest file: %s", $file));
+                throw new BException(BLocale::_("Invalid or empty manifest file: %s", $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName=>$params) {

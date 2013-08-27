@@ -677,7 +677,8 @@ class BLayout extends BClass
             $callback = self::$_metaDirectives[$d['type']];
 
             if ($d['type'] === 'remove') {
-                if ($d['name'] === 'all') { //TODO: allow removing specific instructions
+                if ($d['name'] === 'ALL') { //TODO: allow removing specific instructions
+                    BDebug::debug('LAYOUT.REMOVE');
                     $callbacks = array();
                 }
             } else {

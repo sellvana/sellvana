@@ -10,7 +10,25 @@ class FCom_Core_Model_Abstract extends BModel
      * @var string
      */
     static protected $_dataSerializedField = 'data_serialized';
-    static protected $_dataField = 'data_custom';
+
+    /**
+     * Field name for custom data storage
+     *
+     * @var string
+     */
+    static protected $_dataCustomField = 'data_custom';
+
+    /**
+     * Mapping object properties to custom data paths
+     *
+     * array(
+     *      'prop1' => 'custom/data/path', // different property name and data path mapping
+     *      'prop2', // same name mapping
+     * )
+     *
+     * @var array
+     */
+    static protected $_dataFieldsMap = array();
 
     /**
      * Get custom data from serialized field
@@ -25,9 +43,9 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if (is_null($this->get('data'))) {
             $dataJson = $this->get(static::$_dataSerializedField);
-            $this->set(static::$_dataField, $dataJson ? BUtil::fromJson($dataJson) : array());
+            $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : array());
         }
-        $data = $this->get(static::$_dataField);
+        $data = $this->get(static::$_dataCustomField);
         if (is_null($path)) {
             return $data;
         }
@@ -68,15 +86,34 @@ class FCom_Core_Model_Abstract extends BModel
                 $data[$k] = array();
             }
         }
-        $this->set(static::$_dataField, $data);
+        $this->set(static::$_dataCustomField, $data);
         return $this;
+    }
+
+    public function onAfterLoad()
+    {
+        parent::onAfterLoad();
+
+        foreach (static::$_dataFieldsMap as $k => $v) {
+            if (is_numeric($k)) {
+                $k = $v;
+            }
+            $this->set($k, $this->getData($v));
+        }
     }
 
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
 
-        if (($data = $this->get(static::$_dataField))) {
+        foreach (static::$_dataFieldsMap as $k => $v) {
+            if (is_numeric($k)) {
+                $k = $v;
+            }
+            $this->setData($v, $this->get($k));
+        }
+
+        if (($data = $this->get(static::$_dataCustomField))) {
             $this->set(static::$_dataSerializedField, BUtil::toJson($data));
         }
 
