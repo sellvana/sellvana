@@ -91,7 +91,7 @@
 
         {% if 's' == THIS.get('address_type') %}
         <label for="address_equal" class="checkbox">
-          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ validator.fieldValue('address_equal') ? 'checked' : '' }}>
+          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ validator.fieldValue('address_equal') ? 'checked' }}>
                 {{ "Billing address is same as shipping" |_ }}
         </label>
         {% endif %}

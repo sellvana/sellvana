@@ -31,7 +31,7 @@
                                 <li style="margin-left: 20px;">
                                     <input type="radio" name="shipping" value="{{ shippingMethod ~ ':' ~ serviceKey }}"
                                     {{ shippingMethod == cart.get('shipping_method') and
-                                            serviceKey == cart.get('shipping_service') ? 'checked' : '' }}> {{service}}</li>
+                                            serviceKey == cart.get('shipping_service') ? 'checked' }}> {{service}}</li>
                             {% endfor %}
                             </ul>
                         </li>

@@ -10,13 +10,13 @@
 </header>
 <div class="main col1-layout">
     <div class="col-main">
-        {{ THIS.messagesHtml('frontend') }}
+        {{ THIS.messagesHtml('frontend') | raw }}
 
 {% if validToken %}
         <form method="post" action="{{ formUrl }}">
             <fieldset>
-                <p>{{ "Your email" | _ }}: <strong>{{ THIS.q(email) }}</strong></p>
-                <input type="hidden" name="model[email]" value="{{ THIS.q(email) }}"/>
+                <p>{{ "Your email" | _ }}: <strong>{{ email }}</strong></p>
+                <input type="hidden" name="model[email]" value="{{ email }}"/>
                 <div class="checkbox">
                   <label>
                       <input type="checkbox" name="model[unsub_all]" value="1"
