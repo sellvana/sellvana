@@ -3224,11 +3224,14 @@ class Bcrypt extends BClass
 
     public function verify($input, $existingHash)
     {
-        return crypt($input, $existingHash) === $existingHash;
+        // md5 for protection against timing side channel attack (needed)
+        return md5(crypt($input, $existingHash)) === md5($existingHash);
     }
 
     private function getSalt()
     {
+        // The security weakness between 5.3.7 affects password with 8-bit characters only
+        // @see: http://php.net/security/crypt_blowfish.php
         $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
         $salt .= $this->encodeBytes($this->getRandomBytes(16));
         return $salt;
@@ -3587,7 +3590,7 @@ if( !function_exists( 'xmlentities' ) ) {
 
 if (!function_exists('password_hash')) {
     /**
-     * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well
+     * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well or use PBKDF2
      *
      * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
      */
