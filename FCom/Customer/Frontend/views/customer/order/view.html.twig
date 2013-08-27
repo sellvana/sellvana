@@ -34,7 +34,7 @@
     {% for item in THIS.get('orderItems') %}
         <tr>
             <td class="text-center">{{ item.get('id') }}</td>
-            <td class="text-center">{{ THIS.view('customer/order/item').set('product', APP.instance('BUtil').fromJson(item.get('product_info'))) | raw}} </td>
+            <td class="text-center">{{ THIS.view('customer/order/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw}} </td>
             <td class="text-center">{{ item.get('qty') }} </td>
             <td class="text-center">{{ item.get('total') }} </td>
         </tr>

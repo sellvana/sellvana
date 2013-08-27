@@ -1,0 +1,9 @@
+{% set d = THIS.get('customer') %}
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ To: "{{ "%s %s" | format(d.get('firstname'), d.get('lastname')) }}" <{{ d.get('email') }}> }-->
+<!--{ From: "{{ "Fulleron"| _ }}" <support@fulleron.com> }-->
+<!--{ Subject: {{ "Your registration has been submitted for approval." | _ }} }-->
+
+{{ "Hello, %s." | _ |format(d.get('firstname')) }}
+
+<p>{{ "Thank you for your registration" | _}}</p>

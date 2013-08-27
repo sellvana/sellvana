@@ -1,0 +1,4 @@
+{% for promoMedia in THIS.get('promo').media() %}
+    <img src="/{{ promoMedia.get('folder') ~ '/' ~ promoMedia.get('file_name') }}">
+    <div class="clearfix"></div>
+{% endfor %}

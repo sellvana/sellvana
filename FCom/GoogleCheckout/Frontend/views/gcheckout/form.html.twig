@@ -1,0 +1,10 @@
+{% set model = APP.instance("FCom_GoogleCheckout") %}
+{% model.setConfig(CONFIG.get('modules/FCom_GoogleCheckout')) %}
+
+<form method="POST" action="{{ model.getFormUrl() }}">
+    <input type="hidden" name="cart" value="{{ model.getCartValueEncoded() }}">
+    <input type="hidden" name="signature" value="{{ model.getSignatureValueEncrypted() }}">
+    <input type="image" name="Google Checkout" alt="Fast checkout through Google"
+           src="{{ model.getButtonSrc() }}"
+           height="{{ model.getButtonHeight() }}" width="{{ model.getButtonWidth() }}">
+</form>

@@ -1,0 +1,39 @@
+{% set s = THIS.get('state') %}
+
+<div class="panel panel-filter">
+    <div class="panel-heading">
+        <span class="panel-title">{{ "Narrow Results" | _ }}</span>
+    </div>
+    <form method="get" action="">
+        {{ THIS.view('indextank/product/_pager_categories').set('s', s) | raw }}
+        {% if s['available_facets'] %}
+            {% for label, data in s['available_facets'] %}
+                <div class="subpanel panel-attribute">
+                    <div class="subpanel-heading">
+                        <span class="subpanel-title">{{ label }}</span>
+                    </div>
+                    <ul>
+                        {% for obj in data %}
+                            {% if s['filter_selected'][obj.get('key')]) and obj.get('name') in s['filter_selected'][obj.get('key')] %}
+                                <li><a class="active"
+                                       href="{{ UTIL.setUrlQuery( REQUEST.currentUrl(), { obj.get('param'): '' } ) }}"><span
+                                                class="icon"></span>{{ obj.get('name') }} <span
+                                                class="badge">({{ obj.get('count') }}
+                                            )</span></a></li>
+                                {% if true == s['save_filter'] %}
+                                    <input type="hidden" name="{{ obj.get('param') }}" value="{{ obj.get('name') }}"/>
+                                {% endif %}
+                            {% else %}
+                                <li>
+                                    <a href="{{ UTIL.setUrlQuery(REQUEST.currentUrl(), { obj.get('param'): obj.get('name') } ) }}"><span
+                                                class="icon"></span>{{ obj.get('name') }}
+                                        <span class="badge">({{ obj.get('count') }})</span></a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </form>
+</div>
+
