@@ -39,20 +39,20 @@ todo get session variables for cctype and expiration and preload them if they ar
 </select>
 <br/>
 <label for="authnet_cc_number">Credit Card Number</label>
-<input type="text" id="authnet_cc_number" value="" name="payment[{{ key }}][cc_num]">
+<input type="text" id="authnet_cc_number" name="payment[{{ key }}][cc_num]" class="required">
 <label for="authnet_cc_expiration_date">Expiration date</label>
 <div class="authnet_expiration_date_group">
-    <select name="payment[{{ key }}][expire][year]" id="authnet_cc_expiration_date_year">
+    <select name="payment[{{ key }}][expire][year]" id="authnet_cc_expiration_date_year" class="required">
         <option value="">Select Expiration Year</option>
         {{ el.year_options(date().format('y'), date("+20years").format('y')) }}
     </select>&nbsp;
-    <select name="payment[{{ key }}][expire][month]" id="authnet_cc_expiration_date">
+    <select name="payment[{{ key }}][expire][month]" id="authnet_cc_expiration_date" class="required">
         <option value="">Select Expiration Month</option>
         {{ el.month_options() }}
     </select>
     {% if config['useccv'] %}
         <br>
         <label for="authnet_cc_cid">Card Verification Number</label>
-        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[{{ key }}][cc_cid]" value="" />
+        <input type="text" title="Card Verification Number" id="authnet_cc_cid" name="payment[{{ key }}][cc_cid]" class="required" />
     {% endif %}
 </div>
