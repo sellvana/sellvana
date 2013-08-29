@@ -289,8 +289,8 @@ class BApp extends BClass
             }
 
             if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
-				$url = rtrim($url, "\\"); //for windows installation
-                $url = rtrim($url, '/').'/'.$scriptPath['basename'];
+                $url = rtrim($url, "\\"); //for windows installation
+                $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
             if ($full) {
                 $url = $r->scheme().'://'.$r->httpHost().$url;
