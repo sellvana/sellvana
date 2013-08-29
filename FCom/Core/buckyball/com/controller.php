@@ -937,10 +937,11 @@ class BResponse extends BClass
     }
 
     /**
-    * Set response content
-    *
-    * @param mixed $content
-    */
+     * Set response content
+     *
+     * @param mixed $content
+     * @return BResponse
+     */
     public function set($content)
     {
         $this->_content = $content;
@@ -948,10 +949,11 @@ class BResponse extends BClass
     }
 
     /**
-    * Add content to response
-    *
-    * @param mixed $content
-    */
+     * Add content to response
+     *
+     * @param mixed $content
+     * @return BResponse
+     */
     public function add($content)
     {
         $this->_content = (array)$this->_content+(array)$content;
@@ -1068,11 +1070,14 @@ class BResponse extends BClass
     }
 
     /**
-    * Send file download to client
-    *
-    * @param string $filename
-    * @return exit
-    */
+     * Send file download to client
+     *
+     * @param        $source
+     * @param null   $fileName
+     * @param string $disposition
+     * @internal param string $filename
+     * @return exit
+     */
     public function sendFile($source, $fileName=null, $disposition='attachment')
     {
         BSession::i()->close();
@@ -1099,11 +1104,13 @@ class BResponse extends BClass
     }
 
     /**
-    * Send text content as a file download to client
-    *
-    * @param string $content
-    * @return exit
-    */
+     * Send text content as a file download to client
+     *
+     * @param string $content
+     * @param string $fileName
+     * @param string $disposition
+     * @return exit
+     */
     public function sendContent($content, $fileName='download.txt', $disposition='attachment')
     {
         BSession::i()->close();

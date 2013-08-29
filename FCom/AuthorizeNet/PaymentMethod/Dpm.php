@@ -1,6 +1,6 @@
 <?php
 
-class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_Sales_Method_Payment_Abstract
+class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {
 
     const PAYMENT_METHOD_KEY = "authorizenet_dpm";
@@ -87,6 +87,9 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_Sales_Method_Payment_Abst
         $order = $this->getOrder();
         $time = time();
         $fields = array(
+            "x_version"        => "3.1",
+            "x_delim_char"     => ",",
+            "x_delim_data"     => "TRUE",
             'x_amount'         => $this->getDetail('amount_due'),
             'x_fp_sequence'    => $order->unique_id,
             'x_fp_hash'        => AuthorizeNetSIM_Form::getFingerprint($config['login'],
@@ -100,5 +103,40 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_Sales_Method_Payment_Abst
         );
 
         return $fields;
+    }
+
+    /**
+     * @param AuthorizeNetSIM $response
+     * @return AuthorizeNetSIM
+     */
+    public function processApiResponse($response)
+    {
+        $config = $this->config();
+        if (!$config['enabled']) {
+            // log this and eventually show a message
+            return null;
+        }
+        $action = $config['payment_action'];
+        $this->setDetail($response->transaction_id, $response);
+        $this->setDetail('transaction_id', $response->transaction_id);
+        if ($response->approved) {
+            $status = $action == 'AUTH_ONLY' ? 'authorized' : 'paid';
+        } else {
+            $status = 'error';
+        }
+        $paymentData = array(
+            'method'           => static::PAYMENT_METHOD_KEY,
+            'parent_id'        => $response->transaction_id,
+            'order_id'         => $response->fp_sequence,
+            'amount'           => $this->getDetail('amount_due'),
+            'status'           => $status,
+            'transaction_id'   => $response->transaction_id,
+            'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
+            'online'           => 1,
+        );
+        $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
+        $paymentModel->setData('response', $response);
+        $paymentModel->save();
+        return $response;
     }
 }
