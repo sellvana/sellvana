@@ -424,6 +424,8 @@ class BConfig extends BClass
     */
     protected $_enableSaving = true;
 
+    protected $_encryptedPaths = array();
+
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -489,6 +491,17 @@ class BConfig extends BClass
         return $this;
     }
 
+    public function setPathEncrypted($path)
+    {
+        $this->_encryptedPaths[$path] = true;
+        return $this;
+    }
+
+    public function shouldBeEncrypted($path)
+    {
+        return !empty($this->_encryptedPaths[$path]);
+    }
+
     /**
      * Set configuration data in $path location
      *
@@ -504,6 +517,9 @@ class BConfig extends BClass
             $root =& $this->$toSave;
         } else {
             $root =& $this->_config;
+        }
+        if ($this->shouldBeEncrypted($path)) {
+
         }
         foreach (explode('/', $path) as $key) {
             $root =& $root[$key];

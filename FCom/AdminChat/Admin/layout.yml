@@ -1,0 +1,5 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.adminchat, @FCom_AdminChat/Admin/js/fcom.adminchat ]
+            - [ requireRun, fcom.adminchat ]

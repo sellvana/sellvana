@@ -14,4 +14,4 @@ BConfig::i()->add(array(
 ));
 
 BDebug::mode('DEVELOPMENT');
-FCom_Core_Main::i()->run('FCom_Comet');
+FCom_Core_Main::i()->run('FCom_PushServer');

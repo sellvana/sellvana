@@ -1,7 +1,10 @@
-#AddHandler application/x-httpd-php55 .php
-
 DirectoryIndex index.php
-Options +FollowSymLinks -MultiViews
+Options -Indexes +FollowSymLinks -MultiViews
+
+<FilesMatch "\.yml$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
 <IfModule mod_expires.c>
     ExpiresActive On
