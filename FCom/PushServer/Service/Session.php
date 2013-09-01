@@ -1,6 +1,6 @@
 <?php
 
-class FCom_PushServer_Service_Default extends FCom_PushServer_Service_Abstract
+class FCom_PushServer_Service_Session extends FCom_PushServer_Service_Abstract
 {
     static public function catchAll($message)
     {
@@ -12,8 +12,8 @@ class FCom_PushServer_Service_Default extends FCom_PushServer_Service_Abstract
         }
     }
 
-    public function signal_subscribe($msg)
+    public function signal_load()
     {
-        // each service should handle its own subscribes, to allow for custom permissions
+        $this->_client->set('status', 'load');
     }
 }

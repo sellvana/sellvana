@@ -79,6 +79,10 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
 
     public function send($message, $client = null)
     {
+        if (empty($message['channel'])) {
+            $message['channel'] = $this->channel_name;
+        }
+
         BEvents::i()->fire(__METHOD__ . ':' . $this->channel_name, array(
             'channel' => $this,
             'message' => $message,
