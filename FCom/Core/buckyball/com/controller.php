@@ -1272,7 +1272,7 @@ class BResponse extends BClass
         return $this;
     }
 
-    public static function startLongResponse($bypassBuffering = true)
+    public function startLongResponse($bypassBuffering = true)
     {
         // improve performance by not processing debug log
         if (BDebug::is('DEBUG')) {
@@ -1295,6 +1295,7 @@ class BResponse extends BClass
         }
         // continue in background if the browser request was interrupted
         //ignore_user_abort(true);
+        return $this;
     }
 
     public function shutdown($lastMethod=null)

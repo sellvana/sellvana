@@ -4,7 +4,7 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_index__POST()
     {
-        BResponse::i()->startLongResponse(false);
+        BResponse::i()->nocache()->startLongResponse(false);
 
         $request = BRequest::i()->json();
         FCom_PushServer_Main::i()->dispatch($request);

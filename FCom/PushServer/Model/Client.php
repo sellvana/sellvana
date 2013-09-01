@@ -48,29 +48,34 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     /**
      * Get client by id or session_id
      */
-    static public function getClient($client)
+    static public function getClient($clientId)
     {
-        if (is_object($client) && $client instanceof FCom_PushServer_Model_Client) {
-            return $client;
+        if (is_object($clientId) && $clientId instanceof FCom_PushServer_Model_Client) {
+            return $clientId;
         }
-        if (is_numeric($client)) {
-            return static::load($client);
+        if (!empty(static::$_clientCache[$clientId])) {
+            return static::$_clientCache[$clientId];
         }
-        if (is_string($client)) {
-            return static::load($client, 'session_id');
+        $client = false;
+        if (is_numeric($clientId)) {
+            $client = static::load($clientId);
+        } elseif (is_string($clientId)) {
+            $client = static::load($clientId, 'session_id');
         }
-        throw new BException('Invalid client id');
+        static::$_clientCache[$clientId] = $client;
+        return $client;
     }
 
-    static public function findByAdminUserId($user)
+    static public function findByAdminUser($user)
     {
         if (is_object($user)) {
             $user = $user->id;
         }
-        return static::orm()->where('admin_user_id', $user)->find_many_assoc('session_id');
+        $result = static::orm()->where('admin_user_id', $user)->find_many_assoc('session_id');
+        return $result;
     }
 
-    static public function findByCustomerId($customer)
+    static public function findByCustomer($customer)
     {
         if (is_object($customer)) {
             $customer = $customer->id;
@@ -82,7 +87,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $delay = BConfig::i()->get('modules/FCom_PushServer/delay_microsec');
         $this->checkIn();
+        $start = time();
         while (true) {
+            // if (time() - $start > 60) {
+            //     break;
+            // }
             if (connection_aborted()) {
                 $this->set('status', 'offline')->save();
                 break;
@@ -117,7 +126,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                     $this->set('handover', 0)->save();
                     break;
                 }
-                usleep(500000);
+                usleep(300000);
             }
         } else { // this is a new client
             $this->subscribe();
@@ -137,7 +146,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         foreach ($messageModels as $model) {
             $model->set('status', 'sent')->save();
             $message = (array) BUtil::fromJson($model->get('data_serialized'));
-            $message['ts'] = $model->get('create_at');
+            //$message['ts'] = $model->get('create_at');
             $messages[] = $message;
             if (empty($message['seq'])) {
                 $model->delete();
@@ -145,11 +154,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
 
         $clientUpdate = static::orm()->select('handover')->where('id', $this->id)->find_one();
-        if ($clientUpdate->get('handover')) { // another connection just connected
+        if ($clientUpdate && $clientUpdate->get('handover')) { // another connection just connected
             $this->set('handover', 1); // update local instance
             $messages[] = array( // create message to exit loop
                 'channel' => 'session',
-                'ts' => BDb::now(),
                 'signal' => 'handover',
             );
         }
@@ -162,7 +170,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function checkOut()
     {
         if ($this->get('handover')) { // do we need to hand over connection to another process?
-            $this->set('handover', null)->save(); // clear the flag
+            $this->set('handover', 0)->save(); // clear the flag
         } else { // otherwise it is a normal disconnect
             $this->set('status', 'offline')->save(); // set client as idle //TODO: delete client immediately?
         }

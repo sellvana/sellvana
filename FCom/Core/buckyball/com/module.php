@@ -1472,12 +1472,15 @@ class BMigrate extends BClass
         }
 BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         // creating module before running install, so the module configuration values can be created within script
-        $module = BDbModule::i()->create(array(
-            'module_name' => $mod['module_name'],
-            'schema_version' => $version,
-            'last_upgrade' => BDb::now(),
-            'last_status' => 'INSTALLING',
-        ))->save();
+        $module = BDbModule::i()->load($mod['module_name'], 'module_name');
+        if (!$module) {
+            $module = BDbModule::i()->create(array(
+                'module_name' => $mod['module_name'],
+                'schema_version' => $version,
+                'last_upgrade' => BDb::now(),
+                'last_status' => 'INSTALLING',
+            ))->save();
+        }
         // call install migration script
         try {
             if (is_callable($callback)) {

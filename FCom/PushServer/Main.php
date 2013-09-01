@@ -21,6 +21,13 @@ FCom.pushserver_url = '".BApp::src('@FCom_PushServer/index.php')."';
         }
     }
 
+    static public function onAdminUserLogout($args)
+    {
+        $userId = FCom_Admin_Model_User::i()->sessionUserId();
+        FCom_PushServer_Model_Client::i()->delete_many(array('admin_user_id' => $userId));
+        //TODO: implement roster (online/offline) notifications
+    }
+
     protected $_services = array();
 
     public function addService($channel, $callback)
@@ -81,11 +88,12 @@ FCom.pushserver_url = '".BApp::src('@FCom_PushServer/index.php')."';
                     $instance->onAfterDispatch();
                 }
             } catch (Exception $e) {
-                $this->send(array(
+                $client->send(array(
                     'ref_seq' => !empty($message['seq']) ? $message['seq'] : null,
                     'ref_signal' => !empty($message['signal']) ? $message['signal'] : null,
                     'signal' => 'error',
-                    'description' => $e->getMessage()
+                    'description' => $e->getMessage(),
+                    'trace' => $e->getTrace(),
                 ));
             }
         }
