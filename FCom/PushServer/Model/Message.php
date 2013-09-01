@@ -28,43 +28,4 @@ class FCom_PushServer_Model_Message extends FCom_Core_Model_Abstract
 
         return true;
     }
-
-    /**
-     * Receive a message from service
-     */
-    public function receiveFromService($message)
-    {
-
-    }
-
-    /**
-     * Receive a message from client browser
-     *
-     */
-    public function receiveFromClient($message, $client)
-    {
-
-    }
-
-    /**
-     * Send a message directly to client browser
-     *
-     */
-    public function sendToClient($message, $client)
-    {
-
-    }
 }
-
-/*
-
-From server to client:
-All messages from server include seq, service, channel, ts
-
-{ service:_pushserver, channel:_connection, action:handover }
-
-From client to server:
-
-{ message:received, seq:12345678 }
-
-*/

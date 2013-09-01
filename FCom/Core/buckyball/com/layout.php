@@ -2091,6 +2091,9 @@ class BViewHead extends BView
                     $config['paths'][$name] = $this->src($file);
                 }
             }
+            // if (BDebug::is('DEBUG')) {
+            //     $config['urlArgs'] = 'bust='.time();
+            // }
             $jsArr[] = "require.config(".BUtil::toJavaScript($config)."); ";
         }
         if (!empty($this->_requireJs['run'])) {

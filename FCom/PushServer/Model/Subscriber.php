@@ -10,4 +10,13 @@ class FCom_PushServer_Model_Subscriber extends FCom_Core_Model_Abstract
      * - channel_id
      * - client_id
      */
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
+        $this->set('create_at', BDb::now(), null);
+        $this->set('update_at', BDb::now());
+
+        return true;
+    }
 }

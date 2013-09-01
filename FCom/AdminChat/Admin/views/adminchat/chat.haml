@@ -1,4 +1,11 @@
+.adminchat-container
+    %button#adminchat-test Test Chat
+
 :javascript
     require(['jquery', 'underscore', 'backbone', 'fcom.adminchat'], function($, _, Backbone, AdminChat) {
+        AdminChat.status({status:'online'});
 
+        $('#adminchat-test').click(function(ev) {
+            AdminChat.start({user:'user1'});
+        })
     })

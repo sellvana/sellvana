@@ -33,6 +33,7 @@ class FCom_PushServer_Migrate extends BClass
                 'handover' => 'tinyint',
                 'admin_user_id' => 'int unsigned null',
                 'customer_id' => 'int unsigned null',
+                'remote_ip' => 'varchar(20)',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',

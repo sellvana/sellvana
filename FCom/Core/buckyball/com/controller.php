@@ -575,7 +575,8 @@ class BRequest extends BClass
                 }
                 $p = parse_url($ref);
                 $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
-                $webRoot = static::webRoot();
+                $webRoot = $c->get('web/base_src');
+                if (!$webRoot) $webRoot = static::webRoot();
                 if ($p['host']!==static::httpHost(false) || $webRoot && strpos($p['path'], $webRoot)!==0) {
                     return true; // referrer host or doc root path do not match, high prob. csrf
                 }
@@ -1271,7 +1272,7 @@ class BResponse extends BClass
         return $this;
     }
 
-    public static function startLongResponse()
+    public static function startLongResponse($bypassBuffering = true)
     {
         // improve performance by not processing debug log
         if (BDebug::is('DEBUG')) {
@@ -1289,7 +1290,9 @@ class BResponse extends BClass
         // remove session lock
         session_write_close();
         // bypass initial webservice buffering
-        echo str_pad('', 2000, ' ');
+        if ($bypassBuffering) {
+            echo str_pad('', 2000, ' ');
+        }
         // continue in background if the browser request was interrupted
         //ignore_user_abort(true);
     }

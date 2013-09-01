@@ -1,67 +1,64 @@
 define(['jquery', 'underscore', 'exports'], function($, _, exports)
 {
-    var i, j, config = {}, state = { seq: 0, sub_id: 0 }, channels = {}, subscribers = {}, messages = [];
+    var i, j, state = { seq: 0, sub_id: 0 }, channels = {}, subscribers = {}, messages = [];
 
-    setTimeout(start, 200); // give opportunity for other services to listen and send initial messages
+    scheduler();
 
-    function start(options)
+    listen({ channel: 'session', callback: channel_session_handler });
+    listen({ regexp: /^session:(.*)$/, callback: channel_session_handler });
+
+    function scheduler()
     {
-        if (state.status) {
-            return;
+        if (messages.length) {
+            connect();
         }
-        config = options || {};
-        listen({ regexp: /^session:(.*)$/, callback: channel_session_handler });
-        connect();
+        setTimeout(scheduler, 300);
     }
 
     function connect()
     {
-        for (i = 0; state.status === 'connecting' && i < 20; $i++) {
-            sleep(100);
-        }
-        state.status = 'connecting';
-
-        $.post(FCom.pushserver_url, { messages: messages }, receive);
+        var data = JSON.stringify({ messages: messages });
 
         messages = $.grep(messages, function(qmsg) {
-            return !(qmsg.channel === 'session' && qmsg.message === 'received');
+            return !_.isEmpty(qmsg.seq);
         });
+
+        $.post(FCom.pushserver_url, data, receive);
+
+        state.status = 'online';
     }
 
     function receive(response, status, xhr)
     {
-        if (!response.messages) {
-            state.status = 'disconnected';
-            return;
-            //TODO: reconnect?
-        }
-        state.status = 'connected';
+        console.log(response);
         $.each(response.messages, function(i, msg) {
-            dispatch(msg);
-            if (state.status === 'connected') {
-                connect();
+            if (channels[msg.channel]) {
+                $.each(channels[msg.channel].subscribers, function(i, sub) {
+                    sub.callback(msg);
+                });
             }
-        })
+            $.each(subscribers, function(i, sub) {
+                if (sub.regexp && sub.regexp.test(msg.channel)) {
+                    sub.callback(msg);
+                }
+            });
+        });
+
+        switch (state.status) {
+            case 'online':
+                connect();
+                break;
+
+            case 'handover':
+                state.status = 'online';
+                break;
+        }
     }
 
     function send(msg)
     {
         if (!msg.seq) msg.seq = ++state.seq;
         messages.push(msg);
-    }
-
-    function dispatch(msg)
-    {
-        if (channels[msg.channel]) {
-            $.each(channels[msg.channel].subscribers, function(i, sub) {
-                sub.callback(msg);
-            });
-        }
-        $.each(channel.subscribers, function(i, sub) {
-            if (sub.regexp && sub.regexp.test(msg.channel)) {
-                sub.callback(msg);
-            }
-        })
     }
 
     function listen(options)
@@ -90,26 +87,25 @@ define(['jquery', 'underscore', 'exports'], function($, _, exports)
 
     function channel_session_handler(msg)
     {
-        if (!state.session_id) {
-            var m = msg.channel.match(/^session:(.*)$/);
-            state.session_id = m[1];
-        }
-        switch (msg.message) {
+        switch (msg.signal) {
             case 'received':
                 messages = $.grep(messages, function(qmsg) {
-                    return qmsg.seq != msg.seq;
+                    return qmsg.seq != msg.ref_seq;
                 });
                 break;
 
+            case 'handover':
+                state.status = 'handover';
+                break;
+
             case 'stop':
-                state.status = 'disconnected';
+                state.status = 'offline';
                 break;
         }
     }
 
     _.extend(exports, {
         state: state,
-        start: start,
         listen: listen,
         forget: forget,
         send: send
