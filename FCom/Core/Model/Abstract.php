@@ -41,7 +41,7 @@ class FCom_Core_Model_Abstract extends BModel
      */
     public function getData($path = null)
     {
-        if (is_null($this->get('data'))) {
+        if (is_null($this->get(static::$_dataCustomField))) {
             $dataJson = $this->get(static::$_dataSerializedField);
             $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : array());
         }
@@ -68,23 +68,23 @@ class FCom_Core_Model_Abstract extends BModel
      * @param $value mixed
      * @return FCom_Core_Model_Abstract
      */
-    public function setData($path, $value = null)
+    public function setData($path, $value = null, $merge = false)
     {
         if (is_array($path)) {
-            foreach ($path as $p=>$v) {
+            foreach ($path as $p => $v) {
                 $this->setData($p, $v);
             }
             return $this;
         }
         $data = $this->getData();
-        $pathArr = explode('/', $path);
-        $last = sizeof($pathArr)-1;
-        foreach ($pathArr as $i=>$k) {
-            if ($i === $last) {
-                $data[$k] = $value;
-            } elseif (!isset($data[$k])) {
-                $data[$k] = array();
-            }
+        $node =& $data;
+        foreach (explode('/', $path) as $key) {
+            $node =& $node[$key];
+        }
+        if ($merge) {
+            $node = BUtil::arrayMerge((array)$node, (array)$value);
+        } else {
+            $node = $value;
         }
         $this->set(static::$_dataCustomField, $data);
         return $this;

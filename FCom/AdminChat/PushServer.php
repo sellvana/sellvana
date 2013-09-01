@@ -4,35 +4,32 @@ class FCom_AdminChat_PushServer extends FCom_PushServer_Service_Abstract
 {
     static public function bootstrap()
     {
-        FCom_PushServer_Main::i()->addService(__CLASS__);
+        FCom_PushServer_Main::i()->addService('adminchat', __CLASS__);
     }
 
-    public function init()
+    public function signal_status()
     {
 
     }
 
-    static public function channel_chat($args)
-    {
-
-    }
-
-    static public function message_start($msg)
+    public function signal_start()
     {
         // start the chat, receive initial history
+
+        //$this->_client->send($this->_message);
     }
 
-    static public function message_join($msg)
+    public function signal_join()
     {
 
     }
 
-    static public function message_leave($msg)
+    public function signal_leave()
     {
 
     }
 
-    static public function message_text($msg)
+    public function signal_text()
     {
 
     }

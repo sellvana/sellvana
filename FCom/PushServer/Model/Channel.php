@@ -58,21 +58,20 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function subscribeService($callback)
+    public function listen($callback)
     {
         $channelName = $this->channel_name;
-        //BEvents::i()->on('FCom_PushServer_Model_Client::receive:' . $channelName, $callback, array('context' => 'client:receive'));
-        BEvents::i()->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback, array('context' => 'channel:send'));
+        BEvents::i()->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback);
         return $this;
     }
 
-    public function subscribeClient($client)
+    public function subscribe($client)
     {
         FCom_PushServer_Model_Client::i()->getClient($client)->subscribe($this);
         return $this;
     }
 
-    public function unsubscribeClient($client)
+    public function unsubscribe($client)
     {
         FCom_PushServer_Model_Client::i()->getClient($client)->unsubscribe($this);
         return $this;
@@ -87,19 +86,19 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         ));
 
         $msgHlp = FCom_PushServer_Model_Message::i();
-        $subscribers = FCom_PushServer_Model_Subscriber::i()->orm()->where('s.channel_id', $this->id)->find_many();
+        $subscribers = FCom_PushServer_Model_Subscriber::i()->orm()->where('channel_id', $this->id)->find_many();
         foreach ($subscribers as $sub) {
             if ($client && $client->id === $sub->client_id) {
                 continue;
             }
             $msg = $msgHlp->create(array(
-                'seq' => $message['seq'],
+                'seq' => !empty($message['seq']) ? $message['seq'] : null,
                 'channel_id' => $this->id,
                 'subscriber_id' => $sub->id,
                 'sender_client_id' => $client ? $client->id : null,
                 'recipient_client_id' => $sub->client_id,
                 'status' => 'published',
-            ))->setData(BUtil::arrayMask($message, 'channel,seq,ts'), true)->save();
+            ))->setData($message)->save();
         }
         return $this;
     }

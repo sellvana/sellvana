@@ -2,22 +2,18 @@
 
 class FCom_PushServer_Service_Default extends FCom_PushServer_Service_Abstract
 {
-    public function init()
+    static public function catchAll($message)
     {
-        $client = FCom_PushServer_Model_Client::i()->sessionClient();
-        $channelName = 'session:' . $client->get('session_id');
-        $channel = FCom_PushServer_Model_Channel::i()->getChannel($channelName, true);
-        $channel->subscribeService(array($this, 'channel_session'));
+        if (!empty($message['seq'])) {
+            FCom_PushServer_Model_Client::i()->sessionClient()->send(array(
+                'ref_seq' => $message['seq'],
+                'signal' => 'received',
+            ));
+        }
     }
 
-    public function channel_session($args)
+    public function signal_subscribe($msg)
     {
-        $message = $args['message'];
-
-    }
-
-    public function message_subscribe($msg)
-    {
-
+        // each service should handle its own subscribes, to allow for custom permissions
     }
 }
