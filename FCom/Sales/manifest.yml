@@ -23,7 +23,7 @@ modules:
                 observe:
                     - [ FCom_Admin_View_Header::getNotifications, FCom_Sales_Main.checkDefaultShippingPayment ]
 
-            FCom_Api:
+            FCom_ApiServer:
                 routing:
                     - [ any, /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]
                     - [ any, /v1/sales/order/:id, FCom_Sales_ApiServer_V1_Order.index ]

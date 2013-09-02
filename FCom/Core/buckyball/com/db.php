@@ -584,7 +584,7 @@ EOT
             // temporary code duplication with ddlTable, until the other one is removed
             $fieldsArr = array();
             foreach ($fields as $f=>$def) {
-                $fieldsArr[] = $f.' '.$def;
+                $fieldsArr[] = '`'.$f.'` '.$def;
             }
             $fields = null; // reset before update step
             if ($primary) {
@@ -619,7 +619,7 @@ EOT
         } else {
             $fieldsArr = array();
             foreach ($fields as $f=>$def) {
-                $fieldsArr[] = $f.' '.$def;
+                $fieldsArr[] = '`'.$f.'` '.$def;
             }
             if (!empty($options['primary'])) {
                 $fieldsArr[] = "PRIMARY KEY ".$options['primary'];

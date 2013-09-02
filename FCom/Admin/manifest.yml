@@ -8,9 +8,7 @@ modules:
             - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Main.onSettingsPost ]
 
         default_config:
-            modules:
-                FCom_Admin:
-                    theme: FCom_Admin_DefaultTheme
+            modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
 
         areas:
             FCom_Admin:

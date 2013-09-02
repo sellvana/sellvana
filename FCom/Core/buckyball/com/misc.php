@@ -3202,110 +3202,6 @@ class BYAML extends BCLass
     }
 }
 
-/**
- * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well
- *
- * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
- */
-class Bcrypt extends BClass
-{
-    public function __construct()
-    {
-        if (CRYPT_BLOWFISH != 1) {
-            throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
-        }
-    }
-
-    public function hash($input)
-    {
-        $hash = crypt($input, $this->getSalt());
-        return strlen($hash) > 13 ? $hash : false;
-    }
-
-    public function verify($input, $existingHash)
-    {
-        // md5 for protection against timing side channel attack (needed)
-        return md5(crypt($input, $existingHash)) === md5($existingHash);
-    }
-
-    private function getSalt()
-    {
-        // The security weakness between 5.3.7 affects password with 8-bit characters only
-        // @see: http://php.net/security/crypt_blowfish.php
-        $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
-        $salt .= $this->encodeBytes($this->getRandomBytes(16));
-        return $salt;
-    }
-
-    private $randomState;
-    private function getRandomBytes($count)
-    {
-        $bytes = '';
-
-        if (function_exists('openssl_random_pseudo_bytes') &&
-            (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
-            $bytes = openssl_random_pseudo_bytes($count);
-        }
-
-        if ($bytes === '' && is_readable('/dev/urandom') &&
-            ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
-            $bytes = fread($hRand, $count);
-            fclose($hRand);
-        }
-
-        if (strlen($bytes) < $count) {
-            $bytes = '';
-
-            if ($this->randomState === null) {
-                $this->randomState = microtime();
-                if (function_exists('getmypid')) {
-                    $this->randomState .= getmypid();
-                }
-            }
-
-            for ($i = 0; $i < $count; $i += 16) {
-                $this->randomState = md5(microtime() . $this->randomState);
-
-                $bytes .= md5($this->randomState, true);
-            }
-
-            $bytes = substr($bytes, 0, $count);
-        }
-
-        return $bytes;
-    }
-
-    private function encodeBytes($input)
-    {
-        // The following is code from the PHP Password Hashing Framework
-        $itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        $output = '';
-        $i = 0;
-        do {
-            $c1 = ord($input[$i++]);
-            $output .= $itoa64[$c1 >> 2];
-            $c1 = ($c1 & 0x03) << 4;
-            if ($i >= 16) {
-                $output .= $itoa64[$c1];
-                break;
-            }
-
-            $c2 = ord($input[$i++]);
-            $c1 |= $c2 >> 4;
-            $output .= $itoa64[$c1];
-            $c1 = ($c2 & 0x0f) << 2;
-
-            $c2 = ord($input[$i++]);
-            $c1 |= $c2 >> 6;
-            $output .= $itoa64[$c1];
-            $output .= $itoa64[$c2 & 0x3f];
-        } while (1);
-
-        return $output;
-    }
-}
-
 class BValidate extends BClass
 {
     protected $_reRegex = '#^([/\#~&,%])(.*)(\1)[imsxADSUXJu]*$#';
@@ -3564,6 +3460,199 @@ class BValidateViewHelper extends BClass
     }
 }
 
+/**
+ * If FISMA/FIPS/NIST compliance required, use PBKDF2
+ *
+ * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
+ */
+class Bcrypt extends BClass
+{
+    public function __construct()
+    {
+        if (CRYPT_BLOWFISH != 1) {
+            throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
+        }
+    }
+
+    public function hash($input)
+    {
+        $hash = crypt($input, $this->getSalt());
+        return strlen($hash) > 13 ? $hash : false;
+    }
+
+    public function verify($input, $existingHash)
+    {
+        // md5 for protection against timing side channel attack (needed)
+        return md5(crypt($input, $existingHash)) === md5($existingHash);
+    }
+
+    private function getSalt()
+    {
+        // The security weakness between 5.3.7 affects password with 8-bit characters only
+        // @see: http://php.net/security/crypt_blowfish.php
+        $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
+        $salt .= $this->encodeBytes($this->getRandomBytes(16));
+        return $salt;
+    }
+
+    private $randomState;
+    private function getRandomBytes($count)
+    {
+        $bytes = '';
+
+        if (function_exists('openssl_random_pseudo_bytes') &&
+            (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
+            $bytes = openssl_random_pseudo_bytes($count);
+        }
+
+        if ($bytes === '' && is_readable('/dev/urandom') &&
+            ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
+            $bytes = fread($hRand, $count);
+            fclose($hRand);
+        }
+
+        if (strlen($bytes) < $count) {
+            $bytes = '';
+
+            if ($this->randomState === null) {
+                $this->randomState = microtime();
+                if (function_exists('getmypid')) {
+                    $this->randomState .= getmypid();
+                }
+            }
+
+            for ($i = 0; $i < $count; $i += 16) {
+                $this->randomState = md5(microtime() . $this->randomState);
+
+                $bytes .= md5($this->randomState, true);
+            }
+
+            $bytes = substr($bytes, 0, $count);
+        }
+
+        return $bytes;
+    }
+
+    private function encodeBytes($input)
+    {
+        // The following is code from the PHP Password Hashing Framework
+        $itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        $output = '';
+        $i = 0;
+        do {
+            $c1 = ord($input[$i++]);
+            $output .= $itoa64[$c1 >> 2];
+            $c1 = ($c1 & 0x03) << 4;
+            if ($i >= 16) {
+                $output .= $itoa64[$c1];
+                break;
+            }
+
+            $c2 = ord($input[$i++]);
+            $c1 |= $c2 >> 4;
+            $output .= $itoa64[$c1];
+            $c1 = ($c2 & 0x0f) << 2;
+
+            $c2 = ord($input[$i++]);
+            $c1 |= $c2 >> 6;
+            $output .= $itoa64[$c1];
+            $output .= $itoa64[$c2 & 0x3f];
+        } while (1);
+
+        return $output;
+    }
+}
+
+class BRSA extends BClass
+{
+    protected $_configPath = 'modules/BRSA';
+    protected $_config = array();
+    protected $_cache = array();
+
+    public function __construct()
+    {
+        if (!function_exists('openssl_pkey_new')) {
+            // TODO: integrate Crypt_RSA ?
+        }
+        $defConf = array(
+            "digest_alg" => "sha512",
+            "private_key_bits" => 4096,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
+        $conf = BConfig::i()->get($this->_configPath);
+        $this->_config = array_merge($defConf, $conf);
+    }
+
+    public function generateKey()
+    {
+        $config = BUtil::arrayMask($this->_config, 'digest_alg,x509_extensions,req_extensions,'
+            . 'private_key_bits,private_key_type,encrypt_key,encrypt_key_cipher');
+        $res = openssl_pkey_new($config);
+        openssl_pkey_export($res, $this->_config['private_key']); // private key
+
+        $pubKey = openssl_pkey_get_details($res); // public key
+        $this->_config['public_key'] = $pubKey["key"];
+
+        BConfig::i()
+            //->set($this->_configPath.'/private_key', $this->_config['private_key'], false, true)
+            ->set($this->_configPath.'/public_key', $this->_config['public_key'], false, true)
+        ;
+
+        return $this;
+    }
+
+    public function getPublicKey()
+    {
+        return $this->_config['public_key'];
+    }
+
+    public function getPrivateKey()
+    {
+        return $this->_config['private_key'];
+    }
+
+    public function setPublicKey()
+    {
+        $this->_config['public_key'] = $key;
+        return $this;
+    }
+
+    public function setPrivateKey()
+    {
+        $this->_config['private_key'] = $key;
+        return $this;
+    }
+
+    public function encrypt($plain)
+    {
+        openssl_public_encrypt($plain, $encrypted, $this->_config['public_key']);
+        return $encrypted;
+    }
+
+    public function decrypt($encrypted)
+    {
+        $hash = sha1($encrypted);
+        if (!empty($this->_cache[$hash])) {
+            return $this->_cache[$hash];
+        }
+        if (!empty($this->_config['decrypt_url'])) {
+            $data = array('encrypted' => $encrypted);
+            $response = BUtil::remoteHttp('GET', $this->_config['decrypt_url'], $data);
+            $result = BUtil::fromJson($response);
+            if (!empty($result['decrypted'])) {
+                $decrypted = $result['decrypted'];
+            } else {
+                //TODO: handle exceptions
+            }
+        } else {
+            openssl_private_decrypt($encrypted, $decrypted, $this->_config['private_key']);
+        }
+        $this->_cache[$hash] = $decrypted;
+        return $decrypted;
+    }
+}
+
 if( !function_exists( 'xmlentities' ) ) {
     /**
      * @see http://www.php.net/manual/en/function.htmlentities.php#106535
@@ -3590,7 +3679,7 @@ if( !function_exists( 'xmlentities' ) ) {
 
 if (!function_exists('password_hash')) {
     /**
-     * If FISMA/FIPS/NIST compliance required, can wrap the result into SHA-512 as well or use PBKDF2
+     * If FISMA/FIPS/NIST compliance required, use PBKDF2
      *
      * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
      */
@@ -3668,6 +3757,9 @@ if (!function_exists('hash_pbkdf2')) {
      */
     function hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output = false)
     {
+        if (function_exists('openssl_pbkdf2')) {
+            return openssl_pbkdf2($password, $salt, $key_length, $count, $algorithm);
+        }
         $algorithm = strtolower($algorithm);
         if(!in_array($algorithm, hash_algos(), true))
             die('PBKDF2 ERROR: Invalid hash algorithm.');

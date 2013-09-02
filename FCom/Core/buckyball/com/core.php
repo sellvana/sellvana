@@ -424,6 +424,8 @@ class BConfig extends BClass
     */
     protected $_enableSaving = true;
 
+    protected $_encryptedPaths = array();
+
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -489,6 +491,17 @@ class BConfig extends BClass
         return $this;
     }
 
+    public function setPathEncrypted($path)
+    {
+        $this->_encryptedPaths[$path] = true;
+        return $this;
+    }
+
+    public function shouldBeEncrypted($path)
+    {
+        return !empty($this->_encryptedPaths[$path]);
+    }
+
     /**
      * Set configuration data in $path location
      *
@@ -501,19 +514,20 @@ class BConfig extends BClass
     public function set($path, $value, $merge=false, $toSave=false)
     {
         if (is_string($toSave) && $toSave==='_configToSave') { // limit?
-            $root =& $this->$toSave;
+            $node =& $this->$toSave;
         } else {
-            $root =& $this->_config;
+            $node =& $this->_config;
+        }
+        if ($this->shouldBeEncrypted($path)) {
+
         }
         foreach (explode('/', $path) as $key) {
-            $root =& $root[$key];
+            $node =& $node[$key];
         }
         if ($merge) {
-            $root = (array)$root;
-            $value = (array)$root;
-            $root = BUtil::arrayMerge($root, $value);
+            $node = BUtil::arrayMerge((array)$node, (array)$value);
         } else {
-            $root = $value;
+            $node = $value;
         }
         if ($this->_enableSaving && true===$toSave) {
             $this->set($path, $value, $merge, '_configToSave');
@@ -531,17 +545,17 @@ class BConfig extends BClass
     */
     public function get($path=null, $toSave=false)
     {
-        $root = $toSave ? $this->_configToSave : $this->_config;
+        $node = $toSave ? $this->_configToSave : $this->_config;
         if (is_null($path)) {
-            return $root;
+            return $node;
         }
         foreach (explode('/', $path) as $key) {
-            if (!isset($root[$key])) {
+            if (!isset($node[$key])) {
                 return null;
             }
-            $root = $root[$key];
+            $node = $node[$key];
         }
-        return $root;
+        return $node;
     }
 
     public function writeFile($filename, $config=null, $format=null)
@@ -1561,11 +1575,11 @@ if (!class_exists($r[0])) {
         return $result;
     }
 
-    public function fireRegex($eventRegex, $args)
+    public function fireRegexp($eventRegexp, $args)
     {
         $results = array();
         foreach ($this->_events as $eventName => $event) {
-            if (preg_match($eventRegex, $eventName)) {
+            if (preg_match($eventRegexp, $eventName)) {
                 $results += (array)$this->fire($eventName, $args);
             }
         }

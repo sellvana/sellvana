@@ -158,13 +158,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire('FCom_Admin_Model_User::login:after', array('user'=>$this));
+        BEvents::i()->fire('FCom_Admin_Model_User::login:after', array('user' => $this));
 
         return $this;
     }
 
     static public function logout()
     {
+        BEvents::i()->fire(__METHOD__);
         BSession::i()->data('admin_user', null);
         static::$_sessionUser = null;
     }
