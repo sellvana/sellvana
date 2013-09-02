@@ -21,14 +21,17 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports'], funct
     }
 
     function leave(options) {
-console.log('leave', options);
         PushClient.send({channel:options.channel, signal:'leave'});
+        close_window(options.channel);
     }
 
-    function show_window(chat) {
-console.log('show_window', chat);
+    function show_window(chat)
+    {
+        if (chatWindows[chat.channel]) {
+            return;
+        }
         var $container = $('<div class="fcom-chat-window-container">').attr('id', chat.channel+'-container')
-            .css({right:(10+_.size(chatWindows)*220)+'px'});
+            .css({right:(10+_.size(chatWindows)*320)+'px'});
         var $innerContainer = $('<div class="fcom-chat-window-inner">').appendTo($container);
         var $title = $('<div class="fcom-chat-title">').html(chat.channel).appendTo($innerContainer);
         var $closeTrigger = $('<a href="#" class="fcom-chat-close-trigger">X</a>').appendTo($innerContainer);
@@ -47,6 +50,20 @@ console.log('show_window', chat);
         chatWindows[chat.channel] = {$container:$container, $history:$history};
 
         $container.appendTo('body');
+    }
+
+    function close_window(channel)
+    {
+        chatWindows[channel].$container.remove();
+        delete chatWindows[channel];
+    }
+
+    function add_history(msg)
+    {
+console.log(msg.channel, chatWindows);
+        var $h = chatWindows[msg.channel].$history, h = $h.get(0);
+        $h.append($('<div>').html(msg.text));
+        h.scrollTop = h.scrollHeight;
     }
 
     // receive from server
@@ -71,12 +88,19 @@ console.log('show_window', chat);
             show_window({channel:msg.channel});
         },
         say: function(msg) {
-            var $h = chatWindows[msg.channel].$history;
-            $h.append($('<div>').html(msg.text))
-            $h.css({scrollTop:10000});
+            show_window({channel:msg.channel});
+            add_history(msg);
+        },
+        join: function(msg) {
+            show_window({channel:msg.channel});
+            add_history({channel:msg.channel, text:msg.username + ' joined'});
         },
         leave: function(msg) {
-
+            show_window({channel:msg.channel});
+            add_history({channel:msg.channel, text:msg.username + ' left'});
+        },
+        close: function(msg) {
+            //close_window(msg.channel);
         }
     }
 

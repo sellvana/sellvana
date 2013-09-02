@@ -58,6 +58,15 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onBeforeDelete()
+    {
+        if (!parent::onBeforeDelete()) return false;
+
+        $this->send(array('signal' => 'delete'));
+
+        return true;
+    }
+
     public function listen($callback)
     {
         $channelName = $this->channel_name;
@@ -89,7 +98,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             'client'  => $client,
         ));
 
+        $clientHlp = FCom_PushServer_Model_Client::i();
         $msgHlp = FCom_PushServer_Model_Message::i();
+
         $subscribers = FCom_PushServer_Model_Subscriber::i()->orm()->where('channel_id', $this->id)->find_many();
         foreach ($subscribers as $sub) {
             if ($client && $client->id === $sub->client_id) {
@@ -99,8 +110,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
                 'seq' => !empty($message['seq']) ? $message['seq'] : null,
                 'channel_id' => $this->id,
                 'subscriber_id' => $sub->id,
-                'sender_client_id' => $client ? $client->id : null,
-                'recipient_client_id' => $sub->client_id,
+                'client_id' => $sub->client_id,
+                'page_id' => $clientHlp->getPageId(),
+                'conn_id' => $clientHlp->getConnId(),
                 'status' => 'published',
             ))->setData($message)->save();
         }

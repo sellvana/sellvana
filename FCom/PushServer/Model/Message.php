@@ -10,8 +10,9 @@ class FCom_PushServer_Model_Message extends FCom_Core_Model_Abstract
      * - seq
      * - channel_id
      * - subscriber_id
-     * - sender_client_id
-     * - recipient_client_id
+     * - client_id
+     * - page_id
+     * - conn_id
      * - data_serialized
      * - status
      * - create_at

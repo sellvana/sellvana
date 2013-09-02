@@ -16,6 +16,14 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return FCom_PushServer_Model_Channel::i()->getChannel('adminchat:' . $this->id, true);
     }
 
+    static public function findByChannel($channel)
+    {
+        if (!preg_match('/^adminchat:(.*)$/', $channel, $m)) {
+            return false;
+        }
+        return FCom_AdminChat_Model_Chat::i()->load($m[1]);
+    }
+
     static public function start($remoteUser)
     {
         // get local user
@@ -44,6 +52,29 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $chat;
     }
 
+    public function getHistoryText()
+    {
+        $history = FCom_AdminChat_Model_History::i()->orm('h')
+            ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
+            ->select('u.username')->select('h.create_at')->select('h.text')
+            ->where('h.chat_id', $this->id)->order_by_asc('h.create_at')->find_many();
+        $text = array();
+        foreach ($history as $msg) {
+            $text[] = '['.date('h:i', strtotime($msg->create_at)).'] '.$msg->username.': '.$msg->text;
+        }
+        return join("\n", $text);
+    }
+
+    public function addHistory($user, $text)
+    {
+        $msg = FCom_AdminChat_Model_History::i()->create(array(
+            'chat_id' => $this->id,
+            'user_id' => $user->id,
+            'text' => $text,
+        ))->save();
+        return $msg;
+    }
+
     public function addParticipant($user)
     {
         $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($user);
@@ -60,6 +91,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
             $data['status'] = 'online';
             $participant = $hlp->create($data)->save();
             $this->add('num_participants');
+            $channel->send(array('signal' => 'join', 'username' => $user->username));
         }
 
         return $this;
@@ -79,6 +111,10 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         ));
 
         $this->add('num_participants', -1);
+
+        if ($this->get('num_participants') < 2) {
+            $this->set('status', 'closed')->save();
+        }
 
         return $this;
     }

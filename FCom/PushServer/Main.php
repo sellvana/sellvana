@@ -40,64 +40,8 @@ FCom.pushserver_url = '".BApp::src('@FCom_PushServer/index.php')."';
         return $this;
     }
 
-    public function dispatch($request)
+    public function getServices()
     {
-        if (empty($request['messages'])) {
-            return $this;
-        }
-        $client = FCom_PushServer_Model_Client::i()->sessionClient();
-        foreach ($request['messages'] as $message) {
-            try {
-                foreach ($this->_services as $service) {
-                    if ($service['channel'] !== $message['channel']
-                        && !($service['is_pattern'] && preg_match($service['channel'], $message['channel']))
-                    ) {
-                        continue;
-                    }
-                    if (is_callable($service['callback'])) {
-                        call_user_func($service['callback'], $message);
-                        continue;
-                    }
-                    if (!class_exists($service['callback'])) {
-                        continue;
-                    }
-                    $class = $service['callback'];
-                    $instance = $class::i();
-                    if (!($instance instanceof FCom_PushServer_Service_Abstract)) {
-                        //TODO: exception?
-                        continue;
-                    }
-
-                    $instance->setMessage($message, $client);
-
-                    if (!$instance->onBeforeDispatch()) {
-                        continue;
-                    }
-
-                    if (!empty($message['signal'])) {
-                        $method = 'signal_' . $message['signal'];
-                        if (!method_exists($class, $method)) {
-                            $method = 'onUnknownSignal';
-                        }
-                    } else {
-                        $method = 'onUnknownSignal';
-                    }
-
-                    $instance->$method();
-
-                    $instance->onAfterDispatch();
-                }
-            } catch (Exception $e) {
-                $client->send(array(
-                    'ref_seq' => !empty($message['seq']) ? $message['seq'] : null,
-                    'ref_signal' => !empty($message['signal']) ? $message['signal'] : null,
-                    'signal' => 'error',
-                    'description' => $e->getMessage(),
-                    'trace' => $e->getTrace(),
-                ));
-            }
-        }
-
-        return $this;
+        return $this->_services;
     }
 }

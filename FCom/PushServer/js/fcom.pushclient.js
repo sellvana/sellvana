@@ -1,8 +1,15 @@
 define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
 {
-    var i, j, state = { seq: 0, sub_id: 0 }, channels = {}, subscribers = {}, messages = [];
+    if (!window.name) { // unique name for the browser window or tab
+        window.name = Math.random();
+    }
+    var state = { sub_id: 0, page_id: window.name, conn_id: 0, msg_id: 0, conn_cnt: 0 },
+        channels = {},
+        subscribers = {},
+        messages = [];
 
     send({channel:'session', signal:'load'});
+
     scheduler();
 
     listen({ regexp: /^./, callback: catch_all })
@@ -19,18 +26,18 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
 
     function connect()
     {
-        var data = JSON.stringify({ messages: messages });
+        var data = JSON.stringify({ page_id: state.page_id, conn_id: state.conn_id++, messages: messages });
 
         messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });
-console.log('send', data);
         $.post(FCom.pushserver_url, data, receive);
 
-        state.status = 'online';
+        state.conn_cnt++;
+console.log('send', state.conn_cnt, data);
     }
 
     function receive(response, status, xhr)
     {
-console.log('receive', JSON.stringify(response.messages));
+console.log('receive', state.conn_cnt, JSON.stringify(response.messages));
 
         _.each(response.messages, function(msg) {
             if (channels[msg.channel]) {
@@ -45,20 +52,14 @@ console.log('receive', JSON.stringify(response.messages));
             });
         });
 
-        switch (state.status) {
-            case 'online':
-                connect();
-                break;
-
-            case 'handover':
-                state.status = 'online';
-                break;
+        if ((state.conn_cnt > 0) && ((--state.conn_cnt) === 0)) {
+            connect();
         }
     }
 
     function send(msg)
     {
-        if (!msg.seq) msg.seq = ++state.seq;
+        if (!msg.seq) msg.seq = ++state.msg_id;
         messages.push(msg);
     }
 
@@ -98,15 +99,11 @@ console.log('receive', JSON.stringify(response.messages));
                 messages = _.filter(messages, function(qmsg) { return qmsg.seq != msg.ref_seq; });
                 break;
 
-            case 'handover':
-                state.status = 'handover';
-                break;
-
             case 'error':
                 $.bootstrapGrowl(msg.description, { type:'error', align:'center', width:'auto' });
 
             case 'stop':
-                state.status = 'offline';
+                state.conn_cnt = 0;
                 break;
         }
     }
