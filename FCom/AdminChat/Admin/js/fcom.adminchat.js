@@ -60,7 +60,6 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports'], funct
 
     function add_history(msg)
     {
-console.log(msg.channel, chatWindows);
         var $h = chatWindows[msg.channel].$history, h = $h.get(0);
         $h.append($('<div>').html(msg.text));
         h.scrollTop = h.scrollHeight;

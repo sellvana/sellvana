@@ -1,7 +1,6 @@
 base:
     - view: head
         do:
-            #- [ requireJs, @FCom_PushServer/js/jquery.comet.js, { deps: [ jquery ] } ]
             - [ requireJs, fcom.pushclient, @FCom_PushServer/js/fcom.pushclient ]
 
     - { callback: FCom_PushServer_Main::layoutInit }
