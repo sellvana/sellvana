@@ -17,6 +17,9 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
 
     function scheduler()
     {
+        if (!FCom.pushserver_url) {
+            return;
+        }
         if (messages.length) {
             connect();
         }
