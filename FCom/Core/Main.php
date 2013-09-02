@@ -225,7 +225,7 @@ class FCom_Core_Main extends BClass
         $config = BConfig::i();
         $area = BApp::i()->get('area');
 
-	$configDir = $config->get('fs/config_dir');
+        $configDir = $config->get('fs/config_dir');
         if (file_exists($configDir.'/core.php')) {
             $config->addFile('core.php', true);
         }

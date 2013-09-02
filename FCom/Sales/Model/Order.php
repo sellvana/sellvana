@@ -209,7 +209,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             'totals'           => $cart->data['totals'],
             'shipping_service' => $cart->shipping_service
         );
-        $orderData[static::$_dataField] = $data_;
+        $orderData[static::$_dataCustomField] = $data_;
 
         /* @var $salesOrder FCom_Sales_Model_Order */
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
@@ -238,6 +238,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             static::createOrderAddress($cart, $options);
 
             //Made payment
+            $cart->setPaymentDetails(BUtil::fromJson($cart->payment_details));
             $paymentMethod = $cart->getPaymentMethod();
             static::createOrderPayment($paymentMethod, $salesOrder, $options);
         }
@@ -255,7 +256,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             return;
         }
         /* @var $payment FCom_Sales_Method_Payment_Abstract */
-        $payment->setSalesEntity($salesOrder, $options)
+        $payment->setDetails($salesOrder->getData('payment_details'))
+            ->setSalesEntity($salesOrder, $options)
                 ->payOnCheckout();
         $salesOrder->setData('payment_details', $payment->asArray());
     }
