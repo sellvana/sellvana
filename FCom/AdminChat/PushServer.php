@@ -38,7 +38,7 @@ class FCom_AdminChat_PushServer extends FCom_PushServer_Service_Abstract
 
                     $channels[] = array(
                         'channel' => 'adminchat:' . $chat->id,
-                        'history' => 'TEST',
+                        'history' => nl2br($chat->getHistoryText()),
                     );
                 }
                 $this->reply(array('signal' => 'chats', 'chats' => $channels));
@@ -56,13 +56,19 @@ class FCom_AdminChat_PushServer extends FCom_PushServer_Service_Abstract
     public function signal_say()
     {
         $chan = $this->_message['channel'];
-        if (preg_match('/^adminchat:(.*)/', $chan, $m)) {
-            $user = FCom_Admin_Model_User::i()->sessionUser();
-            $channel = FCom_PushServer_Model_Channel::i()->getChannel($chan);
-            $channel->send(array('signal' => 'say', 'text' => $user->firstname . ': ' . $this->_message['text'].'<br>'));
-            //$chat = FCom_AdminChat_Model_Chat::i()->load($m[1]);
+        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($chan);
+        $channel = FCom_PushServer_Model_Channel::i()->getChannel($chan);
+        if (!$chat) {
+            $channel->send(array('signal' => 'error', 'description' => 'Chat not found'));
+            return;
         }
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $msg = $chat->addHistory($user, $this->_message['text']);
 
+        $channel->send(array(
+            'signal' => 'say',
+            'text' => '['.date('h:i', strtotime($msg->create_at)).'] '.$user->username . ': ' . $this->_message['text'].'<br>',
+        ));
     }
 
     public function signal_kick()
@@ -72,7 +78,16 @@ class FCom_AdminChat_PushServer extends FCom_PushServer_Service_Abstract
 
     public function signal_leave()
     {
+        $channel = $this->_message['channel'];
+        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $chat->removeParticipant($user);
 
+        FCom_PushServer_Model_Channel::i()->getChannel($channel)
+            ->send(array('signal' => 'leave', 'username' => $user->username));
+
+        $this->_client->getChannel()
+            ->send(array('channel' => $channel, 'signal' => 'close'));
     }
 
     public function signal_text()

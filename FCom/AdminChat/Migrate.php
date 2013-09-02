@@ -64,7 +64,6 @@ class FCom_AdminChat_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-
         $tChat = FCom_AdminChat_Model_Chat::table();
         $tUser = FCom_Admin_Model_User::table();
 
@@ -74,6 +73,16 @@ class FCom_AdminChat_Migrate extends BClass
             ),
             'CONSTRAINTS' => array(
                 "FK_{$tChat}_owner" => "FOREIGN KEY (owner_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tHistory = FCom_AdminChat_Model_History::table();
+        BDb::ddlTableDef($tHistory, array(
+            'COLUMNS' => array(
+                'entry_type' => 'varchar(20) default "text" after `user_id`',
             ),
         ));
     }

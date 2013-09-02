@@ -2,7 +2,7 @@
 
 class FCom_PushServer_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
         $tChannel = FCom_PushServer_Model_Channel::table();
         $tClient = FCom_PushServer_Model_Client::table();
@@ -30,7 +30,6 @@ class FCom_PushServer_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'session_id' => 'varchar(100)',
                 'status' => 'varchar(10)',
-                'handover' => 'tinyint',
                 'admin_user_id' => 'int unsigned null',
                 'customer_id' => 'int unsigned null',
                 'remote_ip' => 'varchar(20)',
@@ -68,10 +67,11 @@ class FCom_PushServer_Migrate extends BClass
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'seq' => 'varchar(30)',
-                'channel_id' => 'int unsigned not null',
+                'channel_id' => 'int unsigned null',
                 'subscriber_id' => 'int unsigned not null',
-                'sender_client_id' => 'int unsigned null',
-                'recipient_client_id' => 'int unsigned not null',
+                'client_id' => 'int unsigned not null',
+                'page_id' => 'varchar(30) null',
+                'conn_id' => 'int unsigned null',
                 'status' => 'varchar(20)',
                 'data_serialized' => 'text',
                 'create_at' => 'datetime',
@@ -82,10 +82,50 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ),
             'CONSTRAINTS' => array(
-                "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE NULL",
                 "FK_{$tMessage}_subscriber" => "FOREIGN KEY (subscriber_id) REFERENCES {$tSubscriber} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tMessage}_sender" => "FOREIGN KEY (sender_client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tMessage}_recipient" => "FOREIGN KEY (recipient_client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tMessage}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $tChannel = FCom_PushServer_Model_Channel::table();
+        $tClient = FCom_PushServer_Model_Client::table();
+        $tMessage = FCom_PushServer_Model_Message::table();
+        $tSubscriber = FCom_PushServer_Model_Subscriber::table();
+
+        BDb::ddlTableDef($tClient, array(
+            'COLUMNS' => array(
+                'handover' => 'DROP',
+            ),
+        ));
+
+        BDb::run("DROP TABLE IF EXISTS {$tMessage}");
+
+        BDb::ddlTableDef($tMessage, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'seq' => 'varchar(30)',
+                'channel_id' => 'int unsigned null',
+                'subscriber_id' => 'int unsigned not null',
+                'client_id' => 'int unsigned not null',
+                'page_id' => 'varchar(30) null',
+                'conn_id' => 'int unsigned null',
+                'status' => 'varchar(20)',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'IDX_update_at' => '(update_at)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE SET NULL",
+                "FK_{$tMessage}_subscriber" => "FOREIGN KEY (subscriber_id) REFERENCES {$tSubscriber} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tMessage}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
     }

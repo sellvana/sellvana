@@ -6,11 +6,13 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
     {
         BResponse::i()->nocache()->startLongResponse(false);
 
-        $request = BRequest::i()->json();
-        FCom_PushServer_Main::i()->dispatch($request);
-
         $client = FCom_PushServer_Model_Client::i()->sessionClient();
-        $result = $client->dispatch();
+
+        $request = BRequest::i()->json();
+
+        $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
+
+        $result = array('messages' => $client->getMessages());
 
         BResponse::i()->json($result);
     }
