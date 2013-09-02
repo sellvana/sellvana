@@ -431,7 +431,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             //$order->importPaymentFromCart($cart);
             //$order->save();
             // $payment = FCom_Sales_Model_Order_Payment::i()->createFromCart($cart);
-            $order->pay();
+//            $order->pay();
             $cart->setStatus('ordered')->save();
             return $order;
         } catch (Exception $e) {
@@ -460,9 +460,9 @@ var_dump($e);
         }
         return $this;
     }
-    public function setPaymentToUser()
+    public function setPaymentToUser($post)
     {
-        if (FCom_Customer_Model_Customer::isLoggedIn()) {
+        if (FCom_Customer_Model_Customer::isLoggedIn() && isset($post['payment'])) {
             $user = FCom_Customer_Model_Customer::i()->sessionUser();
             $user->setPaymentDetails($post['payment']);
         }

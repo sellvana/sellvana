@@ -45,7 +45,7 @@ class FCom_Email_Main extends BClass
                 'status' => 'success',
             ))->save();
             return true;
-        } else {
+        } else if($errors){
             $msg->set(array(
                 'status' => 'error',
                 'error_message' => $errors[0]['message'],

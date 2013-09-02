@@ -18,7 +18,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
     public function payOnCheckout()
     {
         $config = $this->config();
-        if (!$config['enabled']) {
+        if (!$config['active']) {
             // log this and eventually show a message
             return null;
         }

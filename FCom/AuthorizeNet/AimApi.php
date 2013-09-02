@@ -172,10 +172,11 @@ class FCom_AuthorizeNet_AimApi extends BClass
                 define('AUTHORIZENET_LOG_FILE', static::AUTHORIZENET_LOG_FILE);
             }
             $this->api = new AuthorizeNetAIM();
-
+/* API is missing currency code !!!!
             if($data->get('currency')){
                 $this->api->currency_code = $data->get('currency');
             }
+*/
         }
         return $this->api;
     }

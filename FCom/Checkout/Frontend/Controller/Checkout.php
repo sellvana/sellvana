@@ -127,7 +127,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (!empty($post['payment'])) {
             $cart->payment_details = BUtil::toJson($post['payment']);
-            $cart->setPaymentToUser();
+            $cart->setPaymentToUser($post);
         }
         if (!empty($post['coupon_code'])) {
             $cart->coupon_code = $post['coupon_code'];

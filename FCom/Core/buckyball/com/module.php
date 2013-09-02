@@ -1026,11 +1026,12 @@ class BModule extends BClass
     }
 
     /**
-    * Register module specific autoload callback
-    *
-    * @param mixed $rootDir
-    * @param mixed $callback
-    */
+     * Register module specific autoload callback
+     *
+     * @param mixed $rootDir
+     * @param mixed $callback
+     * @return $this
+     */
     public function autoload($rootDir='', $callback=null)
     {
         if (!$rootDir) {
