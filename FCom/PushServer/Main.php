@@ -5,10 +5,19 @@ class FCom_PushServer_Main extends BCLass
     static public function bootstrap()
     {
         static::i()
-            ->addService('/^./', 'FCom_PushServer_Service_Default::catchAll')
-            ->addService('session', 'FCom_PushServer_Service_Default')
-            ->addService('/^session:(.*)$/', 'FCom_PushServer_Service_Default')
+            ->addService('/^./', 'FCom_PushServer_Main::catchAll')
+            ->addService('client', 'FCom_PushServer_Service_Client')
         ;
+    }
+
+    static public function catchAll($message)
+    {
+        if (!empty($message['seq'])) {
+            FCom_PushServer_Model_Client::i()->sessionClient()->send(array(
+                'ref_seq' => $message['seq'],
+                'signal' => 'received',
+            ));
+        }
     }
 
     static public function layoutInit()

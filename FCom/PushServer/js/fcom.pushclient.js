@@ -8,13 +8,12 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
         subscribers = {},
         messages = [];
 
-    send({channel:'session', signal:'load'});
+    send({channel:'client', signal:'ready'});
 
     scheduler();
 
-    listen({ regexp: /^./, callback: catch_all })
-    listen({ channel: 'session', callback: channel_session });
-    listen({ regexp: /^session:(.*)$/, callback: channel_session });
+    listen({ regexp: /^./, callback: catchAll })
+    listen({ channel: 'client', callback: channel_client });
 
     function scheduler()
     {
@@ -32,12 +31,12 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
         $.post(FCom.pushserver_url, data, receive);
 
         state.conn_cnt++;
-console.log('send', state.conn_cnt, data);
+console.log('send', data);
     }
 
     function receive(response, status, xhr)
     {
-console.log('receive', state.conn_cnt, JSON.stringify(response.messages));
+console.log('receive', JSON.stringify(response.messages));
 
         _.each(response.messages, function(msg) {
             if (channels[msg.channel]) {
@@ -52,7 +51,7 @@ console.log('receive', state.conn_cnt, JSON.stringify(response.messages));
             });
         });
 
-        if ((state.conn_cnt > 0) && ((--state.conn_cnt) === 0)) {
+        if (state.conn_cnt && ((--state.conn_cnt) === 0)) {
             connect();
         }
     }
@@ -81,18 +80,22 @@ console.log('receive', state.conn_cnt, JSON.stringify(response.messages));
     function forget(alias, channel)
     {
         if (channel) {
-            delete channels[channel].subscribers[alias];
+            if (true === alias) {
+                delete channels[channel];
+            } else {
+                delete channels[channel].subscribers[alias];
+            }
         } else {
             delete subscribers[alias];
         }
     }
 
-    function catch_all(msg)
+    function catchAll(msg)
     {
 
     }
 
-    function channel_session(msg)
+    function channel_client(msg)
     {
         switch (msg.signal) {
             case 'received':
@@ -103,7 +106,7 @@ console.log('receive', state.conn_cnt, JSON.stringify(response.messages));
                 $.bootstrapGrowl(msg.description, { type:'error', align:'center', width:'auto' });
 
             case 'stop':
-                state.conn_cnt = 0;
+                state.conn_cnt = false;
                 break;
         }
     }

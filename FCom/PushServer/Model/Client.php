@@ -266,11 +266,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (empty($connections[static::$_connId])) { // this connection was removed
             unset($connections[static::$_connId]);
             $this->setData($connKey, $connections);
-            $messages[] = array('channel' => 'session', 'signal' => 'noop');
+            $messages[] = array('channel' => 'client', 'signal' => 'noop');
         }
         // foreach ($connections as $connId => $conn) {
         //     if ($connId > static::$_connId) { // a new connection was made
-        //         $messages[] = array('channel' => 'session', 'signal' => 'noop');
+        //         $messages[] = array('channel' => 'client', 'signal' => 'noop');
         //         break;
         //     }
         // }
@@ -288,7 +288,15 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (empty($pages[static::$_pageId]['connections'])) {
             unset($pages[static::$_pageId]);
         }
-        $this->setData('pages', $pages)->save();
+
+        $this->setData('pages', $pages);
+
+        if (!$pages && !$this->_messages) {
+            $this->setStatus('offline');
+        }
+
+        $this->save();
+
         return $this;
     }
 
@@ -299,6 +307,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $data = (array) BUtil::fromJson($clientUpdate->get('data_serialized'));
             $this->set(static::$_dataCustomField, $data);
         }
+        return $this;
+    }
+
+    public function setStatus($status)
+    {
+        $this->set('status', $status);
+        BEvents::i()->fire(__METHOD__, array('client' => $this, 'status' => $status));
         return $this;
     }
 
@@ -346,10 +361,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function getChannel()
     {
-        return FCom_PushServer_Model_Channel::i()->getChannel('session:' . $this->session_id, true);
+        return FCom_PushServer_Model_Channel::i()->getChannel('client:' . $this->id, true);
     }
 
-    public function getMessages ()
+    public function getMessages()
     {
         return $this->_messages;
     }
