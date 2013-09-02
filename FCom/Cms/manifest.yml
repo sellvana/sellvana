@@ -7,10 +7,8 @@ modules:
         description: "CMS for custom pages and blocks"
         auto_use: all
         default_config:
-            modules:
-                FCom_Cms:
-                    page_enable: true
-                    nav_enable: true
+            modules/FCom_Cms/page_enable: true
+            modules/FCom_Cms/nav_enable: true
         areas:
             FCom_Admin:
                 routing:

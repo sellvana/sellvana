@@ -5,11 +5,6 @@ modules:
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Fulleron Extension Market Client"
 
-        default_config:
-            modules:
-                FCom_MarketClient:
-                    market_url: //fulleron.com
-
         observe:
             - [ FCom_MarketClient_Model_Module::find_one:orm, FCom_MarketClient_Model_Module::onFindOrm ]
             - [ FCom_MarketClient_Model_Module::find_many:orm, FCom_MarketClient_Model_Module::onFindOrm ]

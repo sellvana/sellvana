@@ -34,7 +34,7 @@ modules:
                 observe:
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
 
-            FCom_Api:
+            FCom_ApiServer:
                 routing:
                     - [ any, /v1/customer/customer, FCom_Customer_ApiServer_V1_Customer.index ]
                     - [ any, /v1/customer/customer/:id, FCom_Customer_ApiServer_V1_Customer.index ]

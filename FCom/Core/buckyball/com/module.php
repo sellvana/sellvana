@@ -1153,7 +1153,15 @@ class BModule extends BClass
     public function processDefaultConfig()
     {
         if (!empty($this->default_config)) {
-            BConfig::i()->add($this->default_config);
+            $cfgHlp = BConfig::i();
+            $config = $this->default_config;
+            foreach ($config as $path => $value) {
+                if (strpos($path, '/')!==false) {
+                    $cfgHlp->set($path, $value);
+                    unset($config[$path]);
+                }
+            }
+            $cfgHlp->add($config);
         }
         $this->_processProvides();
         return $this;
@@ -1435,7 +1443,9 @@ class BMigrate extends BClass
         end($installs); $install = current($installs);
         $instance = $class::i();
 
-        static::install($install['to'], array($instance, $install['method']));
+        if ($install) {
+            static::install($install['to'], array($instance, $install['method']));
+        }
         foreach ($upgrades as $upgrade) {
             static::upgrade($upgrade['from'], $upgrade['to'], array($instance, $upgrade['method']));
         }
@@ -1463,12 +1473,15 @@ class BMigrate extends BClass
         }
 BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         // creating module before running install, so the module configuration values can be created within script
-        $module = BDbModule::i()->create(array(
-            'module_name' => $mod['module_name'],
-            'schema_version' => $version,
-            'last_upgrade' => BDb::now(),
-            'last_status' => 'INSTALLING',
-        ))->save();
+        $module = BDbModule::i()->load($mod['module_name'], 'module_name');
+        if (!$module) {
+            $module = BDbModule::i()->create(array(
+                'module_name' => $mod['module_name'],
+                'schema_version' => $version,
+                'last_upgrade' => BDb::now(),
+                'last_status' => 'INSTALLING',
+            ))->save();
+        }
         // call install migration script
         try {
             if (is_callable($callback)) {

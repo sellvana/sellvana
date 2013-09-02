@@ -40,7 +40,7 @@ modules:
                 views:
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]
 
-            FCom_Api:
+            FCom_ApiServer:
                 routing:
                     - [ any, /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
                     - [ any, /v1/catalog/category/:id, FCom_Catalog_ApiServer_V1_Category.index ]

@@ -1,5 +1,0 @@
-base:
-    - view: head
-        do:
-            - [ requireJs, @FCom_Comet/js/jquery.comet.js, { deps: [ jquery ] } ]
-            - [ requireJs, @FCom_Comet/js/fcom.comet.js, { deps: [ fcom.core ] } ]
