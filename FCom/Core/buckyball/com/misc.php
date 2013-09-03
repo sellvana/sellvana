@@ -3672,7 +3672,7 @@ class BRSA extends BClass
         if (!empty($this->_config['decrypt_url'])) {
             $data = array('encrypted' => base64_encode($encrypted));
             $result = BUtil::remoteHttp('GET', $this->_config['decrypt_url'], $data);
-            $decrypted = base64_decode($response);
+            $decrypted = base64_decode($result);
             if (!empty($result['decrypted'])) {
                 $decrypted = $result['decrypted'];
             } else {
