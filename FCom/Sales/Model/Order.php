@@ -256,8 +256,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             return;
         }
         /* @var $payment FCom_Sales_Method_Payment_Abstract */
-        $payment->setDetails($salesOrder->getData('payment_details'))
-            ->setSalesEntity($salesOrder, $options)
+        $payment->setSalesEntity($salesOrder, $options)
                 ->payOnCheckout();
         $salesOrder->setData('payment_details', $payment->asArray());
     }
