@@ -399,6 +399,21 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
+     * Set shipping method
+     *
+     * Check if provided code is valid shipping method and apply it
+     * @param string $shipping_method
+     * @return $this
+     */
+    public function setShippingMethod($shipping_method)
+    {
+        if ($this->shipping_method != $shipping_method &&
+            in_array($shipping_method, FCom_Sales_Main::i()->getShippingMethods())) {
+            $this->shipping_method = $shipping_method;
+        }
+        return $this;
+    }
+    /**
      * @return null|FCom_Sales_Method_Payment_Interface
      */
     public function getPaymentMethod()
@@ -408,6 +423,22 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         $methods = FCom_Sales_Main::i()->getPaymentMethods();
         return $methods[$this->payment_method];
+    }
+
+    /**
+     * Set payment method
+     *
+     * Check if provided code is valid payment method and apply it
+     * @param string $payment_method
+     * @return $this
+     */
+    public function setPaymentMethod($payment_method)
+    {
+        if ( $this->payment_method != $payment_method &&
+            array_key_exists($payment_method, FCom_Sales_Main::i()->getPaymentMethods())) {
+            $this->payment_method = $payment_method;
+        }
+        return $this;
     }
 
     public function setStatus($status)
@@ -455,7 +486,7 @@ var_dump($e);
             $paymentMethod = $this->getPaymentMethod();
             if($paymentMethod){
                 $paymentMethod->setDetails($data);
-                $cart->payment_details = BUtil::toJson($paymentMethod->getPublicData());
+                $this->payment_details = BUtil::toJson($paymentMethod->getPublicData());
             }
         }
         return $this;

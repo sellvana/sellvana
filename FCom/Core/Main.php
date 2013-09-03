@@ -298,6 +298,9 @@ class FCom_Core_Main extends BClass
         if (file_exists($configDir.'/local.php')) {
             $config->addFile('local.php', true);
         }
+        if (file_exists($configDir.'/local.yml')) {
+            $config->addFile('local.yml', true);
+        }
 
         BClassAutoload::i(true, array('root_dir'=>$dirConf['local_dir']));
         BClassAutoload::i(true, array('root_dir'=>$dirConf['dlc_dir']));

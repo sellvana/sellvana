@@ -120,9 +120,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (!empty($post['shipping'])) {
             $shipping = explode(":", $post['shipping']);
-            $cart->shipping_method = $shipping[0];
+            $cart->setShippingMethod($shipping[0]);
             $cart->shipping_service = $shipping[1];
             //$cart->shipping_price = FCom_Sales_Model_Cart::i()->getShippingMethod($post['shipping_method'])->getPrice();
+        }
+
+        if(!empty($post['payment_method'])){
+            $cart->setPaymentMethod($post['payment_method']);
         }
 
         if (!empty($post['payment'])) {

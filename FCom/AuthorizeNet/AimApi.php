@@ -90,7 +90,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
 
     /**
      * @param AuthorizeNetAIM $api
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @param FCom_Sales_Model_Order $order
      */
     protected function setSaleDetails($api, $payment, $order)
