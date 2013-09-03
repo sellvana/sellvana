@@ -948,7 +948,8 @@ class BModule extends BClass
 
     protected function _processProvides()
     {
-        if (!empty($this->provides['themes'])) {
+        //TODO: automatically enable theme module when it is used
+        if ($this->run_status===BModule::PENDING && !empty($this->provides['themes'])) {
             foreach ($this->provides['themes'] as $name=>$params) {
                 $params['module_name'] = $this->name;
                 BLayout::i()->addTheme($name, $params);

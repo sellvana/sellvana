@@ -3568,12 +3568,15 @@ class BRSA extends BClass
 {
     protected $_configPath = 'modules/BRSA';
     protected $_config = array();
+    protected $_publicKey;
+    protected $_privateKey;
     protected $_cache = array();
 
     public function __construct()
     {
         if (!function_exists('openssl_pkey_new')) {
             // TODO: integrate Crypt_RSA ?
+            throw new BException('RSA encryption requires openssl module installed');
         }
         $defConf = array(
             "digest_alg" => "sha512",
@@ -3589,64 +3592,94 @@ class BRSA extends BClass
         $config = BUtil::arrayMask($this->_config, 'digest_alg,x509_extensions,req_extensions,'
             . 'private_key_bits,private_key_type,encrypt_key,encrypt_key_cipher');
         $res = openssl_pkey_new($config);
-        openssl_pkey_export($res, $this->_config['private_key']); // private key
+        openssl_pkey_export($res, $this->_privateKey); // private key
 
         $pubKey = openssl_pkey_get_details($res); // public key
-        $this->_config['public_key'] = $pubKey["key"];
+        $this->_publicKey = $pubKey["key"];
 
-        BConfig::i()
-            //->set($this->_configPath.'/private_key', $this->_config['private_key'], false, true)
-            ->set($this->_configPath.'/public_key', $this->_config['public_key'], false, true)
-        ;
+        BConfig::i()->set($this->_configPath.'/public_key', $this->_publicKey, false, true);
+
+        file_put_contents($this->_getPrivateKeyFileName(), $this->_privateKey);
 
         return $this;
     }
 
-    public function getPublicKey()
+    protected  function _getPublicKey()
     {
-        return $this->_config['public_key'];
+        if (!$this->_publicKey) {
+            $this->_publicKey = BConfig::i()->get($this->_configPath.'/public_key');
+            if (!$this->_publicKey) {
+                throw new BException('No public key defined');
+            }
+        }
+        return $this->_publicKey;
     }
 
-    public function getPrivateKey()
+    protected function _getPrivateKeyFileName()
     {
-        return $this->_config['private_key'];
+        $configDir = BConfig::i()->get('fs/config_dir');
+        if (!$configDir) {
+            $configDir = '.';
+        }
+        return $configDir . '/private-' . md5($this->_getPublicKey()) . '.key';
+    }
+
+    protected function _getPrivateKey()
+    {
+        if (!$this->_privateKey) {
+            $filepath = $this->_getPrivateKeyFileName();
+            if (!is_readable($filepath)) {
+                throw new BException('No private key file found');
+            }
+            $this->_privateKey = file_get_contents($filepath);
+        }
+        return $this->_privateKey;
     }
 
     public function setPublicKey()
     {
-        $this->_config['public_key'] = $key;
+        $this->_publicKey = $key;
         return $this;
     }
 
     public function setPrivateKey()
     {
-        $this->_config['private_key'] = $key;
+        $this->_privateKey = $key;
         return $this;
     }
 
     public function encrypt($plain)
     {
-        openssl_public_encrypt($plain, $encrypted, $this->_config['public_key']);
+        openssl_public_encrypt($plain, $encrypted, $this->_getPublicKey());
         return $encrypted;
     }
 
+    /**
+     * Decrypt data
+     *
+     * Use buckyball/ssl/offsite-decrypt.php script for much improved security
+     *
+     * @param string $encrypted
+     * @return string
+     */
     public function decrypt($encrypted)
     {
         $hash = sha1($encrypted);
         if (!empty($this->_cache[$hash])) {
             return $this->_cache[$hash];
         }
+        // even though decrypt_url can potentially be overridden by extension, only encrypted data is sent over
         if (!empty($this->_config['decrypt_url'])) {
-            $data = array('encrypted' => $encrypted);
-            $response = BUtil::remoteHttp('GET', $this->_config['decrypt_url'], $data);
-            $result = BUtil::fromJson($response);
+            $data = array('encrypted' => base64_encode($encrypted));
+            $result = BUtil::remoteHttp('GET', $this->_config['decrypt_url'], $data);
+            $decrypted = base64_decode($response);
             if (!empty($result['decrypted'])) {
                 $decrypted = $result['decrypted'];
             } else {
                 //TODO: handle exceptions
             }
         } else {
-            openssl_private_decrypt($encrypted, $decrypted, $this->_config['private_key']);
+            openssl_private_decrypt($encrypted, $decrypted, $this->_getPrivateKey());
         }
         $this->_cache[$hash] = $decrypted;
         return $decrypted;

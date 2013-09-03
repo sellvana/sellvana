@@ -36,7 +36,6 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                     BSession::i()->addMessage('Invalid DB configuration, not saved: '.$e->getMessage(), 'error', 'admin');
                 }
             }
-
             FCom_Core_Main::i()->writeLocalConfig();
 
             BSession::i()->addMessage('Settings updated', 'success', 'admin');
