@@ -22,6 +22,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $user = FCom_Admin_Model_User::i()->load($this->_message['user'], 'username');
         if (!$user) {
             $this->reply(array('signal' => 'error', 'description' => 'Unknown username'));
+            return;
         }
         $chat = FCom_AdminChat_Model_Chat::i()->start($user);
         $chat->getChannel()->send(array('signal' => 'start'));

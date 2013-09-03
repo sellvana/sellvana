@@ -224,9 +224,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $delay = BConfig::i()->get('modules/FCom_PushServer/delay_microsec');
         $start = time();
         while (true) {
-            // if (time() - $start > 60) {
-            //     break;
-            // }
+            if (time() - $start > 50) {
+                break;
+            }
             if (connection_aborted()) {
                 break;
             }
