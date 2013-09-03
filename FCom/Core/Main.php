@@ -339,7 +339,7 @@ class FCom_Core_Main extends BClass
         unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'],
             $c['mode_by_ip'], $c['cache']);
         $config->writeFile('core.php', $m); // PHP for simpler loading
-        $config->writeFile('local.yml', $c);
+        $config->writeFile('local.php', $c);
         return $this;
     }
 
