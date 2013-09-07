@@ -57,7 +57,7 @@ base:
 
   - view: admin/nav
     do:
-      - [ addNav, home, { label: Dashboard, href: /, pos: 10, icon_class: icon-home-1 } ]
+      - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-home-1 } ]
       - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle } ]
       - [ addNav, modules/installed, { label: Installed Modules, href: /modules } ]
       - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog-1 } ]
@@ -161,8 +161,12 @@ form:
 /:
     - { include: base }
     - { include: flot }
-    - { hook: main, views: home }
-    - { view: admin/nav, do: [[ setNav, home ]] }
+    - { hook: main, views: dashboard }
+    - { view: admin/nav, do: [[ setNav, dashboard ]] }
+    - view: head
+      do:
+        - [ requireJs, ModalLauncher, @FCom_Admin/js/BackboneViews/ModalLauncher ]
+        - [ requireJs, FormView, @FCom_Admin/js/BackboneViews/FormView ]
 
 /denied:
     - { include: base }

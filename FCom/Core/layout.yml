@@ -26,7 +26,7 @@ common_js_libs:
             - [ requireJs, bacon, @FCom_Core/js/lib/bacon.min, { exports: Bacon } ]
             - [ requireJs, backbone, @FCom_Core/js/lib/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
             - [ requireJs, backbone.modelbinder, @FCom_Core/js/lib/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
-            - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ Backbone ], exports: Backbone.Marionette } ]
+            - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ backbone ], exports: Backbone.Marionette } ]
             - [ requireJs, backbone-pageable, @FCom_Core/js/lib/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
 
             - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
