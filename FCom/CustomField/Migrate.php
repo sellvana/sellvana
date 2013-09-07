@@ -89,24 +89,24 @@ class FCom_CustomField_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('sort_order' => "int not null default '0'")));
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `facet_select` enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'")));
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `system` tinyint(1) NOT NULL DEFAULT '0'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('system' => "tinyint(1) NOT NULL DEFAULT '0'")));
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
         $tProdField = FCom_CustomField_Model_ProductField::table();
-        BDb::run("ALTER TABLE {$tProdField} ADD `_data_serialized` text null AFTER _hide_field_ids");
+        BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('_data_serialized' => "text null AFTER _hide_field_ids")));
     }
 }
