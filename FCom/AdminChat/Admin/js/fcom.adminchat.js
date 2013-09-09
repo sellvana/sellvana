@@ -71,7 +71,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports'], funct
 
     function channel_adminchat(msg)
     {
-        console.log(msg.signal, msg);
+console.log(msg.channel, msg.signal, msg);
         if (channel_adminchat.signals[msg.signal]) {
             channel_adminchat.signals[msg.signal](msg);
         }
