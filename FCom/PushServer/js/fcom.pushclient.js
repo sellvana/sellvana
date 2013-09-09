@@ -14,6 +14,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
 
     listen({ regexp: /^./, callback: catchAll })
     listen({ channel: 'client', callback: channel_client });
+    listen({ regexp: /^client:(.*)$/, callback: channel_client });
 
     function scheduler()
     {
@@ -49,6 +50,7 @@ console.log('receive', JSON.stringify(response.messages));
             }
             _.each(subscribers, function(sub) {
                 if (sub.regexp && sub.regexp.test(msg.channel)) {
+console.log('regexp subscriber', sub);
                     sub.callback(msg);
                 }
             });

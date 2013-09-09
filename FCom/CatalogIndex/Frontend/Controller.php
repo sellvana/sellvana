@@ -14,13 +14,13 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         FCom_CatalogIndex_Main::i()->autoReindex(false);
 
         // create categories / subcategories
-        if (true) {
+        if (false) {
             $root = FCom_Catalog_Model_Category::i()->load(1);
             for ($i=1; $i<=20; $i++) {
                 $root->createChild('Category '.$i);
             }
         }
-        if (true) {
+        if (false) {
             //$root = FCom_Catalog_Model_Category::i()->load(1);
             $cats = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
             foreach ($cats as $c) {
@@ -32,7 +32,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // create products
         $products = true;
-        if (true) {
+        if (false) {
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
@@ -66,7 +66,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         // assign products to categories
-        if (true) {
+        if (false) {
             BDb::run("TRUNCATE fcom_category_product");
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
