@@ -1,4 +1,4 @@
-define(['backbone','marionette'],
+define(['backbone','marionette','backbone.bootstrap-modal'],
     function(Backbone,Marionette){
         var ModalLauncher = Backbone.Marionette.ItemView.extend({
             getTemplate: function(){
