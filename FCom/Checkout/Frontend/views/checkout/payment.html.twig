@@ -6,7 +6,7 @@
 <fieldset>
         {% for method, class in THIS.get('payment_methods') %}
         <label class="radio">
-          <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' }}>
+          <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' }} id="payment_method_{{ method }}">
             {{ class.getName()|_ }}
         </label><br>
             {% if payment_html[method] %}
