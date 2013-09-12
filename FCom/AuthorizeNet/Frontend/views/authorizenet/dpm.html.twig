@@ -1,3 +1,92 @@
+{% extends '@FCom_AuthorizeNet/authorizenet/aim.html.twig' %}
 {% set method = THIS.get('method') %}
+{% block extra %}
 
-{{ THIS.view('authorizenet/aim').set({'method': method}) | raw }}
+
+    <script type="text/javascript">
+        require(['jquery'], function($){
+            var iFrameTpl = '<iframe src="/empty.html" frameborder="0" allowtransparency="true"'
+            + 'style="display: none;width:100%;background-color:transparent" name="dpm_post" id="dpm-post-frame"></iframe>';
+
+            var $placeOrderBtn = $("button[name='place_order']");
+            var $form = $placeOrderBtn.parents('form');
+
+            $form.submit(function(event){
+                if($("#payment_method_{{ method_code }}").prop("checked") == false) {
+                    return;
+                }
+                event.preventDefault();
+
+                var data = $form.serialize();
+                data += "&is_ajax=1";
+                $.post(
+                        '{{ APP.href("/checkout") }}',
+                        data,
+                        function(response) {
+                            console.log(response);
+
+                            var $iframe = $(iFrameTpl);
+                            $iframe.insertAfter($form);
+
+                            var dpmUrl = '{{ config["cgi_url"] }}';
+                            var dpmData = {};
+                            dpmData['x_card_num'] = $("#authnet_cc_number").val();
+                            dpmData['x_exp_date'] = $("#").val();
+                            var billing = response['billing'];
+                            var order = response['order'];
+                            dpmData['x_invoice_num'] = order['unique_id'];
+                            {% if config['useccv']  %}
+                            dpmData['x_card_code'] = $("#authnet_cc_cid").val();
+                            {% endif %}
+                            if (billing) {
+                                if (billing['firstname']) {
+                                    dpmData['x_first_name'] = billing['firstname'];
+                                }
+                                if (billing['lastname']) {
+                                    dpmData['x_last_name'] = billing['lastname'];
+                                }
+                                if (billing['company']) {
+                                    dpmData['x_company'] = billing['company'];
+                                }
+                                if (billing['city']) {
+                                    dpmData['x_city'] = billing['city'];
+                                }
+                                if (billing['region']) {
+                                    dpmData['x_state'] = billing['region'];
+                                }
+                                if (billing['postcode']) {
+                                    dpmData['x_zip'] = billing['postcode'];
+                                }
+                                if (billing['country']) {
+                                    dpmData['x_country'] = billing['country'];
+                                }
+                                if (billing['phone']) {
+                                    dpmData['x_phone'] = billing['phone'];
+                                }
+                                if (billing['fax']) {
+                                    dpmData['x_fax'] = billing['fax'];
+                                }
+                            }
+                            if (order['customer_email']) {
+                                dpmData['x_email'] = order['customer_email'];
+                            }
+                            if (order['customer_id']) {
+                                dpmData['x_cust_id'] = order['customer_id'];
+                            }
+
+                            dpmData['x_po_num'] = order['unique_id'];
+
+                            for(var key in response['x_fields']) {
+                                dpmData[key] = response['x_fields'][key];
+                            }
+                            $.post(dpmUrl, dpmData, function(response){
+                                console.log(response);
+                            });
+                        },
+                        'json'
+                );
+            });
+        });
+    </script>
+{% endblock %}
+{#{{ THIS.view('authorizenet/aim').set({'method': method}) | raw }}#}

@@ -68,6 +68,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
                                          ->set('cart', $cart)
                                          ->set('method', $method)
+                                         ->set('code', $code)
                                          ->render();
         }
 
@@ -139,7 +140,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $cart->save();
 
-        if (empty($post['place_order'])) {
+        if (empty($post['place_order']) && empty($post['is_ajax'])) {
             BResponse::i()->redirect(BApp::href('checkout'));
         }
         $order = $cart->placeOrder();
@@ -147,8 +148,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $sData =& BSession::i()->dataToUpdate();
         $sData['last_order']['id'] = $order->id;
-
-        BResponse::i()->redirect(BApp::href('checkout/success'));
+        if(BRequest::i()->get('is_ajax') || (isset($post['is_ajax'])  && $post['is_ajax'])){
+            $data = $cart->getPaymentMethod()->ajaxData();
+            BResponse::i()->json($data);
+        } else {
+            BResponse::i()->redirect(BApp::href('checkout/success'));
+        }
     }
 
     public function action_payment()

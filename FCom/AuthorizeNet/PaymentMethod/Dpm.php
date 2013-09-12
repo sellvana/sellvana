@@ -12,7 +12,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('authorizenet/dpm');
+        return BLayout::i()->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
     public function payOnCheckout()
@@ -92,17 +92,33 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
             "x_delim_data"     => "TRUE",
             'x_amount'         => $this->getDetail('amount_due'),
             'x_fp_sequence'    => $order->unique_id,
-            'x_fp_hash'        => AuthorizeNetSIM_Form::getFingerprint($config['login'],
-                                                                       $config['trans_key'],
-                                                                       $this->getDetail('amount_due'),
-                                                                       $order->unique_id, $time),
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
             'x_relay_url'      => BApp::href("authorizenet/dpm"),
             'x_login'          => $config['login'],
+            'x_description'    => $order->getTextDescription(),
         );
-
+        if (class_exists("AuthorizeNetSIM")) {
+            $fields['x_fp_hash'] = AuthorizeNetSIM_Form::getFingerprint($config['login'],
+                                                                        $config['trans_key'],
+                                                                        $this->getDetail('amount_due'),
+                                                                        $order->unique_id, $time);
+        }
         return $fields;
+    }
+
+    public function ajaxData()
+    {
+        $order = $this->getOrder();
+        $data['order'] = $order->as_array();
+        if($order->billing()){
+            $data['billing']  = $order->billing()->as_array();
+        }
+        if($order->shipping()){
+            $data['shipping'] = $order->shipping()->as_array();
+        }
+        $data['x_fields'] = $this->hiddenFields();
+        return $data;
     }
 
     /**

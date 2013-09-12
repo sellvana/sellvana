@@ -12,7 +12,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);;
+        return BLayout::i()->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
     public function payOnCheckout()
