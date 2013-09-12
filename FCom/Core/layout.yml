@@ -28,6 +28,7 @@ common_js_libs:
             - [ requireJs, backbone.modelbinder, @FCom_Core/js/lib/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
             - [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ backbone ], exports: Backbone.Marionette } ]
             - [ requireJs, backbone-pageable, @FCom_Core/js/lib/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
+            - [ requireJs, backbone.bootstrap-modal, @FCom_Core/js/lib/backbone.bootstrap-Modal, { deps: [ backbone ], exports: Backbone.BootstrapModal } ]
 
             - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
 #            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
