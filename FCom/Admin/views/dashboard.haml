@@ -47,8 +47,10 @@
             eventHelper: "#openForm",
             passedView : form
         });
-        $("#someid").html(modalLauncher.el);/// brute force..
-        //debugger
+        var mgr = new Backbone.Marionette.Region({
+            el: "#someid"
+        });
+        mgr.show(modalLauncher);
         $.plot('#chart1', [
             { label: "Pending", data: 20 },
             { label: "New", data: 30 },
