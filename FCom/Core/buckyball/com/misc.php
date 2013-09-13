@@ -2499,6 +2499,25 @@ class BLocale extends BClass
 
                     case 'po':
                         //TODO: implement https://github.com/clinisbut/PHP-po-parser
+                        $contentLines = file($data);
+                        $translations = array();
+                        $mode = null;
+                        foreach ($contentLines as $line) {
+                            $line = trim($line);
+                            if ($line[0]==='"') {
+                                $cmd = '+'.$mode;
+                                $str = $line;
+                            } else {
+                                list($cmd, $str) = explode(' ', $line, 2);
+                            }
+                            $str = preg_replace('/(^\s*"|"\s*$)/', '', $str);
+                            switch ($cmd) {
+                                case 'msgid': $msgid = $str; $mode = $cmd; $translations[$msgid] = ''; break;
+                                case '+msgid': $msgid .= $str; break;
+                                case 'msgstr': $mode = $cmd; $translations[$msgid] = $str; break;
+                                case '+msgstr': $translations[$msgid] .= $str; break;
+                            }
+                        }
                         break;
                 }
             } else {
@@ -2586,14 +2605,16 @@ class BLocale extends BClass
         $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
         switch ($ext) {
             case 'php':
-                self::saveToPHP($targetFile, $newtranslations);
+                static::saveToPHP($targetFile, $newtranslations);
                 break;
             case 'csv':
-                self::saveToCSV($targetFile, $newtranslations);
+                static::saveToCSV($targetFile, $newtranslations);
                 break;
             case 'json':
-                self::saveToJSON($targetFile, $newtranslations);
+                static::saveToJSON($targetFile, $newtranslations);
                 break;
+            case 'po':
+                static::saveToJSON($targetFile, $newtranslations);
             default:
                 throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
         }
@@ -2625,6 +2646,16 @@ class BLocale extends BClass
         foreach ($array as $k => $v) {
             $k = trim($k, '"');
             fputcsv($handle, array($k, $v));
+        }
+        fclose($handle);
+    }
+
+    static protected function saveToPO($targetFile, $array)
+    {
+        $handle = fopen($targetFile, "w");
+        foreach ($array as $k => $v) {
+            $v = str_replace("\n", '\n', $v);
+            fwrite($handle, "msgid \"{$k}\"\nmsgstr \"{$v}\"\n\n");
         }
         fclose($handle);
     }
