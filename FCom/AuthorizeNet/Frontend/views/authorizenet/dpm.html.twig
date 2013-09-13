@@ -5,12 +5,21 @@
 
     <script type="text/javascript">
         require(['jquery'], function($){
+            var iframeName = 'dpm_post';
+            var dpmUrl = '{{ config["cgi_url"] }}';
             var iFrameTpl = '<iframe src="/empty.html" frameborder="0" allowtransparency="true"'
-            + 'style="display: none;width:100%;background-color:transparent" name="dpm_post" id="dpm-post-frame"></iframe>';
+                    + 'style="display: none;width:100%;background-color:transparent" name="'
+                    + iframeName + '" id="dpm-post-frame"></iframe>';
+
+            var dpmFormTpl = '<form method="post" enctype="application/x-www-form-urlencoded" ' +
+                    'action="' + dpmUrl + '" target="' + iframeName + '" style="display: none"></form>';
+
 
             var $placeOrderBtn = $("button[name='place_order']");
             var $form = $placeOrderBtn.parents('form');
 
+            var $iframe = $(iFrameTpl);
+            $iframe.insertAfter($form);
             $form.submit(function(event){
                 if($("#payment_method_{{ method_code }}").prop("checked") == false) {
                     return;
@@ -22,16 +31,12 @@
                 $.post(
                         '{{ APP.href("/checkout") }}',
                         data,
-                        function(response) {
+                        function (response) {
                             console.log(response);
 
-                            var $iframe = $(iFrameTpl);
-                            $iframe.insertAfter($form);
-
-                            var dpmUrl = '{{ config["cgi_url"] }}';
                             var dpmData = {};
                             dpmData['x_card_num'] = $("#authnet_cc_number").val();
-                            dpmData['x_exp_date'] = $("#").val();
+                            dpmData['x_exp_date'] = parseInt($("#authnet_cc_expiration_date_month").val()) + '/' + parseInt($("#authnet_cc_expiration_date_year").val());
                             var billing = response['billing'];
                             var order = response['order'];
                             dpmData['x_invoice_num'] = order['unique_id'];
@@ -76,12 +81,15 @@
 
                             dpmData['x_po_num'] = order['unique_id'];
 
-                            for(var key in response['x_fields']) {
+                            for (var key in response['x_fields']) {
                                 dpmData[key] = response['x_fields'][key];
                             }
-                            $.post(dpmUrl, dpmData, function(response){
-                                console.log(response);
+                            var $dpmForm = $(dpmFormTpl);
+                            $dpmForm.insertAfter($form);
+                            $.each(dpmData, function (key, val) {
+                                $('<input type="hidden" name="' + key + '" value="' + val + '"/>').appendTo($dpmForm);
                             });
+                            $dpmForm.submit();
                         },
                         'json'
                 );
