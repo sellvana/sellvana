@@ -22,7 +22,7 @@ class FCom_AuthorizeNet_Frontend_Controller extends FCom_Core_Controller_Abstrac
                 $redirect_url = BApp::href('checkout/checkout') . '?response_code=' . $apiResponse->response_code . '&response_reason_text=' . $apiResponse->response_reason_text;
             }
             // Send the Javascript back to AuthorizeNet, which will redirect user back to your site.
-            $response->set(AuthorizeNetDPM::getRelayResponseSnippet($redirect_url));
+            $response->set(BLayout::i()->getView('authorizenet/dpm_relay')->set('redirect_url', $redirect_url)->render());
 
             $response->render();
         } else {
