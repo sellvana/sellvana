@@ -12,7 +12,10 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 
         $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
 
-        $result = array('conn_id' => $client->getConnId(), 'messages' => $client->getMessages());
+        $result = array(
+            'conn_id' => $client->getConnId(),
+            'messages' => $client->getMessages(),
+        );
 
         BResponse::i()->json($result);
     }

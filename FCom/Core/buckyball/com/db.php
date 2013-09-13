@@ -659,18 +659,19 @@ EOT
                     if (!empty($tableFields[$f])) {
                         $alterArr[] = "DROP `{$f}`";
                     }
+                } elseif (strpos($def, 'RENAME')===0) {
+                    $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
+                    // Why not use a sprintf($def, $f) to fill in column name from $f?
+                    $colName = $a[1];
+                    $def = $a[2];
+                    if (empty($tableFields[$f])) {
+                        $f = $colName;
+                    }
+                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
                 } elseif (empty($tableFields[$f])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {
-                    if (strpos($def, 'RENAME')===0) {
-                        $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
-                        // Why not use a sprintf($def, $f) to fill in column name from $f?
-                        $colName = $a[1];
-                        $def = $a[2];
-                    } else {
-                        $colName = $f;
-                    }
-                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
+                    $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
                 }
             }
         }
