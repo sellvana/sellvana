@@ -1,0 +1,21 @@
+<html>
+<head>
+    <script language="javascript">
+        <!--
+        {% set redirect_url = THIS.get('redirect_url') %}
+        var goTo = "{{ redirect_url }}";
+        if (window.self === window.top) {
+            // if not loaded in frame, just relocate
+            window.location = goTo;
+        } else {
+            window.top.location = goTo;
+        }
+        //-->
+    </script>
+</head>
+<body>
+<noscript>
+    <meta http-equiv="refresh" content="1;url={{ redirect_url }}">
+</noscript>
+</body>
+</html>
