@@ -73,4 +73,14 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     {
         return array("name" => $this->getName());
     }
+
+    public function set($name, $value)
+    {
+        return $this->details[$name] = $value;
+    }
+
+    public function get($name, $default = null)
+    {
+        return isset($this->details[$name]) ? $this->details[$name]: $default;
+    }
 }
