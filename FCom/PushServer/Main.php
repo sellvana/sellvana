@@ -5,7 +5,7 @@ class FCom_PushServer_Main extends BCLass
     static public function bootstrap()
     {
         static::i()
-            ->addService('/^./', 'FCom_PushServer_Main::catchAll')
+            //->addService('/^./', 'FCom_PushServer_Main::catchAll')
             ->addService('client', 'FCom_PushServer_Service_Client')
         ;
     }

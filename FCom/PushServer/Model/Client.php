@@ -6,7 +6,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_origClass = __CLASS__;
 
     static protected $_clientCache = array();
-    static protected $_pageId;
+    static protected $_windowId;
     static protected $_connId;
 
     protected $_messages = array();
@@ -70,9 +70,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $client;
     }
 
-    static public function getPageId()
+    static public function getWindowId()
     {
-        return static::$_pageId;
+        return static::$_windowId;
     }
 
     static public function getConnId()
@@ -101,14 +101,14 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $client = FCom_PushServer_Model_Client::i()->sessionClient();
 
-        if (!isset($request['page_id']) || !isset($request['conn_id'])) {
+        if (!isset($request['window_id']) || !isset($request['conn_id'])) {
             $client->send(array(
                 'signal' => 'error',
-                'description' => 'Missing page_id or conn_id',
+                'description' => 'Missing window_id or conn_id',
             ));
             return;
         }
-        static::$_pageId = $request['page_id'];
+        static::$_windowId = $request['window_id'];
         static::$_connId = $request['conn_id'];
 
         if (empty($request['messages'])) {
@@ -152,6 +152,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         $method = 'onUnknownSignal';
                     }
 
+#BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
                     $instance->$method();
 
                     $instance->onAfterDispatch();
@@ -176,29 +177,29 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkIn()
     {
-        $oldPages = $newPages = (array) $this->getData('pages');
-        $oldConnections = !empty($oldPages[static::$_pageId]['connections'])
-            ? $oldPages[static::$_pageId]['connections'] : array();
+        $oldWindows = $newWindows = (array) $this->getData('windows');
+        $oldConnections = !empty($oldWindows[static::$_windowId]['connections'])
+            ? $oldWindows[static::$_windowId]['connections'] : array();
 
-        foreach ($newPages as $pageId => $page) { // some cleanup
-            if (empty($page['connections'])) {
-                unset($newPages[$pageId]);
+        foreach ($newWindows as $windowId => $window) { // some cleanup
+            if (empty($window['connections'])) {
+                unset($newWindows[$windowId]);
             }
         }
 
         foreach ($oldConnections as $connId => $conn) { // reset old connections
-            $newPages[static::$_pageId]['connections'][$connId] = 0;
+            $newWindows[static::$_windowId]['connections'][$connId] = 0;
         }
-        $newPages[static::$_pageId]['connections'][static::$_connId] = 1; // set new connection
+        $newWindows[static::$_windowId]['connections'][static::$_connId] = 1; // set new connection
 
-        $this->setData('pages', $newPages)->save(); // save new state
+        $this->setData('windows', $newWindows)->save(); // save new state
 
-        if (!$oldPages) { // is this first connection for the client
+        if (!$oldWindows) { // is this first connection for the client
             $this->subscribe();
             $this->set('status', 'online')->save(); // set as connected
-        } elseif ($oldConnections) { // are there already connections for this page
+        } elseif (false && $oldConnections) { // are there already connections for this window
             $start = microtime(true);
-            $connKey = 'pages/'.static::$_pageId.'/connections';
+            $connKey = 'windows/'.static::$_windowId.'/connections';
             while (true) {
                 $this->fetchCustomData(); // update connections
                 $newConnections = $this->getData($connKey);
@@ -215,7 +216,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                 usleep(300000);
             }
         }
-//BDebug::dump($this->getData('pages'));
+//BDebug::dump($this->getData('windows'));
         return $this;
     }
 
@@ -224,17 +225,17 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $delay = BConfig::i()->get('modules/FCom_PushServer/delay_microsec');
         $start = time();
         while (true) {
-            if (time() - $start > 50) {
+            if (time() - $start > 50) { // timeout for connection to counteract default gateway timeouts
                 break;
             }
-            if (connection_aborted()) {
+            if (connection_aborted()) { // browser cancelled connection
                 break;
             }
-            $this->_messages = $this->sync();
+            $this->_messages = $this->sync(); // fetch messages for the client
             if ($this->_messages) {
                 break;
             } else {
-                usleep($delay ? $delay : 300000);
+                usleep($delay ? $delay : 100000);
             }
         }
         return $this;
@@ -247,26 +248,31 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $messageModels = FCom_PushServer_Model_Message::i()->orm('m')
             ->where('client_id', $this->id)
+            ->where('window_id', static::$_windowId)
+            //->where_raw('conn_id is null or conn_id=?', static::$_connId)
             ->where('status', 'published')
             ->find_many_assoc();
         $messages = array();
-        foreach ($messageModels as $model) {
-            $model->set('status', 'sent')->save();
-            $message = (array) BUtil::fromJson($model->get('data_serialized'));
+        foreach ($messageModels as $msg) {
+#BDebug::log("SYNC: ".print_r($msg->as_array(),1));
+            $msg->set('status', 'sent')->save();
+            $message = (array) BUtil::fromJson($msg->get('data_serialized'));
             //$message['ts'] = $model->get('create_at');
             $messages[] = $message;
             if (empty($message['seq'])) {
-                $model->delete();
+                $msg->delete();
             }
         }
 
         $this->fetchCustomData();
-        $connKey = 'pages/'.static::$_pageId.'/connections';
+        $connKey = 'windows/'.static::$_windowId.'/connections';
         $connections = $this->getData($connKey);
         if (empty($connections[static::$_connId])) { // this connection was removed
             unset($connections[static::$_connId]);
             $this->setData($connKey, $connections);
-            $messages[] = array('channel' => 'client', 'signal' => 'noop');
+            if (!$messages) {
+                $messages[] = array('channel' => 'client', 'signal' => 'noop');
+            }
         }
         // foreach ($connections as $connId => $conn) {
         //     if ($connId > static::$_connId) { // a new connection was made
@@ -283,15 +289,15 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkOut()
     {
-        $pages = $this->getData('pages');
-        unset($pages[static::$_pageId]['connections'][static::$_connId]);
-        if (empty($pages[static::$_pageId]['connections'])) {
-            unset($pages[static::$_pageId]);
+        $windows = $this->getData('windows');
+        unset($windows[static::$_windowId]['connections'][static::$_connId]);
+        if (empty($windows[static::$_windowId]['connections'])) {
+            unset($windows[static::$_windowId]);
         }
 
-        $this->setData('pages', $pages);
+        $this->setData('windows', $windows);
 
-        if (!$pages && !$this->_messages) {
+        if (!$windows && !$this->_messages) {
             $this->setStatus('offline');
         }
 
