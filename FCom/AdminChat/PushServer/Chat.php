@@ -69,7 +69,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         }
         $user = FCom_Admin_Model_User::i()->sessionUser();
         $msg = $chat->addHistory($user, $this->_message['text']);
-
+#BDebug::log('ADMINCHAT: say '.print_r($this->_message, 1));
         $channel->send(array(
             'signal' => 'say',
             'text' => '['.date('h:i', strtotime($msg->create_at)).'] '.$user->username . ': ' . $this->_message['text'].'<br>',
