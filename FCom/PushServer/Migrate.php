@@ -2,7 +2,7 @@
 
 class FCom_PushServer_Migrate extends BClass
 {
-    public function install__0_1_1()
+    public function install__0_1_2()
     {
         $tChannel = FCom_PushServer_Model_Channel::table();
         $tClient = FCom_PushServer_Model_Client::table();
@@ -70,7 +70,7 @@ class FCom_PushServer_Migrate extends BClass
                 'channel_id' => 'int unsigned null',
                 'subscriber_id' => 'int unsigned not null',
                 'client_id' => 'int unsigned not null',
-                'page_id' => 'varchar(30) null',
+                'window_id' => 'varchar(30) null',
                 'conn_id' => 'int unsigned null',
                 'status' => 'varchar(20)',
                 'data_serialized' => 'text',
@@ -126,6 +126,19 @@ class FCom_PushServer_Migrate extends BClass
                 "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE SET NULL",
                 "FK_{$tMessage}_subscriber" => "FOREIGN KEY (subscriber_id) REFERENCES {$tSubscriber} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tMessage}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tMessage = FCom_PushServer_Model_Message::table();
+        BDb::ddlTableDef($tMessage, array(
+            'COLUMNS' => array(
+                'page_id' => 'RENAME window_id varchar(30) null',
+            ),
+            'KEYS' => array(
+                'IDX_client_window_status' => '(client_id, window_id, status)',
             ),
         ));
     }
