@@ -17,7 +17,7 @@ class FCom_AdminChat_Admin extends BClass
         if ($args['status'] === 'offline') {
             $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($userId);
             foreach ($clients as $c) { // check other clients
-                if ($c->id !=== $args['client']->id && $c->status !== 'offline') {
+                if ($c->id !== $args['client']->id && $c->status !== 'offline') {
                     return; // if at least one of the not offline, abort
                 }
             }

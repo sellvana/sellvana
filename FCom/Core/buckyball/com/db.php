@@ -678,12 +678,13 @@ EOT
         if ($indexes) {
             $tableIndexes = static::ddlIndexInfo($fullTableName);
             foreach ($indexes as $idx=>$def) {
+                $idxLower = strtolower($idx);
                 if ($def==='DROP') {
-                    if (!empty($tableIndexes[$idx])) {
+                    if (!empty($tableIndexes[$idxLower])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
                 } else {
-                    if (!empty($tableIndexes[$idx])) {
+                    if (!empty($tableIndexes[$idxLower])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
                     if (strpos($def, 'PRIMARY')===0) {
