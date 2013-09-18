@@ -885,7 +885,13 @@ class BUtil extends BClass
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
-            $url .= (strpos($url, '?')===false ? '?' : '&').$request;
+            if(is_array($data)){
+                $request = http_build_query($data, '', '&');
+            } else {
+                $request = $data;
+            }
+
+            $url .= (strpos($url, '?')===false ? '?' : '&') . $request;
         }
 
         // curl disabled because file upload doesn't work for some reason. TODO: figure out why
@@ -932,6 +938,10 @@ class BUtil extends BClass
             list($response, $headers) = explode("\r\n\r\n", $rawResponse, 2);
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
             $respHeaders = explode("\r\n", $headers);
+            if(curl_errno($ch) != 0){
+                static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
+                static::$_lastRemoteHttpInfo['error'] = curl_error($ch);
+            }
             curl_close($ch);
 
         } else {
