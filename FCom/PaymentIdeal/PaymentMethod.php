@@ -22,11 +22,11 @@ class FCom_PaymentIdeal_PaymentMethod
 
     public function payOnCheckout()
     {
-        $bankId = $this->get('bank_id');
-        $amount = $this->get('amount_due') * 100;
+        $bankId      = $this->get('bank_id');
+        $amount      = $this->get('amount_due') * 100;
         $description = $this->salesEntity->getTextDescription();
-        $returnUrl = BApp::href("checkout/success");
-        $reportUrl = BApp::href("ideal/report");
+        $returnUrl   = BApp::href("checkout/success");
+        $reportUrl   = BApp::href("ideal/report");
 
         try {
             $this->createPayment($bankId, $amount, $description, $returnUrl, $reportUrl);
@@ -74,7 +74,7 @@ class FCom_PaymentIdeal_PaymentMethod
      */
     public function config()
     {
-        if(!$this->config){
+        if (!$this->config) {
             $this->config = BData::i(true, BConfig::i()->get('modules/FCom_PaymentIdeal'));
         }
         return $this->config;
@@ -204,7 +204,7 @@ class FCom_PaymentIdeal_PaymentMethod
         return true;
     }
 
-    public function CreatePaymentLink($description, $amount)
+    public function createPaymentLink($description, $amount)
     {
         if (!$this->setDescription($description) || !$this->setAmount($amount)) {
             throw new Exception("Invalid description or amount");
@@ -232,6 +232,15 @@ class FCom_PaymentIdeal_PaymentMethod
 
         $this->set('payment_url', (string)$create_object->link->URL);
         return true;
+    }
+
+    public function setOrderPaid($transactionId)
+    {
+        $order = $this->loadOrderByTransactionId($transactionId);
+        // update order
+        if($this->get('paid_status')){
+            $order->set('status', 'paid')->save();
+        }
     }
 
     protected function setBankId($bank_id)
@@ -266,12 +275,12 @@ class FCom_PaymentIdeal_PaymentMethod
 
     protected function _sendRequest($path, $query)
     {
-        $url = rtrim($this->api_host, '/') . "{$path}";
+        $url      = rtrim($this->api_host, '/') . "{$path}";
         $response = BUtil::remoteHttp('GET', $url, $query);
-        if(!$response){
-            $info = BUtil::lastRemoteHttpInfo();
-            $error_code = isset($info['errno']) ? $info['errno']: -1;
-            $error_msg = isset($info['error']) ? $info['error'] : BLocale::_("An error occurred");
+        if (!$response) {
+            $info       = BUtil::lastRemoteHttpInfo();
+            $error_code = isset($info['errno']) ? $info['errno'] : -1;
+            $error_msg  = isset($info['error']) ? $info['error'] : BLocale::_("An error occurred");
             throw new Exception($error_msg, $error_code);
         }
 
@@ -281,11 +290,11 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function _XMLtoObject($xml)
     {
         $errorHandling = libxml_use_internal_errors(true);
-        $xml_object = simplexml_load_string($xml);
+        $xml_object    = simplexml_load_string($xml);
         if (!$xml_object) {
-            $error_code    = -2;
-            $error_msg = BLocale::_("There was an error processing XML.");
-            $errors = libxml_get_errors();
+            $error_code = -2;
+            $error_msg  = BLocale::_("There was an error processing XML.");
+            $errors     = libxml_get_errors();
             $debugError = '';
             foreach ($errors as $error) {
                 $debugError .= $this->displayXmlError($error);
@@ -306,10 +315,10 @@ class FCom_PaymentIdeal_PaymentMethod
      */
     protected function getResponseError($xml)
     {
-        if(empty($xml)){
+        if (empty($xml)) {
             return array(
                 'error_message' => "Empty response",
-                'error_code' => 100,
+                'error_code'    => 100,
             );
         }
         /*
@@ -334,7 +343,6 @@ class FCom_PaymentIdeal_PaymentMethod
 
         return false;
     }
-
 
     /**
      * @param libXMLError $error
@@ -366,4 +374,17 @@ class FCom_PaymentIdeal_PaymentMethod
         return $return . PHP_EOL;
     }
 
+    /**
+     * @param $transactionId
+     * @return BModel
+     */
+    public function loadOrderByTransactionId($transactionId)
+    {
+        // load payment info from transaction id
+        $payment = FCom_Sales_Model_Order_Payment::i()->load($transactionId, 'transaction_id');
+        // load order from payment method order_id
+        $orderId = $payment->get('order_id');
+        $order   = FCom_Sales_Model_Order::i()->load($orderId);
+        return $order;
+    }
 }

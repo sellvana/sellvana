@@ -147,7 +147,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         FCom_Sales_Model_Cart::i()->sessionCartId(false);
 
         $sData =& BSession::i()->dataToUpdate();
-        $sData['last_order']['id'] = $order->id;
+        $sData['last_order']['id'] = $order ? $order->id : null;
         if(BRequest::i()->get('is_ajax') || (isset($post['is_ajax'])  && $post['is_ajax'])){
             $data = $cart->getPaymentMethod()->ajaxData();
             BResponse::i()->json($data);
