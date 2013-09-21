@@ -1,7 +1,7 @@
 modules:
     FCom_AdminChat:
-        version: 0.1.2
-        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
+        version: 0.1.3
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.2 } }
 
         areas:
             FCom_Admin:
