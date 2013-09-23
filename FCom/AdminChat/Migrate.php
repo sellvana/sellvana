@@ -86,4 +86,28 @@ class FCom_AdminChat_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tUserStatus = FCom_AdminChat_Model_UserStatus::table();
+        $tUser = FCom_Admin_Model_User::table();
+
+        BDb::ddlTableDef($tUserStatus, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'user_id' => 'int unsigned not null',
+                'status' => 'varchar(20)',
+                'message' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'IDX_update_at' => '(update_at)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tUserStatus}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+    }
 }
