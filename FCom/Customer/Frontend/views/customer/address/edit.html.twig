@@ -84,7 +84,7 @@
             <select class="geo-region required select2" name="region" id="address-region" style="display:none;">
                 <option value="">{{ "Select an option" | _ }}</option>
             </select>
-            <input type="text" class="geo-region" name="region" id="address-region"/>
+            <input type="text" class="geo-region" name="region" id="address-region" value="{{ validator.fieldValue("region") }}"/>
               {{ validator.errorHtml("region", "address-region") | raw }}
           </div>
         </div>
