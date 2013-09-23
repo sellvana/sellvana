@@ -2229,26 +2229,7 @@ class BActionController extends BClass
             $this->layout($baseLayout);
         }
         BLayout::i()->applyLayout('view-proxy')->applyLayout($viewPrefix.$page);
-
-        $view->render();
-        $metaData = $view->param('meta_data');
-        if ($metaData) {
-            if (!empty($metaData['layout.yml'])) {
-                BLayout::i()->addLayout('viewproxy-metadata', BYAML::i()->parse(trim($metaData['layout.yml'])))
-                    ->applyLayout('viewproxy-metadata');
-            }
-            if (($head = $this->view('head'))) {
-                foreach ($metaData as $k=>$v) {
-                    $k = strtolower($k);
-                    switch ($k) {
-                    case 'title':
-                        $head->addTitle($v); break;
-                    case 'meta_title': case 'meta_description': case 'meta_keywords':
-                        $head->meta(str_replace('meta_','',$k), $v); break;
-                    }
-                }
-            }
-        }
+        $view->useMetaData();
 
         if (($root = BLayout::i()->view('root'))) {
             $root->addBodyClass('page-'.$page);

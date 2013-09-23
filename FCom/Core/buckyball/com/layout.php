@@ -1377,6 +1377,33 @@ class BView extends BClass
     }
 
     /**
+     * Use meta data declared in the view template to set head meta tags
+     */
+    public function useMetaData()
+    {
+        $this->render();
+        $metaData = $this->param('meta_data');
+        if ($metaData) {
+            if (!empty($metaData['layout.yml'])) {
+                BLayout::i()->addLayout('viewproxy-metadata', BYAML::i()->parse(trim($metaData['layout.yml'])))
+                    ->applyLayout('viewproxy-metadata');
+            }
+            if (($head = $this->view('head'))) {
+                foreach ($metaData as $k=>$v) {
+                    $k = strtolower($k);
+                    switch ($k) {
+                    case 'title':
+                        $head->addTitle($v); break;
+                    case 'meta_title': case 'meta_description': case 'meta_keywords':
+                        $head->meta(str_replace('meta_','',$k), $v); break;
+                    }
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     protected function _beforeRender()
