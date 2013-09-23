@@ -135,7 +135,12 @@ class BModuleRegistry extends BClass
     protected function _getManifestCacheFilename()
     {
         $area = BApp::i()->get('area');
-        return BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';
+        $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';
+        $path = dirname($fileName);
+        if(!is_dir($path)){
+            mkdir($path, 0777, true);
+        }
+        return $fileName;
     }
 
     public function saveManifestCache()
