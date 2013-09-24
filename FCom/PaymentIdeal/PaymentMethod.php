@@ -30,6 +30,10 @@ class FCom_PaymentIdeal_PaymentMethod
 
         try {
             $this->createPayment($bankId, $amount, $description, $returnUrl, $reportUrl);
+            $bankUrl = $this->get('bank_url');
+            if ($bankUrl) {
+                BSession::i()->set('redirect_url', $bankUrl);
+            }
         } catch (Exception $e) {
             BDebug::log($e->getMessage(), static::IDEAL_LOG);
             BDebug::log($e->getTraceAsString(), static::IDEAL_LOG);
@@ -39,6 +43,8 @@ class FCom_PaymentIdeal_PaymentMethod
         $success = !$this->get('error');
         if ($success) {
             $status = 'processing';
+            $this->salesEntity->set('status', $this->config()->get('order_status'));
+            $this->salesEntity->save();
         } else {
             $status = 'error';
         }
@@ -56,6 +62,14 @@ class FCom_PaymentIdeal_PaymentMethod
         $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
+    }
+
+    public function setDetails($details = array())
+    {
+        if(isset($details['ideal'])){
+            $this->details = $details['ideal'];
+        }
+        return $this;
     }
 
     public function getCheckoutFormView()

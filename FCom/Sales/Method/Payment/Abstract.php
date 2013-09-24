@@ -45,6 +45,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     public function setDetails($details)
     {
         $this->details = $details;
+        return $this;
     }
 
     /**
