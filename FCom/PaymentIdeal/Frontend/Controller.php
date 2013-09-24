@@ -10,11 +10,16 @@ class FCom_Payment_Frontend_Controller
     public function action_report()
     {
         $transactionId = BRequest::get('transaction_id');
+//        BDebug::log(__METHOD__, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+//        BDebug::log($transactionId, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
         if ($transactionId) {
             /* @var $paymentMethod FCom_PaymentIdeal_PaymentMethod */
             $paymentMethod = FCom_PaymentIdeal_PaymentMethod::i();
+//            BDebug::log('Before check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
             $paymentMethod->checkPayment($transactionId);
+//            BDebug::log('After check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
             $paymentMethod->setOrderPaid($transactionId);
+//            BDebug::log('After set order id', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
         }
     }
 
