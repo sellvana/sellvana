@@ -153,6 +153,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             BResponse::i()->json($data);
         } else {
             $redirectUrl = BSession::i()->get('redirect_url')? BSession::i()->get('redirect_url'): BApp::href('checkout/success');
+            BSession::i()->set('redirect_url', null);
             BResponse::i()->redirect($redirectUrl);
         }
     }
