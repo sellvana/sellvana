@@ -4,5 +4,5 @@ define(['backbone','marionette'],
             tagName: "li",
             template: "#tab-template"
         });
-        return TablistItemView;
+        return TabListItemView;
 });
