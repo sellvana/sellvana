@@ -23,7 +23,7 @@ class FCom_PaymentIdeal_PaymentMethod
     public function payOnCheckout()
     {
         $bankId      = $this->get('bank_id');
-        $amount      = $this->get('amount_due') * 100;
+        $amount      = $this->salesEntity->get('balance') * 100;
         $description = $this->salesEntity->getTextDescription();
         $returnUrl   = BApp::href("checkout/success");
         $reportUrl   = BApp::href("ideal/report");
