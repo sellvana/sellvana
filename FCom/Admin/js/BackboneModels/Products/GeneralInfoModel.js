@@ -1,6 +1,6 @@
-define(['backbone','mariontte','memento'],
+define(['backbone','marionette','memento'],
     function(Backbone,Marionette,Memento){
-        var GeneralInfoModel = Bakcbone.Model.extend({
+        var GeneralInfoModel = Backbone.Model.extend({
             //url: "yourbackend"
             initialize: function(){
                 var memento = new Backbone.Memento(this);
