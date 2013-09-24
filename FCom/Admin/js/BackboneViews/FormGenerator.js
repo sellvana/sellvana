@@ -1,4 +1,4 @@
-define(['backbone','marionette','backbone-forms'],
+define(['backbone','marionette','backbone.forms'],
     function(Backbone,Marionette,Form){
         var FormGenerator = Backbone.Marionette.ItemView.extend({
         id : function (){
