@@ -148,11 +148,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $sData =& BSession::i()->dataToUpdate();
         $sData['last_order']['id'] = $order ? $order->id : null;
-        if(BRequest::i()->get('is_ajax') || (isset($post['is_ajax'])  && $post['is_ajax'])){
+        if(BRequest::i()->get('is_ajax') || (isset($post['is_ajax']) && $post['is_ajax'])){
             $data = $cart->getPaymentMethod()->ajaxData();
             BResponse::i()->json($data);
         } else {
-            BResponse::i()->redirect(BApp::href('checkout/success'));
+            $redirectUrl = BSession::i()->get('redirect_url')? BSession::i()->get('redirect_url'): BApp::href('checkout/success');
+            BResponse::i()->redirect($redirectUrl);
         }
     }
 

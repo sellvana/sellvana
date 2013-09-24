@@ -136,10 +136,7 @@ class BModuleRegistry extends BClass
     {
         $area = BApp::i()->get('area');
         $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';
-        $path = dirname($fileName);
-        if(!is_dir($path)){
-            mkdir($path, 0777, true);
-        }
+        BUtil::ensureDir(dirname($fileName));
         return $fileName;
     }
 
