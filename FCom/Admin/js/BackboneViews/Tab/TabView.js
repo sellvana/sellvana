@@ -1,5 +1,5 @@
-define(['backbone','marionette'],
-    function(Backbone,Marionette){
+define(['backbone','marionette','formGenerator'],
+    function(Backbone,Marionette,FormGenerator){
         var TabView = Backbone.Marionette.ItemView.extend({
             region : {},
             className: "tab-pane",
