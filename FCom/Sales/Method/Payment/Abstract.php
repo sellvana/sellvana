@@ -10,6 +10,25 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     protected $_sortOrder = 50;
     protected $_name;
 
+    protected $_capabilities = array(
+        'pay'           => 1,
+        'refund'        => 1,
+        'void'          => 1,
+        'recurring'     => 0,
+        'pay_partial'   => 0,
+        'pay_online'    => 0,
+        'refund_online' => 0,
+        'void_online'   => 0,
+    );
+
+    public function can($capability)
+    {
+        if(isset($this->_capabilities[strtolower($capability)])){
+            return (bool) $this->_capabilities[strtolower($capability)];
+        }
+        return false;
+    }
+
     public function getName()
     {
         return $this->_name;

@@ -7,6 +7,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     function __construct()
     {
+        parent::__construct();
         $this->_name = 'Authorize.net Direct Post';
     }
 

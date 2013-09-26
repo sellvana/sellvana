@@ -8,6 +8,9 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
     function __construct()
     {
         $this->_name = 'Authorize.net';
+        $this->_capabilities['pay_online'] = 1;
+        $this->_capabilities['void_online'] = 1;
+        $this->_capabilities['refund_online'] = 1;
     }
 
     public function getCheckoutFormView()
