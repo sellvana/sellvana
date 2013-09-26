@@ -652,11 +652,13 @@ EOT
     public static function ddlTableColumns($fullTableName, $fields, $indexes=null, $fks=null)
     {
         $tableFields = static::ddlFieldInfo($fullTableName, null);
+        $tableFields = array_change_key_case($tableFields, CASE_LOWER);
         $alterArr = array();
         if ($fields) {
             foreach ($fields as $f=>$def) {
+                $fLower = strtolower($f);
                 if ($def==='DROP') {
-                    if (!empty($tableFields[$f])) {
+                    if (!empty($tableFields[$fLower])) {
                         $alterArr[] = "DROP `{$f}`";
                     }
                 } elseif (strpos($def, 'RENAME')===0) {
@@ -664,11 +666,11 @@ EOT
                     // Why not use a sprintf($def, $f) to fill in column name from $f?
                     $colName = $a[1];
                     $def = $a[2];
-                    if (empty($tableFields[$f])) {
+                    if (empty($tableFields[$fLower])) {
                         $f = $colName;
                     }
                     $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
-                } elseif (empty($tableFields[$f])) {
+                } elseif (empty($tableFields[$fLower])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {
                     $alterArr[] = "CHANGE `{$f}` `{$f}` {$def}";
@@ -677,6 +679,7 @@ EOT
         }
         if ($indexes) {
             $tableIndexes = static::ddlIndexInfo($fullTableName);
+            $tableIndexes = array_change_key_case($tableIndexes, CASE_LOWER);
             foreach ($indexes as $idx=>$def) {
                 $idxLower = strtolower($idx);
                 if ($def==='DROP') {
@@ -702,17 +705,19 @@ EOT
         }
         if ($fks) {
             $tableFKs = static::ddlForeignKeyInfo($fullTableName);
+            $tableFKs = array_change_key_case($tableFKs, CASE_LOWER);
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
             // You cannot add a foreign key and drop a foreign key in separate clauses of a single ALTER TABLE statement.
             // Separate statements are required.
             $dropArr = array();
             foreach ($fks as $idx=>$def) {
+                $idxLower = strtolower($idx);
                 if ($def==='DROP') {
-                    if (!empty($tableFKs[$idx])) {
+                    if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                 } else {
-                    if (!empty($tableFKs[$idx])) {
+                    if (!empty($tableFKs[$idxLower])) {
                     // what if it is not foreign key constraint we do not doe anything to check for UNIQUE and PRIMARY constraint
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
