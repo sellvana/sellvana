@@ -20,6 +20,12 @@ class FCom_PaymentIdeal_PaymentMethod
 
     protected $_name = "iDEAL";
 
+    public function __construct()
+    {
+        $this->_capabilities['pay_online'] = 1;
+        $this->_capabilities['refund_online'] = 0;
+    }
+
     public function payOnCheckout()
     {
         $bankId      = $this->get('bank_id');
