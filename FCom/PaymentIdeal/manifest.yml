@@ -19,3 +19,5 @@ modules:
 
             FCom_Frontend:
                 auto_use: [ views ]
+                routing:
+                    - [ any, /ideal/.action, FCom_PaymentIdeal_Frontend_Controller ]

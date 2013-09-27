@@ -190,7 +190,7 @@ class FCom_PaymentIdeal_PaymentMethod
 
     public function checkPayment($transaction_id)
     {
-        if (!empty($transaction_id)) {
+        if (empty($transaction_id)) {
             throw new Exception("Transaction ID missing");
         }
 
@@ -220,7 +220,8 @@ class FCom_PaymentIdeal_PaymentMethod
         $this->set('status', (string)$check_object->order->status);
         $this->set('amount', (int)$check_object->order->amount);
         $this->set('consumer_info', (isset($check_object->order->consumer)) ? (array)$check_object->order->consumer : array());
-
+        $payment = $this->loadPaymentByTransactionId($transaction_id);
+        $payment->set('status', 'paid')->save();
         return true;
     }
 
@@ -401,10 +402,20 @@ class FCom_PaymentIdeal_PaymentMethod
     public function loadOrderByTransactionId($transactionId)
     {
         // load payment info from transaction id
-        $payment = FCom_Sales_Model_Order_Payment::i()->load($transactionId, 'transaction_id');
+        $payment = $this->loadPaymentByTransactionId($transactionId);
         // load order from payment method order_id
         $orderId = $payment->get('order_id');
         $order   = FCom_Sales_Model_Order::i()->load($orderId);
         return $order;
+    }
+
+    /**
+     * @param string $transactionId
+     * @return FCom_Sales_Model_Order_Payment
+     */
+    public function loadPaymentByTransactionId($transactionId)
+    {
+        $payment = FCom_Sales_Model_Order_Payment::i()->load($transactionId, 'transaction_id');
+        return $payment;
     }
 }

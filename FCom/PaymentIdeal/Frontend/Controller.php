@@ -4,22 +4,28 @@
  * @project fulleron
  */
 
-class FCom_Payment_Frontend_Controller
+class FCom_PaymentIdeal_Frontend_Controller
     extends FCom_Frontend_Controller_Abstract
 {
     public function action_report()
     {
         $transactionId = BRequest::get('transaction_id');
-//        BDebug::log(__METHOD__, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
-//        BDebug::log($transactionId, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+        BDebug::log(__METHOD__, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+        BDebug::log($transactionId, FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
         if ($transactionId) {
-            /* @var $paymentMethod FCom_PaymentIdeal_PaymentMethod */
-            $paymentMethod = FCom_PaymentIdeal_PaymentMethod::i();
-//            BDebug::log('Before check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
-            $paymentMethod->checkPayment($transactionId);
-//            BDebug::log('After check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
-            $paymentMethod->setOrderPaid($transactionId);
-//            BDebug::log('After set order id', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+            try {
+                /* @var $paymentMethod FCom_PaymentIdeal_PaymentMethod */
+                $paymentMethod = FCom_PaymentIdeal_PaymentMethod::i();
+                BDebug::log('Before check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+                $paymentMethod->checkPayment($transactionId);
+                BDebug::log('After check payment', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+                $paymentMethod->setOrderPaid($transactionId);
+                BDebug::log('After set order id', FCom_PaymentIdeal_PaymentMethod::IDEAL_LOG);
+            } catch (Exception $e) {
+                BDebug::logException($e);
+                BDebug::log($e->getMessage());
+                BDebug::log($transactionId);
+            }
         }
     }
 
