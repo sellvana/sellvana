@@ -129,7 +129,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         if (BRequest::i()->xhr()) {
             $r = BRequest::i()->post();
             BConfig::i()->set('module_run_levels/FCom_Core/'.$r['module_name'], $r['run_level_core'], false, true);
-            FCom_Core_Main::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeConfigFiles('core');
             BResponse::i()->json(array('success'=>true));
         }
         try {
@@ -146,7 +146,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                 }
                 BConfig::i()->set('module_run_levels/'.$area, $levels[$area], false, true);
             }
-            FCom_Core_Main::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeConfigFiles('core');
             BSession::i()->addMessage('Run levels updated', 'success', 'admin');
         } catch (Exception $e) {
             BDebug::logException($e);

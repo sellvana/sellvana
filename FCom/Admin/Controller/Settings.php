@@ -31,12 +31,12 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!empty($post['config']['db'])) {
                 try {
                     BDb::connect();
-                    FCom_Core_Main::i()->writeDbConfig();
+                    //FCom_Core_Main::i()->writeConfigFiles('db');
                 } catch (Exception $e) {
                     BSession::i()->addMessage('Invalid DB configuration, not saved: '.$e->getMessage(), 'error', 'admin');
                 }
             }
-            FCom_Core_Main::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeConfigFiles();
 
             BSession::i()->addMessage('Settings updated', 'success', 'admin');
 
@@ -67,7 +67,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
         if ($dirty) {
             $conf->set('modules/FCom_Core/dismissed/notifications', $dismissed, false, true);
-            FCom_Core_Main::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeConfigFiles('local');
         }
 
         BResponse::i()->json("success");

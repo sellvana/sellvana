@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
     if (!window.name) { // unique name for the browser window or tab
         window.name = (Math.random()+'').replace(/^0\./, 'f-');
     }
-    var state = { sub_id: 0, window_id: window.name, conn_id: 0, msg_id: 0, conn_cnt: 0 },
+    var state = { sub_id: 0, window_name: window.name, conn_id: 0, msg_id: 0, conn_cnt: 0 },
         channels = {},
         subscribers = {},
         messages = [];
@@ -29,7 +29,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
 
     function connect()
     {
-        var data = JSON.stringify({ window_id: state.window_id, conn_id: state.conn_id++, messages: messages });
+        var data = JSON.stringify({ window_name: state.window_name, conn_id: state.conn_id++, messages: messages });
 
         $.post(FCom.pushserver_url, data, receive);
 

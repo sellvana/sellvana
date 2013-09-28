@@ -1,11 +1,17 @@
-
 define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports'], function($, _, Backbone, PushClient, exports)
 {
-    var chatWindows = {};
+    var chatWindows = {}, username;
+
+    function init(options) {
+        username = options.username;
+        PushClient.send({channel:'adminuser', signal:'subscribe'});
+        PushClient.send({channel:'adminuser', signal:'init'})
+        status({status:options.status})
+    }
 
     // send to server
     function status(options) {
-        PushClient.send({channel:'adminchat', signal:'status', status:options.status});
+        PushClient.send({channel:'adminuser', signal:'status', status:options.status});
     }
 
     function start(options) {
@@ -65,18 +71,37 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports'], funct
         h.scrollTop = h.scrollHeight;
     }
 
+    PushClient.listen({ channel: 'adminuser', callback: channel_adminuser });
+
     // receive from server
-    PushClient.listen({ channel: 'adminchat', callback: channel_adminchat});
-    PushClient.listen({ regexp: /^adminchat:(.*)$/, callback: channel_adminchat});
+    PushClient.listen({ channel: 'adminchat', callback: channel_adminchat });
+    PushClient.listen({ regexp: /^adminchat:(.*)$/, callback: channel_adminchat });
+
+    function channel_adminuser(msg)
+    {
+        if (channel_adminuser.signals[msg.signal]) {
+            channel_adminuser.signals[msg.signal](msg);
+        }
+    }
+    channel_adminuser.signals = {
+        status: function(msg) {
+            _.each(msg.users, function(user) {
+                if (user.username === username) {
+                    return;
+                }
+                if (!msg.init) {
+                    $.bootstrapGrowl(user.username+' is '+user.status, { type:'success', align:'center', width:'auto' });
+                }
+            })
+        }
+    }
 
     function channel_adminchat(msg)
     {
-console.log(msg.channel, msg.signal, msg);
         if (channel_adminchat.signals[msg.signal]) {
             channel_adminchat.signals[msg.signal](msg);
         }
     }
-
     channel_adminchat.signals = {
         chats: function(msg) {
             _.each(msg.chats, function(chat) {
@@ -104,6 +129,7 @@ console.log(msg.channel, msg.signal, msg);
     }
 
     _.extend(exports, {
+        init: init,
         status: status,
         start: start,
         invite: invite,

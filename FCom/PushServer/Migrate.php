@@ -2,7 +2,7 @@
 
 class FCom_PushServer_Migrate extends BClass
 {
-    public function install__0_1_2()
+    public function install__0_1_3()
     {
         $tChannel = FCom_PushServer_Model_Channel::table();
         $tClient = FCom_PushServer_Model_Client::table();
@@ -70,7 +70,7 @@ class FCom_PushServer_Migrate extends BClass
                 'channel_id' => 'int unsigned null',
                 'subscriber_id' => 'int unsigned not null',
                 'client_id' => 'int unsigned not null',
-                'window_id' => 'varchar(30) null',
+                'window_name' => 'varchar(30) null',
                 'conn_id' => 'int unsigned null',
                 'status' => 'varchar(20)',
                 'data_serialized' => 'text',
@@ -139,6 +139,19 @@ class FCom_PushServer_Migrate extends BClass
             ),
             'KEYS' => array(
                 'IDX_client_window_status' => '(client_id, window_id, status)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tMessage = FCom_PushServer_Model_Message::table();
+        BDb::ddlTableDef($tMessage, array(
+            'COLUMNS' => array(
+                'window_id' => 'RENAME window_name varchar(30) null',
+            ),
+            'KEYS' => array(
+                'IDX_client_window_status' => '(client_id, window_name, status)',
             ),
         ));
     }

@@ -11,7 +11,7 @@ class FCom_PushServer_Model_Message extends FCom_Core_Model_Abstract
      * - channel_id
      * - subscriber_id
      * - client_id
-     * - window_id
+     * - window_name
      * - conn_id
      * - data_serialized
      * - status

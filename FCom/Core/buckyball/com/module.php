@@ -32,14 +32,6 @@ class BModuleRegistry extends BClass
     protected static $_singleton;
 
     /**
-    * Local cache for BApp::i()->get('area');
-    *
-    * @todo make sure handling is case insensitive
-    * @var mixed
-    */
-    protected $_area;
-
-    /**
     * Module information collected from manifests
     *
     * @var array
@@ -132,6 +124,65 @@ class BModuleRegistry extends BClass
         return $this;
     }
 
+    /**
+    * Set or return current module context
+    *
+    * If $name is specified, set current module, otherwise retrieve one
+    *
+    * Used in context of bootstrap, event observer, view
+    *
+    * @todo remove setting module func
+    *
+    * @param string|empty $name
+    * @return BModule|BModuleRegistry
+    */
+    public function currentModule($name=null)
+    {
+        if (is_null($name)) {
+#echo '<hr><pre>'; debug_print_backtrace(); echo static::$_currentModuleName.' * '; print_r($this->module(static::$_currentModuleName)); #echo '</pre>';
+            $name = $this->currentModuleName();
+            return $name ? $this->module($name) : false;
+        }
+        $this->_currentModuleName = $name;
+        return $this;
+    }
+
+    public function setCurrentModule($name)
+    {
+        $this->_currentModuleName = $name;
+        return $this;
+    }
+
+    public function pushModule($name)
+    {
+        array_push($this->_currentModuleStack, $name);
+        return $this;
+    }
+
+    public function popModule()
+    {
+        array_pop($this->_currentModuleStack);
+        return $this;
+    }
+
+    public function currentModuleName()
+    {
+        if (!empty($this->_currentModuleStack)) {
+            return $this->_currentModuleStack[sizeof($this->_currentModuleStack)-1];
+        }
+        return $this->_currentModuleName;
+    }
+/*
+    public function onBeforeDispatch()
+    {
+        $routing = BRouting::i();
+        foreach ($this->_modules as $module) {
+            if ($module->run_status===BModule::LOADED && ($prefix = $module->url_prefix)) {
+                $routing->redirect('GET /'.$prefix, $prefix.'/');
+            }
+        }
+    }
+*/
     protected function _getManifestCacheFilename()
     {
         $area = BApp::i()->get('area');
@@ -169,6 +220,16 @@ class BModuleRegistry extends BClass
         } else {
             return false;
         }
+    }
+
+    public function deleteManifestCache()
+    {
+        $cacheFile = $this->_getManifestCacheFilename();
+        if (file_exists($cacheFile)) {
+            unlink($cacheFile);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -305,10 +366,10 @@ class BModuleRegistry extends BClass
             }
             if ($mod->errors && !$mod->errors_propagated) {
                 // propagate dependency errors into subdependent modules
-                $this->propagateDependErrors($mod);
+                $this->propagateRequireErrors($mod);
             } elseif ($mod->run_status===BModule::PENDING) {
                 // propagate pending status into deep dependent modules
-                $this->propagateDepends($mod);
+                $this->propagateRequires($mod);
             }
         }
         #var_dump($this->_modules);exit;
@@ -321,7 +382,7 @@ class BModuleRegistry extends BClass
     * @param BModule $mod
     * @return BModuleRegistry
     */
-    public function propagateDependErrors($mod)
+    public function propagateRequireErrors($mod)
     {
         //$mod->action = !empty($dep['action']) ? $dep['action'] : 'error';
         $mod->run_status = BModule::ERROR;
@@ -332,7 +393,7 @@ class BModuleRegistry extends BClass
             }
             $child = $this->_modules[$childName];
             if ($child->run_level===BModule::REQUIRED && $child->run_status!==BModule::ERROR) {
-                $this->propagateDependErrors($child);
+                $this->propagateRequireErrors($child);
             }
         }
         return $this;
@@ -344,7 +405,7 @@ class BModuleRegistry extends BClass
     * @param BModule $mod
     * @return BModuleRegistry
     */
-    public function propagateDepends($mod)
+    public function propagateRequires($mod)
     {
         foreach ($mod->parents as $parentName) {
             if (empty($this->_modules[$parentName])) {
@@ -355,13 +416,13 @@ class BModuleRegistry extends BClass
                 continue;
             }
             $parent->run_status = BModule::PENDING;
-            $this->propagateDepends($parent);
+            $this->propagateRequires($parent);
         }
         return $this;
     }
 
     /**
-     * Detect circula module dependencies references
+     * Detect circular module dependencies references
      */
     public function detectCircularReferences($mod, $depPathArr = array())
     {
@@ -396,7 +457,7 @@ class BModuleRegistry extends BClass
     *
     * @return BModuleRegistry
     */
-    public function sortDepends()
+    public function sortRequires()
     {
         $modules = $this->_modules;
 
@@ -484,7 +545,7 @@ class BModuleRegistry extends BClass
     public function processRequires()
     {
         $this->checkRequires();
-        $this->sortDepends();
+        $this->sortRequires();
         return $this;
     }
 
@@ -518,70 +579,6 @@ class BModuleRegistry extends BClass
         BEvents::i()->fire('BModuleRegistry::bootstrap:after');
         return $this;
     }
-
-    /**
-    * Set or return current module context
-    *
-    * If $name is specified, set current module, otherwise retrieve one
-    *
-    * Used in context of bootstrap, event observer, view
-    *
-    * @todo remove setting module func
-    *
-    * @param string|empty $name
-    * @return BModule|BModuleRegistry
-    */
-    public function currentModule($name=null)
-    {
-        if (is_null($name)) {
-#echo '<hr><pre>'; debug_print_backtrace(); echo static::$_currentModuleName.' * '; print_r($this->module(static::$_currentModuleName)); #echo '</pre>';
-            $name = $this->currentModuleName();
-            return $name ? $this->module($name) : false;
-        }
-        $this->_currentModuleName = $name;
-        return $this;
-    }
-
-    public function setCurrentModule($name)
-    {
-        $this->_currentModuleName = $name;
-        return $this;
-    }
-
-    public function pushModule($name)
-    {
-        array_push($this->_currentModuleStack, $name);
-        return $this;
-    }
-
-    public function popModule()
-    {
-        array_pop($this->_currentModuleStack);
-        return $this;
-    }
-
-    public function currentModuleName()
-    {
-        if (!empty($this->_currentModuleStack)) {
-            return $this->_currentModuleStack[sizeof($this->_currentModuleStack)-1];
-        }
-        return $this->_currentModuleName;
-    }
-/*
-    public function onBeforeDispatch()
-    {
-        $routing = BRouting::i();
-        foreach ($this->_modules as $module) {
-            if ($module->run_status===BModule::LOADED && ($prefix = $module->url_prefix)) {
-                $routing->redirect('GET /'.$prefix, $prefix.'/');
-            }
-        }
-    }
-*/
-    public function debug()
-    {
-        return $this->_modules;
-    }
 }
 
 /**
@@ -609,6 +606,8 @@ class BModule extends BClass
     * @var array
     */
     static protected $_manifestCache = array();
+
+    public $manifest = array();
 
     public $name;
     public $run_level;
@@ -647,6 +646,7 @@ class BModule extends BClass
     public $default_config;
     public $autoload;
     public $crontab;
+    public $custom;
 
     const
         // run_level

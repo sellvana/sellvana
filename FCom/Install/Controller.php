@@ -189,8 +189,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'PRODUCTION',
             ),
         ), true);
-        FCom_Core_Main::i()->writeDbConfig();
-        FCom_Core_Main::i()->writeLocalConfig();
+        FCom_Core_Main::i()->writeConfigFiles();
         BResponse::i()->redirect(BApp::baseUrl());
     }
 }
