@@ -14,20 +14,6 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         return true;
     }
 
-    public function signal_start()
-    {
-        // start the chat, receive initial history
-
-        //$this->_client->send($this->_message);
-        $user = FCom_Admin_Model_User::i()->load($this->_message['user'], 'username');
-        if (!$user) {
-            $this->reply(array('signal' => 'error', 'description' => 'Unknown username'));
-            return;
-        }
-        $chat = FCom_AdminChat_Model_Chat::i()->start($user);
-        $chat->getChannel()->send(array('signal' => 'start'));
-    }
-
     public function signal_status()
     {
         if ($this->_client->admin_user_id) {
@@ -51,6 +37,20 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
                 $this->reply(array('signal' => 'noop', 'description' => 'No chats found'));
             }
         }
+    }
+
+    public function signal_start()
+    {
+        // start the chat, receive initial history
+
+        //$this->_client->send($this->_message);
+        $user = FCom_Admin_Model_User::i()->load($this->_message['user'], 'username');
+        if (!$user) {
+            $this->reply(array('signal' => 'error', 'description' => 'Unknown username'));
+            return;
+        }
+        $chat = FCom_AdminChat_Model_Chat::i()->start($user);
+        $chat->getChannel()->send(array('signal' => 'start'));
     }
 
     public function signal_invite()

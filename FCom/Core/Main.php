@@ -267,11 +267,14 @@ class FCom_Core_Main extends BClass
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
         $dirConf = $config->get('fs');
+        $modReg = BModuleRegistry::i();
 
-        if ('STAGING' === $mode || 'PRODUCTION' === $mode) {
-            $manifestsLoaded = BModuleRegistry::i()->loadManifestCache();
+        $useProductionCache = 'STAGING' === $mode || 'PRODUCTION' === $mode;
+        if ($useProductionCache) {
+            $manifestsLoaded = $modReg->loadManifestCache();
         } else {
             $manifestsLoaded = false;
+            $modReg->deleteManifestCache();
         }
         if (!$manifestsLoaded) {
             if (defined('BUCKYBALL_ROOT_DIR')) {
@@ -284,22 +287,23 @@ class FCom_Core_Main extends BClass
             $this->_modulesDirs[] = $dirConf['root_dir'].'/FCom/*'; // Core modules
 
             foreach ($this->_modulesDirs as $dir) {
-                BModuleRegistry::i()->scan($dir);
+                $modReg->scan($dir);
             }
-            BModuleRegistry::i()->saveManifestCache(); //TODO: call explicitly
+            $modReg->processRequires();
         }
 #BDebug::profile($d);
 
-        BModuleRegistry::i()->processRequires()->processDefaultConfig();
+        $modReg->processDefaultConfig();
+
+        if ($useProductionCache && !$manifestsLoaded) {
+            $modReg->saveManifestCache(); //TODO: call explicitly
+        }
 
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
         }
         if (file_exists($configDir.'/local.php')) {
             $config->addFile('local.php', true);
-        }
-        if (file_exists($configDir.'/local.yml')) {
-            $config->addFile('local.yml', true);
         }
 
         BClassAutoload::i(true, array('root_dir'=>$dirConf['local_dir']));
@@ -320,29 +324,39 @@ class FCom_Core_Main extends BClass
         BLayout::i()->defaultViewClass('FCom_Core_View_Base');
     }
 
-    public function writeDbConfig()
+    public function writeConfigFiles($files = null)
     {
-        $c = array('db'=>BConfig::i()->get('db', true));
-        BConfig::i()->writeFile('db.php', $c); // PHP for simpler loading
-        return $this;
-    }
+        if (is_null($files)) {
+            $files = array('core', 'db', 'local');
+        }
+        if (is_string($files)) {
+            $files = explode(',', strtolower($files));
+        }
 
-    public function writeLocalConfig()
-    {
         $config = BConfig::i();
         $c = $config->get(null, true);
-        // collect configuration necessary for core startup
-        $m = array(
-            'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
-            'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
-            'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
-            'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
-            'cache' => !empty($c['cache']) ? $c['cache'] : null,
-        );
-        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'],
-            $c['mode_by_ip'], $c['cache']);
-        $config->writeFile('core.php', $m); // PHP for simpler loading
-        $config->writeFile('local.php', $c);
+
+        if (in_array('core', $files)) {
+            // configuration necessary for core startup
+            $core = array(
+                'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
+                'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
+                'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
+                'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
+                'cache' => !empty($c['cache']) ? $c['cache'] : array(),
+            );
+            $config->writeFile('core.php', $core);
+        }
+        if (in_array('db', $files)) {
+            // db connections
+            $db = !empty($c['db']) ? array('db' => $c['db']) : array();
+            $config->writeFile('db.php', $db);
+        }
+        if (in_array('local', $files)) {
+            // the rest of configuration
+            $local = BUtil::arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache', true);
+            $config->writeFile('local.php', $local);
+        }
         return $this;
     }
 

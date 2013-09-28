@@ -6,7 +6,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_origClass = __CLASS__;
 
     static protected $_clientCache = array();
-    static protected $_windowId;
+    static protected $_windowName;
     static protected $_connId;
 
     protected $_messages = array();
@@ -70,9 +70,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $client;
     }
 
-    static public function getWindowId()
+    static public function getWindowName()
     {
-        return static::$_windowId;
+        return static::$_windowName;
     }
 
     static public function getConnId()
@@ -101,14 +101,14 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $client = FCom_PushServer_Model_Client::i()->sessionClient();
 
-        if (!isset($request['window_id']) || !isset($request['conn_id'])) {
+        if (!isset($request['window_name']) || !isset($request['conn_id'])) {
             $client->send(array(
                 'signal' => 'error',
-                'description' => 'Missing window_id or conn_id',
+                'description' => 'Missing window_name or conn_id',
             ));
             return;
         }
-        static::$_windowId = $request['window_id'];
+        static::$_windowName = $request['window_name'];
         static::$_connId = $request['conn_id'];
 
         if (empty($request['messages'])) {
@@ -152,7 +152,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         $method = 'onUnknownSignal';
                     }
 
-#BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
+BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
                     $instance->$method();
 
                     $instance->onAfterDispatch();
@@ -178,19 +178,19 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function checkIn()
     {
         $oldWindows = $newWindows = (array) $this->getData('windows');
-        $oldConnections = !empty($oldWindows[static::$_windowId]['connections'])
-            ? $oldWindows[static::$_windowId]['connections'] : array();
+        $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
+            ? $oldWindows[static::$_windowName]['connections'] : array();
 
-        foreach ($newWindows as $windowId => $window) { // some cleanup
+        foreach ($newWindows as $windowName => $window) { // some cleanup
             if (empty($window['connections'])) {
-                unset($newWindows[$windowId]);
+                unset($newWindows[$windowName]);
             }
         }
 
         foreach ($oldConnections as $connId => $conn) { // reset old connections
-            $newWindows[static::$_windowId]['connections'][$connId] = 0;
+            $newWindows[static::$_windowName]['connections'][$connId] = 0;
         }
-        $newWindows[static::$_windowId]['connections'][static::$_connId] = 1; // set new connection
+        $newWindows[static::$_windowName]['connections'][static::$_connId] = 1; // set new connection
 
         $this->setData('windows', $newWindows)->save(); // save new state
 
@@ -199,7 +199,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $this->set('status', 'online')->save(); // set as connected
         } elseif (false && $oldConnections) { // are there already connections for this window
             $start = microtime(true);
-            $connKey = 'windows/'.static::$_windowId.'/connections';
+            $connKey = 'windows/'.static::$_windowName.'/connections';
             while (true) {
                 $this->fetchCustomData(); // update connections
                 $newConnections = $this->getData($connKey);
@@ -246,26 +246,26 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function sync()
     {
-        $messageModels = FCom_PushServer_Model_Message::i()->orm('m')
-            ->where('client_id', $this->id)
-            ->where('window_id', static::$_windowId)
-            //->where_raw('conn_id is null or conn_id=?', static::$_connId)
-            ->where('status', 'published')
-            ->find_many_assoc();
+        $msgHlp = FCom_PushServer_Model_Message::i();
+        $where = array('client_id' => $this->id, 'window_name' => static::$_windowName, 'status' => 'published');
+        $msgHlp->update_many(array('status'=>'locked'), $where);
+        $where['status'] = 'locked';
+        $messageModels = $msgHlp->orm('m')->where($where)->find_many_assoc();
         $messages = array();
         foreach ($messageModels as $msg) {
-#BDebug::log("SYNC: ".print_r($msg->as_array(),1));
-            $msg->set('status', 'sent')->save();
+BDebug::log("SYNC: ".print_r($msg->as_array(),1));
+            //$msg->set('status', 'sent')->save();
             $message = (array) BUtil::fromJson($msg->get('data_serialized'));
             //$message['ts'] = $model->get('create_at');
             $messages[] = $message;
-            if (empty($message['seq'])) {
-                $msg->delete();
-            }
+            // if (empty($message['seq'])) {
+            //     $msg->delete();
+            // }
         }
+        $msgHlp->delete_many($where);
 
         $this->fetchCustomData();
-        $connKey = 'windows/'.static::$_windowId.'/connections';
+        $connKey = 'windows/'.static::$_windowName.'/connections';
         $connections = $this->getData($connKey);
         if (empty($connections[static::$_connId])) { // this connection was removed
             unset($connections[static::$_connId]);
@@ -290,9 +290,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function checkOut()
     {
         $windows = $this->getData('windows');
-        unset($windows[static::$_windowId]['connections'][static::$_connId]);
-        if (empty($windows[static::$_windowId]['connections'])) {
-            unset($windows[static::$_windowId]);
+        unset($windows[static::$_windowName]['connections'][static::$_connId]);
+        if (empty($windows[static::$_windowName]['connections'])) {
+            unset($windows[static::$_windowName]);
         }
 
         $this->setData('windows', $windows);

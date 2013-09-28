@@ -37,7 +37,7 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
             }
         }
         if ($configUpdated) {
-            FCom_Core_Main::i()->writeLocalConfig();
+            FCom_Core_Main::i()->writeConfigFiles();
         }
     }
 }
