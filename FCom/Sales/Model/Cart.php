@@ -127,7 +127,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function recentItems($limit=3)
     {
-        $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id)
+        $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id())
             ->order_by_desc('ci.update_at')->limit($limit);
         BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
         $items = $orm->find_many();
@@ -177,7 +177,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function itemQty()
     {
-        return $this->item_qty*1;
+        return $this->get('item_qty')*1;
     }
 
     public function addProduct($productId, $params=array())

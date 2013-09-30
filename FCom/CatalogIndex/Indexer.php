@@ -269,7 +269,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $filterFields[$fName]['value_ids'] = array();
             // take category filter from options if available
             if (!empty($options['category']) && $field['field_type']=='category') {
-                $filters[$fName] = $options['category']->url_path;
+                $filters[$fName] = $options['category']->get('url_path');
             }
         }
 
@@ -467,10 +467,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     ->where_in('dv.field_id', $ff['field_ids']) //TODO: maybe filter by value_id? preferred index conflict?
                     ->group_by('dv.value_id')->find_many();
                 foreach ($counts as $c) {
-                    $v = $filterValues[$c->value_id];
+                    $v = $filterValues[$c->get('value_id')];
                     $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
                     $facets[$f['field_name']]['values'][$v['val']]['display'] = $v['display'] ? $v['display'] : $v['val'];
-                    $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $c->cnt;
+                    $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $c->get('cnt');
                 }
             }
         }

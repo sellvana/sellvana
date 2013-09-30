@@ -43,7 +43,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             $r['run_level_core'] = $r['auto_run_level'] ? 'AUTO' : (!empty($coreLevels[$modName]) ? $coreLevels[$modName] : '');
             //$r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : '';
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
-            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : '';
+            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
             $data[] = $r;
         }
