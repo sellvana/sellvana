@@ -7,7 +7,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
     protected static $_indexedFields;
     protected static $_sortingArray;
-    
+
     protected static $_fieldOptions = array(
         'field_type' => array('int' => 'Integer', 'decimal' => 'Decimal', 'varchar' => 'String', 'text' => 'Text', 'category' => 'Category'),
         'source_type' => array('field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback'),
@@ -28,15 +28,15 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             }
             $fields = $orm->order_by_asc('filter_order')->find_many();
             foreach ($fields as $f) {
-                $k = $f->field_name;
+                $k = $f->get('field_name');
                 static::$_indexedFields['all'][$k] = $f;
-                if ($f->sort_type!=='none') {
+                if ($f->get('sort_type')!=='none') {
                     static::$_indexedFields['sort'][$k] = $f;
                 }
-                if ($f->filter_type!=='none') {
+                if ($f->get('filter_type')!=='none') {
                     static::$_indexedFields['filter'][$k] = $f;
                 }
-                if ($f->search_type!=='none') {
+                if ($f->get('search_type')!=='none') {
                     static::$_indexedFields['search'][$k] = $f;
                 }
             }
@@ -50,16 +50,16 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             static::$_sortingArray = array();
             $sortFields = static::getFields('sort');
             foreach ($sortFields as $fName=>$field) {
-                $sortType = $field->sort_type;
-                $labels = explode('||', $field->sort_label);
-                $l1 = !empty($labels[0]) ? trim($labels[0]) : $field->field_label;
+                $sortType = $field->get('sort_type');
+                $labels = explode('||', $field->get('sort_label'));
+                $l1 = !empty($labels[0]) ? trim($labels[0]) : $field->get('field_label');
                 $l2 = !empty($labels[1]) ? trim($labels[1]) : null;
                 $sortBoth = $sortType=='both';
                 if ($sortType=='asc' || $sortBoth) {
-                    static::$_sortingArray[$field->field_name.' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
+                    static::$_sortingArray[$field->get('field_name').' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
                 }
                 if ($sortType=='desc' || $sortBoth) {
-                    static::$_sortingArray[$field->field_name.' desc'] = $sortBoth ? (empty($l2) ? $l1.' (Desc)' : $l2) : $l1;
+                    static::$_sortingArray[$field->get('field_name').' desc'] = $sortBoth ? (empty($l2) ? $l1.' (Desc)' : $l2) : $l1;
                 }
             }
         }

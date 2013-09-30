@@ -292,8 +292,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function ascendants()
     {
         $asc = array();
-        foreach (explode('/', $this->id_path) as $id) {
-            if ($id && $this->id!=$id) $asc[$id] = $this->load($id);
+        foreach (explode('/', $this->get('id_path')) as $id) {
+            if ($id && $this->id() != $id) $asc[$id] = $this->load($id);
         }
         return $asc;
     }
@@ -302,7 +302,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $siblings = array();
         foreach ($this->parent()->children() as $c) {
-            if ($c->id!=$this->id) $siblings[$c->id] = $c;
+            if ($c->id() != $this->id()) $siblings[$c->id()] = $c;
         }
         return $siblings;
     }
@@ -315,8 +315,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             $siblings = $parent->children();
         }
         foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
-            if ($c->sort_order && $c->parent_id==$this->parent_id) {
-                $sortOrder = max($sortOrder, $c->sort_order);
+            if ($c->get('sort_order') && $c->get('parent_id') == $this->get('parent_id')) {
+                $sortOrder = max($sortOrder, $c->get('sort_order'));
             }
         }
         $this->set('sort_order', $sortOrder+1);
@@ -325,15 +325,16 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        $this->set('url_key', BLocale::transliterate($this->node_name));
+        $this->set('url_key', BLocale::transliterate($this->get('node_name')));
         return $this;
     }
 
     public function generateUrlPath()
     {
-        $urlKey = $this->url_key;
-        if ($this->parent() && $this->parent()->url_path) {
-            $urlKey = trim($this->parent()->url_path.'/'.$this->url_key, '/');
+        $urlKey = $this->get('url_key');
+        $urlPath = $this->parent() ? $this->parent()->get('url_path') : null;
+        if ($urlPath) {
+            $urlKey = trim($urlPath.'/'.$urlKey, '/');
         }
         $this->set('url_path', $urlKey);
         return $this;
@@ -342,7 +343,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function generateFullName()
     {
         $parent = $this->parent();
-        $fullName = ($parent ? $parent->full_name : '').static::$_separator.$this->node_name;
+        $fullName = ($parent ? $parent->get('full_name') : '') . static::$_separator . $this->get('node_name');
         $this->set('full_name', trim($fullName, '|'));
         return $this;
     }

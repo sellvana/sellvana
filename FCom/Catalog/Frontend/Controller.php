@@ -36,10 +36,14 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
             $layout->view('catalog/product')->category = $category;
             $layout->view('head')->canonical_url = $product->url();
-            foreach ($category->ascendants() as $c) if ($c->node_name) $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-            $crumbs[] = array('label'=>$category->node_name, 'href'=>$category->url());
+            foreach ($category->ascendants() as $c) {
+                if ($c->get('node_name')) {
+                    $crumbs[] = array('label'=>$c->get('node_name'), 'href'=>$c->url());
+                }
+            }
+            $crumbs[] = array('label'=>$category->get('node_name'), 'href'=>$category->url());
         }
-        $crumbs[] = array('label'=>$product->product_name, 'active'=>true);
+        $crumbs[] = array('label'=>$product->get('product_name'), 'active'=>true);
 
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 

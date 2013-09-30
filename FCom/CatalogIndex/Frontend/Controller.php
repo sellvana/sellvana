@@ -141,13 +141,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $head = $this->view('head');
         $crumbs = array('home');
         foreach ($category->ascendants() as $c) {
-            if ($c->node_name) {
-                $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-                $head->addTitle($c->node_name);
+            $nodeName = $c->get('node_name');
+            if ($nodeName) {
+                $crumbs[] = array('label'=>$nodeName, 'href'=>$c->url());
+                $head->addTitle($nodeName);
             }
         }
-        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
-        $head->addTitle($category->node_name);
+        $crumbs[] = array('label'=>$category->get('node_name'), 'active'=>true);
+        $head->addTitle($category->get('node_name'));
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
         $layout->view('catalog/search')->query = $q;
