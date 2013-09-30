@@ -653,19 +653,49 @@
 .fcom-footer {
   position: fixed;
   width: 100%;
-  height: 60px;
+  height: 30px;
   background-color: #252525;
   bottom: 0;
+  width: auto;
   color: #ffffff;
+  right: 0;
 }
 .fcom-footer [class^='fcom-icon'],
 .fcom-footer [class*="fcom-icon"] {
-  position: absolute;
-  right: 20px;
-  top: 15px;
+  position: relative;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: top;
 }
 .fcom-footer-copyright {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+  position: relative;
+  top: 5px;
+  margin: 0 10px;
+  display: inline-block;
+}
+.fcom-timeline .header {
+  color: #ffffff;
+  background-color: #358fce;
+  padding: 5px 5px;
+  margin-right: 15px;
+}
+.fcom-timeline .header div {
+  display: inline-block;
+}
+.fcom-timeline .header span {
+  display: block;
+}
+.fcom-timeline .header button {
+  background: #256fa7;
+  border: 1px solid #256fa7;
+  border-radius: 0;
+  padding: 13px, 10px;
+}
+.fcom-timeline .header button:hover {
+  border: 1px solid #256fa7;
+  background-color: #358fce;
+}
+.fcom-timeline .header .controls {
+  vertical-align: middle;
+  display: inline-block;
 }
