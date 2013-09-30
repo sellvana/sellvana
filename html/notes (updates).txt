@@ -1,6 +1,0 @@
-Updates
-	- Added search bar
-	- Added user menu
-	- Cleaned classes grouping
-	- Cleaned unused styles
-	- Fixed positioning issues
