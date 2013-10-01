@@ -167,6 +167,9 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 collection.fetch({ reset:true });
             }
 
+
+
+
             if (true) { // true = jquery-ui resizable, false = colResizable
                 grid.$('thead th').resizable({
                     handles: 'e',
@@ -187,6 +190,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 });
             } else { // interferes with dragtable
                 grid.$el.colResizable();
+
             }
 
             if (true) { // true = jebaird, false = akottr
