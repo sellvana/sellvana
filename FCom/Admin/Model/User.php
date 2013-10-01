@@ -46,14 +46,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if ($this->get('password')) {
-            $this->set('password_hash', BUtil::fullSaltedHash($this->get('password')));
+        if ($this->password) {
+            $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
-        if ($this->get('api_password')) {
-            $this->set('api_password_hash', BUtil::fullSaltedHash($this->get('api_password')));
+        if ($this->api_password) {
+            $this->api_password_hash = BUtil::fullSaltedHash($this->api_password);
         }
-        if (!$this->get('role_id')) {
-            $this->set('role_id', null);
+        if (!$this->role_id) {
+            $this->role_id = null;
         }
 
         return true;
@@ -69,7 +69,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function validatePassword($password, $field='password_hash')
     {
-        return BUtil::validateSaltedHash($password, $this->get($field));
+        return BUtil::validateSaltedHash($password, $this->$field);
     }
 
     public static function has_role($orm, $role)
@@ -105,7 +105,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUserId()
     {
         $user = self::sessionUser();
-        return !empty($user) ? $user->id() : false;
+        return !empty($user) ? $user->id : false;
     }
 
     static public function isLoggedIn()
@@ -152,11 +152,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         BSession::i()->data('admin_user', serialize($this));
         static::$_sessionUser = $this;
 
-        if ($this->get('locale')) {
-            setlocale(LC_ALL, $this->get('locale'));
+        if ($this->locale) {
+            setlocale(LC_ALL, $this->locale);
         }
-        if ($this->get('timezone')) {
-            date_default_timezone_set($this->get('timezone'));
+        if ($this->timezone) {
+            date_default_timezone_set($this->timezone);
         }
         BEvents::i()->fire('FCom_Admin_Model_User::login:after', array('user' => $this));
 
@@ -186,12 +186,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function tzOffset()
     {
-        return BLocale::i()->tzOffset($this->get('tz'));
+        return BLocale::i()->tzOffset($this->tz);
     }
 
     public function fullname()
     {
-        return $this->get('firstname').' '.$this->get('lastname');
+        return $this->firstname.' '.$this->lastname;
     }
 
     /**
@@ -209,14 +209,13 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             return $this->sessionUser()->personalize($data);
         }
         if (!$this->_persModel) {
-            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id(), 'user_id');
+            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id, 'user_id');
             if (!$this->_persModel) {
                 $this->_persModel = FCom_Admin_Model_Personalize::i()->create(array('user_id'=>$this->id));
             }
         }
         if (!$this->_persData) {
-            $dataJson = $this->_persModel->get('data_json');
-            $this->_persData = $dataJson ? BUtil::fromJson($dataJson) : array();
+            $this->_persData = $this->_persModel->data_json ? BUtil::fromJson($this->_persModel->data_json) : array();
         }
         if (is_null($data)) {
             return $this->_persData;
@@ -228,21 +227,20 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function getPermission($paths)
     {
-        if ($this->get('is_superadmin')) {
+        if ($this->is_superadmin) {
             return true;
         }
-        if (!$this->get('role_id')) {
+        if (!$this->role_id) {
             return false;
         }
-        if (!$this->get('permissions')) {
-            $this->set('permissions', FCom_Admin_Model_Role::i()->load($this->role_id)->get('permissions'));
+        if (!$this->permissions) {
+            $this->permissions = FCom_Admin_Model_Role::i()->load($this->role_id)->permissions;
         }
         if (is_string($paths)) {
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            $perms = $this->get('permissions');
-            if (!empty($perms[$p])) {
+            if (!empty($this->permissions[$p])) {
                 return true;
             }
         }

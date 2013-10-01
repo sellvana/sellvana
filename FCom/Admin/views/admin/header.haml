@@ -65,7 +65,7 @@
 
             %li.dropdown
                 %a.dropdown-toggle#utilnav-account(href="#" data-toggle="dropdown" data-target="#")
-                    %img.avatar(src="#{BUtil::gravatar($user->get('email'))}")
+                    %img.avatar(src="#{BUtil::gravatar($user->email)}")
                     %span.user-name = $user->fullname()
                 %ul.dropdown-menu(role="menu" aria-labelledby="utilnav-account")
                     %li

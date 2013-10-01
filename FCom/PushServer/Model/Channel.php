@@ -92,8 +92,8 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             $message['channel'] = $this->channel_name;
         }
 
-#BDebug::log("SEND1: ".print_r($message,1));
-        BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), array(
+BDebug::log("SEND1: ".print_r($message,1));
+        BEvents::i()->fire(__METHOD__ . ':' . $this->channel_name, array(
             'channel' => $this,
             'message' => $message,
             'client'  => $fromClient,
@@ -107,13 +107,13 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
 
         $toClients = FCom_PushServer_Model_Client::i()->orm('c')
             ->join('FCom_PushServer_Model_Subscriber', array('c.id','=','s.client_id'), 's')
-            ->where('s.channel_id', $this->id())
+            ->where('s.channel_id', $this->id)
             ->select('s.id', 'sub_id')->select('c.id')->select('c.data_serialized')
             ->find_many();
-#BDebug::log('SEND2: '.sizeof($toClients).': '.print_r($this->as_array(),1));
+BDebug::log('SEND2: '.sizeof($toClients).': '.print_r($this->as_array(),1));
 
         foreach ($toClients as $toClient) {
-            if ($fromClient && $fromClient->id() === $toClient->id()) {
+            if ($fromClient && $fromClient->id === $toClient->id) {
                 //continue;
             }
             $windows = $toClient->getData('windows');
@@ -121,15 +121,15 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
                 $toConnId = !empty($toWindowData['connections']) ? key($toWindowData['connections']) : null;
                 $msg = $msgHlp->create(array(
                     'seq' => !empty($message['seq']) ? $message['seq'] : null,
-                    'channel_id' => $this->id(),
-                    'subscriber_id' => $toClient->get('sub_id'),
-                    'client_id' => $toClient->id(),
+                    'channel_id' => $this->id,
+                    'subscriber_id' => $toClient->sub_id,
+                    'client_id' => $toClient->id,
                     'window_name' => $toWindowName,
                     'conn_id' => $toConnId,
                     'status' => 'published',
                 ))->setData($message)->save();
                 //$msgIds[] = $msg->id;
-#BDebug::log("SEND3: ".print_r($msg->as_array(),1));
+BDebug::log("SEND3: ".print_r($msg->as_array(),1));
             }
         }
         if ($msgIds) {
