@@ -116,10 +116,10 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
                     $field = $col['name'];
                     switch ($col['cell']) {
                         case 'number':
-                            $row->set($field, floatval($row->get($field)));
+                            $row->$field = floatval($row->$field);
                             break;
                         case 'integer':
-                            $row->set($field, intval($row->get($field)));
+                            $row->$field = intval($row->$field);
                             break;
                     }
                 }

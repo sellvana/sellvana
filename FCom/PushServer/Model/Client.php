@@ -152,7 +152,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         $method = 'onUnknownSignal';
                     }
 
-#BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
+BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
                     $instance->$method();
 
                     $instance->onAfterDispatch();
@@ -247,13 +247,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function sync()
     {
         $msgHlp = FCom_PushServer_Model_Message::i();
-        $where = array('client_id' => $this->get('id'), 'window_name' => static::$_windowName, 'status' => 'published');
+        $where = array('client_id' => $this->id, 'window_name' => static::$_windowName, 'status' => 'published');
         $msgHlp->update_many(array('status'=>'locked'), $where);
         $where['status'] = 'locked';
         $messageModels = $msgHlp->orm('m')->where($where)->find_many_assoc();
         $messages = array();
         foreach ($messageModels as $msg) {
-#BDebug::log("SYNC: ".print_r($msg->as_array(),1));
+BDebug::log("SYNC: ".print_r($msg->as_array(),1));
             //$msg->set('status', 'sent')->save();
             $message = (array) BUtil::fromJson($msg->get('data_serialized'));
             //$message['ts'] = $model->get('create_at');
@@ -308,7 +308,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function fetchCustomData()
     {
-        $clientUpdate = static::orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
+        $clientUpdate = static::orm()->select('data_serialized')->where('id', $this->id)->find_one();
         if ($clientUpdate) { // another connection just connected
             $data = (array) BUtil::fromJson($clientUpdate->get('data_serialized'));
             $this->set(static::$_dataCustomField, $data);
@@ -335,7 +335,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $channel = FCom_PushServer_Model_Channel::i()->getChannel($channel, true);
         }
         $hlp = FCom_PushServer_Model_Subscriber::i();
-        $data = array('client_id' => $this->id(), 'channel_id' => $channel->id());
+        $data = array('client_id' => $this->id, 'channel_id' => $channel->id);
         $subscriber = $hlp->load($data);
         if (!$subscriber) {
             $subscriber = $hlp->create($data)->save();
@@ -351,7 +351,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (!is_object($channel)) {
             $channel = FCom_PushServer_Model_Channel::i()->getChannel($channel, true);
         }
-        $data = array('client_id' => $this->id(), 'channel_id' => $channel->id());
+        $data = array('client_id' => $this->id, 'channel_id' => $channel->id);
         FCom_PushServer_Model_Subscriber::i()->delete_many($data);
         return $this;
     }
@@ -367,7 +367,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function getChannel()
     {
-        return FCom_PushServer_Model_Channel::i()->getChannel('client:' . $this->id(), true);
+        return FCom_PushServer_Model_Channel::i()->getChannel('client:' . $this->id, true);
     }
 
     public function getMessages()

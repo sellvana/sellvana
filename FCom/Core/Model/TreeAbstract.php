@@ -236,17 +236,15 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function children($sort='sort_order')
     {
         $children = array();
-        $id = $this->id();
+        $id = $this->id;
 
         if (($cache = $this->cacheFetch())) {
             foreach ($cache as $c) {
-                if ($c->get('parent_id')==$id) {
-                    $children[$c->id()] = $c;
-                }
+                if ($c->parent_id==$id) $children[$c->id] = $c;
             }
         }
-        $numChildren = $this->get('num_children');
-        if (is_null($numChildren) || sizeof($children) != $numChildren) {
+
+        if (is_null($this->num_children) || sizeof($children)!=$this->num_children) {
             $class = get_class($this);
             $orm = $this->orm('t')->where('t.parent_id', $id);
             if ($children) $orm->where_not_in('t.id', array_keys($children));
@@ -254,7 +252,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             $rows = $orm->find_many();
             foreach ($rows as $c) {
                 $c->cacheStore();
-                $children[$c->id()] = $c;
+                $children[$c->id] = $c;
             }
         }
         return $children;
@@ -267,23 +265,22 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if ($this->is_dirty('id_path')) {
             $path = $this->old_values('id_path').'/';
         } else {
-            $path = $this->get('id_path').'/';
+            $path = $this->id_path.'/';
         }
         if (($cache = $this->cacheFetch())) {
             foreach ($cache as $c) {
-                if (strpos($c->get('id_path'), $path)===0) $desc[$c->id()] = $c;
+                if (strpos($c->id_path, $path)===0) $desc[$c->id] = $c;
             }
         }
 #echo "<pre>"; print_r(BDb::many_as_array($desc)); exit;
-        $numDescendants = $this->get('num_descendants');
-        if (is_null($numDescendants) || sizeof($desc) != $numDescendants) {
+        if (is_null($this->num_descendants) || sizeof($desc)!=$this->num_descendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path.'%');
             if ($desc) $orm->where_not_in('t.id', array_keys($desc));
             if ($sort) $orm->order_by_asc($sort);
             $rows = $orm->find_many();
             foreach ($rows as $c) {
                 $c->cacheStore();
-                $desc[$c->id()] = $c;
+                $desc[$c->id] = $c;
             }
         }
         return $desc;

@@ -49,15 +49,13 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $nodeChildren = $node ? $node->children() : $class::i()->orm()->where_null('parent_id')->find_many();
         $children = array();
         foreach ($nodeChildren as $c) {
-            $nodeName = $c->get('node_name');
-            $numChildren = $c->get('num_children');
             $children[] = array(
-                'data'     => $nodeName ? $nodeName : 'ROOT',
-                'attr'     => array('id'=>$c->id()),
-                'state'    => $numChildren ? ($depth ? 'open' : 'closed') : null,
-                'rel'      => $node ? 'root' : ($numChildren ? 'parent' : 'leaf'),
-                'position' => $c->get('sort_order'),
-                'children' => $depth && $numChildren ? $this->_nodeChildren($c, $depth-1) : null,
+                'data'     => $c->node_name ? $c->node_name : 'ROOT',
+                'attr'     => array('id'=>$c->id),
+                'state'    => $c->num_children ? ($depth ? 'open' : 'closed') : null,
+                'rel'      => $node ? 'root' : ($c->num_children ? 'parent' : 'leaf'),
+                'position' => $c->sort_order,
+                'children' => $depth && $c->num_children ? $this->_nodeChildren($c, $depth-1) : null,
             );
         }
         return $children;

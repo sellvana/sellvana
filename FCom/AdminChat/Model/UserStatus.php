@@ -39,7 +39,7 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
     public function changeStatus($status, $userId = null)
     {
         $userStatus = $this->sessionUserStatus(true);
-        if ($userStatus->get('status') != $status) {
+        if ($userStatus->status != $status) {
             $userStatus->set('status', $status)->save();
 
             $userHlp = FCom_Admin_Model_User::i();
@@ -52,7 +52,7 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
             $channel->send(array(
                 'signal' => 'status',
                 'users' => array(
-                    array('username' => $user->get('username'), 'status' => $status),
+                    array('username' => $user->username, 'status' => $status),
                 ),
             ));
         }
