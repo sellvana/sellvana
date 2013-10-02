@@ -11,7 +11,7 @@
             {% endif %}
             <h2>{{ 'Review the information below then click "Place your order"' |_ }}</h2>
             <div class="row">
-                <div class="span6">
+                <div class="col-md-6">
                     <h4>{{ "Shipping to" |_}}</h4>
                     {{ THIS.get('shipping_address').as_html() | raw }}
                     {% if THIS.get('guest_checkout') %}
@@ -21,7 +21,7 @@
                     {% endif %}
                 </div>
             {% if THIS.get('shipping_methods') %}
-                <div class="span6">
+                <div class="col-md-6">
                     <h4>{{ "Shipping Options" |_ }}:</h4>
                     <ul>
                         {% for shippingMethod, shippingClass in THIS.get('shipping_methods') %}
@@ -43,7 +43,7 @@
             </div>
             <div class="divider"></div>
             <div class="row">
-                <div class="span6">
+                <div class="col-md-6">
                     <h4>{{ "Billing address" |_ }}</h4>
                     {% if cart.get('shipping_same') %}
                         <p>{{ 'Same as shipping' |_ }}</p>
@@ -57,7 +57,7 @@
                         <small><a href="{{ APP.href('customer/address/choose?t=b') }}">{{ "Change" |_ }}</a></small>
                     {% endif %}
                 </div>
-                <div class="span6">
+                <div class="col-md-6">
                     {{ THIS.view('checkout/payment') | raw }}
                 </div>
             </div>

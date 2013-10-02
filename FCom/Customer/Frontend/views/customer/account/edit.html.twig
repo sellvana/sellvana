@@ -8,13 +8,13 @@
         <form action="{{ APP.href('customer/myaccount/edit') }}" method="post" id="edit-form">
             <fieldset>
               <div class="row-fluid">
-                <div class="control-group span6">
+                <div class="control-group col-md-6">
                   <label for="edit-firstname" class="control-label required">{{ "First Name" | _ }}</label>
                   <div class="controls">
                     <input type="text" name="model[firstname]" class="required" value="{{ THIS.get('customer').get('firstname') }}" id="edit-firstname"/>
                   </div>
                 </div>
-                <div class="control-group span6">
+                <div class="control-group col-md-6">
                   <label for="edit-lastname" class="control-label required">{{ "Last Name" | _ }}</label>
                   <div class="controls">
                     <input type="text" name="model[lastname]" class="required" value="{{ THIS.get('customer').get('lastname') }}" id="edit-lastname"/>
@@ -22,7 +22,7 @@
                 </div>
               </div>
               <div class="row-fluid">
-                <div class="control-group span6">
+                <div class="control-group col-md-6">
                   <label for="edit-email" class="control-label required">{{ "Email" | _ }}</label>
                   <div class="controls">
                     <input type="email" name="model[email]" class="required"  value="{{ THIS.get('customer').get('email') }}" id="edit-email"/>
@@ -31,13 +31,13 @@
               </div>
               <!--
               <div class="row-fluid">
-                <div class="control-group span6">
+                <div class="control-group col-md-6">
                   <label for="model-password" class="control-label required">{{ "Password" | _ }}</label>
                   <div class="controls">
                     <input type="password" name="model[password]" class="required" id="model-password"/>
                   </div>
                 </div>
-                <div class="control-group span6">
+                <div class="control-group col-md-6">
                   <label for="edit-password_confirm" class="control-label required">{{ "Confirm Password" | _ }}</label>
                   <div class="controls">
                     <input type="password" name="model[password_confirm]" class="required" equalto="#model-password" id="edit-password_confirm"/>

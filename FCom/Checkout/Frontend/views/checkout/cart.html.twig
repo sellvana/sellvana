@@ -68,7 +68,7 @@
             </table>
         </form>
         <section class="row">
-            <form action="{{ APP.href('cart/add') }}" method="post" class="span6 control-group form-inline">
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6 control-group form-inline">
                 <label for="" class="control-label">{{ "Promo Code" |_ }}</label>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 <div class="controls">
@@ -76,7 +76,7 @@
                   <button class="btn">{{ "Submit" |_ }}</button>
                 </div>
             </form>
-            <form action="{{ APP.href('cart/add') }}" method="post" class="span6">
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6">
                 <header>{{ "Shipping Estimate" |_ }}</header>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 {% if (shipping_estimates) %}
