@@ -92,7 +92,10 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             $message['channel'] = $this->channel_name;
         }
 
-#BDebug::log("SEND1: ".print_r($message,1));
+
+if (FCom_PushServer_Main::isDebugMode()) {
+    BDebug::log("SEND1: ".print_r($message,1));
+}
         BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), array(
             'channel' => $this,
             'message' => $message,
@@ -110,7 +113,10 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             ->where('s.channel_id', $this->id())
             ->select('s.id', 'sub_id')->select('c.id')->select('c.data_serialized')
             ->find_many();
-#BDebug::log('SEND2: '.sizeof($toClients).': '.print_r($this->as_array(),1));
+
+if (FCom_PushServer_Main::isDebugMode()) {
+    BDebug::log('SEND2: '.sizeof($toClients).': '.print_r($this->as_array(),1));
+}
 
         foreach ($toClients as $toClient) {
             if ($fromClient && $fromClient->id() === $toClient->id()) {
@@ -129,7 +135,10 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
                     'status' => 'published',
                 ))->setData($message)->save();
                 //$msgIds[] = $msg->id;
-#BDebug::log("SEND3: ".print_r($msg->as_array(),1));
+
+if (FCom_PushServer_Main::isDebugMode()) {
+    BDebug::log("SEND3: ".print_r($msg->as_array(),1));
+}
             }
         }
         if ($msgIds) {

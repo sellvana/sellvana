@@ -2,12 +2,17 @@
 
 class FCom_PushServer_Main extends BCLass
 {
+    protected $_services = array();
+
+    protected static $_debug = false;
+
     static public function bootstrap()
     {
         static::i()
             //->addService('/^./', 'FCom_PushServer_Main::catchAll')
             ->addService('client', 'FCom_PushServer_Service_Client')
         ;
+        static::$_debug = true;
     }
 
     static public function catchAll($message)
@@ -37,8 +42,6 @@ FCom.pushserver_url = '".BApp::src('@FCom_PushServer/index.php')."';
         //TODO: implement roster (online/offline) notifications
     }
 
-    protected $_services = array();
-
     public function addService($channel, $callback)
     {
         $this->_services[] = array(
@@ -52,5 +55,10 @@ FCom.pushserver_url = '".BApp::src('@FCom_PushServer/index.php')."';
     public function getServices()
     {
         return $this->_services;
+    }
+
+    static public function isDebugMode()
+    {
+        return static::$_debug;
     }
 }

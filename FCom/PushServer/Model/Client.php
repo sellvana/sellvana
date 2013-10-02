@@ -152,7 +152,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         $method = 'onUnknownSignal';
                     }
 
-#BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
+if (FCom_PushServer_Main::isDebugMode()) {
+    BDebug::log("RECEIVE: ".get_class($instance).'::'.$method.': '.print_r($message,1));
+}
                     $instance->$method();
 
                     $instance->onAfterDispatch();
@@ -253,7 +255,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $messageModels = $msgHlp->orm('m')->where($where)->find_many_assoc();
         $messages = array();
         foreach ($messageModels as $msg) {
-#BDebug::log("SYNC: ".print_r($msg->as_array(),1));
+
+if (FCom_PushServer_Main::isDebugMode()) {
+    BDebug::log("SYNC: ".print_r($msg->as_array(),1));
+}
             //$msg->set('status', 'sent')->save();
             $message = (array) BUtil::fromJson($msg->get('data_serialized'));
             //$message['ts'] = $model->get('create_at');

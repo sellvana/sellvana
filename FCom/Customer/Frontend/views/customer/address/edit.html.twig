@@ -7,7 +7,7 @@
     {% endif %}
     <fieldset>
       <div class="row-fluid">
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           <label for="address-firstname" class="control-label required">{{ "First name" | _ }}</label>
           <div class="controls">
             <input type="text" name="firstname" id="address-firstname" value="{{ validator.fieldValue("firstname") }}"
@@ -15,7 +15,7 @@
               {{ validator.errorHtml("firstname", "address-firstname") | raw }}
           </div>
         </div>
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           <label for="address-lastname" class="control-label required">{{ "Last name" | _ }}</label>
           <div class="controls">
             <input type="text" name="lastname" id="address-lastname" value="{{ validator.fieldValue("lastname") }}">
@@ -46,14 +46,14 @@
         </div>
       </div>
       <div class="row-fluid">
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           <label for="address-city" class="control-label required">{{ "City" | _ }}</label>
           <div class="controls">
             <input type="text" name="city" id="address-city" value="{{ validator.fieldValue("city") }}">
               {{ validator.errorHtml("city", "address-city") | raw }}
           </div>
         </div>
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           {{ THIS.view('geo/embed') | raw}}
           <script>
               require(['jquery'], function($) {
@@ -78,7 +78,7 @@
         </div>
       </div>
       <div class="row-fluid">
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           <label for="address-region" class="control-label required">{{ "State/Region" | _ }}</label>
           <div class="controls">
             <select class="geo-region required select2" name="region" id="address-region" style="display:none;">
@@ -88,7 +88,7 @@
               {{ validator.errorHtml("region", "address-region") | raw }}
           </div>
         </div>
-        <div class="control-group span6">
+        <div class="control-group col-md-6">
           <label for="address-postcode" class="control-label required">{{ "Zip / Postal Code" | _ }}</label>
           <div class="controls">
             <input type="text" name="postcode" id="address-postcode" value="{{ validator.fieldValue("postcode") }}">
