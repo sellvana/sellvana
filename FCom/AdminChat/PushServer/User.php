@@ -32,6 +32,6 @@ class FCom_AdminChat_PushServer_User extends FCom_PushServer_Service_Abstract
 
     public function signal_status()
     {
-        FCom_AdminChat_Model_UserStatus::i()->changeStatus($this->_message['status'], $this->_client->admin_user_id);
+        FCom_AdminChat_Model_UserStatus::i()->changeStatus($this->_message['status'], $this->_client->get('admin_user_id'));
     }
 }

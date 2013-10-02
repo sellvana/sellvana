@@ -463,7 +463,7 @@ EOT
             $tables = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}`", array())->find_many();
             $field = "Tables_in_{$dbName}";
             foreach ($tables as $t) {
-                 static::$_tables[$dbName][$t->$field] = array();
+                 static::$_tables[$dbName][$t->get($field)] = array();
             }
         } elseif (!isset(static::$_tables[$dbName][$tableName])) {
             $table = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}` LIKE ?", array($tableName))->find_one();
