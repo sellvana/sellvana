@@ -15,4 +15,6 @@ Folders:
 
 	startWatchMode.bat - A shortcut to start watch mode on fulleron-theme.styl (This also compiles on save replacing the fulleron-theme.css file so use with caution)
 
+	dashboard - Contains the less version of the timeline
+
 *Note: In order to compile the stylus code you need to install stylus (npm install -g stylus)
