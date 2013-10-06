@@ -145,7 +145,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_CatalogIndex' => 'REQUESTED',
                         'FCom_Checkout' => 'REQUESTED',
                         'FCom_Cms' => 'REQUESTED',
-                        'FCom_Comet' => 'REQUESTED',
                         'FCom_Cron' => 'REQUESTED',
                         'FCom_Customer' => 'REQUESTED',
                         'FCom_CustomerGroups' => 'REQUESTED',
@@ -170,6 +169,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_PayPal' => 'REQUESTED',
                         'FCom_ProductReviews' => 'REQUESTED',
                         'FCom_Promo' => 'REQUESTED',
+                        'FCom_PushServer' => 'REQUESTED',
                         'FCom_Sales' => 'REQUESTED',
                         'FCom_Seo' => 'REQUESTED',
                         'FCom_ShippingPlain' => 'REQUESTED',
@@ -189,8 +189,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'PRODUCTION',
             ),
         ), true);
-        FCom_Core_Main::i()->writeDbConfig();
-        FCom_Core_Main::i()->writeLocalConfig();
+        FCom_Core_Main::i()->writeConfigFiles();
         BResponse::i()->redirect(BApp::baseUrl());
     }
 }

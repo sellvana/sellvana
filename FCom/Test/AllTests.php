@@ -21,7 +21,7 @@ class FCom_Test_AllTests extends BClass
         }
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
-        $modules = BModuleRegistry::i()->debug();
+        $modules = BModuleRegistry::i()->getAllModules();
 
         $testModules = array();
         foreach ($modules as $module) {

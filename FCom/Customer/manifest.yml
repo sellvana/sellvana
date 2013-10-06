@@ -1,6 +1,7 @@
 modules:
     FCom_Customer:
         version: 0.1.6
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0 } }
         translations: { de: de.php }
         description: Customer Accounts and Management
@@ -33,7 +34,7 @@ modules:
                 observe:
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
 
-            FCom_Api:
+            FCom_ApiServer:
                 routing:
                     - [ any, /v1/customer/customer, FCom_Customer_ApiServer_V1_Customer.index ]
                     - [ any, /v1/customer/customer/:id, FCom_Customer_ApiServer_V1_Customer.index ]

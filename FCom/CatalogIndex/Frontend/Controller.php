@@ -52,8 +52,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     'color' => $colors[rand(0, sizeof($colors)-1)],
                     'size' => $sizes[rand(0, sizeof($sizes)-1)],
                 ))->save();
+                $exists = array();
 //                $pId = $product->id;
-//                $exists = array();
 //                for ($i=0; $i<5; $i++) {
 //                    do {
 //                        $cId = $categories[rand(0, sizeof($categories)-1)]->id;
@@ -66,7 +66,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         // assign products to categories
-        if (true) {
+        if (false) {
             BDb::run("TRUNCATE fcom_category_product");
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
@@ -141,13 +141,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $head = $this->view('head');
         $crumbs = array('home');
         foreach ($category->ascendants() as $c) {
-            if ($c->node_name) {
-                $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
-                $head->addTitle($c->node_name);
+            $nodeName = $c->get('node_name');
+            if ($nodeName) {
+                $crumbs[] = array('label'=>$nodeName, 'href'=>$c->url());
+                $head->addTitle($nodeName);
             }
         }
-        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
-        $head->addTitle($category->node_name);
+        $crumbs[] = array('label'=>$category->get('node_name'), 'active'=>true);
+        $head->addTitle($category->get('node_name'));
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
         $layout->view('catalog/search')->query = $q;

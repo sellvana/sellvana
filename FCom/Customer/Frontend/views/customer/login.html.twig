@@ -1,0 +1,40 @@
+<div class="page-main-wrapper">
+    <div class="page-main">
+        <form action="{{ APP.href('login') }}" method="post" id="login-form">
+            <fieldset class="login-form">
+                <header class="page-title">
+                    <h1 class="title">{{"Login" | _}}</h1>
+                </header>
+                {{ THIS.messagesHtml() | raw }}
+                <div class="control-group">
+                    <label for="email" class="control-label">{{ "Email" | _ }}</label>
+                    <div class="controls">
+                      <input type="email" name="login[email]" class="required" id="email"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="password" class="control-label">{{ "Password" | _ }}</label>
+                    <div class="controls">
+                      <input type="password" name="login[password]" class="required" id="password"/>
+                    </div>
+                </div>
+                <div class="checkbox">
+                    <label for="remember-me"><input type="checkbox" id="remember-me" name="remember_me"/>{{"Remember Me" | _}}</label>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" type="submit"><span>{{"Login"|_}}</span></button>
+                    <a href="{{ APP.href('customer/password/recover')}}">{{ "Forgot your password?" | _ }}</a></a>
+                </div>
+                <div class="divider"></div>
+                <p>{{ "No Account? " | _ }}<strong><a href="{{ APP.href('customer/register') }}">{{"Sign up now" | _ }} &raquo;</strong></a></p>
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#login-form').validate();
+    })
+})
+</script>

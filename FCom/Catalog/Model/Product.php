@@ -42,14 +42,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function url($category=null)
     {
-        return BApp::href(($category ? $category->url_path.'/' : '').$this->url_key);
+        return BApp::href(($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
     }
 
     public function imageUrl($full=false)
     {
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
-        return $url.$media.'/'.($this->thumb_url ? $this->thumb_url : 'image-not-found.jpg');
+        $thumbUrl = $this->get('thumb_url');
+        return $url.$media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
     }
 
     public function thumbUrl($w, $h=null, $full=false)
@@ -193,7 +194,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($this);
         if ($fields) {
             foreach ($fields as $f) {
-                if ($f->frontend_show) {
+                if ($f->get('frontend_show')) {
                     $result[] = $f;
                 }
             }

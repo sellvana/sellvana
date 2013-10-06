@@ -1,3 +1,5 @@
+{% set validator = THIS.validator('address-form', THIS.get('address')) %}
+
 <form action="{{ APP.href('checkout/address') }}" method="post" class="address-form" id="address-form">
     <input type="hidden" name="address_equal" value="0">
     <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
@@ -6,76 +8,90 @@
             <h1 class="title">{{ "Shipping Address" |_ }}</h1>
         </header>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "First name" |_ }}</label>
+          <label for="address-firstname" class="control-label">{{ "First name" |_ }}</label>
           <div class="controls">
-            <input type="text" name="firstname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+            <input type="text" name="firstname" id="address-firstname" value="{{ validator.fieldValue('firstname') }}" class="required{{ ' ' ~ validator.fieldClass('firstname') }}">
+            {{ validator.errorHtml("firstname", "address-firstname") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Last name" |_ }}</label>
+          <label for="address-lastname" class="control-label">{{ "Last name" |_ }}</label>
           <div class="controls">
-            <input type="text" name="lastname" value="{{ THIS.get('address').get('firstname') }}" class="required">
+            <input type="text" name="lastname" id="address-lastname" value="{{ validator.fieldValue('lastname') }}" class="required{{ ' ' ~ validator.fieldClass('lastname') }}">
+              {{ validator.errorHtml("lastname", "address-lastname") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "E-mail" |_ }}</label>
+          <label for="address-email" class="control-label">{{ "E-mail" |_ }}</label>
           <div class="controls">
-            <input type="text" name="email" value="{{ THIS.get('address').get('email') }}" class="required">
+            <input type="text" name="email" id="address-email" value="{{ validator.fieldValue('email') }}" class="required{{ ' ' ~ validator.fieldClass('email') }}">
+              {{ validator.errorHtml("email", "address-email") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Street 1" |_ }}</label>
+          <label for="address-street1" class="control-label">{{ "Street 1" |_ }}</label>
           <div class="controls">
-            <input type="text" name="street1" value="{{ THIS.get('address').get('street1') }}" class="required">
+            <input type="text" name="street1" id="address-street1" value="{{ validator.fieldValue('street1') }}" class="required{{ ' ' ~ validator.fieldClass('street1') }}">
+              {{ validator.errorHtml("street1", "address-street1") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Street 2" |_ }}</label>
+          <label for="address-street2" class="control-label">{{ "Street 2" |_ }}</label>
           <div class="controls">
-            <input type="text" name="street2" value="{{ THIS.get('address').get('street2') }}">
+            <input type="text" name="street2" id="address-street2" value="{{ validator.fieldValue('street2') }}" class="{{ ' ' ~ validator.fieldClass('street2') }}">
+              {{ validator.errorHtml("street2", "address-street2") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "City" |_ }}</label>
+          <label for="address-city" class="control-label">{{ "City" |_ }}</label>
           <div class="controls">
-            <input type="text" name="city" value="{{ THIS.get('address').get('city') }}" class="required">
+            <input type="text" name="city" id="address-city" value="{{ validator.fieldValue('city') }}" class="required{{ ' ' ~ validator.fieldClass('city') }}">
+              {{ validator.errorHtml("city", "address-city") | raw }}
           </div>
         </div>
           {{ THIS.view('geo/embed') | raw }}
           <script>
               require(['jquery'], function($) {
                   $(function() {
-                      $('.geo-country').geoCountryRegion({country:'{{ THIS.get('address').get('country') }}', region:'{{ THIS.get('address').get('region') }}'});
+                      $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue('country') }}', region:'{{ validator.fieldValue('region') }}'});
                   })
               })
           </script>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Region" |_ }}</label>
+          <label for="address-country" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
           <div class="controls">
-            <select class="geo-region required" name="region"  class="required">
-                <option value="">{{ "Select an option" |_ }}</option>
-            </select>
-            <input type="text" class="geo-region" name="region"  class="required"/>
-          </div>
-        </div>
-        <div class="control-group">
-          <label for="#" class="control-label">{{ "Country" |_ }}<em class="required">*</em></label>
-          <div class="controls">
-            <select class="geo-country" name="country" id="country" class="required">
+            {% set countries = THIS.get('countries') %}
+            {% set defC = validator.fieldValue('country') %}
+            <select class="geo-country required{{ ' ' ~ validator.fieldClass('country') }}" name="country" id="address-country">
               <option value="">{{ "Select an option" |_ }}</option>
+                {% for iso, country in countries %}
+                <option value="{{ iso }}" {{ defC == iso ? "selected" }}>{{ country }}</option>
+                {% endfor %}
             </select>
+              {{ validator.errorHtml("country", "address-country") | raw }}
           </div>
         </div>
         <div class="control-group">
-          <label for="#" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
+            <label for="address-region" class="control-label">{{ "Region" |_ }}<em class="required">*</em></label>
+            <div class="controls">
+                <select class="geo-region required{{ ' ' ~ validator.fieldClass('region') }}" style="display: none" name="region" id="address-region">
+                    <option value="">{{ "Select an option" |_ }}</option>
+                </select>
+                <input type="text" class="geo-region required{{ ' ' ~ validator.fieldClass('region') }}" name="region" id="address-region" value="{{ validator.fieldValue('region') }}"/>
+                {{ validator.errorHtml("region", "address-region") | raw }}
+            </div>
+        </div>
+        <div class="control-group">
+          <label for="address-postcode" class="control-label">{{ "Zip / Postal Code" |_ }}</label>
           <div class="controls">
-            <input type="text" name="postcode" value="{{ THIS.get('address').get('postcode') }}" class="required">
+            <input type="text" name="postcode" id="address-postcode" value="{{ validator.fieldValue('postcode') }}" class="required{{ ' ' ~ validator.fieldClass('postcode') }}">
+              {{ validator.errorHtml("postcode", "address-postcode") | raw }}
           </div>
-        </div>          
-          
+        </div>
+
         {% if 's' == THIS.get('address_type') %}
         <label for="address_equal" class="checkbox">
-          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ THIS.get('address_equal') ? 'checked' : '' }}>
+          <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ validator.fieldValue('address_equal') ? 'checked' }}>
                 {{ "Billing address is same as shipping" |_ }}
         </label>
         {% endif %}
@@ -83,7 +99,7 @@
     </fieldset>
 </form>
 <script>
-require(['jquery'], function($) {
+require(['jquery', 'jquery.validate'], function($) {
     $(function() {
         $('#address-form').validate();
     })

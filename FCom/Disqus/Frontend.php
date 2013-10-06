@@ -2,20 +2,16 @@
 
 class FCom_Disqus_Frontend extends BClass
 {
-    static public function bootstrap()
-    {
-        BLayout::i()->onAfterTheme('FCom_Disqus_Frontend::layout');
-    }
-
     static public function layout()
     {
-        if (BConfig::i()->get('modules/FCom_Disqus/show_on_all_pages')) {
+        $conf = BConfig::i()->get('modules/FCom_Disqus');
+        if (!empty($conf['show_on_all_pages'])) {
              BLayout::i()->layout(array(
-            'base'=>array(
-                array('hook', 'footer', 'views'=>array('disqus/embed')),
-                )
+                'base'=>array(
+                    array('hook', 'footer', 'views'=>array('disqus/embed')),
+                ),
             ));
-        } else {
+        } elseif (!empty($conf['show_on_product'])) {
             // by default only on product info page
             BLayout::i()->layout(array(
                 '/catalog/product' => array(

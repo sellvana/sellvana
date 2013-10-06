@@ -1,0 +1,22 @@
+modules:
+    FCom_PushServer:
+        version: 0.1.3
+        channel: beta
+        description: XHR Push Server implementation for long polling real-time communication C2C and S2C
+
+        require: { module: { FCom_Core: 0.1.0 } }
+
+        areas:
+            FCom_Admin:
+                require: { module: { FCom_Admin: 0.1.0 } }
+                auto_use: [ layout ]
+                observe:
+                    - [ FCom_Admin_Model_User::logout, FCom_PushServer_Main::onAdminUserLogout ]
+
+            FCom_PushServer:
+                auto_use: [ bootstrap ]
+                routing:
+                    - [ post, /, FCom_PushServer_Controller.index ]
+
+                default_config:
+                    modules/FCom_PushServer/delay_sec: 1

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @method FCom_Sales_Main i() i($new=false, array $args=array())
+ * Class FCom_Sales_Main
+ */
 class FCom_Sales_Main extends BClass
 {
     protected $_registry = array();
@@ -85,24 +88,21 @@ class FCom_Sales_Main extends BClass
 
     public function checkDefaultShippingPayment($args)
     {
-        $warnings = array();
         if(!$this->getShippingMethods()){
-            $warnings[] = "shipping";
+            $args['notifications'][] = array(
+                'type' => 'warning',
+                'group' => 'FCom Sales',
+                'message' => 'You have to enable at least one shipping module',
+                'code' => "sales_missing_shipping",
+            );
         }
         if(!$this->getPaymentMethods()){
-            $warnings[] = "payment";
-        }
-        if(!empty($warnings)){
-            $msg = "You have to enable at least one module for %s.";
-            $data = array();
-            foreach ($warnings as $type) {
-                $obj =  new stdClass();
-                $obj->text = sprintf($msg, $type);
-                $obj->url = null;
-                $data[] = $obj;
-            }
-
-            $args['modulesNotification']["FCom Sales"] = $data;
+            $args['notifications'][] = array(
+                'type' => 'warning',
+                'group' => 'FCom Sales',
+                'message' => 'You have to enable at least one payment module',
+                'code' => "sales_missing_payment",
+            );
         }
     }
 }

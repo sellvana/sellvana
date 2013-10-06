@@ -30,4 +30,18 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         $this->update_at = BDb::now();
         return true;
     }
+
+    protected $_validationRules = array(
+        array('firstname', '@required'),
+        array('firstname', '@alphanum'),
+        array('lastname', '@required'),
+        array('lastname', '@alphanum'),
+        array('email', '@required'),
+        array('email', '@email'),
+        array("street1", '@required'),
+        array("city", '@required'),
+        array("country", '@required'),
+        array("region", '@required'),
+        array("postcode", '@required'),
+    );
 }

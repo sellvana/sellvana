@@ -1,12 +1,10 @@
 <?php
 
 if (!defined('FULLERON_ROOT_DIR')) {
-    define('FULLERON_ROOT_DIR', dirname(dirname(__DIR__)));
+    define('FULLERON_ROOT_DIR', str_replace('\\', '/', dirname(dirname(__DIR__))));
 }
 
-if (!defined('BUCKYBALL_ROOT_DIR')) {
-    require_once FULLERON_ROOT_DIR.'/FCom/buckyball/buckyball.php';
-}
+require_once __DIR__ . '/buckyball/buckyball.php';
 
 class FCom_Core_Main extends BClass
 {
@@ -53,8 +51,9 @@ class FCom_Core_Main extends BClass
         $rootDir = $config->get('fs/root_dir');
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
-            $localConfig['fs']['root_dir'] = $rootDir = BRequest::i()->scriptDir();
+            $rootDir = BRequest::i()->scriptDir();
         }
+        $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
         BDebug::debug('ROOTDIR='.$rootDir);
 
@@ -98,6 +97,12 @@ class FCom_Core_Main extends BClass
                 $permissionErrors[] = $dlcDir;
             }
             $config->set('fs/dlc_dir', $dlcDir);
+        }
+
+        $localDir = $config->get('fs/local_dir');
+        if (!$localDir) {
+            $localDir = $rootDir.'/local';
+            $config->set('fs/local_dir', $localDir);
         }
 
         $storageDir = $config->get('fs/storage_dir');
@@ -219,8 +224,8 @@ class FCom_Core_Main extends BClass
     {
         $config = BConfig::i();
         $area = BApp::i()->get('area');
-        
-	$configDir = $config->get('fs/config_dir');
+
+        $configDir = $config->get('fs/config_dir');
         if (file_exists($configDir.'/core.php')) {
             $config->addFile('core.php', true);
         }
@@ -261,48 +266,49 @@ class FCom_Core_Main extends BClass
 
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
+        $dirConf = $config->get('fs');
+        $modReg = BModuleRegistry::i();
 
-        if ('STAGING' === $mode || 'PRODUCTION' === $mode) {
-            $manifestsLoaded = BModuleRegistry::i()->loadManifestCache();
+        $useProductionCache = 'STAGING' === $mode || 'PRODUCTION' === $mode;
+        if ($useProductionCache) {
+            $manifestsLoaded = $modReg->loadManifestCache();
         } else {
             $manifestsLoaded = false;
+            $modReg->deleteManifestCache();
         }
         if (!$manifestsLoaded) {
             if (defined('BUCKYBALL_ROOT_DIR')) {
                 $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
             }
-            $this->_modulesDirs[] = $rootDir.'/FCom/*'; // Core modules
-            $this->_modulesDirs[] = $rootDir.'/dlc/*'; // Downloaded modules (1st dir level)
-            $this->_modulesDirs[] = $rootDir.'/dlc/*/*'; // Download modules (2nd dir level, including vendor)
-            $this->_modulesDirs[] = $rootDir.'/local/*'; // Local modules
-            $this->_modulesDirs[] = $rootDir.'/local/*/*'; // Local modules
-            $this->_modulesDirs[] = $rootDir.'/storage/custom'; // Custom module
+            $this->_modulesDirs[] = $dirConf['storage_dir'].'/custom'; // Custom module
+            $this->_modulesDirs[] = $dirConf['local_dir'].'/*/*'; // Local modules
+            $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
+            $this->_modulesDirs[] = $dirConf['root_dir'].'/FCom/*'; // Core modules
 
             foreach ($this->_modulesDirs as $dir) {
-                BModuleRegistry::i()->scan($dir);
+                $modReg->scan($dir);
             }
-            BModuleRegistry::i()->saveManifestCache(); //TODO: call explicitly
+            $modReg->processRequires();
         }
 #BDebug::profile($d);
 
-        BModuleRegistry::i()->processRequires()->processDefaultConfig();
+        $modReg->processDefaultConfig();
+
+        if ($useProductionCache && !$manifestsLoaded) {
+            $modReg->saveManifestCache(); //TODO: call explicitly
+        }
 
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
-        }
-        //TODO: Temporary, remove after we're certain that everyone is migrated
-        if (file_exists($configDir.'/local.yml')) {
-            BConfig::i(true)->addFile('local.yml', true)->writeFile('local.php');
-            unlink($configDir.'/local.yml');
         }
         if (file_exists($configDir.'/local.php')) {
             $config->addFile('local.php', true);
         }
 
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/local'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir.'/dlc'));
-        BClassAutoload::i(true, array('root_dir'=>$rootDir));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['local_dir']));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['dlc_dir']));
+        BClassAutoload::i(true, array('root_dir'=>$dirConf['root_dir']));
 
         return $this;
     }
@@ -318,29 +324,39 @@ class FCom_Core_Main extends BClass
         BLayout::i()->defaultViewClass('FCom_Core_View_Base');
     }
 
-    public function writeDbConfig()
+    public function writeConfigFiles($files = null)
     {
-        $c = array('db'=>BConfig::i()->get('db', true));
-        BConfig::i()->writeFile('db.php', $c); // PHP for simpler loading
-        return $this;
-    }
+        if (is_null($files)) {
+            $files = array('core', 'db', 'local');
+        }
+        if (is_string($files)) {
+            $files = explode(',', strtolower($files));
+        }
 
-    public function writeLocalConfig()
-    {
         $config = BConfig::i();
         $c = $config->get(null, true);
-        // collect configuration necessary for core startup
-        $m = array(
-            'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
-            'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
-            'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
-            'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
-            'cache' => !empty($c['cache']) ? $c['cache'] : null,
-        );
-        unset($c['db'], $c['install_status'], $c['module_run_levels'], $c['recovery_modules'],
-            $c['mode_by_ip'], $c['cache']);
-        $config->writeFile('core.php', $m); // PHP for simpler loading
-        $config->writeFile('local.yml', $c);
+
+        if (in_array('core', $files)) {
+            // configuration necessary for core startup
+            $core = array(
+                'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
+                'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
+                'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
+                'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
+                'cache' => !empty($c['cache']) ? $c['cache'] : array(),
+            );
+            $config->writeFile('core.php', $core);
+        }
+        if (in_array('db', $files)) {
+            // db connections
+            $db = !empty($c['db']) ? array('db' => $c['db']) : array();
+            $config->writeFile('db.php', $db);
+        }
+        if (in_array('local', $files)) {
+            // the rest of configuration
+            $local = BUtil::arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache', true);
+            $config->writeFile('local.php', $local);
+        }
         return $this;
     }
 

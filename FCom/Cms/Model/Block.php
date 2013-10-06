@@ -5,7 +5,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_cms_block';
     protected static $_origClass = __CLASS__;
 
-    public function validate()
+    public function validateBlock()
     {
         return true;
     }

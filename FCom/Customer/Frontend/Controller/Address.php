@@ -40,24 +40,25 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
-        $countriesList = '';
-        foreach($countries as $country){
-            $countriesList .= $country->iso.',';
-        }
-        $countriesList = substr($countriesList, 0, -1);
+
+        $countriesList = array_map(function ($el) {
+            return $el->get('iso');
+        }, $countries);
+        $countriesList = implode(',', $countriesList);
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'View Addresses', 'href'=>Bapp::href('customer/address'));
         $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $layout->view('geo/embed')->countries = $countriesList;
+        $layout->view('customer/address/edit')->countries = FCom_Geo_Model_Country::options($countriesList);
         $layout->view('customer/address/edit')->address = $address;
         $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
         $layout->view('customer/address/edit')->default_billing = $defaultBilling;
         $this->layout('/customer/address/edit');
     }
 
-    public function action_index__POST()
+    public function action_edit__POST()
     {
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $r = BRequest::i()->post();

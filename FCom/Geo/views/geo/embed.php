@@ -8,15 +8,18 @@ require(['jquery'], function($) {
             opt = opt || {};
             var $country = this;
             var $regionSelect = $(opt.regionSelectEl || 'select.geo-region');
-            var $regionSelect2 = $('#s2id_' + $regionSelect.attr('id') );
+            var $regionInput  = $(opt.regionInputEl || 'input.geo-region');
+            var $regionSelect2 = $('#s2id_' + $regionSelect.attr('id') );// ???
             console.log($regionSelect2);
             var regionLeave = $('option', $regionSelect).length;
-            var $regionInput = $(opt.regionInputEl || 'input.geo-region');
             var country = opt.country || '';
             var region = opt.region || '';
             var regionDefHtml = $regionSelect.html();
-            for (var i in geoCountries) {
-                $country.append($('<option>').val(i).text(geoCountries[i]));
+
+            if ($country.find('option').length == 1) { // if a template with address uses this, it should still work
+                for (var i in geoCountries) {
+                    $country.append($('<option>').val(i).text(geoCountries[i]));
+                }
             }
             $country.val(country);
 

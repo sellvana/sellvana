@@ -71,8 +71,8 @@ class FCom_CatalogIndex_Main extends BClass
 
     static public function onCustomFieldAfterSave($args)
     {
-        if (static::$_autoReindex) {
-            $indexField = FCom_CatalogIndex_Model_Field::i()->load('field_name', $args['field']->field_code);
+        if (static::$_autoReindex && !$args['model']->isNewRecord()) {
+            $indexField = FCom_CatalogIndex_Model_Field::i()->load($args['model']->field_code, 'field_name');
             if ($indexField) {
                 static::reindexField($indexField);
             }

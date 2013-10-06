@@ -6,7 +6,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $pageUrl = BRequest::i()->params('page');
         $block = FCom_Cms_Model_Block::i()->load(array('page_enabled' => 1, 'page_url' => $pageUrl));
-        if (!$block || !$block->validate()) {
+        if (!$block || !$block->validateBlock()) {
             $this->forward(false);
             return;
         }
@@ -44,7 +44,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $handle = BRequest::i()->params('nav');
         $nav = FCom_Cms_Model_Nav::i()->load($handle, 'url_path');
-        if (!$nav || !$nav->validate()) {
+        if (!$nav || !$nav->validateNav()) {
             $this->forward(false);
             return;
         }

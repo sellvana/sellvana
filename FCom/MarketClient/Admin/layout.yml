@@ -1,25 +1,39 @@
 base:
 	- view: admin/nav
 		do:
-			- [ addNav, market, { label: Market, pos: 100, icon_class: icon-install } ]
-			- [ addNav, market/market, { label: Market Center, href: /market/market } ]
-			- [ addNav, market/index, { label: My Modules, href: /market/index } ]
+			- [ addNav, modules/remote, { label: Download from Market, href: /marketclient/remote } ]
+			- [ addNav, modules/publish, { label: Publish on Market, href: /marketclient/publish } ]
 
-/market:
+/marketclient:
 	- { include: base }
 	- { hook: main, views: admin/grid }
-	- { view: admin/nav, do: [[ setNav, market ]] }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
 
-/market/form:
+/marketclient/form:
 	- { include: base }
 	- { include: form }
 	- { hook: main, views: admin/form }
-	- { view: admin/nav, do: [[ setNav, market ]] }
-	- view: admin/form
-		set: { tab_view_prefix: market/ }
-		do:
-			- [ addTab, main, { label: Market, pos: 10 } ]
+	- { view: admin/nav, do: [[ setNav, modules ]] }
 
-/market/market:
+/marketclient/remote:
 	- { include: base }
-	- { hook: main, views: market/market }
+	- { hook: main, views: marketclient/remote }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish:
+	- { include: base }
+	- { hook: main, views: marketclient/publish }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/publish/module:
+	- { include: base }
+	- { hook: main, views: marketclient/publish/module }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+
+/marketclient/install:
+	- { include: base }
+	- { hook: header, remove: ALL }
+	- { hook: footer, remove: ALL }
+	- { hook: main, views: marketclient/install }
+	- { view: admin/nav, do: [[ setNav, modules ]] }
+

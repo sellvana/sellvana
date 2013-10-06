@@ -119,7 +119,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             ),
         ));
 
-        $this->upgrade_0_1_4();
+        $this->upgrade__0_1_3__0_1_4();
     }
 
     public function upgrade__0_1_3__0_1_4()

@@ -1,23 +1,39 @@
-#Header unset ETag
-#FileETag None
+DirectoryIndex index.php
+Options -Indexes +FollowSymLinks -MultiViews
 
-AddHandler application/x-httpd-php55 .php
+<FilesMatch "\.yml$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 months"
 </IfModule>
 
-#Header unset If-Modified-Since
-#Header unset If-None-Match
-
-Options +FollowSymLinks -MultiViews
+<IfModule mod_header.c>
+    Header unset If-Modified-Since
+    Header unset If-None-Match
+    Header unset ETag
+    FileETag None
+</IfModule>
 
 <IfModule mod_php.c>
     php_value output_buffering Off
     php_value zlib.output_compression Off
 
     php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+</IfModule>
+
+<IfModule mod_php5.c>
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
+
+    php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
 </IfModule>
 
 <IfModule mod_rewrite.c>

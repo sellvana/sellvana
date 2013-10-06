@@ -2,46 +2,48 @@
 
 class FCom_MarketClient_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_2_1()
     {
-        $tModules = FCom_MarketClient_Model_Modules::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tModules} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `mod_name` VARCHAR( 255 ) NOT NULL DEFAULT '',
-            `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-            `version` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-            `description` text COLLATE utf8_unicode_ci NOT NULL,
-            PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-        ");
-    }
-
-    public function upgrade__0_1_0__0_1_1()
-    {
-        $pModules = FCom_MarketClient_Model_Modules::table();
-        BDb::run( " ALTER TABLE {$pModules} ADD `need_upgrade` tinyint(1) NOT NULL DEFAULT '0'");
-    }
-
-    public function upgrade__0_1_1__0_1_2()
-    {
-        $pModules = FCom_MarketClient_Model_Modules::table();
-        BDb::run( " ALTER TABLE {$pModules} MODIFY `description` text DEFAULT NULL");
-    }
-
-    public function upgrade__0_1_2__0_1_3()
-    {
-        $pModules = FCom_MarketClient_Model_Modules::table();
-        BDb::run( " ALTER TABLE {$pModules} ADD `market_version` varchar(50) DEFAULT NULL");
-    }
-
-    public function upgrade__0_1_3__0_1_4()
-    {
-        $pModules = FCom_MarketClient_Model_Modules::table();
-        BDb::ddlTableDef($pModules, array(
+        $tCoreModule = FCom_Core_Model_Module::table();
+        $tMarketModule = FCom_MarketClient_Model_Module::table();
+        BDb::ddlTableDef($tMarketModule, array(
             'COLUMNS' => array(
-                'mod_name' => "varchar(255) NOT NULL AFTER `id`",
+                'id' => 'int unsigned not null auto_increment',
+                'core_module_id' => 'int unsigned not null',
+                'channel' => 'varchar(20)',
+                'remote_version' => 'varchar(20)',
+                'version_check_at' => 'datetime',
+                'last_download_at' => 'datetime',
+                'is_upgrade_available' => 'tinyint',
+                'data_serialized' => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_core_module' => 'UNIQUE (core_module_id)',
+                'IDX_upgrade_available' => '(is_upgrade_available)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tMarketModule}_module" => "FOREIGN KEY (core_module_id) REFERENCES {$tCoreModule} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
+    }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $tCoreModule = FCom_Core_Model_Module::table();
+        BDb::ddlTableDef($tCoreModule, array(
+            'COLUMNS' => array(
+                'data_serialized' => 'DROP',
+                'market_branch' => 'DROP',
+                'market_version' => 'DROP',
+                'market_version_check_at' => 'DROP',
+                'market_download_at' => 'DROP',
+                'market_upgrade_available' => 'DROP',
+            ),
+        ));
+
+        BDb::run("DROP TABLE IF EXISTS fcom_marketclient_modules; DROP TABLE IF EXISTS fcom_market_modules");
+
+        $this->install__0_2_1();
     }
 }
