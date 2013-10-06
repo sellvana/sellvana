@@ -1,14 +1,21 @@
 modules:
-	FCom_MarketClient:
-		version: 0.1.4
-		require: { module: { FCom_Core: 0.1.0 } }
-		description: "Fulleron Extension Market Client"
+    FCom_MarketClient:
+        version: 0.2.1
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: "Fulleron Extension Market Client"
+
+        observe:
+            - [ FCom_MarketClient_Model_Module::find_one:orm, FCom_MarketClient_Model_Module::onFindOrm ]
+            - [ FCom_MarketClient_Model_Module::find_many:orm, FCom_MarketClient_Model_Module::onFindOrm ]
 
         areas:
             FCom_Admin:
-                auto_use: all
+                auto_use: [ all ]
                 routing:
-                    - [ get, /market, FCom_MarketClient_Admin_Controller.index ]
-                    - [ any, /market/.action, FCom_MarketClient_Admin_Controller ]
+                    - [ get, /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
+                    - [ any, /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
+                    - [ any, /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
+                    - [ any, /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
                 observe:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]

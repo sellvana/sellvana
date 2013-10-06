@@ -17,8 +17,9 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
 
     static public function getNextSeqId($entityType)
     {
-        BDb::run('lock tables '.static::table().' read');
-        $seq = static::load($entityType, 'entity_type');
+
+        BDb::run('lock tables '.static::table() . ' write');
+        $seq = static::orm(static::table())->where( 'entity_type', $entityType )->find_one();
         if (!$seq) {
             $seq = static::create(array(
                 'entity_type' => $entityType,

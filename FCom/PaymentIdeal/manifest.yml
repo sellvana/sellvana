@@ -1,0 +1,23 @@
+modules:
+    FCom_PaymentIdeal:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Sales: 0.1.10 } }
+        translations: { de: de.php, nl: nl.php }
+        description: "Payment iDEAL module"
+        autoload: lib
+
+        auto_use: [ bootstrap ]
+        default_config:
+            modules:
+                FCom_PaymentIdeal:
+                    title: iDEAL
+                    test: 1
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
+            FCom_Frontend:
+                auto_use: [ views ]
+                routing:
+                    - [ any, /ideal/.action, FCom_PaymentIdeal_Frontend_Controller ]

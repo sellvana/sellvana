@@ -14,7 +14,7 @@
         $('#form-modules').attr('action', '#{BApp::href('modules/migrate')}').submit();
     }
 
-    require(['jquery', 'backgrid', 'fcom.core'], function($) {
+    require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
         FCom.ModuleModel = Backbone.Model.extend({
             save: function(attributes, options) {
                 var data = {

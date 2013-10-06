@@ -1,15 +1,14 @@
 modules:
     FCom_Admin:
         version: 0.1.5
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
         observe:
             - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Main.onSettingsPost ]
 
         default_config:
-            modules:
-                FCom_Admin:
-                    theme: FCom_Admin_DefaultTheme
+            modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
 
         areas:
             FCom_Admin:
@@ -48,9 +47,11 @@ modules:
                     - [ post, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
 
                     - [ get, /test, FCom_Admin_Controller.test ]
+                    - [ get, /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
     FCom_Admin_DefaultTheme:
         version: 0.1.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Default Admin theme"
         provides:

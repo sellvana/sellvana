@@ -4,6 +4,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order';
     protected static $_origClass = __CLASS__;
+    protected $addresses;
 
     /**
     * Fallback singleton/instance factory
@@ -28,10 +29,20 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @return null|FCom_Sales_Model_Order_Address
+     */
     public function billing()
     {
-        return FCom_Sales_Model_Cart_Address::i()->orm('a')
-                ->where('cart_id', $this->cart_id)->where('atype', 'billing')->find_one();
+        return $this->getAddressByType('billing');
+    }
+
+    /**
+     * @return null|FCom_Sales_Model_Order_Address
+     */
+    public function shipping()
+    {
+        return $this->getAddressByType('shipping');
     }
 
     public function addNew($data)
@@ -92,10 +103,10 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     }
 
-    public function addresses()
+/*    public function addresses()
     {
         return FCom_Sales_Model_Order_Address::i()->orm('a')->where('order_id', $this->id)->find_many();
-    }
+    }*/
 
     public function prepareApiData($orders, $includeItems=false)
     {
@@ -194,11 +205,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData['grandtotal'] = $cart->grand_total; // full grand total
         $orderData['create_at'] = $orderData['update_at'] = BDb::now();
 
-        $data_serialized = array(
+        $data_ = array(
             'totals'           => $cart->data['totals'],
             'shipping_service' => $cart->shipping_service
         );
-        $orderData['data_serialized'] = $data_serialized;
+        $orderData[static::$_dataCustomField] = $data_;
 
         /* @var $salesOrder FCom_Sales_Model_Order */
         $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
@@ -222,11 +233,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         $salesOrder->save(); // save to have valid unique_id
         if(isset($options['all_components']) && $options['all_components']){
-            $options['order_id'] = $salesOrder->unique_id ? $salesOrder->unique_id: $salesOrder->id();
+            $options['order_id'] = $salesOrder->id();
             static::createOrderItems($cart, $options);
             static::createOrderAddress($cart, $options);
 
             //Made payment
+            $cart->setPaymentDetails(BUtil::fromJson($cart->payment_details));
             $paymentMethod = $cart->getPaymentMethod();
             static::createOrderPayment($paymentMethod, $salesOrder, $options);
         }
@@ -243,6 +255,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if(!$payment instanceof FCom_Sales_Method_Payment_Interface){
             return;
         }
+        /* @var $payment FCom_Sales_Method_Payment_Abstract */
         $payment->setSalesEntity($salesOrder, $options)
                 ->payOnCheckout();
         $salesOrder->setData('payment_details', $payment->asArray());
@@ -265,6 +278,33 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
+    public function getAddressByType($type)
+    {
+        $addresses = $this->getAddresses();
+
+        switch ($type) {
+            case 'billing':
+                return !empty($addresses['billing']) ? $addresses['billing'] : null;
+
+            case 'shipping':
+                if ($this->shipping_same) {
+                    return $this->getAddressByType('billing');
+                }
+                return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
+            default:
+                throw new BException('Invalid order address type: ' . $type);
+        }
+    }
+
+    protected function getAddresses()
+    {
+        if (!$this->addresses) {
+            $this->addresses = FCom_Sales_Model_Order_Address::i()->orm()
+                               ->where("order_id", $this->id)
+                               ->find_many_assoc('atype');
+        }
+        return $this->addresses;
+    }
 
     /**
      * @param FCom_Sales_Model_Cart $cart
@@ -312,6 +352,26 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
 
         return true; // no items filter passed
+    }
+
+    public function getTextDescription()
+    {
+        $description = array();
+        foreach ($this->items() as $item) {
+            $product_data = BUtil::fromJson($item->get('product_info'));
+            $name = isset($product_data['product_name'])? $product_data['product_name']: null;
+            if(!isset($description[$name])){
+                $description[$name] = $item->qty;
+            } else {
+                $description[$name] += $item->qty;
+            }
+        }
+        $result = array();
+        foreach ($description as $name => $qty) {
+            $line = $name . ' x (' . $qty . ')';
+            $result[] = $line;
+        }
+        return join("\n", $result);
     }
 
 }

@@ -1,0 +1,41 @@
+{% set facets = THIS.get('products_data')['facets'] %}
+{% set s = THIS.products_data['state'] %}
+{% set hlp = APP.instance('FCom_CatalogIndex_Main') %}
+
+<section class="block block-filter">
+    <header class="block-title"><span class="title">{{ "Narrow Results" | _ }}</span></header>
+    <form class="block-content" method="get" action="">
+        <fieldset>
+
+        </fieldset>
+        {% if facets %}
+            {% for fKey, facet in facets %}
+                {% if facet['custom_view'] %}
+                    {{ THIS.view( facet['custom_view'], { 'facet_key': fKey, 'facet': facet, 'products_data': THIS.get('products_data') })| raw }}
+                {% elseif facet['values'] %}
+                    <section class="block-sub block-attribute">
+                        <fieldset>
+                        <header class="block-sub-title"><span class="title">{{ facet['display'] }}</header>
+                        <ul>
+                            {%  for vKey, value in facet['values'] %}
+                                {% if value['selected'] %}
+                                    <li><a class="active" href="{{ hlp.getUrl(null, { fKey: vKey}) }}">
+                                        <span class="icon"></span>{{ value['display'] }}</a></li>
+                                    {% if s['save_filter']%}
+                                        <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
+                                    {% endif %}
+                                {% else %}
+                                    <li><a href="{{ hlp.getUrl({ fKey: vKey}) }}">
+                                         <span class="icon"></span>{{ value['display'] }}
+                                         {% if value['cnt'] %}<span class="count">{{ "(%s)" | format(value['cnt']) | _ }}</span>{% endif %}
+                                         </a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        </fieldset>
+                    </section>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </form>
+</section>

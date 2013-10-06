@@ -5,7 +5,9 @@
         <div class="span4">
             <label>
                 <select>
+                    <% _.each(ps_options, function(ps) { %>
                     <option></option>
+                    <% }) %>
                 </select>
             </label>
         </div>
@@ -25,7 +27,7 @@
 <div id="{{ c['id'] }}"></div>
 
 <script>
-    require(['jquery', 'fcom.core', 'jquery.dragtable'/*, 'jquery.colResizable'*/], function($) {
+    require(['jquery', 'fcom.backbone.grid', 'jquery.dragtable'/*, 'jquery.colResizable'*/], function($) {
         $(function() {
             var config = {{ THIS.getBackgridConfigJson() | raw }}
             //console.log('config', config);

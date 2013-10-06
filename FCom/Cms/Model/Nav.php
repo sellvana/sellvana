@@ -24,7 +24,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 
     }
 
-    public function validate()
+    public function validateNav()
     {
         switch ($this->node_type) {
         case 'cms_page':

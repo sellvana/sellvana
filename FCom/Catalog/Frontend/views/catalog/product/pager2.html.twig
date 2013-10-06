@@ -1,0 +1,50 @@
+{% set s = THIS.get('state') %}
+{% set psOptions = array(25, 50, 100, 500, 30000) %}
+{% set sortOptions = THIS.get('sort_options') ? THIS.get('sort_options') : {
+    '': 'Sort...',
+    'product_name|asc': 'Product Name (A-Z)',
+    'product_name|desc': 'Product Name (Z-A)',
+    'local_sku|asc': 'SKU (A-Z)',
+    'local_sku|desc': 'SKU (Z-A)',
+    'base_price|asc': 'Price (Lower first)',
+    'base_price|desc': 'Price (Higher first)'
+}
+%}
+<form id="product_list_pager" name="product_list_pager" method="get" action="">
+
+<div class="pager-row">
+    <strong class="count">{{ s['c'] }} found.</strong>
+    <input type="hidden" name="q" value="{{ REQUEST.get('q') }}"/>
+    <div class="pager">
+    <label>{{ "Page" | _ }}:</label>
+    {% if s['p']>1: %}
+    <a href="#" class="previous" onclick="$(this).siblings('input[name=p]').val({{ s['p']-1 }}); $(this).parents('form').submit()">&lt;</a>
+    {% endif %}
+    <!--<select name="p" onchange="this.form.submit()">
+{% for i in 1..s['mp'] %}
+        <option value="{{ i }}" {{s['p']==i?'selected'}}>{{ i }}</option>
+{% endfor ?>
+    </select>-->
+    <input type="text" name="p" value="{{ s['p'] }}"/>{{ "of " | _ ~  s['mp'] }}
+    {% if s['p'] < s['mp'] %}
+    <a href="#" class="next" onclick="$(this).siblings('input[name=p]').val({{ s['p']+1 }}); $(this).parents('form').submit()">&gt;</a>
+    {% endif %}
+    </div>
+    <div class="rows pull-right">
+    <label>{{ "Rows" | _ }}:</label>&nbsp;
+    <select name="ps" onchange="this.form.submit()">
+{% for i in psOptions %}
+        <option value="{{ i }}" {{s['ps']==i?'selected'}}>{{ i }}</option>
+{% endfor %}
+    </select>
+    </div>
+    <div class="sort-by pull-right">
+    <label>{{ "Sort" | _ }}:</label> <select name="sc" onchange="this.form.submit()">
+{% for k, v in sortOptions %}
+        <option value="{{ k }}" {{s['sc']==k?'selected'}}>{{ v }}</option>
+{% endfor %}
+    </select>
+    </div>
+</div>
+
+</form>

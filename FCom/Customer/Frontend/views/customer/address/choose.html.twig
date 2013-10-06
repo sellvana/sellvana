@@ -1,0 +1,19 @@
+<a href="{{ APP.href("customer/address/edit") }}">{{ "Add new address" | _ }}</a>
+<br/>
+{% for address in THIS.get('addresses') %}
+    {% if ('s' == THIS.get('type')) %}
+        {% if address.get('id') == THIS.get('customer').get('default_shipping_id') %}
+            <strong>{{ "Default shipping address" | _ }}</strong><br/>
+        {% endif %}
+    {% else %}
+        {% if address.get('id') == THIS.get('customer').get('default_billing_id') %}
+            <strong>{{ "Default billing address" | _ }}</strong><br/>
+        {% endif; %}
+    {% endif; %}
+
+    {{ APP.instance("FCom_Customer_Model_Address").as_html(address) | raw }}
+    <a href="{{ APP.href("customer/address/choose") }}?id={{ address.get('id') }}&t={{ THIS.get('type') }}">{{ "Select" | _ }}</a>
+    <hr/>
+{% endfor %}
+<br/>
+

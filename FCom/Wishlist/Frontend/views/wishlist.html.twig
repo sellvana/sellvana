@@ -1,0 +1,53 @@
+<div class="col-main">
+        <div class="main-title category-title">
+            <h1>{{ "Wishlist" | _ }}</h1>
+        </div>
+{% if THIS.get('wishlist') or THIS.get('wishlist').items()) %}
+     <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
+        <table class="product-list">
+            <col width="30"/>
+            <col width="60"/>
+            <col/>
+            <col width="180"/>
+            <col width="70"/>
+            <col width="70"/>
+            <thead>
+                <tr>
+                    <td>{{ "Remove" | _ }}</td>
+                    <td colspan="2">{{ "Product" | _ }}</td>
+                    <td>{{ "Price" | _ }}</td>
+                </tr>
+            </thead>
+            <tbody>
+    {% for item in THIS.get('wishlist').items() as item %}
+        {% set p = item.product() %}
+                <tr id="tr-product-{{ p.get('id')}}">
+                    <td class="first text-center">
+                        <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.get('id')}}"></label>
+                    </td>
+                    <td>
+                        <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.get('product_name') }}"/>
+                    </td>
+                    <td>
+                        <h3 class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></h3>
+                    </td>
+                    <td class="actions last text-left">
+                        <div class="price-box">
+                            <span class="price">$ {{ p.get('base_price') | number_format }}</span>
+                        </div>
+                    </td>
+                </tr>
+    {% endfor %}
+             </tbody>
+            <tfoot>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><input type="submit" class="btn btn-primary" value="{{ "Update Wishlist" | _ }}"/></td>
+            </tfoot>
+        </table>
+    </form>
+{% else %}
+    <p class="alert">{{ "There are no products in wishlist" | _ }}.</p>
+{% endif %}
+</div>

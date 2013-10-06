@@ -1,0 +1,63 @@
+- echo $this->messagesHtml('admin')
+.home-icon = $this->_('Welcome.')
+
+#fcom-dashboard-container
+
+    .widget-box
+        .widget-title
+            %span.icon
+                %i.icon-signal
+            %h5 = $this->_('Order Status Distribution')
+            .buttons
+                %a.btn.btn-setting(href="#")
+                    %i.icon-wrench
+                %a.btn.btn-minimize(href="#")
+                    %i.icon-chevron-up
+                %a.btn.btn-close(href="#")
+                    %i.icon-remove
+        .box-content
+            #chart1(style="width:300px; height:200px")
+    .widget-box
+        .buttons
+            %a.btn.btn-setting(href="#form")
+                %p Form
+            #someid
+                %p Something else goes here...
+
+    %script{:type=>"text/template", :id=>"form-template"}
+        %form{:method=>"get", :action=>"#", :id=> "my_form"}
+            %fieldset
+                %legend Form
+                %ol
+                    %li
+                        %label{:for=>"name"}Name
+                        %input{:type=>"text", :name=>"name", :id=>"name"}
+                    %li
+                        %label{:for=>"name"}Email
+                        %input{:type=>"email", :name=>"email", :id=>"email"}
+                    %li
+                        %input{:type=>"submit", :name=>"submit", :value=>"submit", :id=>"submit"}
+    %script{:type=>"text/template", :id=>"ModalLauncher-template"}
+        %button{:id=>"openForm"} Open Form
+:javascript
+    require(['ModalLauncher','FormView','flot','flot.pie'], function(ModalLauncher,FormView) {
+        var form = new FormView();
+        var modalLauncher = new ModalLauncher({
+            templateHelper:"#ModalLauncher-template",
+            eventHelper: "#openForm",
+            passedView : form
+        });
+        var mgr = new Backbone.Marionette.Region({
+            el: "#someid"
+        });
+        mgr.show(modalLauncher);
+        $.plot('#chart1', [
+            { label: "Pending", data: 20 },
+            { label: "New", data: 30 },
+            { label: "Shipped", data: 50 },
+            { label: "Declined", data: 10 }
+        ], {
+            series: { pie: { show: true } }
+        })
+    })
+

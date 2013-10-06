@@ -11,6 +11,7 @@ base:
     - { include: base }
     - { include: form }
     - { include: lib_tokeninput }
+    - { include: lib_wysihtml5 }
     - { hook: main, views: admin/form }
     - { view: admin/nav, do: [[ setNav, cms/blog ]] }
     - view: admin/form

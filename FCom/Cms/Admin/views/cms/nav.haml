@@ -16,7 +16,7 @@
         .ui-layout-center.adm-main#nav-form-container
 
 :javascript
-    require(['jquery', 'fcom.admin'], function($) {
+    require(['jquery', 'jstree', 'fcom.admin'], function($) {
         $(function() {
             FCom.Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'unlocked', label:'Unlocked'}, on:{icon:'locked', label:'Locked'}});
             FCom.Admin.checkboxButton('#nav-expand-collapse', {

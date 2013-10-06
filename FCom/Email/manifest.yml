@@ -1,15 +1,14 @@
 modules:
-	FCom_Email:
-		version: 0.1.2
-		require: { module: { FCom_Core: 0.1.0 } }
-		translations: { de: de.php }
-		description: "Base email subscription, message queue and mailing list management"
+    FCom_Email:
+        version: 0.1.2
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        translations: { de: de.php }
+        description: "Base email subscription, message queue and mailing list management"
         auto_use: [ views, bootstrap, layout ]
 
         default_config:
-            modules:
-                FCom_Email:
-                    default_handler: FCom_Email
+            modules/FCom_Email/default_handler: FCom_Email
 
         observe:
             - [ BEmail::send:before, FCom_Email_Main::onEmailSendBefore ]

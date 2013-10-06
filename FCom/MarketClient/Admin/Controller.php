@@ -27,23 +27,13 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             'need_upgrade' => array('label'=>'Notice', 'width'=>250, 'editable'=>true, 'sortable'=>true,
                 'options'=>array('1'=>'Need upgrade!', '0'=>'Latest version'))
         );
-
-        $config['grid']['id'] = __CLASS__;
-        $config['grid']['autowidth'] = false;
-        $config['grid']['caption'] = 'All modules';
-        $config['grid']['multiselect'] = false;
-        $config['grid']['height'] = '100%';
-        $config['grid']['columns'] = $columns;
-        $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>false);
-        $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
-
         return $config;
     }
 
-    public function action_market()
+    public function action_remote()
     {
-        $this->view('market/market')->url = FCom_MarketClient_Main::i()->getSsoUrl();
-        $this->layout('/market/market');
+        $this->view('marketclient/remote')->url = FCom_MarketClient_RemoteApi::i()->getUrl('/market');
+        $this->layout('/marketclient/remote');
     }
 
     public function action_form()
@@ -67,7 +57,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 //check requirements with current state
                 //1. check modules
                 if (!empty($module['require']['module'])) {
-                    $installedmodules = BModuleRegistry::i()->debug();
+                    $installedmodules = BModuleRegistry::i()->getAllModules();
                     foreach($module['require']['module'] as &$modreq) {
                         if (!isset($installedmodules[$modreq['name']])) {
                             $modreq['error'] = 'Required module not exist';
@@ -165,61 +155,28 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             $module = $modules[$modName];
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         try {
-            $moduleFile = FCom_MarketClient_Main::i()->download($modName);
+            $moduleFile = FCom_MarketClient_Main::i()->downloadPackage($modName);
         } catch(Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         if (!$moduleFile) {
             BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
-            BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
+            BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
-        $dlcPath = BConfig::i()->get('fs/dlc_dir');
-        $modNameParts = explode("_", $modName);
-        if (count($modNameParts) == 2) {
-            $dlcPath .= '/'.$modNameParts[0];
-            BUtil::ensureDir($dlcPath);
-        }
-
-        $ftpenabled = BConfig::i()->get('modules/FCom_MarketClient/ftp/enabled');
-        if ($ftpenabled) {
-            $modulePath = dirname($moduleFile).'/'.$modName;
-            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $modulePath);
-            //copy modulePath by FTP to marketPath
-            if (!$res) {
-                BSession::i()->addMessage("Permissions denied to write into storage dir: ".$modulePath);
-                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
+        try {
+            FCom_MarketClient_Main::i()->installFiles($modName, $moduleFile);
+        } catch (Exception $e) {
+            foreach (explode("\n", $e->getMessage()) as $error) {
+                BSession::i()->addMessage($error, 'error');
             }
-            $conf = BConfig::i()->get('modules/FCom_MarketClient/ftp');
-            if (empty($conf['port'])) {
-                $conf['port'] = $conf['type'] =='ftp' ? 21 : 22;
-            }
-            $ftpClient = new BFtpClient($conf);
-            $errors = $ftpClient->ftpUpload($modulePath, $dlcPath);
-            if ($errors) {
-                foreach($errors as $error) {
-                    BSession::i()->addMessage($error);
-                }
-                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}", 'error');
-            }
-
-        } else {
-            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $dlcPath);
-            if (!$res) {
-                $error = FCom_MarketClient_Main::i()->getErrors();
-                if ($error) {
-                    BSession::i()->addMessage($error, 'error');
-                } else {
-                    BSession::i()->addMessage("Permissions denied to write into storage dir: ".$dlcPath, 'error');
-                }
-                BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
-            }
+            BResponse::i()->redirect("marketclient3/form?mod_name={$modName}");
         }
 
         if ($res) {
@@ -235,7 +192,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             }
         }
         BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("market/form")."?mod_name={$modName}");
+        BResponse::i()->redirect(BApp::href("marketclient/form")."?mod_name={$modName}");
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }

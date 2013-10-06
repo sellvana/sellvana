@@ -1,15 +1,14 @@
 modules:
-	FCom_Cms:
-		version: 0.1.2
-		require: { module: { FCom_Core: 0.1.0, BTwig: 1.12.4 } }
-		translations: { de: de.php }
-		description: "CMS for custom pages and blocks"
+    FCom_Cms:
+        version: 0.1.2
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, BTwig: 1.12.4 } }
+        translations: { de: de.php }
+        description: "CMS for custom pages and blocks"
         auto_use: all
         default_config:
-            modules:
-                FCom_Cms:
-                    page_enable: true
-                    nav_enable: true
+            modules/FCom_Cms/page_enable: true
+            modules/FCom_Cms/nav_enable: true
         areas:
             FCom_Admin:
                 routing:

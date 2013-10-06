@@ -34,7 +34,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
             $params = array('title'=>$params);
         }
         if (empty($params['module_name'])) {
-            $params['module_name'] = BModuleRegistry::currentModuleName();
+            $params['module_name'] = BModuleRegistry::i()->currentModuleName();
         }
         static::$_allPermissions[$path] = $params;
         return $this;
