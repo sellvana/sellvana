@@ -34,7 +34,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         }
         $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
         $head->addTitle($category->node_name);
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
+        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
         $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
         $rowsView = $layout->view($rowsViewName);
@@ -43,8 +43,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->query = $q;
-        $layout->view('catalog/product/pager')->filters = $filter;
+        $layout->view('catalog/product/pager')->set(array('query' => $q, 'filters' => $filter));
 
         FCom_Core_Main::i()->lastNav(true);
 
@@ -74,10 +73,10 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-        $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/product/pager')->filters = $filter;
-        $layout->view('catalog/product/pager')->query = $q;
+        $layout->view('breadcrumbs')->set('crumbs', array('home', array('label'=>'Search: '.$q, 'active'=>true)));
+        $layout->view('catalog/search')->set('query', $q);
+        $layout->view('catalog/product/pager')->set('filters', $filter);
+        $layout->view('catalog/product/pager')->set('query', $q);
 
         FCom_Core_Main::i()->lastNav(true);
         $this->layout('/catalog/search');

@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.1.5
+        version: 0.1.6
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
         description: Base Admin functionality
@@ -29,7 +29,7 @@ modules:
                     - [ any, /password/reset, FCom_Admin_Controller.password_reset ]
                     - [ get, /logout, FCom_Admin_Controller.logout ]
 
-                    - [ get, /my_account, FCom_Admin_Controller.my_account ]
+                    - [ any, /my_account, FCom_Admin_Controller.my_account ]
                     - [ get, /reports, FCom_Admin_Controller.reports ]
                     - [ post, /my_account/personalize, FCom_Admin_Controller.personalize ]
 

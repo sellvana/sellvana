@@ -1,0 +1,191 @@
+.box {
+  margin-bottom: 20px;
+  position: relative;
+
+  &.box-collapsed {
+    .box-header {
+      .actions {
+        .box-collapse {
+          i:before {
+            content: "\f078";
+          }
+        }
+      }
+    }
+
+    .box-content {
+      display: none;
+    }
+  }
+
+  .box-header {
+    font-size: $baseFontSize * 1.5;
+    font-weight: 200;
+    line-height: $baseLineHeight * 1.5;
+    padding: 10px 15px;
+    @include clearfix;
+
+    @for $i from 1 through length($colorsNames) {
+      $colorName: nth($colorsNames, $i);
+      $color: nth($colors, $i);
+
+      &.#{$colorName}-background {
+        color: $boxTextContrastColor;
+
+        .title {
+          color: $boxTextContrastColor;
+        }
+
+        .actions {
+          .btn-link {
+            color: $boxActionsContrastColor;
+
+            &:hover {
+              color: $color !important;
+              background-color: $boxActionsContrastHoverBackground;
+            }
+          }
+        }
+      }
+    }
+
+    .title {
+      float: left;
+      color: $boxHeaderColor;
+    }
+
+    .actions {
+      margin-top: -3px;
+      float: right;
+
+      .dropdown-toggle {
+        position: relative;
+        top: 5px;
+      }
+
+      .btn-link {
+        color: $boxActionsColor;
+        text-decoration: none;
+        text-shadow: none;
+
+        &:hover {
+          color: $boxActionsHoverColor;
+        }
+      }
+
+      .box-collapse {
+        i {
+          font-family: FontAwesome;
+          font-weight: normal;
+          font-style: normal;
+          text-decoration: inherit;
+          -webkit-font-smoothing: antialiased;
+          display: inline;
+          width: auto;
+          height: auto;
+          line-height: normal;
+          vertical-align: baseline;
+          background-image: none;
+          background-position: 0% 0%;
+          background-repeat: repeat;
+          margin-top: 0;
+
+          &:before {
+            content: "\f077";
+          }
+        }
+      }
+    }
+
+    &.box-header-small {
+      font-size: 14px;
+      font-weight: 200;
+      line-height: 19px;
+      padding: 10px 10px;
+
+      .actions {
+        margin-top: -1px;
+      }
+    }
+  }
+
+  .box-content {
+    padding: 10px;
+    border: 1px solid $boxBorder;
+    background: $boxBackground;
+    display: block;
+    @include box-shadow(0 1px 3px rgba(0,0,0,.055));
+
+    .box-toolbox {
+      @include clearfix;
+      background-color: $boxToolboxBackground;
+      padding: 5px;
+
+      &.box-toolbox-top {
+        margin: -10px -10px 10px -10px;
+        border-bottom: 1px solid $boxToolboxBorder;
+      }
+
+      &.box-toolbox-bottom {
+        margin: 10px -10px -10px -10px;
+        border-top: 1px solid $boxToolboxBorder;;
+      }
+    }
+
+    &.box-no-padding {
+      padding: 0;
+
+      form {
+        margin-bottom: 0;
+      }
+    }
+    &.box-padding {
+      padding: 20px;
+
+      .box-toolbox {
+        padding: 10px;
+        position: relative;
+
+        &.box-toolbox-top { margin: -20px -20px 20px -20px; }
+        &.box-toolbox-bottom { margin: 20px -20px -20px -20px; }
+      }
+    }
+
+    &.box-double-padding {
+      padding: 40px;
+
+      .box-toolbox {
+        padding: 20px;
+
+        &.box-toolbox-top { margin: -40px -40px 40px -40px; }
+        &.box-toolbox-bottom { margin: 40px -40px -40px -40px; }
+      }
+    }
+  }
+
+  &.box-transparent {
+    background: none;
+    padding: 0;
+    border: none;
+    @include box-shadow(none);
+
+    .box-content {
+      background: transparent;
+      border: none;
+      border-top: 1px solid $boxBorder;
+      @include box-shadow(none);
+    }
+  }
+
+  &.box-bordered {
+    border-style: solid;
+    border-width: 2px;
+    border-color: $boxBorder;
+
+    .box-content {
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+    }
+  }
+}

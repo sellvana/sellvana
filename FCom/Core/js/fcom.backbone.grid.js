@@ -6,7 +6,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
             Backgrid.HeaderCell.prototype.render.apply(this, arguments);
             this.$el.width(this.column.get('width'));
             this.$el.attr('data-id', this.column.get('name'));
-            var dragHandle = $('<div class="drag-handle">');
+            var dragHandle = $('<div class="drag-handle"><i class="icon-reorder"></i></div>');
             this.$el.append(dragHandle);
             return this;
         }

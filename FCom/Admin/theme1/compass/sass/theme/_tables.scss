@@ -1,0 +1,127 @@
+.responsive-table {
+  position: relative;
+  overflow: hidden;
+
+  .scrollable-area {
+    width: 100%;
+    overflow: scroll;
+    overflow-y: hidden;
+  }
+
+  table {
+    td {
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+}
+
+.box-content.box-no-padding {
+  .table-striped {
+    th, td {
+      &:first-child { border-left:  none; }
+      &:last-child { border-right:  none; }
+    }
+  }
+}
+
+.dataTables_wrapper {
+  .datatables-top, .datatables-bottom {
+    padding: 5px;
+  }
+
+  @include sm-minus {
+    .datatables-top, .datatables-bottom {
+      text-align: center;
+      .dataTables_filter {
+        float: none;
+        text-align: center;
+        label {
+          float: none;
+        }
+      }
+      .dataTables_paginate {
+        text-align: center;
+        float: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .dataTables_length {
+        text-align: center;
+        display: inline-block;
+        float: none;
+      }
+    }
+  }
+
+  @include clearfix;
+
+  .dataTables_length {
+    margin: 13px 10px 5px 10px;
+    float: left;
+  }
+
+  .dataTables_filter {
+    margin: 10px 10px 5px 10px;
+    float: right;
+  }
+
+  .dataTables_info {
+    padding: 0;
+    margin: 4px 10px 10px 10px;
+  }
+
+  .dataTables_paginate {
+    margin-right: 10px;
+
+    .pagination {
+      margin: 0;
+    }
+  }
+
+  .filter_column {
+    input[type="text"] {
+      display: block;
+      width: 100%;
+      min-height: 30px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+  }
+
+  @mixin font-awesome-icon {
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+    *margin-right: .3em;
+    @include opacity(.3);
+  }
+
+  .sorting {
+    &:after {
+      @include font-awesome-icon;
+      content: "\f0dc";
+      float: right;
+    }
+  }
+
+  .sorting_asc {
+    &:after {
+      @include font-awesome-icon;
+      content: "\f0de";
+      float: right;
+    }
+  }
+
+  .sorting_desc {
+    &:after {
+      @include font-awesome-icon;
+      content: "\f0dd";
+      float: right;
+    }
+  }
+}

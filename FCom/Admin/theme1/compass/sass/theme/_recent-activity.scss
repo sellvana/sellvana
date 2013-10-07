@@ -1,0 +1,124 @@
+.recent-activity {
+  .load-more {
+    > a {
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+    }
+  }
+
+  ul {
+    margin-bottom: 0;
+  }
+
+  .users {
+    > li {
+      border-bottom: 1px solid $recentBorder;
+      padding: 10px;
+      @include clearfix;
+
+      .avatar {
+        margin-right: 10px;
+        @include square(23px);
+
+        .icon-user {
+          font-size: 20px;
+          position: relative;
+          top: 2px;
+          color: darken($light, 5%);
+          @include square(23px);
+        }
+      }
+
+      .date, .action {
+        padding-top: 2px;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .comments {
+    > li {
+      border-bottom: 1px solid $recentBorder;
+      padding: 10px;
+      position: relative;
+      @include clearfix;
+
+      .avatar {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        margin-right: 10px;
+        @include square(23px);
+
+        .icon-user {
+          font-size: 20px;
+          position: relative;
+          top: 2px;
+          color: darken($light, 5%);
+          @include square(23px);
+        }
+      }
+
+      .body {
+        margin-left: 33px;
+
+        .actions {
+          position: absolute;
+          right: 10px;
+          top: 2px;
+          display: none;
+
+          .btn-link {
+            padding-left: 2px;
+            padding-right: 2px;
+
+            &:hover {
+              text-decoration: none;
+            }
+          }
+
+          .ok {
+            color: $green;
+            margin-right: 10px;
+
+            &:hover {
+              color: darken($green, 10%);
+            }
+          }
+
+          .remove {
+            color: $red;
+
+            &:hover {
+              color: darken($red, 10%);
+            }
+          }
+        }
+      }
+
+      &:hover {
+        .actions {
+          display: block;
+        }
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.touch {
+  .recent-activity {
+    .comments {
+      > li {
+        .actions { display: block; }
+      }
+    }
+  }
+}

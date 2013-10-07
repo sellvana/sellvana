@@ -1,5 +1,7 @@
 {{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
+
 {% if not THIS.get('products_data').state.c %}
+
     <div class="alert">{{ "There are no products matching the selection." |_ }}</div>
 
 {% else %}

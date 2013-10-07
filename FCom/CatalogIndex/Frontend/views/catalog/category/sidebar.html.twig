@@ -19,13 +19,13 @@
                         <ul>
                             {%  for vKey, value in facet['values'] %}
                                 {% if value['selected'] %}
-                                    <li><a class="active" href="{{ hlp.getUrl(null, { fKey: vKey}) }}">
+                                    <li><a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
                                         <span class="icon"></span>{{ value['display'] }}</a></li>
                                     {% if s['save_filter']%}
                                         <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
                                     {% endif %}
                                 {% else %}
-                                    <li><a href="{{ hlp.getUrl({ fKey: vKey}) }}">
+                                    <li><a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
                                          <span class="icon"></span>{{ value['display'] }}
                                          {% if value['cnt'] %}<span class="count">{{ "(%s)" | format(value['cnt']) | _ }}</span>{% endif %}
                                          </a></li>

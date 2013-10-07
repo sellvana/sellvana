@@ -114,14 +114,32 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_my_account()
     {
-        BLayout::i()->view('my_account')->model = FCom_Admin_Model_User::i()->sessionUser();
+        $model = FCom_Admin_Model_User::i()->sessionUser();
+        BLayout::i()->view('my_account')->set('model', $model);
         $this->layout('/my_account');
+    }
+
+    public function action_my_account__POST()
+    {
+        $r = BRequest::i();
+        $args = array();
+        try {
+            $model = FCom_Admin_Model_User::i()->sessionUser();
+            $data = $r->post('model');
+            $model->set($data)->save();
+            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+        }
+
+        BResponse::i()->redirect('my_account');
     }
 
     public function action_reports()
     {
         //TODO add code for reports
-        //BLayout::i()->view('my_account')->model = FCom_Admin_Model_User::i()->sessionUser();
+        // $model = FCom_Admin_Model_User::i()->sessionUser();
+        //BLayout::i()->view('my_account')->set('model', $model);
         $this->layout('/reports');
     }
 

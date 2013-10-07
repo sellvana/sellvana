@@ -14,18 +14,18 @@ base:
 
     - { include: common_js_libs }
 
-    - { hook: breadcrumbs, views: breadcrumbs }
+    #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
     - { hook: footer, views: footer }
 
 404:
     - { include: base }
-    - { hook: main, views: 404 }
+    - { hook: main, views: 404, use_meta: true }
 
 /denied:
     - { include: base }
-    - { hook: main, views: denied }
+    - { hook: main, views: denied, use_meta: true }
 
 /:
     - { include: base }
-    - { hook: main, views: static/index }
+    - { hook: main, views: static/index, use_meta: true }

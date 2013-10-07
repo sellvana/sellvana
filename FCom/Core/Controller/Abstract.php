@@ -40,7 +40,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 
     public function messages($viewName, $namespace='frontend')
     {
-        $this->view($viewName)->messages = BSession::i()->messages($namespace);
+        $this->view($viewName)->set('messages', BSession::i()->messages($namespace));
         return $this;
     }
 

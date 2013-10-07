@@ -757,6 +757,9 @@ class BLayout extends BClass
             foreach ((array)$d['views'] as $v) {
                 $this->hookView($d['name'], $v, $args);
             }
+            if (!empty($d['use_meta'])) {
+                $this->view($v)->useMetaData();
+            }
         }
     }
 
@@ -1385,8 +1388,8 @@ class BView extends BClass
         $metaData = $this->param('meta_data');
         if ($metaData) {
             if (!empty($metaData['layout.yml'])) {
-                BLayout::i()->addLayout('viewproxy-metadata', BYAML::i()->parse(trim($metaData['layout.yml'])))
-                    ->applyLayout('viewproxy-metadata');
+                $layoutData = BYAML::i()->parse(trim($metaData['layout.yml']));
+                BLayout::i()->addLayout('viewproxy-metadata', $layoutData)->applyLayout('viewproxy-metadata');
             }
             if (($head = $this->view('head'))) {
                 foreach ($metaData as $k=>$v) {

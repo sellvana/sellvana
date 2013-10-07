@@ -1,0 +1,59 @@
+.box-statistic {
+  background-color: $statBoxBackground;
+  margin-bottom: 5px;
+  padding: 5px 10px;
+  position: relative;
+
+  .title {
+    margin: 0;
+    line-height: 28px;
+  }
+
+  small {
+    text-transform: uppercase;
+  }
+
+  [class*="icon-"] {
+    font-size: 30px;
+    top: 13px;
+
+    &.align-left {
+      position: absolute;
+      left: 10px;
+    }
+
+    &.align-right {
+      position: absolute;
+      right: 10px;
+    }
+  }
+
+  @for $i from 1 through length($colorsNames) {
+    $colorName: nth($colorsNames, $i);
+    $color: nth($colors, $i);
+
+    &.#{$colorName}-background {
+      .title, small, [class*="icon-"] {
+        color: $statBoxContrastColor !important;
+      }
+
+      small {
+        @include opacity(.7);
+      }
+    }
+  }
+
+  &:hover {
+    [class*="icon-"] {
+      &.align-right {
+        right: 15px;
+        @include transition(right .1s linear);
+      }
+
+      &.align-left {
+        left: 15px;
+        @include transition(left .1s linear);
+      }
+    }
+  }
+}

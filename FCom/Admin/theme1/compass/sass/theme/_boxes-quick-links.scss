@@ -1,0 +1,63 @@
+.box-quick-link {
+  text-align: center;
+  margin-bottom: 10px;
+
+  a {
+    text-decoration: none;
+
+    .header {
+      height: 60px;
+      line-height: 60px;
+      padding-bottom: 2px;
+
+      [class^="icon-"], [class*=" icon-"] {
+        color: $quickIconColor;
+        font-size: 30px;
+        vertical-align: middle;
+      }
+    }
+
+    .content {
+      text-transform: uppercase;
+      font-size: 85%;
+      @include ellipsis;
+      color: $quickContentColor;
+      background-color: $quickContentBackground;
+      border-bottom: 1px solid $quickContentBorder;
+      padding: 5px;
+    }
+
+    &:hover {
+      .header {
+        [class^="icon-"], [class*=" icon-"] {
+          font-size: 40px;
+        }
+      }
+
+      .content {
+        text-decoration: underline;
+        border-bottom-color: $quickContentHoverBorder;
+        background-color: $quickContentHoverBackground;
+      }
+    }
+  }
+
+  @for $i from 1 through length($colorsNames) {
+    $colorName: nth($colorsNames, $i);
+    $color: nth($colors, $i);
+
+    &.#{$colorName}-background {
+      a:active {
+        .header {
+          background: darken($color, 10%);
+        }
+      }
+
+      &:hover {
+        .header {
+          background: darken($color, 5%);
+        }
+      }
+    }
+  }
+}

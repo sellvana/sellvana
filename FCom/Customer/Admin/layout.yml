@@ -1,7 +1,7 @@
 base:
     - view: admin/nav
         do:
-            - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-users-1 } ]
+            - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-user } ]
             - [ addNav, customer/customers, { label: Customers, href: /customers } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index } ]
 

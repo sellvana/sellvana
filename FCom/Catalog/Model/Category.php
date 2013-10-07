@@ -80,17 +80,27 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this->is_top_menu;
     }
 
-    static public function getTopNavCategories()
+    static public function getTopNavCategories($maxLevel = 1)
     {
         if (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
             $rootId = BConfig::i()->get('modules/FCom_Frontend/nav_top/root_category');
             if (!$rootId){
                 $rootId = 1;
             }
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', $rootId)->find_many();
+            $categories = static::orm()->where('parent_id', $rootId)->find_many_assoc();
         } else {
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where('top_menu', 1)->find_many();
+            $categories = static::orm()->where('top_menu', 1)->find_many_assoc();
         }
-        return $categories;
+        if ($maxLevel === 2) {
+            $subcats = static::orm()->where_in('parent_id', array_keys($categories))->find_many();
+            $children = array();
+            foreach ($subcats as $sc) {
+                $children[$sc->get('parent_id')][] = $sc;
+            }
+            foreach ($children as $cId => $cs) {
+                $categories[$cId]->set('children', $cs);
+            }
+        }
+        return array_values($categories);
     }
 }

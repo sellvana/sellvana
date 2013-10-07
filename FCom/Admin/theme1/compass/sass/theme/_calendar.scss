@@ -1,0 +1,62 @@
+@for $i from 1 through length($colorsNames) {
+  $colorName: nth($colorsNames, $i);
+  $color: nth($colors, $i);
+
+  .event-#{$colorName}, .label-#{$colorName} {
+    .fc-event-inner { background-color: $color !important; }
+  }
+}
+
+.fc-header {
+  .fc-header-left {
+    position: absolute;
+    width: 100%;
+    text-align: right;
+    right: 10px;
+    top: 10px;
+
+    .fc-button {
+      padding: 0px 12px;
+      background-color: $calButtonBackground;
+
+      &.fc-state-active, &:hover {
+        background-color: $calButtonHoverBackground;
+      }
+    }
+  }
+
+  .fc-header-right {
+    padding-top: 5px;
+  }
+
+  .fc-header-center {
+    text-align: left;
+  }
+}
+.fc-content {
+  .fc-event {
+    .fc-event-inner {
+      border-color: $contrast;
+      background-color: $contrast;
+    }
+
+    .ui-resizable-handle.ui-resizable-e {
+      background: $white;
+      cursor: col-resize;
+      @include opacity(.3);
+    }
+
+    @each $item in label {
+      &.#{$item}-important .fc-event-inner        { background-color: $red; }
+      &.#{$item}-important[href].fc-event-inner   { background-color: darken($red, 10%); }
+      &.#{$item}-warning .fc-event-inner          { background-color: $orange; }
+      &.#{$item}-warning[href] .fc-event-inner    { background-color: darken($orange, 10%); }
+      &.#{$item}-success .fc-event-inner          { background-color: $green; }
+      &.#{$item}-success[href] .fc-event-inner    { background-color: darken($green, 10%); }
+      &.#{$item}-info .fc-event-inner             { background-color: $purple; }
+      &.#{$item}-info[href] .fc-event-inner       { background-color: darken($purple, 10%); }
+      &.#{$item}-inverse .fc-event-inner          { background-color: $dark; }
+      &.#{$item}-inverse[href] .fc-event-inner    { background-color: darken($dark, 10%); }
+    }
+  }
+}

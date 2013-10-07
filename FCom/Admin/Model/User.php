@@ -46,6 +46,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
+
         if ($this->get('password')) {
             $this->set('password_hash', BUtil::fullSaltedHash($this->get('password')));
         }
@@ -57,6 +58,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
 
         return true;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        if ($this->id()===static::sessionUserId()) {
+            BSession::i()->data('admin_user', serialize($this));
+            static::$_sessionUser = $this;
+        }
     }
 
     public function as_array(array $objHashes=array())
@@ -192,6 +203,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function fullname()
     {
         return $this->get('firstname').' '.$this->get('lastname');
+    }
+
+    public function thumb($w, $h=null)
+    {
+        return BUtil::gravatar($this->get('email'));
+        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
+            'f' => $this->thumb_url,
+        ));
     }
 
     /**

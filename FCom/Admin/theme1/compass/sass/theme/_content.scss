@@ -1,0 +1,117 @@
+.main-nav-opened {
+  #content {
+    margin-left: $navWidth + 1px;
+  }
+}
+
+.main-nav-closed {
+  #content {
+    margin-left: $navClosedWidth + 1px;
+
+    @include sm-minus {
+      margin-left: 0;
+    }
+  }
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  position: relative;
+}
+
+body {
+  background: $contentBackground;
+
+  &.fixed-header {
+    #wrapper {
+      padding-top: 40px;
+    }
+
+    #main-nav.main-nav-fixed {
+      position: fixed;
+      top: 40px;
+      left: 0;
+    }
+  }
+
+  &.without-footer {
+    #footer {
+      display: none;
+    }
+  }
+}
+
+#wrapper {
+  min-height: 100%;
+
+  @include md-minus {
+    overflow: hidden;
+  }
+}
+
+#content-wrapper {
+  padding-bottom: 20px;
+}
+
+#content {
+  margin-left: $navWidth + 1px;
+  background: $contentBackground;
+  min-width: 320px - $navClosedWidth + 1px;
+  background: $contentBackground;
+
+  @include md-minus {
+    margin-left: $navClosedWidth + 1px;
+  }
+
+  @include sm-minus {
+    margin-left: 0;
+  }
+
+  @media print {
+    margin-left: 0 !important;
+  }
+}
+
+.container {
+  max-width: 100% !important;
+}
+
+#footer {
+  color: mix($navText, $navBackground, 40%);
+  text-shadow: 1px 1px 1px $white;
+  text-align: center;
+  border-top: 1px solid #eeeeee;
+
+  .footer-wrapper {
+    border-top: 1px solid $white;
+    padding: 10px 0;
+  }
+
+  a {
+    color: $navText;
+  }
+
+  .text {
+    margin-bottom: 7px;
+
+    @include sm-plus {
+      text-align: left;
+      padding-top: 7px;
+      margin-bottom: 0;
+    }
+  }
+
+  .buttons {
+    @include sm-plus {
+      text-align: right;
+    }
+
+    .btn:last-child {
+      padding-right: 0;
+    }
+  }
+}

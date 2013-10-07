@@ -16,7 +16,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             'username'    => array('label'=>'User Name', 'width'=>100, 'href' => BApp::href('users/form/?id=<%=id%>')),
             'email'       => array('label'=>'Email', 'width'=>150),
             'firstname'   => array('label'=>'First Name', 'width'=>150),
-            'lastname'    => array('label'=>'First Name', 'width'=>150),
+            'lastname'    => array('label'=>'Last Name', 'width'=>150),
             'is_superadmin' => array('label'=>'Super?', 'width'=>100,
                 'options'=>FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
             'status'      => array('label'=>'Status', 'width'=>100,
