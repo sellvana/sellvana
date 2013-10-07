@@ -134,6 +134,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 case 'min':
                     $runLevels = array(
                         'FCom_MarketClient' => 'REQUESTED',
+                        'FCom_FrontendThemeBlue' => 'REQUESTED',
                     );
                     break;
 
