@@ -7,7 +7,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function messages($viewName, $namespace='admin')
     {
-        $this->view($viewName)->messages = BSession::i()->messages($namespace);
+        $this->view($viewName)->set('messages', BSession::i()->messages($namespace));
         return $this;
     }
 

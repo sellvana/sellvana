@@ -1,0 +1,152 @@
+.todo-list {
+  .new-todo {
+    margin-bottom: 0;
+    width: 100%;
+    position: relative;
+    @include clearfix;
+
+    input[type="text"] {
+      border-left: 0;
+      border-top: 0;
+      padding-left: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      height: 45px;
+      line-height: 45px;
+    }
+
+    input {
+      margin-bottom: 0;
+      padding-right: 40px;
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 45px;
+    }
+  }
+
+  .date {
+    text-transform: uppercase;
+    color: $contrast;
+    font-size: 11px;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  ul {
+    margin-bottom: 20px;
+
+    > li {
+      line-height: 35px;
+      padding: 0 7px 0 10px;
+      border-bottom: 1px solid $light;
+      position: relative;
+      @include clearfix;
+
+      label {
+        padding: 5px 0;
+        font-weight: normal;
+        margin: 0;
+
+        .todo {
+          padding-left: 5px;
+          display: inline;
+          position: relative;
+          top: 3px;
+        }
+
+        input[type="checkbox"] {
+          margin-top: 0;
+        }
+      }
+
+      .actions {
+        margin-top: 2px;
+        .remove, .edit { display: none; }
+
+        .btn-link {
+          padding: 10px 5px;
+
+          &:hover {
+            text-decoration: none;
+          }
+        }
+
+        .important {
+          color: $blue;
+
+          i:before {content: "\f097";}
+
+          &:hover {
+            color: darken($blue, 10%);
+          }
+        }
+
+        .edit {
+          color: $orange;
+
+          &:hover {
+            color: darken($orange, 10%);
+          }
+        }
+
+        .remove {
+          color: $red;
+
+          &:hover {
+            color: darken($red, 10%);
+          }
+        }
+      }
+
+      &.important {
+        border-left: 2px solid $blue;
+        padding-left: 15px;
+        background: lighten($light, 10%);
+
+        .important {
+          i:before {content: "\f02e";}
+        }
+      }
+
+      &.done {
+        opacity: 0.5;
+
+        .todo {
+          text-decoration: line-through;
+        }
+      }
+
+      &:hover {
+        cursor: move;
+
+        .remove, .edit { display: inline;}
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+
+      li {
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+.touch {
+  .todo-list {
+    ul {
+      > li {
+        .actions {
+          .remove, .edit { display: inline; }
+        }
+      }
+    }
+  }
+}

@@ -8,15 +8,16 @@
 </style>
 
 {% set isLoggedIn = APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
-<div class="adminchat-container">
-    {% if isLoggedIn %}
-        <button id="adminchat-test">Test Chat</button>
-        <select id="adminuser-status">
-            {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
-        </select>
-    {% endif %}
-</div>
-
+{% if false %}
+    <div class="adminchat-container">
+        {% if isLoggedIn %}
+            <button id="adminchat-test">Test Chat</button>
+            <select id="adminuser-status">
+                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
+            </select>
+        {% endif %}
+    </div>
+{% endif %}
 <script>
     require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
         AdminChat.init({

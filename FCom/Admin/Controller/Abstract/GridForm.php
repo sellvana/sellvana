@@ -62,7 +62,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_index()
     {
-        //$this->view('jqgrid')->config = $this->gridConfig();
+        //$this->view('jqgrid')->set('config', $this->gridConfig());
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }

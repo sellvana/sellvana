@@ -1,0 +1,55 @@
+.progress {
+  @include box-shadow(none);
+  background-image: none;
+  filter: none;
+
+  &.progress-small {
+    height: 10px;
+    line-height: 10px;
+
+    .progress-bar {
+      font-size: 10px;
+      padding-top: 0;
+    }
+  }
+
+  &.progress-mini {
+    height: 5px;
+    line-height: 5px;
+
+    .progress-bar {
+      font-size: 5px;
+      padding-top: 0;
+    }
+  }
+
+  .progress-bar {
+    background-image: none;
+    background-color: $blue;
+    padding-top: 2px;
+  }
+
+  &.progress-danger .progress-bar, &.progress .progress-bar-danger {
+    background-image: none;
+    background-color: $red;
+  }
+
+  &.progress-success .progress-bar, &.progress .progress-bar-success{
+    background-image: none;
+    background-color: $green;
+  }
+
+  &.progress-warning .progress-bar, &.progress .progress-bar-warning {
+    background-image: none;
+    background-color: $orange;
+  }
+
+  &.progress-info .progress-bar, &.progress .progress-bar-info{
+    background-image: none;
+    background-color: $purple;
+  }
+}
+
+.progress-pwstrength {
+  margin-bottom: 0;
+}

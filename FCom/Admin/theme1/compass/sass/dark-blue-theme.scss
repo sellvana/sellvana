@@ -1,0 +1,142 @@
+@import "compass";
+@import "theme/variables";
+@import "theme/utilities";
+
+$lightest: #f4f7f9;
+$light: #dce1e5;
+
+$dark: #143249;
+$darkest: #0d2231;
+
+$white: #fff;
+$contentBackground: $lightest;
+
+// header
+$headerBackground: $contrast !default;
+$headerBrandColor: $white !default;
+$headerSearchButtonColor: $headerBackground !default;
+
+// navigation
+$showNavCaret: true;
+$navBackground: $darkest;
+$navBorder: transparent;
+$navItemBackround: $navBackground;
+$navItemBorderTop: darken($navBackground, 5%);
+$navItemBorderBottom: lighten($navBackground, 5%);
+$navItemHoverFocusBackground: darken($navBackground, 3%);
+$navIcon: lighten($dark, 22%);
+$navText: lighten($dark, 18%);
+$navIconHoverFocus: $contrast;
+$navTextHoverFocus: lighten($dark, 25%);
+$navHeaderColor: lighten($navBackground, 20%);
+$navWidth: 250px;
+$navClosedWidth: 45px;
+
+$navSecondBackground: $contentBackground;
+$navSecondBorder: darken($navSecondBackground, 20%);
+$navSecondItemBorder: darken($navSecondBackground, 10%);
+$navSecondItemHoverFocusBackground: darken($navSecondBackground, 5%);
+
+//type
+$pageHeaderBackground: $white;
+$pageHeaderColor: $darkest;
+$pageHeaderBorder: $light;
+$pageHeaderIconColor: $contrast;
+$pageHeaderBreadCrumbHover: $contrast;
+
+//timeline
+$timelineLine: $light;
+$timelineContentBackground: $white;
+$timelineIconColor: $white;
+
+//boxes
+$boxBorder: $light;
+$boxBackground: $white;
+$boxHeaderColor: $dark;
+$boxActionsColor: darken($light, 10%);
+$boxActionsHoverColor: $contrast;
+$boxTextContrastColor: $white;
+$boxActionsContrastColor: $white;
+$boxActionsContrastHoverBackground: $white;
+$boxToolboxBackground: $lightest;
+$boxToolboxBorder: $light;
+
+//quick links
+$quickIconColor: $white;
+$quickContentColor: darken($lightest, 60%);
+$quickContentBackground: darken($lightest, 10%);
+$quickContentHoverBackground: darken($lightest, 15%);
+$quickContentBorder: darken($lightest, 15%);
+$quickContentHoverBorder: darken($lightest, 20%);
+
+//statistic boxes
+$statBoxBackground: $white;
+$statBoxContrastColor: $white;
+
+//calendar
+$calButtonBackground: $white;
+$calButtonHoverBackground: $light;
+
+//chat
+$chatMessageBorder: $light;
+$fixedChatHeaderBackground: $contrast;
+$fixedChatHeaderColor: $white;
+$fixedChatActionsColor: $white;
+
+//forms
+$formActionsBackground: $lightest;
+$formStripedBorder: $light;
+$formStripedBackground: $lightest;
+
+$inputBorder: darken($light, 5%);
+$inputBackground: $white;
+$inputFocusBorderColor: darken($light, 20%);
+$inputFocusShadow: rgba(220, 225, 229, 1);
+
+//gallery
+$galleryActionsColor: $white;
+$galleryActionsBackground: rgba(0, 0, 0, .3);
+
+//recent activity
+$recentBorder: $light;
+
+//wizard
+$wizardStepCompleteBackground: $green;
+$wizardStepCompleteColor: $white;
+$wizardStepActiveBackground: $contrast;
+$wizardStepActiveColor: $white;
+$wizardStepBackground: $light;
+$wizardStepColor: darken($lightest, 70%);
+
+@import "theme/font-awesome";
+@import "theme/type";
+@import "theme/header";
+@import "theme/navigation";
+@import "theme/content";
+@import "theme/boxes";
+@import "theme/boxes-quick-links";
+@import "theme/boxes-statistics";
+@import "theme/tables";
+@import "theme/todo-list";
+@import "theme/recent-activity";
+@import "theme/calendar";
+@import "theme/chat";
+@import "theme/tasks";
+@import "theme/nestable-list";
+@import "theme/accordions";
+@import "theme/tabs";
+@import "theme/wizard";
+@import "theme/forms";
+
+@import "theme/pages/gallery";
+@import "theme/pages/timeline";
+@import "theme/pages/invoice";
+@import "theme/pages/pricing_tables";
+@import "theme/pages/orders";
+@import "theme/pages/faq";
+@import "theme/pages/errors";
+@import "theme/pages/login";
+
+@import "theme/overrides-bootstrap";
+@import "theme/overrides-plugins";
+@import "theme/common";

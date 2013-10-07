@@ -1,41 +1,53 @@
 {% set customer = APP.instance('FCom_Customer_Model_Customer') %}
+{% set storeName = CONFIG.get('modules/FCom_Core/store_name') %}
+{% set imgBaseUrl = APP.src('@FCom_FrontendTheme1/img') %}
 
-<header class="header-wrapper">
-	<div class="header-top-wrapper">
-	    <div class="header-top">
-	        <a href="#" class="site-logo">{{ CONFIG.get('modules/FCom_Core/store_name') }}</a>
-	        <div id="minicart-container">{{ THIS.view('checkout/cart/block') | raw }}</div>
-	        <nav class="sup-links">
-	            <ul>
-	                {% if customer.isLoggedIn() %}
-						<li class="header-sup-signin">
-	                        Hello {{ customer.sessionUser().email }}
-	                        <a href="{{ APP.href('logout') }}">{{ 'Logout' |_ }} </a>
-	                    </li>
-	                    <li><a href="{{ APP.href('customer/myaccount') }}">{{ 'My Account' |_ }}</a></li>
-	                {% else %}
-						<li class="header-sup-signin">{{ 'Hello there!' |_ }}</li>
-						<li><a href="{{ APP.href('login') }}">{{ 'Sign in' |_ }}</a></li>
-						<li class="header-sup-wishlist"><a href="{{ APP.href('customer/register') }}">{{ 'Register' |_ }}</a></li>
-	                {% endif %}
-					<li><a href="{{ APP.href('wishlist') }}">{{ 'Wishlist' |_ }}</a></li>
-	            </ul>
-	        </nav>
-	    </div>
-	</div>
-	<div class="header-nav-wrapper">
-	    <div class="header-nav">
-            <nav class="site-nav">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ APP.baseUrl() }}">{{ 'Home' |_ }}</a>
-                    {{ THIS.view('nav') | raw }}
-                </ul>
-            </nav>
-            <form class="site-search" action="{{ APP.href('catalog/search') }}">
-            	<fieldset>
-            		<input type="text" placeholder="{{ 'Search entire store' |_ }}" name="q" value="{{ REQUEST.get('q') }}"/><button class="btn">{{ 'Search' |_ }}</button>
-            	</fieldset>
-            </form>
-	    </div>
-	</div>
+<!-- Header Start -->
+<header>
+    <div class="headerstrip">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <a href="{{ APP.href() }}" class="logo pull-left"><img src="{{ APP.src('@FCom_Core/img/logo.svg') }}" alt="{{ storeName }}" title="{{ storeName }}"></a>
+
+                    <div class="pull-right">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <form class="form-search top-search" action="{{ APP.href('catalog/search') }}">
+                                    <input type="text" class="input-medium search-query" placeholder="Search Here…" name="q" value="{{ REQUEST.get('q') }}">
+                                </form>
+                            </div>
+                            <div class="col-lg-6">
+                                {{ THIS.view('checkout/cart/block') | raw }}
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <select>
+                                <option value="USD" selected>$ USD</option>
+                                <option value="EUR">&euro; EUR</option>
+                                <option value="GBP">&pound; GBP</option>
+                            </select>
+                            <select>
+                                <option value="EN" selected>EN</option>
+                                <option value="ES">ES</option>
+                                <option value="DE">DE</option>
+                            </select>
+                            <a href="{{ APP.href('wishlist') }}">{{ 'Wishlist'|_ }}</a>
+                            {% if customer.isLoggedIn() %}
+                                <a href="{{ APP.href('wishlist') }}">{{ 'My Account'|_ }}</a>
+                                <a href="{{ APP.href('logout') }}">{{ 'Log off'|_ }}</a>
+                            {% else %}
+                                <a href="{{ APP.href('login') }}">{{ 'Log In'|_ }}</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {{ THIS.view('nav') | raw }}
+    </div>
 </header>
+<!-- Header End -->

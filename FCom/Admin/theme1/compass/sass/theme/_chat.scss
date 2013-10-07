@@ -1,0 +1,114 @@
+.chat {
+  .box-collapsed {
+    .box-header {
+      .actions {
+        .box-collapse {
+          i:before {
+            content: "\f077" !important;
+          }
+        }
+      }
+    }
+  }
+
+  &.chat-fixed {
+    width: 300px;
+    position: fixed;
+    z-index: $zindexDropdown - 1;
+    bottom: 0;
+    right: 20px;
+
+    .box {
+      margin-bottom: 0;
+    }
+
+    .box-header {
+
+      .actions {
+        .box-collapse {
+          i:before {
+            content: "\f078";
+          }
+        }
+      }
+    }
+
+    form {
+      input[type="text"] {
+        padding: 4px 6px;
+        height: 33px;
+        line-height: 33px;
+      }
+
+      button {
+        height: 33px;
+        height: 33px;
+      }
+    }
+  }
+
+  ul {
+    margin-bottom: 0;
+
+    > li {
+      border-bottom: 1px solid $chatMessageBorder;
+      padding: 10px;
+      position: relative;
+      @include clearfix;
+
+      .avatar {
+        position: absolute;
+        margin-right: 10px;
+        top: 10px;
+        left: 10px;
+        @include square(23px);
+      }
+
+      .name-and-time {
+        margin-left: 33px;
+        @include clearfix;
+      }
+
+      .body {
+        margin-left: 33px;
+      }
+
+      .time {
+        font-size: 12px;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  form {
+    margin-bottom: 0;
+    width: 100%;
+    position: relative;
+    @include clearfix;
+
+    input[type="text"] {
+      border-left: 0;
+      border-bottom: 0;
+      padding-left: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      height: 45px;
+      line-height: 45px;
+    }
+
+    input {
+      margin-bottom: 0;
+      padding-right: 40px;
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 45px;
+    }
+  }
+}

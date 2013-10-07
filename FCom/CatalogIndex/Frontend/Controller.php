@@ -149,9 +149,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
         $crumbs[] = array('label'=>$category->get('node_name'), 'active'=>true);
         $head->addTitle($category->get('node_name'));
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
+        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
-        $layout->view('catalog/search')->query = $q;
+        $layout->view('catalog/search')->set('query', $q);
 
         $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
         $rowsView = $layout->view($rowsViewName);
@@ -160,8 +160,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_CatalogIndex_Model_Field::i()->getSortingArray();
-        $layout->view('catalog/category/sidebar')->products_data = $productsData;
+        $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
+        $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
         $this->layout('/catalog/category');
     }
 
@@ -187,8 +187,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
-        $layout->view('catalog/search')->query = $q;
+        $layout->view('breadcrumbs')->set('crumbs', array('home', array('label'=>'Search: '.$q, 'active'=>true)));
+        $layout->view('catalog/search')->set('query', $q);
 
         $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
         $rowsView = $layout->view($rowsViewName);
@@ -196,8 +196,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_CatalogIndex_Model_Field::i()->getSortingArray();
-        $layout->view('catalog/category/sidebar')->products_data = $productsData;
+        $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
+        $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
 
         $this->layout('/catalog/search');
     }

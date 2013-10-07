@@ -31,25 +31,25 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             $name = preg_split('#\s*'.preg_quote($sep).'\s*#', $name, 0, PREG_SPLIT_NO_EMPTY);
         }
 
-        $childName = ($this->full_name ? $this->full_name.$sep : '').$name[0];
+        $childName = ($this->get('full_name') ? $this->get('full_name').$sep : '').$name[0];
         $child = $this->load($childName, 'full_name');
         if (!$child) {
             //$class = get_class($this);
             $child = static::i()->create(array(
-                'parent_id' => $this->id,
+                'parent_id' => $this->id(),
                 'node_name' => $name[0],
                 'full_name' => $childName,
                 'num_children' => 0,
                 'num_descendants' => 0,
             ))->set($params)->save();
-            $child->set('id_path', $this->id_path.'/'.$child->id)->save();
+            $child->set('id_path', $this->get('id_path').'/'.$child->id())->save();
 
-            $this->num_children++;
-            $this->num_descendants++;
-            $saveObjects[$this->id] = $this;
+            $this->add('num_children');
+            $this->add('num_descendants');
+            $saveObjects[$this->id()] = $this;
             foreach ($this->ascendants() as $c) {
-                $c->num_descendants++;
-                $saveObjects[$c->id] = $c;
+                $c->add('num_descendants');
+                $saveObjects[$c->id()] = $c;
             }
         }
         if ($saveObjects) {
@@ -66,7 +66,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function rename($newName, $resetUrl=false)
     {
-        $pName = $this->parent()->full_name;
+        $pName = $this->parent()->get('full_name');
         $this->set(array(
             'node_name' => $newName,
             'full_name' => ($pName?$pName.'|':'').$newName,
@@ -80,13 +80,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function move($parentId)
     {
-        if ($parentId!=$this->parent_id) {
+        if ($parentId!=$this->get('parent_id')) {
             $p = $this->load($parentId);
             $this->unregister();
             $this->set(array(
-                'parent_id' => $p->id,
-                'id_path' => $p->id_path.'/'.$this->id,
-                'full_name' => trim($p->full_name.static::$_separator.$this->node_name, static::$_separator),
+                'parent_id' => $p->id(),
+                'id_path' => $p->get('id_path').'/'.$this->id(),
+                'full_name' => trim($p->get('full_name').static::$_separator.$this->get('node_name'), static::$_separator),
                 'url_path' => null,
             ));
 
@@ -112,26 +112,26 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $conflict = false;
         foreach ($this->siblings() as $c) {
-            if ($c->sort_order==$sortOrder) {
+            if ($c->get('sort_order')==$sortOrder) {
                 $conflict = true;
                 break;
             }
         }
         if ($conflict) {
             foreach ($this->siblings() as $c) {
-                if ($c->sort_order>=$sortOrder) {
-                    $c->sort_order++;
+                if ($c->get('sort_order')>=$sortOrder) {
+                    $c->add('sort_order');
                 }
             }
         }
-        $this->sort_order = $sortOrder;
+        $this->set('sort_order', $sortOrder);
         return $this;
     }
 
     public function reorderChildrenAZ($recursive=false)
     {
         $children = $this->children();
-        uasort($children, function($a, $b) { return strcmp($a->node_name, $b->node_name); });
+        uasort($children, function($a, $b) { return strcmp($a->get('node_name'), $b->get('node_name')); });
         $i = 0;
         foreach ($children as $c) {
             $c->set('sort_order', ++$i);
@@ -144,11 +144,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        if (!$this->id) $this->_new = true;
-        if (!$this->sort_order) $this->generateSortOrder();
-        if (!$this->url_key) $this->generateUrlKey();
-        if (!$this->url_path || $this->is_dirty('url_key')) $this->generateUrlPath();
-        if (!$this->full_name || $this->is_dirty('node_name')) $this->generateFullName();
+        if (!$this->id()) $this->_new = true;
+        if (!$this->get('sort_order')) $this->generateSortOrder();
+        if (!$this->get('url_key')) $this->generateUrlKey();
+        if (!$this->get('url_path') || $this->is_dirty('url_key')) $this->generateUrlPath();
+        if (!$this->get('full_name') || $this->is_dirty('node_name')) $this->generateFullName();
+        if ($this->is_dirty('id_path')) $this->set('level', sizeof(explode('/', $this->get('id_path')))-1);
 
         return true;
     }
@@ -157,8 +158,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         foreach ($this->descendants() as $c) {
             $c->set(array(
-                'id_path' => $this->id_path .'/'.$c->id,
-                'full_name' => $this->full_name.static::$_separator.$c->node_name,
+                'id_path' => $this->get('id_path') .'/'.$c->id(),
+                'full_name' => $this->get('full_name').static::$_separator.$c->get('node_name'),
             ));
             if ($resetUrl) $c->set('url_path', null);
             $c->refreshDescendants($save);
@@ -170,8 +171,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function recalculateNumDescendants($save=false)
     {
         $children = $this->children();
-        $this->num_children = 0;
-        $this->num_descendants = 0;
+        $this->set('num_children', 0);
+        $this->set('num_descendants', 0);
         if ($children) {
             foreach ($children as $c) {
                 $c->recalculateNumDescendants($save);
@@ -186,7 +187,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function unregister($save=false)
     {
         $this->parent()->add('num_children', -1);
-        $numDesc = 1+$this->num_descendants;
+        $numDesc = 1+$this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
             $c->add('num_descendants', -$numDesc);
             if ($save) $c->save();
@@ -199,7 +200,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function register($save=false)
     {
         $this->parent()->add('num_children');
-        $numDesc = 1+$this->num_descendants;
+        $numDesc = 1+$this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
             $c->add('num_descendants', $numDesc);
             if ($save) $c->save();
@@ -230,7 +231,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function parent()
     {
-        return $this->relatedModel(get_class($this), $this->parent_id, false, 'parent');
+        return $this->relatedModel(get_class($this), $this->get('parent_id'), false, 'parent');
     }
 
     public function children($sort='sort_order')

@@ -1,0 +1,140 @@
+$baseFontSize: 14px !default;
+$baseLineHeight: 20px !default;
+$sansFontFamily: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$zindexDropdown: 1000 !default;
+$zindexFixedNavbar: 1030 !default;
+$grayLighter: #eee !default;
+$hrBorder: $grayLighter !default;
+
+$lightest: #f4f7f9 !default;
+$light: #dce1e5 !default;
+
+$dark: #143249 !default;
+$darkest: #0d2231 !default;
+
+$white: #fff !default;
+$contentBackground: $lightest !default;
+
+$orange: #f8a326 !default;
+$blue: #00acec !default;
+$seaBlue: #0163ac !default;
+$purple: #9564e2 !default;
+$green: #49bf67 !default;
+$red: #f34541 !default;
+$muted: #999999 !default;
+$fb: #3d579d !default;
+$darkColor: #2b2d30 !default;
+$pink: #c44a83 !default;
+$grassGreen: #5daf2b !default;
+$banana: #fcd052 !default;
+$contrast: $red !default;
+$brown: #924e31 !default;
+$darkOrange: #f56e00 !default;
+
+// colors
+$colors: ($contrast, $orange, $blue, $purple, $green, $red, $muted, $fb, $darkColor, $pink, $grassGreen, $seaBlue, $banana, $darkOrange, $brown);
+$colorsNames: ("contrast", "orange", "blue", "purple", "green", "red", "muted", "fb", "dark", "pink", "grass-green", "sea-blue", "banana", "dark-orange", "brown");
+
+// themes
+$themeNames: ("red","orange", "blue", "purple", "green", "fb", "muted", "dark", "pink", "grass-green", "sea-blue", "banana", "dark-orange", "brown");
+$themeColors: ($red,$orange, $blue, $purple, $green, $fb, $muted, $darkColor, $pink, $grassGreen, $seaBlue, $banana, $darkOrange, $brown);
+
+// fonts
+$headingsFontFamily: Montserrat;
+
+// header
+$headerBackground: $contrast !default;
+$headerBrandColor: $white !default;
+$headerSearchButtonColor: $headerBackground !default;
+$headerHeight: 40px !default;
+
+// navigation
+$navBackground: $darkest !default;
+$navBorder: transparent !default;
+$navItemBackround: $navBackground !default;
+$navItemBorderTop: darken($navBackground, 5%) !default;
+$navItemBorderBottom: lighten($navBackground, 5%) !default;
+$navItemHoverFocusBackground: darken($navBackground, 3%) !default;
+$navIcon: lighten($dark, 22%) !default;
+$navText: lighten($dark, 18%) !default;
+$navIconHoverFocus: $contrast !default;
+$navTextHoverFocus: lighten($dark, 25%) !default;
+$navHeaderColor: lighten($navBackground, 20%) !default;
+$navWidth: 250px !default;
+$navClosedWidth: 50px !default;
+
+$navSecondBackground: $contentBackground !default;
+$navSecondBorder: darken($navSecondBackground, 20%) !default;
+$navSecondItemBorder: darken($navSecondBackground, 10%) !default;
+$navSecondItemHoverFocusBackground: darken($navSecondBackground, 5%) !default;
+
+//type
+$pageHeaderBackground: $white !default;
+$pageHeaderBorder: $light !default;
+$pageHeaderIconColor: $contrast !default;
+$pageHeaderBreadCrumbHover: $contrast !default;
+
+//timeline
+$timelineLine: $light !default;
+$timelineContentBackground: $white !default;
+$timelineIconColor: $white !default;
+
+
+//boxes
+$boxBorder: $light !default;
+$boxBackground: $white !default;
+$boxActionsColor: darken($light, 10%) !default;
+$boxActionsHoverColor: $contrast !default;
+$boxTextContrastColor: $white !default;
+$boxActionsContrastColor: $white !default;
+$boxActionsContrastHoverBackground: $white !default;
+$boxToolboxBackground: $lightest !default;
+$boxToolboxBorder: $light !default;
+
+//quick links
+$quickIconColor: $white !default;
+$quickContentColor: darken($lightest, 60%) !default;
+$quickContentBackground: darken($lightest, 10%) !default;
+$quickContentBorder: darken($lightest, 15%) !default;
+
+//statistic boxes
+$statBoxBackground: $white !default;
+$statBoxContrastColor: $white !default;
+
+//calendar
+$calButtonBackground: $white !default;
+$calButtonHoverBackground: $light !default;
+
+//chat
+$chatMessageBorder: $light !default;
+$fixedChatHeaderBackground: $contrast !default;
+$fixedChatHeaderColor: $white !default;
+$fixedChatActionsColor: $white !default;
+
+//forms
+$formActionsBackground: $lightest !default;
+$formStripedBorder: $light !default;
+$formStripedBackground: $lightest !default;
+
+$inputBorder: darken($light, 5%);
+$inputBackground: $white;
+$inputFocusBorderColor: darken($light, 20%);
+$inputFocusShadow: rgba(220, 225, 229, 1);
+
+//gallery
+$galleryActionsColor: $white !default;
+$galleryActionsBackground: rgba(0, 0, 0, .3) !default;
+
+//recent activity
+$recentBorder: $light !default;
+
+//wizard
+$wizardStepCompleteBackground: $green !default;
+$wizardStepCompleteColor: $white;
+$wizardStepActiveBackground: $contrast !default;
+$wizardStepActiveColor: $white;
+$wizardStepBackground: $light !default;
+$wizardStepColor: darken($lightest, 70%) !default;
+
+//other
+$showNavCaret: true !default;

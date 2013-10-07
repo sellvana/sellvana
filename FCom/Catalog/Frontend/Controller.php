@@ -23,7 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        $layout->view('catalog/product')->product = $product;
+        $layout->view('catalog/product')->set('product', $product);
 
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
@@ -34,8 +34,8 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
             BApp::i()->set('current_category', $category);
 
-            $layout->view('catalog/product')->category = $category;
-            $layout->view('head')->canonical_url = $product->url();
+            $layout->view('catalog/product')->set('category', $category);
+            $layout->view('head')->canonical($product->url());
             foreach ($category->ascendants() as $c) {
                 if ($c->get('node_name')) {
                     $crumbs[] = array('label'=>$c->get('node_name'), 'href'=>$c->url());
@@ -45,13 +45,13 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
         $crumbs[] = array('label'=>$product->get('product_name'), 'active'=>true);
 
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
+        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
         $user = false;
         if (Bapp::m('FCom_Customer')) {
             $user = FCom_Customer_Model_Customer::i()->sessionUser();
         }
-        $layout->view('catalog/product')->user = $user;
+        $layout->view('catalog/product')->set('user', $user);
 
         $this->layout('/catalog/product');
     }
@@ -99,14 +99,14 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 BResponse::i()->redirect(FCom_Core_Main::i()->lastNav());
             }
         }
-        $layout->view('catalog/compare')->products = array_values($products);
+        $layout->view('catalog/compare')->set('products', array_values($products));
         if ($xhr) {
             $this->layout('/catalog/compare/xhr');
         } else {
             $this->layout('/catalog/compare');
-            $layout->view('breadcrumbs')->crumbs = array('home',
+            $layout->view('breadcrumbs')->set('crumbs', array('home',
                 array('label'=>'Compare '.sizeof($products).' products', 'active'=>true)
-            );
+            ));
         }
     }
 }

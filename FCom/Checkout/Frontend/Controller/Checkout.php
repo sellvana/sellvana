@@ -5,8 +5,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout_login()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>BApp::baseUrl()),
-            array('label'=>'Login or guest checkout', 'active'=>true));
+        $layout->view('breadcrumbs')->set('crumbs', array(array('label'=>'Home', 'href'=>BApp::baseUrl()),
+            array('label'=>'Login or guest checkout', 'active'=>true)));
         $this->layout('/checkout/login');
     }
 
@@ -171,10 +171,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                                          ->render();
         }
 
-        $layout->view('breadcrumbs')->crumbs = array(
+        $layout->view('breadcrumbs')->set('crumbs', array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
-            array('label'=>'Payment methods', 'active'=>true));
+            array('label'=>'Payment methods', 'active'=>true)));
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
                                          ->set('cart', $cart);
@@ -203,12 +203,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_shipping()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array(
+        $layout->view('breadcrumbs')->set('crumbs', array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
-            array('label'=>'Shipping address', 'active'=>true));
-        $layout->view('checkout/shipping')->address = array();
-        $layout->view('checkout/shipping')->methods = array();
+            array('label'=>'Shipping address', 'active'=>true)));
+        $layout->view('checkout/shipping')->set(array('address' => array(), 'methods' => array()));
         $this->layout('/checkout/shipping');
     }
 

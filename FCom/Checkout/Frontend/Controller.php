@@ -6,21 +6,21 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         $layout = BLayout::i();
 
-        $layout->view('checkout/cart')->redirectLogin = false;
+        $layout->view('checkout/cart')->set('redirectLogin', false);
         if (BApp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn() == false) {
-            $layout->view('checkout/cart')->redirectLogin = true;
+            $layout->view('checkout/cart')->set('redirectLogin', true);
         }
 
 
-        $layout->view('breadcrumbs')->crumbs = array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
-            array('label'=>'Cart', 'active'=>true));
+        $layout->view('breadcrumbs')->set('crumbs', array(array('label'=>'Home', 'href'=>  BApp::baseUrl()),
+            array('label'=>'Cart', 'active'=>true)));
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         BEvents::i()->fire('FCom_Checkout_Frontend_Controller::action_cart:cart', array('cart'=>$cart));
 
         $shippingEstimate = BSession::i()->data('shipping_estimate');
-        $layout->view('checkout/cart')->cart = $cart;
-        $layout->view('checkout/cart')->shipping_esitmate = $shippingEstimate;
+        $layout->view('checkout/cart')->set('cart', $cart);
+        $layout->view('checkout/cart')->set('shipping_esitmate', $shippingEstimate);
         $this->layout('/checkout/cart');
     }
 

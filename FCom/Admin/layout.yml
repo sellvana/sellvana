@@ -9,21 +9,36 @@ base:
   - { callback: FCom_Admin_Admin::layout }
 
   - { include: common_js_libs }
+  - { include: lib_admin_theme1 }
 
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
-      - [ css, @FCom_Core/css/bootstrap-3.min.css ]
+      #- [ css, @FCom_Core/css/bootstrap-3.min.css ]
       #- [ css, @FCom_Admin/compass/css/screen.css ]
       #- [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
       #- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
       #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
       #- [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
+
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/jquery/jquery_ui.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
+      - [ css, @FCom_Admin/css/fcom.admin.css ]
+
+      - [ js, @FCom_Admin/theme1/assets/javascripts/ie/html5shiv.js, { if: lt IE 9 } ]
+      - [ js, @FCom_Admin/theme1/assets/javascripts/ie/respond.min.js, { if: lt IE 9 } ]
+
       - [ css, @FCom_Core/js/select2/select2.css ]
       - [ css, @FCom_Core/css/fcom.core.css ]
-      - [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
+      #- [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
       #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
       #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
 
@@ -57,10 +72,10 @@ base:
 
   - view: admin/nav
     do:
-      - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-home-1 } ]
-      - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle } ]
+      - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-dashboard } ]
+      - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle-piece } ]
       - [ addNav, modules/installed, { label: Installed Modules, href: /modules } ]
-      - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog-1 } ]
+      - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
       - [ addNav, system/users, { label: Users, href: /users  } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
       - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
@@ -68,6 +83,66 @@ base:
   - view: admin/header
     do:
       - [ addShortcut, system/users, { label: New User, href: /users/form } ]
+
+lib_admin_theme1:
+  - view: head
+    do:
+      - [ requireJs, autosize, @FCom_Admin/theme1/assets/javascripts/plugins/autosize/jquery.autosize-min, { deps: [ jquery ] } ]
+      - [ requireJs, bootbox, @FCom_Admin/theme1/assets/javascripts/plugins/bootbox/bootbox.min, { deps: [ jquery ] } ]
+      - [ requireJs, daterangepicker, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker, { deps: [ jquery ] } ]
+      - [ requireJs, datetimepicker, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_datetimepicker/bootstrap-datetimepicker, { deps: [ jquery ] } ]
+      - [ requireJs, hoverdropdown, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_hover_dropdown/twitter-bootstrap-hover-dropdown.min, { deps: [ jquery ] } ]
+      - [ requireJs, maxlength, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_maxlength/bootstrap-maxlength.min, { deps: [ jquery ] } ]
+      - [ requireJs, switch, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_switch/bootstrapSwitch.min, { deps: [ jquery ] } ]
+      - [ requireJs, charcount, @FCom_Admin/theme1/assets/javascripts/plugins/charCount/charCount, { deps: [ jquery ] } ]
+      - [ requireJs, ckeditor, @FCom_Admin/theme1/assets/javascripts/plugins/ckeditor/ckeditor, { deps: [ jquery ] } ]
+      - [ requireJs, wysihtml5, @FCom_Admin/theme1/assets/javascripts/plugins/common/wysihtml5.min, { deps: [ jquery ] } ]
+      - [ requireJs, moment, @FCom_Admin/theme1/assets/javascripts/plugins/common/moment.min ]
+      - [ requireJs, bootstrap-wysihtml5, @FCom_Admin/theme1/assets/javascripts/plugins/common/bootstrap-wysihtml5, { deps: [ wysihtml5, bootstrap ] } ]
+      - [ requireJs, dynatree, @FCom_Admin/theme1/assets/javascripts/plugins/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
+      - [ requireJs, fileinput, @FCom_Admin/theme1/assets/javascripts/plugins/fileinput/bootstrap-fileinput.min, { deps: [ jquery ] } ]
+
+      - [ requireJs, tmpl, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/tmpl.min, { deps: [ jquery ] } ]
+      - [ requireJs, load-image, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/load-image.min, { deps: [ jquery ] } ]
+      - [ requireJs, canvas-to-blob, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/canvas-to-blob.min, { deps: [ jquery ] } ]
+      - [ requireJs, iframe-transport, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/jquery.iframe-transport.min ]
+      - [ requireJs, fileupload, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload.min ]
+      - [ requireJs, fileupload-fp, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-fp.min ]
+      - [ requireJs, fileupload-ui, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-ui.min ]
+      - [ requireJs, fileupload-init, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-init ]
+
+      - [ requireJs, fuelux.wizard, @FCom_Admin/theme1/assets/javascripts/plugins/fuelux/wizard, { deps: [ jquery ] } ]
+      - [ requireJs, fullcalendar, @FCom_Admin/theme1/assets/javascripts/plugins/fullcalendar/fullcalendar, { deps: [ jquery ] } ]
+      - [ requireJs, inputmask, @FCom_Admin/theme1/assets/javascripts/plugins/input_mask/bootstrap-inputmask.min, { deps: [ jquery ] } ]
+      - [ requireJs, jgrowl, @FCom_Admin/theme1/assets/javascripts/plugins/jgrowl/jquery.jgrowl.min, { deps: [ jquery ] } ]
+      - [ requireJs, touchpunch, @FCom_Admin/theme1/assets/javascripts/plugins/jquery_ui_touch_punch/jquery.ui.touch-punch.min, { deps: [ jquery, jquery-ui ] } ]
+      - [ requireJs, lightbox, @FCom_Admin/theme1/assets/javascripts/plugins/lightbox/lightbox.min, { deps: [ jquery ] } ]
+      - [ requireJs, mention, @FCom_Admin/theme1/assets/javascripts/plugins/mention/mention.min, { deps: [ jquery ] } ]
+      - [ requireJs, modernizr, @FCom_Admin/theme1/assets/javascripts/plugins/modernizr/modernizr.min ]
+      - [ requireJs, mention, @FCom_Admin/theme1/assets/javascripts/plugins/mention/mention.min, { deps: [ jquery ] } ]
+      - [ requireJs, nestable, @FCom_Admin/theme1/assets/javascripts/plugins/nestable/jquery.nestable, { deps: [ jquery ] } ]
+      - [ requireJs, pwstrength, @FCom_Admin/theme1/assets/javascripts/plugins/nestable/jpwstrength, { deps: [ jquery ] } ]
+      - [ requireJs, retina, @FCom_Admin/theme1/assets/javascripts/plugins/retina/retina ]
+      - [ requireJs, select2, @FCom_Admin/theme1/assets/javascripts/plugins/select2/select2, { deps: [ jquery ] } ]
+      - [ requireJs, slidernav, @FCom_Admin/theme1/assets/javascripts/plugins/slider_nav/slidernav-min, { deps: [ jquery ] } ]
+      - [ requireJs, slimscroll, @FCom_Admin/theme1/assets/javascripts/plugins/slimscroll/jquery.slimscroll.min, { deps: [ jquery ] } ]
+      - [ requireJs, sparklines, @FCom_Admin/theme1/assets/javascripts/plugins/sparklines/jquery.sparkline.min, { deps: [ jquery ] } ]
+      - [ requireJs, tabdrop, @FCom_Admin/theme1/assets/javascripts/plugins/tabdrop/bootstrap-tabdrop, { deps: [ jquery ] } ]
+      - [ requireJs, timeago, @FCom_Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago, { deps: [ jquery ] } ]
+      - [ requireJs, typeahead, @FCom_Admin/theme1/assets/javascripts/plugins/typeahead/typeahead, { deps: [ jquery ] } ]
+      - [ requireJs, timeago, @FCom_Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.validate, @FCom_Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min, { deps: [ jquery ] } ]
+
+      - [ js, @FCom_Admin/theme1/assets/javascripts/jquery/jquery.min.js, { alias: jquery } ]
+      - [ requireJs, jquery-mobile, @FCom_Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min, { deps: [ jquery ] } ]
+      - [ requireJs, jquery-ui, @FCom_Admin/theme1/assets/javascripts/jquery/jquery-ui.min, { deps: [ jquery ] } ]
+      - [ requireJs, jquery-migrate, @FCom_Admin/theme1/assets/javascripts/jquery/jquery-migrate.min, { deps: [ jquery ] } ]
+      - [ requireJs, bootstrap, @FCom_Admin/theme1/assets/javascripts/bootstrap/bootstrap.min, { deps: [ jquery ] } ]
+
+      - [ requireJs, admin.theme, @FCom_Admin/theme1/assets/javascripts/theme, { deps: [ jquery, timeago ] } ]
+      - [ requireJs, admin.demo, @FCom_Admin/theme1/assets/javascripts/demo, { deps: [ jquery ] } ]
+
+      - [ requireRun, [ jquery-mobile, jquery-ui, jquery-migrate, bootstrap, admin.theme, admin.demo ] ]
 
 jqgrid:
   - view: head
@@ -191,7 +266,7 @@ form:
 
 /my_account:
     - { include: base }
-    - { hook: main, views: my_account }
+    - { hook: main, views: my_account, use_meta: true }
 
 /reports:
     - { include: base }

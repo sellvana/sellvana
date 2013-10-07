@@ -82,15 +82,15 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 
                      array('name' => 'description', 'label' => 'Description', 'width'=>250),
 
-                     array('name' => 'version', 'label' => 'Code Version', 'width'=>50),
+                     array('name' => 'version', 'label' => 'Code', 'width'=>50),
 
-                     array('name' => 'schema_version', 'label' => 'Schema Version', 'width'=>50,
+                     array('name' => 'schema_version', 'label' => 'Schema', 'width'=>50,
                         'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
 
-                     array('name' => 'run_status', 'label' => 'Run Status', 'options'=>$runStatusOptions, 'width' => 80,
+                     array('name' => 'run_status', 'label' => 'Status', 'options'=>$runStatusOptions, 'width' => 80,
                         'cell' => new BValue("FCom.Backgrid.RunStatusCell")),
 
-                     array('name' => 'run_level', 'label' => 'Run Level', 'options'=>$coreRunLevelOptions, 'width'=>100,
+                     array('name' => 'run_level', 'label' => 'Level', 'options'=>$coreRunLevelOptions, 'width'=>100,
                         'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
 
                      array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions,

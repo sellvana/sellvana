@@ -15,7 +15,7 @@ class FCom_Catalog_Migrate extends BClass
         ));
     }
 
-    public function install__0_2_2()
+    public function install__0_2_5()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -50,6 +50,7 @@ class FCom_Catalog_Migrate extends BClass
                 'images_data'   => 'TEXT',
                 'create_dt'     => 'DATETIME DEFAULT NULL',
                 'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'data_serialized' => 'mediumtext null',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -93,6 +94,7 @@ class FCom_Catalog_Migrate extends BClass
                 'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL',
                 'id_path'       => 'VARCHAR(50) NOT NULL',
+                'level'         => 'tinyint',
                 'sort_order'    => 'INT(10) UNSIGNED NOT NULL',
                 'node_name'     => 'VARCHAR(255) NOT NULL',
                 'full_name'     => 'VARCHAR(255) NOT NULL',
@@ -103,10 +105,11 @@ class FCom_Catalog_Migrate extends BClass
                 'num_products'  => 'INT(10) UNSIGNED DEFAULT NULL',
                 'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL',
                 'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+                'data_serialized' => 'mediumtext null',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
-                'id_path'       => 'UNIQUE (`id_path`)',
+                'id_path'       => 'UNIQUE (`id_path`, `level`)',
                 'full_name'     => 'UNIQUE (`full_name`)',
                 'parent_id'     => 'UNIQUE (`parent_id`,`node_name`)',
                 'is_top_menu'   => '(is_top_menu)',
@@ -160,6 +163,18 @@ class FCom_Catalog_Migrate extends BClass
             'COLUMNS' => array(
                   'create_dt'      => 'RENAME create_at DATETIME DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_4__0_2_5()
+    {
+        BDb::ddlTableDef(FCom_Catalog_Model_Category::table(), array(
+            'COLUMNS' => array(
+                'level' => 'tinyint null after id_path',
+            ),
+            'KEYS' => array(
+                'id_path' => 'UNIQUE (`id_path`, `level`)',
             ),
         ));
     }

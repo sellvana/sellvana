@@ -11,9 +11,9 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
     {
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
-        $this->view('customer/account')->customer = $customer;
+        $this->view('customer/account')->set('customer', $customer);
         $crumbs[] = array('label'=>'Account', 'active'=>true);
-        $this->view('breadcrumbs')->crumbs = $crumbs;
+        $this->view('breadcrumbs')->set('crumbs', $crumbs);
         $this->layout('/customer/account');
     }
 

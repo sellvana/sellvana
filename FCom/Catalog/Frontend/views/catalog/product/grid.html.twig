@@ -1,28 +1,70 @@
-{{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
+{% set addToCartUrl = THIS.url('cart/add') %}
 
 {% if not THIS.get('products_data').state.c %}
 
     <p class="note-msg">{{ "There are no products matching the selection." |_ }}</p>
 
 {% else %}
-    {{ THIS.view('catalog/compare/block') | raw }}
-    <div class="product-listing">
-        <ul>
-        {% for p in THIS.get('products') %}
-            <li class="item">
-                <img src="{{ p.thumbUrl(125, 125) }}" width="160" height="160" class="product-image" alt="{{ p.get('product_name') }}"/>
-                <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
-                <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
-                {{ '%s of 5' | _(p.get('avg_rating')) }}
-                {% if p.get('num_reviews') %}
-                    (<a href="{{ p.url(THIS.get('category')) }}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
+
+    <!--{{ THIS.view('catalog/compare/block') | raw }}-->
+
+    <!-- Category Products-->
+    <section id="category">
+       {{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
+       <!-- Category-->
+        <section id="categorygrid">
+
+          <ul class="thumbnails grid">
+{% for p in THIS.get('products') %}
+    {% set productName = p.get('product_name') %}
+    {% set productUrl = p.url(THIS.get('category')) %}
+            <li class="col-lg-4 col-sm-6">
+              <a class="prdocutname" href="product.html">{{ productName }}</a>
+              <div class="thumbnail">
+                {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                    <span class="sale tooltip-test">Sale</span>
+                    <!--<span class="offer tooltip-test">Offer</span>-->
                 {% endif %}
-                {{ THIS.view('catalog/product/price', {'prod': p}) | raw }}
-                <button class="button btn-add-to-cart" onclick="FCom.cart.add({{ p.id() }}, 1)"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
-                <p><label for="wishlist-{{ p.id() }}"><input type="checkbox" id="wishlist-{{ p.id() }}"/> {{ 'Wishlist' |_ }}</label></p>
-                <p><label for="compare-{{ p.id() }}"><input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{ p.id() }}" value="{{ p.id() }}"/> {{ 'Compare' |_ }}</label></p>
+                <a href="{{ productUrl }}"><img alt="{{ productName }}" src="{{ p.thumbUrl(260, 337) }}"></a>
+                <div class="shortlinks">
+                  <a class="details" href="{{ productUrl }}">DETAILS</a>
+                  <a class="wishlist" href="#">WISHLIST</a>
+                  <a class="compare" href="#">COMPARE</a>
+                </div>
+                <div class="pricetag">
+                  <span class="spiral"></span>
+
+                  <form class="form-inline" method="post" action="{{ addToCartUrl }}">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="qty" value="1">
+                    <button type="submit" name="id" value="{{ p.id() }}" class="productcart" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false">ADD TO CART</button>
+                  </form>
+
+                  <div class="price">
+                    {% if p.get('base_price') == 0 %}
+                        <div class="pricenew">FREE</div>
+                    {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                        <div class="priceold">{{ p.get('base_price') | currency }}</div>
+                        <div class="pricenew">{{ p.get('sale_price') | currency }}</div>
+                    {% else %}
+                        <span class="pricenew">{{ p.get('base_price') | currency }}</span>
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
             </li>
-        {% endfor %}
-        </ul>
-    </div>
+{% endfor %}
+          </ul>
+        </section>
+<!--
+<div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
+{{ '%s of 5' | _(p.get('avg_rating')) }}
+{% if p.get('num_reviews') %}
+    (<a href="{{ p.url(THIS.get('category')) }}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
+{% endif %}
+<button class="button btn-add-to-cart" onclick="FCom.cart.add({{ p.id() }}, 1)"><em class="icon"></em><span>{{ "Add to Cart" |_ }}</span></button>
+<p><label for="wishlist-{{ p.id() }}"><input type="checkbox" id="wishlist-{{ p.id() }}"/> {{ 'Wishlist' |_ }}</label></p>
+<p><label for="compare-{{ p.id() }}"><input type="checkbox" name="compare" class="compare-checkbox" id="compare-{{ p.id() }}" value="{{ p.id() }}"/> {{ 'Compare' |_ }}</label></p>
+-->
 {% endif %}

@@ -1,0 +1,138 @@
+<!--{ title: {{ 'My Account'|_ }} }-->
+
+{% set m = THIS.get('model') %}
+{% set userHlp = APP.instance('FCom_Admin_Model_User') %}
+
+<div class="row" id="content-wrapper">
+
+  <form class="form form-horizontal" method="post">
+
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="page-header with-breadcrumbs" data-spy="affix">
+            <div class="pull-left">
+              <h1>
+                <i class="icon-user"></i>
+                <span>{{ m.fullname() }}</span>
+              </h1>
+
+              <ul class="breadcrumb">
+                <li>
+                  <a href="{{ APP.href() }}">
+                    <i class="icon-home"></i>
+                  </a>
+                </li>
+                <li class="separator">
+                  <i class="icon-angle-right"></i>
+                </li>
+                <li class="active">{{ 'User profile' |_ }}</li>
+              </ul>
+            </div>
+            <div class="pull-right">
+              <div class="btn-toolbar">
+                <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="icon-save"></i>
+                  {{ 'Save' |_ }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-content">
+          <div class="row">
+
+            <div class="col-lg-6">
+              <fieldset>
+                <div class='lead'>
+                  <i class='icon-laptop text-contrast'></i>
+                  Account Information
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{ 'Username'|_ }}</label>
+                  <div class="col-md-7">
+                    <input class="form-control" id="username" placeholder="{{ 'Username'|_ }}" type="text" name="model[username]" value="{{ m.get('username') }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{ 'E-mail'|_ }}</label>
+                  <div class="col-md-7">
+                    <input class="form-control" id="email" placeholder="{{ 'E-mail'|_ }}" type="text" name="model[email]" value="{{ m.get('email') }}">
+                  </div>
+                  <div class="col-md-1">
+                    <img class="img-responsive" width="32" height="32" src="{{ m.thumb(32) }}" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="controls col-md-offset-3">
+                    <div class="checkbox">
+                      <label>
+                        <input data-target="#change-password" data-toggle="collapse" id="changepasswordcheck" type="checkbox" value="option1">
+                        {{ 'Change password?'|_ }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="collapse" id="change-password">
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'Password'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="password" placeholder="{{ 'Password'|_ }}" type="password" name="model[password]">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'Password confirmation'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="password-confirmation" placeholder="{{ 'Password confirmation'|_ }}" type="password" name="model[password_confirm]">
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+              <hr class="hr-normal">
+
+              <fieldset>
+                <div class="lead">
+                  <i class="icon-user text-contrast"></i>
+                  {{ 'Personal info'|_ }}
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{ 'First name'|_ }}</label>
+                  <div class="col-md-7">
+                    <input class="form-control" id="firstname" placeholder="First name" type="text" name="model[firstname]" value="{{ m.get('firstname') }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{ 'Last name'|_ }}</label>
+                  <div class="col-md-7">
+                    <input class="form-control" id="lastname" placeholder="Last name" type="text" name="model[lastname]" value="{{ m.get('lastname') }}">
+                  </div>
+                </div>
+                <hr class="hr-normal">
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{ 'Bio' |_ }}</label>
+                  <div class="col-md-7">
+                    <textarea class="autosize form-control" id="bio" placeholder="Bio"></textarea>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="lead">
+                  <i class="icon-bell text-contrast"></i>
+                  {{ 'Notifications Subscriptions'|_ }}
+                </div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+  </form>
+</div>

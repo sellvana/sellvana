@@ -46,16 +46,14 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         } else {
             $breadCrumbLabel = 'Billing address';
         }
-        $layout->view('breadcrumbs')->crumbs = array(
+        $layout->view('breadcrumbs')->set('crumbs', array(
             array('label'=>'Home', 'href'=>  BApp::baseUrl()),
             array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
-            array('label'=>$breadCrumbLabel, 'active'=>true));
+            array('label'=>$breadCrumbLabel, 'active'=>true)));
         if ($layout->view('geo/embed')) {
-            $layout->view('geo/embed')->countries = $countriesList;
+            $layout->view('geo/embed')->set('countries', $countriesList);
         }
-        $layout->view('checkout/address')->address = $address;
-        $layout->view('checkout/address')->address_type = $atype;
-        $layout->view('checkout/address')->countries = $countries;
+        $layout->view('checkout/address')->set(array('address' => $address, 'address_type' => $atype, 'countries' => $countries));
         $this->layout('/checkout/address');
     }
 

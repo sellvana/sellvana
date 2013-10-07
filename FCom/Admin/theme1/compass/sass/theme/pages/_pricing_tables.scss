@@ -1,0 +1,65 @@
+.pricing-tables {
+  .pricing-table {
+    border: 1px solid $white;
+    margin-bottom: 20px;
+    position: relative;
+    @include transition(opacity 100ms ease);
+
+    &.not-important {
+      @include opacity(.5);
+
+      &:hover {
+        @include opacity(1);
+      }
+
+      @media print {
+        @include opacity(1);
+      }
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px 0 50px 0;
+      font-size: 20px;
+      font-family: $headingsFontFamily;
+      background-color: $light;
+    }
+
+    .price {
+      @include size(30%, 60px);
+      line-height: 60px;
+      position: absolute;
+      top: 60px;
+      z-index: 900;
+      left: 50%;
+      display: block;
+      font-size: 25px;
+      text-align: center;
+      color: $white;
+      margin-left: -15%;
+      font-family: $headingsFontFamily;
+
+      span {
+        vertical-align: middle;
+      }
+    }
+
+    .features {
+      padding-top: 50px;
+      text-align: center;
+      margin-bottom: 0;
+      background-color: $white;
+
+      > li {
+        padding: 5px 0;
+        border-bottom: 1px solid lighten($light, 5%);
+      }
+    }
+
+    .footer {
+      text-align: center;
+      background-color: $light;
+      padding: 20px 0;
+    }
+  }
+}

@@ -48,4 +48,9 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         unset($item);
         return array('count' => sizeof($notifications), 'groups' => $result);
     }
+
+    public function getRecentActivity()
+    {
+        return array();
+    }
 }

@@ -1,0 +1,231 @@
+.btn {
+  &:focus {
+    outline: thin dotted #333;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  }
+}
+
+.btn-group.open .btn.dropdown-toggle, .btn {
+  background-color: whitesmoke;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken(whitesmoke, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: whitesmoke;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: whitesmoke;
+  }
+
+  &:hover {
+    background-color: darken(whitesmoke, 10%);
+  }
+
+  &.btn-white {
+    background-color: $white;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) !important;
+    @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+    &:active, &.active {
+      @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+      background-color: $white;
+    }
+
+    &:focus, &.disabled, &[disabled] {
+      background-color: $white;
+    }
+
+    &.disabled:hover, &[disabled]:hover {
+      background-color: $white;
+    }
+
+    &:hover {
+      background-color: darken($white, 10%);
+    }
+  }
+}
+
+a, a:hover, .btn-link, .btn-link:hover, .btn-link:focus {
+  color: $darkest;
+  text-shadow:none;
+  @include box-shadow(none);
+
+  &:active, &:hover {
+    @include box-shadow(none);
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: #e6e6e6;
+  }
+}
+
+.btn-link:focus, .btn-link, .btn-link:hover, .btn-link:active {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.btn-group.open .btn-primary.dropdown-toggle, .btn.btn-primary {
+  background-color: $blue;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken($blue, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: $blue;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: $blue;
+  }
+
+  &:hover {
+    background-color: darken($blue, 10%);
+  }
+}
+.btn-group.open .btn-warning.dropdown-toggle, .btn.btn-warning {
+  background-color: $orange;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken($orange, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: $orange;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: $orange;
+  }
+
+  &:hover {
+    background-color: darken($orange, 10%);
+  }
+}
+.btn-group.open .btn-danger.dropdown-toggle, .btn.btn-danger {
+  background-color: $red;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken($red, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: $red;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: $red;
+  }
+
+  &:hover {
+    background-color: darken($red, 10%);
+  }
+}
+.btn-group.open .btn-success.dropdown-toggle, .btn.btn-success {
+  background-color: $green;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken($green, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: $green;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: $green;
+  }
+
+  &:hover {
+    background-color: darken($green, 10%);
+  }
+}
+.btn-group.open .btn-info.dropdown-toggle, .btn.btn-info {
+  background-color: $purple;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken($purple, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: $purple;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: $purple;
+  }
+
+  &:hover {
+    background-color: darken($purple, 10%);
+  }
+}
+
+.btn-group.open .btn-inverse.dropdown-toggle, .btn.btn-inverse {
+  background-color: #363636;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  color: $white;
+  @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+  &:active, &.active {
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+    background-color: darken(#363636, 10%);
+  }
+
+  &:focus, &.disabled, &[disabled] {
+    background-color: #363636;
+  }
+
+  &.disabled:hover, &[disabled]:hover {
+    background-color: #363636;
+  }
+
+  &:hover {
+    background-color: darken(#363636, 10%);
+  }
+
+  .caret {
+    border-top-color: $white;
+  }
+}
+
+.dropup .btn-inverse .caret {
+  border-bottom-color: $white;
+}
+
+.btn-group.open .btn.dropdown-toggle {
+  @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.nav .caret, .nav a:hover .caret {
+  border-top-color: $contrast;
+  border-bottom-color: $contrast;
+}

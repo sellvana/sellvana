@@ -30,6 +30,7 @@ form label.required:after { color:#e32; content:' *'; display:inline; }
 
 .backgrid td, .backgrid td { max-width:100px !important; }
 .backgrid th { white-space: nowrap; }
-.backgrid th .drag-handle { visibility:hidden; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.backgrid th .drag-handle { visibility:hidden; float:right; margin:2px; }
+.backgrid th .drag-handle i { font-size:8pt; color:#AAA; }
 .backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
 .backgrid th .ui-resizable-handle { z-index:1000; right:0; width:5px; }

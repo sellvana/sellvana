@@ -1,0 +1,87 @@
+.timeline {
+  li {
+    position: relative;
+    border-left: 4px solid $timelineLine;
+    padding-bottom: 20px;
+
+    .date {
+      @include size(40px, 40px);
+      background-color: red;
+      text-align: center;
+      color: $white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-family: $headingsFontFamily;
+    }
+
+    &:first-child, &:last-child {
+      &:before {
+        content: "";
+        @include square(10px);
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -7px;
+        background-color: $timelineLine;
+      }
+    }
+
+    &:last-child {
+      &:before {
+        top: auto;
+        bottom: 0;
+      }
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    .content {
+      padding: 10px;
+      background-color: $timelineContentBackground;
+      border: 1px solid $timelineLine;
+      position: relative;
+      margin-top: 10px;
+      margin-left: 20px;
+      position: relative;
+    }
+
+    .icon {
+      @include square(40px);
+      text-align: center;
+      color: $timelineIconColor;
+      vertical-align: middle;
+      line-height: 40px;
+      font-size: 25px;
+      position: absolute;
+      top: 0;
+      left: 20px;
+
+      &:before {
+        content: "";
+        @include size(20px, 4px);
+        background-color: $timelineLine;
+        position: absolute;
+        vertical-align: middle;
+        top: 50%;
+        margin-top: -2px;
+        left: -20px;
+      }
+    }
+
+    .title {
+      font-family: $headingsFontFamily;
+      margin-left: 70px;
+      padding: 2px 0;
+      font-size: 16px;
+      
+      small {
+        font-family: $sansFontFamily;
+        display: block;
+        font-size: 10px;
+      }
+    }
+  }
+}

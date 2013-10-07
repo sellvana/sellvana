@@ -1,8 +1,13 @@
 {% set s = THIS.get('state') %}
 {% set url = REQUEST.currentUrl() %}
+{% set pageUrl = UTIL.setUrlQuery(url, {p:'-PAGE-'}) %}
+{% set showPageNums = 4 %}
+{% set showPageNumsHalf = (showPageNums/2)|floor %}
+{% set startPageList = (s.p-showPageNumsHalf)|min(s.mp-showPageNums)|max(1) %}
+{% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
 {% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'list' %}
 
-{% set psOptions = { 25:25, 50:50, 100:100, 500:500 } %}
+{% set psOptions = { 25:25, 50:50, 100:100 } %}
 {% set sortOptions = THIS.get("sort_options") %}
 {% if not sortOptions %}
     {% set sortOptions = {
@@ -15,45 +20,67 @@
     } %}
 {% endif %}
 
-<div class="pager-row">
-    <form id="product_list_pager" name="product_list_pager" autocomplete="off" method="get" action="">
-        {% if THIS.get('query') %}
-            <input type="hidden" name="q" value="{{ THIS.get('query') }}" />
-        {% endif %}
 
-        {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
+<!-- Sorting-->
+<form class="form-inline" method="get" action="{{ url }}">
+    <div class="well">
 
-        <div class="pager-count">
-            <strong class="count">{{ "Found: %s." | _(s.c ? s.c : 0) }}</strong>&nbsp;&nbsp;
-            <label>{{ "Page" |_ }}:</label>
-            {% if s.p > 1 %}
-                <a href="{{ UTIL.setUrlQuery(url, { p: s.p-1 }) }}" class="arrow-left"><big>&laquo;</big></a>
-            {% endif %}
-                <input type="text" name="p" value="{{ s.p }}" size="3"/>
-                <button type="button" class="button btn-aux" onclick="this.form.submit()"><span>{{ 'Go' |_ }}</span></button>
-                {{ 'of %s' | _(s.mp) }}
-            {% if s.p < s.mp %}
-                <a href="{{ UTIL.setUrlQuery(url, { p: s.p+1 }) }}" class="arrow-right"><big>&raquo;</big></a>
-            {% endif %}
+      <div class="row">
+        <div class="col-sm-5">
+            <ul class="pagination">
+                {% if s.p > 1 %}
+                  <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}">&lt;</a></li>
+                {% endif %}
+                {% if s.p > showPageNumsHalf+1 %}
+                  <li><a href="{{ pageUrl|replace({'-PAGE-':1}) }}">1</a></li>
+                {% endif %}
+                {% if s.p > showPageNumsHalf+2 %}
+                  <li><a href="#">...</a></li>
+                {% endif %}
+                {% for p in startPageList..endPageList %}
+                  <li {{ p == s.p ? 'class="active"' }}>
+                    <a href="{{ pageUrl|replace({'-PAGE-':p}) }}">{{ p }}</a>
+                  </li>
+                {% endfor %}
+                {% if s.p < s.mp-showPageNumsHalf-2 %}
+                  <li><a href="#">...</a></li>
+                {% endif %}
+                {% if s.p < s.mp-showPageNumsHalf-1 %}
+                  <li><a href="{{ pageUrl|replace({'-PAGE-':s.mp}) }}">{{ s.mp }}</a></li>
+                {% endif %}
+                {% if s.p < s.mp %}
+                  <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}">&gt;</a></li>
+                {% endif %}
+            </ul>
         </div>
-        <div class="pager-rows">
-            <label>{{ "Rows:" |_ }}</label>
+        <div class="col-sm-3">
+
+            <ul class="pagination pull-left">
+            {% for ps in psOptions %}
+                <li {{ ps == s.ps ? 'class="active"' }}>
+                    <a href="{{ UTIL.setUrlQuery(url, {ps:ps}) }}">{{ ps }}</a>
+                </li>
+            {% endfor %}
+            </ul>
+            <!--
             <select name="ps" onchange="this.form.submit()" class="select2">
                 {{ UTIL.optionsHtml(psOptions, s.ps) | raw }}
             </select>
+            -->
         </div>
-        <div class="pager-sort">
-            <label>{{ "Sort:" |_ }}</label>
-            <select name="sc" onchange="this.form.submit()" class="select2">
+        <div class="col-sm-2">
+            <select name="sc" onchange="this.form.submit()" class="select2 pull-left">
                 {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
             </select>
         </div>
-        <div class="pager-layout">
-            <span class="options-select">
-                <a href="{{ UTIL.setUrlQuery(url, { view: 'grid' }) }}" class="option grid {{ viewAs=='grid' ? 'active' : '' }}"><span class="icon"></span>{{ "View as Grid" |_ }}</a>
-                <a href="{{ UTIL.setUrlQuery(url, { view: 'list' }) }}" class="option list {{ viewAs=='list' ? 'active' : '' }}"><span class="icon"></span>{{ "View as List" |_ }}</a>
-            </span>
-        </div>
-    </form>
-</div>
+        {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
 
+        <div class="col-sm-2">
+          <div class="btn-group pull-right">
+            <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="btn {{ viewAs=='list'?'btn-orange':'btn-gray' }}"><i class="icon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
+            <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="btn {{ viewAs=='grid'?'btn-orange':'btn-gray' }}"><i class="icon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>
