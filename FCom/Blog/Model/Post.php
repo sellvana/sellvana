@@ -7,7 +7,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     static protected $_fieldOptions = array(
         'status' => array(
             'pending'  => 'Pending',
-            'publised' => 'Published',
+            'published' => 'Published',
         ),
     );
 
@@ -45,6 +45,12 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
             $this->author_user_id = FCom_Admin_Model_User::i()->sessionUserId();
         }
 
+        return true;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
         FCom_Blog_Model_PostTag::i()->delete_many(array('post_id' => $this->id));
         if ($this->tags) {
             $tagNames = preg_split('#[ ,;]+#', $this->tags);
@@ -59,8 +65,6 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
                 FCom_Blog_Model_PostTag::i()->create(array('post_id' => $this->id, 'tag_id' => $tagId))->save();
             }
         }
-
-        return true;
     }
 
     public function getUrl()
