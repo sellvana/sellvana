@@ -135,6 +135,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                     $runLevels = array(
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_FrontendThemeBlue' => 'REQUESTED',
+                        'FCom_FrontendTheme1' => 'REQUESTED',
                     );
                     break;
 
@@ -157,6 +158,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_FrontendCP' => 'REQUESTED',
                         'FCom_FrontendThemeBlue' => 'REQUESTED',
                         'FCom_FrontendThemeBootstrap' => 'REQUESTED',
+                        'FCom_FrontendTheme1' => 'REQUESTED',
                         'FCom_Geo' => 'REQUESTED',
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_MultiCurrency' => 'REQUESTED',
