@@ -59,7 +59,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         try {
             $w = BRequest::i()->post('w');
             BConfig::i()->add(array('db'=>$w['db']), true);
-            FCom_Core_Main::i()->writeDbConfig();
+            FCom_Core_Main::i()->writeConfigFiles('db');
 
             if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
                 && FCom_Admin_Model_User::i()->orm('u')->find_one()
