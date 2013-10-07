@@ -63,7 +63,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
                 if (!static::$_permissionsCache['*'][$uId]) {
                     $perms = $u->get('permissions_data');
                     if ($perms) {
-                        forach (array_flip(explode("\n", $perms)) as $p) {
+                        foreach (array_flip(explode("\n", $perms)) as $p) {
                             static::$_permissionsCache[$p][$uId] = 1;
                         }
                     }
