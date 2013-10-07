@@ -168,6 +168,16 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
             break;
 
+        case 'grid.state':
+            if (empty($r['grid'])) {
+                break;
+            }
+            if (!empty($r['s']) && empty($r['sd'])) {
+                $r['sd'] = 'asc';
+            }
+            $data = array('grid' => array($r['grid'] => BUtil::arrayMask($r, 'p,ps,s,sd,q')));
+            break;
+
         case 'settings.tabs.order':
             break;
 
