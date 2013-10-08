@@ -6,7 +6,9 @@
     <body class="{{ THIS.getBodyClass() }}">
         {{ THIS.hook('body_start') | raw }}
         {{ THIS.hook('header') | raw }}
-        {{ THIS.hook('main') | raw }}
+        <div id="maincontainer">
+            {{ THIS.hook('main') | raw }}
+        </div>
         {{ THIS.hook('footer') | raw }}
         {{ THIS.hook('before_body_end') | raw }}
     </body>

@@ -82,7 +82,7 @@
                     <col>
                     <col width="180">
                     </colgroup><tbody>
-{{ THIS.view('catalog/product/rows').set('products', APP.instance('FCom_Catalog_Model_ProductLink').productsByType(prod.id(), 'similar')) }}
+{{ THIS.view('catalog/product/list-rows').set('products', APP.instance('FCom_Catalog_Model_ProductLink').productsByType(prod.id(), 'similar')) }}
                     </tbody>
                 </table>
             </div>
@@ -94,7 +94,7 @@
                     <col>
                     <col width="180">
                     </colgroup><tbody>
-{{ THIS.view('catalog/product/rows').set('products', APP.instance('FCom_Catalog_Model_Product').orm().offset(30).limit(10).find_many()) }}
+{{ THIS.view('catalog/product/list-rows').set('products', APP.instance('FCom_Catalog_Model_Product').orm().offset(30).limit(10).find_many()) }}
                     </tbody>
                 </table>
             </div>
