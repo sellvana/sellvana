@@ -57,7 +57,37 @@
         });
     })
 
-%form#settings-form(action="#{$formUrl}" method="post")
+%form#settings-form.form.form-horizontal(action="#{$formUrl}" method="post")
+    .row.fcom-admin-main-title
+        .col-sm-12
+            .page-header
+                %h1.pull-left
+                    %i.icon-cog
+                    %span = $this->_('Settings')
+                .pull-right
+                    .btn-group
+                        %button.btn(type="submit" onclick="return adminForm.saveAll(this)") = $this->_('Save All')
+
+    .row
+        .col-sm-12.fcom-admin-main-container
+            .fcom-admin-main-content
+                %ul.nav.nav-tabs
+                    - foreach ($this->tab_groups as $gk => $group)
+                        %li.dropdown
+                            %a.dropdown-toggle(href="#" data-toggle="dropdown") = $group['label']
+                            %ul.dropdown-menu(a="a" #{!empty($group['open']) ? '' : 'hidden'})
+                                - foreach ($group['tabs'] as $k => $tab)
+                                    - if (empty($tab['disabled']))
+                                        %li(id="settings-tab-#{$k}")
+                                            %a.js-form-tab-toggle(href="#tab-#{$k}" data-toggle="tab")
+                                                %span.icon
+                                                = $tab['label']
+                .tab-content
+                    - foreach ($this->tabs as $k=>$tab)
+                        .tab-pane(id="tab-#{$k}" #{empty($tab['async']) ? 'data-loaded="true"' : ''})
+                            - if (empty($tab['async']))
+                                - echo $this->view($tab['view'])
+-#%form#settings-form.form.form-horizontal(action="#{$formUrl}" method="post")
     %input#current_tab(type="hidden" name="current_tab" value="FCom_Admin")
 
     %header.fcom-admin-main-title
