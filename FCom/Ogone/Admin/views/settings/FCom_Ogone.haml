@@ -1,34 +1,33 @@
 - $c = $this->model
 
-%fieldset
-    .settings-container
-        .group
-            %h3
-                %a(href="#") = $this->_('Ogone API')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Test/Live Mode')
-                        %td
-                            %select(name="config[modules][FCom_Ogone][mode]")
-                                - echo BUtil::optionsHtml(array(0=>'Test', 1=>'Live'), $c->get('modules/FCom_Ogone/mode'))
-                    %tr
-                        %td = $this->_('PSPID')
-                        %td
-                            %input(type="text" name="config[modules][FCom_Ogone][pspid]"
-                                value="#{ $c->get('modules/FCom_Ogone/pspid') }")
-                    %tr
-                        %td = $this->_('Feedback Message')
-                        %td
-                            %input(type="text" name="config[modules][FCom_Ogone][feedback_message]"
-                                value="#{ $c->get('modules/FCom_Ogone/feedback_message') }")
-        .group
-            %h3
-                %a(href="#") = $this->_('Owner Information')
-            %div
-                %table
-                    %tr
-                        %td = $this->_('Address')
-                        %td
-                            %input(type="text" name="config[modules][FCom_Ogone][owner_address]"
-                                value="#{ $c->get('modules/FCom_Ogone/owner_address') }")
+.accordion.accordion-blue.panel-group#settings-FCom_Ogone
+    .panel.panel-default
+        .panel-heading
+            %a.accordion-toggle = $this->_('Ogone API')
+        .panel-collapse.collapse.in#settings-FCom_Ogone-group0
+            .panel-body
+                .form-group
+                    %label.col-md-2.control-label = $this->_('Test/Live Mode')
+                    .col-md-5
+                        %select.form-control(name="config[modules][FCom_Ogone][mode]")
+                            - echo BUtil::optionsHtml(array(0=>'Test', 1=>'Live'), $c->get('modules/FCom_Ogone/mode'))
+                .form-group
+                    %label.col-md-2.control-label = $this->_('PSPID')
+                    .col-md-5
+                        %input.form-control(type="text" name="config[modules][FCom_Ogone][pspid]"
+                            value="#{ $c->get('modules/FCom_Ogone/pspid') }")
+                .form-group
+                    %label.col-md-2.control-label = $this->_('Feedback Message')
+                    .col-md-5
+                        %input.form-control(type="text" name="config[modules][FCom_Ogone][feedback_message]"
+                            value="#{ $c->get('modules/FCom_Ogone/feedback_message') }")
+    .panel.panel-default
+        .panel-heading
+            %a.accordion-toggle = $this->_('Owner Information')
+        .panel-collapse.collapse.in#settings-FCom_Ogone-group1
+            .panel-body
+                .form-group
+                    %label.col-md-2.control-label = $this->_('Address')
+                    .col-md-5
+                        %input.form-control(type="text" name="config[modules][FCom_Ogone][owner_address]"
+                            value="#{ $c->get('modules/FCom_Ogone/owner_address') }")
