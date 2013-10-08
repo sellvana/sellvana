@@ -23,7 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:product', array('product'=>&$product));
         BApp::i()->set('current_product', $product);
 
-        $layout->view('catalog/product')->set('product', $product);
+        $layout->view('catalog/product/details')->set('product', $product);
 
         if ($r) {
             $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
@@ -34,7 +34,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
             BApp::i()->set('current_category', $category);
 
-            $layout->view('catalog/product')->set('category', $category);
+            $layout->view('catalog/product/details')->set('category', $category);
             $layout->view('head')->canonical($product->url());
             foreach ($category->ascendants() as $c) {
                 if ($c->get('node_name')) {
@@ -51,7 +51,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         if (Bapp::m('FCom_Customer')) {
             $user = FCom_Customer_Model_Customer::i()->sessionUser();
         }
-        $layout->view('catalog/product')->set('user', $user);
+        $layout->view('catalog/product/details')->set('user', $user);
 
         $this->layout('/catalog/product');
     }

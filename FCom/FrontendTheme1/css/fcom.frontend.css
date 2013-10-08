@@ -33,3 +33,4 @@ color: #; vertical-align: top; padding: 5px 10px; border-bottom: 1px dashed #E7E
 .productcart { border:none; }
 
 .pagination > li > a, .pagination > li > span { padding: 4px 8px;}
+.list { display:block; }
