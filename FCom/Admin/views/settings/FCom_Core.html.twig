@@ -35,7 +35,7 @@
                     <label class="col-md-2 control-label">{{ "Enable Logging"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[db][logging]">
-                            {{ APP.instance("BUtil").optionsHtml({0:'No', 1:'Yes'}, c.get('db/logging'))|raw }}
+                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get('db/logging'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                     <label class="col-md-2 control-label">{{ "Session Handler"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[cookie][session_handler]">
-                            {{ APP.instance("BUtil").optionsHtml(APP.instance("BSession").i().getHandlers(), c.get('cookie/session_handler'))|raw }}
+                            {{ UTIL.optionsHtml(SESSION.getHandlers(), c.get('cookie/session_handler'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                     <label class="col-md-2 control-label">{{ "Verify Session IP"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[cookie][session_check_ip]">
-                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('cookie/session_check_ip'))|raw }}
+                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('cookie/session_check_ip'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                     <label class="col-md-2 control-label">{{ "Hide script file name in URL"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[web][hide_script_name]">
-                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('web/hide_script_name'))|raw }}
+                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('web/hide_script_name'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                     <label class="col-md-2 control-label">{{ "Check Method"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[web][csrf_check_method]">
-                            {{ APP.instance("BUtil").optionsHtml({'referrer':'Referrer', 'token':'Token'}, c.get('web/csrf_check_method'))|raw }}
+                            {{ UTIL.optionsHtml({'referrer':'Referrer', 'token':'Token'}, c.get('web/csrf_check_method'))|raw }}
                         </select>
                     </div>
                 </div>

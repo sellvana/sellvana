@@ -1,4 +1,4 @@
-{% set formUrl = APP.instance("BApp").href("settings") %}
+{% set formUrl = APP.href("settings") %}
 
 <script type="text/javascript">
     require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin'], function($) {
@@ -12,7 +12,7 @@
 
                 return; //TODO: figure out whether to personalize settings items order
 
-                var url = '{{ APP.instance("BApp").href("my_account/personalize") }}';
+                var url = '{{ APP.href("my_account/personalize") }}';
 
                 switch (type) {
                     case 'tabs':

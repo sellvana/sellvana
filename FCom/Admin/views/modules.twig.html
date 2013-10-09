@@ -12,7 +12,7 @@
 
 <script>
     function runMigrationScripts() {
-        $('#form-modules').attr('action', '#{BApp::href('modules/migrate')}').submit();
+        $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
     }
 
     require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
