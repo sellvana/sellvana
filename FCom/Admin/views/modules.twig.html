@@ -1,0 +1,103 @@
+<style>
+    tr.module-disabled td { background:#DDD !important; }
+    tr.module-requested {}
+
+    td.run-level-DISABLED, option[value="DISABLED"] { background:#CCC !important; }
+    td.run-level-REQUESTED, option[value="REQUESTED"] { background:#CFC !important; }
+    td.run-level-REQUIRED, option[value="REQUIRED"] { background:#FFC !important; }
+    td.run-status-LOADED { background:#CFC !important; }
+    td.run-status-ERROR { background:#FCC !important; }
+    td.schema-migration-available { background:#FCC !important; }
+</style>
+
+<script>
+    function runMigrationScripts() {
+        $('#form-modules').attr('action', '#{BApp::href('modules/migrate')}').submit();
+    }
+
+    require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
+        FCom.ModuleModel = Backbone.Model.extend({
+            save: function(attributes, options) {
+                var data = {
+                    module_name: this.attributes.name,
+                    run_level_core: this.attributes.run_level_core,
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                };
+                $.post("#{$this->form_url}", data, function(response, status, xhr) {
+                    $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+                });
+            }
+        });
+
+        FCom.Backgrid.RunLevelCell = Backgrid.Cell.extend({
+            render: function() {
+                var val = this.model.get(this.column.get("name"));
+                this.$el.addClass('run-level-' + val);
+                return Backgrid.Cell.prototype.render.apply(this, arguments);
+            }
+        });
+        FCom.Backgrid.RunStatusCell = Backgrid.Cell.extend({
+            render: function() {
+                var val = this.model.get(this.column.get("name"));
+                this.$el.addClass('run-status-' + val);
+                return Backgrid.Cell.prototype.render.apply(this, arguments);
+            }
+        });
+        FCom.Backgrid.SchemaVersionCell = Backgrid.Cell.extend({
+            render: function() {
+                var val = this.model.get(this.column.get("name"));
+                if (this.model.get('migration_available') && val != this.model.get('version')) {
+                    this.$el.addClass('schema-migration-available');
+                }
+                return Backgrid.Cell.prototype.render.apply(this, arguments);
+            }
+        });
+
+        FCom.Backgrid.RunLevelSelectCellEditor = Backgrid.SelectCellEditor.extend({
+            save: function(e) {
+                Backgrid.SelectCellEditor.prototype.save.apply(this, arguments);
+                this.model.save();
+            }
+        });
+
+        FCom.Backgrid.RunLevelSelectCell = Backgrid.SelectCell.extend({
+            initialize: function(options) {
+                var optionValues = [];
+                _.each(options.column.attributes.options, function(v, k) {
+                    optionValues.push([v, k]);
+                })
+                this.optionValues = optionValues;
+                if (this.options.model.get('auto_run_level')) {
+                    this.editable = false;
+                }
+                return Backgrid.SelectCell.prototype.initialize.apply(this, arguments);
+            },
+
+            editor: FCom.Backgrid.RunLevelSelectCellEditor,
+
+            render: function() {
+                var val = this.model.get(this.column.get("name"));
+                if (val==='AUTO') {
+                    return Backgrid.Cell.prototype.render.apply(this, arguments);
+                }
+                this.$el.removeClass('run-level-DISABLED run-level-REQUESTED runl-level-DISABLED')
+                this.$el.addClass('run-level-' + val);
+                return Backgrid.SelectCell.prototype.render.apply(this, arguments);
+            }
+        })
+
+    });
+</script>
+
+<form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
+    <header class="fcom-admin-main-title">
+        <span class="title">{{ 'Modules'|_ }}</span>
+        <div class="btn-group">
+            <button class="btn btn-success" type="button" onclick="location.href='{{APP.href('modules/market')}}'"><span>{{ 'Download new Modules'|_ }}</span></button>
+            <button class="btn btn-primary" type="button" onclick="return runMigrationScripts()'"><span>{{ 'Run Migration Scripts'|_ }}</span></button>
+        </div>
+    </header>
+    {{ THIS.view('core/messages') | raw }}
+    {{ THIS.view('core/backgrid') | raw }}
+</form>
+

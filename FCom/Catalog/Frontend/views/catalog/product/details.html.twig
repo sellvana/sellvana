@@ -4,7 +4,7 @@
 
 <section id="product">
     <div class="container">
-        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="return false;" >
+        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="" >
             <input type="hidden" name="id" value="{{ prod.id() }}">
             <input type="hidden" name="action" value="add">
             <!-- Product Details-->
@@ -65,7 +65,7 @@
                             <div class="productprice">
 
                                 {% if prod.get('base_price') == 0 %}
-                                    <div class="productpageprice"><span class="spiral"></span>FREE</div>
+                                    <div class="productpageprice"><span class="spiral"></span>{{ 'FREE'|_ }}</div>
                                 {% elseif prod.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
                                     <div class="productpageprice"><span class="spiral"></span>{{ prod.get('sale_price') | currency }}</div>
                                     <div class="productpageoldprice">{{ prod.get('base_price') | currency }}</div>
@@ -115,7 +115,7 @@
                                 </div>
                             </div>
                             <ul class="productpagecart">
-                                <li><a class="cart" href="#">Add to Cart</a>
+                                <li><button type="submit" class="cart">Add to Cart</button>
                                 </li>
                                 <li><a class="wish" href="#" >Add to Wishlist</a>
                                 </li>

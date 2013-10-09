@@ -19,9 +19,7 @@
             </section>
         </div>
     {% else %}
-        <div class="fcom-admin-container" id="root-layout">
-            {{ THIS.hook('main') | raw }}
-        </div>
+        {{ THIS.hook('main') | raw }}
     {% endif %}
 
     {{ THIS.hook('before_body_end') | raw }}

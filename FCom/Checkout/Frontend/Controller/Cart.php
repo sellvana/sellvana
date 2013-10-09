@@ -44,7 +44,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     $cart->save();
                 }
                 $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-                // todo add success message
+                BSession::i()->addMessage('The product has been added to your cart', 'success', 'frontend');
                 break;
             }
         } else {
@@ -71,6 +71,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 BSession::i()->data('shipping_estimate', $estimate);
             }
             $cart->calculateTotals()->save();
+            BSession::i()->addMessage('Your cart has been updated', 'success', 'frontend');
         }
         BResponse::i()->redirect($cartHref);
     }

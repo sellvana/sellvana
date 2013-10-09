@@ -23,12 +23,12 @@
           <form class="form-inline" method="post" action="{{ addToCartUrl }}">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="qty" value="1">
-            <button type="submit" name="id" value="{{ p.id() }}" class="productcart" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false">ADD TO CART</button>
+            <button type="submit" name="id" value="{{ p.id() }}" class="productcart" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false">{{ 'ADD TO CART'|_ }}</button>
           </form>
 
           <div class="price">
             {% if p.get('base_price') == 0 %}
-                <div class="pricenew">FREE</div>
+                <div class="pricenew">{{ 'FREE'|_ }}</div>
             {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
                 <div class="priceold">{{ p.get('base_price') | currency }}</div>
                 <div class="pricenew">{{ p.get('sale_price') | currency }}</div>
