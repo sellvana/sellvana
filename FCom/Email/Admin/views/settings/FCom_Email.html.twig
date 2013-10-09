@@ -23,7 +23,7 @@
                     <label class="col-md-2 control-label">{{ 'Default Handler'|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Email][default_handler]">
-                            {{ APP.instance('BUtil').optionsHtml(APP.instance('BUtil').arrayToOptions(APP.instance('BEmail').i().getHandlers(), 'description'), c.get('modules/FCom_Email/default_handler'))|raw }}
+                            {{ UTIL.optionsHtml(UTIL.arrayToOptions(APP.instance('BEmail').getHandlers(), 'description'), c.get('modules/FCom_Email/default_handler'))|raw }}
                         </select>
                     </div>
                 </div>

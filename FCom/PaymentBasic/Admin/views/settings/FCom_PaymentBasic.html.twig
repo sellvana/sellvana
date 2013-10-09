@@ -23,7 +23,7 @@
                     <label class="col-md-2 control-label">{{ 'Custom Order Status On Payment'|_ }}</label>
                     <div class="col-md-5">
                         <select nname="config[modules][FCom_PaymentBasic][order_status_authorized">
-                            {{ APP.instance('BUtil').optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_PaymentBasic/order_status_authorized')) }}
+                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_PaymentBasic/order_status_authorized')) }}
                         </select>
                     </div>
                 </div>
