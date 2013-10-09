@@ -4,6 +4,7 @@ base:
   - { hook: header, views: admin/header }
   - { hook: top-nav, views: admin/nav }
   - { hook: before_body_end, views: bottom_scripts }
+  - { view: core/messages, set: { namespace: admin } }
 
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
   - { callback: FCom_Admin_Admin::layout }
@@ -251,16 +252,19 @@ form:
 /login:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: login }
 
 /password/recover:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: password/recover }
 
 /password/reset:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: password/reset }
 
 

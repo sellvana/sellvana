@@ -2,5 +2,5 @@
     %span.title = $this->title
     .btn-group
         - echo join(' ', (array)$this->actions)
-- echo $this->messagesHtml('admin')
+- echo $this->view('core/messages')
 - echo $this->view('core/backgrid')
