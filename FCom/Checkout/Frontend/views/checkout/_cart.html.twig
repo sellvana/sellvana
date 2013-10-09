@@ -1,0 +1,120 @@
+
+    <div class="col-cart-left">
+        <header class="page-title">
+            <h1 class="title">{{ "Shopping Cart" |_ }}</h1>
+        </header>
+        <form name="cart" action="{{ APP.href('cart/add') }}" method="post">
+            <table class="table">
+                <col width="30"/>
+                <col width="60"/>
+                <col/>
+                <col width="120"/>
+                <col width="80"/>
+                <col width="120"/>
+                <thead>
+                    <tr>
+                        <th class="text-center">{{ 'Remove' |_ }}</th>
+                        <th colspan="2" class="text-left">{{ "Product" |_ }}</th>
+                        <th class="text-right">{{ "Price" |_ }}</th>
+                        <th class="text-center">{{ "Qty" |_ }}</th>
+                        <th class="text-right">{{ "Subtotal" |_ }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in cartItems %}
+                    {% set p = item.product() %}
+                    {% if p %}
+                        <tr id="tr-product-{{ p.id }}">
+                            <td class="text-center"><label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="{{ item.id }}"></label></td>
+                            <td>
+                                <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" class="product-image" alt="{{ p.product_name }}"/>
+                            </td>
+                            <td>
+                                <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.product_name }}</a></span>
+                            </td>
+                            <td class="text-right">
+                                <div class="price-box {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+                                    <div class=""><span class="price">{{ p.base_price | currency }}</span></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <input type="text" size="3" name="qty[{{ item.id }}]" class="qty" value="{{ item.qty*1 }}"/>
+                            </td>
+                            <td class="text-right">
+                                <div class="price-box">
+                                    <div class=""><span class="price">{{ item.rowTotal() | currency }}</span></div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button type="submit" class="btn">{{ "Update Cart" |_ }}</button></td>
+                    <td class="text-right"><span class="cart-subtotal">{{ cart.get('subtotal') | currency }}</span></td>
+                </tfoot>
+            </table>
+        </form>
+        <section class="row">
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6 control-group form-inline">
+                <label for="" class="control-label">{{ "Promo Code" |_ }}</label>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
+                <div class="controls">
+                  <input type="text"/>
+                  <button class="btn">{{ "Submit" |_ }}</button>
+                </div>
+            </form>
+            <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6">
+                <header>{{ "Shipping Estimate" |_ }}</header>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
+                {% if (shipping_estimates) %}
+                    <ul class="shipping-estimates">
+                        {% for estimate in shipping_estimates %}
+                            <li>{{ estimate.description }} ({{ estimate.estimate | currency }})</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <div class="control-group>
+                  <label for="" class="control-label">{{ "Post code" |_ }}</label>
+                  <div class="controls">
+                    <input type="text" size="4" name="postcode" value=""/>
+                    <button type="submit" class="btn">{{ "Submit" |_ }}</button>
+                  </div>
+            </form>
+        </section>
+        {{ THIS.hook('promotions') | raw }}
+    </div>
+    <div class="col-cart-right">
+        <div class="cart-totals">
+            <table>
+                {% for total in cart.getTotals() %}
+                    {% if not total.isHidden() %}
+                        <tr class="{{ total.getRowClass() }}">
+                            <td>{{ total.getLabelFormatted() }}</td>
+                            <td>{{ total.getValueFormatted() }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+        <ul class="checkout-btns">
+            {% for checkout in checkout_methods %}
+                {% set button = checkout.getCartCheckoutButton() %}
+                {% if button %}
+                    <li>
+                        {% if button.html %}
+                            {{ button.html | raw }}
+                        {% else %}
+                            <a href="{{ button.href }}" class="button btn-sz2"><span>{{ button.label |_ }}</span></a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+    <br/><br/>

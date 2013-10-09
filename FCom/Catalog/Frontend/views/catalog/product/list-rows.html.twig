@@ -31,7 +31,7 @@
 
               <div class="price">
                 {% if p.get('base_price') == 0 %}
-                    <div class="pricenew">FREE</div>
+                    <div class="pricenew">{{ 'FREE'|_ }}</div>
                 {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
                     <div class="priceold">{{ p.get('base_price') | currency }}</div>
                     <div class="pricenew">{{ p.get('sale_price') | currency }}</div>

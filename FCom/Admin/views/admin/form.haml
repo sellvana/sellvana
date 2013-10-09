@@ -37,7 +37,7 @@
         .btn-group
             - echo join(' ', (array)$this->actions)
 
-    - echo $this->messagesHtml('admin')
+    - echo $this->view('core/alerts')
     .fcom-admin-main-container.fcom-admin-sidebar-view
         .fcom-admin-main-content.tab-content
             - foreach ($tabs as $k=>$tab)

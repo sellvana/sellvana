@@ -34,3 +34,10 @@ color: #; vertical-align: top; padding: 5px 10px; border-bottom: 1px dashed #E7E
 
 .pagination > li > a, .pagination > li > span { padding: 4px 8px;}
 .list { display:block; }
+
+
+.productpagecart button { background:#F25C27 url(../img/productpageicon.png) no-repeat 0 0; color:#fff; padding:15px 15px 15px 60px; font-size:18px; border:0; }
+.productpagecart li button.cart { background-position:10px 12px }
+.productpagecart li button.wish { background-position:10px -51px }
+.productpagecart li button.comare { background-position:10px -126px }
+.productpagecart li button:hover { background-color: #d8420e }
