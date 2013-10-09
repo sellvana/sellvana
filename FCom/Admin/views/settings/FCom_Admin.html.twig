@@ -11,7 +11,7 @@
                     <label class="col-md-2 control-label" for="input-theme-selection">{{ "Theme"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Admin][theme]" id="input-theme-selection">
-                            {{ APP.instance("BUtil").optionsHtml(APP.instance("BLayout").i.getThemes("FCom_Admin", true), c.get('modules/FCom_Admin/theme'))|raw }}
+                            {{ AUTIL.optionsHtml(LAYOUT.getThemes("FCom_Admin", true), c.get('modules/FCom_Admin/theme'))|raw }}
                         </select>
                     </div>
                 </div>

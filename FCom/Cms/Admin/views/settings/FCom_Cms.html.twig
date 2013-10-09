@@ -11,7 +11,7 @@
                     <label class="col-md-2 control-label">{{ 'Enable CMS Pages'|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Cms][page_enable]">
-                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/page_enable'))|raw }}
+                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/page_enable'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
                     <label class="col-md-2 control-label">{{ 'Enable CMS Nav'|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Cms][nav_enable]">
-                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/nav_enable'))|raw }}
+                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/nav_enable'))|raw }}
                         </select>
                     </div>
                 </div>

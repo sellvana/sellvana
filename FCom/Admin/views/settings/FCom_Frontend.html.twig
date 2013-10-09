@@ -11,7 +11,7 @@
                     <label class="col-md-2 control-label">{{ "Theme"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Frontend][theme]">
-                            {{ APP.instance("BUtil").optionsHtml(APP.instance("BLayout").i().getThemes('FCom_Frontend', true), c.get('modules/FCom_Frontend/theme'))|raw }}
+                            {{ UTIL.optionsHtml(LAYOUT.getThemes('FCom_Frontend', true), c.get('modules/FCom_Frontend/theme'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     <label class="col-md-2 control-label">{{ "Select top menu"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Frontend][nav_top][type]">
-                            {{ APP.instance("BUtil").optionsHtml({'':'Select an option', 'cms':'CMS menu', 'categories_root':'Categories menu by root id', 'categories_custom':'Categories menu by custom selection'}, c.get('modules/FCom_Frontend/nav_top/type'))|raw }}
+                            {{ UTIL.optionsHtml({'':'Select an option', 'cms':'CMS menu', 'categories_root':'Categories menu by root id', 'categories_custom':'Categories menu by custom selection'}, c.get('modules/FCom_Frontend/nav_top/type'))|raw }}
                         </select>
                     </div>
                 </div>
