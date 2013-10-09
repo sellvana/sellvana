@@ -1,6 +1,6 @@
 define(["jquery", "backbone", "backbone-pageable", "backbone.modelbinder", "lunr", "transparency",
     "backgrid", "backgrid-filter", "backgrid-select-all",
-    "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell"],
+    "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell", "jquery.widgets"],
 
 function($, Backbone, PageableCollection) {
     /*
