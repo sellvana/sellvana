@@ -1,0 +1,159 @@
+{% set c = THIS.model %}
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_Core">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "DB Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse" id="settings-FCom_Core-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Host"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[db][host]" value="{{ c.get('db/host') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "DB Name"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[db][dbname]" value="{{ c.get('db/dbname') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "User"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[db][username]" value="{{ c.get('db/username') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Password"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="password" name="config[db][password]" placeholder="*****" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Enable Logging"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[db][logging]">
+                            {{ APP.instance("BUtil").optionsHtml({0:'No', 1:'Yes'}, c.get('db/logging'))|raw }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Website"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-FCom_Core-group1">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Store Name"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Core][store_name]" value="{{ c.get('modules/FCom_Core/store_name') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Admin Email"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Core][admin_email]" value="{{ c.get('modules/FCom_Core/admin_email') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Copyright Message"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Core][copyright]" value="{{ c.get('modules/FCom_Core/copyright') }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Session"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-FCom_Core-group2">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Session Handler"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[cookie][session_handler]">
+                            {{ APP.instance("BUtil").optionsHtml(APP.instance("BSession").i().getHandlers(), c.get('cookie/session_handler'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Cookie Timeout"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[cookie][timeout]" value="{{ c.get('cookie/timeout') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Cookie Domain"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[cookie][domain]" value="{{ c.get('cookie/domain') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Cookie Path"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[cookie][path]" value="{{ c.get('cookie/path') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Session Namespace"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[cookie][session_namespace]" value="{{ c.get('cookie/session_namespace') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Verify Session IP"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[cookie][session_check_ip]">
+                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('cookie/session_check_ip'))|raw }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "System"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-FCom_Core-group3">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Hide script file name in URL"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[web][hide_script_name]">
+                            {{ APP.instance("BUtil").optionsHtml({0:'No',1:'Yes'}, c.get('web/hide_script_name'))|raw }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "CSRF Protection"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-FCom_Core-group4">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Check Method"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[web][csrf_check_method]">
+                            {{ APP.instance("BUtil").optionsHtml({'referrer':'Referrer', 'token':'Token'}, c.get('web/csrf_check_method'))|raw }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
