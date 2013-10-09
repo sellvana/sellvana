@@ -1,5 +1,6 @@
 base:
     - { hook: head, views: head }
+    - { view: core/messages, set: { namespace: install } }
 
     - { callback: FCom_Core_Main::defaultThemeCustomLayout }
     - { include: common_js_libs }
