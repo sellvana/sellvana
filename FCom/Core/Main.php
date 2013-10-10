@@ -64,9 +64,10 @@ class FCom_Core_Main extends BClass
         $baseHref = $config->get('web/base_href');
         $baseSrc = $config->get('web/base_src');
         $baseStore = $config->get('web/base_store');
+
         if (!$baseHref) {
             $baseHref = $webRoot;
-        } elseif (!BUtil::isPathAbsolute($baseSrc)) {
+        } elseif (!BUtil::isPathAbsolute($baseHref)) {
             $baseHref = $webRoot.'/'.$baseHref;
         }
         if (!$baseSrc) {
@@ -76,7 +77,7 @@ class FCom_Core_Main extends BClass
         }
         if (!$baseStore) {
             $baseStore = $baseHref;
-        } elseif (!BUtil::isPathAbsolute($baseSrc)) {
+        } elseif (!BUtil::isPathAbsolute($baseStore)) {
             $baseStore = $webRoot.'/'.$baseStore;
         }
         $localConfig['web']['base_href'] = $baseHref;
