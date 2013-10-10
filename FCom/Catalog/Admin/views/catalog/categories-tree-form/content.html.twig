@@ -1,24 +1,14 @@
 {% set m = THIS.get('model') %}
-<fieldset class="form-horizontal">
-  <div class="control-group">
-    <label class="control-label" for="main-content">{{ 'Content'|_ }}</label>
-    <div class="controls">
-      <textarea id="main-content" name="model[content]">{{ m.get('content') }}</textarea>
+
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-content">{{ 'Content'|_ }}</label>
+    <div class="col-md-5">
+        <textarea id="main-content" class="form-control" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="main-layout_update">{{ 'Layout Update'|_ }}</label>
-    <div class="controls">
-      <textarea id="main-layout_update" name="model[layout_update]" style="width:90%; height:100px">{{ m.get('layout_update') }}</textarea>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-layout_update">{{ 'Layout Update'|_ }}</label>
+    <div class="col-md-5">
+        <textarea id="main-layout_update" class="form-control" rows="5" name="model[layout_update]">{{ m.get('layout_update') }}</textarea>
     </div>
-  </div>
-</fieldset>
-<script>
-    require(['jquery', 'ckeditor'], function($) {
-        $(function() {
-            var ck = CKEDITOR.instances['main-content'];
-            ck && ck.destroy();
-            //$('#main-content').ckeditor();
-        });
-    })
-</script>
+</div>

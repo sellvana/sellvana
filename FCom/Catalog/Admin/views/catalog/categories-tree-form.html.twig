@@ -9,40 +9,31 @@
         });
     })
 </script>
-<div class="fcom-admin-main-content">
-  <header class="fcom-admin-main-title">
-    <div class="btn-group">
-      <div class="btn btn-primary" onclick="return adminForm.saveAll(this)">
-        <span>
-          {{ 'Save'|_ }}
-        </span>
-      </div>
-    </div>
-    <span class="title">
-      {{ m.get('full_name')|replace('|', ' > ') }}
-    </span>
-  </header>
-  <nav>
-    <ul class="nav nav-tabs fcom-nav-st1">
-      {% for k, tab in tabs %}
-        <li>
-          <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
-            <span class="icon"></span>
-            {{ tab.label }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </nav>
-  <div class="tab-content fcom-admin-main-content">
-    {% for k, tab in tabs %}
-      {% if tab.view %}
-        <div class="tab-pane" id="tab-{{ k }}" {{ tab.async ? 'data-loaded="true"' }}>
-          {% if not tab.async %}
-            {{ THIS.view(tab.view) | raw }}
-          {% endif %}
+
+<div class="box fcom-admin-main-content">
+    <div class="fcom-admin-main-title box-header">
+        <div class="title">{{ m.get('full_name')|replace('|', ' > ') }}</div>
+        <div class="btn-group actions">
+            <button class="btn btn-primary" onclick="return adminForm.saveAll(this)">{{ 'Save'|_ }}</button>
         </div>
-      {% endif %}
-    {% endfor %}
-  </div>
+    </div>
+    <div class="box-content">
+    <div class="nav">
+        <ul class="nav nav-tabs fcom-nav-st1">
+            {% for k, tab in tabs %}
+                <li>
+                    <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="tab-content fcom-admin-main-content">
+        {% for k, tab in tabs %}
+            {% if tab.view is not empty %}
+                <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
+                    {% if tab.async is empty %}{{ THIS.view(tab.view)|raw }}{% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
