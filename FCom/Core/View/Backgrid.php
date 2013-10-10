@@ -108,6 +108,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     {
         $config = $this->grid['config'];
         //TODO: add _processFilters and processORM
+        $orm = $this->grid['orm'];
         $data = $this->grid['orm']->paginate();
 
         foreach ($data['rows'] as &$row) {

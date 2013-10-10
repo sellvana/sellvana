@@ -54,7 +54,10 @@ common_js_libs:
 
             - [ requireJs, wysihtml5, @FCom_Core/js/lib/wysihtml5/wysihtml5-0.4.0pre ]
             - [ requireJs, bootstrap-wysihtml5, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5, { deps: [ jquery, bootstrap, wysihtml5 ] } ]
-
+            - [ requireJs, jquery.widgets, @FCom_Core/js/lib/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
+            - [ requireJs, jquery.tablesorter, @FCom_Core/js/lib/jquery.tablesorter.min, { deps: [ jquery ] }]
+ #           - [ requireJs, store, @FCom_Core/js/lib/store ]
+ #           - [ requireJs, jquery.resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns ]
             - [ requireJs, fcom.backbone.grid, @FCom_Core/js/fcom.backbone.grid ]
 
 lib_backgrid:

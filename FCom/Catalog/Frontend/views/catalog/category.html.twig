@@ -1,30 +1,28 @@
 {% set category = APP.get('current_category') %}
 
-<div id="maincontainer">
-  <section id="product">
-    <div class="container">
-     <!--  breadcrumb -->
-      <ul class="breadcrumb">
-        <li>
-          <a href="#">Home</a>
-          <span class="divider">/</span>
-        </li>
-        <li class="active">{{ category.get('node_name') }}</li>
-      </ul>
-      <div class="row">
-        <!-- Sidebar Start-->
-        <aside class="col-lg-3">
-            {{ THIS.hook('sidebar-left') | raw }}
-        </aside>
-        <!-- Sidebar End-->
-        <!-- Category-->
-        <div class="col-lg-9">
-            <h1 class="productname">
-                {{ category.get('node_name') }}
-            </h1>
-            {{ THIS.hook('main_products') | raw }}
-        </div>
+<section id="product">
+  <div class="container">
+   <!--  breadcrumb -->
+    <ul class="breadcrumb">
+      <li>
+        <a href="#">Home</a>
+        <span class="divider">/</span>
+      </li>
+      <li class="active">{{ category.get('node_name') }}</li>
+    </ul>
+    <div class="row">
+      <!-- Sidebar Start-->
+      <aside class="col-lg-3">
+          {{ THIS.hook('sidebar-left') | raw }}
+      </aside>
+      <!-- Sidebar End-->
+      <!-- Category-->
+      <div class="col-lg-9">
+          <h1 class="productname">
+              {{ category.get('node_name') }}
+          </h1>
+          {{ THIS.hook('main_products') | raw }}
       </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>

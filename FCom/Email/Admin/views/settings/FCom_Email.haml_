@@ -1,0 +1,23 @@
+- $c = $this->model
+
+.accordion.accordion-blue.panel-group#settings-FCom_Email
+    .panel.panel-default
+        .panel-heading
+            %a.accordion-toggle = $this->_('Email Sending')
+        .panel-collapse.collapse.in#settings-FCom_Email-group0
+            .panel-body
+                .form-group
+                    %label.col-md-2.control-label = $this->_('SMTP Host')
+                    .col-md-5
+                        %input.form-control(type="text" name="config[modules][FCom_Email][smtp_host]"
+                            value="#{$c->get('modules/FCom_Email/smtp_host')}")
+                .form-group
+                    %label.col-md-2.control-label = $this->_('Sendmail From')
+                    .col-md-5
+                        %input.form-control(type="text" name="config[modules][FCom_Email][sendmail_from]"
+                            value="#{$c->get('modules/FCom_Email/sendmail_from')}")
+                .form-group
+                    %label.col-md-2.control-label = $this->_('Default Handler')
+                    .col-md-5
+                        %select.form-control(name="config[modules][FCom_Email][default_handler]")
+                            - echo BUtil::optionsHtml(BUtil::arrayToOptions(BEmail::i()->getHandlers(), 'description'), $c->get('modules/FCom_Email/default_handler'))

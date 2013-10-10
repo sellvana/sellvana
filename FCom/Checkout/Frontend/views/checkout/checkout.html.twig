@@ -6,9 +6,9 @@
             <header class="main-title">
                 <h1 class="title">{{ 'Review and Place Order'|_ }}</h1>
             </header>
-            {% if THIS.messagesHtml() %}
-                <div class="alert alert-error">{{ THIS.messagesHtml() | raw }}</div>
-            {% endif %}
+
+            {{ THIS.view('core/messages') | raw }}
+
             <h2>{{ 'Review the information below then click "Place your order"' |_ }}</h2>
             <div class="row">
                 <div class="col-md-6">

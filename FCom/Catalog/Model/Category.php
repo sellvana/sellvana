@@ -91,8 +91,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         } else {
             $categories = static::orm()->where('top_menu', 1)->find_many_assoc();
         }
-        if ($maxLevel === 2) {
-            $subcats = static::orm()->where_in('parent_id', array_keys($categories))->find_many();
+        if ($maxLevel === 2) {            
+            if(sizeof($categories)===0)                
+                $subcats=array();
+            else
+                $subcats = static::orm()->where_in('parent_id', array_keys($categories))->find_many();            
             $children = array();
             foreach ($subcats as $sc) {
                 $children[$sc->get('parent_id')][] = $sc;

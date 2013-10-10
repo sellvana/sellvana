@@ -6,7 +6,7 @@
                 <header class="main-title">
                     <h1 class="title">{{ 'Login' |_ }}</h1>
                 </header>
-                {{ THIS.messagesHtml() | raw }}
+                {{ THIS.view('core/messages') | raw }}
                 <div class="control-group">
                   <label for="#" class="control-label">{{ "Email" |_ }}</label>
                   <div class="controls">

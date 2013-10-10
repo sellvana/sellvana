@@ -1,0 +1,127 @@
+{% set hlp = APP.instance('FCom_Catalog_ProductsImport') %}
+{% set info = hlp.getFileInfo(THIS.get('dir').'/'.THIS.get('file')) %}
+{% if not info %}
+  <div>
+    {{ 'Invalid file format, please go back and select another file'|_ }}
+  </div>
+{% else %}
+  <form id="import-columns-form" method="post">
+    <input>(type="hidden" name="config[filename]" value="{{ THIS.get('file') }}">
+    <table>
+      <tr>
+        <td>
+          {{ 'Field Delimiter'|_ }}
+        </td>
+        <td>
+          <input type="text" name="config[delim]" value="{{ info.delim }}">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ 'Skip First Lines'|_ }}
+        </td>
+        <td>
+          <input type="text" name="config[skip_first]" value="{{ info.skip_first }}">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ 'Batch Size'|_ }}
+        </td>
+        <td>
+          <input type="text" name="config[batch_size]" value="{{ info.batch_size ?: 100 }}">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ 'Multi Value Delimiter'|_ }}
+        </td>
+        <td>
+          <input type="text" name="config[multivalue_separator]" value="{{ info.multivalue_separator ?: ';' }}">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ 'Nesting Level Delimiter'|_ }}
+        </td>
+        <td>
+          <input type="text" name="config[nesting_separator]" value="{{ info.nesting_separator ?: '>' }}">
+        </td>
+      </tr>
+    </table>
+    <br/>
+    <table>
+      <tr>
+        <td class="col">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  {{ 'Column Content'|_ }}
+                </th>
+                <th>
+                  {{ 'DB Field'|_ }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i, v in info.first_row %}
+                <tr>
+                  <td>
+                    {{ v }}
+                  </td>
+                  <td>
+                    <select name="config[columns][{{ i }}]">
+                      <option></option>
+                      {{ UTIL.optionsHtml(hlp.getFieldOptions(), info.columns[$i] ?: '') | raw }}
+                    </select>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </td>
+        <td class="col">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  {{ 'DB Field'|_ }}
+                </th>
+                <th>
+                  {{ 'Default'|_ }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k, v in hlp.getFieldData() %}
+                {% set _default = info.defaults[$k] ? info.defaults[$k] %}
+                <tr>
+                  <td>
+                    {{ k }}
+                  </td>
+                  <td>
+                    {% if f.options %}
+                      <select name="config[defaults][{{ k }}]">
+                        <option></option>
+                        {{ UTIL.optionsHtml(f.options, _default) | raw }}
+                      </select>
+                    {% else %}
+                      {% set _input = f.input ?: 'text' %}
+                      {% if _input == 'text' %}
+                        <input type="text" name="config[defaults][{{ k }}]" value="{{ _default }}">
+                      {% elseif _input == 'textarea') %}
+                        <textarea name="config[defaults][{{ k }}]" style="width:400px; height:100px">{{ _default }}</textarea>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <button class="btn st1 sz2" id="step2-next" type="button">{{ 'Save configuration and go to next step'|_ }}</button>
+  </form>
+{% endif %}
