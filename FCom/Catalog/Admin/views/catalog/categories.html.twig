@@ -1,0 +1,102 @@
+{% set formUrl = APP.href('catalog/categories/tree_form/') %}
+
+<div class="fcom-admin-main-container fcom-admin-sidebar-view" id="categories-layout">
+  <aside class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar">
+    <div class="ui-widget-header">
+      <span class="title">
+        {{ 'Categories'|_ }}
+      </span>
+      <input class="entypo lock" id="categories-tree-lock" type="checkbox">
+    </div>
+    <div class="fcom-admin-expand-toggles">
+      <a class="js-expand-all" href=''>{{ 'Expand All'|_ }}</a>
+      <a class="js-collapse-all" href=''>{{ 'Collapse All'|_ }}</a>
+    </div>
+    <div id="categories"></div>
+  </aside>
+  <form class="fcom-admin-main-content" id="categories-tree-form" action="{{ formUrl }}" method="post">
+    <div id="categories-form-container">
+       
+    </div>
+  </form>
+</div>
+
+<script>
+    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter'], function($) {
+        $(function() {
+            /*
+            $('.fcom-admin-nav-sidebar').resizable({
+                handles: 'e',
+                resize: function(ev, ui) {
+                    $('#categories-layout').css('padding-left', ui.size.width+'px');
+                }
+            });
+            */
+            $('#categories-layout').split({
+                orientation: 'vertical',
+                limit: 10,
+                position: '300',
+            })
+            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
+                on:{icon:'icon-lock', label:'Editing Locked'},
+                off:{icon:'icon-lock-open', label:'Editing Unlocked'}
+            });
+            $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
+            $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
+
+            /*
+            var tree = new FCom.Admin.DynaTree({el:'#categories', tree: {
+                persist: true,
+                children: [ // Pass an array of nodes.
+                    {title: "Item 1"},
+                    {title: "Folder 2", isFolder: true,
+                        children: [
+                            {title: "Sub-item 2.1"},
+                            {title: "Sub-item 2.2"}
+                        ]
+                    },
+                    {title: "Item 3"}
+                ]
+            }});
+            tree.render();
+            */
+
+            FCom.Admin.tree('#categories', {
+                url:'{{ APP.href('catalog/categories/tree_data') }}'
+                , on_click: function (n) { loadForm(n.attr('id')); }
+                //, on_dblclick: function (n) { loadForm(n.attr('id')); }
+                , on_select: function (n) { loadForm(n.attr('id')); }
+                , lock_flag: '#categories-tree-lock'
+            });
+            /*
+            var cmsNavLayout = $('#categories-layout').height($('.adm-wrapper').height()).layout({
+                useStateCookie: true,
+                west__minWidth:400,
+                west__spacing_open:1,
+                west__closable:false,
+                triggerEventsOnLoad: true,
+                onresize:function(pane, $Pane, paneState) {
+                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                        if (!this.id.match(/_t$/)) {
+                            $(this).setGridWidth(paneState.innerWidth - 20);
+                        }
+                    });
+                }
+            });
+            */
+            function loadForm(id) {
+                var url = '{{ formUrl }}?id='+id;
+                $('#categories-form-container').load(url, function() {
+                    $('#categories-tree-form').attr('action', url);
+                    window.adminForm = FCom.Admin.form({
+                        tabs:     '.adm-tabs li',
+                        panes:    '.adm-tabs-content',
+                        url_get:  url,
+                        url_post: url
+                    });
+                });
+            }
+
+        })
+    })
+</script>
