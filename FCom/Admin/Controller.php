@@ -175,7 +175,14 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (!empty($r['s']) && empty($r['sd'])) {
                 $r['sd'] = 'asc';
             }
-            $data = array('grid' => array($r['grid'] => BUtil::arrayMask($r, 'p,ps,s,sd,q')));
+
+            if ($r['sd']==='ascending') {
+                $r['sd'] = 'asc';
+            } elseif ($r['sd']==='descending') {
+                $r['sd'] = 'desc';
+            }
+
+            $data = array('grid' => array($r['grid'] => array('state' => BUtil::arrayMask($r, 'p,ps,s,sd,q'))));
             break;
 
         case 'settings.tabs.order':
@@ -185,6 +192,6 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             break;
         }
         FCom_Admin_Model_User::i()->personalize($data);
-        BResponse::i()->json(array('success'=>true));
+        BResponse::i()->json(array('success'=>true, 'data' => $data));
     }
 }
