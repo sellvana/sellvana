@@ -1,0 +1,84 @@
+{% set formUrl = APP.href('catalog/categories/tree_form/') %}
+
+<script type="text/javascript">
+    require(['jquery', 'jstree', 'fcom.admin'], function($) {
+        $(function() {
+            $('.fcom-admin-nav-sidebar').resizable({
+                handles: 'e',
+                resize: function(ev, ui) {
+                    $('#categories-layout').css('padding-left', ui.size.width+'px');
+                }
+            });
+            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
+                on:{icon:'icon-lock', label:'Editing Locked'},
+                off:{icon:'icon-lock-open', label:'Editing Unlocked'}
+            });
+            $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
+            $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
+
+            FCom.Admin.tree('#categories', {
+                url:'{{ APP.href('catalog/categories/tree_data') }}'
+                , on_click: function (n) { loadForm(n.attr('id')); }
+                //, on_dblclick: function (n) { loadForm(n.attr('id')); }
+                , on_select: function (n) { loadForm(n.attr('id')); }
+                , lock_flag: '#categories-tree-lock'
+            });
+            /*
+             var cmsNavLayout = $('#categories-layout').height($('.adm-wrapper').height()).layout({
+             useStateCookie: true,
+             west__minWidth:400,
+             west__spacing_open:1,
+             west__closable:false,
+             triggerEventsOnLoad: true,
+             onresize:function(pane, $Pane, paneState) {
+             $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+             if (!this.id.match(/_t$/)) {
+             $(this).setGridWidth(paneState.innerWidth - 20);
+             }
+             });
+             }
+             });
+             */
+            function loadForm(id) {
+                var url = '{{ formUrl }}?id='+id;
+                $('#categories-form-container').load(url, function() {
+                    $('#categories-tree-form').attr('action', url);
+                    window.adminForm = FCom.Admin.form({
+                        tabs:     '.adm-tabs li',
+                        panes:    '.adm-tabs-content',
+                        url_get:  url,
+                        url_post: url
+                    });
+                });
+            }
+
+        })
+    })
+</script>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header">
+            <h1 class="pull-left">
+                <i class="icon-list-ul"></i>
+                <span>{{ "Categories" |_ }}</span>
+                <input class="entypo lock" id="categories-tree-lock" type="checkbox"/>
+            </h1>
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
+                    <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fcom-admin-main-container fcom-admin-sidebar-view row" id="categories-layout">
+    <div class="box col-sm-3">
+        <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar box-content" id="categories"></div>
+    </div>
+    <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
+        <div id="categories-form-container" class="col-sm-9"></div>
+    </form>
+</div>
