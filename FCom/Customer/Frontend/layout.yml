@@ -16,7 +16,7 @@
 
 /customer/account:
 	- { include: base }
-	- { hook: main, views: customer/account }
+	- { hook: main, views: customer/account/dashboard }
 
 /customer/account/edit:
 	- { include: base }

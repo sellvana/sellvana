@@ -1,0 +1,23 @@
+{% set m = THIS.get('model') %}
+<fieldset class="form-horizontal">
+  <div class="control-group">
+    <label class="control-label" for="main-node_name">{{ 'Node Name'|_ }}</label>
+    <div class="controls">
+      <input id="main-node_name" type="text" name="model[node_name]" value="{{ m.get('node_name') }}")>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="main-url_key">{{ 'Url Key'|_ }}</label>
+    <div class="controls">
+      <input id="main-url_key" type="text" name="model[url_key]" value="{{ m.get('url_key') }}">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="model-is-top-menu">{{ 'Show in top menu'|_ }}</label>
+    <div class="controls">
+      <select id="model-is-top-menu" name="model[is_top_menu">
+        {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, m.get('is_top_menu')) | raw }}
+      </select>
+    </div>
+  </div>
+</fieldset>
