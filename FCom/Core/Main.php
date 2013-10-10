@@ -49,6 +49,9 @@ class FCom_Core_Main extends BClass
         $localConfig['fs']['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
         $rootDir = $config->get('fs/root_dir');
+        if ($rootDir) {
+            $rootDir = realpath($rootDir);
+        }
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
             $rootDir = BRequest::i()->scriptDir();
@@ -57,17 +60,28 @@ class FCom_Core_Main extends BClass
 
         BDebug::debug('ROOTDIR='.$rootDir);
 
+        $webRoot = BRequest::i()->webRoot();
         $baseHref = $config->get('web/base_href');
+        $baseSrc = $config->get('web/base_src');
+        $baseStore = $config->get('web/base_store');
         if (!$baseHref) {
-            $baseHref = BRequest::i()->webRoot();
-            $localConfig['web']['base_href'] = $baseHref;
+            $baseHref = $webRoot;
+        } elseif (!BUtil::isPathAbsolute($baseSrc)) {
+            $baseHref = $webRoot.'/'.$baseHref;
         }
-        if (!$config->get('web/base_src')) {
-            $localConfig['web']['base_src'] = $baseHref;
+        if (!$baseSrc) {
+            $baseSrc = $baseHref;
+        } elseif (!BUtil::isPathAbsolute($baseSrc)) {
+            $baseSrc = $webRoot.'/'.$baseSrc;
         }
-        if (!$config->get('web/base_store')) {
-            $localConfig['web']['base_store'] = $baseHref;
+        if (!$baseStore) {
+            $baseStore = $baseHref;
+        } elseif (!BUtil::isPathAbsolute($baseSrc)) {
+            $baseStore = $webRoot.'/'.$baseStore;
         }
+        $localConfig['web']['base_href'] = $baseHref;
+        $localConfig['web']['base_src'] = $baseSrc;
+        $localConfig['web']['base_store'] = $baseStore;
 
         $permissionErrors = array();
 
