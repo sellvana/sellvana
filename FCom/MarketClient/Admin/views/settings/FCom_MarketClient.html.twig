@@ -62,7 +62,7 @@
                             FTP
                         </label>
                         <label class="radio radio-inline">
-                            <input type="radio" name="config[modules][FCom_MarketClient][ftp][type]" value="ftps" {% if c.get('modules/FCom_MarketClient/ftp/type') == 'ftps' %}checked="checked"{% endif %}/>
+                            <input type="radio" name="config[modules][FCom_MarketClient][ftp][type]" value="ftps" {% if c.get('modules/FCom_MarketClient/ftp/type') != 'ftps'%}checked="checked"{% endif %}/>
                             FTPS
                         </label>
                     </div>
