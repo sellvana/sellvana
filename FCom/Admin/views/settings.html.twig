@@ -1,0 +1,112 @@
+{% set formUrl = APP.href("settings") %}
+
+<script type="text/javascript">
+    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin'], function($) {
+        $(function() {
+            function onSortableStop(event, ui) {
+                var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
+                console.log(ui.item[0].id);
+                var handle = ui.item;
+                if (type=='tabs') handle = handle.children('h3');
+                handle.triggerHandler('focusout');
+
+                return; //TODO: figure out whether to personalize settings items order
+
+                var url = '{{ APP.href("my_account/personalize") }}';
+
+                switch (type) {
+                    case 'tabs':
+                        var items = [];
+                        ui.item.parent().children().each(function(idx, el) {
+                            items.push(el.id.replace(/^settings-tab-/, ''));
+                        });
+                        //$.post(url, {'do':'settings.'+type+'.order', items:items});
+                        break;
+
+                    case 'sections':
+                        var items = [];
+                        break;
+                }
+            }
+
+            window.adminForm = FCom.Admin.form({
+                form:     '#settings-form',
+                tabs:     '.adm-tabs-sidebar li',
+                panes:    '.adm-tabs-content',
+                url_get:  '{{ formUrl }}',
+                url_post: '{{ formUrl }}'
+                //on_tab_load: initTabs
+            });
+            $('#settings-form').validate();
+            //initTabs.apply($('#settings-form'));
+
+            //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
+
+            FCom.Admin.Tabs('.fcom-admin-main-container', {
+                url_get: "{{ formUrl }}",
+                cur_tab: "{{ THIS.cur_tab }}",
+                tab_load_callback: function(i) {
+                    FCom.Admin.Accordion('settings-'+i);
+                    FCom.Admin.initCodeEditors();
+                }
+            });
+            $('.accordion').each(function(i, el) {
+                FCom.Admin.Accordion(el.id);
+            });
+            FCom.Admin.initCodeEditors()
+        });
+    })
+</script>
+
+<form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
+    <div class="row fcom-admin-main-title">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <h1 class="pull-left">
+                    <i class="icon-cog"></i>
+                    <span>{{ "Settings" |_ }}</span>
+                </h1>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn" type="submit" onclick="return adminForm.saveAll(this)">{{ "Save All" |_ }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 fcom-admin-main-container">
+            <div class="fcom-admin-main-content">
+                <ul class="nav nav-tabs">
+                    {% for group in THIS.tab_groups %}
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }}</a>
+                            <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
+                                {% for k, tab in group.tabs %}
+                                    {% if tab.disabled is empty %}
+                                        <li id="settings-tab-{{ k }}">
+                                            <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                                                <span class="icon"></span>
+                                                {{ tab.label }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="tab-content">
+                    {% for k, tab in THIS.tabs %}
+                        <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
+                            {% if tab.async is empty  %}
+                                {{ THIS.view(tab.view)|raw }}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

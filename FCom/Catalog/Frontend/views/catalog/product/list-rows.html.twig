@@ -1,0 +1,55 @@
+{% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
+{% set priceView = THIS.view('catalog/product/price') %}
+{% set addToCartUrl = THIS.url('cart/add') %}
+
+<ul class="thumbnails list row">
+{% for p in THIS.get('products') %}
+    {% set productName = p.get('product_name') %}
+    {% set productUrl = p.url(THIS.get('category')) %}
+    <li>
+      <div class="thumbnail">
+        <div class="row">
+          <div class="col-lg-4 col-sm-4">
+            {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                <span class="sale tooltip-test">Sale</span>
+                <!--<span class="offer tooltip-test">Offer</span>-->
+            {% endif %}
+            <a href="{{ productUrl }}"><img alt="{{ productName }}" src="{{ p.thumbUrl(260, 337) }}"></a>
+          </div>
+          <div class="col-lg-8 col-sm-8">
+            <a class="prdocutname" href="{{ productUrl }}">{{ productName }}</a>
+            <div class="productdiscrption">{{ p.get('short_description') }}</div>
+            <div class="pricetag">
+              <span class="spiral"></span>
+
+              <form class="form-inline" method="post" action="{{ addToCartUrl }}">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="qty" value="1">
+                <button type="submit" name="id" value="{{ p.id() }}" class="productcart" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false">ADD TO CART</button>
+              </form>
+
+
+              <div class="price">
+                {% if p.get('base_price') == 0 %}
+                    <div class="pricenew">{{ 'FREE'|_ }}</div>
+                {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                    <div class="priceold">{{ p.get('base_price') | currency }}</div>
+                    <div class="pricenew">{{ p.get('sale_price') | currency }}</div>
+                {% else %}
+                    <div class="pricenew">{{ p.get('base_price') | currency }}</div>
+                {% endif %}
+
+              </div>
+            </div>
+            <div class="shortlinks">
+              <a class="details" href="{{ productUrl }}">DETAILS</a>
+              <a class="wishlist active" href="#">WISHLIST</a>
+              <a class="compare active" href="#">COMPARE</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+{% endfor %}
+</ul>
+

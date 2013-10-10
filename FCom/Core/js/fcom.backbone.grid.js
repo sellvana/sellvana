@@ -2,14 +2,19 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
     Backgrid.Column.prototype.defaults.editable = false;
 
     Backgrid.Column.prototype.defaults.headerCell = Backgrid.HeaderCell.extend({
-        render: function() {
+       render: function() {
             Backgrid.HeaderCell.prototype.render.apply(this, arguments);
             this.$el.width(this.column.get('width'));
             this.$el.attr('data-id', this.column.get('name'));
             var dragHandle = $('<div class="drag-handle"><i class="icon-reorder"></i></div>');
             this.$el.append(dragHandle);
             return this;
-        }
+        },
+      sort:function(colName,dir){
+            Backgrid.HeaderCell.prototype.sort.apply(this, arguments);
+            Backbone.trigger("backgrid:sort",colName,dir);            
+            return this;
+        }        
     });
     Backgrid.Extension.SelectRowCell.prototype.render = function() {
         this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
@@ -38,16 +43,17 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
         this.delegateEvents();
         return this;
       }
-
     });
 
     FCom.Backgrid.Toolbar = Backbone.View.extend({
         className: 'fcom-backgrid-toolbar',
 
         bindings: {
+            
         },
-
+        
         initialize: function() {
+    
             this.model = new Backbone.Model(this.options);
             this.template = _.template($(this.options.template).html());
             var self = this;
@@ -71,6 +77,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
     })
 
     FCom.BackgridView = Backbone.View.extend({
+        
         prepareConfig: function() {
             _.map(this.options.columns, function(col, i) {
                 if (!col.name) col.name = '';
@@ -81,7 +88,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
 
         render: function() {
             var self = this, paginator, filter;
-
+            
             this.prepareConfig();
 
             var Model = this.options.model || Backbone.Model;
@@ -141,13 +148,13 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
             toolbarOptions.columns = this.options.columns;
             toolbarOptions.collection = collection;
             var toolbar = new FCom.Backgrid.Toolbar(toolbarOptions);
-
+            
             var grid = new Backgrid.Grid({
                 columns: this.options.columns,
                 collection: collection
             });
 
-
+            
             var $container = $(this.options.container);
 
             if (toolbar) {
@@ -167,9 +174,20 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 collection.fetch({ reset:true });
             }
 
+           /*this.listenTo(Backgrid, "backgrid:sort", function () {
+                    console.log('i heard that');
+            });*/
 
-
-
+           Backbone.on("backgrid:sort",function(colName,dir){                
+                 $.post(self.options.personalize_url,
+                            { 'do': 'grid.state', grid: self.options.id,s:colName,sd:dir },
+                            function(response, status, xhr) {
+                                console.log(response, status, xhr);
+                            }
+                        );
+           });
+            
+            
             if (true) { // true = jquery-ui resizable, false = colResizable
                 grid.$('thead th').resizable({
                     handles: 'e',
@@ -207,6 +225,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                         grid.$('thead th').each(function(i, el) {
                             cols.push({ name: $(el).data('id') });
                         });
+                        
                         $.post(self.options.personalize_url,
                             { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
                             function(response, status, xhr) {

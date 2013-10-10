@@ -960,7 +960,7 @@ class BUtil extends BClass
                 }
                 if (!$multipart) {
                     $contentType = 'application/x-www-form-urlencoded';
-                    $opts['http']['content'] = $request;
+                    $opts['http']['content'] = http_build_query($data);
                 } else {
                     $boundary = '--------------------------'.microtime(true);
                     $contentType = 'multipart/form-data; boundary='.$boundary;
@@ -2894,19 +2894,30 @@ class BLocale extends BClass
         return self::$_tr;
     }
 
-    static protected $_currency;
+    static protected $_currencySymbolMap = array(
+        'USD' => '$',
+        'EUR' => '',
+        'GBP' => '',
+    );
+    static protected $_currencyCode = 'USD';
+    static protected $_currencySymbol = '$';
 
-    static public function setCurrency($currency)
+    static public function setCurrency($code, $symbol = null)
     {
-        static::$_currency = $currency;
+        static::$_currencyCode = $code;
+        if (is_null($symbol)) {
+            if (!empty(static::$_currencySymbolMap[$code])) {
+                $symbol = static::$_currencySymbolMap[$code];
+            } else {
+                $symbol = $code.' ';
+            }
+        }
+        static::$_currencySymbol = $symbol;
     }
 
-    static public function currency($value, $currency = null)
+    static public function currency($value, $decimals = 2)
     {
-        if (!$currency) {
-            $currency = static::$_currency;
-        }
-        return sprintf('%s%s', $currency, number_format($value, 2));
+        return sprintf('%s%s', static::$_currencySymbol, number_format($value, $decimals));
     }
 }
 

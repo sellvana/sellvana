@@ -12,7 +12,7 @@ base:
 
 /catalog/product:
 	- { include: base }
-	- { hook: main, views: catalog/product }
+	- { hook: main, views: catalog/product/details }
 
 /catalog/search:
 	- { include: base }

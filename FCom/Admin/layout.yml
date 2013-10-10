@@ -4,6 +4,7 @@ base:
   - { hook: header, views: admin/header }
   - { hook: top-nav, views: admin/nav }
   - { hook: before_body_end, views: bottom_scripts }
+  - { view: core/messages, set: { namespace: admin } }
 
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
   - { callback: FCom_Admin_Admin::layout }
@@ -23,14 +24,6 @@ base:
       #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
       #- [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
 
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/jquery/jquery_ui.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
       - [ css, @FCom_Admin/css/fcom.admin.css ]
 
       - [ js, @FCom_Admin/theme1/assets/javascripts/ie/html5shiv.js, { if: lt IE 9 } ]
@@ -53,13 +46,21 @@ base:
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       #- [ js, @FCom_Core/js/select2/select2.min.js ]
       # highcharts
-      - [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
+      #- [ requireJs, highcharts, @FCom_Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.contextmenu, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu, { deps: [ jquery ] } ]
+
+      - [ requireJs, jquery.splitter, @FCom_Core/js/lib/splitter/jquery.splitter, { deps: [ jquery ] } ]
+      - [ css, @FCom_Core/js/lib/splitter/jquery.splitter.css ]
 
       - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/js/fcom.admin ]
+      - [ requireJs, fcom.admin.dynatree, @FCom_Admin/js/fcom/fcom.admin.dynatree ]
       - [ requireJs, fcom.admin.form, @FCom_Admin/js/fcom.admin.form ]
       - [ requireRun, fcom.admin ]
+
+      - [ requireJs, dynatree, @FCom_Admin/js/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
+      - [ css, @FCom_Admin/js/dynatree/skin-vista/ui.dynatree.css ]
 
   - { include: grid }
   - { include: jqgrid }
@@ -87,6 +88,16 @@ base:
 lib_admin_theme1:
   - view: head
     do:
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/jquery/jquery_ui.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
+      #- [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/dynatree/ui.dynatree.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
+
       - [ requireJs, autosize, @FCom_Admin/theme1/assets/javascripts/plugins/autosize/jquery.autosize-min, { deps: [ jquery ] } ]
       - [ requireJs, bootbox, @FCom_Admin/theme1/assets/javascripts/plugins/bootbox/bootbox.min, { deps: [ jquery ] } ]
       - [ requireJs, daterangepicker, @FCom_Admin/theme1/assets/javascripts/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker, { deps: [ jquery ] } ]
@@ -99,7 +110,7 @@ lib_admin_theme1:
       - [ requireJs, wysihtml5, @FCom_Admin/theme1/assets/javascripts/plugins/common/wysihtml5.min, { deps: [ jquery ] } ]
       - [ requireJs, moment, @FCom_Admin/theme1/assets/javascripts/plugins/common/moment.min ]
       - [ requireJs, bootstrap-wysihtml5, @FCom_Admin/theme1/assets/javascripts/plugins/common/bootstrap-wysihtml5, { deps: [ wysihtml5, bootstrap ] } ]
-      - [ requireJs, dynatree, @FCom_Admin/theme1/assets/javascripts/plugins/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
+      #- [ requireJs, dynatree, @FCom_Admin/theme1/assets/javascripts/plugins/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
       - [ requireJs, fileinput, @FCom_Admin/theme1/assets/javascripts/plugins/fileinput/bootstrap-fileinput.min, { deps: [ jquery ] } ]
 
       - [ requireJs, tmpl, @FCom_Admin/theme1/assets/javascripts/plugins/fileupload/tmpl.min, { deps: [ jquery ] } ]
@@ -157,8 +168,8 @@ jqgrid:
       - [ requireJs, jqgrid.ui.multiselect, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect ]
       - [ requireJs, jqgrid.i18n.en, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en, { deps: [ jquery ] } ]
       - [ requireJs, jqgrid, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min, { deps: [ jquery, jqgrid.i18n.en ], exports: $.fn.jqgrid } ]
-      - [ requireJs, jqgrid.tablednd, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd, { deps: [ jqgrid ] } ]
       - [ requireJs, jqgrid.contextmenu, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu, { deps: [ jqgrid ] } ]
+      - [ requireJs, jqgrid.tablednd, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd, { deps: [ jqgrid ] } ]
 
       # - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
 
@@ -251,16 +262,19 @@ form:
 /login:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: login }
 
 /password/recover:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: password/recover }
 
 /password/reset:
     - { include: base }
     - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: password/reset }
 
 

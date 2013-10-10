@@ -114,7 +114,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function action_step3()
     {
         $this->view('step3')->set(array(
-            'debug_modes' => array('PRODUCTION' => 'PRODUCTION', 'DEBUG' => 'DEBUG'),
+            'debug_modes' => array('DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */),
             'run_level_bundles' => array('min' => 'Minimal', 'all' => 'All Bundled'),
         ));
         BLayout::i()->applyLayout('/step3');

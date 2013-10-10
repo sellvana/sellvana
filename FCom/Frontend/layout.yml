@@ -3,6 +3,7 @@ base:
     - { root: root }
     - { hook: head, views: head }
     - { hook: before_body_end, views: bottom_scripts }
+    - { view: core/messages, set: { namespace: frontend } }
 
     - view: head
         do:

@@ -1,0 +1,11 @@
+{% for alert in THIS.getAlerts() %}
+    <div class="alert alert-dismissable alert-{{ alert.class }}">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        {% if alert.title %}
+            <h4><i class="icon-{{ alert.icon }}-sign"></i> {{ alert.title }}</h4>
+        {% else %}
+            <i class="icon-{{ alert.icon }}-sign"></i>
+        {% endif %}
+        {{ alert.msg }}
+    </div>
+{% endfor %}
