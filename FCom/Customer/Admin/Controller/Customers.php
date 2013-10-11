@@ -22,8 +22,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'region' => array('label'=>'Region', 'index'=>'a.region'),
             'postcode' => array('label'=>'Postal Code', 'index'=>'a.postcode'),
             'country' => array('label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
-            'create_at' => array('label'=>'Created', 'index'=>'c.create_at', 'formatter'=>'date'),
-            'update_at' => array('label'=>'Updated', 'index'=>'c.update_at', 'formatter'=>'date'),
+            'create_at' => array('label'=>'Created', 'index'=>'c.create_at'),
+            'update_at' => array('label'=>'Updated', 'index'=>'c.update_at'),
         ));
         $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         return $config;
