@@ -13,6 +13,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $req = BRequest::i()->get();
 
         // prepare array to update personalization
+
         $personalize = array();
         foreach (array('p', 'ps', 's', 'sd', 'q') as $k) {
             if (!isset($persGrid['state'][$k])) {
@@ -50,7 +51,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     {
         $config = $this->grid['config'];
         if (!empty($config['data_url'])) {
-            $config['mode'] = 'server';
+            $config['data_mode'] = 'server';
         }
 
         $config['personalize_url'] = BApp::href('my_account/personalize');
@@ -148,7 +149,12 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $gridId = $this->grid['config']['id'];
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
-        $r = array_replace_recursive($r, $persState);
+        foreach ($persState as $k => $v) {
+            if (empty($r[$k]) && !empty($v)) {
+                $r[$k] = $v;
+            }
+        }
+        FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => array('state' => $r))));
 
         if ($stateKey) {
             $sess =& BSession::i()->dataToUpdate();
@@ -168,6 +174,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
             BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
         }
+
         $data = $orm->paginate($r);
 
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;

@@ -90,7 +90,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
             var self = this, paginator, filter;
 
             this.prepareConfig();
-            
+
             var Model = this.options.model || Backbone.Model;
             if (this.options.data_url || this.options.pageable) {
 
@@ -187,8 +187,8 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                     $("th[data-id='"+state.sortKey+"']").find("a:first").trigger("click");
             }
 
-            Backbone.on("backgrid:sort",function(colName,dir){                 
-                var mode=self.options.data_mode || 'client'                
+            Backbone.on("backgrid:sort",function(colName,dir){
+                var mode=self.options.data_mode || 'client'
                 if (dir==='ascending')
                     dir='asc';
                 else if (dir==='descending')
@@ -206,7 +206,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 }
                 return true;
             });
-            
+
 
             if (true) { // true = jquery-ui resizable, false = colResizable
                 grid.$('thead th').resizable({

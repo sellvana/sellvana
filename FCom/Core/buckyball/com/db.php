@@ -1502,6 +1502,9 @@ exit;
         if(empty($d['donotlimit'])){
             $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
         }
+#BDebug::dump($s);
+#BDebug::dump($this);
+
         $rows = $this->find_many(); // result data
         $s['rc'] = $rows ? sizeof($rows) : 0; // returned row count
         if (!empty($d['as_array'])) {

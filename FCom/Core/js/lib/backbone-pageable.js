@@ -1219,7 +1219,6 @@ console.log(this.url, this.state, state, options);
         // silent the first reset from backbone
         return BBColProto.fetch.call(self, _extend({}, options, {silent: true}));
       }
-
       return BBColProto.fetch.call(this, options);
     },
 
