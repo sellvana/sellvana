@@ -11,11 +11,14 @@
                 }
             });
             */
-            $('#categories-layout').split({
+            //fix for splitter
+            var categories_layout = $('#categories-layout');
+            categories_layout.css('height', $(this).height());
+            categories_layout.split({
                 orientation: 'vertical',
-                limit: 10,
-                position: '300',
-            })
+                limit: 2,
+                position: '25%'
+            });
             FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
                 on:{icon:'icon-lock', label:'Editing Locked'},
                 off:{icon:'icon-lock-open', label:'Editing Unlocked'}
@@ -99,12 +102,14 @@
     </div>
 </div>
 
-<div class="fcom-admin-main-container fcom-admin-sidebar-view row" id="categories-layout">
-    <div class="box col-sm-3">
-        <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar box-content" id="categories"></div>
+<div class="box row">
+    <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content" id="categories-layout">
+        <div class="col-sm-3" id="categories-wrapper">
+            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar" id="categories"></div>
+        </div>
+        <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
+            <div id="categories-form-container" class="col-sm-12"></div>
+        </form>
     </div>
-    <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
-        <div id="categories-form-container" class="col-sm-9"></div>
-    </form>
 </div>
 

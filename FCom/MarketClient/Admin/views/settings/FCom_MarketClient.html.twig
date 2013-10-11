@@ -10,9 +10,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Auto-Login to marketplace'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_MarketClient][auto_login]">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get('modules/FCom_MarketClient/auto_login'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[modules][FCom_MarketClient][auto_login]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_MarketClient][auto_login]" {% if c.get('modules/FCom_MarketClient/auto_login') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
             </div>
@@ -28,12 +27,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Enable FTP'|_ }}</label>
                     <div class="col-md-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="hidden" name="config[modules][FCom_MarketClient][ftp][enabled]" value="0"/>
-                                <input type="checkbox" name="config[modules][FCom_MarketClient][ftp][enabled]" value="1" {% if c.get('modules/FCom_MarketClient/ftp/enabled') == 1 %}checked="checked"{% endif %}/>
-                            </label>
-                        </div>
+                        <input type="hidden" name="config[modules][FCom_MarketClient][ftp][enabled]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_MarketClient][ftp][enabled]" value='1' {% if c.get('modules/FCom_MarketClient/ftp/enabled') == 1 %}checked="checked"{% endif %} type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
