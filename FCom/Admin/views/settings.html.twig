@@ -1,7 +1,8 @@
 {% set formUrl = APP.href("settings") %}
 
 <script type="text/javascript">
-    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin'], function($) {
+
+    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch'], function($) {
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -29,6 +30,15 @@
                 }
             }
 
+            // init switch buttons
+            function loadSwitchButtons() {
+                $('#settings-form').find('.switch-cbx').each(function(){
+                    if ($(this).parents('.make-switch').hasClass('make-switch') == false) {
+                        $(this).wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+                    }
+                });
+            }
+
             window.adminForm = FCom.Admin.form({
                 form:     '#settings-form',
                 tabs:     '.adm-tabs-sidebar li',
@@ -48,12 +58,17 @@
                 tab_load_callback: function(i) {
                     FCom.Admin.Accordion('settings-'+i);
                     FCom.Admin.initCodeEditors();
+
+                    loadSwitchButtons();
                 }
             });
             $('.accordion').each(function(i, el) {
                 FCom.Admin.Accordion(el.id);
             });
-            FCom.Admin.initCodeEditors()
+            FCom.Admin.initCodeEditors();
+
+            // init switch buttons
+            loadSwitchButtons();
         });
     })
 </script>

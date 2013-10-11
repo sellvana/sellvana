@@ -92,6 +92,7 @@ lib_admin_theme1:
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
       #- [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/dynatree/ui.dynatree.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_switch/bootstrap-switch.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]

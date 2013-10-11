@@ -10,9 +10,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Enable CMS Pages'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_Cms][page_enable]">
-                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/page_enable'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[modules][FCom_Cms][page_enable]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_Cms][page_enable]" {% if c.get('modules/FCom_Cms/page_enable') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -24,9 +23,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Enable CMS Nav'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_Cms][nav_enable]">
-                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('modules/FCom_Cms/nav_enable'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[modules][FCom_Cms][nav_enable]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_Cms][nav_enable]" {% if c.get('modules/FCom_Cms/nav_enable') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">

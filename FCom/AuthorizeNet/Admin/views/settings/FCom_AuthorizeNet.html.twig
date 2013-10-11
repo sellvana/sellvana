@@ -23,9 +23,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}active">{{ 'Enabled'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[active]" id="{{ aimPrefix }}active">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get(baseAimConfigPath ~ "/active"))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseAimHtmlName }}[active]" value="0" id="{{ aimPrefix }}active"/>
+                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[active]" {% if c.get(baseAimConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -71,9 +70,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}test">{{ 'Sandbox Mode'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[test]" id="{{ aimPrefix }}test">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get(baseAimConfigPath ~ '/payment_action'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseAimHtmlName }}[test]" id="{{ aimPrefix }}test" value="0"/>
+                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[test]" {% if c.get(baseAimConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -93,9 +91,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[email_customer]" id="{{ aimPrefix }}email_customer">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseAimConfigPath ~ '/email_customer'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseAimHtmlName }}[email_customer]" id="{{ aimPrefix }}email_customer" value="0"/>
+                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[email_customer]" {% if c.get(baseAimConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -115,9 +112,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[useccv]" id="{{ aimPrefix }}useccv">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseAimConfigPath ~ '/useccv'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseAimHtmlName }}[useccv]" id="{{ aimPrefix }}useccv" value="0"/>
+                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[useccv]" {% if c.get(baseAimConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -139,9 +135,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}allow_partial_authorization">{{ 'Allow Partial Authorization'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[allow_partial_authorization]" id="{{ aimPrefix }}allow_partial_authorization">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseAimConfigPath ~ '/allow_partial_authorization'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseAimHtmlName }}[allow_partial_authorization]" id="{{ aimPrefix }}allow_partial_authorization" value="0"/>
+                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[allow_partial_authorization]" {% if c.get(baseAimConfigPath ~ "/allow_partial_authorization") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
             </div>
@@ -156,9 +151,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}active">{{ 'Enabled'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[active]" id="{{ dpmPrefix }}active">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get(baseDpmConfigPath ~ "/active"))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseDpmHtmlName }}[active]" id="{{ dpmPrefix }}active" value="0"/>
+                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[active]" {% if c.get(baseDpmConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -204,9 +198,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}test">{{ 'Test Mode'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[test]" id="{{ dpmPrefix }}test">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get(baseDpmConfigPath ~ '/payment_action'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseDpmHtmlName }}[test]" id="{{ dpmPrefix }}test" value="0"/>
+                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[test]" {% if c.get(baseDpmConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -226,17 +219,15 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}debug">{{ 'Debug'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[debug]" id="{{ dpmPrefix }}debug">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseDpmConfigPath ~ '/debug'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseDpmHtmlName }}[debug]" id="{{ dpmPrefix }}debug" value="0"/>
+                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[debug]" {% if c.get(baseDpmConfigPath ~ "/debug") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[email_customer]" id="{{ dpmPrefix }}email_customer">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseDpmConfigPath ~ '/email_customer'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseDpmHtmlName }}[email_customer]" id="{{ dpmPrefix }}email_customer" value="0"/>
+                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[email_customer]" {% if c.get(baseDpmConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">
@@ -256,9 +247,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[useccv]" id="{{ dpmPrefix }}useccv">
-                            {{ UTIL.optionsHtml( {0:'No', 1:'Yes'}, c.get(baseDpmConfigPath ~ '/useccv'))|raw }}
-                        </select>
+                        <input type="hidden" name="{{ baseDpmHtmlName }}[useccv]" id="{{ dpmPrefix }}useccv" value="0"/>
+                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[useccv]" {% if c.get(baseDpmConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
                 <div class="form-group">

@@ -36,12 +36,10 @@
                     <label class="col-md-2 control-label">{{ 'Shipping services'|_ }}</label>
                     <div class="col-md-5">
                         {% for sId, sName in services %}
-                            <div class="checkbox">
-                                <label for="FCom_ShippingUPS-service-{{ sId }}">
-                                    <input type="hidden" name="config[modules][FCom_ShippingUps][services][s{{ sId }}]" value="0" />
-                                    <input type="checkbox" name="config[modules][FCom_ShippingUps][services][s{{ sId }}]" id="FCom_ShippingUPS-service-{{ sId }}" {% if c.get('modules/FCom_ShippingUps/services/s'~sId) == 1 %}checked="checked"{% endif %} value="1" />
-                                    {{ sName }}
-                                </label>
+                            <div class="switch-checkbox">
+                                <input type="hidden" name="config[modules][FCom_ShippingUps][services][s{{ sId }}]" value="0" />
+                                <input class="switch-cbx" type="checkbox" name="config[modules][FCom_ShippingUps][services][s{{ sId }}]" id="FCom_ShippingUPS-service-{{ sId }}" {% if c.get('modules/FCom_ShippingUps/services/s'~sId) == 1 %}checked="checked"{% endif %} value="1" />
+                                {{ sName }}
                             </div>
                         {% endfor %}
                     </div>
