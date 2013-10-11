@@ -18,7 +18,7 @@ class FCom_Admin_Main extends BClass
     {
         if (!empty($args['post']['config']['db'])) {
             $db =& $args['post']['config']['db'];
-            if (!empty($db['password']) && $db['password']==='*****') {
+            if (empty($db['password']) || $db['password']==='*****') {
                 unset($db['password']);
             }
         }
