@@ -8,23 +8,22 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
 
         // retrieve current personalization
         $pers = FCom_Admin_Model_User::i()->personalize();
-        $pers = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
+        $persGrid = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
 #var_dump($pers);
         $req = BRequest::i()->get();
 
         // prepare array to update personalization
         $personalize = array();
         foreach (array('p', 'ps', 's', 'sd', 'q') as $k) {
-            if (!isset($pers[$k])) {
-                $pers[$k] = null;
+            if (!isset($persGrid['state'][$k])) {
+                $persGrid['state'][$k] = null;
             }
-            if (isset($req[$k]) && $pers[$k] !== $req[$k]) {
-                $personalize[$k] = $req[$k];
-            } elseif (isset($pers[$k])) {
-                $config['state'][$k] = $pers[$k];
+            if (isset($req[$k]) && $persGrid['state'][$k] !== $req[$k]) {
+                $personalize['state'][$k] = $req[$k];
+            } elseif (isset($persGrid[$k])) {
+                $config['state'][$k] = $persGrid[$k];
             }
         }
-
         // save personalization
         if (!empty($personalize)) {
             FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => $personalize)));
@@ -34,8 +33,8 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $persCols = array();
         $defPos = 0;
         foreach ($config['columns'] as $col) {
-            if (!empty($col['name']) && !empty($pers['columns'][$col['name']])) {
-                $col = BUtil::arrayMerge($col, $pers['columns'][$col['name']]);
+            if (!empty($col['name']) && !empty($persGrid['columns'][$col['name']])) {
+                $col = BUtil::arrayMerge($col, $persGrid['columns'][$col['name']]);
             }
             if (empty($col['position'])) {
                 $col['position'] = $defPos;
@@ -109,24 +108,70 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $config = $this->grid['config'];
         //TODO: add _processFilters and processORM
         $orm = $this->grid['orm'];
-        $data = $this->grid['orm']->paginate();
-
-        foreach ($data['rows'] as &$row) {
+        #$data = $this->grid['orm']->paginate();
+        $data = $this->processORM($this->grid['orm']);
+        foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {
                 if (!empty($col['cell']) && !empty($col['name'])) {
                     $field = $col['name'];
+                    $value = $row->get($field);
                     switch ($col['cell']) {
                         case 'number':
-                            $row->set($field, floatval($row->get($field)));
+                            $value1 = floatval($value);
                             break;
                         case 'integer':
-                            $row->set($field, intval($row->get($field)));
+                            $value1 = intval($value);
                             break;
+                    }
+                    if ($value !== $value1) {
+                        $row->set($field, $value1);
                     }
                 }
             }
         }
-        unset($row);
+        return $data;
+    }
+
+    public function processORM($orm, $method=null, $stateKey=null, $forceRequest=array())
+    {
+        $r = BRequest::i()->request();
+        if (!empty($r['hash'])) {
+            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+        } elseif (!empty($r['filters'])) {
+            $r['filters'] = BUtil::fromJson($r['filters']);
+        }
+
+        $gridId = $this->grid['config']['id'];
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        $r = array_replace_recursive($r, $persState);
+
+        if ($stateKey) {
+            $sess =& BSession::i()->dataToUpdate();
+            $sess['grid_state'][$stateKey] = $r;
+        }
+        if ($forceRequest) {
+            $r = array_replace_recursive($r, $forceRequest);
+        }
+//print_r($r); exit;
+        //$r = array_replace_recursive($hash, $r);
+#print_r($r); exit;
+        if (!empty($r['filters'])) {
+            $where = $this->_processFilters($r['filters']);
+            $orm->where($where);
+        }
+        if (!is_null($method)) {
+            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
+        }
+        $data = $orm->paginate($r);
+
+        $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
+        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
+        $data['reloadGrid'] = !empty($r['hash']);
+        if (!is_null($method)) {
+            BEvents::i()->fire($method.'.data', array('data'=>&$data));
+        }
 
         return $data;
     }
@@ -170,45 +215,6 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             }
         }
         return $where;
-    }
-
-    public function processORM($orm, $method=null, $stateKey=null, $forceRequest=array())
-    {
-        $r = BRequest::i()->request();
-        if (!empty($r['hash'])) {
-            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
-        } elseif (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
-        }
-
-        if ($stateKey) {
-            $sess =& BSession::i()->dataToUpdate();
-            $sess['grid_state'][$stateKey] = $r;
-        }
-        if ($forceRequest) {
-            $r = array_replace_recursive($r, $forceRequest);
-        }
-//print_r($r); exit;
-        //$r = array_replace_recursive($hash, $r);
-#print_r($r); exit;
-        if (!empty($r['filters'])) {
-            $where = $this->_processFilters($r['filters']);
-            $orm->where($where);
-        }
-        if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
-        }
-        $data = $orm->jqGridData($r);
-#print_r(BORM::get_last_query());
-        $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
-        $data['reloadGrid'] = !empty($r['hash']);
-        if (!is_null($method)) {
-            BEvents::i()->fire($method.'.data', array('data'=>&$data));
-        }
-
-        return $data;
     }
 
     public function export($orm, $class=null)

@@ -47,6 +47,22 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
             $data[] = $r;
         }
+
+        $r = (array)BRequest::i()->get('s');
+
+        $gridId = 'modules';
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $s = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        //BDebug::dump($pers); exit;
+        if (!empty($s['s'])) {
+            usort($data, function($a, $b) use($s) {
+                $a1 = !empty($a[$s['s']]) ? $a[$s['s']] : '';
+                $b1 = !empty($b[$s['s']]) ? $b[$s['s']] : '';
+                $sd = empty($s['sd']) || $s['sd']==='asc' ? 1 : -1;
+                return $a1 < $b1 ? -$sd : ($a1 > $b1 ? $sd : 0);
+            });
+        }
+
         return $data;
     }
 
@@ -76,7 +92,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                 'model'       => new BValue('FCom.ModuleModel'),
                 'pageable'    => true,
                 'collection'  => $this->getModulesData(),
-                'edit_url'    => BApp::href('/modules/grid_data'),
+                'edit_url'    => BApp::href('modules/grid_data'),
                 'columns'     => array(
                      array('name' => 'name', 'label' => 'Name', 'width'=>150),
 

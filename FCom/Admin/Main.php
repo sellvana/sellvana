@@ -16,9 +16,11 @@ class FCom_Admin_Main extends BClass
 
     public function onSettingsPost($args)
     {
-        $db =& $args['post']['config']['db'];
-        if (!empty($db['password']) && $db['password']==='*****') {
-            unset($db['password']);
+        if (!empty($args['post']['config']['db'])) {
+            $db =& $args['post']['config']['db'];
+            if (!empty($db['password']) && $db['password']==='*****') {
+                unset($db['password']);
+            }
         }
 
         $ip = BRequest::i()->ip();

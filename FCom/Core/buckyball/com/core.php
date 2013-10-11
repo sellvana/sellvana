@@ -471,6 +471,7 @@ class BConfig extends BClass
         if (!is_readable($filename)) {
             BDebug::error(BLocale::_('Invalid configuration file name: %s', $filename));
         }
+
         switch ($ext) {
         case 'php':
             $config = include($filename);
