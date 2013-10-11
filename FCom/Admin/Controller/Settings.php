@@ -25,7 +25,6 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             $post = BRequest::i()->post();
 
             BEvents::i()->fire(__METHOD__, array('post'=>&$post));
-
             BConfig::i()->add($post['config'], true);
 
             if (!empty($post['config']['db'])) {

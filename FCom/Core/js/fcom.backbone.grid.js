@@ -12,9 +12,9 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
         },
       sort:function(colName,dir){
             Backgrid.HeaderCell.prototype.sort.apply(this, arguments);
-            Backbone.trigger("backgrid:sort",colName,dir);            
+            Backbone.trigger("backgrid:sort",colName,dir);
             return this;
-        }        
+        }
     });
     Backgrid.Extension.SelectRowCell.prototype.render = function() {
         this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
@@ -49,11 +49,11 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
         className: 'fcom-backgrid-toolbar',
 
         bindings: {
-            
+
         },
-        
+
         initialize: function() {
-    
+
             this.model = new Backbone.Model(this.options);
             this.template = _.template($(this.options.template).html());
             var self = this;
@@ -77,7 +77,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
     })
 
     FCom.BackgridView = Backbone.View.extend({
-        
+
         prepareConfig: function() {
             _.map(this.options.columns, function(col, i) {
                 if (!col.name) col.name = '';
@@ -88,9 +88,9 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
 
         render: function() {
             var self = this, paginator, filter;
-            
-            this.prepareConfig();
 
+            this.prepareConfig();
+            
             var Model = this.options.model || Backbone.Model;
             if (this.options.data_url || this.options.pageable) {
 
@@ -107,19 +107,21 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                     }
                 }
                 var state = { pageSize: 25 }, invDirs = {'asc':'-1', 'desc':'1'};
-                _.each(paramMap, function(k, v) {
-                    if (self.options.state[k]) {
-                        var val = self.options.state[k];
-                        if ('order' === v) val = invDirs[val];
-                        state[v] = val;
+                console.log(self.options.state);
+                _.each(paramMap, function(v, k) {
+                    var val = self.options.state[v];
+                    console.log(k, v, val);
+                    if (val) {
+                        if ('order' === k) val = val ? invDirs[val] : 1;
+                        state[k] = val;
                     }
                 });
-                console.log(state);
+                //console.log(state);
                 var Collection = PageableCollection.extend({
                     model: Model,
                     url: this.options.data_url,
                     state: state,
-                    mode: this.options.data_mode || 'server',
+                    mode: this.options.data_mode || 'client',
                     queryParams: paramMap
                 });
                 var collection = new Collection();
@@ -148,13 +150,13 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
             toolbarOptions.columns = this.options.columns;
             toolbarOptions.collection = collection;
             var toolbar = new FCom.Backgrid.Toolbar(toolbarOptions);
-            
+
             var grid = new Backgrid.Grid({
                 columns: this.options.columns,
                 collection: collection
             });
 
-            
+
             var $container = $(this.options.container);
 
             if (toolbar) {
@@ -174,20 +176,38 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 collection.fetch({ reset:true });
             }
 
-           /*this.listenTo(Backgrid, "backgrid:sort", function () {
-                    console.log('i heard that');
-            });*/
+           if(state.sortKey)
+            {
+                var click_times=0;
+                if(state.order=='-1')
+                    click_times=1;
+                if(state.order=='1')
+                    click_times=2;
+                for(var i=0;i<click_times;i++)
+                    $("th[data-id='"+state.sortKey+"']").find("a:first").trigger("click");
+            }
 
-           Backbone.on("backgrid:sort",function(colName,dir){                
-                 $.post(self.options.personalize_url,
+            Backbone.on("backgrid:sort",function(colName,dir){                 
+                var mode=self.options.data_mode || 'client'                
+                if (dir==='ascending')
+                    dir='asc';
+                else if (dir==='descending')
+                    dir='desc';
+                else
+                    dir='null';
+                if( mode !=='server')
+                {
+                    $.post(self.options.personalize_url,
                             { 'do': 'grid.state', grid: self.options.id,s:colName,sd:dir },
                             function(response, status, xhr) {
                                 console.log(response, status, xhr);
                             }
                         );
-           });
+                }
+                return true;
+            });
             
-            
+
             if (true) { // true = jquery-ui resizable, false = colResizable
                 grid.$('thead th').resizable({
                     handles: 'e',
@@ -225,7 +245,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                         grid.$('thead th').each(function(i, el) {
                             cols.push({ name: $(el).data('id') });
                         });
-                        
+
                         $.post(self.options.personalize_url,
                             { 'do': 'grid.col.order', grid: self.options.id, cols: JSON.stringify(cols) },
                             function(response, status, xhr) {
