@@ -49,6 +49,10 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     public function getBackgridConfigJson()
     {
         $config = $this->grid['config'];
+        if (!empty($config['data_url'])) {
+            $config['mode'] = 'server';
+        }
+
         $config['personalize_url'] = BApp::href('my_account/personalize');
 
         if (empty($config['id'])) {
