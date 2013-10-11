@@ -34,9 +34,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Enable Logging"|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[db][logging]">
-                            {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, c.get('db/logging'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[db][logging]" value="0"/>
+                        <input class="switch-cbx" name="config[db][logging]" {% if c.get('db/logging') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
             </div>
@@ -112,9 +111,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Verify Session IP"|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[cookie][session_check_ip]">
-                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('cookie/session_check_ip'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[cookie][session_check_ip]" value="0"/>
+                        <input class="switch-cbx" name="config[cookie][session_check_ip]" {% if c.get('cookie/session_check_ip') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
             </div>
@@ -130,9 +128,8 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Hide script file name in URL"|_ }}</label>
                     <div class="col-md-5">
-                        <select class="form-control" name="config[web][hide_script_name]">
-                            {{ UTIL.optionsHtml({0:'No',1:'Yes'}, c.get('web/hide_script_name'))|raw }}
-                        </select>
+                        <input type="hidden" name="config[web][hide_script_name]" value="0"/>
+                        <input class="switch-cbx" name="config[web][hide_script_name]" {% if c.get('web/hide_script_name') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
             </div>

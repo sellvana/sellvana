@@ -1,3 +1,6 @@
 .page-header .breadcrumb li,
 .page-header .breadcrumb a { font-size:12pt; }
 .page-header.with-breadcrumbs div.pull-left { margin-top:15px;}
+
+#categories-layout.spliter_panel .vspliter { width: 1px; color: #ddd; }
+#categories-layout .jstree-default.jstree-focused { background: none; }

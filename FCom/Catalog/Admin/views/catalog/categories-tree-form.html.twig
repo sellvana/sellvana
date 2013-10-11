@@ -17,23 +17,24 @@
             <button class="btn btn-primary" onclick="return adminForm.saveAll(this)">{{ 'Save'|_ }}</button>
         </div>
     </div>
-    <div class="box-content">
-    <div class="nav">
-        <ul class="nav nav-tabs fcom-nav-st1">
+    <div>
+        <div class="nav">
+            <ul class="nav nav-tabs fcom-nav-st1">
+                {% for k, tab in tabs %}
+                    <li>
+                        <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="tab-content fcom-admin-main-content">
             {% for k, tab in tabs %}
-                <li>
-                    <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }}</a>
-                </li>
+                {% if tab.view is not empty %}
+                    <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
+                        {% if tab.async is empty %}{{ THIS.view(tab.view)|raw }}{% endif %}
+                    </div>
+                {% endif %}
             {% endfor %}
-        </ul>
-    </div>
-    <div class="tab-content fcom-admin-main-content">
-        {% for k, tab in tabs %}
-            {% if tab.view is not empty %}
-                <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
-                    {% if tab.async is empty %}{{ THIS.view(tab.view)|raw }}{% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
+        </div>
     </div>
 </div>
