@@ -125,7 +125,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
 
                      array('name' => 'required_by', 'label' => 'Required By', 'width'=>250),
                 ),
-                'state' => array('s' => 'name', 'sd' => 'asc'),
+                'state' => array('ps' => 1000, 's' => 'name', 'sd' => 'asc'),
             ),
         );
         #BEvents::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('grid'=>&$grid));
