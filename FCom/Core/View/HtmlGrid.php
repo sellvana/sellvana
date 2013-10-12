@@ -36,6 +36,11 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return $this->grid['config']['actions'];
     }
 
+    public function callUserFunc($cb, $args)
+    {
+        return call_user_func_array($cb, $args);
+    }
+
     public function multiselectToggleOptions()
     {
         return array(
