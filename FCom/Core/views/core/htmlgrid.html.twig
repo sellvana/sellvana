@@ -1,0 +1,95 @@
+{% set data = THIS.gridData() %}
+{% set config = THIS.grid['config'] %}
+{% set s = data.result.state %}
+{% set pageUrl = THIS.pageChangeHref() %}
+{# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
+<div class="fcom-datagrid" id="{{ config.id }}">
+  {# %form(method="get" action="#{$this->gridUrl()") #}
+  {# %fieldset #}
+  <div class="fcom-datagrid__toolbar">
+    {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
+    {# %input(type="submit" value="#{$this->_('Search')}") #}
+    <table class="table">
+      <tr>
+        <td class="text-left">
+          <span class="fcom-datagrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
+          <span class="fcom-datagrid__rows-per-page">{% for ps in THIS.pageSizeOptions() %}<a class="js-change-url"
+                href="{{ THIS.gridUrl({ps:ps}) }}" class="{{ ps==s.ps ? 'active' }}">{{ ps }}</a>{% endfor %}</span>
+        </td>
+        <td class="text-center">
+          <span class="fcom-datagrid__pager">
+            {% if s.p > 1 %}<a class="js-change-url" href="{{ pageUrl|replace('-VALUE-', s.p-1) }}")>&raquo;</a>{% else %}&raquo;{% endif %}
+            {#
+            <label>
+              {{ 'Page'|_ }}
+            </label>
+            <input class="fcom-datagrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
+            {{ 'of %s'|_(s.mp) }}
+            #}
+            {% if s.p > 6 %}<a class="js-change-url" href="{{ pageUrl|replace('-VALUE-', 1) }}"{{ i == 1 ? 'class="active"' }}>1</a>{% endif %}
+            {% if s.p > 7 %}&hellip;{% endif %}
+            {% for i in (s.p-5)|max(1)..(s.p+5)|min(s.mp) %}
+                <a class="js-change-url" href="{{ pageUrl|replace('-VALUE-', i) }}" {{ i == s.p ? 'class="active"' }}>{{ i }}</a>{% endif %}
+            {% endfor %}
+            {% if s.p <= s.mp-7 %}&hellip;{% endif %}
+            {% if s.p <= s.mp-6 %}<a class="js-change-url" href="{{ pageUrl|replace('-VALUE-', s.mp) }}">{{ s.mp }}</a>{% endif %}
+            {% if s.p < s.mp %}<a class="js-change-url" href="{{ pageUrl|replace('-VALUE-', s.p+1) }}")>&raquo;</a>{% else %}&raquo;{% endif %}
+          </span>
+        </td>
+        <td class="text-right">
+          <span class="fcom-datagrid__actions">
+            {% for action in THIS.gridActions() %}
+              {% if action.renderer %}
+                {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+              {% elseif action.html %}
+                {{ action.html | raw }}
+              {% endif %}
+            {% endfor %}
+          </span>
+        </td>
+      </tr>
+    </table>
+  </div>
+  {% if s.description %}
+    <div class="fcom-datagrid__status-description">
+      {{ s.description|raw }}
+    </div>
+  {% endif %}
+  <table class="fcom-datagrid__grid table">
+    <colgroup>
+      {# foreach ($config['columns'] as $colId => $column) %}
+        <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
+      {% end #}
+    </colgroup>
+    <thead>
+      <tr id="tr-sort-{{ config.id }}")
+        {% for colId, col in config.columns %}
+          <th class="label" id="th-sort-{{ config.id ~ '-' ~ colId }}" data-id="{{ colId }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
+            {% if col.type is empty or col.type == 'default' %}
+                {% if empty col.no_reorder %}<div class="drag-handle"></div>{% endif %}
+                <div class="drag-handle">
+                    <a class="js-change-url" href="{{ THIS.sortUrl(col) }}">{{ col.label }}</a>
+                </div>
+            {% elseif col.type == 'multiselect' %}
+                <select class="js-sel">
+                    {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
+                </select>
+            {% endif %}
+          </th>
+        {% endfor %}
+        {% if config.filters %}
+            <tr class="fcom-datagrid__inline-filters id="tr-filter-{{ config.id }}>
+                {% for colId, col in config.columns %}
+                    <th id="th-filter-{{ config.id ~ '-' ~ colId }}">
+                        {{ THIS.colFilterHtml(col) | raw }}
+                    </th>
+                {% endfor %}
+            </tr>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+        {{ THIS.rowsHtml() | raw }}
+    </tbody>
+  </table>
+</div>
