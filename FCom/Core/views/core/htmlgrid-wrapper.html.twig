@@ -1,0 +1,20 @@
+{% set gridView = THIS.view('core/grid') %}
+{% set config = gridView.gridConfig() %}
+{% set defSel = config.selection ? config.selection|join('|') %}
+
+<div class="fcom-datagrid-wrapper">{{ gridView|raw }}</div>
+
+<input type="hidden" id="{{ config.id }}-selection" name="datagrid[{{ config.id }}][selection]" value="{{ defSel }}">
+
+<script>
+    require(['jquery', 'fcom.core'], function($) {
+        $(function() {
+            var grid = new FCom.DataGrid({
+                id: "{{ config.id }}",
+                grid_url: "{{ config.grid_url }}",
+                personalize_url: "{{ APP.href('my_account/personalize') }}",
+                selection: {{ config.selection ? UTIL.toJson(config.selection) : '{}' }}
+            })
+        })
+    })
+</script>

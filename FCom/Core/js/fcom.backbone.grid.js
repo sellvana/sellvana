@@ -107,10 +107,9 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                     }
                 }
                 var state = { pageSize: 25 }, invDirs = {'asc':'-1', 'desc':'1'};
-                console.log(self.options.state);
+
                 _.each(paramMap, function(v, k) {
                     var val = self.options.state[v];
-                    console.log(k, v, val);
                     if (val) {
                         if ('order' === k) val = val ? invDirs[val] : 1;
                         state[k] = val;
@@ -135,16 +134,16 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 var collection = new Collection(this.options.collection);
             }
 
-            /*
-            paginator = new Backgrid.Extension.Paginator({
+
+            var paginator = new Backgrid.Extension.Paginator({
                 collection: collection
             });
 
-            filter = new Backgrid.Extension.ServerSideFilter({
+            var filter = new Backgrid.Extension.ServerSideFilter({
                 collection: collection,
                 fields: ['name']
             });
-            */
+
 
             var toolbarOptions = this.options.toolbar;
             toolbarOptions.columns = this.options.columns;
@@ -163,7 +162,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                 $container.append(toolbar.render().$el);
             }
 
-            if (false && filter) {
+            if (filter) {
                 $container.append(filter.render().$el);
             }
 
