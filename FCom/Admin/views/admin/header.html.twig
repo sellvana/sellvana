@@ -2,7 +2,7 @@
 {% set notifications = THIS.getNotifications() %}
 {% set recentActivity = THIS.getRecentActivity() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
-
+{% set adminChatsEnabled = APP.m('FCom_AdminChat').run_status == 'LOADED' %}
 <header>
   <nav class="navbar navbar-default">
     <a class="navbar-brand" href="{{ APP.href() }}">
@@ -157,7 +157,16 @@
           </ul>
         </li>
       {% endif %}
-
+      {% if adminChatsEnabled %}
+      <li class="dropdown medium only-icon widget">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+          <i class="icon-comments-alt"></i>Chats
+        </a>
+          <ul class="dropdown-menu">
+          {{ "Userlist" |_ }}            
+          </ul>
+      </li>
+      {% endif %}
       <li class="dropdown dark user-menu">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <img width="23" height="23" alt="{{ user.fullname() }}" src="{{ UTIL.gravatar(user.get("email")) }}" />
