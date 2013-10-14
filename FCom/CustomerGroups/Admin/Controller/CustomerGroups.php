@@ -17,18 +17,11 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
 
     public function gridConfig()
     {
-        $config = array(
-            'grid' => array(
-                'id' => 'customer-groups',
-                'data_url' => BApp::href('customer-groups/grid_data'),
-                'edit_url' => BApp::href('customer-groups/grid_data/?id='),
-                'columns' => array(
-                    'id' => array('label'=>'ID', 'width'=>30, 'index' => 'cg.id'),
-                    'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href('customer-groups/form/?id=<%=id%>')),
-                    'code' => array('label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
-                ),
-            ),
-
+        $config = parent::gridConfig();
+        $config['columns'] += array(
+            'id' => array('label'=>'ID', 'width'=>30, 'index' => 'cg.id'),
+            'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href('customer-groups/form/?id=:id')),
+            'code' => array('label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
         );
         return $config;
     }

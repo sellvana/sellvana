@@ -13,7 +13,7 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
+        $config['columns'] = array_replace_recursive($config['grid']['columns'], array(
             'id' => array('index'=>'s.id'),
             'name' => array('label'=>'Site Name', 'index'=>'s.name'),
             'match_domains' => array('label'=>'Match Domains', 'index'=>'s.match_domains'),

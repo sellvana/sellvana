@@ -11,7 +11,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
     #protected $_gridViewName = 'admin/grid';
-    protected $_gridViewName = 'core/backgrid';
+    protected $_gridViewName = 'core/htmlgrid';
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
@@ -24,11 +24,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         parent::__construct();
         $this->_gridHref = trim($this->_gridHref, '/');
         if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
+
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
+        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/htmlgrid';
+
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
         if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
-        if (is_null($this->_gridViewName))   $this->_formViewName = 'core/backgrid';
         if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
+
         if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
     }
 
@@ -37,7 +40,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $view = $this->view($this->_gridViewName);
         if (method_exists($this, 'gridConfig')) {
             $config = $this->gridConfig();
-            $view->set('grid', array('config' => $config['grid']));
+            $view->set('grid', array('config' => $config));
         }
         BEvents::i()->fire(static::$_origClass.'::gridView', array('view'=>&$config));
         return $view;
@@ -47,14 +50,15 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridConfig()
     {
         $gridDataUrl = BApp::href($this->_gridHref.'/grid_data');
+        $gridHtmlUrl = BApp::href($this->_gridHref.'/grid_html');
         $formUrl = BApp::href($this->_formHref);
         $config = array(
-            'grid'=>array(
-                'id' => static::$_origClass,
-                'data_url' => $gridDataUrl,
-                'edit_url' => $gridDataUrl,
-                'columns' => array(
-                ),
+            'id' => static::$_origClass,
+            'orm' => $this->_modelClass,
+            'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,
+            'grid_url' => $gridHtmlUrl,
+            'columns' => array(
             ),
         );
         return $config;
@@ -62,7 +66,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_index()
     {
-        //$this->view('jqgrid')->set('config', $this->gridConfig());
+        if (BRequest::i()->xhr()) {
+            BResponse::i()->set($this->gridView())->output();
+        }
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
@@ -73,13 +79,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridViewBefore($args)
     {
-        $this->view('admin/grid')->set(array(
+        $this->view('core/htmlgrid')->set(array(
             'title' => $this->_gridTitle,
             'actions' => array(
                 'new' => ' <button class="st1 sz2 btn" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
             ),
         ));
         BEvents::i()->fire(static::$_origClass.'::gridViewBefore', $args);
+    }
+
+    public function action_grid_html()
+    {
+        BResponse::i()->set($this->gridView())->output();
     }
 
     public function action_grid_data()

@@ -12,9 +12,9 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
+        $config['columns'] += array(
             'id' => array('label' => 'ID'),
-            'title' => array('label'=>'Title', 'href' => BApp::href('blog/post/form/?id=<%=id%>')),
+            'title' => array('label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
             'author_user_id' => array('label'=>'Author'),
             'version' => array('label'=>'Version'),
             'create_at' => array('label'=>'Created', 'cell'=>'date'),

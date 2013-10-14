@@ -78,6 +78,7 @@ base:
       - [ addNav, modules/installed, { label: Installed Modules, href: /modules } ]
       - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
       - [ addNav, system/users, { label: Users, href: /users  } ]
+      - [ addNav, system/templates, { label: Templates, href: /templates  } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
       - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
 
@@ -155,6 +156,9 @@ lib_admin_theme1:
       - [ requireJs, admin.demo, @FCom_Admin/theme1/assets/javascripts/demo, { deps: [ jquery ] } ]
 
       - [ requireRun, [ jquery-mobile, jquery-ui, jquery-migrate, bootstrap, admin.theme, admin.demo ] ]
+
+htmlgrid:
+  - { hook: main, view: core/htmlgrid-wrapper }
 
 jqgrid:
   - view: head
@@ -289,7 +293,7 @@ form:
 
 /users:
     - { include: base }
-    - { hook: main, views: admin/grid }
+    - { hook: main, views: core/htmlgrid-wrapper }
     - { view: admin/nav, do: [[ setNav, system/users ]] }
 
 /users/form:
@@ -338,3 +342,12 @@ form:
     - { include: base }
     - { hook: main, views: modules }
     - { view: admin/nav, do: [[ setNav, modules/installed ]] }
+
+/templates:
+    - { include: base }
+    - { hook: main, views: templates }
+    - { view: admin/nav, do: [[ setNav, system/templates ]] }
+
+/test:
+    - { include: base }
+    - { hook: main, views: core/htmlgrid-wrapper }

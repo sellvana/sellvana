@@ -33,8 +33,11 @@ modules:
                     - [ get, /reports, FCom_Admin_Controller.reports ]
                     - [ post, /my_account/personalize, FCom_Admin_Controller.personalize ]
 
+                    - [ any, /templates/?.action, FCom_Admin_Controller_Templates ]
+
                     - [ get, /users, FCom_Admin_Controller_Users.index ]
                     - [ any, /users/.action, FCom_Admin_Controller_Users ]
+
 
                     - [ get, /roles, FCom_Admin_Controller_Roles.index ]
                     - [ any, /roles/.action, FCom_Admin_Controller_Roles ]

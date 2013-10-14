@@ -454,4 +454,12 @@ FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], '
 FCom.base_href = '".BApp::baseUrl()."';
         "));
     }
+
+    public static function onTwigInit($args)
+    {
+        $fa = $args['file_adapter'];
+        $fa->addFunction(new Twig_SimpleFunction('fcom_htmlgrid', function($config) {
+            return BLayout::i()->view('core/htmlgrid-wrapper')->set('config', $config);
+        }));
+    }
 }

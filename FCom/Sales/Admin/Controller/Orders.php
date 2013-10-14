@@ -12,8 +12,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
-            'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=<%=id%>')),
+        $config['columns'] = array_replace_recursive($config['grid']['columns'], array(
+            'id' => array('index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=:id')),
             'create_at' => array('index'=>'o.create_at', 'label' => 'Purchased on'),
             'billing_name' => array('label'=>'Bill to Name', 'index'=>'ab.billing_name'),
             'billing_address' => array('label'=>'Bill to Address', 'index'=>'ab.billing_address'),
