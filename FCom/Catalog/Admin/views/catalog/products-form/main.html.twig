@@ -1,0 +1,70 @@
+{% set m = THIS.model %}
+
+<fieldset name="main-product">
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-product-name" name="model[product_name]" value="{{ m.get('product_name') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }} {{ 'optional'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-url-key" name="model[url_key]" value="{{ m.get('url_key') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-local-sku">{{ 'Local SKU'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" value="{{ m.get('local_sku') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-short-description">{{ 'Short Description'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" id="model-short-description" name="model[short_description]" rows="5">{{ m.get('short_description') }}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-description">{{ 'Long Description'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" id="model-description" name="model[description]" rows="5">{{ m.get('description') }}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-net-weight">{{ 'Net Weight'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-net-weight" name="model[net_weight]" value="{{ m.get('net_weight') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-shipping-weight">{{ 'Shipping Weight'|_ }}</label>
+        <div class="col-md-5">
+            <input type="text" class="form-control" id="model-shipping-weight" name="model[net_weight]" value="{{ m.get('ship_weight') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-hide-product">{{ 'Hide Product'|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="model[is_hidden]" value="0" />
+            <input id="model-hide-product" class="switch-cbx" name="model[is_hidden]" {% if m.get('is_hidden') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        </div>
+    </div>
+</fieldset>
+
+{{ THIS.hook('catalog/products/tab/main', {'model' : m}) | raw }}
+
+<script>
+    require(['jquery', 'fcom.admin.form'], function($) {
+        $(function() {
+            //adminForm.wysiwygCreate('general-info-description');
+        });
+    })
+</script>
