@@ -33,6 +33,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
     public function gridActions()
     {
+        if (empty($this->grid['config']['actions'])) {
+            return array();
+        }
         return $this->grid['config']['actions'];
     }
 
@@ -44,15 +47,15 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
     public function multiselectToggleOptions()
     {
         return array(
-            '' => 'Selection...',
+            '' => '',
             '@Show' => array(
                 'show_all' => 'All',
-                'show_sel' => 'Only Selected',
-                'show_unsel' => 'Only Unselected',
+                'show_sel' => 'Sel',
+                'show_unsel' => 'Unsel',
             ),
-            '@Change Selection' => array(
-                'upd_sel' => 'Select Visible',
-                'upd_unsel' => 'Unselect Visible',
+            '@Select' => array(
+                'upd_sel' => 'Sel',
+                'upd_unsel' => 'Unsel',
             ),
         );
     }
@@ -69,10 +72,10 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (!empty($col['no_sort'])) {
             return '#';
         }
-        if (!empty($grid['request']['s']) && $grid['request']['s']==$col['id']) {
+        if (!empty($grid['request']['s']) && $grid['request']['s']==$col['name']) {
             $change = array('sd'=>$grid['request']['sd']=='desc'?'asc':'desc');
         } else {
-            $change = array('s'=>$col['id'], 'sd'=>'asc');
+            $change = array('s'=>$col['name'], 'sd'=>'asc');
         }
         return $this->gridUrl($change);
     }
@@ -88,7 +91,11 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (empty($col['no_reorder'])) $classArr[] = 'js-draggable';
 
         $s = $this->grid['result']['state'];
-        if (!empty($s['s']) && $s['s'] == $col['id']) $classArr[] = 'sort-'.$s['sd'];
+        if (!empty($s['s']) && $s['s'] == $col['name']) {
+            $classArr[] = 'sort-'.$s['sd'];
+        } else {
+            $classArr[] = 'sort';
+        }
 
         return join(' ', $classArr);
     }
@@ -110,17 +117,17 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (empty($c['page_size_options'])) {
             $c['page_size_options'] = array(1, 25, 50, 100);
         }
-        if (empty($c['page_size'])) {
-            $c['page_size'] = $c['page_size_options'][0];
+        if (empty($c['state']['ps'])) {
+            $c['state']['ps'] = $c['page_size_options'][0];
+        }
+        if (!isset($c['state']['s'])) {
+            $c['state']['s'] = '';
+        }
+        if (!isset($c['state']['sd'])) {
+            $c['state']['sd'] = 'asc';
         }
         if (empty($c['search'])) {
             $c['search'] = new stdClass;
-        }
-        if (!isset($c['sort'])) {
-            $c['sort'] = '';
-        }
-        if (!isset($c['sort_dir'])) {
-            $c['sort_dir'] = 'asc';
         }
         if (empty($c['row_id_column'])) {
             $c['row_id_column'] = 'id';
@@ -140,7 +147,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $pos = 0;
         foreach ($grid['config']['columns'] as $cId => &$col) {
-            $col['id'] = $cId;
+            if (empty($col['name'])) {
+                $col['name'] = $cId;
+            }
             $col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
@@ -220,20 +229,20 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         // retrieve current personalization
         $pers = FCom_Admin_Model_User::i()->personalize();
-        $pers = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
+        $persGrid = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
 
         $req = $grid['request'];
 
         // prepare array to update personalization
         $personalize = array();
-        foreach (array('p'=>'page', 'ps'=>'page_size', 's'=>'sort', 'sd'=>'sort_dir', 'q'=>'query') as $k=>$cfgKey) {
-            if (!isset($pers[$k])) {
-                $pers[$k] = null;
+        foreach (array('p'=>'p', 'ps'=>'ps', 's'=>'s', 'sd'=>'sd', 'q'=>'q') as $k => $cfgKey) {
+            if (!isset($persGrid['state'][$k])) {
+                $persGrid['state'][$k] = null;
             }
-            if (isset($req[$k]) && $pers[$k] !== $req[$k]) {
-                $personalize[$k] = $req[$k];
-            } elseif (isset($pers[$k])) {
-                $grid['config'][$cfgKey] = $pers[$k];
+            if (isset($req[$k]) && $persGrid['state'][$k] !== $req[$k]) {
+                $personalize['state'][$k] = $req[$k];
+            } elseif (isset($persGrid['state'][$k])) {
+                $grid['config']['state'][$cfgKey] = $persGrid['state'][$k];
             }
         }
         // save personalization
@@ -242,8 +251,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
 
         // get columns personalization
-        if (!empty($pers['columns'])) {
-            $persCols = $pers['columns'];
+        if (!empty($persGrid['columns'])) {
+            $persCols = $persGrid['columns'];
             foreach ($persCols as $k=>$c) {
                 if (empty($grid['config']['columns'][$k])) {
                     unset($persCols[$k]);
@@ -257,10 +266,18 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
-    public function gridConfig()
+    protected function _resetPersonalization()
     {
-        if (!empty($this->grid['config']['_processed'])) {
-            return $this->grid['config'];
+        $grid = $this->grid;
+        $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
+        $reset = array('state' => array('p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null));
+        FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => $reset)));
+    }
+
+    public function getGrid()
+    {
+        if (!empty($this->grid['_processed'])) {
+            return $this->grid;
         }
 
         $this->_processDefaults();
@@ -270,33 +287,46 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         $grid = $this->grid;
         BEvents::i()->fire(__METHOD__.'.after', array('grid' => &$grid));
-        $grid['config']['_processed'] = true;
+        $grid['_processed'] = true;
         $this->grid = $grid;
 
-        return $grid['config'];
+        return $grid;
     }
 
-    public function gridData(array $options=array())
+    public function getGridData(array $options=array())
     {
         // fetch grid configuration
-        $config = $this->gridConfig();
-        $grid = $this->grid;
+        $grid = $this->getGrid();
+        $config = $grid['config'];
 
-        $orm = $config['orm'];
+        if (empty($config['orm']) && !$grid['data']) {
+            throw new BException('Either ORM or data is required');
+        }
+        if (!empty($config['orm'])) {
+            $orm = $config['orm'];
+            if (is_string($orm)) {
+                $orm = $orm::i()->orm();
+            }
+            BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
+        } else {
+            // raw data
+        }
 
-        BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
-
-        $mapColumns = array();
-
+        //$mapColumns = array();
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
-        $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
 
-        $grid['result'] = $orm->paginate($grid['request'], array(
-            's' => !empty($config['sort']) ? $config['sort'] : null,
-            'sd' => !empty($config['sort_dir']) ? $config['sort_dir'] : null,
-            'p' => !empty($config['page']) ? $config['page'] : null,
-            'ps' => !empty($config['page_size']) ? $config['page_size'] : $config['page_size_options'][0],
-        ));
+        $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
+        try {
+            $grid['result'] = $orm->paginate($grid['request'], array(
+                's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
+                'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
+                'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
+                'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
+            ));
+        } catch (Exception $e) {
+            $this->_resetPersonalization();
+            throw $e;
+        }
 
         $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
@@ -364,10 +394,10 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $args['attr'] = $out['attr'];
             $out['attr'] = call_user_func($col['attr_callback'], $args);
         }
-        $out['attr']['data-col'] = $col['id'];
+        $out['attr']['data-col'] = $col['name'];
         //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
 
-        $field = !empty($col['field']) ? $col['field'] : $col['id'];
+        $field = !empty($col['field']) ? $col['field'] : $col['name'];
         $value = $row->get($field);
 
         if (('' === $value || is_null($value)) && !empty($col['default'])) {

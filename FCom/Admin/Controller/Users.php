@@ -12,8 +12,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
-            'username'    => array('label'=>'User Name', 'width'=>100, 'href' => BApp::href('users/form/?id=<%=id%>')),
+        $config['columns'] += array(
+            'username'    => array('label'=>'User Name', 'width'=>100, 'href' => BApp::href('users/form/?id=:id')),
             'email'       => array('label'=>'Email', 'width'=>150),
             'firstname'   => array('label'=>'First Name', 'width'=>150),
             'lastname'    => array('label'=>'Last Name', 'width'=>150),

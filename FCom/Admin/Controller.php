@@ -12,7 +12,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_test()
     {
+        $config = array(
+            'id' => 'test',
+            'orm' => 'FCom_Admin_Model_User',
+            'columns' => array(
+                'id' => array('title' => 'ID'),
+            ),
+            'data' => array(
+                array('id' => '123'),
+            ),
+        );
+        $this->view('core/htmlgrid-wrapper')->set('grid', array('config' => $config));
+        $this->layout('/test');
 
+/*
         $c = BConfig::i();
         echo $this->view('settings/FCom_Admin')->set('model', $c);
         $timer = microtime(true);
@@ -22,7 +35,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $timer = microtime(true);
         echo $this->view('settings/FCom_Core-php')->set('model', $c);
         echo microtime(true)-$timer.', ';
-
+*/
     }
 
     public function action_index()
