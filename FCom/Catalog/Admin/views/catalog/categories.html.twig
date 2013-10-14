@@ -21,7 +21,7 @@
             });
             FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
                 on:{icon:'icon-lock', label:'Editing Locked'},
-                off:{icon:'icon-lock-open', label:'Editing Unlocked'}
+                off:{icon:'icon-unlock', label:'Editing Unlocked'}
             });
             $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
             $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
@@ -104,8 +104,8 @@
 
 <div class="box row">
     <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content" id="categories-layout">
-        <div class="col-sm-3" id="categories-wrapper">
-            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar" id="categories"></div>
+        <div id="categories-wrapper">
+            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-sm-12" id="categories"></div>
         </div>
         <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
             <div id="categories-form-container" class="col-sm-12"></div>
