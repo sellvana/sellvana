@@ -420,12 +420,45 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
                                 recursive:recursive?1:''
                             }, function(data) { el.jstree('refresh', n); });
                         }
-                        $('<div title="Reorder A-Z"></div>').dialog({
+                        /*$('<div title="Reorder A-Z"></div>').dialog({
                             resizable:false, height:140, modal:true, buttons: {
                                 'Only immediate children': function() { reorder(false); $(this).dialog( "close" ); },
-                                'All descendants': function() { reorder(true); $(this).dialog( "close" ); }
+                                'All descendants': function() { reorder(true); $(this).dialog( "close" ); },
+                                'abc' : function() { alert('test'); $(this).dialog("close")}
                             }
-                        });
+                        });*/
+
+                        //use boostraps modal box
+                        var reorderModalContent = '<div class="modal fade" id="jstree-reorder" tabindex="-1" role="dialog" aria-hidden="true">' +
+                            '   <div class="modal-dialog">' +
+                            '       <div class="modal-content">' +
+                            '           <div class="modal-header">' +
+                            '               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+                            '               <h4 class="modal-title">Reorder A-Z</h4>' +
+                            '           </div>' +
+                            '           <div class="modal-body"></div>' +
+                            '       </div>' +
+                            '   </div>' +
+                            '</div>';
+                        //trigger modal dialog
+                        $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
+                            .on('shown.bs.modal', function(){
+                                $('<button></button>', {
+                                    type: 'button',
+                                    click: function() {reorder(false);},
+                                    text: 'Only immediate children',
+                                    'data-dismiss': 'modal',
+                                    class: 'btn btn-default'
+                                }).button().appendTo('#jstree-reorder .modal-body');
+                                $('<button></button>', {
+                                    type: 'button',
+                                    click: function() {reorder(true);},
+                                    text: 'All descendants',
+                                    'data-dismiss': 'modal',
+                                    class: 'btn btn-default'
+                                }).button().appendTo('#jstree-reorder .modal-body');
+                            })
+                            .on('hidden.bs.modal', function(){$(this).remove()});
                     }},
                     'refresh': {label:'Refresh', separator_before:true, action: function(n) { el.jstree('refresh', n); }}
                 }

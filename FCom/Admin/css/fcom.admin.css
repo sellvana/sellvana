@@ -6,3 +6,4 @@
 #categories-layout .jstree-default.jstree-focused { background: none; }
 #categories-layout #categories { padding-top: 15px; padding-bottom: 15px; }
 #categories-layout .jstree a { height: 18px; line-height: 18px; }
+label[for="categories-tree-lock"] { font-size: .7em; }
