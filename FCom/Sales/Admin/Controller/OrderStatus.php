@@ -12,7 +12,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
+        $config['columns'] = array_replace_recursive($config['grid']['columns'], array(
             'id' => array('index'=>'o.id', 'label' => 'Status id', 'width' =>70),
             'name' => array('index'=>'name', 'label' => 'Label'),
             'code' => array('index'=>'code', 'label' => 'Code')

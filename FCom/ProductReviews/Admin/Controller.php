@@ -19,20 +19,19 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'approved'=>array('label'=>'Approved', 'editable'=>true, 'options' => array('1' => 'Yes','0' => 'No'))
         );
 
-        $config['grid']['id'] = __CLASS__;
-        $config['grid']['autowidth'] = false;
-        $config['grid']['caption'] = 'All review';
-        $config['grid']['multiselect'] = false;
-        $config['grid']['height'] = '100%';
-        $config['grid']['columns'] = $columns;
+        $config['autowidth'] = false;
+        $config['caption'] = 'All review';
+        $config['multiselect'] = false;
+        $config['height'] = '100%';
+        $config['columns'] = $columns;
         $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-            $config['grid']['id'] = 'products_reviews';
-            $config['grid']['columns']['product_name']=array('label'=>'Product name', 'width'=>250, 'editable'=>false);
-            $config['grid']['datatype'] = 'local';
-            $config['grid']['editurl'] = '';
-            $config['grid']['url'] = '';
+            $config['id'] = 'products_reviews';
+            $config['columns']['product_name'] = array('label'=>'Product name', 'width'=>250, 'editable'=>false);
+            $config['datatype'] = 'local';
+            $config['editurl'] = '';
+            $config['url'] = '';
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
@@ -48,7 +47,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 }
             }
             //print_r($data);
-            $config['grid']['data'] = $data;
+            $config['data'] = $data;
         } else {
             $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
         }

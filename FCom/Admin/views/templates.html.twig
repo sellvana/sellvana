@@ -1,0 +1,11 @@
+<form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
+    <header class="fcom-admin-main-title">
+        <span class="title">{{ 'Modules'|_ }}</span>
+        <div class="btn-group">
+            <button class="btn btn-success" type="button" onclick="location.href='{{APP.href('modules/market')}}'"><span>{{ 'Download new Modules'|_ }}</span></button>
+            <button class="btn btn-primary" type="button" onclick="return runMigrationScripts()'"><span>{{ 'Run Migration Scripts'|_ }}</span></button>
+        </div>
+    </header>
+    {{ THIS.view('core/messages') | raw }}
+    {{ THIS.view('core/htmlgrid-wrapper') | raw }}
+</form>
