@@ -13,21 +13,16 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function gridConfig()
     {
-        $config = BUtil::arrayMerge(parent::gridConfig(), array(
-            'grid' => array(
-                'id'            => 'promo',
-                'url'           => 'promo/grid_data',
-                'columns'      => array(
-                    'id'=>array('label'=>'ID', 'index'=>'id', 'width'=>55, 'sorttype'=>'number'),
-                    'description'=>array('label'=>'Description', 'index'=>'description', 'width'=>250),
-                    'from_date'=>array('label'=>'Start Date', 'index'=>'from_date', 'formatter'=>'date'),
-                    'to_date'=>array('label'=>'End Date', 'index'=>'to_date', 'formatter'=>'date'),
-                    'status'=>array('label'=>'Status', 'index'=>'p.status', 'options'=>FCom_Promo_Model_Promo::i()->fieldOptions('status')),
-                    'details'=>array('label'=>'Details', 'index'=>'details', 'hidden'=>true),
-                    'attachments'=>array('label'=>'Attachments', 'sortable'=>false, 'hidden'=>false),
-                ),
-            ),
-        ));
+        $config = parent::gridConfig();
+        $config['columns'] += array(
+            'id'=>array('label'=>'ID', 'index'=>'id', 'width'=>55, 'sorttype'=>'number'),
+            'description'=>array('label'=>'Description', 'index'=>'description', 'width'=>250),
+            'from_date'=>array('label'=>'Start Date', 'index'=>'from_date', 'formatter'=>'date'),
+            'to_date'=>array('label'=>'End Date', 'index'=>'to_date', 'formatter'=>'date'),
+            'status'=>array('label'=>'Status', 'index'=>'p.status', 'options'=>FCom_Promo_Model_Promo::i()->fieldOptions('status')),
+            'details'=>array('label'=>'Details', 'index'=>'details', 'hidden'=>true),
+            'attachments'=>array('label'=>'Attachments', 'sortable'=>false, 'hidden'=>false),
+        );
         return $config;
     }
 

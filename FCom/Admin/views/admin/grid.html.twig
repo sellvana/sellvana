@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="row fcom-admin-main-title">
     <div class="col-sm-12">
         <div class="page-header">
@@ -22,3 +23,13 @@
         </div>
     </div>
 </div>
+=======
+<header class="fcom-admin-main-title">
+    <span class="title">{{ THIS.get('title') }}</span>
+    <div class="btn-group">
+        {{ THIS.get('actions')|join(' ') | raw }}
+    </div>
+</header>
+{{ THIS.view('core/messages') | raw }}
+{{ THIS.view('core/htmlgrid-wrapper') | raw }}
+>>>>>>> origin/bootstrap-3

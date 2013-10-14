@@ -11,8 +11,8 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
-            'handle' => array('label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=<%=id%>')),
+        $config['columns'] += array(
+            'handle' => array('label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=:id')),
             'description' => array('label'=>'Description', 'editable'=>true),
             'version' => array('label'=>'Version'),
             'create_at' => array('label'=>'Created', 'cell'=>'date'),

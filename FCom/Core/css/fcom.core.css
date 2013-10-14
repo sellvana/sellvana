@@ -1,32 +1,34 @@
 .container-low { margin-top: 100px; }
 form label.required:after { color:#e32; content:' *'; display:inline; }
 
-.fcom-datagrid-wrapper { margin: 20px; }
+.pagination { margin:0; }
 
-.fcom-datagrid__toolbar { padding: 5px; height: 20px; }
-.fcom-datagrid__toolbar > table { width:100%; }
-.fcom-datagrid__toolbar > table td { width:33%; }
-.fcom-datagrid__pager {  }
-.fcom-datagrid__rows-per-page a { border:solid 1px #CCC; padding: 2px 5px; }
-.fcom-datagrid__rows-per-page a.active { background:#FFF; font-weight:bold; }
-.fcom-datagrid__rows-status { }
-.fcom-datagrid__gotopage { width:30px; }
+.fcom-htmlgrid-wrapper { margin: 20px; }
 
-.fcom-datagrid__grid th.label { padding:3px 5px; border-right: solid 1px #CCC; background: #DDD; }
-.fcom-datagrid__grid th.label a { color:#888; /*display:block;*/ padding: 5px 10px; white-space: nowrap; }
-.fcom-datagrid__grid th.label a:hover { text-decoration: underline; }
-.fcom-datagrid__grid th.sort-asc a:after { content: ' v'; font-size:8px; color:#F00; }
-.fcom-datagrid__grid th.sort-desc a:after { content: ' ^'; font-size:10px; color:#F00; }
-.fcom-datagrid__grid th.label .drag-handle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
-.fcom-datagrid__grid th.label:hover .drag-handle { display:block; cursor: move; }
+.fcom-htmlgrid__toolbar { padding: 5px; height: 20px; }
+.fcom-htmlgrid__toolbar > table { width:100%; }
+.fcom-htmlgrid__toolbar > table td { width:33%; }
+.fcom-htmlgrid__pager {  }
+.fcom-htmlgrid__rows-per-page a { border:solid 1px #CCC; padding: 2px 5px; }
+.fcom-htmlgrid__rows-per-page a.active { background:#FFF; font-weight:bold; }
+.fcom-htmlgrid__rows-status { }
+.fcom-htmlgrid__gotopage { width:30px; }
 
-.fcom-datagrid__grid { width: 100%; }
-.fcom-datagrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
-.fcom-datagrid__grid tr.even td { background: #FCFCFC; }
-.fcom-datagrid__grid tr.odd td { background: #FFF; }
-.fcom-datagrid__grid tr:hover td { background: #EEE; }
+.fcom-htmlgrid__grid th.label { padding:3px 5px; border-right: solid 1px #CCC; background: #DDD; }
+.fcom-htmlgrid__grid th.label a { color:#888; /*display:block;*/ padding: 5px 10px; white-space: nowrap; }
+.fcom-htmlgrid__grid th.label a:hover { text-decoration: underline; }
+.fcom-htmlgrid__grid th.sort-asc a:after { content: ' v'; font-size:8px; color:#F00; }
+.fcom-htmlgrid__grid th.sort-desc a:after { content: ' ^'; font-size:10px; color:#F00; }
+.fcom-htmlgrid__grid th.label .drag-handle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.fcom-htmlgrid__grid th.label:hover .drag-handle { display:block; cursor: move; }
 
-.fcom-datagrid__actions a { border:solid 1px #AAA; margin: 2px; padding: 2px 5px; }
+.fcom-htmlgrid__grid { width: 100%; }
+.fcom-htmlgrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
+.fcom-htmlgrid__grid tr.even td { background: #FCFCFC; }
+.fcom-htmlgrid__grid tr.odd td { background: #FFF; }
+.fcom-htmlgrid__grid tr:hover td { background: #EEE; }
+
+.fcom-htmlgrid__actions a { border:solid 1px #AAA; margin: 2px; padding: 2px 5px; }
 
 .backgrid td, .backgrid td { max-width:100px !important; }
 .backgrid th { white-space: nowrap; }

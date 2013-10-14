@@ -18,6 +18,9 @@ modules:
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
 
+        observe:
+            - [ BTwig::init, FCom_Core_Main::onTwigInit ]
+
         default_config:
             db:
                 dbname: fulleron

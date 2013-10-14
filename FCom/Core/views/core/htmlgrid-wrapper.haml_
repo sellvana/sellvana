@@ -2,15 +2,15 @@
 - $config = $gridView->gridConfig()
 - $defSel = !empty($config['selection']) ? join('|', $config['selection']) : '';
 
-.fcom-datagrid-wrapper
+.fcom-htmlgrid-wrapper
     - echo $gridView
 
-%input(type="hidden" id="#{$config['id']}-selection" name="datagrid[#{$config['id']}][selection]" value="#{$defSel}")
+%input(type="hidden" id="#{$config['id']}-selection" name="htmlgrid[#{$config['id']}][selection]" value="#{$defSel}")
 
 :javascript
-    require(['jquery', 'fcom.core'], function($) {
+    require(['jquery', 'fcom.htmlgrid'], function($) {
         $(function() {
-            var grid = new FCom.DataGrid({
+            var grid = new FCom.HtmlGrid({
                 id: "#{$config['id']}",
                 grid_url: "#{$config['grid_url']}",
                 personalize_url: "#{BApp::href('my_account/personalize')}",

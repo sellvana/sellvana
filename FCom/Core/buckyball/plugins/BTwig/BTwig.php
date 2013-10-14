@@ -72,7 +72,11 @@ class BTwig extends BClass
             static::$_stringTwig->addGlobal($global, $instance);
         }
 
-        BEvents::i()->fire(__METHOD__, array('options' => $options));
+        BEvents::i()->fire(__METHOD__, array(
+            'options' => $options,
+            'file_adapter' => static::$_fileTwig,
+            'string_adapter' => static::$_stringTwig,
+        ));
     }
 
     public static function onLayoutAddAllViews($args)
