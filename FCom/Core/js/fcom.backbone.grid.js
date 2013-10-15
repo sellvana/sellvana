@@ -237,7 +237,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
                     items: 'thead .drag-handle', //jebaird
                     handle: 'drag-handle', //jebaird
                     change: function() { //jebaird
-                        //console.log($('.dragtable-drag-wrapper').html());
+                        console.log($('.dragtable-drag-wrapper').html());
                     },
                     stop: function() { //jebaird
                         var cols = [];
