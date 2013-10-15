@@ -6,6 +6,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_gridHref = 'prodreviews';
     protected $_modelClass = 'FCom_ProductReviews_Model_Review';
     protected $_mainTableAlias = 'prr';
+	protected $_gridTitle = 'Product Reviews';
 
     public function gridConfig($productModel = false)
     {
@@ -64,7 +65,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'actions' => array(
                 'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href("prodreviews").'\'"><span>Back to list</span></button>',
                 'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>Save</span></button>',
             ),
         ));
 
