@@ -57,8 +57,8 @@
         </div>
         <div class="time pull-right">
             <small class="date pull-right text-muted">
-                <span title="October 10, 2013 - 17:47" data-placement="top" class="timeago fade has-tooltip in">3 days ago</span>
-                <i class="icon-time"></i>
+                <span title="" data-placement="top" class="timeago fade has-tooltip"></span>
+                <i class="icon-time"></i>                
             </small>
         </div>
     </div>
@@ -71,11 +71,4 @@
 
 {% endif %}
 
-<script>
-    require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
-        AdminChat.init({
-            username:"{{ APP.instance('FCom_Admin_Model_User').sessionUser().username }}",
-            status:'{{ isLoggedIn?"online":"offline" }}'
-        })
-    });
-</script>
+
