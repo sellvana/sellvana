@@ -1,0 +1,107 @@
+{% set logoSrc = APP.src('@FCom_Core/img/logo.svg') %}
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% set cartQty = cart.itemQty() %}
+{% set customer = APP.instance('FCom_Customer_Model_Customer').sessionUser() %}
+{% set isLoggedIn = customer.isLoggedIn() %}
+{% set storeName = CONFIG.get('modules/FCom_Core/store_name') %}
+
+<div class="f-site-header">
+  <nav class="f-site-header-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="{{ APP.href() }}" title="{{ storeName }}"><img src="{{ logoSrc }}" width="140" alt="{{ storeName }}"/></a>
+      </div>
+      <ul class="nav navbar-nav navbar-right f-header-util-links">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-globe"></span><span class="f-header-util-links-label"><b class="flag flag-gb"></b> Language <b class="caret"></b></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><b class="flag flag-gb"></b> English</a></li>
+            <li><a href="#"><b class="flag flag-es"></b> Spanish</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-usd"></span><span class="f-header-util-links-label">Currency ($) <b class="caret"></b></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">$ - USD</a></li>
+            <li><a href="#">&euro; - EUR</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+        {% if isLoggedIn %}
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-user"></span>
+            <span class="f-header-util-links-label"><img src="{{ UTIL.gravatar(customer.get('email'), {s:20}) }}" width="20" height="20"> My Account <b class="caret"></b></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Account Info</a></li>
+            <li><a href="#">Order Status</a></li>
+            <li><a href="#">Wishlist</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Log Out</a></li>
+          </ul>
+        {% else %}
+          <a href="{{ APP.href('login') }}">
+            <span class="glyphicon glyphicon-user"></span>
+            <span class="f-header-util-links-label">Log In</span>
+          </a>
+        {% endif %}
+        </li>
+        <li class="dropdown f-header-mini-cart-trigger">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-shopping-cart"></span><span class="f-header-util-links-label">Cart ({{ cartQty }}) <b class="caret"></b></span></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li role="presentation" class="dropdown-header">{{ cartQty ? 'Recently added to cart'|_ : 'Cart is empty'|_ }}</li>
+            <li>{{ THIS.view('checkout/cart/block') | raw }}</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="f-header-search-bar">
+      <div class="container">
+        <a href="javascript:void()" class="navbar-toggle" data-toggle="collapse" data-target=".f-catalog-navbar .navbar-nav">
+          <span class="f-navbar-toggle-icon">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </span>
+          Browse
+        </a>
+        <form class="navbar-form f-header-search-form" role="search">
+          <input type="text" class="form-control typeahead" placeholder="Search the store">
+          <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search"></span></button>
+        </form>
+        <script type="text/javascript">
+          require(['jquery', 'typeahead'], function($) {
+            $('.header-search-form input.typeahead').typeahead({
+              name: 'countries',
+              prefetch: 'test-countries.json',
+              limit: 10
+            });
+          })
+        </script>
+      </div>
+    </div>
+  </nav><!-- /#site-header-top -->
+  {{ THIS.view('catalog/nav') | raw }}
+  <div class="f-header-col-callouts">
+    <div class="container">
+      <div class="row">
+        <a href="#" class="col-sm-4">
+          Free Ground Shipping
+          <small>On orders over $100</small>
+        </a>
+        <a href="#" class="col-sm-4">
+          We Ship Globally
+          <small>See list of countries</small>
+        </a>
+        <a href="#" class="col-sm-4">
+          Easy returns and exchange
+          <small>We've made it easy for you!</small>
+        </a>
+      </div>
+    </div>
+  </div>
+</div><!-- /#site-header -->
