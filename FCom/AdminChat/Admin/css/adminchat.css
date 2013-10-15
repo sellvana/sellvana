@@ -1,0 +1,14 @@
+.online 
+{
+	color: #49bf67 !important;
+}
+
+.offline
+{
+	color: #C3C3C3 !important;
+}
+
+ul#adminUserList li
+{	
+	cursor: pointer !important;
+}
