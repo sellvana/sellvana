@@ -14,32 +14,32 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
     }
   };
 
-  
-       
+
+
     ChatUserList = {
         Models: {},
         Collections: {},
         Views: {}
     }
-    
+
     //User Model
-    ChatUserList.Models.User = Backbone.Model.extend({   
+    ChatUserList.Models.User = Backbone.Model.extend({
     });
 
     //A List of Users
     ChatUserList.Collections.Users = Backbone.Collection.extend({
         model: ChatUserList.Models.User
     });
-    
+
     //View for all user list
     ChatUserList.Views.Users = Backbone.View.extend({
         el: '#adminUserList',
-        render: function(){            
+        render: function(){
             this.collection.each(this.addOne, this);
             return this;
         },
         addOne: function(user)
-        {            
+        {
             var userView = new ChatUserList.Views.User({model: user});
             this.$el.append(userView.render().el);
         }
@@ -48,14 +48,14 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
     //View for a user
     ChatUserList.Views.User = Backbone.View.extend({
         tagName: 'li',
-        template: _.template($('#userTemplate').html()),        
+        template: _.template($('#userTemplate').html()),
         events: {
             'click' :'initChat'
         },
-        initChat: function(){            
+        initChat: function(){
             AdminChat.start({user: this.model.get('username')});
         },
-        render: function(){                             
+        render: function(){
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         }
@@ -69,8 +69,8 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
         Views: {}
     }
 
-    //Chat item model     
-    ChatWindows.Models.Item = Backbone.Model.extend({   
+    //Chat item model
+    ChatWindows.Models.Item = Backbone.Model.extend({
     });
 
     //A List of items
@@ -82,13 +82,13 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
     ChatWindows.Models.Win = Backbone.Model.extend({
         defaults: {
             index: 0
-        }    
-    });    
-    
+        }
+    });
+
     //A List of windows
     ChatWindows.Collections.Wins = Backbone.Collection.extend({
         model: ChatWindows.Models.Win
-    });    
+    });
 
 
     //view for multipul chat windows(when user create several chat sessions)
@@ -97,38 +97,38 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
         initialize: function(){
             this.collection.on('add', this.addOne, this);
         },
-        render: function(){            
+        render: function(){
             this.collection.each(this.addOne, this);
             return this;
         },
         addOne: function(win)
-        {           
+        {
             var chatItems = new ChatWindows.Collections.Items([]);
             var chatWin = new ChatWindows.Views.Window({model:win,collection: chatItems});
             loadedWins[loadedWins.length]={channel:win.attributes.channel, win:chatWin};
-            this.$el.append(chatWin.render().el);               
+            this.$el.append(chatWin.render().el);
         }
     })
 
     //view for chat window
     ChatWindows.Views.Window = Backbone.View.extend({
-        
-        template: _.template($('#chatWinTemplate').html()),   
+
+        template: _.template($('#chatWinTemplate').html()),
         initialize: function(){
             this.collection.on('add', this.addOne, this);
-        }, 
+        },
         events: {
             'click .btn.box-collapse' :'toggleChatWin',
-            'click .btn.box-remove' :'closeChatWin',           
+            'click .btn.box-remove' :'closeChatWin',
             'submit' :'say'
-        },        
+        },
         toggleChatWin: function(e){
             alert('abc');
             var box = this.$el.find(".box");
             box.toggleClass("box-collapsed");
             e.preventDefault();
-            return false; 
-        },        
+            return false;
+        },
         closeChatWin: function(){
             leave({channel: this.model.get('channel')});
 
@@ -141,16 +141,16 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
         },
         say: function(ev)
         {
-            ev.preventDefault();            
+            ev.preventDefault();
             say({channel:this.model.get('channel'), text:this.$el.find('#message_body').val()});
             this.$el.find('#message_body').val('');
         },
-        render: function(){                             
+        render: function(){
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         },
         addOne: function(item)
-        {            
+        {
             var chatItem = new ChatWindows.Views.Item({model: item});
             console.log(chatItem.render().el);
             this.$el.find('ul:first').append(chatItem.render().el);
@@ -159,17 +159,17 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
             $(scrollable).slimScroll({
                 scrollTo: scrollable.prop('scrollHeight') + "px"
             });
-            this.$el.find('ul li:last').effect("highlight", {}, 500);            
+            this.$el.find('ul li:last').effect("highlight", {}, 500);
 
         }
     });
 
     //view for single chat line(item)
-    ChatWindows.Views.Item = Backbone.View.extend({        
+    ChatWindows.Views.Item = Backbone.View.extend({
         template: _.template($('#chatItemTempate').html()),
         tagName: 'li',
         className: 'message',
-        render: function(){                             
+        render: function(){
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         }
@@ -182,6 +182,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
         username = options.username;
         PushClient.send({channel:'adminuser', signal:'subscribe'});
         PushClient.send({channel:'adminuser', signal:'init'})
+        PushClient.send({channel:'adminchat', signal:'init'})
         status({status:options.status})
     }
 
@@ -214,10 +215,10 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
         if(_.contains(_.pluck(loadedWins,'channel'), chat.channel))
             return;
 
-        chat.index=loadedWins.length;                
+        chat.index=loadedWins.length;
         var chatWin= new ChatWindows.Models.Win(chat);
-        chatWins.add(chatWin);       
-        
+        chatWins.add(chatWin);
+
     }
 
     function close_window(channel)
@@ -230,9 +231,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
     {
         console.log(loadedWins);
         console.log(msg);
-        var json=_.where(loadedWins,{channel:msg.channel});        
+        var json=_.where(loadedWins,{channel:msg.channel});
         if(json[0])
-        {            
+        {
             var chatItem= new ChatWindows.Models.Item(msg);
             json[0].win.collection.add(chatItem);
         }
@@ -257,9 +258,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
     channel_adminuser.signals = {
         status: function(msg) {
 
-            var users = new ChatUserList.Collections.Users(msg.users);  
+            var users = new ChatUserList.Collections.Users(msg.users);
             var userView = new ChatUserList.Views.Users({collection: users});
-            userView.render();            
+            userView.render();
             _.each(msg.users, function(user) {
                 if (user.username === username) {
                     return;
@@ -283,7 +284,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
                 show_window(chat);
             })
         },
-        start: function(msg) {            
+        start: function(msg) {
             show_window({channel:msg.channel});
         },
         say: function(msg) {
@@ -293,7 +294,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports','fcom.a
             add_history(msg);
         },
         join: function(msg) {
-            show_window({channel:msg.channel});            
+            show_window({channel:msg.channel});
             add_history({channel:msg.channel, text: 'joined', username:msg.username});
         },
         leave: function(msg) {

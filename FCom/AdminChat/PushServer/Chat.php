@@ -14,7 +14,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         return true;
     }
 
-    public function signal_status()
+    public function signal_init()
     {
         if ($this->_client->admin_user_id) {
             $chats = FCom_AdminChat_Model_Chat::i()->orm('c')
