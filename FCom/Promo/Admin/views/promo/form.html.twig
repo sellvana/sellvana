@@ -1,0 +1,77 @@
+{% set m = THIS.model %}
+{% set tabs = THIS.sortedTabs() %}
+
+<script>
+require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
+    $(function() {
+        window.adminForm = FCom.Admin.form({
+            form:     '#{{ THIS.form_id }}',
+            tabs:     '.adm-tabs-sidebar li',
+            panes:    '.adm-tabs-content',
+            url_get:  '{{ THIS.form_url }}',
+            url_post: '{{ THIS.form_url }}'
+        });
+        $("#{{ THIS.form_id }}").validate();
+    });
+})
+</script>
+
+<form id="{{ THIS.get('form_id') }}" action="{{ THIS.get('form_url') }}" method="post">
+    <header class="adm-page-title">
+        <span class="title" id="tab-title">{{ THIS.q(THIS.get('title')) }}</span>
+        <div class="btns-set">{{ THIS.actions|join (' ')|raw }}</div>
+    </header>
+    <section class="adm-content-box info-view-mode">
+        <aside class="{% if THIS.sidebar_img %}form-img-sidebar{% else %}adm-sidebar{% endif %}">
+
+            {% if THIS.get('sidebar_img') %}
+                <img src="{{ THIS.q(THIS.sidebar_img)}}" width="98" height="98"/>
+            {% endif %}
+            <nav class="adm-tabs-sidebar">
+                <ul>
+                    {% for k, tab in tabs %}
+                        {% if tab.disabled is empty %}
+                            <li {% if k is sameas(THIS.cur_tab) %}class="active"{% endif %}>
+                                <a href="#tab-{{ THIS.q(k) }}"><span class="icon"></span>{{ THIS.q(tab.label) }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
+        </aside>
+
+
+        <div class="adm-main">
+
+            {% if m.id  %}
+                <section class="adm-product-summary adm-section-group">
+                    <h2>{{ THIS.q(m.description) }}<sup>({{ THIS.q(m.fieldOptions('status', m.status))|raw }} )</sup></h2>
+                    <table class="adm-form-subtable">
+                        <tr>
+                            <td>BUY</td>
+                            <td><strong>{{ THIS.q(m.fieldOptions('buy_type', m.buy_type))|raw }}</strong></td>
+                            <td>FROM</td>
+                            <td><strong>{{ THIS.q(m.fieldOptions('buy_group', m.buy_group))|raw }}</strong></td>
+                            <td>GET</td>
+                            <td><strong>{{ THIS.q(m.fieldOptions('get_type', m.get_type))|raw }}</strong></td>
+                            <td>OF</td>
+                            <td><strong>{{ THIS.q(m.fieldOptions('get_group', m.get_group))|raw }}</strong></td>
+                        </tr>
+                    </table>
+                </section>
+            {% endif %}
+
+            <div class="adm-tabs-container">
+
+                {% for k, tab in tabs %}
+                    <section id="tab-{{ THIS.q(k) }}" class="adm-tabs-content"
+                             {% if k is not sameas(THIS.cur_tab) %}hidden{% endif %}
+                            {% if tab.async is empty %}data-loaded="true"{% endif %}
+                            >
+                        {% if tab.async is empty %} {{ THIS.view(tab.view)|raw }}{% endif %}
+                    </section>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</form>
