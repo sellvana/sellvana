@@ -1,35 +1,81 @@
-<style>
-    .fcom-chat-window-container { position:fixed; bottom:0; right:0; border:solid 1px #888; width:300px; height:400px; z-index:9999; padding:3px; background:#EEE; }
-    .fcom-chat-window-inner { position:relative; width:100%; height:100%; padding:3px; }
-    .fcom-chat-title { position:absolute; top:3px; left:3px; width:90%; height:20px; }
-    .fcom-chat-close-trigger { position:absolute; color:red; top:3px; right:3px; }
-    .fcom-chat-history { position:absolute; background:#FFF; top:23px; left:3px; right:3px; bottom:43px; padding:3px; overflow-y:auto; }
-    .fcom-chat-input { position:absolute; bottom:3px; left:3px; width:285px; height:30px; }
-</style>
+
 
 {% set isLoggedIn = APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
-{% if false %}
-    <div class="adminchat-container">
-        {% if isLoggedIn %}
-            <button id="adminchat-test">Test Chat</button>
-            <select id="adminuser-status">
-                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
-            </select>
-        {% endif %}
+{% set adminChatsEnabled = APP.m('FCom_AdminChat').run_status == 'LOADED' %}
+
+{% if adminChatsEnabled %}
+<script>
+ var curUser='{{ APP.instance('FCom_Admin_Model_User').sessionuser().username }}';
+</script>
+<div id='adminChatMain'></div>
+<script type='text/template' class='template' id= 'chatWinTemplate'>            
+        <div class='chat chat-fixed' style='margin-right: <%- index*300 %>px'>
+            <div class='col-sm-12'>
+                <div class='box'>
+                    <div class='box-header box-header-small contrast-background'>
+                        <div class='title'>
+                          <i class='icon-comments-alt'></i>
+                          Chat
+                        </div>
+                        <div class='actions'>
+                          <a class="btn box-remove btn-xs btn-link" href="#"><i class='icon-remove'></i>
+                          </a>                          
+                          <a class="btn box-collapse btn-xs btn-link" href="#"><i></i>
+                          </a>
+                        </div>
+                    </div>
+                    <div class='box-content box-no-padding'>
+                        <div class='scrollable' data-scrollable-height='300' data-scrollable-start='bottom'>
+                          <ul class='list-unstyled list-hover list-striped'>
+                         
+                          </ul>
+                        </div>
+                        <form class="new-message" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
+                            <input class='form-control' id='message_body' name='message[body]' placeholder='Type your message here...' type='text'>
+                            <button class='btn btn-success' type='submit'>
+                                <i class='icon-plus'></i>
+                            </button>
+                        </form>
+              
+                    </div>
+                </div>
+            </div>
+        </div>
+</script>
+
+<script type='text/template' class='template' id='chatItemTempate'>
+
+    <div class="avatar">
+        <img width="23" height="23" src="http://www.gravatar.com/avatar/70b03db954aa45fc2559e85f5d5bd13e?default=identicon" alt="Avatar">
     </div>
+    
+    <div class="name-and-time">
+        <div class="name pull-left">
+            <small>
+                <a href="#" class="text-contrast"><%- username %></a>
+            </small>
+        </div>
+        <div class="time pull-right">
+            <small class="date pull-right text-muted">
+                <span title="October 10, 2013 - 17:47" data-placement="top" class="timeago fade has-tooltip in">3 days ago</span>
+                <i class="icon-time"></i>
+            </small>
+        </div>
+    </div>
+    
+    <div class="body">
+        &nbsp;<%- text %>
+    </div>
+
+</script>
+
 {% endif %}
+
 <script>
     require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
         AdminChat.init({
             username:"{{ APP.instance('FCom_Admin_Model_User').sessionUser().username }}",
             status:'{{ isLoggedIn?"online":"offline" }}'
         })
-
-        $('#adminchat-test').click(function(ev) {
-            AdminChat.start({user:'user1'});
-        });
-        $('#adminuser-status').change(function(ev) {
-            AdminChat.status({status:this.value});
-        });
-    })
+    });
 </script>

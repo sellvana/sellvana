@@ -1,8 +1,25 @@
+<style>
+.online 
+{
+  color: #49bf67 !important;
+}
+
+.offline
+{
+  color: #C3C3C3 !important;
+}
+
+ul#adminUserList li
+{ 
+  cursor: pointer !important;
+}
+</style>
 {% set user = APP.instance("FCom_Admin_Model_User").sessionUser() %}
 {% set notifications = THIS.getNotifications() %}
 {% set recentActivity = THIS.getRecentActivity() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
 {% set adminChatsEnabled = APP.m('FCom_AdminChat').run_status == 'LOADED' %}
+{% set curUserStatus = APP.instance("FCom_AdminChat_Model_UserStatus").sessionUserStatus() %}
 <header>
   <nav class="navbar navbar-default">
     <a class="navbar-brand" href="{{ APP.href() }}">
@@ -102,7 +119,7 @@
             <i class="icon-rss"></i>
             <div class="label">{{ notifications.count }}</div>
           </a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu" >
             {% for item in recentActivity %}
               <li>
                 <a href="{{ item.href }}" title="{{ item.title }}">
@@ -160,10 +177,41 @@
       {% if adminChatsEnabled %}
       <li class="dropdown medium only-icon widget">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-          <i class="icon-comments-alt"></i>Chats
+          <i class="icon-comments-alt"></i>&nbsp;Chats
         </a>
-          <ul class="dropdown-menu">
-          {{ "Userlist" |_ }}            
+          <ul class="dropdown-menu" id="adminUserList">
+            <li>
+              <div class="widget-body">
+                          <div class="pull-left icon">
+                            <i class="icon-user {{ curUserStatus.status }}"></i>
+                          </div>
+                          <div class="pull-left text">
+                            {{ user.username }}&nbsp;
+                            <small class="text-muted">
+                              <select id='adminuser-status'>
+                                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
+                              </select>
+                            </small>
+                          </div>
+
+              </div>              
+            </li>
+            <li class="divider"></li>
+            <script type='text/template' class='template' id= 'userTemplate'>            
+                  <% if ( username !== '{{ user.username }}' ) { %>
+                  <div class="widget-body">
+                        <div class="pull-left icon">
+                          <i class="icon-user <%- status %>"></i>
+                        </div>
+                        <div class="pull-left text">
+                          <%- username %>&nbsp;
+                          <small class="text-muted"></small>
+                        </div>
+                        
+                  </div>              
+                  <% } %>
+            </script>
+
           </ul>
       </li>
       {% endif %}
@@ -204,3 +252,22 @@
     </form>
   </nav>
 </header>
+
+<script>
+  require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
+    
+    $('#adminchat-status').val('{{ curUser.status }}');
+
+    $('#adminchat-status').parents('li:first').click(function(ev){ 
+      alert('abc');
+      ev.preventDefaults();      
+    });
+    $('#adminchat-status').click(function(ev){ 
+      alert('abc123');
+      ev.preventDefaults();      
+    });
+    $('#adminchat-status').change(function(ev){      
+      AdminChat.status({status:this.value});
+    });
+  });
+</script>
