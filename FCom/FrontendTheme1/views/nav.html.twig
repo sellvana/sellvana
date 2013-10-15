@@ -6,11 +6,11 @@
 
 {% elseif conf.type == 'categories_root' %}
 
-    {{ THIS.view('catalog/nav') | raw }}
+    {{ THIS.view('catalog/category/nav') | raw }}
 
 {% elseif conf.type == 'categories_custom' %}
 
-    {{ THIS.view('catalog/nav') | raw }}
+    {{ THIS.view('catalog/category/nav') | raw }}
 
 {% else %}
 
