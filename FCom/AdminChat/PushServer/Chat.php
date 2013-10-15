@@ -72,7 +72,10 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 #BDebug::log('ADMINCHAT: say '.print_r($this->_message, 1));
         $channel->send(array(
             'signal' => 'say',
-            'text' => '['.date('h:i', strtotime($msg->create_at)).'] '.$user->username . ': ' . $this->_message['text'].'<br>',
+            'text' => $this->_message['text'],
+            'username' =>$user->username,
+            'msg_id' => $this->_message['msg_id'],
+            'time' =>gmdate("Y-m-d H:i:s +0000")
         ));
     }
 
