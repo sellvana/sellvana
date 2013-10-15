@@ -1,5 +1,5 @@
 <style>
-.online 
+.online
 {
   color: #49bf67 !important;
 }
@@ -10,7 +10,7 @@
 }
 
 ul#adminUserList li
-{ 
+{
   cursor: pointer !important;
 }
 </style>
@@ -18,7 +18,7 @@ ul#adminUserList li
 {% set notifications = THIS.getNotifications() %}
 {% set recentActivity = THIS.getRecentActivity() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
-{% set adminChatsEnabled = APP.m('FCom_AdminChat').run_status == 'LOADED' %}
+{% set adminChatsEnabled = MODULES.isLoaded('FCom_AdminChat') %}
 {% set curUserStatus = APP.instance("FCom_AdminChat_Model_UserStatus").sessionUserStatus() %}
 <header>
   <nav class="navbar navbar-default">
@@ -194,10 +194,10 @@ ul#adminUserList li
                             </small>
                           </div>
 
-              </div>              
+              </div>
             </li>
             <li class="divider"></li>
-            <script type='text/template' class='template' id= 'userTemplate'>            
+            <script type='text/template' class='template' id= 'userTemplate'>
                   <% if ( username !== '{{ user.username }}' ) { %>
                   <div class="widget-body">
                         <div class="pull-left icon">
@@ -207,8 +207,8 @@ ul#adminUserList li
                           <%- username %>&nbsp;
                           <small class="text-muted"></small>
                         </div>
-                        
-                  </div>              
+
+                  </div>
                   <% } %>
             </script>
 
@@ -255,18 +255,18 @@ ul#adminUserList li
 
 <script>
   require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
-    
+
     $('#adminchat-status').val('{{ curUser.status }}');
 
-    $('#adminchat-status').parents('li:first').click(function(ev){ 
+    $('#adminchat-status').parents('li:first').click(function(ev){
       alert('abc');
-      ev.preventDefaults();      
+      ev.preventDefaults();
     });
-    $('#adminchat-status').click(function(ev){ 
+    $('#adminchat-status').click(function(ev){
       alert('abc123');
-      ev.preventDefaults();      
+      ev.preventDefaults();
     });
-    $('#adminchat-status').change(function(ev){      
+    $('#adminchat-status').change(function(ev){
       AdminChat.status({status:this.value});
     });
   });

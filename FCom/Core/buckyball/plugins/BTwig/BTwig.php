@@ -64,9 +64,16 @@ class BTwig extends BClass
             static::$_stringTwig->addFilter($filter);
         }
 
-        foreach (array('app', 'config', 'layout', 'request', 'session', 'util', 'debug') as $var) {
-            $global   = strtoupper($var);
-            $class    = 'B'.ucfirst($var);
+        foreach (array(
+            'APP' => 'BApp',
+            'CONFIG' => 'BConfig',
+            'LAYOUT' => 'BLayout',
+            'REQUEST' => 'BRequest',
+            'SESSION' => 'BSession',
+            'UTIL' => 'BUtil',
+            'DEBUG' => 'BDebug',
+            'MODULES' => 'BModuleRegistry',
+        ) as $global => $class) {
             $instance = $class::i();
             static::$_fileTwig->addGlobal($global, $instance);
             static::$_stringTwig->addGlobal($global, $instance);
