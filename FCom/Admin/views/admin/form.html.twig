@@ -76,7 +76,7 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
-                <div class="fcom-admin-main-content tab-content">
+                <div class="tab-content">
                     {% for k, tab in tabs %}
                         <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
                             {% if tab.async is empty %}{{ THIS.view(tab.view) | raw }}{% endif %}
