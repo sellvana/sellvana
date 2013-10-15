@@ -161,11 +161,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $m = $args['model'];
         $actions = array();
 
-        $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>';
+        $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>' .  BLocale::_('Back to list') . '</span></button>';
         if ($m->id) {
-            $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>Delete</span></button>';
+            $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Delete') . '</span></button>';
         }
-        $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>Save</span></button>';
+        $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
         $args['view']->set(array(
             'form_id' => BLocale::transliterate($this->_formLayoutName),

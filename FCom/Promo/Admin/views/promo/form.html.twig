@@ -56,17 +56,17 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
 
                 {% if m.get('id')  %}
                     <section class="adm-product-summary adm-section-group">
-                        <h2>{{ THIS.q(m.description) }}<sup>({{ THIS.q(m.fieldOptions('status', m.get('status')))|raw }} )</sup></h2>
+                        <h2>{{ m.get('description') }}<sup>({{ m.fieldOptions('status', m.get('status')) }})</sup></h2>
                         <table class="adm-form-subtable">
                             <tr>
                                 <td>BUY</td>
-                                <td><strong>{{ THIS.q(m.fieldOptions('buy_type', m.get('buy_type')))|raw }}</strong></td>
+                                <td><strong>{{ m.fieldOptions('buy_type', m.get('buy_type')) }}</strong></td>
                                 <td>FROM</td>
-                                <td><strong>{{ THIS.q(m.fieldOptions('buy_group', m.get('buy_group')))|raw }}</strong></td>
+                                <td><strong>{{ m.fieldOptions('buy_group', m.get('buy_group')) }}</strong></td>
                                 <td>GET</td>
-                                <td><strong>{{ THIS.q(m.fieldOptions('get_type', m.get('get_type')))|raw }}</strong></td>
+                                <td><strong>{{ m.fieldOptions('get_type', m.get('get_type')) }}</strong></td>
                                 <td>OF</td>
-                                <td><strong>{{ THIS.q(m.fieldOptions('get_group', m.get('get_group')))|raw }}</strong></td>
+                                <td><strong>{{ m.fieldOptions('get_group', m.get('get_group')) }}</strong></td>
                             </tr>
                         </table>
                     </section>
@@ -75,7 +75,7 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
 
                     {% for k, tab in tabs %}
                         <section id="tab-{{ THIS.q(k) }}" class="adm-tabs-content"
-                                 {% if k is not sameas(THIS.get('cur_tab')) %}hidden{% endif %}
+                                {% if k != THIS.get('cur_tab') %}hidden{% endif %}
                                 {% if tab.async is empty %}data-loaded="true"{% endif %}
                                 >
                             {% if tab.async is empty %} {{ THIS.view(tab.view)|raw }}{% endif %}
