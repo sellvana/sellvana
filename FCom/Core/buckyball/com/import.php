@@ -36,6 +36,8 @@ class BImport extends BClass
         // assume we know nothing about the file
         $info = array();
         // open file for reading
+	    if (!file_exists($file))
+		    return false;
         $fp = fopen($file, 'r');
         // get first line in the file
         $r = fgets($fp);
