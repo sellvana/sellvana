@@ -466,6 +466,15 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
             'cookies': { auto_save: false,save_opened: false,save_selected: false},
             'checkbox': opt.checkbox/*{ real_checkboxes:true }*/
         })
+        .bind("loaded.jstree", function(e, data){
+            if (opt.create_lock) {
+                $(el).find('li#1>a').after('<input class="entypo lock" id="'+opt.lock_flag.replace('#', '')+'" type="checkbox"/>');
+                FCom.Admin.checkboxButton(opt.lock_flag, {def:true,
+                    on:{icon:'icon-lock', label:'Editing Locked'},
+                    off:{icon:'icon-unlock', label:'Editing Unlocked'}
+                });
+            }
+        })
         .bind("before.jstree", function (e, data) {
             if (data.func.match(/(create|remove|rename|move_node)/) && !checkLock()) {
                 e.stopImmediatePropagation();

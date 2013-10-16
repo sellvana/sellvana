@@ -19,10 +19,10 @@
                 limit: 2,
                 position: '25%'
             });
-            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
-                on:{icon:'icon-lock', label:'Editing Locked'},
-                off:{icon:'icon-unlock', label:'Editing Unlocked'}
-            });
+//            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
+//                on:{icon:'icon-lock', label:'Editing Locked'},
+//                off:{icon:'icon-unlock', label:'Editing Unlocked'}
+//            });
             $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
             $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
 
@@ -44,11 +44,12 @@
             */
 
             FCom.Admin.tree('#categories', {
-                url:'{{ APP.href('catalog/categories/tree_data') }}'
-                , on_click: function (n) { loadForm(n.attr('id')); }
+                url:'{{ APP.href('catalog/categories/tree_data') }}',
+                on_click: function (n) { loadForm(n.attr('id')); } ,
                 //, on_dblclick: function (n) { loadForm(n.attr('id')); }
-                , on_select: function (n) { loadForm(n.attr('id')); }
-                , lock_flag: '#categories-tree-lock'
+                on_select: function (n) { loadForm(n.attr('id')); },
+                lock_flag: '#categories-tree-lock',
+                create_lock: true
             });
             /*
             var cmsNavLayout = $('#categories-layout').height($('.adm-wrapper').height()).layout({
@@ -90,14 +91,8 @@
             <h1 class="pull-left">
                 <i class="icon-list-ul"></i>
                 <span>{{ "Categories" |_ }}</span>
-                <input class="entypo lock" id="categories-tree-lock" type="checkbox"/>
+                {#<input class="entypo lock" id="categories-tree-lock" type="checkbox"/>#}
             </h1>
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
-                    <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -105,6 +100,10 @@
 <div class="box col-sm-12">
     <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content row" id="categories-layout">
         <div id="categories-wrapper">
+            <div class="text-center well-sm">
+                <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
+                <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
+            </div>
             <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-sm-12" id="categories"></div>
         </div>
         <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
