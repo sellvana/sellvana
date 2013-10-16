@@ -50,7 +50,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridConfig()
     {
         $gridDataUrl = BApp::href($this->_gridHref.'/grid_data');
-        $gridHtmlUrl = BApp::href($this->_gridHref.'/grid_html');
+        #$gridHtmlUrl = BApp::href($this->_gridHref.'/grid_html');
+        $gridHtmlUrl = BApp::href($this->_gridHref);
         $formUrl = BApp::href($this->_formHref);
         $config = array(
             'id' => static::$_origClass,

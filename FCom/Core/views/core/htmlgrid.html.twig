@@ -1,17 +1,17 @@
+{# Logic provided by FCom_Core_View_Backgrid #}
+
 {% set data = THIS.getGridData() %}
 {% set config = THIS.grid['config'] %}
 {% set s = data.result.state %}
 {% set pageUrl = THIS.pageChangeHref() %}
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
-  <div class="_scrollable-area">
   {# %form(method="get" action="#{$this->gridUrl()") #}
   {# %fieldset #}
   <div class="fcom-htmlgrid__toolbar">
+    <div class="btn-toolbar">
     {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
     {# %input(type="submit" value="#{$this->_('Search')}") #}
-    <div class="row">
-      <div class="col-sm-3 text-left">
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
@@ -22,8 +22,7 @@
             </li>
           {% endfor %}
         </ul>
-      </div>
-      <div class="col-sm-6 text-center">
+
         <ul class="pagination pagination-sm">
           {#
           <label>
@@ -51,8 +50,7 @@
             <a class="js-change-url" href="{{ s.p >= s.mp ? '#' : pageUrl|replace({'-VALUE-': s.mp}) }}">&raquo;</a>
           </li>
         </ul>
-      </div>
-      <div class="col-sm-3 text-right">
+
         <span class="fcom-htmlgrid__actions">
           {% for action in THIS.gridActions() %}
             {% if action.renderer %}
@@ -62,50 +60,55 @@
             {% endif %}
           {% endfor %}
         </span>
-      </div>
     </div>
   </div>
+  <div class="clearfix"></div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
       {{ s.description|raw }}
     </div>
   {% endif %}
-  <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped">
-    {#<colgroup>
-      {% foreach ($config['columns'] as $colId => $column) %}
-        <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
-      {% end %}
-    </colgroup>#}
-    <thead>
-      <tr id="tr-sort-{{ config.id }}" role="row">
-        {% for colId, col in config.columns %}
-          <th id="th-sort-{{ config.id ~ '-' ~ col.name }}" data-id="{{ colId }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
-            {% if col.type is empty or col.type == 'default' %}
-              <a class="js-change-url" href="{{ THIS.sortUrl(col) }}">
-                {% if col.no_reorder is empty %}<div class="drag-handle"></div>{% endif %}
-                {{ col.label }}
-              </a>
-            {% elseif col.type == 'multiselect' %}
-              <select class="js-sel">
-                  {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-              </select>
-            {% endif %}
-          </th>
-        {% endfor %}
-        {% if config.filters %}
-          <tr class="fcom-htmlgrid__inline-filters id="tr-filter-{{ config.id }}>
-            {% for colId, col in config.columns %}
-                <th id="th-filter-{{ config.id ~ '-' ~ col.name }}">
-                    {{ THIS.colFilterHtml(col) | raw }}
-                </th>
-            {% endfor %}
-          </tr>
-        {% endif %}
-      </tr>
-    </thead>
-    <tbody>
-      {{ THIS.rowsHtml() | raw }}
-    </tbody>
-  </table>
-</div>
+  <div class="scrollable-area">
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped">
+      {#<colgroup>
+        {% foreach ($config['columns'] as $colId => $column) %}
+          <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
+        {% end %}
+      </colgroup>#}
+      <thead>
+        <tr id="tr-sort-{{ config.id }}" role="row">
+          {% for colId, col in config.columns %}
+            <th id="th-sort-{{ config.id ~ '-' ~ col.name }}" data-id="{{ colId }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
+              {% if col.type is empty or col.type == 'default' %}
+                {% if col.sortable is not sameas(false) %}
+                <a class="js-change-url" href="{{ THIS.sortHref(col) }}">
+                  {% if col.no_reorder is empty %}<div class="drag-handle"></div>{% endif %}
+                  {{ col.label }}
+                </a>
+                {% else %}
+                  {{ col.label }}
+                {% endif %}
+              {% elseif col.type == 'multiselect' %}
+                <select class="js-sel">
+                    {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
+                </select>
+              {% endif %}
+            </th>
+          {% endfor %}
+          {% if config.filters %}
+            <tr class="fcom-htmlgrid__inline-filters id="tr-filter-{{ config.id }}>
+              {% for colId, col in config.columns %}
+                  <th id="th-filter-{{ config.id ~ '-' ~ col.name }}">
+                      {{ THIS.colFilterHtml(col) | raw }}
+                  </th>
+              {% endfor %}
+            </tr>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {{ THIS.rowsHtml() | raw }}
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -66,7 +66,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return !empty($grid['request']['selected']) ? $grid['request']['selected'] : '';
     }
 
-    public function sortUrl($col)
+    public function sortHref($col)
     {
         $grid = $this->get('grid');
         if (!empty($col['no_sort'])) {
@@ -77,7 +77,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         } else {
             $change = array('s'=>$col['name'], 'sd'=>'asc');
         }
-        return $this->gridUrl($change);
+        return BUtil::setUrlQuery(true, $change);
     }
 
     public function sortStyle($col)
@@ -115,7 +115,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $c['grid_url'] = BRequest::currentUrl();
         }
         if (empty($c['page_size_options'])) {
-            $c['page_size_options'] = array(1, 25, 50, 100);
+            $c['page_size_options'] = array(10, 25, 50, 100);
         }
         if (empty($c['state']['ps'])) {
             $c['state']['ps'] = $c['page_size_options'][0];
@@ -172,11 +172,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     $col['no_reorder'] = true;
                     $col['format'] = function($args) use($col) {
                         $options = array('' => '');
-                        foreach ($col['options'] as $k => $opt) {
-                            if (!empty($opt['data-href'])) {
-                                $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
+                        if (!empty($col['options'])) {
+                            foreach ($col['options'] as $k => $opt) {
+                                if (!empty($opt['data-href'])) {
+                                    $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
+                                }
+                                $options[$k] = $opt;
                             }
-                            $options[$k] = $opt;
                         }
                         return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
                     };
