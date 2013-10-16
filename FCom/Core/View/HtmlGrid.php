@@ -240,19 +240,20 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         // retrieve current personalization
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persGrid = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
-
-        $req = $grid['request'];
+#var_dump($pers);
+        $req = BRequest::i()->get();
 
         // prepare array to update personalization
+
         $personalize = array();
-        foreach (array('p'=>'p', 'ps'=>'ps', 's'=>'s', 'sd'=>'sd', 'q'=>'q') as $k => $cfgKey) {
+        foreach (array('p', 'ps', 's', 'sd', 'q') as $k) {
             if (!isset($persGrid['state'][$k])) {
                 $persGrid['state'][$k] = null;
             }
             if (isset($req[$k]) && $persGrid['state'][$k] !== $req[$k]) {
                 $personalize['state'][$k] = $req[$k];
-            } elseif (isset($persGrid['state'][$k])) {
-                $grid['config']['state'][$cfgKey] = $persGrid['state'][$k];
+            } elseif (isset($persGrid[$k])) {
+                $grid['config']['state'][$k] = $persGrid[$k];
             }
         }
         // save personalization
@@ -261,21 +262,20 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
 
         // get columns personalization
-        if (!empty($persGrid['columns'])) {
-            $persCols = $persGrid['columns'];
-            foreach ($persCols as $k=>$c) {
-                if (empty($grid['config']['columns'][$k])) {
-                    unset($persCols[$k]);
-                }
+        $persCols = array();
+        $defPos = 0;
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($persGrid['columns'][$col['name']])) {
+                $col = BUtil::arrayMerge($col, $persGrid['columns'][$col['name']]);
             }
-            $grid['config']['columns'] = BUtil::arrayMerge($grid['config']['columns'], $persCols);
-            uasort($grid['config']['columns'], function($a, $b) {
-                $a1 = !empty($a['position']) ? $a['position'] : 99999;
-                $b1 = !empty($b['position']) ? $b['position'] : 99999;
-                return $a1 - $b1;
-            });
+            if (empty($col['position'])) {
+                $col['position'] = $defPos;
+            }
+            $defPos++;
+            $persCols[] = $col;
         }
-        // sort columns by user preference
+        usort($persCols, function($a, $b) { return $a['position'] - $b['position']; });
+        $grid['config']['columns'] = $persCols;
 
         $this->grid = $grid;
     }

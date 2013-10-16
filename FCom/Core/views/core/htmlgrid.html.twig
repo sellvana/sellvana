@@ -76,16 +76,12 @@
       <thead>
         <tr id="tr-sort-{{ config.id }}" role="row">
           {% for colId, col in config.columns %}
-            <th id="th-sort-{{ config.id ~ '-' ~ col.name }}" data-id="{{ colId }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
+            <th id="th-sort-{{ config.id ~ '-' ~ col.name }}" data-id="{{ col.name }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
               {% if col.type is empty or col.type == 'default' %}
-                {% if col.sortable is not sameas(false) %}
                 <a class="js-change-url" href="{{ THIS.sortHref(col) }}">
                   {% if col.no_reorder is empty %}<div class="drag-handle"></div>{% endif %}
                   {{ col.label }}
                 </a>
-                {% else %}
-                  {{ col.label }}
-                {% endif %}
               {% elseif col.type == 'multiselect' %}
                 <select class="js-sel">
                     {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
