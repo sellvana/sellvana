@@ -29,7 +29,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 
                     $channels[] = array(
                         'channel' => 'adminchat:' . $chat->id,
-                        'history' => nl2br($chat->getHistoryText()),
+                        'history' => $chat->getHistoryArray(),
                     );
                 }
                 $this->reply(array('signal' => 'chats', 'chats' => $channels));

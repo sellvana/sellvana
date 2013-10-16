@@ -52,7 +52,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $chat;
     }
 
-    public function getHistoryText()
+    public function getHistoryArray()
     {
         $history = FCom_AdminChat_Model_History::i()->orm('h')
             ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
@@ -60,9 +60,9 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
             ->where('h.chat_id', $this->id)->order_by_asc('h.create_at')->find_many();
         $text = array();
         foreach ($history as $msg) {
-            $text[] = '['.date('h:i', strtotime($msg->create_at)).'] '.$msg->username.': '.$msg->text;
+            $text[] = array('time'=>gmdate("Y-m-d H:i:s +0000", strtotime($msg->create_at)),'username'=>$msg->username,'text'=>$msg->text);
         }
-        return join("\n", $text);
+        return $text;
     }
 
     public function addHistory($user, $text)
