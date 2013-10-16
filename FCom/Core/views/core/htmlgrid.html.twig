@@ -9,8 +9,7 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
   {# %form(method="get" action="#{$this->gridUrl()") #}
   {# %fieldset #}
-  <div class="fcom-htmlgrid__toolbar">
-    <div class="btn-toolbar">
+  <div class="fcom-htmlgrid__toolbar btn-toolbar" style="height:45px">
     {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
     {# %input(type="submit" value="#{$this->_('Search')}") #}
       <!--
@@ -61,9 +60,7 @@
             {% endif %}
           {% endfor %}
         </span>
-    </div>
   </div>
-  <div class="clearfix"></div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
       {{ s.description|raw }}
