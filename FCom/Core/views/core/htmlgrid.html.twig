@@ -4,6 +4,7 @@
 {% set config = THIS.grid['config'] %}
 {% set s = data.result.state %}
 {% set pageUrl = THIS.pageChangeHref() %}
+
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
   {# %form(method="get" action="#{$this->gridUrl()") #}
