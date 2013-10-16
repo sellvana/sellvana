@@ -88,7 +88,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $data = array('chat_id' => $this->id, 'user_id' => $user->id);
         $participant = $hlp->load($data);
         if (!$participant) {
-            $data['status'] = 'online';
+            $data['status'] = 'open';
             $participant = $hlp->create($data)->save();
             $this->add('num_participants');
             $channel->send(array('signal' => 'join', 'username' => $user->username));
