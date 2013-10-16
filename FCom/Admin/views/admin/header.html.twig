@@ -256,7 +256,7 @@ ul#adminUserList li
   require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
     AdminChat.init({
       username: '{{ user.username }}',
-      status: '{{ isLoggedIn?"online":"offline" }}'
+      status: '{{ curUserStatus.status }}'
     });
   });
 </script>
