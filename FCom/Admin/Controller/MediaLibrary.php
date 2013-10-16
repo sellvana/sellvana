@@ -62,7 +62,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.file_name', 'a.file_size'))
             ;
-            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__.'.'.$folder);
+            $data = FCom_Admin_View_JqGrid::i()->processORM($orm, __METHOD__.'.'.$folder);
             BResponse::i()->json($data);
             break;
 
