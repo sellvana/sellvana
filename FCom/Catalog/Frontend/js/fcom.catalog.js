@@ -1,4 +1,4 @@
-define(['jquery', 'jquery.cookie'], function($) {
+define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
 
     FCom.CompareBlock = function(opt) {
     //console.log('FROM CATALOG.JS', $, $.cookie);

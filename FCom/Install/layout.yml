@@ -11,7 +11,7 @@ base:
             - [ css, @FCom_Core/css/fcom.core.css ]
             - [ css, @FCom_Install/css/styles.css ]
             - [ css, @FCom_Core/css/fulleron-base.css ]
-            - [ requireRun, fcom.core ]
+            #- [ requireRun, fcom.core ]
 
 /:
     - { include: base }

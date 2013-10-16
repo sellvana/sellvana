@@ -1,6 +1,7 @@
-define(['jquery'], function($) {
+define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
 
     FCom.HtmlGrid = function(config) {
+        
         var gridEl = $('#'+config.id);
         var gridParent = gridEl.parent();
         var gridSelection = config.selection || {};
@@ -32,9 +33,9 @@ define(['jquery'], function($) {
             setSelection();
 
             var $table = $('table.fcom-htmlgrid__grid', gridParent);
-
+            
             // resize columns
-            /*
+            
             $('thead th', gridParent).resizable({
                 handles: 'e',
                 minWidth: 20,
@@ -174,5 +175,7 @@ define(['jquery'], function($) {
                 eval(data.eval);
             }
         });
+        
+        
     }
 })
