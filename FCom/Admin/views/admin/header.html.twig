@@ -19,7 +19,9 @@ ul#adminUserList li
 {% set recentActivity = THIS.getRecentActivity() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
 {% set adminChatsEnabled = APP.m('FCom_AdminChat').run_status == 'LOADED' %}
-{% set curUserStatus = APP.instance("FCom_AdminChat_Model_UserStatus").sessionUserStatus() %}
+{% set curUserStatus = APP.m("FCom_AdminChat_Model_UserStatus").sessionUserStatus() %}
+{% set isLoggedIn = APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
+
 <header>
   <nav class="navbar navbar-default">
     <a class="navbar-brand" href="{{ APP.href() }}">
@@ -179,37 +181,36 @@ ul#adminUserList li
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">
           <i class="icon-comments-alt"></i>&nbsp;Chats
         </a>
-          <ul class="dropdown-menu" id="adminUserList">
-            <li>
-              <div class="widget-body">
-                          <div class="pull-left icon">
-                            <i class="icon-user {{ curUserStatus.status }}"></i>
-                          </div>
-                          <div class="pull-left text">
-                            {{ user.username }}&nbsp;
-                            <small class="text-muted">
-                              <select id='adminuser-status'>
-                                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
-                              </select>
-                            </small>
-                          </div>
-
-              </div>              
+          <ul class="dropdown-menu" id="adminUserList">      
+            <li id="adminStatus">                  
+              <script type='text/template' class='template' id='statusTemplate'>
+                <div class="widget-body">                
+                    <div class="pull-left icon">
+                      <i class="icon-user <%- status %>"></i>
+                    </div>
+                    <div class="pull-left text">
+                      <%- username %>&nbsp;
+                      <small class="text-muted">
+                        <select id='adminuser-status' value='<%- status %>'>                          
+                          {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
+                        </select>
+                      </small>
+                    </div>                
+                </div>    
+              </script>              
             </li>
             <li class="divider"></li>
-            <script type='text/template' class='template' id= 'userTemplate'>            
-                  <% if ( username !== '{{ user.username }}' ) { %>
+            <script type='text/template' class='template' id= 'userTemplate'>                              
                   <div class="widget-body">
                         <div class="pull-left icon">
                           <i class="icon-user <%- status %>"></i>
                         </div>
                         <div class="pull-left text">
                           <%- username %>&nbsp;
-                          <small class="text-muted"></small>
+                          <small class="text-muted">-<%- status %></small>
                         </div>
                         
-                  </div>              
-                  <% } %>
+                  </div>                                
             </script>
 
           </ul>
@@ -254,20 +255,13 @@ ul#adminUserList li
 </header>
 
 <script>
-  require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
-    
-    $('#adminchat-status').val('{{ curUser.status }}');
+  
 
-    $('#adminchat-status').parents('li:first').click(function(ev){ 
-      alert('abc');
-      ev.preventDefaults();      
-    });
-    $('#adminchat-status').click(function(ev){ 
-      alert('abc123');
-      ev.preventDefaults();      
-    });
-    $('#adminchat-status').change(function(ev){      
-      AdminChat.status({status:this.value});
+  require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
+
+    AdminChat.init({
+      username: '{{ user.username }}',
+      status: '{{ isLoggedIn?"online":"offline" }}'
     });
   });
 </script>
