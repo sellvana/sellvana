@@ -74,6 +74,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 $url = BApp::href('install/step2');
             }
         } catch (Exception $e) {
+            print_r($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
             $url = BApp::href('install/step1');
         }

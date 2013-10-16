@@ -29,6 +29,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', 'backbone-pageable', 'ex
 
     FCom.Backgrid.HrefCell = Backgrid.Cell.extend({
       /** @property */
+      
       className: "href-cell",
 
       render: function () {
