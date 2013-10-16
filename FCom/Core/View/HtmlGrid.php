@@ -70,7 +70,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
     public function sortHref($col)
     {
         $grid = $this->get('grid');
-        if (!empty($col['no_sort'])) {
+        if (empty($col['name']) || isset($col['sortable']) && !$col['sortable']) {
             return '#';
         }
         if (!empty($grid['request']['s']) && $grid['request']['s']==$col['name']) {
@@ -92,7 +92,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (empty($col['no_reorder'])) $classArr[] = 'js-draggable';
 
         $s = $this->grid['result']['state'];
-        if (!empty($s['s']) && $s['s'] == $col['name']) {
+        if (!empty($s['s']) && !empty($col['name']) && $s['s'] == $col['name']) {
             $classArr[] = 'sort-'.$s['sd'];
         } else {
             $classArr[] = 'sort';
@@ -212,7 +212,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                             BLocale::_('Sort')
                         ));
                         break;
-                    
+
                     case 'link_to_page':
                         $action = array('html' => BUtil::tagHtml('a',
                             array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page'),
@@ -269,7 +269,11 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                 }
             }
             $grid['config']['columns'] = BUtil::arrayMerge($grid['config']['columns'], $persCols);
-            uasort($grid['config']['columns'], function($a, $b) { return $a['position'] - $b['position']; });
+            uasort($grid['config']['columns'], function($a, $b) {
+                $a1 = !empty($a['position']) ? $a['position'] : 99999;
+                $b1 = !empty($b['position']) ? $b['position'] : 99999;
+                return $a1 - $b1;
+            });
         }
         // sort columns by user preference
 
@@ -403,6 +407,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (!empty($col['attr_callback'])) {
             $args['attr'] = $out['attr'];
             $out['attr'] = call_user_func($col['attr_callback'], $args);
+        }
+        if (empty($col['name'])) {
+            $col['name'] = null; //TODO: correct value
         }
         $out['attr']['data-col'] = $col['name'];
         //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
