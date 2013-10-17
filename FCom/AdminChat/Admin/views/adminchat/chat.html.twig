@@ -3,6 +3,7 @@
 <div id='sound'></div>
 <script>
  var curUser = "{{ APP.instance('FCom_Admin_Model_User').sessionUser().get('username') }}";
+ var dingPath = '{{ APP.src('@FCom_Core/sound/ding.wav') }}';
 </script>
 <div id='adminChatMain'></div>
 <script type='text/template' class='template' id= 'chatWinTemplate'>

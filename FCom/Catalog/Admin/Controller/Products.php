@@ -25,7 +25,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['actions'] = array(
             'refresh' => true,
             'link_to_page' => true,
-            'sort' => true,
         );
         $config['format_callback'] = function($args) {
             foreach ($args['rows'] as $row) {
