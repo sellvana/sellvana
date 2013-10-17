@@ -4257,6 +4257,11 @@ body.login {
   -webkit-border-radius: 0 !important;
   -moz-border-radius: 0 !important;
   border-radius: 0 !important; }
+.table-bordered th:first-child {min-width: 100px;}
+.table-bordered tr th { display:inline-block; 
+                    vertical-align: middle;
+}
+
 
 .input-group-addon, .form-control, .input-append .add-on:last-child, .input-append .btn:last-child, .input-append .btn-group:last-child > .dropdown-toggle,
 .input-prepend.input-append .add-on:last-child, .input-prepend.input-append .btn:last-child,

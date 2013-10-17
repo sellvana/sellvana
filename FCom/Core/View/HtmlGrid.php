@@ -5,7 +5,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
     static protected $_defaultActions = array(
         'refresh' => true,
         'link_to_page' => true,
-        'sort' => true,
+        'columns' => true,
     );
 
     public function gridUrl($changeRequest=array())
@@ -206,13 +206,6 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                             BLocale::_('Refresh')
                         ));
                         break;
-                    case 'sort':
-                        $action = array('html' => BUtil::tagHtml('a',
-                            array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh btn'),
-                            BLocale::_('Sort')
-                        ));
-                        break;
-
                     case 'link_to_page':
                         $action = array('html' => BUtil::tagHtml('a',
                             array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page btn'),

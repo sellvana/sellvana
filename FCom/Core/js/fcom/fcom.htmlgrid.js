@@ -1,4 +1,4 @@
-define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
+define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function($) {
 
     FCom.HtmlGrid = function(config) {
         
@@ -34,6 +34,26 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
 
             var $table = $('table.fcom-htmlgrid__grid', gridParent);
             
+            $('.showhide_column').each(function(){
+                $(this).attr('checked','checked');
+            })
+            $('.showhide_column').bind('click',function(){
+
+                var id = $(this).data('id');
+                
+                    $('.table-bordered  tr').each(function() {
+                        $(this).children('th').each(function()
+                        {
+                            if ($(this).data('id') == id)
+                            {
+                                index = $(this).index();
+                            }
+                        });
+
+                    $('th:eq(' + index + ')',this).toggle();
+                    $('tr:eq(' + index + ')',this).toggle();
+                });
+            })
             // resize columns
             
             $('thead th', gridParent).resizable({
@@ -68,7 +88,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
             */
 
             // reorder columns
-            /*
+            
             $table.dragtable({
                 handle: 'drag-handle',
                 items: 'thead .drag-handle',
@@ -91,7 +111,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
                 }
             });
 
-            /*
+            
             $('thead', gridParent).sortable({
                 items: 'th',
                 containment:'parent',
@@ -111,7 +131,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function($) {
                     );
                 }
             });
-            */
+            
         }
         // initialize DOM first time on page load
         initDOM();
