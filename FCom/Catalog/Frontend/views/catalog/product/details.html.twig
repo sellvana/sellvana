@@ -46,6 +46,13 @@
         <!-- Product Select Column-->
         <div class="col-md-7 f-col-prod-select">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
+          <div class="f-prod-avg-rating">
+            <div class="glyphicon f-rating-stars f-sm-stars">
+              <span class="f-filled-stars" style="width:100%;"></span>
+              <span class="f-empty-stars"></span>
+            </div>
+            <a href="#f-prod-tab-reviews">3 Reviews</a>
+          </div>
           <div class="f-price-group">
             {% if prod.get('base_price') == 0 %}
               <span class="f-special-price">{{ 'FREE'|_ }}</span>
@@ -115,7 +122,7 @@
         <div class="col-md-7 f-col-prod-select">
           <div class="f-prod-info">
             <div class="tab-content">
-              <div class="tab-pane active" id="f-prod-tab-specs">
+              <section class="tab-pane active" id="f-prod-tab-specs">
                 <h3 class="f-tab-heading">Specifications</h3>
                 <div class="table-responsive f-prod-specs-table">
                   <table class="table table-condensed">
@@ -198,42 +205,107 @@
                     </tr>
                   </table>
                 </div>
-              </div>
-              <div class="tab-pane active" id="f-prod-tab-reviews">
+              </section>
+              <section class="tab-pane active f-prod-reviews" id="f-prod-tab-reviews">
                 <h3 class="f-tab-heading">Customer Reviews</h3>
-                <div class="glyphicon f-rating-stars ">
-                  <span class="f-filled-stars" style="width:50%;"></span>
-                  <span class="f-empty-stars"></span>
+                <div class="f-prod-review-avg clearfix">
+                  <strong>Avg. Customer Rating:</strong>
+                  <div class="glyphicon f-rating-stars f-lg-stars">
+                    <span class="f-filled-stars" style="width:100%;"></span>
+                    <span class="f-empty-stars"></span>
+                  </div>
+                  <strong>5 Stars</strong>
+                  (20 Customer reviews)
+                  <div class="f-prod-review-attrs">
+                    <dl class="dl-horizontal">
+                      <dt>Value</dt>
+                      <dd>5</dd>
+                      <dt>Features</dt>
+                      <dd>5</dd>
+                      <dt>Quality</dt>
+                      <dd>5</dd>
+                    </dl>
+                  </div>
                 </div>
-                <div class="glyphicon f-rating-stars f-sm-stars">
-                  <span class="f-filled-stars"></span>
-                  <span class="f-empty-stars"></span>
-                </div>
-                <div class="glyphicon f-rating-stars f-lg-stars">
-                  <span class="f-filled-stars"></span>
-                  <span class="f-empty-stars"></span>
-                </div>
-                <form class="form-vertical">
-                  <fieldset>
-                    <div class="control-group">
-                      <label class="control-label">Text input</label>
-                      <div class="controls">
-                        <input type="text" class="col-lg-3">
-                      </div>
-                    </div>
-                    <div class="control-group">
-                      <label class="control-label">Textarea</label>
-                      <div class="controls">
-                        <textarea rows="3"  class="col-lg-3"></textarea>
-                      </div>
-                    </div>
-                  </fieldset>
-                  <button type="submit" class="btn btn-default">Submit Review</button>
-                </form>
-              </div>
-              <div class="tab-pane active" id="f-prod-tab-tags">
+                <article class="f-prod-review-post clearfix">
+                  <h5>I love Fulleron!! Great value and service.</h5>
+                  <span class="meta">by John Doe on October 12, 2013</span>
+                  <div class="col-md-4 f-prod-review-attrs">
+                    <dl class="dl-horizontal">
+                      <dt><strong>Overall</strong></dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        <strong>5</strong>
+                      </dd>
+                      <dt>Value</dt>
+                      <dd>5</dd>
+                      <dt>Features</dt>
+                      <dd>5</dd>
+                      <dt>Quality</dt>
+                      <dd>5</dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-8 f-prod-review">
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                  </div>
+                </article>
+                <article class="f-prod-review-post clearfix">
+                  <h5>I love Fulleron!! Great value and service.</h5>
+                  <span class="meta">by John Doe on October 12, 2013</span>
+                  <div class="col-md-4 f-prod-review-attrs">
+                    <dl class="dl-horizontal">
+                      <dt><strong>Overall</strong></dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        <strong>5</strong>
+                      </dd>
+                      <dt>Value</dt>
+                      <dd>5</dd>
+                      <dt>Features</dt>
+                      <dd>5</dd>
+                      <dt>Quality</dt>
+                      <dd>5</dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-8 f-prod-review">
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                  </div>
+                </article>
+                <article class="f-prod-review-post clearfix">
+                  <h5>I love Fulleron!! Great value and service.</h5>
+                  <span class="meta">by John Doe on October 12, 2013</span>
+                  <div class="col-md-4 f-prod-review-attrs">
+                    <dl class="dl-horizontal">
+                      <dt><strong>Overall</strong></dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        <strong>5</strong>
+                      </dd>
+                      <dt>Value</dt>
+                      <dd>5</dd>
+                      <dt>Features</dt>
+                      <dd>5</dd>
+                      <dt>Quality</dt>
+                      <dd>5</dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-8 f-prod-review">
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                  </div>
+                </article>
+              </section>
+              <section class="tab-pane active" id="f-prod-tab-tags">
                 <h3 class="f-tab-heading">Tags</h3>
-              </div>
+              </section>
             </div>
           </div>
         </div><!-- /.f-col-prod-select -->

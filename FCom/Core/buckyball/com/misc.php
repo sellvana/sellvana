@@ -1478,6 +1478,13 @@ class BUtil extends BClass
         $zip->close();
         return true;
     }
+
+    static public function getMemoryLimit()
+    {
+        preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
+        $mult = array('G' => 1073741824, 'M' => 1048576, 'K' => 1024);
+        return $val[1]*(!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
+    }
 }
 
 class BHTML extends BClass
