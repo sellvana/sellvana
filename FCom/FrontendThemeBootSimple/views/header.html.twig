@@ -14,7 +14,7 @@
       <ul class="nav navbar-nav navbar-right f-header-util-links">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-globe"></span><span class="f-header-util-links-label"><b class="flag flag-gb"></b> Language <b class="caret"></b></span></a>
+            <span class="glyphicon glyphicon-globe"></span><span class="f-header-util-links-label"><b class="flag flag-gb"></b> English <b class="caret"></b></span></a>
           <ul class="dropdown-menu">
             <li><a href="#"><b class="flag flag-gb"></b> English</a></li>
             <li><a href="#"><b class="flag flag-es"></b> Spanish</a></li>
@@ -22,11 +22,15 @@
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-usd"></span><span class="f-header-util-links-label">Currency ($) <b class="caret"></b></span></a>
+            <span class="glyphicon glyphicon-usd"></span><span class="f-header-util-links-label">$ USD <b class="caret"></b></span></a>
           <ul class="dropdown-menu">
             <li><a href="#">$ - USD</a></li>
             <li><a href="#">&euro; - EUR</a></li>
           </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-togge" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-th-list"></span><span class="f-header-util-links-label">Compare <b class="caret"></b></span></a>
         </li>
         <li class="dropdown">
         {% if isLoggedIn %}
@@ -50,7 +54,7 @@
         </li>
         <li class="dropdown f-header-mini-cart-trigger">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-shopping-cart"></span><span class="f-header-util-links-label">Cart ({{ cartQty }}) <b class="caret"></b></span></b>
+            <span class="glyphicon glyphicon-shopping-cart"></span><span class="f-header-util-links-label">Cart ({{ cartQty }}) <b class="caret"></b></span><span class="f-header-util-qty">{{ cartQty }}</span>
           </a>
           <ul class="dropdown-menu">
             <li role="presentation" class="dropdown-header">{{ cartQty ? 'Recently added to cart'|_ : 'Cart is empty'|_ }}</li>
@@ -58,6 +62,17 @@
           </ul>
         </li>
       </ul>
+      <form class="navbar-form f-header-search-form" role="search">
+        <input type="text" class="form-control typeahead" placeholder="Search the store">
+        <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search"></span></button>
+      </form>
+      <script type="text/javascript">
+        /*$('.f-header-search-form input.typeahead').typeahead({
+          name: 'countries',                                                          
+          prefetch: 'test-countries.json',                                         
+          limit: 10                                                                   
+        });*/
+      </script>
     </div>
     <div class="f-header-search-bar">
       <div class="container">
