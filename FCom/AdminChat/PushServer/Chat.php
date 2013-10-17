@@ -20,7 +20,8 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
             $chats = FCom_AdminChat_Model_Chat::i()->orm('c')
                 ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')
                 ->where('p.user_id', $this->_client->admin_user_id)
-                ->select('c.id')
+                ->select('c.id')                
+                ->select_expr('p.status', 'chatWinStatus')
                 ->find_many();
             if ($chats) {
                 $channels = array();
@@ -29,6 +30,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 
                     $channels[] = array(
                         'channel' => 'adminchat:' . $chat->id,
+                        'status' => $chat->chatWinStatus,
                         'history' => $chat->getHistoryArray(),
                     );
                 }
@@ -82,6 +84,42 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
     public function signal_kick()
     {
 
+    }
+
+    public function signal_close()
+    {
+        $channel = $this->_message['channel'];
+        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $hlp = FCom_AdminChat_Model_Participant::i();
+        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
+        $participant = $hlp->load($data);
+        $participant->status='close';
+        $participant->save();
+    }
+
+    public function signal_minize()
+    {
+        $channel = $this->_message['channel'];
+        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $hlp = FCom_AdminChat_Model_Participant::i();
+        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
+        $participant = $hlp->load($data);
+        $participant->status='minize';
+        $participant->save();
+    }
+
+    public function signal_open()
+    {
+        $channel = $this->_message['channel'];
+        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $hlp = FCom_AdminChat_Model_Participant::i();
+        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
+        $participant = $hlp->load($data);
+        $participant->status='open';
+        $participant->save();
     }
 
     public function signal_leave()
