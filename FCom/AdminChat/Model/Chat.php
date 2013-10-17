@@ -24,7 +24,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return FCom_AdminChat_Model_Chat::i()->load($m[1]);
     }
 
-    static public function start($remoteUser)
+    static public function openWithUser($remoteUser)
     {
         // get local user
         $user = FCom_Admin_Model_User::i()->sessionUser();
@@ -32,8 +32,9 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $chats = static::orm('c')->where('num_participants', 2)
             ->join('FCom_AdminChat_Model_Participant', array('p1.chat_id','=','c.id'), 'p1')
             ->join('FCom_AdminChat_Model_Participant', array('p2.chat_id','=','c.id'), 'p2')
-            ->where('p1.user_id', $user->id)
-            ->where('p2.user_id', $remoteUser->id)
+            ->where('p1.user_id', $user->id())
+            ->where('p2.user_id', $remoteUser->id())
+            ->select('c.*')
             ->find_many_assoc();
         if ($chats) {
             foreach ($chats as $chat) {
@@ -57,10 +58,16 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $history = FCom_AdminChat_Model_History::i()->orm('h')
             ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
             ->select('u.username')->select('h.create_at')->select('h.text')
-            ->where('h.chat_id', $this->id)->order_by_asc('h.create_at')->find_many();
+            ->where('h.chat_id', $this->id())
+            ->where_gt('create_at', date('Y-m-d', time()-86400))
+            ->order_by_asc('h.create_at')->find_many();
         $text = array();
         foreach ($history as $msg) {
-            $text[] = array('time'=>gmdate("Y-m-d H:i:s +0000", strtotime($msg->create_at)),'username'=>$msg->username,'text'=>$msg->text);
+            $text[] = array(
+                'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
+                'username' => $msg->get('username'),
+                'text' => $msg->get('text'),
+            );
         }
         return $text;
     }
@@ -68,8 +75,8 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
     public function addHistory($user, $text)
     {
         $msg = FCom_AdminChat_Model_History::i()->create(array(
-            'chat_id' => $this->id,
-            'user_id' => $user->id,
+            'chat_id' => $this->id(),
+            'user_id' => $user->id(),
             'text' => $text,
         ))->save();
         return $msg;
@@ -85,13 +92,13 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         }
 
         $hlp = FCom_AdminChat_Model_Participant::i();
-        $data = array('chat_id' => $this->id, 'user_id' => $user->id);
+        $data = array('chat_id' => $this->id(), 'user_id' => $user->id());
         $participant = $hlp->load($data);
         if (!$participant) {
             $data['status'] = 'open';
             $participant = $hlp->create($data)->save();
             $this->add('num_participants');
-            $channel->send(array('signal' => 'join', 'username' => $user->username));
+            $channel->send(array('signal' => 'join', 'username' => $user->get('username')));
         }
 
         return $this;
@@ -106,8 +113,8 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         }
 
         FCom_AdminChat_Model_Participant::i()->delete_many(array(
-            'chat_id' => $this->id,
-            'user_id' => $user->id,
+            'chat_id' => $this->id(),
+            'user_id' => $user->id(),
         ));
 
         $this->add('num_participants', -1);
