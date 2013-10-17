@@ -1,0 +1,38 @@
+{% set m = THIS.model %}
+
+<fieldset class="adm-section-group">
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Handle"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[handle]" value="{{ m.get('handle') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Description"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[description]" value="{{ m.get('description') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Content"|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" name="model[content]" id="main-content" rows="5">{{ m.get('content') }}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Content Format"|_ }}</label>
+        <div class="col-md-5">
+            <select class="form-control" name="model[renderer]">
+                {{ UTIL.optionsHtml(LAYOUT.getAllRenderers(true), m.get('renderer'))|raw }}
+            </select>
+        </div>
+    </div>
+</fieldset>
+
+<script>
+    require(['jquery', 'fcom.admin.form'], function($) {
+        $(function() {
+            //adminForm.wysiwygCreate('main-content');
+        });
+    })
+</script>

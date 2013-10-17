@@ -86,7 +86,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 
     }
 
-    public function signal_close()
+    public function signal_notify()
     {
         $channel = $this->_message['channel'];
         $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
@@ -94,31 +94,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $hlp = FCom_AdminChat_Model_Participant::i();
         $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
         $participant = $hlp->load($data);
-        $participant->status='close';
-        $participant->save();
-    }
-
-    public function signal_minize()
-    {
-        $channel = $this->_message['channel'];
-        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
-        $user = FCom_Admin_Model_User::i()->sessionUser();
-        $hlp = FCom_AdminChat_Model_Participant::i();
-        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
-        $participant = $hlp->load($data);
-        $participant->status='minize';
-        $participant->save();
-    }
-
-    public function signal_open()
-    {
-        $channel = $this->_message['channel'];
-        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
-        $user = FCom_Admin_Model_User::i()->sessionUser();
-        $hlp = FCom_AdminChat_Model_Participant::i();
-        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
-        $participant = $hlp->load($data);
-        $participant->status='open';
+        $participant->status = $this->_message['status'];
         $participant->save();
     }
 
