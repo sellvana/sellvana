@@ -51,15 +51,13 @@
           </li>
         </ul>
 
-        <span class="fcom-htmlgrid__actions">
-          {% for action in THIS.gridActions() %}
-            {% if action.renderer %}
-              {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
-            {% elseif action.html %}
-              {{ action.html | raw }}
-            {% endif %}
-          {% endfor %}
-        </span>
+        {% for action in THIS.gridActions() %}
+          {% if action.renderer %}
+            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+          {% elseif action.html %}
+            {{ action.html | raw }}
+          {% endif %}
+        {% endfor %}
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
