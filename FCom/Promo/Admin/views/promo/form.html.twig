@@ -36,6 +36,17 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
     </div>
 
     <div class="row adm-content-box info-view-mode col-sm-12 box">
+        {% if m.get('id')  %}
+            <div class="adm-product-summary adm-section-group box-header blue-background">
+                <div class="title">{{ m.get('description') }}<sup>({{ m.fieldOptions('status', m.get('status')) }})</sup></div>
+                <p class="promo-summary" style="font-size: .5em; clear: both;">
+                    {{ "BUY"|_ }} <strong>{{ m.fieldOptions('buy_type', m.get('buy_type')) }}</strong>
+                    {{ "FROM"|_ }} <strong>{{ m.fieldOptions('buy_group', m.get('buy_group')) }}</strong>
+                    {{ "GET"|_ }} <strong>{{ m.fieldOptions('get_type', m.get('get_type')) }}</strong>
+                    {{ "OF"|_ }} <strong>{{ m.fieldOptions('get_group', m.get('get_group')) }}</strong>
+                </p>
+            </div>
+        {% endif %}
         <div class="box-content">
             <div class="tabbable tabs-left {% if THIS.get('sidebar_img') %}form-img-sidebar{% else %}adm-sidebar{% endif %}">
                 <ul class="nav nav-tabs nav-stacked adm-tabs-sidebar" id="tabs">
@@ -50,38 +61,21 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
                         {% endif %}
                     {% endfor %}
                 </ul>
-            </div>
 
-            <div class="adm-main tab-content">
+                <div class="adm-main tab-content">
 
-                {% if m.get('id')  %}
-                    <section class="adm-product-summary adm-section-group">
-                        <h2>{{ m.get('description') }}<sup>({{ m.fieldOptions('status', m.get('status')) }})</sup></h2>
-                        <table class="adm-form-subtable">
-                            <tr>
-                                <td>BUY</td>
-                                <td><strong>{{ m.fieldOptions('buy_type', m.get('buy_type')) }}</strong></td>
-                                <td>FROM</td>
-                                <td><strong>{{ m.fieldOptions('buy_group', m.get('buy_group')) }}</strong></td>
-                                <td>GET</td>
-                                <td><strong>{{ m.fieldOptions('get_type', m.get('get_type')) }}</strong></td>
-                                <td>OF</td>
-                                <td><strong>{{ m.fieldOptions('get_group', m.get('get_group')) }}</strong></td>
-                            </tr>
-                        </table>
-                    </section>
-                {% endif %}
 
 
                     {% for k, tab in tabs %}
                         <section id="tab-{{ THIS.q(k) }}" class="adm-tabs-content"
-                                {% if k != THIS.get('cur_tab') %}hidden{% endif %}
+                                 {% if k != THIS.get('cur_tab') %}hidden{% endif %}
                                 {% if tab.async is empty %}data-loaded="true"{% endif %}
                                 >
                             {% if tab.async is empty %} {{ THIS.view(tab.view)|raw }}{% endif %}
                         </section>
                     {% endfor %}
 
+                </div>
             </div>
         </div>
     </div>
