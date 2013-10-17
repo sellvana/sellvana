@@ -146,7 +146,7 @@ common_js_libs:
 lib_admin_theme1:
   - view: head
     do:
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/jquery/jquery_ui.css ]
+      - [ css, //ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.min.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
       #- [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/dynatree/ui.dynatree.css ]

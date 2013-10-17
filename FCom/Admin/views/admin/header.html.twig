@@ -181,7 +181,7 @@ ul#adminUserList li
       {% if adminChatsEnabled %}
       <li class="dropdown medium only-icon widget">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-          <i class="icon-comments-alt"></i>&nbsp;Chats
+          <i class="icon-comments-alt"></i>&nbsp;<span class="badge badge-inverse" style="display:none;" id="totalUnreads"></span>
         </a>
           <ul class="dropdown-menu" id="adminUserList">
             <li id="adminStatus">
@@ -208,7 +208,9 @@ ul#adminUserList li
                 </div>
                 <div class="pull-left text">
                   <%- username %>&nbsp;
-                  <small class="text-muted">-<%- status %></small>
+                  <small class="text-muted">-<%- status %>&nbsp;
+                    <span class="badge badge-inverse" style="display:none;"></span>
+                  </small>
                 </div>
             </script>
           </ul>

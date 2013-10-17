@@ -5,6 +5,9 @@
 {% set s = data.result.state %}
 {% set pageUrl = THIS.pageChangeHref() %}
 
+
+
+
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
   {# %form(method="get" action="#{$this->gridUrl()") #}
@@ -59,6 +62,23 @@
               {{ action.html | raw }}
             {% endif %}
           {% endfor %}
+        </span>
+        <span class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
+                Columns
+                <b class="caret"></b>
+            </a>
+                <ul class="dropdown-menu">
+                              {% for colId, col in config.columns %}
+         
+          {% if col.type != 'multiselect' %}
+                <li><label>
+                    <input class="showhide_column" type="checkbox" data-id={{col.name}}>
+                        {{col.label}}</label>
+                </li>
+            {% endif %}
+                    {% endfor %}
+                </ul>
         </span>
   </div>
   {% if s.description %}
