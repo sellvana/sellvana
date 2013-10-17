@@ -45,7 +45,7 @@
             <fieldset>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Column Content'|_ }}</label>
-                    <label class="col-md-5 control-label">{{ 'DB Field'|_ }}</label>
+                    <label class="col-md-5 control-label" style="text-align: left;">{{ 'DB Field'|_ }}</label>
                 </div>
                 {% for i, v in info.first_row %}
                     <div class="form-group">
@@ -63,7 +63,7 @@
             <fieldset>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'DB Field'|_ }}</label>
-                    <label class="col-md-5 control-label">{{ 'Default'|_ }}</label>
+                    <label class="col-md-5 control-label" style="text-align: left;">{{ 'Default'|_ }}</label>
                 </div>
                 {% for k, f in hlp.getFieldData() %}
                     {% set _default = info.defaults[k] ? info.defaults[k] %}
