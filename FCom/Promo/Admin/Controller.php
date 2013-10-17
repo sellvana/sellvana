@@ -44,12 +44,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $m = $args['model'];
         $actions = array('<input type="hidden" id="save_as" name="save_as" value=""/>');
         if ($m->status==='template') {
-            $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
+            $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
         } else {
-            $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
+            $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
         }
         $args['view']->title = $m->id ? 'Edit Promo: '.$m->description: 'Create New Promo';
-        $args['view']->actions = BUtil::arrayMerge($actions, $args['view']->actions);
+        $args['view']->actions = BUtil::arrayMerge($args['view']->actions, $actions);
     }
 
     public function formPostBefore($args)
@@ -285,4 +285,27 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ))
             ->save();
     }
+
+	public function attachmentGridConfig($model)
+	{
+		return array(
+			'grid' => array(
+				'id' => 'promo_attachments',
+				'caption' => 'Promotion Attachments',
+				'datatype' => 'local',
+				'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+				'colModel' => array(
+					array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+					array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+				),
+				'multiselect' => true,
+				'multiselectWidth' => 30,
+				'shrinkToFit' => true,
+				'forceFit' => true,
+			),
+			'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+			array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor'=>'pointer'),
+			array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor'=>'pointer'),
+		);
+	}
 }
