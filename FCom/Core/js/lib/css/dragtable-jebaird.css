@@ -38,6 +38,7 @@
     color:#EFEFEF;
     background: #EFEFEF !important; 
     visibility: visible !important;
+    left: 200px;
 }
 table .dragtable-col-placeholder:first{
     border-top:1px dotted black;
