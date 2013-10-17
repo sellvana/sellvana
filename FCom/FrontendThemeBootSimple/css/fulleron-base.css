@@ -79,6 +79,7 @@ a:hover, a:focus { text-decoration:none; }
 .table tbody > tr > td, 
 .table tfoot > tr > td { 
   border-color:#eee; 
+  font-size:.95em;
   }
 
 /* Dropdown */
@@ -318,32 +319,101 @@ a:hover, a:focus { text-decoration:none; }
 
 /* Ratings & Reviews */
 .f-rating-stars {
-  display:block;
+  display:inline-block;
   position:relative;
-  width:120px;
+  width:105px;
+  vertical-align:middle;
   }
-.f-rating-stars .f-filled-stars {
+.f-rating-stars [class$='stars'] {
   display:block;
-  height:23px;
+  height:21px;
+  background-image:url(../img/rating_stars.svg);
+  background-repeat:repeat-x;
+  background-position:0 0;
+ }
+.f-rating-stars .f-filled-stars {
   position:absolute;
   top:0;
   left:0;
-  background:url(../img/rating_stars.svg) repeat-x;
-  zoom:1;
   z-index:9;
-  overflow:hidden;
   }
 .f-rating-stars .f-empty-stars {
-  display:block;
-  height:23px;
-  background:url(../img/rating_stars.svg) repeat-x 0 -22px;
-  }
-.f-rating-stars.f-sm-stars {
-  font-size:15px;
+  background-position:0 -19px;
   }
 .f-rating-stars.f-lg-stars {
-  font-size:24px;
+  width:120px;
+  }
+.f-rating-stars.f-lg-stars [class$='stars'] {
+  height:25px;
+  background-image:url(../img/rating_stars_lg.svg);
  }
+.f-rating-stars.f-lg-stars .f-empty-stars {
+  background-position:0 -22px;
+  }
+.f-rating-stars.f-sm-stars {
+  width:84px;
+  }
+.f-rating-stars.f-sm-stars [class$='stars'] {
+  height:17px;
+  background-image:url(../img/rating_stars_sm.svg);
+  }
+.f-rating-stars.f-sm-stars .f-empty-stars {
+  background-position:0 -16px;
+  }
+.f-rating-stars.f-xs-stars {
+  width:64px;
+  }
+.f-rating-stars.f-xs-stars [class$='stars'] {
+  height:12px;
+  background-image:url(../img/rating_stars_xs.svg);
+  }
+.f-rating-stars.f-xs-stars .f-empty-stars {
+  background-position:0 -12px;
+  }
+.f-prod-review-attrs dt {
+  float:left;
+  width:90px;
+  text-align:left;
+  }
+.f-prod-review-attrs dd {
+  margin-left:95px;
+  text-align:left;
+  }
+.f-prod-reviews .f-prod-review-avg {
+  background:#f3f3f3;
+  padding:15px;
+  }
+.f-prod-reviews .f-prod-review-post {
+  border-bottom:1px solid #eee;
+  margin-bottom:15px;
+  padding-bottom:15px;
+  }
+.f-prod-reviews .f-prod-review-post:last-of-type {
+  border-bottom:none;
+  margin-bottom:0;
+  padding-bottom:0;
+  }
+.f-prod-reviews .f-prod-review-post .f-prod-review-attrs,
+.f-prod-reviews .f-prod-review-post .f-prod-review {
+  padding-left:0;
+  padding-right:0;
+  }
+.f-prod-reviews .f-prod-review-post h5 {
+  margin-bottom:3px;
+  font-size:15px;
+  font-weight:bold;
+  }
+.f-prod-reviews .f-prod-review-post .meta {
+  display:block;
+  margin:3px 0 5px;
+  font-size:.85em;
+  }
+.f-prod-reviews .f-prod-review-post .f-prod-review-attrs dt,
+.f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd {
+  display:none;
+  }
+
+
 /*------------------------------------*\
    CONTAINER-SPECIFIC
 \*------------------------------------*/
@@ -380,8 +450,8 @@ a:hover, a:focus { text-decoration:none; }
   }
 .f-prod-info > .tab-content .tab-pane {
   border-top:1px solid #eee;
-  margin-top:20px;
-  padding-top:20px; 
+  margin-top:25px;
+  padding-top:25px; 
   }
 .f-prod-info > .tab-content .f-tab-heading {
   margin:0 0 10px 0;
@@ -603,6 +673,12 @@ a:hover, a:focus { text-decoration:none; }
   .f-catalog-navbar .nav > li > .dropdown-menu {
     display:none !important;
     }
+    
+  /* Container: Product Rating & Reviews */
+  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dt:first-of-type,
+  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd:first-of-type {
+    display:block;
+    }
 }
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
@@ -655,6 +731,11 @@ a:hover, a:focus { text-decoration:none; }
     }
   .f-site-footer dd { 
     margin:3px 0; 
+    }
+  /* Container: Product Rating & Reviews */
+  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dt,
+  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd {
+    display:block;
     }
 }
     
@@ -764,6 +845,11 @@ a:hover, a:focus { text-decoration:none; }
   /* Page: Product View */
   .f-col-related-prods { float:left; }
   .f-col-prod-select { float:right; }
+  
+  /* Container: Product Rating & Reviews */
+  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dl {
+    margin:0;
+    }
 }
 
 /* Large devices (large desktops, 1200px and up) */
