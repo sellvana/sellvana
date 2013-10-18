@@ -246,6 +246,7 @@ class FCom_Core_Main extends BClass
         }
 
         $this->initDebug();
+        $this->runCodeMigration();
 
         $mode = BDebug::mode();
 
@@ -462,5 +463,10 @@ FCom.base_src = '".BConfig::i()->get('web/base_src')."';
         $fa->addFunction(new Twig_SimpleFunction('fcom_htmlgrid', function($config) {
             return BLayout::i()->view('core/htmlgrid-wrapper')->set('config', $config);
         }));
+    }
+
+    public function runCodeMigration()
+    {
+
     }
 }

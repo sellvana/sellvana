@@ -28,19 +28,20 @@
           </ul>
         </div>
         <script>
-          $(function() {
-          $(".rslides").responsiveSlides({
-            speed: 500,        // Integer: Speed of the transition, in milliseconds
-            timeout: 4000,        // Integer: Time between slide transitions, in milliseconds
-            pager: true,         // Boolean: Show pager, true or false
-            nav: true,         // Boolean: Show navigation, true or false
-            random: true,        // Boolean: Randomize the order of the slides, true or false
-            pause: true,         // Boolean: Pause on hover, true or false
-            pauseControls: true    // Boolean: Pause when hovering controls, true or false
+          require(['jquery', 'responsiveslides'], function($) {
+            $(".rslides").responsiveSlides({
+              speed: 500,        // Integer: Speed of the transition, in milliseconds
+              timeout: 4000,        // Integer: Time between slide transitions, in milliseconds
+              pager: true,         // Boolean: Show pager, true or false
+              nav: true,         // Boolean: Show navigation, true or false
+              random: true,        // Boolean: Randomize the order of the slides, true or false
+              pause: true,         // Boolean: Pause on hover, true or false
+              pauseControls: true    // Boolean: Pause when hovering controls, true or false
+            });
           });
         </script>
         <!-- /.f-col-prod-img -->
-        
+
         <!-- Product Select Column-->
         <div class="col-md-7 f-col-prod-select">
           <h1 class="f-prod-name">Realistically longer name {{ prod.get('product_name') }}</h1>
@@ -74,7 +75,7 @@
             {% endif %}
           </table>
           <!-- /.f-price-group -->
-          
+
           <div class="f-prod-select">
             <div class="row">
               <div class="col-md-6 form-group">
@@ -122,7 +123,7 @@
             </div>
           </div>
           <!-- /.f-prod-select -->
-          
+
           <div class="f-prod-info">
             <div class="tab-content">
               <div class="tab-pane active" id="f-prod-tab-description">
@@ -141,12 +142,12 @@
             </div>
           </div>
           <!-- /.f-prod-info -->
-          
+
         </div>
         <!-- /.f-col-prod-select -->
       </div>
       <!-- /.row -->
-      
+
       <div class="row">
         <div class="col-md-7 f-col-prod-select">
           <div class="f-prod-info">
@@ -401,9 +402,9 @@
             </div>
           </div>
         </div><!-- /.f-col-prod-select -->
-        
+
         <div class="col-md-5 f-col-related-prods">
-        
+
           <!-- Product Listing -->
           <div class="f-widget f-widget-featured-prods">
             <header class="f-widget-header">
@@ -530,7 +531,7 @@
         </div><!-- /.f-col-related-prods -->
       </div><!-- /.row -->
     </form>
-    
+
     <!-- You may also like -->
     <div class="f-widget f-widget-featured-prods">
       <header class="f-widget-header">
@@ -662,6 +663,6 @@
         </div><!-- /.row -->
       </div><!-- /.f-prod-listing -->
     </div><!-- /.f-widget -->
-    
+
   </div>
 </div>
