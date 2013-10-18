@@ -246,7 +246,7 @@ class FCom_Core_Main extends BClass
         }
 
         $this->initDebug();
-        $this->runCodeMigration();
+        $this->runConfigMigration();
 
         $mode = BDebug::mode();
 
@@ -356,6 +356,7 @@ class FCom_Core_Main extends BClass
             // configuration necessary for core startup
             $core = array(
                 'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
+                'core' => !empty($c['core']) ? $c['core'] : null,
                 'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : array(),
                 'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
                 'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : array(),
@@ -465,8 +466,9 @@ FCom.base_src = '".BConfig::i()->get('web/base_src')."';
         }));
     }
 
-    public function runCodeMigration()
+    public function runConfigMigration()
     {
+        $ver = BConfig::i()->get('core/patch_version');
 
     }
 }
