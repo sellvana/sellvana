@@ -12,7 +12,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] = array_replace_recursive($config['grid']['columns'], array(
+        $config['columns'] = array(
             'id' => array('index'=>'c.id'),
             'firstname' => array('label'=>'First Name', 'index'=>'c.firstname'),
             'lastname' => array('label'=>'Last Name', 'index'=>'c.lastname'),
@@ -24,7 +24,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'country' => array('label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             'create_at' => array('label'=>'Created', 'index'=>'c.create_at'),
             'update_at' => array('label'=>'Updated', 'index'=>'c.update_at'),
-        ));
+        );
         $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         return $config;
     }
