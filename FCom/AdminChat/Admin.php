@@ -38,6 +38,9 @@ class FCom_AdminChat_Admin extends BClass
         $p = BDebug::debug('ADMINCHAT INITIAL STATE');
 
         $user = FCom_Admin_Model_User::i()->sessionUser();
+        if (!$user) {
+            return array();
+        }
         $userId = $user->id();
         $userName = $user->get('username');
 
