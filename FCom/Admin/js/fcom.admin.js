@@ -1,4 +1,4 @@
-define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl'], function($, angular) {
+define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl'], function($, angular) {
 
     FCom.Admin.Accordion = function(containerId, options) {
         var $container = $('#'+containerId);
@@ -1013,8 +1013,10 @@ define(["jquery", "angular", "jquery-ui", "jqgrid", "bootstrap", "fcom.core", 'c
     }
 
     $(function() {
-        $.jgrid.formatter.date.newformat = 'm/d/Y';
-        $.jgrid.edit.width = 500;
+        if ($.jgrid) {
+            $.jgrid.formatter.date.newformat = 'm/d/Y';
+            $.jgrid.edit.width = 500;
+        }
 
         if (typeof CKEDITOR !== 'undefined') {
             CKEDITOR.config.autoUpdateElement = true;
