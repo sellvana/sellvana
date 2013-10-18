@@ -322,6 +322,7 @@ select.form-control {
   
 /* Product Listing */
 .f-prod-listing-toolbar {
+  margin-bottom:1em;
   border-width:1px 0;
   border-style:solid;
   border-color:#eee;
@@ -357,7 +358,6 @@ select.form-control {
   }
 .f-prod-listing .f-prod-img img {
   width:100%;
-  margin-bottom:.5em;
   }
 .f-prod-listing .f-prod-name {
   display:block;
@@ -387,6 +387,9 @@ select.form-control {
 .f-prod-listing-rows .row {
   margin-top:1em;
   margin-bottom:1.5em;
+  }
+.f-prod-listing-rows .f-prod-img {
+  margin-bottom:.5em; 
   }
 .f-prod-listing-rows .f-prod-name {
   font-size:1.15em;
