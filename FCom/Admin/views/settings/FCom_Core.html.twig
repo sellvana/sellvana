@@ -38,6 +38,13 @@
                         <input class="switch-cbx" name="config[db][logging]" {% if c.get('db/logging') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Implicit Migration"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="config[db][implicit_migration]" value="0"/>
+                        <input class="switch-cbx" name="config[db][implicit_migration]" {% if c.get('db/implicit_migration') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

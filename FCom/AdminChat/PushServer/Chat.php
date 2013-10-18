@@ -37,6 +37,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
             'signal' => 'chats',
             array(
                 'channel' => $channel->get('channel_name'),
+                'title' => $participant->get('chat_title'),
                 'status'  => 'open',
                 'history' => $chat->getHistoryArray(),
             ),
