@@ -2400,18 +2400,18 @@ class BLocale extends BClass
 
     public static function transliterate($str, $filler='-')
     {
-        if (function_exists('transliterator_transliterate')) {
-            $str = transliterator_transliterate("Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();", $str);
-            $str = preg_replace('~['.$filler.'\s]+~', $filler, $str);
-            return trim($str, $filler);
+        $qFiller = preg_quote($filler);
+        if (function_exists('transliterator_transliterate')) { // PHP >= 5.4.0
+            $rules = "Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();";
+            $str = transliterator_transliterate($rules, $str);
+            $str = preg_replace('/['.$qFiller.'\s]+/', $filler, $str); // consolidate fillers
         } else {
-            $str = preg_replace('~[^\\pL0-9]+~u', $filler, $str); // substitutes anything but letters, numbers and '_' with separator
-            $str = trim($str, $filler);
-            $str = iconv("utf-8", "us-ascii//TRANSLIT", $str); // TRANSLIT does the whole job
-            $str = strtolower($str);
-            $str = preg_replace('~[^'.$filler.'a-z0-9]+~', '', $str); // keep only letters, numbers, '_' and separator
-            return $str;
+            $str = preg_replace('/[^\\pL0-9]+/u', $filler, $str); // leave only letters and numbers, consolidate fillers
+            $str = iconv("utf-8", "us-ascii//TRANSLIT", $str); // transliterate
+            $str = preg_replace('/[^'.$qFiller.'a-z0-9]+/', '', strtolower($str)); // remove leftovers from transliteration
         }
+        $str = trim($str, $filler); // remove fillers from start and end of string
+        return $str;
     }
 
     public static function setCurrentLanguage($lang)
