@@ -49,7 +49,6 @@ class FCom_AdminChat_Admin extends BClass
         $chatModels = FCom_AdminChat_Model_Chat::i()->orm('c')
             ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')->where('p.user_id', $userId)
             ->select('c.id')
-            ->select('c.title')
             ->select('p.status', 'chat_window_status')
             ->select('p.chat_title')
             ->find_many_assoc('c.id');
