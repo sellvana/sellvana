@@ -83,13 +83,15 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                 $('.dropdown-menu').find("input").each(function(i, el) {
                             cols.push({ name: $(el).data('id') });
                 });
+                
+                $.ajaxSetup({ async: false });
 
                     $.post(config.personalize_url,
                         { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                               if (response.success) {
-                                load();
+                               load();
                             }
                         }
                     )
