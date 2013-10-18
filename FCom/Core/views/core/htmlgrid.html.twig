@@ -54,15 +54,13 @@
           </li>
         </ul>
 
-        <span class="fcom-htmlgrid__actions">
-          {% for action in THIS.gridActions() %}
-            {% if action.renderer %}
-              {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
-            {% elseif action.html %}
-              {{ action.html | raw }}
-            {% endif %}
-          {% endfor %}
-        </span>
+        {% for action in THIS.gridActions() %}
+          {% if action.renderer %}
+            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+          {% elseif action.html %}
+            {{ action.html | raw }}
+          {% endif %}
+        {% endfor %}
         <span class="dropdown">
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
                 Columns
