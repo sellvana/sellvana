@@ -135,8 +135,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 case 'min':
                     $runLevels = array(
                         'FCom_MarketClient' => 'REQUESTED',
-                        'FCom_FrontendThemeBlue' => 'REQUESTED',
-                        'FCom_FrontendTheme1' => 'REQUESTED',
+                        'FCom_FrontendThemeBootSimple' => 'REQUESTED',
                     );
                     break;
 
@@ -157,9 +156,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_Email' => 'REQUESTED',
                         'FCom_FreshBooks' => 'REQUESTED',
                         'FCom_FrontendCP' => 'REQUESTED',
-                        'FCom_FrontendThemeBlue' => 'REQUESTED',
-                        'FCom_FrontendThemeBootstrap' => 'REQUESTED',
-                        'FCom_FrontendTheme1' => 'REQUESTED',
+                        'FCom_FrontendThemeBootSimple' => 'REQUESTED',
                         'FCom_Geo' => 'REQUESTED',
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_MultiCurrency' => 'REQUESTED',
@@ -191,6 +188,11 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             'mode_by_ip' => array(
                 'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'PRODUCTION',
                 'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'PRODUCTION',
+            ),
+            'modules' => array(
+                'FCom_Frontend' => array(
+                    'theme' => 'FCom_FrontendThemeBootSimple',
+                ),
             ),
         ), true);
         FCom_Core_Main::i()->writeConfigFiles();
