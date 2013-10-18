@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.adminchat', 'slimscroll', 'timeago'], function ($, _, Backbone, PushClient, exports, AdminChat, slimscroll, timeago) {
     function playDing() {
-        
+
         document.getElementById("sound").innerHTML = '<audio autoplay="autoplay"><source src="' + dingPath + '" type="audio/wav" /><embed hidden="true" autostart="true" loop="false" src="' + dingPath + '" /></audio>';
     }
 
@@ -55,15 +55,15 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
 
     //A List of Users
     ChatUserList.Collections.Users = Backbone.Collection.extend({
-        model: ChatUserList.Models.User,        
+        model: ChatUserList.Models.User,
         findModelByName: function (username) {
             for (var i=0;i<this.models.length;i++) {
-                if (this.models[i].get('username') === username) {                                        
+                if (this.models[i].get('username') === username) {
                     return this.models[i];
                 }
-            }                
+            }
 
-            return false;            
+            return false;
         }
     });
 
@@ -117,7 +117,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         },
         updateUnread: function() {
             var total = 0;
-            
+
             this.collection.each(function(userModel){
                 total += userModel.get('unreadCount');
             });
@@ -142,7 +142,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             'click' :'initChat'
         },
         initChat: function(){
-            AdminChat.start({
+            AdminChat.open({
                 user: this.model.get('username')
             });
         },
@@ -262,26 +262,17 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
                         var userModel = userView.collection.findModelByName(item.get('username'));
                         console.log(userModel);
                         if (userModel!==false) {
-                            userModel.decUnread();    
+                            userModel.decUnread();
                     }
-                        
+
                     }
                 },this);
                 this.model.set('unreadCount',0);
                 this.model.set('badgeDisplay','none');
-                notifyStatus({
-                    channel: this.model.get('channel'),
-                    status: 'open'
-                });
 
-                
+                PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'open'});
             } else {
-                notifyStatus({
-                    channel: this.model.get('channel'),
-                    status: 'minize'
-                });
-            } else {
-                _collapse({channel:this.model.get('channel')});
+                PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'collapsed'});
             }
             e.preventDefault();
 
@@ -303,10 +294,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         },
         closeChatWin: function()
         {
-            notifyStatus({
-                channel: this.model.get('channel'),
-                status: 'close'
-            });
+            PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'closed'});
 
             loadedWins = _.reject(loadedWins, function (obj) {
                 return obj.channel === this.model.get('channel');
@@ -356,7 +344,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
                 var chatItem = new ChatWindows.Views.Item({
                     model: item
                 });
-                
+
                 this.$el.find('ul:first').append(chatItem.render().el);
 
                 scrollable = this.$el.find(".scrollable");
@@ -475,18 +463,6 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         });
     }
 
-    function _close(options){
-        PushClient.send({channel:options.channel, signal:'window_status', status:'closed'});
-    }
-
-    function _open(options){
-        PushClient.send({channel:options.channel, signal:'window_status', status:'open'});
-    }
-
-    function _collapse(options){
-        PushClient.send({channel:options.channel, signal:'window_status', status:'collapsed'});
-    }
-
     function leave(options) {
         PushClient.send({
             channel: options.channel,
@@ -508,7 +484,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         chat.index=loadedWins.length;
         var chatModel = new ChatWindows.Models.Win(chat);
 
-        if(chat.status && chat.status === 'collapsed')
+        if(chat.status && chat.status === 'collapsed') {
             chatModel.set('collapsed',true);
         }
 
@@ -520,7 +496,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         delete chatWindows[channel];
     }
 
-    function add_history(msg, checkUnread) {        
+    function add_history(msg, checkUnread) {
         checkUnread = typeof checkUnread !== 'undefined' ? checkUnread : true;
 
         var json = _.where(loadedWins, {
@@ -536,7 +512,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
                     winView.model.set('badgeDisplay','inline');
                     chatItem.set('unread',true);
 
-                    var userModel = userView.collection.findModelByName(msg.username);                    
+                    var userModel = userView.collection.findModelByName(msg.username);
                     if (userModel!==false) {
                         userModel.incUnread();
                 }
@@ -624,7 +600,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             })
         },
         open: function(msg) {
-            
+
             show_window({
                 channel: msg.channel
             });

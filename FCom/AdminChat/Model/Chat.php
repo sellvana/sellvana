@@ -59,7 +59,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
             ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
             ->select('u.username')->select('h.create_at')->select('h.text')
             ->where('h.chat_id', $this->id())
-            ->where_gt('create_at', date('Y-m-d', time()-86400))
+            ->where_gt('h.create_at', date('Y-m-d', time()-86400))
             ->order_by_asc('h.create_at')->find_many();
         $text = array();
         foreach ($history as $msg) {
