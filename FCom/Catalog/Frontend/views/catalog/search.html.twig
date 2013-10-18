@@ -1,6 +1,8 @@
-<div class="col-main">
-    <header class="main-title category-title">
-        <h1 class="title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
+<div class="f-site-main" role="main">
+  <div class="container">
+    <header class="f-page-header">
+      <h1 class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
     </header>
     {{ THIS.hook('main_products') | raw }}
+  </div>
 </div>

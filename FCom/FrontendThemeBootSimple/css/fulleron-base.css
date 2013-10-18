@@ -323,10 +323,9 @@ select.form-control {
 /* Product Listing */
 .f-prod-listing-toolbar {
   margin-bottom:1em;
-  border-width:1px 0;
-  border-style:solid;
-  border-color:#eee;
-  padding:10px 0;
+  padding:10px;
+  background:#f9f9f9;
+  line-height:1em;
   }
 .f-prod-listing-toolbar .pagination {
   margin:0;
@@ -335,6 +334,7 @@ select.form-control {
 .f-prod-listing-toolbar .pagination > li > span {
   margin:1px;
   border:none;
+  background:none;
   padding:3px 6px;
   line-height:1em;
   }
@@ -352,6 +352,23 @@ select.form-control {
   background:none;
   color:#2f2f2f;
   font-weight:bold;
+  }
+.f-prod-listing-toolbar select.form-control {
+  width:auto;
+  height:22px;
+  font-size:13px;
+  }
+.f-prod-listing-toolbar .btn-group .btn {
+  border:1px solid #ddd;
+  padding:3px 6px;
+  color:#bbb;
+  }
+.f-prod-listing-toolbar .btn-group .btn.active {
+  background:#ddd;
+  color:#444;
+  }
+.f-prod-listing-toolbar .btn-group .btn .glyphicon {
+  margin-right:0;
   }
 .f-prod-listing .f-prod-img {
   display:block;  
