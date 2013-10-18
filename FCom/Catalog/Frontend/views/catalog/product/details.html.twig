@@ -15,18 +15,16 @@
         <!-- Product Image Column -->
         <div class="col-md-5 f-col-prod-img">
           <ul class="thumbnails rslides f-prod-imgs">
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray.gif') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray.gif') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray.gif') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
           </ul>
           <p class="text-center"><small>Mouse move on Image to zoom</small></p>
           <ul class="f-prod-more-view-imgs row">
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/pixel-gray-800x800.gif') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
           </ul>
         </div>
         <script>
@@ -45,61 +43,92 @@
         
         <!-- Product Select Column-->
         <div class="col-md-7 f-col-prod-select">
-          <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
+          <h1 class="f-prod-name">Realistically longer name {{ prod.get('product_name') }}</h1>
           <div class="f-prod-avg-rating">
             <div class="glyphicon f-rating-stars f-sm-stars">
               <span class="f-filled-stars" style="width:100%;"></span>
               <span class="f-empty-stars"></span>
             </div>
-            <a href="#f-prod-tab-reviews">3 Reviews</a>
+            <a href="#f-prod-tab-reviews">53 Reviews</a>
           </div>
-          <div class="f-price-group">
+          <table class="f-price-group">
             {% if prod.get('base_price') == 0 %}
-              <span class="f-special-price">{{ 'FREE'|_ }}</span>
+              <tr class="f-reg-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ 'FREE'|_ }}</td>
+              </tr>
             {% elseif prod.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-              <span class="f-special-price">{{ prod.get('sale_price') | currency }}</span>
-              <span class="f-old-price">{{ prod.get('base_price') | currency }}</span>
+              <tr class="f-special-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
+              </tr>
+              <tr class="f-old-price">
+                <th class="f-price-label">Was:</th>
+                <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+              </tr>
             {% else %}
-              <span class="f-price">{{ prod.get('base_price') | currency }}</span>
+              <tr class="f-reg-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+              </tr>
             {% endif %}
-          </div>
+          </table>
           <!-- /.f-price-group -->
           
           <div class="f-prod-select">
-            <select class="selectsize">
-              <option>Select Size</option>
-              <option>Red</option>
-              <option>Green</option>
-              <option>Blue</option>
-              <option>Black</option>
-            </select>
-            <select class="selectqty">
-              <option>Select</option>
-              <option>24</option>
-              <option>36</option>
-              <option>48</option>
-            </select>
-            <div class="control-group">
-              <div class="controls">
-                <label class="checkbox">
-                  <input type="checkbox" name="#" value="#"> Checkbox label</label>
-                <label class="radio">
-                  <input type="radio" name="#" id="#" value="#" checked="checked"> Radiobox label</label>
+            <div class="row">
+              <div class="col-md-6 form-group">
+                <label for="#" class="control-label">Width:</label>
+                <p class="form-control-static">M</p>
               </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 form-group">
+                <label for="#" class="control-label">Color:</label>
+                <select class="form-control" id="#">
+                  <option>Select Color</option>
+                  <option>Red</option>
+                  <option>Green</option>
+                  <option>Blue</option>
+                  <option>Black</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 form-group">
+                <label for="#" class="control-label">Size:</label>
+                <select class="form-control" id="#">
+                <option>Select Size</option>
+                <option>24</option>
+                <option>36</option>
+                <option>48</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="#" value="#" checked> Checkbox label
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="#" id="#" value="#" checked> Radio label
+              </label>
+            </div>
+            <div class="f-prod-add-cart">
+              <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>Add to Cart</button>
+              <a class="btn btn-link" href="#">Add to Wishlist</a>
+              <a class="btn btn-link" href="#">Add to Compare</a>
             </div>
           </div>
           <!-- /.f-prod-select -->
           
-          <div class="f-prod-add-cart">
-            <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
-            <a class="btn btn-link" href="#">Add to Wishlist</a>
-            <a class="btn btn-link" href="#">Add to Compare</a>
-          </div>
-          
           <div class="f-prod-info">
             <div class="tab-content">
               <div class="tab-pane active" id="f-prod-tab-description">
-                <h3 class="f-tab-heading">Product Description</h3>
+                <div class="f-tab-heading">
+                  <h5 class="f-tab-title">Product Description</h5>
+                </div>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
                 <ul>
@@ -123,7 +152,9 @@
           <div class="f-prod-info">
             <div class="tab-content">
               <section class="tab-pane active" id="f-prod-tab-specs">
-                <h3 class="f-tab-heading">Specifications</h3>
+                <div class="f-tab-heading">
+                  <h5 class="f-tab-title">Specifications</h5>
+                </div>
                 <div class="table-responsive f-prod-specs-table">
                   <table class="table table-condensed">
                     <col class="col-md-4 col-sm-4"/>
@@ -207,30 +238,47 @@
                 </div>
               </section>
               <section class="tab-pane active f-prod-reviews" id="f-prod-tab-reviews">
-                <h3 class="f-tab-heading">Customer Reviews</h3>
+                <div class="f-tab-heading">
+                  <h5 class="f-tab-title">Customer Reviews</h5>
+                  <a href="#" class="btn btn-sm btn-primary">Write your own review</a>
+                </div>
                 <div class="f-prod-review-avg clearfix">
-                  <strong>Avg. Customer Rating:</strong>
+                  <h5>Avg. Customer Rating (53 Reviews):</h5>
                   <div class="glyphicon f-rating-stars f-lg-stars">
-                    <span class="f-filled-stars" style="width:100%;"></span>
+                    <span class="f-filled-stars" style="width:80%;"></span>
                     <span class="f-empty-stars"></span>
                   </div>
-                  <strong>5 Stars</strong>
-                  (20 Customer reviews)
+                  <strong>4 / 5</strong>
                   <div class="f-prod-review-attrs">
                     <dl class="dl-horizontal">
                       <dt>Value</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:80%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        4</dd>
                       <dt>Features</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                       <dt>Quality</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:80%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        4</dd>
                     </dl>
                   </div>
                 </div>
                 <article class="f-prod-review-post clearfix">
                   <h5>I love Fulleron!! Great value and service.</h5>
                   <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-4 f-prod-review-attrs">
+                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
                     <dl class="dl-horizontal">
                       <dt><strong>Overall</strong></dt>
                       <dd>
@@ -238,24 +286,80 @@
                           <span class="f-filled-stars" style="width:100%;"></span>
                           <span class="f-empty-stars"></span>
                         </div>
-                        <strong>5</strong>
+                        <strong>5 / 5</strong>
                       </dd>
                       <dt>Value</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                       <dt>Features</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                       <dt>Quality</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                     </dl>
                   </div>
-                  <div class="col-md-8 f-prod-review">
+                  <div class="col-md-7 col-sm-7 f-prod-review">
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'.</p>
+                    <p>Making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                  </div>
+                </article>
+                <article class="f-prod-review-post clearfix">
+                  <h5>I love Fulleron!! Great value and service.</h5>
+                  <span class="meta">by John Doe on October 12, 2013</span>
+                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
+                    <dl class="dl-horizontal">
+                      <dt><strong>Overall</strong></dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        <strong>5 / 5</strong>
+                      </dd>
+                      <dt>Value</dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
+                      <dt>Features</dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
+                      <dt>Quality</dt>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-7 col-sm-7 f-prod-review">
                     <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
                   </div>
                 </article>
                 <article class="f-prod-review-post clearfix">
                   <h5>I love Fulleron!! Great value and service.</h5>
                   <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-4 f-prod-review-attrs">
+                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
                     <dl class="dl-horizontal">
                       <dt><strong>Overall</strong></dt>
                       <dd>
@@ -263,48 +367,36 @@
                           <span class="f-filled-stars" style="width:100%;"></span>
                           <span class="f-empty-stars"></span>
                         </div>
-                        <strong>5</strong>
+                        <strong>5 / 5</strong>
                       </dd>
                       <dt>Value</dt>
-                      <dd>5</dd>
-                      <dt>Features</dt>
-                      <dd>5</dd>
-                      <dt>Quality</dt>
-                      <dd>5</dd>
-                    </dl>
-                  </div>
-                  <div class="col-md-8 f-prod-review">
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
-                  </div>
-                </article>
-                <article class="f-prod-review-post clearfix">
-                  <h5>I love Fulleron!! Great value and service.</h5>
-                  <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-4 f-prod-review-attrs">
-                    <dl class="dl-horizontal">
-                      <dt><strong>Overall</strong></dt>
                       <dd>
                         <div class="glyphicon f-rating-stars f-xs-stars">
                           <span class="f-filled-stars" style="width:100%;"></span>
                           <span class="f-empty-stars"></span>
                         </div>
-                        <strong>5</strong>
-                      </dd>
-                      <dt>Value</dt>
-                      <dd>5</dd>
+                        5</dd>
                       <dt>Features</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                       <dt>Quality</dt>
-                      <dd>5</dd>
+                      <dd>
+                        <div class="glyphicon f-rating-stars f-xs-stars">
+                          <span class="f-filled-stars" style="width:100%;"></span>
+                          <span class="f-empty-stars"></span>
+                        </div>
+                        5</dd>
                     </dl>
                   </div>
-                  <div class="col-md-8 f-prod-review">
+                  <div class="col-md-7 col-sm-7 f-prod-review">
                     <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
                   </div>
                 </article>
-              </section>
-              <section class="tab-pane active" id="f-prod-tab-tags">
-                <h3 class="f-tab-heading">Tags</h3>
+                <p><a href="#"><strong>Read all 53 customer reviews &rsaquo;</strong></a></p>
               </section>
             </div>
           </div>
@@ -319,75 +411,115 @@
             </header>
             <div class="f-prod-listing f-prod-listing-grid">
               <div class="row">
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                      <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
-                      </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <table class="f-price-group">
+                          <tr class="f-special-price">
+                            <th class="f-price-label">Price:</th>
+                            <td class="f-price">$59.99</td>
+                          </tr>
+                          <tr class="f-old-price">
+                            <th class="f-price-label">Was:</th>
+                            <td class="f-price">$109.99</td>
+                          </tr>
+                      </table>
+                      <!-- /.f-price-group -->
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                      <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
-                      </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <table class="f-price-group">
+                          <tr class="f-special-price">
+                            <th class="f-price-label">Price:</th>
+                            <td class="f-price">$59.99</td>
+                          </tr>
+                          <tr class="f-old-price">
+                            <th class="f-price-label">Was:</th>
+                            <td class="f-price">$109.99</td>
+                          </tr>
+                      </table>
+                      <!-- /.f-price-group -->
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <div class="f-price-group">
                       <span class="f-price">$58.49</span>
                       </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                      <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
-                      </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <table class="f-price-group">
+                          <tr class="f-special-price">
+                            <th class="f-price-label">Price:</th>
+                            <td class="f-price">$59.99</td>
+                          </tr>
+                          <tr class="f-old-price">
+                            <th class="f-price-label">Was:</th>
+                            <td class="f-price">$109.99</td>
+                          </tr>
+                      </table>
+                      <!-- /.f-price-group -->
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                      <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
-                      </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <table class="f-price-group">
+                          <tr class="f-special-price">
+                            <th class="f-price-label">Price:</th>
+                            <td class="f-price">$59.99</td>
+                          </tr>
+                          <tr class="f-old-price">
+                            <th class="f-price-label">Was:</th>
+                            <td class="f-price">$109.99</td>
+                          </tr>
+                      </table>
+                      <!-- /.f-price-group -->
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-4">
                   <div class="thumbnail">
-                    <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+                    <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                      <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
-                      </div>
-                      <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                      <table class="f-price-group">
+                          <tr class="f-special-price">
+                            <th class="f-price-label">Price:</th>
+                            <td class="f-price">$59.99</td>
+                          </tr>
+                          <tr class="f-old-price">
+                            <th class="f-price-label">Was:</th>
+                            <td class="f-price">$109.99</td>
+                          </tr>
+                      </table>
+                      <!-- /.f-price-group -->
+                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
@@ -405,75 +537,123 @@
       </header>
       <div class="f-prod-listing f-prod-listing-grid">
         <div class="row">
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-6">
+          <div class="col-md-2 col-sm-4 ">
             <div class="thumbnail">
-              <a href="#"><img class="f-prod-img" src="{{ imgBaseUrl }}/ph/pixel-gray.gif" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
                 <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
-                <div class="f-price-group">
-                <span class="f-price">$58.49</span>
-                </div>
-                <p><a href="#" class="btn btn-primary btn-xs">Add to Cart</a> <a href="#" class="btn btn-link btn-xs">View Details</a></p>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>

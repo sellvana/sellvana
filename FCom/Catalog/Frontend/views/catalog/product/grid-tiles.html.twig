@@ -1,44 +1,54 @@
 {% set addToCartUrl = THIS.url('cart/add') %}
 
-<ul class="thumbnails grid">
+<div class="f-prod-listing f-prod-listing-grid">
+  <div class="row">
   {% for p in THIS.get('products') %}
   {% set productName = p.get('product_name') %}
   {% set productUrl = p.url(THIS.get('category')) %}
-    <li class="col-lg-4 col-sm-6">
-      <a class="prdocutname" href="product.html">{{ productName }}</a>
+    <div class="col-md-4 col-sm-4">
       <div class="thumbnail">
         {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
             <span class="sale tooltip-test">Sale</span>
-            <!--<span class="offer tooltip-test">Offer</span>-->
         {% endif %}
-        <a href="{{ productUrl }}"><img alt="{{ productName }}" src="{{ p.thumbUrl(260, 337) }}"></a>
-        <div class="shortlinks">
-          <a class="details" href="{{ productUrl }}">DETAILS</a>
-          <a class="wishlist" href="#">WISHLIST</a>
-          <a class="compare" href="#">COMPARE</a>
-        </div>
-        <div class="pricetag">
-          <span class="spiral"></span>
-
-          <form class="form-inline" method="post" action="{{ addToCartUrl }}">
+        <a href="{{ productUrl }}" class="f-prod-img"><img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/></a>
+        <div class="caption">
+          <a href="{{ productUrl }}" class="f-prod-name">{{ productName }}</a>
+          <table class="f-price-group">
+            {% if p.get('base_price') == 0 %}
+              <tr class="f-reg-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ 'FREE'|_ }}</td>
+              </tr>
+            {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+              <tr class="f-special-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ p.get('sale_price') | currency }}</td>
+              </tr>
+              <tr class="f-old-price">
+                <th class="f-price-label">Was:</th>
+                <td class="f-price">{{ p.get('base_price') | currency }}</td>
+              </tr>
+            {% else %}
+              <tr class="f-reg-price">
+                <th class="f-price-label">Price:</th>
+                <td class="f-price">{{ p.get('base_price') | currency }}</td>
+              </tr>
+            {% endif %}
+          </table>
+          <!-- /.f-price-group -->
+          <!--{{ p.get('short_description') }}-->
+          <form method="post" action="{{ addToCartUrl }}">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="qty" value="1">
-            <button type="submit" name="id" value="{{ p.id() }}" class="productcart" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false">{{ 'ADD TO CART'|_ }}</button>
+            <p>
+              <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">Add to Cart</button>
+              <a href="{{ productUrl }}" class="btn btn-link btn-sm">View Details</a>
+            </p>
           </form>
-
-          <div class="price">
-            {% if p.get('base_price') == 0 %}
-                <div class="pricenew">{{ 'FREE'|_ }}</div>
-            {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-                <div class="priceold">{{ p.get('base_price') | currency }}</div>
-                <div class="pricenew">{{ p.get('sale_price') | currency }}</div>
-            {% else %}
-                <div class="pricenew">{{ p.get('base_price') | currency }}</div>
-            {% endif %}
-
-          </div>
         </div>
       </div>
-    </li>
-  {% endfor %}
-</ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
