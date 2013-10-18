@@ -14,33 +14,6 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         return true;
     }
 
-    public function signal_init()
-    {
-        if ($this->_client->admin_user_id) {
-            $chats = FCom_AdminChat_Model_Chat::i()->orm('c')
-                ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')
-                ->where('p.user_id', $this->_client->get('admin_user_id'))
-                ->select('c.id')
-                ->select_expr('p.status', 'chat_window_status')
-                ->find_many();
-            if ($chats) {
-                $channels = array();
-                foreach ($chats as $chat) {
-                    //$chat->addParticipant($this->_client->admin_user_id); //TODO: figure out why it disappears??
-
-                    $channels[] = array(
-                        'channel' => 'adminchat:' . $chat->id(),
-                        'status' => $chat->get('chat_window_status'),
-                        'history' => $chat->getHistoryArray(),
-                    );
-                }
-                $this->reply(array('signal' => 'chats', 'chats' => $channels));
-            } else {
-                $this->reply(array('signal' => 'noop', 'description' => 'No chats found'));
-            }
-        }
-    }
-
     public function signal_open()
     {
         // start the chat, receive initial history

@@ -1,7 +1,11 @@
-define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.adminchat', 'slimscroll', 'timeago'], function ($, _, Backbone, PushClient, exports, AdminChat, slimscroll, timeago) {
-    function playDing() {
+define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago) {
+    var dingPath, username = '', initializing;
 
-        document.getElementById("sound").innerHTML = '<audio autoplay="autoplay"><source src="' + dingPath + '" type="audio/wav" /><embed hidden="true" autostart="true" loop="false" src="' + dingPath + '" /></audio>';
+    function playDing() {
+        document.getElementById("sound").innerHTML = '<audio autoplay="autoplay">'
+            + '<source src="' + dingPath + '" type="audio/wav" />'
+            + '<embed hidden="true" autostart="true" loop="false" src="' + dingPath + '" />'
+            + '</audio>';
     }
 
     var setScrollable = function(selector) {
@@ -31,9 +35,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         }
     };
 
-    var username='';
-
-    ChatUserList = {
+    var ChatUserList = {
         Models: {},
         Collections: {},
         Views: {}
@@ -86,9 +88,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         },
         changeStatus: function(ev){
             var status = this.$el.find('select#adminuser-status:first').val();
-            AdminChat.status({
-                status: status
-            });
+            sendStatus({status: status});
 
             return true;
         },
@@ -142,9 +142,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             'click' :'initChat'
         },
         initChat: function(){
-            AdminChat.open({
-                user: this.model.get('username')
-            });
+            sendOpen({user: this.model.get('username')});
         },
         render: function(){
             this.$el.html(this.template(this.model.toJSON()));
@@ -165,7 +163,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
 
 
 
-    ChatWindows = {
+    var ChatWindows = {
         Models: {},
         Collections: {},
         Views: {}
@@ -208,7 +206,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         },
         updatePosition: function(){
             var index=0;
-            _.each(this.collection.models,function(model){
+            _.each(this.collection.models, function(model) {
                 model.set('index',index);
                 index++;
             });
@@ -251,7 +249,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             var box = this.$el.find(".box");
 
             box.toggleClass("box-collapsed");
-            this.model.set('collapsed',box.hasClass("box-collapsed"));
+            this.model.set('collapsed', box.hasClass("box-collapsed"));
 
             if (!this.model.get('collapsed')) {
                 this.collection.each(function (item) {
@@ -263,12 +261,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
                         console.log(userModel);
                         if (userModel!==false) {
                             userModel.decUnread();
-                    }
-
+                        }
                     }
                 },this);
-                this.model.set('unreadCount',0);
-                this.model.set('badgeDisplay','none');
+                this.model.set('unreadCount', 0);
+                this.model.set('badgeDisplay', 'none');
 
                 PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'open'});
             } else {
@@ -280,9 +277,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         },
         updateHeader: function()
         {
-            this.$el.find("div.chat.chat-fixed").css('margin-right',(this.model.get('index')*300)+'px');
+            this.$el.find("div.chat.chat-fixed").css('margin-right', (this.model.get('index')*300)+'px');
 
-            this.$el.find("span.badge").css('display',this.model.get('badgeDisplay'));
+            this.$el.find("span.badge").css('display', this.model.get('badgeDisplay'));
             if (this.model.get('collapsed')) {
                 var badgeText = this.model.get('unreadCount') + '&nbsp;unread';
                 if (this.model.get('unreadCount') > 1) {
@@ -314,17 +311,17 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             var msg_item = new ChatWindows.Models.Item({
                 channel: this.model.get('channel'),
                 username: username,
-                text: this.$el.find('#message_body').val(),
+                text: this.$el.find('.js-message-body').val(),
                 msg_id: msg_id,
                 time: -1
             });
             this.collection.add(msg_item);
-            say({
+            sendSay({
                 channel: this.model.get('channel'),
-                text: this.$el.find('#message_body').val(),
+                text: this.$el.find('.js-message-body').val(),
                 msg_id: msg_id
             });
-            this.$el.find('#message_body').val('');
+            this.$el.find('.js-message-body').val('');
         },
         render: function()
         {
@@ -341,16 +338,12 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             if (!item.get('unread')) {
                 //this.$el.find('div.box.box-collapsed').removeClass('box-collapsed');
 
-                var chatItem = new ChatWindows.Views.Item({
-                    model: item
-                });
+                var chatItem = new ChatWindows.Views.Item({model: item});
 
                 this.$el.find('ul:first').append(chatItem.render().el);
 
                 scrollable = this.$el.find(".scrollable");
-                $(scrollable).slimScroll({
-                    scrollTo: scrollable.prop('scrollHeight') + "px"
-                });
+                $(scrollable).slimScroll({scrollTo: scrollable.prop('scrollHeight') + "px"});
 
                 this.$el.find('ul li:last').effect("highlight", {}, 500);
                 playDing();
@@ -358,9 +351,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
 
         },
         messageSent: function (msg) {
-            var itemModel = this.collection.findWhere({
-                msg_id: msg.msg_id
-            });
+            var itemModel = this.collection.findWhere({msg_id: msg.msg_id});
 
             if (itemModel) {
                 itemModel.set('time',msg.time);
@@ -401,79 +392,51 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         }
     });
 
-    var chatWins = new ChatWindows.Collections.Wins([]),
-        username;
-    var chatMainWin = new ChatWindows.Views.Main({
-        collection: chatWins
-    });
+    var chatWins = new ChatWindows.Collections.Wins([]);
+    var chatMainWin = new ChatWindows.Views.Main({collection: chatWins});
     var loadedWins=[];
 
-    function init(options) {
-        console.log(options);
+    //TODO: refactor for AdminChat to be main class
+    var AdminChat = function(options) {
+        initializing = true;
         username = options.username;
-        PushClient.send({
-            channel: 'adminuser',
-            signal: 'subscribe'
-        });
-        PushClient.send({
-            channel: 'adminuser',
-            signal: 'init'
-        })
-        PushClient.send({
-            channel: 'adminchat',
-            signal: 'init'
-        })
-        status({
-            status: options.status
-        })
+        dingPath = options.dingPath;
+
+        _.each(options.state.chats, show_window);
+        _.each(options.state.users, user_status);
+
+        PushClient.listen({channel: 'adminuser', callback: channel_adminuser});
+        PushClient.listen({channel: 'adminchat', callback: channel_adminchat});
+        PushClient.listen({regexp: /^adminchat:(.*)$/, callback: channel_adminchat});
+
+        initializing = false;
     }
 
     // send to server
-    function status(options) {
-        PushClient.send({
-            channel: 'adminuser',
-            signal: 'status',
-            status: options.status
-        });
+    function sendStatus(options) {
+        PushClient.send({channel: 'adminuser', signal: 'status', status: options.status});
     }
 
-    function open(options) {
-        PushClient.send({
-            channel: 'adminchat',
-            signal: 'open',
-            user: options.user
-        });
+    function sendOpen(options) {
+        PushClient.send({channel: 'adminchat', signal: 'open', user: options.user});
     }
 
-    function invite(options) {
-        PushClient.send({
-            channel: 'adminchat',
-            signal: 'invite',
-            user: options.user
-        });
+    function sendSay(options) {
+        PushClient.send({channel: options.channel, signal: 'say', text: options.text, msg_id: options.msg_id});
     }
 
-    function say(options) {
-        //add message to dom
-        PushClient.send({
-            channel: options.channel,
-            signal: 'say',
-            text: options.text,
-            msg_id: options.msg_id
-        });
+    function sendInvite(options) {
+        PushClient.send({channel: 'adminchat', signal: 'invite', user: options.user});
     }
 
-    function leave(options) {
-        PushClient.send({
-            channel: options.channel,
-            signal: 'leave'
-        });
+    function sendLeave(options) {
+        PushClient.send({channel: options.channel, signal: 'leave'});
         //close_window(options.channel);
     }
 
 
     function show_window(chat) {
-        if (chat.status && chat.status === 'close') {
+        if (chat.status && chat.status === 'closed') {
             return;
         }
 
@@ -481,7 +444,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             return;
         }
 
-        chat.index=loadedWins.length;
+        chat.index = loadedWins.length;
         var chatModel = new ChatWindows.Models.Win(chat);
 
         if(chat.status && chat.status === 'collapsed') {
@@ -502,7 +465,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         var json = _.where(loadedWins, {
             channel: msg.channel
         });
-        if(json[0])
+        if (json[0]) {
             if (!(msg.msg_id && json[0].win.messageSent(msg))) {
                 var winView=json[0].win;
                 var chatItem= new ChatWindows.Models.Item(msg);
@@ -515,26 +478,30 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
                     var userModel = userView.collection.findModelByName(msg.username);
                     if (userModel!==false) {
                         userModel.incUnread();
-                }
+                    }
                 }
                 json[0].win.collection.add(chatItem);
             }
+        }
     }
 
-    PushClient.listen({
-        channel: 'adminuser',
-        callback: channel_adminuser
-    });
+    function user_status(user) {
+        if (user.username === username) {
+            statusModel.set('status',user.status);
 
-    // receive from server
-    PushClient.listen({
-        channel: 'adminchat',
-        callback: channel_adminchat
-    });
-    PushClient.listen({
-        regexp: /^adminchat:(.*)$/,
-        callback: channel_adminchat
-    });
+            return;
+        }
+        var temps = users.where({username: user.username});
+        if (temps.length > 0) {
+            temps[0].set("status",user.status);
+        } else {
+            users.add(user);
+        }
+
+        if (!initializing) {
+            $.bootstrapGrowl(user.username + ' is ' + user.status, {type: 'success', align: 'center', width: 'auto'});
+        }
+    }
 
     function channel_adminuser(msg) {
         if (channel_adminuser.signals[msg.signal]) {
@@ -542,45 +509,15 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
         }
     }
     var users = new ChatUserList.Collections.Users([]);
-    var userView = new ChatUserList.Views.Users({
-        collection: users
-    });
+    var userView = new ChatUserList.Views.Users({collection: users});
 
-    var statusModel = new ChatUserList.Models.User({
-        username: username,
-        status: 'online'
-    });
-    var statusView = new ChatUserList.Views.Status({
-        model: statusModel
-    });
+    var statusModel = new ChatUserList.Models.User({username: username, status: 'online'});
+    var statusView = new ChatUserList.Views.Status({model: statusModel});
     statusView.render();
 
     channel_adminuser.signals = {
         status: function(msg) {
-            _.each(msg.users, function(user) {
-
-                if (user.username === username) {
-                    statusModel.set('status',user.status);
-
-                    return;
-                }
-                var temps = users.where({
-                    username: user.username
-                });
-                if (temps.length > 0) {
-                    temps[0].set("status",user.status);
-                } else {
-                    users.add(user);
-                }
-
-                if (!msg.init) {
-                    $.bootstrapGrowl(user.username + ' is ' + user.status, {
-                        type: 'success',
-                        align: 'center',
-                        width: 'auto'
-                    });
-                }
-            });
+            _.each(msg.users, user_status);
         }
     }
 
@@ -600,49 +537,24 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'fcom.
             })
         },
         open: function(msg) {
-
-            show_window({
-                channel: msg.channel
-            });
+            show_window({channel: msg.channel});
         },
         say: function(msg) {
-
-            show_window({
-                channel: msg.channel
-            });
+            show_window({channel: msg.channel});
             add_history(msg);
         },
         join: function(msg) {
-            show_window({
-                channel: msg.channel
-            });
-            add_history({
-                channel: msg.channel,
-                text: 'joined',
-                username: msg.username
-            });
+            show_window({channel: msg.channel});
+            add_history({channel: msg.channel, text: 'joined', username: msg.username});
         },
         leave: function(msg) {
-            show_window({
-                channel: msg.channel
-            });
-            add_history({
-                channel: msg.channel,
-                text: ' left',
-                username: msg.username
-            });
+            show_window({channel: msg.channel});
+            add_history({channel: msg.channel, text: ' left', username: msg.username});
         },
         close: function(msg) {
             //close_window(msg.channel);
         }
     }
 
-    _.extend(exports, {
-        init: init,
-        status: status,
-        open: open,
-        invite: invite,
-        say: say,
-        leave: leave
-    });
+    return AdminChat;
 });
