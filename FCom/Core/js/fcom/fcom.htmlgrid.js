@@ -50,10 +50,26 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                             }
                         });
 
+                    
+                    $('td:eq(' + index + ')',this).toggle();
                     $('th:eq(' + index + ')',this).toggle();
-                    $('tr:eq(' + index + ')',this).toggle();
                 });
             })
+            
+            
+	
+//	  $('.dropdown-menu li').draggable({
+//	    revert: 'invalid'
+//	  });
+//	  $('.dropdown-menu').droppable({
+//	    activeClass: 'dropdown-menu',
+//	    hoverClass: 'dropdown-menu',
+//	    drop: function(event, ui) {
+//	      puffRemove($(ui.draggable));
+//	    }
+//	  });
+	
+            
             // resize columns
             
             $('thead th', gridParent).resizable({
@@ -89,48 +105,48 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 
             // reorder columns
             
-            $table.dragtable({
-                handle: 'drag-handle',
-                items: 'thead .drag-handle',
-                scroll: true,
-                appendParent: $table,
-                change: function() {
-                    //console.log($('.dragtable-drag-wrapper').html());
-                },
-                stop: function() {
-                    var cols = [];
-                    $('thead th', gridParent).each(function(i, el) {
-                        cols.push({ name: $(el).data('id') });
-                    });
-                    $.post(config.personalize_url,
-                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
-                        function(response, status, xhr) {
-                            //console.log(response, status, xhr);
-                        }
-                    );
-                }
-            });
+//            $table.dragtable({
+//                handle: 'drag-handle',
+//                items: 'thead .drag-handle',
+//                scroll: true,
+//                appendParent: $table,
+//                change: function() {
+//                    //console.log($('.dragtable-drag-wrapper').html());
+//                },
+//                stop: function() {
+//                    var cols = [];
+//                    $('thead th', gridParent).each(function(i, el) {
+//                        cols.push({ name: $(el).data('id') });
+//                    });
+//                    $.post(config.personalize_url,
+//                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+//                        function(response, status, xhr) {
+//                            //console.log(response, status, xhr);
+//                        }
+//                    );
+//                }
+//            });
 
             
-            $('thead', gridParent).sortable({
-                items: 'th',
-                containment:'parent',
-                update: function(ev, ui) {
-                    var cols = [];
-                    $('th', this).each(function(i, el) {
-                        cols.push({ name: $(el).data('id') });
-                    });
-                    $.post(config.personalize_url,
-                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
-                        function(response, status, xhr) {
-                            console.log(response, status, xhr);
-                            if (response.success) {
-                                load();
-                            }
-                        }
-                    );
-                }
-            });
+//            $('thead', gridParent).sortable({
+//                items: 'th',
+//                containment:'parent',
+//                update: function(ev, ui) {
+//                    var cols = [];
+//                    $('th', this).each(function(i, el) {
+//                        cols.push({ name: $(el).data('id') });
+//                    });
+//                    $.post(config.personalize_url,
+//                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+//                        function(response, status, xhr) {
+//                            console.log(response, status, xhr);
+//                            if (response.success) {
+//                                load();
+//                            }
+//                        }
+//                    );
+//                }
+//            });
             
         }
         // initialize DOM first time on page load
