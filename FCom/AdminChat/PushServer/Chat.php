@@ -14,34 +14,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         return true;
     }
 
-    public function signal_init()
-    {
-        if ($this->_client->admin_user_id) {
-            $chats = FCom_AdminChat_Model_Chat::i()->orm('c')
-                ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')
-                ->where('p.user_id', $this->_client->admin_user_id)
-                ->select('c.id')                
-                ->select_expr('p.status', 'chatWinStatus')
-                ->find_many();
-            if ($chats) {
-                $channels = array();
-                foreach ($chats as $chat) {
-                    //$chat->addParticipant($this->_client->admin_user_id); //TODO: figure out why it disappears??
-
-                    $channels[] = array(
-                        'channel' => 'adminchat:' . $chat->id,
-                        'status' => $chat->chatWinStatus,
-                        'history' => $chat->getHistoryArray(),
-                    );
-                }
-                $this->reply(array('signal' => 'chats', 'chats' => $channels));
-            } else {
-                $this->reply(array('signal' => 'noop', 'description' => 'No chats found'));
-            }
-        }
-    }
-
-    public function signal_start()
+    public function signal_open()
     {
         // start the chat, receive initial history
 
@@ -51,8 +24,23 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
             $this->reply(array('signal' => 'error', 'description' => 'Unknown username'));
             return;
         }
-        $chat = FCom_AdminChat_Model_Chat::i()->start($user);
-        $chat->getChannel()->send(array('signal' => 'start'));
+        $chat = FCom_AdminChat_Model_Chat::i()->openWithUser($user);
+        $participant = FCom_AdminChat_Model_Participant::i()->load(array(
+            'chat_id' => $chat->id(),
+            'user_id' => FCom_Admin_Model_User::i()->sessionUserId(),
+        ));
+        if ($participant->get('status') !== 'open') {
+            $participant->set('status', 'open')->save();
+        }
+        $channel = $chat->getChannel();
+        $channel->send(array(
+            'signal' => 'chats',
+            array(
+                'channel' => $channel->get('channel_name'),
+                'status'  => 'open',
+                'history' => $chat->getHistoryArray(),
+            ),
+        ));
     }
 
     public function signal_invite()
@@ -73,11 +61,11 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $msg = $chat->addHistory($user, $this->_message['text']);
 #BDebug::log('ADMINCHAT: say '.print_r($this->_message, 1));
         $channel->send(array(
-            'signal' => 'say',
-            'text' => $this->_message['text'],
-            'username' =>$user->username,
-            'msg_id' => $this->_message['msg_id'],
-            'time' =>gmdate("Y-m-d H:i:s +0000")
+            'signal'   => 'say',
+            'text'     => $this->_message['text'],
+            'username' => $user->get('username'),
+            'msg_id'   => $this->_message['msg_id'],
+            'time'     => gmdate("Y-m-d H:i:s +0000")
         ));
     }
 
@@ -86,16 +74,15 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 
     }
 
-    public function signal_notify()
+    public function signal_window_status()
     {
         $channel = $this->_message['channel'];
         $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $userId = FCom_Admin_Model_User::i()->sessionUserId();
         $hlp = FCom_AdminChat_Model_Participant::i();
-        $data = array('chat_id' => $chat->id, 'user_id' => $user->id);
+        $data = array('chat_id' => $chat->id(), 'user_id' => $userId);
         $participant = $hlp->load($data);
-        $participant->status = $this->_message['status'];
-        $participant->save();
+        $participant->set('status', $this->_message['status'])->save();
     }
 
     public function signal_leave()
@@ -106,7 +93,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $chat->removeParticipant($user);
 
         FCom_PushServer_Model_Channel::i()->getChannel($channel)
-            ->send(array('signal' => 'leave', 'username' => $user->username));
+            ->send(array('signal' => 'leave', 'username' => $user->get('username')));
 
         $this->_client->getChannel()
             ->send(array('channel' => $channel, 'signal' => 'close'));

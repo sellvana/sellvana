@@ -8,7 +8,7 @@ modules:
                 auto_use: [ layout, views ]
                 observe:
                     - [ FCom_Admin_Model_User::logout, FCom_AdminChat_Admin::onAdminUserLogout ]
-                    - [ FCom_PushServer_Model_Client::setStatus, FCom_AdminChat_Admin::onClientSetStatus ]
+                    #- [ FCom_PushServer_Model_Client::setStatus, FCom_AdminChat_Admin::onClientSetStatus ]
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]
