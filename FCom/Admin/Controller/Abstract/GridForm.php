@@ -42,10 +42,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $config = $this->gridConfig();
             $view->set('grid', array('config' => $config));
         }
-        BEvents::i()->fire(static::$_origClass.'::gridView', array('view'=>&$config));
+        BEvents::i()->fire(static::$_origClass.'::gridView');
         return $view;
     }
-
 
     public function gridConfig()
     {
@@ -64,7 +63,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         );
         return $config;
     }
+    public function simpleGridConfig()
+    {
+        $config = array(
+                'columns' => array(),
+                'data' => array(),
+            );
 
+        return $config;
+
+    }
     public function action_index()
     {
         if (BRequest::i()->xhr()) {

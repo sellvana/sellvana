@@ -70,7 +70,9 @@ class FCom_AdminChat_Admin extends BClass
                 ->where_gt('h.create_at', date('Y-m-d', time()-86400))
                 ->select('h.*')
                 ->select('u.username')
+                ->order_by_asc('h.create_at')
                 ->find_many();
+
             foreach ($history as $msg) {
                 $chats[$msg->get('chat_id')]['history'][] = array(
                     'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
@@ -80,14 +82,25 @@ class FCom_AdminChat_Admin extends BClass
             }
         }
 
-        $users = FCom_Admin_Model_User::i()->orm('u')
+        $users = array();
+        $userModels = FCom_Admin_Model_User::i()->orm('u')
             ->left_outer_join('FCom_AdminChat_Model_UserStatus', array('us.user_id','=','u.id'), 'us')
             ->select('u.username')->select('u.firstname')->select('u.lastname')->select('us.status')
+            ->select('u.email')
             ->find_many();
+        foreach ($userModels as $user) {
+            $users[] = array(
+                'username' => $user->get('username'),
+                'firstname' => $user->get('firstname'),
+                'lastname' => $user->get('lastname'),
+                'status' => $user->get('status'),
+                'avatar' => BUtil::gravatar($user->get('email')),
+            );
+        }
 
         $result = array(
             'chats' => array_values($chats),
-            'users' => BDb::many_as_array($users),
+            'users' => $users,
         );
 
         BDebug::profile($p);
