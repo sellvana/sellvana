@@ -20,9 +20,6 @@ ul#adminUserList li
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
 
 {% set adminChatsEnabled = MODULES.isLoaded('FCom_AdminChat') %}
-{% set curUserStatus = APP.instance("FCom_AdminChat_Model_UserStatus").sessionUserStatus() %}
-
-{% set isLoggedIn = APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
 
 <header>
   <nav class="navbar navbar-default">
@@ -178,6 +175,7 @@ ul#adminUserList li
           </ul>
         </li>
       {% endif %}
+
       {% if adminChatsEnabled %}
       <li class="dropdown medium only-icon widget">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">
@@ -216,6 +214,7 @@ ul#adminUserList li
           </ul>
       </li>
       {% endif %}
+
       <li class="dropdown dark user-menu">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <img width="23" height="23" alt="{{ user.fullname() }}" src="{{ UTIL.gravatar(user.get("email")) }}" />
@@ -253,12 +252,3 @@ ul#adminUserList li
     </form>
   </nav>
 </header>
-
-<script>
-  require(['jquery', 'fcom.adminchat'], function($, AdminChat) {
-    AdminChat.init({
-      username: '{{ user.username }}',
-      status: '{{ curUserStatus.status }}'
-    });
-  });
-</script>

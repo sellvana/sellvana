@@ -35,7 +35,11 @@ class FCom_AdminChat_Admin extends BClass
 
     public function getInitialState()
     {
+        $p = BDebug::debug('ADMINCHAT INITIAL STATE');
+
         $userId = FCom_Admin_Model_User::i()->sessionUserId();
+
+        FCom_PushServer_Model_Client::i()->sessionClient()->subscribe(FCom_PushServer_Model_Channel::i()->getChannel('adminuser'));
 
         $chats = array();
 
@@ -54,19 +58,29 @@ class FCom_AdminChat_Admin extends BClass
         }
 
         $history = FCom_AdminChat_Model_History::i()->orm()
-            ->where_in('chat_id', array_keys($chatModels))
+            ->where_in('chat_id', array_keys($chats))
             ->where_gt('create_at', date('Y-m-d', time()-86400))
             ->find_many();
         foreach ($history as $msg) {
-            $chats[$msg->get('chat_id')][] = array(
+            $chats[$msg->get('chat_id')]['history'][] = array(
                 'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
                 'username' => $msg->get('username'),
                 'text' => $msg->get('text'),
             );
         }
-        return array(
-            'users' => $users,
-            'chats' => $chats,
-        )
+
+        $users = FCom_Admin_Model_User::i()->orm('u')
+            ->left_outer_join('FCom_AdminChat_Model_UserStatus', array('us.user_id','=','u.id'), 'us')
+            ->select('u.username')->select('u.firstname')->select('u.lastname')->select('us.status')
+            ->find_many();
+
+        $result = array(
+            'chats' => array_values($chats),
+            'users' => BDb::many_as_array($users),
+        );
+
+        BDebug::profile($p);
+
+        return $result;
     }
 }

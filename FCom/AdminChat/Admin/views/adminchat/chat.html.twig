@@ -1,12 +1,18 @@
-{% set isLoggedIn = APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
+<script>
+    require(['fcom.adminchat'], function(AdminChat) {
+        new AdminChat({
+            state: {{ UTIL.toJson(APP.instance('FCom_AdminChat_Admin').getInitialState()) | raw }},
+            username: '{{ APP.instance('FCom_Admin_Model_User').sessionUser().get('username') }}',
+            dingPath: '{{ APP.src('@FCom_Core/sound/ding.wav') }}'
+        })
+    })
+</script>
 
 <div id='sound'></div>
-<script>
- var curUser = "{{ APP.instance('FCom_Admin_Model_User').sessionUser().get('username') }}";
- var dingPath = '{{ APP.src('@FCom_Core/sound/ding.wav') }}';
-</script>
+
 <div id='adminChatMain'></div>
-<script type='text/template' class='template' id= 'chatWinTemplate'>
+
+<script type='text/template' class='template' id='chatWinTemplate'>
     <div class='chat chat-fixed' style='margin-right: <%- index*300 %>px'>
         <div class='col-sm-12'>
             <div class='box'>
@@ -44,7 +50,6 @@
 </script>
 
 <script type='text/template' class='template' id='chatItemTempate'>
-
     <div class="avatar">
         <img width="23" height="23" src="http://www.gravatar.com/avatar/70b03db954aa45fc2559e85f5d5bd13e?default=identicon" alt="Avatar">
     </div>
@@ -66,7 +71,6 @@
     <div class="body">
         &nbsp;<%- text %>
     </div>
-
 </script>
 
 
