@@ -90,14 +90,26 @@
 </script>
 
 <form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
-    <header class="fcom-admin-main-title">
-        <span class="title">{{ 'Modules'|_ }}</span>
-        <div class="btn-group">
-            <button class="btn btn-success" type="button" onclick="location.href='{{APP.href('modules/market')}}'"><span>{{ 'Download new Modules'|_ }}</span></button>
-            <button class="btn btn-primary" type="button" onclick="return runMigrationScripts()"><span>{{ 'Run Migration Scripts'|_ }}</span></button>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <h1 class="pull-left">
+                    <i class="icon-puzzle-piece"></i>
+                    <span>{{ "Modules" |_ }}</span>
+                </h1>
+                <div class="pull-right">
+                    <button class="btn btn-success" type="button" onclick="location.href='{{APP.href('modules/market')}}'"><span>{{ 'Download new Modules'|_ }}</span></button>
+                    <button class="btn btn-primary" type="button" onclick="return runMigrationScripts()"><span>{{ 'Run Migration Scripts'|_ }}</span></button>
+                </div>
+            </div>
         </div>
-    </header>
-    {{ THIS.view('core/messages') | raw }}
-    {{ THIS.view('core/backgrid') | raw }}
+    </div>
+
+    <div class="box col-sm-12">
+        <div class="box-content">
+            {{ THIS.view('core/messages') | raw }}
+            {{ THIS.view('core/backgrid') | raw }}
+        </div>
+    </div>
 </form>
 
