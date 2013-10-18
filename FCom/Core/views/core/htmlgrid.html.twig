@@ -66,11 +66,12 @@
                 Columns
                 <b class="caret"></b>
             </a>
+                
                 <ul class="dropdown-menu">
                               {% for colId, col in config.columns %}
          
           {% if col.type != 'multiselect' %}
-                <li><label>
+                <li calss="ui-state-default"><label>
                     <input class="showhide_column" type="checkbox" data-id={{col.name}}>
                         {{col.label}}</label>
                 </li>

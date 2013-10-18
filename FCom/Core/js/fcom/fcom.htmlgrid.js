@@ -37,7 +37,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
             $('.showhide_column').each(function(){
                 $(this).attr('checked','checked');
             })
-            $('.showhide_column').bind('click',function(){
+            $('.showhide_column').bind('click',function(e){
 
                 var id = $(this).data('id');
                 
@@ -54,20 +54,65 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                     $('td:eq(' + index + ')',this).toggle();
                     $('th:eq(' + index + ')',this).toggle();
                 });
+                //$('.dropdown-toggle').dropdown('toggle');
+                e.stopPropagation();
             })
             
             
+             $(function() {
+                $( ".dropdown_menu" ).sortable({
+                    revert: true
+                });
+//                $( ".dropdown-menu li" ).draggable({
+//                    connectToSortable: ".dropdown_menu",
+//                    helper: "clone",
+//                    revert: "invalid"
+//                });
+                $( "ul, li" ).disableSelection();
+            });
+            
+            
+             $( ".dropdown-menu" ).sortable({
+                revert: true
+            });
 	
-//	  $('.dropdown-menu li').draggable({
-//	    revert: 'invalid'
-//	  });
-//	  $('.dropdown-menu').droppable({
+        $.fn.switchColumns = function ( col1, col2 ) {
+            console.log(this);
+    var $this = this,
+        $tr = $this.find('tr');
+
+    $tr.each(function(i, ele){
+        var $ele = $(ele),
+            $td = $ele.find('td'),
+            $th = $ele.find('th'),
+            $tdt, $tht;
+            
+        $tht = $th.eq( col1 ).clone();
+        $th.eq( col1 ).html( $th.eq( col2 ).html() );
+        $th.eq( col2 ).html( $tht.html() );
+
+        $tdt = $td.eq( col1 ).clone();
+        $td.eq( col1 ).html( $td.eq( col2 ).html() );
+        $td.eq( col2 ).html( $tdt.html() );
+    });
+};
+
+
+	  $('.dropdown-menu').droppable({
 //	    activeClass: 'dropdown-menu',
 //	    hoverClass: 'dropdown-menu',
-//	    drop: function(event, ui) {
-//	      puffRemove($(ui.draggable));
-//	    }
-//	  });
+	    drop: function(event, ui) {
+                console.log(ui);
+             console.log(ui.draggable.index());
+             console.log(ui.helper);
+                
+                $('table').switchColumns(0,ui.draggable.index());
+	    },
+            out: function( event, ui ) 
+            {
+                console.log(ui);
+            }
+	  });
 	
             
             // resize columns
