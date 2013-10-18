@@ -34,7 +34,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // create products
         $products = true;
-        if (false) {
+        if (true) {
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
