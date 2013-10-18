@@ -59,9 +59,9 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
             })
             
             
-             $(function() {
+             
                 $( ".dropdown_menu" ).sortable({
-                    revert: true
+                    revert: true,
                 });
 //                $( ".dropdown-menu li" ).draggable({
 //                    connectToSortable: ".dropdown_menu",
@@ -69,49 +69,32 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 //                    revert: "invalid"
 //                });
                 $( "ul, li" ).disableSelection();
-            });
+            
             
             
              $( ".dropdown-menu" ).sortable({
                 revert: true
             });
 	
-        $.fn.switchColumns = function ( col1, col2 ) {
-            console.log(this);
-    var $this = this,
-        $tr = $this.find('tr');
-
-    $tr.each(function(i, ele){
-        var $ele = $(ele),
-            $td = $ele.find('td'),
-            $th = $ele.find('th'),
-            $tdt, $tht;
-            
-        $tht = $th.eq( col1 ).clone();
-        $th.eq( col1 ).html( $th.eq( col2 ).html() );
-        $th.eq( col2 ).html( $tht.html() );
-
-        $tdt = $td.eq( col1 ).clone();
-        $td.eq( col1 ).html( $td.eq( col2 ).html() );
-        $td.eq( col2 ).html( $tdt.html() );
-    });
-};
-
-
-	  $('.dropdown-menu').droppable({
-//	    activeClass: 'dropdown-menu',
-//	    hoverClass: 'dropdown-menu',
+  	  $('.dropdown-menu').droppable({
 	    drop: function(event, ui) {
-                console.log(ui);
-             console.log(ui.draggable.index());
-             console.log(ui.helper);
                 
-                $('table').switchColumns(0,ui.draggable.index());
-	    },
-            out: function( event, ui ) 
-            {
-                console.log(ui);
-            }
+                var cols = [];
+                $('.dropdown-menu').find("input").each(function(i, el) {
+                            cols.push({ name: $(el).data('id') });
+                });
+
+                    $.post(config.personalize_url,
+                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+                        function(response, status, xhr) {
+                            //console.log(response, status, xhr);
+                              if (response.success) {
+                                load();
+                            }
+                        }
+                    )
+
+	    }
 	  });
 	
             
@@ -128,7 +111,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }
-                    )
+                    );
                 }
             });
             /*
