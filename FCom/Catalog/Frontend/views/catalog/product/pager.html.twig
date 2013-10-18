@@ -22,10 +22,16 @@
 
 
 <!-- Sorting-->
-<form method="get" action="{{ url }}">
+<form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
     <div class="row">
-      <div class="col-sm-5">
+      <div class="col-sm-2">
+        <div class="btn-group">
+          <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
+          <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
+        </div>
+      </div>
+      <div class="col-sm-4">
         <ul class="pagination">
             {% if s.p > 1 %}
               <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}">&lt;</a></li>
@@ -52,8 +58,9 @@
             {% endif %}
         </ul>
       </div>
-      <div class="col-sm-3">
-        <ul class="pagination pull-left">
+      <div class="col-sm-2">
+        View:
+        <ul class="pagination">
         {% for ps in psOptions %}
             <li {{ ps == s.ps ? 'class="active"' }}>
                 <a href="{{ UTIL.setUrlQuery(url, {ps:ps}) }}">{{ ps }}</a>
@@ -61,19 +68,13 @@
         {% endfor %}
         </ul>
       </div>
-      <div class="col-sm-2">
-        <select name="sc" onchange="this.form.submit()" class="form-control pull-left">
-            {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
+      <div class="col-sm-4 text-right">
+        <label for="#" class="control-label">Sort by:</label>
+        <select name="sc" onchange="this.form.submit()" class="form-control">
+          {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
         </select>
       </div>
       {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
-  
-      <div class="col-sm-2">
-        <div class="btn-group pull-right">
-          <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn-default':'btn-default' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
-          <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn-default':'btn-default' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
-        </div>
-      </div>
     </div>
   </fieldset>
 </form>
