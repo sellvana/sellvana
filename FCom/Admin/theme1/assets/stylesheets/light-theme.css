@@ -4258,10 +4258,9 @@ body.login {
   -moz-border-radius: 0 !important;
   border-radius: 0 !important; }
 .table-bordered th:first-child {min-width: 100px;}
-.table-bordered tr th { display:inline-block; 
-                    vertical-align: middle;
+.ui-resizable-handle {
+    float: right; height: 29px; margin: -6px -14px -6px 0; position: static; width: 7px; 
 }
-
 
 .input-group-addon, .form-control, .input-append .add-on:last-child, .input-append .btn:last-child, .input-append .btn-group:last-child > .dropdown-toggle,
 .input-prepend.input-append .add-on:last-child, .input-prepend.input-append .btn:last-child,
