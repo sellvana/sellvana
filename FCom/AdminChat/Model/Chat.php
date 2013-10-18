@@ -43,11 +43,13 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
             }
         }
         $chat = static::create(array(
-            'owner_user_id' => $user->id,
+            'owner_user_id' => $user->id(),
+            'title' => $user->get('username').', '.$remoteUser->get('username'),
         ))->save();
 
-        $chat->addParticipant($user);
-        $chat->addParticipant($remoteUser);
+        $chat->addParticipant($user, array('chat_title' => $remoteUser->get('username')));
+        $chat->addParticipant($remoteUser, array('chat_title' => $user->get('username')));
+
         $chat->save();
 
         return $chat;
@@ -82,7 +84,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $msg;
     }
 
-    public function addParticipant($user)
+    public function addParticipant($user, $extraData = array())
     {
         $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($user);
         $channel = $this->getChannel();
@@ -96,12 +98,13 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $participant = $hlp->load($data);
         if (!$participant) {
             $data['status'] = 'open';
+            $data = array_merge($data, $extraData);
             $participant = $hlp->create($data)->save();
             $this->add('num_participants');
             $channel->send(array('signal' => 'join', 'username' => $user->get('username')));
         }
 
-        return $this;
+        return $participant;
     }
 
     public function removeParticipant($user)

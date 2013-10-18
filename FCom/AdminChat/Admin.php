@@ -37,29 +37,37 @@ class FCom_AdminChat_Admin extends BClass
     {
         $p = BDebug::debug('ADMINCHAT INITIAL STATE');
 
-        $userId = FCom_Admin_Model_User::i()->sessionUserId();
+        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $userId = $user->id();
+        $userName = $user->get('username');
 
         FCom_PushServer_Model_Client::i()->sessionClient()->subscribe(FCom_PushServer_Model_Channel::i()->getChannel('adminuser'));
 
         $chats = array();
 
+        $reUsername = '#(^|\s*,\s*)'.preg_quote($userName).'(\s*,\s*|$)#';
         $chatModels = FCom_AdminChat_Model_Chat::i()->orm('c')
-            ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')
-            ->where('p.user_id', $userId)
+            ->join('FCom_AdminChat_Model_Participant', array('c.id','=','p.chat_id'), 'p')->where('p.user_id', $userId)
             ->select('c.id')
-            ->select('(p.status)', 'chat_window_status')
+            ->select('c.title')
+            ->select('p.status', 'chat_window_status')
+            ->select('p.chat_title')
             ->find_many_assoc('c.id');
         foreach ($chatModels as $c) {
             $chats[$c->id()] = array(
                 'channel' => 'adminchat:' . $c->id(),
+                'title' => $c->get('chat_title'),
                 'status' => $c->get('chat_window_status'),
                 'history' => array(),
             );
         }
         if ($chats) {
-            $history = FCom_AdminChat_Model_History::i()->orm()
-                ->where_in('chat_id', array_keys($chats))
-                ->where_gt('create_at', date('Y-m-d', time()-86400))
+            $history = FCom_AdminChat_Model_History::i()->orm('h')
+                ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
+                ->where_in('h.chat_id', array_keys($chats))
+                ->where_gt('h.create_at', date('Y-m-d', time()-86400))
+                ->select('h.*')
+                ->select('u.username')
                 ->find_many();
             foreach ($history as $msg) {
                 $chats[$msg->get('chat_id')]['history'][] = array(

@@ -110,4 +110,13 @@ class FCom_AdminChat_Migrate extends BClass
             ),
         ));
     }
+    public function upgrade__0_1_3__0_1_4()
+    {
+        $tParticipant = FCom_AdminChat_Model_Participant::table();
+        BDb::ddlTableDef($tParticipant, array(
+            'COLUMNS' => array(
+                'chat_title' => 'varchar(50) null after `status`',
+            ),
+        ));
+    }
 }
