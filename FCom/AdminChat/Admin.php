@@ -56,17 +56,18 @@ class FCom_AdminChat_Admin extends BClass
                 'history' => array(),
             );
         }
-
-        $history = FCom_AdminChat_Model_History::i()->orm()
-            ->where_in('chat_id', array_keys($chats))
-            ->where_gt('create_at', date('Y-m-d', time()-86400))
-            ->find_many();
-        foreach ($history as $msg) {
-            $chats[$msg->get('chat_id')]['history'][] = array(
-                'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
-                'username' => $msg->get('username'),
-                'text' => $msg->get('text'),
-            );
+        if ($chats) {
+            $history = FCom_AdminChat_Model_History::i()->orm()
+                ->where_in('chat_id', array_keys($chats))
+                ->where_gt('create_at', date('Y-m-d', time()-86400))
+                ->find_many();
+            foreach ($history as $msg) {
+                $chats[$msg->get('chat_id')]['history'][] = array(
+                    'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
+                    'username' => $msg->get('username'),
+                    'text' => $msg->get('text'),
+                );
+            }
         }
 
         $users = FCom_Admin_Model_User::i()->orm('u')
