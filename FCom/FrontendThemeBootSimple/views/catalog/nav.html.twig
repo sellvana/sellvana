@@ -1,126 +1,23 @@
-{% set imgBaseUrl = APP.src('@FCom_FrontendThemeBootSimple/img') %}
+{% set categories = APP.instance('FCom_Catalog_Model_Category').getTopNavCategories(2) %}
+{% set activeCategory = 'home' %}
+
 <nav class="f-catalog-navbar navbar" role="navigation">
-  <div class="container">
-    <ul class="nav navbar-nav collapse">
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Bed & Bath</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Fashion Bedding</a></li>
-          <li><a href="#">Sheets</a></li>
-          <li><a href="#">Memory Foam</a></li>
-          <li><a href="#">Down Bedding</a></li>
-          <li><a href="#">Bath & Towels</a></li>
-          <li><a href="#">Kids' & Teen Bedding</a></li>
-          <li><a href="#">Blankets & Throws</a></li>
-          <li><a href="#">Mattress Pads & Toppers</a></li>
-          <li><a href="#">Bedding Accessories</a></li>
+    <div class="container">
+        <ul class="nav navbar-nav collapse">
+{% for cat in categories %}
+<!-- TODO: correct active category -->
+            <li class="dropdown">
+                <a class="dropdown-toggle disabled {{ activeCategory == cat.get('url_path') ? 'active' }}"
+                    href="{{ APP.href(cat.get('url_path')) }}" data-toggle="dropdown">{{ cat.get('node_name') }}</a>
+{% if cat.get('children') %}
+                <ul class="dropdown-menu">
+{% for cat1 in cat.get('children') %}
+                    <li><a href="{{ APP.href(cat1.get('url_path')) }}">{{ cat1.get('node_name') }}</a></li>
+{% endfor %}
+                </ul>
+{% endif %}
+            </li>
+{% endfor %}
         </ul>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Clothing</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Women's Clothing (9,222)</a></li>
-          <li><a href="#">Shoes</a></li>
-          <li><a href="#">Children's Clothing</a></li>
-          <li><a href="#">Men's Clothing</a></li>
-          <li><a href="#">Handbags</a></li>
-          <li><a href="#">Designer Store</a></li>
-          <li><a href="#">Accessories</a></li>
-          <li><a href="#">Women's Sport Clothing</a></li>
-          <li><a href="#">Sunglasses</a></li>
-          <li><a href="#">Men's Activewear (256)</a></li>
-        </ul>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Electronics</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Computers, Hardware & Software</a></li>
-          <li><a href="#">Audio & Video</a></li>
-          <li><a href="#">Telephones</a></li>
-          <li><a href="#">Cameras & Photo</a></li>
-          <li><a href="#">Printers & Scanners</a></li>
-          <li><a href="#">Monitors & Displays</a></li>
-          <li><a href="#">Home Office Equipment</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Health & Beauty</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Beauty Products</a></li>
-          <li><a href="#">Fitness & Nutrition</a></li>
-          <li><a href="#">Sexual Wellness</a></li>
-          <li><a href="#">Healthcare & Supplies</a></li>
-          <li><a href="#">Medical Supplies & Equipment</a></li>
-          <li><a href="#">Funeral</a></li>
-          <li><a href="#">Holistic Supplies</a></li>
-          <li><a href="#">Mobility & Transportation</a></li>
-          <li><a href="#">Specific Needs</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Pets</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Pet Beds</a></li>
-          <li><a href="#">Cat Supplies</a></li>
-          <li><a href="#">Crates & Kennels</a></li>
-          <li><a href="#">Feeders & Waterers</a></li>
-          <li><a href="#">Pet Carriers & Travel</a></li>
-          <li><a href="#">Pet Houses</a></li>
-          <li><a href="#">Pet Gates & Doors</a></li>
-          <li><a href="#">Pet Training</a></li>
-          <li><a href="#">Collars, Harnesses & Leashes</a></li>
-          <li><a href="#">Pet Toys</a></li>
-          <li><a href="#">Pet Apparel</a></li>
-          <li><a href="#">Pet Health Supplies</a></li>
-          <li><a href="#">Food & Treats</a></li>
-          <li><a href="#">Bird Supplies</a></li>
-          <li><a href="#">Pet Grooming</a></li>
-          <li><a href="#">Fish Supplies</a></li>
-          <li><a href="#">Pet Stairs & Ramps</a></li>
-          <li><a href="#">Pet Jewelry</a></li>
-          <li><a href="#">Small Animal Supplies</a></li>
-          <li><a href="#">Pet Lover's Gifts</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Toys</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Bikes, Ride-Ons & Scooters</a></li>
-          <li><a href="#">Outdoor Play</a></li>
-          <li><a href="#">Dolls & Dollhouses</a></li>
-          <li><a href="#">Pretend Play</a></li>
-          <li><a href="#">Learning & Educational</a></li>
-          <li><a href="#">Remote Control Toys</a></li>
-          <li><a href="#">Play Sets</a></li>
-          <li><a href="#">Kids' Electronics</a></li>
-          <li><a href="#">Toy Vehicles</a></li>
-          <li><a href="#">Games & Puzzles</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Bed & Bath</a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Fashion Bedding</a></li>
-          <li><a href="#">Sheets</a></li>
-          <li><a href="#">Memory Foam</a></li>
-          <li><a href="#">Down Bedding</a></li>
-          <li><a href="#">Bath & Towels</a></li>
-          <li><a href="#">Kids' & Teen Bedding</a></li>
-          <li><a href="#">Blankets & Throws</a></li>
-          <li><a href="#">Mattress Pads & Toppers</a></li>
-          <li><a href="#">Bedding Accessories</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="product-listing.php" class="dropdown-toggle disabled" data-toggle="dropdown">Electronics</a>
-        <ul class="dropdown-menu pull-right">
-          <li><a href="#">Computers, Hardware & Software</a></li>
-          <li><a href="#">Audio & Video</a></li>
-          <li><a href="#">Telephones</a></li>
-          <li><a href="#">Cameras & Photo</a></li>
-          <li><a href="#">Printers & Scanners</a></li>
-          <li><a href="#">Monitors & Displays</a></li>
-          <li><a href="#">Home Office Equipment</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div><!-- /.container -->
+    </div>
 </nav>

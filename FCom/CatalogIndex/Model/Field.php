@@ -89,20 +89,22 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         foreach ($products as $p) {
             $pIds[] = $p->id;
         }
-        // fetch category - product associations
-        $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
-            ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
-            ->select(array('category_id', 'product_id', 'id_path'))
-            ->where_in('product_id', $pIds)
-            ->find_many();
-        // find ascendant ids of associated categories
         $catIds = array();
         $prodCatIds = array();
-        foreach ($catProds as $cp) {
-            $idPath = explode('/', $cp->id_path);
-            for ($i=sizeof($idPath)-1; $i>0; $i--) {
-                $prodCatIds[$cp->product_id][] = $idPath[$i];
-                $catIds[$idPath[$i]] = $idPath[$i];
+        if ($pIds) {
+            // fetch category - product associations
+            $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+                ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+                ->select(array('category_id', 'product_id', 'id_path'))
+                ->where_in('product_id', $pIds)
+                ->find_many();
+            // find ascendant ids of associated categories
+            foreach ($catProds as $cp) {
+                $idPath = explode('/', $cp->id_path);
+                for ($i=sizeof($idPath)-1; $i>0; $i--) {
+                    $prodCatIds[$cp->product_id][] = $idPath[$i];
+                    $catIds[$idPath[$i]] = $idPath[$i];
+                }
             }
         }
 

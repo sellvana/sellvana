@@ -2,34 +2,40 @@
 
 class FCom_CatalogIndex_Indexer extends BClass
 {
-    protected static $_maxChunkSize = 1000;
+    protected static $_maxChunkSize = 100;
     protected static $_indexData;
     protected static $_filterValues;
 
     static public function indexProducts($products)
     {
-        if ($products===true) {
-            static::indexDropDocs(true);
-            $start = 0;
+        BDebug::mode('PRODUCTION');
+        if ($products === true) {
             $i = 0;
+            //$start = 0;
             $t = time();
             do {
-                $products = FCom_Catalog_Model_Product::i()->orm()->limit(static::$_maxChunkSize)
-                    ->offset($start)->find_many();
+                $products = FCom_Catalog_Model_Product::i()->orm('p')
+                    ->left_outer_join('FCom_CatalogIndex_Model_Doc', array('idx.id','=','p.id'), 'idx')
+                    ->where_complex(array('OR'=>array('idx.id is null', 'idx.flag_reindex=1')))
+                    ->limit(static::$_maxChunkSize)
+                    //->offset($start)
+                    ->find_many();
                 static::indexProducts($products);
                 echo 'DONE CHUNK '.($i++).': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).' - '.(time()-$t).'<hr>';
                 $t = time();
-                $start += static::$_maxChunkSize;
+                //$start += static::$_maxChunkSize;
             } while (sizeof($products)==static::$_maxChunkSize);
             return;
         } else {
             $pIds = array();
             foreach ($products as $p) {
-                $pIds[] = $p->id;
+                $pIds[] = $p->id();
             }
-            static::indexDropDocs($pIds);
+            if ($pIds) {
+                static::indexDropDocs($pIds);
+            }
         }
-        if (sizeof($products)>static::$_maxChunkSize) {
+        if (sizeof($products) > static::$_maxChunkSize) {
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i=>$chunk) {
                 static::indexProducts($chunk);
@@ -89,7 +95,7 @@ class FCom_CatalogIndex_Indexer extends BClass
     static protected function _indexSaveDocs()
     {
         $docHlp = FCom_CatalogIndex_Model_Doc::i();
-        $now = BDB::now();
+        $now = BDb::now();
         $sortFields = FCom_CatalogIndex_Model_Field::i()->getFields('sort');
         foreach (static::$_indexData as $pId=>$pData) {
             $row = array('id'=>$pId, 'last_indexed'=>$now);
@@ -161,18 +167,20 @@ class FCom_CatalogIndex_Indexer extends BClass
                 }
             }
         }
-        $termIds = $termHlp->orm()->where(array('term'=>array_keys($allTerms)))->find_many_assoc('term', 'id');
-        foreach ($allTerms as $v=>$termData) {
-            if (empty($termIds[$v])) {
-                $term = $termHlp->create(array('term'=>$v))->save();
-                $termId = $term->id;
-            } else {
-                $termId = $termIds[$v];
-            }
-            foreach ($termData as $pId=>$productData) {
-                foreach ($productData as $fId=>$idx) {
-                    $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'term_id'=>$termId, 'position'=>$idx);
-                    $docTermHlp->create($row)->save();
+        if ($allTerms) {
+            $termIds = $termHlp->orm()->where(array('term'=>array_keys($allTerms)))->find_many_assoc('term', 'id');
+            foreach ($allTerms as $v=>$termData) {
+                if (empty($termIds[$v])) {
+                    $term = $termHlp->create(array('term'=>$v))->save();
+                    $termId = $term->id;
+                } else {
+                    $termId = $termIds[$v];
+                }
+                foreach ($termData as $pId=>$productData) {
+                    foreach ($productData as $fId=>$idx) {
+                        $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'term_id'=>$termId, 'position'=>$idx);
+                        $docTermHlp->create($row)->save();
+                    }
                 }
             }
         }
@@ -481,8 +489,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // format categories facet result
         foreach ($filterFields as $fName=>$field) {
+            ksort($facets[$field['field_name']]['values']);
             if ($field['field_type']=='category' && !empty($facets[$field['field_name']]['values'])) {
-                ksort($facets[$field['field_name']]['values']);
                 foreach ($facets[$field['field_name']]['values'] as $vKey=>&$fValue) {
                     $vId = $filterValueIdsByVal[$field['id']][$vKey];
                     if (!empty($filterValues[$vId])) {

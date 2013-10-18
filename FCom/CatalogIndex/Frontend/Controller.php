@@ -4,6 +4,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 {
     public function action_reindex()
     {
+        BResponse::i()->startLongResponse();
+        //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
         FCom_CatalogIndex_Indexer::i()->indexProducts(true);
         FCom_CatalogIndex_Indexer::i()->indexGC();
     }

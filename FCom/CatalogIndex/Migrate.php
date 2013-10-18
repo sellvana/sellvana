@@ -1,7 +1,7 @@
 <?php
 class FCom_CatalogIndex_Migrate extends BClass
 {
-    public function install__0_1_6()
+    public function install__0_1_7()
     {
         $tCustField = FCom_CustomField_Model_Field::table();
         $tProduct = FCom_Catalog_Model_Product::table();
@@ -71,6 +71,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
+                'flag_reindex' => 'tinyint not null default 0',
                 'sort_product_name' => 'varchar(50)',
                 'sort_price' => 'decimal(12,2)',
                 'sort_rating' => 'tinyint',
@@ -78,6 +79,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'IDX_last_indexed' => '(last_indexed)',
+                'IDX_flag_reindex' => '(flag_reindex)',
                 'IDX_sort_product_name' => '(sort_product_name)',
                 'IDX_sort_price' => '(sort_price)',
                 'IDX_sort_rating' => '(sort_rating)',
@@ -159,6 +161,18 @@ VALUES
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_multiselect' => 'DROP',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+            'COLUMNS' => array(
+                'flag_reindex' => 'tinyint not null default 0 after last_indexed',
+            ),
+            'KEYS' => array(
+                'IDX_flag_reindex' => '(flag_reindex)',
             ),
         ));
     }
