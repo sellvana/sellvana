@@ -70,7 +70,9 @@ class FCom_AdminChat_Admin extends BClass
                 ->where_gt('h.create_at', date('Y-m-d', time()-86400))
                 ->select('h.*')
                 ->select('u.username')
+                ->order_by_asc('h.create_at')
                 ->find_many();
+
             foreach ($history as $msg) {
                 $chats[$msg->get('chat_id')]['history'][] = array(
                     'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
