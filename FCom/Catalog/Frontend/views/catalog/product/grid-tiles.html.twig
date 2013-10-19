@@ -10,7 +10,12 @@
         {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
             <span class="sale tooltip-test">Sale</span>
         {% endif %}
-        <a href="{{ productUrl }}" class="f-prod-img"><img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/></a>
+        <div class="f-col-listing-prod-img">
+          <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn">Quick View</a>
+          <a href="{{ productUrl }}" class="f-prod-img">
+            <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
+          </a>
+        </div>
         <div class="caption">
           <a href="{{ productUrl }}" class="f-prod-name">{{ productName }}</a>
           <table class="f-price-group">
