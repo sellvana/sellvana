@@ -1,0 +1,6 @@
+{% set m = THIS.model %}
+{% set prodImagesConfig =  APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
+{{ THIS.view('core/simplegrid').set('grid', { config: prodImagesConfig }) | raw }}
+ 
+
+
