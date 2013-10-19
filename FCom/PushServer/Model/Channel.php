@@ -122,7 +122,7 @@ if (FCom_PushServer_Main::isDebugMode()) {
             if ($fromClient && $fromClient->id() === $toClient->id()) {
                 //continue;
             }
-            $windows = $toClient->getData('windows');
+            $windows = (array)$toClient->getData('windows');
             foreach ($windows as $toWindowName => $toWindowData) {
                 $toConnId = !empty($toWindowData['connections']) ? key($toWindowData['connections']) : null;
                 $msg = $msgHlp->create(array(
