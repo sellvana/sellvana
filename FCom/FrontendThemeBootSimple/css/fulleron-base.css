@@ -424,7 +424,16 @@ select.form-control {
 .f-widget-featured-prods [class^='col-md'] {
   padding:0 5px;
   }
-
+.f-prod-listing-filter dl {
+  font-size:.95em;
+  }
+.f-prod-listing-filter dl dd ul {
+  padding-left:0;
+  }
+.f-prod-listing-filter dl dd li {
+  list-style:none;
+  margin:2px 0;
+  }
 /* Ratings & Reviews */
 .f-rating-stars {
   position:relative;
