@@ -176,7 +176,7 @@ ul#adminUserList li
         </li>
       {% endif %}
 
-      {% if adminChatsEnabled %}
+      {% if adminChatsEnabled %}      
       <li class="dropdown medium only-icon widget">
         <a href="#" data-toggle="dropdown" class="dropdown-toggle">
           <i class="icon-comments-alt"></i>&nbsp;<span class="badge badge-inverse" style="display:none;" id="totalUnreads"></span>
@@ -186,7 +186,7 @@ ul#adminUserList li
               <script type='text/template' class='template' id='statusTemplate'>
               <div class="widget-body">
                 <div class="pull-left icon">
-                  <i class="icon-user <%- status %>"></i>
+                  <img width="23" height="23" src="<%- avatar %>" alt="<%- username %>">
                 </div>
                 <div class="pull-left text">
                   <%- username %>&nbsp;
@@ -202,7 +202,7 @@ ul#adminUserList li
             <script type='text/template' class='template' id= 'userTemplate'>
               <div class="widget-body">
                 <div class="pull-left icon">
-                  <i class="icon-user <%- status %>"></i>
+                  <img width="23" height="23" src="<%- avatar %>" alt="<%- username %>">
                 </div>
                 <div class="pull-left text">
                   <%- username %>&nbsp;
