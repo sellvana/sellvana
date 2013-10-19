@@ -37,7 +37,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
             $('.showhide_column').each(function(){
                 $(this).attr('checked','checked');
             })
-            $('.showhide_column').bind('click',function(){
+            $('.showhide_column').bind('click',function(e){
 
                 var id = $(this).data('id');
                 
@@ -54,20 +54,50 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                     $('td:eq(' + index + ')',this).toggle();
                     $('th:eq(' + index + ')',this).toggle();
                 });
+                //$('.dropdown-toggle').dropdown('toggle');
+                e.stopPropagation();
             })
             
             
+             
+                $( ".dropdown_menu" ).sortable({
+                    revert: true,
+                });
+//                $( ".dropdown-menu li" ).draggable({
+//                    connectToSortable: ".dropdown_menu",
+//                    helper: "clone",
+//                    revert: "invalid"
+//                });
+                $( "ul, li" ).disableSelection();
+            
+            
+            
+             $( ".dropdown-menu" ).sortable({
+                revert: true
+            });
 	
-//	  $('.dropdown-menu li').draggable({
-//	    revert: 'invalid'
-//	  });
-//	  $('.dropdown-menu').droppable({
-//	    activeClass: 'dropdown-menu',
-//	    hoverClass: 'dropdown-menu',
-//	    drop: function(event, ui) {
-//	      puffRemove($(ui.draggable));
-//	    }
-//	  });
+  	  $('.dropdown-menu').droppable({
+	    drop: function(event, ui) {
+                
+                var cols = [];
+                $('.dropdown-menu').find("input").each(function(i, el) {
+                            cols.push({ name: $(el).data('id') });
+                });
+                
+                $.ajaxSetup({ async: false });
+
+                    $.post(config.personalize_url,
+                        { 'do': 'grid.col.order', grid: config.id, cols: JSON.stringify(cols) },
+                        function(response, status, xhr) {
+                            //console.log(response, status, xhr);
+                              if (response.success) {
+                               load();
+                            }
+                        }
+                    )
+
+	    }
+	  });
 	
             
             // resize columns
@@ -83,7 +113,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                         function(response, status, xhr) {
                             //console.log(response, status, xhr);
                         }
-                    )
+                    );
                 }
             });
             /*
