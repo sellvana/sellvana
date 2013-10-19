@@ -74,8 +74,8 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         el: 'li#adminStatus',
         template: _.template($('#statusTemplate').html()),
         events: {
-            'change #adminuser-status': 'changeStatus',
-            'click #adminuser-status': 'preventDefault'
+            'change .js-adminuser-status': 'changeStatus',
+            'click .js-adminuser-status': 'preventDefault'
         },
         initialize: function(){
             this.model.on('change', this.render,this);
@@ -87,7 +87,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             return this;
         },
         changeStatus: function(ev){
-            var status = this.$el.find('select#adminuser-status:first').val();
+            var status = this.$el.find('.js-adminuser-status').val();
             sendStatus({status: status});
 
             return true;
@@ -187,7 +187,8 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             index: 0,
             collapsed: false,
             unreadCount: 0,
-            badgeDisplay: 'none'
+            badgeDisplay: 'none',
+            title: ''
         }
     });
 
@@ -340,7 +341,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
                 var chatItem = new ChatWindows.Views.Item({model: item});
 
-                this.$el.find('ul:first').append(chatItem.render().el);
+                this.$el.find('ul').append(chatItem.render().el);
 
                 scrollable = this.$el.find(".scrollable");
                 $(scrollable).slimScroll({scrollTo: scrollable.prop('scrollHeight') + "px"});
@@ -398,10 +399,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //TODO: refactor for AdminChat to be main class
     var AdminChat = function(options) {
+        
         initializing = true;
         username = options.username;
         dingPath = options.dingPath;
-
+        console.log(options.state);
         _.each(options.state.chats, show_window);
         _.each(options.state.users, user_status);
 
@@ -452,6 +454,14 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         }
 
         chatWins.add(chatModel);
+
+        if (chat.history) {
+            _.each(chat.history, function (history) {
+                    history.channel = chat.channel;
+                    add_history(history, false);
+            });
+        }
+
     }
 
     function close_window(channel) {
@@ -527,14 +537,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         }
     }
     channel_adminchat.signals = {
+        
         chats: function(msg) {
-            _.each(msg.chats, function(chat) {
-                show_window(chat);
-                _.each(chat.history, function (history) {
-                    history.channel = chat.channel;
-                    add_history(history, false);
-                });
-            })
+            
+            show_window(msg[0]);
+            
         },
         open: function(msg) {
             show_window({channel: msg.channel});

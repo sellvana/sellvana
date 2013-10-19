@@ -191,7 +191,7 @@ ul#adminUserList li
                 <div class="pull-left text">
                   <%- username %>&nbsp;
                   <small class="text-muted">
-                    <select id='adminuser-status' value='<%- status %>'>
+                    <select class='js-adminuser-status' value='<%- status %>'>
                       {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
                     </select>
                   </small>
