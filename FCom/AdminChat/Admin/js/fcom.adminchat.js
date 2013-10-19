@@ -69,7 +69,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             return false;
         }
     });
-    
+
     //View for a current login user status
     ChatUserList.Views.Status = Backbone.View.extend({
         el: 'li#adminStatus',        
@@ -175,7 +175,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         defaults: {
             unread: false,
             joinMsg: false,
-            avatar: '',
+            avatar: ''            
         },
         initialize: function(config)
         {
@@ -361,15 +361,13 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 $(scrollable).slimScroll({scrollTo: scrollable.prop('scrollHeight') + "px"});
 
                 this.$el.find('ul li:last').effect("highlight", {}, 500);
-                if (!initializing) {
-                    playDing();  
-                } 
+
             }
 
         },
         messageSent: function (msg) {
             var itemModel = this.collection.findWhere({msg_id: msg.msg_id});
-
+            playDing();
             if (itemModel) {
                 itemModel.set('time',msg.time);
 
@@ -507,7 +505,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 if (checkUnread && winView.model.get('collapsed')) {
                     winView.model.set('unreadCount',winView.model.get('unreadCount')+1);
                     winView.model.set('badgeDisplay','inline');
-                    chatItem.set('unread',true);
+                    chatItem.set('unread',true);                    
+                    if(!initializing)
+                        playDing();
 
                     var userModel = userView.collection.findModelByName(msg.username);
                     if (userModel!==false) {
