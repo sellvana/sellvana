@@ -1,6 +1,0 @@
-%header.fcom-admin-main-title
-    %span.title = $this->title
-    .btn-group
-        - echo join(' ', (array)$this->actions)
-- echo $this->view('core/messages')
-- echo $this->view('core/backgrid')
