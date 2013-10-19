@@ -190,6 +190,11 @@ select.form-control {
   padding:10px 15px; 
   color:#fff;
   }
+.modal-footer { 
+  background:#f9f9f9;
+  margin-top:0;
+  padding:10px 15px; 
+  }
 .modal-header .close:active,
 .modal-header .close:focus,
 .modal-header .close:hover {
