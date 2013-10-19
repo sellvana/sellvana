@@ -1,2 +1,0 @@
-%li
-    - echo $this->view('core/backgrid')->set('grid', FCom_CustomerGroups_Admin_Controller_TierPrices::i()->getTierPricesGrid($this->model))

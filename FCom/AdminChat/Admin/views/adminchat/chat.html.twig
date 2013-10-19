@@ -39,7 +39,7 @@
                           </ul>
                         </div>
                         <form class="new-message" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
-                            <input class='form-control js-message-body' name='message[body]' placeholder='Type your message here...' type='text'>
+                            <textarea class='form-control js-message-body' name='message[body]' placeholder='Type your message here...' type='text' style='width: 232px; line-height:29px;'></textarea>
                             <button class='btn btn-success' type='submit'>
                                 <i class='icon-plus'></i>
                             </button>
@@ -52,7 +52,7 @@
 
     <script type='text/template' class='template' id='chatItemTempate'>
         <div class="avatar">
-            <img width="23" height="23" src="http://www.gravatar.com/avatar/70b03db954aa45fc2559e85f5d5bd13e?default=identicon" alt="Avatar">
+            <img width="23" height="23" src="<%- avatar %>" alt="Avatar">
         </div>
 
         <div class="name-and-time">
@@ -69,10 +69,15 @@
             </div>
         </div>
 
-        <div class="body">
-            &nbsp;<%- text %>
+        <div class="body" style="word-wrap: break-word;">
+            <%- text %>
         </div>
     </script>
+
+
+
+
+
 {% endif %}
 
 
