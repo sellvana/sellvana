@@ -347,7 +347,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 $(scrollable).slimScroll({scrollTo: scrollable.prop('scrollHeight') + "px"});
 
                 this.$el.find('ul li:last').effect("highlight", {}, 500);
-                playDing();
+                if (!initializing) {
+                    playDing();  
+                } 
             }
 
         },
