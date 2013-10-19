@@ -56,7 +56,19 @@ a:hover, a:focus { text-decoration:none; }
 .open .dropdown-toggle.btn-primary {
   background-color:#4563ba; 
   border:none;
-  } 
+  }
+.btn-info {
+  background-color:#40aff4;
+  border:none;
+  }
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active,
+.btn-info.active,
+.open .dropdown-toggle.btn-info {
+  background-color:#2ba4ef; 
+  border:none;
+  }
 .btn-link {
   color:#0452a1;
   }
@@ -76,6 +88,17 @@ a:hover, a:focus { text-decoration:none; }
 .nav > li > a { padding:7px 13px; }
 .nav > li > a:hover { background:#f5f5f5; }
 .navbar { z-index:99; }
+.nav-tabs { border-bottom-color:#ccc; }
+.nav-tabs > li > a {
+  border-radius:2px 2px 0 0;
+  border-bottom:1px solid #ccc;
+  background:#f3f3f3;
+  color:#777;
+  }
+.nav-tabs > li.active > a { 
+  border-color:#ccc;
+  border-bottom-color:transparent;
+  }
 
 /* Table */
 .table th, 
@@ -149,6 +172,35 @@ select.form-control {
   -ms-filter: "FlipH";
   }
 
+/* Modal */
+.modal-content { border-radius:3px; }
+.modal.in .modal-dialog,
+.modal.fade .modal-dialog {
+  -webkit-transform:none;
+  -ms-transform:none;
+  transform:none;
+  -webkit-transition:none;
+  -moz-transition:none;
+  -o-transition:none;
+  transition:none;
+  }
+.modal-header { 
+  border-radius:2px 2px 0 0;
+  background:#6079c0;
+  padding:10px 15px; 
+  color:#fff;
+  }
+.modal-header .close:active,
+.modal-header .close:focus,
+.modal-header .close:hover {
+  color:#fff;
+  text-shadow:none;
+  }
+.modal-content {
+  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+  }
+  
 /*------------------------------------*\
    PERSISTENT
 \*------------------------------------*/
@@ -330,6 +382,10 @@ select.form-control {
 .f-prod-listing-toolbar .pagination {
   margin:0;
   }
+.f-prod-listing-toolbar .f-search-pages-pagination .glyphicon {
+  top:0;
+  font-size:9px;
+  }
 .f-prod-listing-toolbar .pagination > li > a, 
 .f-prod-listing-toolbar .pagination > li > span {
   margin:1px;
@@ -388,7 +444,10 @@ select.form-control {
 .f-prod-listing .f-price-group .f-price-label {
   font-size:.95em;
   }
-.f-prod-listing-grid .btn-primary {
+.f-prod-listing .f-col-listing-prod-img .f-prod-quickview-btn {
+  display:none;
+  }
+.f-prod-listing-grid .caption .btn-primary {
   width:100%;  
   }
 .f-prod-listing-grid .btn-link {
@@ -425,15 +484,34 @@ select.form-control {
   padding:0 5px;
   }
 .f-prod-listing-filter dl {
-  font-size:.95em;
+  margin-top:5px;
+  font-size:.9em;
   }
 .f-prod-listing-filter dl dd ul {
-  padding-left:0;
+  padding-left:13px;
   }
 .f-prod-listing-filter dl dd li {
   list-style:none;
   margin:2px 0;
   }
+.f-prod-listing-filter dl dd li a.active {
+  color:#444;
+  font-weight:500;
+  }
+.f-prod-listing-filter dl dd .count {
+  color:#999;
+  font-size:.9em;
+  }
+.f-prod-listing-filter .glyphicon {
+  font-size:1.1em;
+  }
+.f-prod-listing-filter .glyphicon-unchecked {
+  color:#eee;
+  }
+.f-prod-listing-filter .glyphicon-check {
+  color:#114c87;
+  }
+  
 /* Ratings & Reviews */
 .f-rating-stars {
   position:relative;
@@ -921,6 +999,50 @@ select.form-control {
   .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd {
     display:block;
     }
+  .f-prod-listing .f-col-listing-prod-img {
+    position:relative;
+    }
+  .f-prod-listing .f-col-listing-prod-img:hover .f-prod-quickview-btn {
+    display:block;
+    position:absolute;
+    right:10px;
+    bottom:10px;
+    }
+  .f-prod-quickview .modal-dialog {
+    width:800px;
+    }
+  .f-prod-quickview .nav-tabs {
+    margin-bottom:15px;
+    font-size:.9em;
+    font-weight:bold;
+    }
+  .f-prod-quickview .tab-pane {
+    font-size:.9em; 
+    }
+  .f-prod-quickview .f-prod-name {
+    font:700 1.55em 'Lato', sans-serif;
+    }
+  .f-prod-quickview .f-price-group {
+    font-size:1em;
+    }
+  .f-prod-quickview .f-prod-select .form-group {
+    margin-bottom:8px;
+    }
+  .f-prod-quickview .f-prod-select select {
+    height:24px;
+    font-size:13px;
+    }
+  .f-prod-quickview .f-prod-add-cart {
+    margin:10px 0;
+    }
+  .f-prod-quickview .f-add-to-links {
+    margin:10px 0;
+    padding-left:0;
+    font-size:.95em;
+    }
+  .f-prod-quickview .f-add-to-links li {
+    list-style:none;
+    }
 }
     
 @media (max-width: 992px) {
@@ -981,6 +1103,10 @@ select.form-control {
   .f-site-header-top > .container > .f-header-search-form {
     display:none;
     }
+  .f-btn-prod-listing-filter-toggle {
+    margin:0;
+    z-index:9;
+  }
 }
 
 /* Medium devices (desktops, 992px and up) */

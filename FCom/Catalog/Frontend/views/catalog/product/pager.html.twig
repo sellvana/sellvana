@@ -32,9 +32,9 @@
         </div>
       </div>
       <div class="col-sm-4">
-        <ul class="pagination">
+        <ul class="pagination f-search-pages-pagination">
             {% if s.p > 1 %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}">&lt;</a></li>
+              <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
             {% endif %}
             {% if s.p > showPageNumsHalf+1 %}
               <li><a href="{{ pageUrl|replace({'-PAGE-':1}) }}">1</a></li>
@@ -54,7 +54,7 @@
               <li><a href="{{ pageUrl|replace({'-PAGE-':s.mp}) }}">{{ s.mp }}</a></li>
             {% endif %}
             {% if s.p < s.mp %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}">&gt;</a></li>
+              <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
             {% endif %}
         </ul>
       </div>
