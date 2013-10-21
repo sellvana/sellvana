@@ -81,6 +81,17 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BResponse::i()->redirect($href);
     }
 
+    public function action_quickview()
+    {
+        if (!BRequest::i()->xhr()) {
+            $this->forward(false);
+        }
+        $this->layout('/catalog/quickview');
+        $product = FCom_Catalog_Model_Product::i()->load(BRequest::i()->get('id'));
+        $view = BLayout::i()->getRootView();
+        $view->set('model', $product);
+    }
+
     public function action_compare()
     {
         $layout = BLayout::i();

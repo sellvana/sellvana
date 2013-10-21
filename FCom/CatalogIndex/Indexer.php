@@ -489,6 +489,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // format categories facet result
         foreach ($filterFields as $fName=>$field) {
+            if (empty($facets[$field['field_name']]['values'])) {
+                BDebug::debug('Empty values for facet field '.$field['field_name']);
+                continue;
+            }
             ksort($facets[$field['field_name']]['values']);
             if ($field['field_type']=='category' && !empty($facets[$field['field_name']]['values'])) {
                 foreach ($facets[$field['field_name']]['values'] as $vKey=>&$fValue) {

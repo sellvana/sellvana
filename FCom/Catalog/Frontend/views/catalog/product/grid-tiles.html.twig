@@ -11,7 +11,7 @@
             <span class="sale tooltip-test">Sale</span>
         {% endif %}
         <div class="f-col-listing-prod-img">
-          <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn">Quick View</a>
+          <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">Quick View</a>
           <a href="{{ productUrl }}" class="f-prod-img">
             <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
           </a>

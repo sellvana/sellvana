@@ -1,23 +1,28 @@
 base:
-	- view: admin/nav
-		do:
-			- [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
+    - view: head
+        do:
+            - [ requireJs, fcom.customfields, @FCom_CustomField/Admin/js/fcom.customfields ]
+
+    - view: admin/nav
+        do:
+            - [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
 
 catalog_product_form_tabs:
-	- view: admin/form
-		do:
-			- [ addTab, fields, { label: Custom Fields, pos: 15, view: customfields/products/fields-tab } ]
+    - view: admin/form
+        do:
+            - [ addTab, fields, { label: Custom Fields, pos: 15, view: customfields/products/fields-tab } ]
+            - [ addTab, variants, { label: Variants, pos: 18, view: customfields/products/variants-tab } ]
 
 /customfields/fieldsets:
-	- { include: base }
-	- { hook: main, views: customfields/fieldsets }
-	- { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
+    - { include: base }
+    - { hook: main, views: customfields/fieldsets }
+    - { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
 
 /customfields/fieldsets/form:
-	- { include: base }
-	- { include: form }
-	- { hook: main, views: customfields/fieldsets/form }
-	- { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: customfields/fieldsets/form }
+    - { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
 
 /settings:
   - view: settings

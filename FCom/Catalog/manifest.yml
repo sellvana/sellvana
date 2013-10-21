@@ -29,6 +29,7 @@ modules:
                 routing:
                     - [ get, /*category, FCom_Catalog_Frontend_Controller_Search.category ]
                     - [ get, /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
+                    - [ get, /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
                     - [ get, /*manuf, FCom_Catalog_Frontend_Controller.manuf ]
                     - [ any, /:product, FCom_Catalog_Frontend_Controller.product ]
                     - [ get, /*category/:product, FCom_Catalog_Frontend_Controller.product ]

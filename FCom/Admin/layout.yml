@@ -123,7 +123,7 @@ common_js_libs:
       - [ requireJs, lunr, @FCom_Core/js/lib/lunr.min, { exports: lunr } ]
       - [ requireJs, moment, @FCom_Core/js/lib/moment.min, { exports: moment } ]
 
-      - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min, @FCom_Core/js/lib/angular.min ], { deps: [ jquery ], exports: angular } ]
+      - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, @FCom_Core/js/lib/angular.min ], { deps: [ jquery ], exports: angular } ]
 
       - [ requireJs, fcom.core, @FCom_Core/js/fcom.core ]
       - [ requireJs, fcom.htmlgrid, @FCom_Core/js/fcom/fcom.htmlgrid ]
@@ -197,7 +197,7 @@ lib_admin_theme1:
       - [ requireJs, sparklines, @FCom_Admin/theme1/assets/javascripts/plugins/sparklines/jquery.sparkline.min, { deps: [ jquery ] } ]
       - [ requireJs, tabdrop, @FCom_Admin/theme1/assets/javascripts/plugins/tabdrop/bootstrap-tabdrop, { deps: [ jquery ] } ]
       - [ requireJs, timeago, @FCom_Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago, { deps: [ jquery ] } ]
-      - [ requireJs, typeahead, @FCom_Admin/theme1/assets/javascripts/plugins/typeahead/typeahead, { deps: [ jquery ] } ]      
+      - [ requireJs, typeahead, @FCom_Admin/theme1/assets/javascripts/plugins/typeahead/typeahead, { deps: [ jquery ] } ]
       - [ requireJs, jquery.validate, @FCom_Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min, { deps: [ jquery ] } ]
 
       - [ js, @FCom_Admin/theme1/assets/javascripts/jquery/jquery.min.js, { alias: jquery } ]
