@@ -1,13 +1,13 @@
 {% set m = THIS.model %}
 
 <fieldset>
-    <div class="form-control">
+    <div class="form-group">
         <label class="col-md-2 control-label" for="main-node_name">{{ 'Content'|_ }}</label>
         <div class="col-md-5">
             <textarea id="main-content" class="form-control" rows="5" name="model[content]">{{ m.get('content') }}</textarea>
         </div>
     </div>
-    <div class="form-control">
+    <div class="form-group">
         <label class="col-md-2 control-label" for="main-url_key">{{ 'Layout Update'|_ }}</label>
         <div class="col-md-5">
             <textarea name="model[layout_update]" class="form-control" id="main-layout_update" rows="5">{{ m.get('layout_update') }}</textarea>
@@ -16,11 +16,11 @@
 </fieldset>
 
 <script>
-    require(['jquery', 'ckeditor'], function($) {
+    /*require(['jquery', 'ckeditor'], function($) {
         $(function() {
             var ck = CKEDITOR.instances['main-content'];
             ck && ck.destroy();
             $('#main-content').ckeditor();
         });
-    })
+    })*/
 </script>
