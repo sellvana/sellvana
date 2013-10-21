@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
 
-    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch'], function($) {
+    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl'], function($) {
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -69,6 +69,14 @@
 
             // init switch buttons
             loadSwitchButtons();
+
+            $('#settings-form').submit(function(ev) {
+                var $form = $(this);
+                $.post($form.attr('action'), $form.serializeArray(), function(data, status, xhr) {
+                    $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
+                });
+                return false;
+            })
         });
     })
 </script>

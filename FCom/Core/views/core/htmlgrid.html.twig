@@ -127,14 +127,24 @@
 </div>
 
 <script type="template" id="{{ config.id }}-row-template">
-  {{ THIS.rowsHtml([APP.instance('FCom_Catalog_Model_Product').create()]) | raw }}
+  <tr id="<%= row.id %>">
+  {% for col in THIS.get('grid').config.columns %}
+    <td class="{{ td.class }} <%= col.class %>" style="{{ col.style }}">
+      {% if col.col_type == 'select-row' %}
+        <input type="checkbox" name="grid[{{ config.id}}][checked][<%= row.id %>]">
+      {% else %}
+        <%= row[{{ td.col_name }}] %>
+      {% endif %}
+    </td>
+  {% endfor %}
+  </tr>
 </script>
 
 <script>
 require(['jquery', 'fcom.htmlgrid'], function($) {
   new FCom.HtmlGrid({
     template: '#{{ config.id }}-row-template',
-    data: {{ UTIL.toJson(THIS.getPageData()) | raw }}
+    data: {{ UTIL.toJson(THIS.getPageRowsData()) | raw }}
   })
 })
 </script>

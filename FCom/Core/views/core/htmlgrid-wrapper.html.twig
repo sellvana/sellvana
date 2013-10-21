@@ -8,7 +8,7 @@
 <input type="hidden" id="{{ config.id }}-selection" name="htmlgrid[{{ config.id }}][selection]" value="{{ defSel }}">
 
 <script>
-    require(['jquery', 'fcom.htmlgrid'], function($) {
+  /*  require(['jquery', 'fcom.htmlgrid'], function($) {
         $(function() {
             var grid = new FCom.HtmlGrid({
                 id: "{{ config.id }}",
@@ -17,5 +17,5 @@
                 selection: {{ config.selection ? UTIL.toJson(config.selection) : '{}' }}
             })
         })
-    })
+    })*/
 </script>
