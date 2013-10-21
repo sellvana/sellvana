@@ -1,8 +1,14 @@
 <?php
 
-class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
+class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';
+	protected static $_origClass = __CLASS__;
+	protected $_modelClass = 'FCom_Core_Model_Module';
+	protected $_gridHref = 'modules';
+	protected $_gridTitle = 'Modules';
+	protected $_recordName = 'Product';
+	protected $_mainTableAlias = 'm';
 
     public function getModulesData()
     {
@@ -66,7 +72,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         return $data;
     }
 
-    public function gridConfig()
+    public function gridConfigOld()
     {
         $editMode = BRequest::i()->get('edit');
         $coreRunLevelOptions = array(
@@ -132,13 +138,37 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         return $grid;
     }
 
+	public function gridConfig()
+	{
+		$coreRunLevelOptions = FCom_Core_Model_Module::getCoreRunLevelOptions();
+		$areaRunLevelOptions = FCom_Core_Model_Module::getAreaLevelOptions();
+		$runStatusOptions = FCom_Core_Model_Module::getRunStatusOptions();
+		$config = parent::gridConfig();
+
+		$config['columns'] = array(
+			array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
+			array('name' => 'module_name', 'label' => 'Name', 'index' => 'm.module_name', 'width' => 150),
+			array('name' => 'description', 'label' => 'Description', 'width' => 250),
+			array('name' => 'version', 'label' => 'Code', 'width' => 50),
+			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 50, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
+			array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell")),
+			array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
+			array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options' => $areaRunLevelOptions, 'width' => 120, 'editable' => true, 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
+			array('name' => 'requires', 'label' => 'Requires', 'width' => 250),
+			array('name' => 'required_by', 'label' => 'Required By', 'width' => 250),
+		);
+
+		return $config;
+	}
+
+	/*
     public function action_index()
     {
         BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
         $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
         BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->messages('modules')->layout('/modules');
-    }
+    }*/
 
     public function action_index__POST()
     {
