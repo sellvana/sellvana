@@ -109,4 +109,24 @@ class FCom_CustomField_Migrate extends BClass
         $tProdField = FCom_CustomField_Model_ProductField::table();
         BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('_data_serialized' => "text null AFTER _hide_field_ids")));
     }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+        $tProdVariant = FCom_CustomField_Model_ProductVariant::table();
+        BDb::ddlTableDef($tProdVariant, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'field_values' => 'varchar(255)',
+                'variant_sku' => 'varchar(50)',
+                'variant_price' => 'decimal(12,2)',
+                'data_serialized' => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_product' => 'UNIQUE (product_id, field_values)',
+                'IDX_sku' => '(variant_sku)',
+            ),
+        ));
+    }
 }

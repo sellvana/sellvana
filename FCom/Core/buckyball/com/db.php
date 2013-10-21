@@ -2431,6 +2431,24 @@ class BModel extends Model
         return $options;
     }
 
+    static public function as_values($labelField, $idField = 'id', $sortBy = null)
+    {
+        $orm = static::orm()->select($idField)->select($labelField);
+        if ($sortBy) {
+            $sortArr = explode(' ', $sortBy);
+            if (empty($sortArr[1])) $sortArr[1] = 'asc';
+            $sortMethod = 'order_by_'.$sortArr[1];
+            $orm->$sortMethod($sortArr[0]);
+        } else {
+            $orm->order_by_asc($labelField);
+        }
+        $values = array();
+        foreach ($orm->find_many() as $m) {
+            $values[$m->get($idField)] = $m->get($labelField);
+        }
+        return $values;
+    }
+
     /**
      * Model validation
      *

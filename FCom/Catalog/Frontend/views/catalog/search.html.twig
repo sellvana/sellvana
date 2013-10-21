@@ -1,8 +1,24 @@
 <div class="f-site-main" role="main">
   <div class="container">
-    <header class="f-page-header">
-      <h1 class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
-    </header>
-    {{ THIS.hook('main_products') | raw }}
+   <!--  breadcrumb -->
+    <ul class="breadcrumb">
+      <li><a href="#">{{ 'Home'|_ }}</a></li>
+      <li class="active">{{ 'Search'|_ }}</li>
+    </ul>
+    <a href="javascript:void()" class="f-btn-prod-listing-filter-toggle btn btn-default navbar-toggle collapsed" data-toggle="collapse" data-target=".f-col-sidebar">View filters</a>
+    <div class="row">
+      <!-- Sidebar Start -->
+      <aside class="f-col-sidebar col-md-3 col-sm-3">
+          {{ THIS.hook('sidebar-left') | raw }}
+      </aside>
+      <!-- Sidebar End -->
+      <!-- Category -->
+      <div class="f-col-main col-md-9 col-sm-9">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
+        </header>
+        {{ THIS.hook('main_products') | raw }}
+      </div>
+    </div>
   </div>
 </div>

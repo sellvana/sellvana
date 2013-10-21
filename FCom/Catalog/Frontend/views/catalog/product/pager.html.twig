@@ -7,7 +7,7 @@
 {% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
 {% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'list' %}
 
-{% set psOptions = { 25:25, 50:50, 100:100 } %}
+{% set psOptions = { 10:10, 25:25, 50:50, 100:100 } %}
 {% set sortOptions = THIS.get("sort_options") %}
 {% if not sortOptions %}
     {% set sortOptions = {

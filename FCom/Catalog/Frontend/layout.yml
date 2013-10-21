@@ -1,32 +1,37 @@
 base:
-	- view: head
-		do:
-			- [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
-			- [ requireRun, fcom.catalog ]
+    - view: head
+        do:
+            - [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
+            - [ requireRun, fcom.catalog ]
 
 /catalog/category:
-	- { include: base }
-	- { view: root, set: { show_left_col: true } }
-	- { hook: main, views: catalog/category }
-	- { hook: sidebar-left, views: catalog/category/sidebar }
-
-/catalog/product:
-	- { include: base }
-	- { hook: main, views: catalog/product/details }
+    - { include: base }
+    - { view: root, set: { show_left_col: true } }
+    - { hook: main, views: catalog/category }
+    - { hook: main, views: catalog/product/quickview }
+    - { hook: sidebar-left, views: catalog/category/sidebar }
 
 /catalog/search:
-	- { include: base }
-	- { view: root, set: { show_left_col: true } }
-	- { hook: main, views: catalog/search }
-	- { hook: sidebar-left, views: catalog/category/sidebar }
+    - { include: base }
+    - { view: root, set: { show_left_col: true } }
+    - { hook: main, views: catalog/search }
+    - { hook: main, views: catalog/product/quickview }
+    - { hook: sidebar-left, views: catalog/category/sidebar }
+
+/catalog/product:
+    - { include: base }
+    - { hook: main, views: catalog/product/details }
+
+/catalog/quickview:
+    - { root: catalog/product/quickview-partial }
 
 /catalog/review/add:
-	- { include: base }
-	- { hook: main, views: catalog/review/add }
+    - { include: base }
+    - { hook: main, views: catalog/review/add }
 
 /catalog/compare:
-	- { include: base }
-	- { hook: main, views: catalog/compare }
+    - { include: base }
+    - { hook: main, views: catalog/compare }
 
 /catalog/compare/xhr:
-	- { root: catalog/compare }
+    - { root: catalog/compare }

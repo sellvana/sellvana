@@ -1,5 +1,10 @@
 define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl'], function($, angular) {
-
+/*
+    var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
+        $interpolateProvider.startSymbol("<%");
+        $interpolateProvider.endSymbol("%>");
+    });
+*/
     FCom.Admin.Accordion = function(containerId, options) {
         var $container = $('#'+containerId);
         $container.find('.accordion-toggle').each(function(i, headingEl) {
