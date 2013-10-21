@@ -343,7 +343,21 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return $grid;
     }
 
-    public function getPageData($rows = null)
+    public function getPageRowsData()
+    {
+        $grid = $this->get('grid');
+        $state = $grid['result']['state'];
+        $rows = $grid['result']['rows'];
+        $gridId = $grid['config']['id'];
+        $columns = $grid['config']['columns'];
+        $data = array();
+        foreach ($rows as $rowId => $row) {
+            $data[] = $row->as_array();
+        }
+        return array('state' => $state, 'data' => $data);
+    }
+
+    public function getPageHtmlData($rows = null)
     {
         $grid = $this->get('grid');
         if (is_null($rows)) {
@@ -384,7 +398,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
     public function rowsHtml($rows = null)
     {
-        $trArr = $this->getPageData($rows);
+        $trArr = $this->getPageHtmlData($rows);
 
         $trHtmlArr = array();
         foreach ($trArr as $rowId => $tr) {
