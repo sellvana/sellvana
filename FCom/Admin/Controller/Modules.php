@@ -174,7 +174,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
     public function action_migrate__POST()
     {
         try {
-            BMigrate::i()->migrateModules();
+            BMigrate::i()->migrateModules(true);
             BSession::i()->addMessage('Migration complete', 'success', 'admin');
         } catch (Exception $e) {
             BDebug::logException($e);
