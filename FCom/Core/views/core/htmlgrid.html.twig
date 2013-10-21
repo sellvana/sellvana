@@ -66,10 +66,10 @@
                 Columns
                 <b class="caret"></b>
             </a>
-                
+
                 <ul class="dropdown-menu">
                               {% for colId, col in config.columns %}
-         
+
           {% if col.type != 'multiselect' %}
                 <li calss="ui-state-default"><label>
                     <input class="showhide_column" type="checkbox" data-id={{col.name}}>
@@ -120,8 +120,21 @@
         </tr>
       </thead>
       <tbody>
-        {{ THIS.rowsHtml() | raw }}
+        {#{ THIS.rowsHtml() | raw }#}
       </tbody>
     </table>
   </div>
 </div>
+
+<script type="template" id="{{ config.id }}-row-template">
+  {{ THIS.rowsHtml([APP.instance('FCom_Catalog_Model_Product').create()]) | raw }}
+</script>
+
+<script>
+require(['jquery', 'fcom.htmlgrid'], function($) {
+  new FCom.HtmlGrid({
+    template: '#{{ config.id }}-row-template',
+    data: {{ UTIL.toJson(THIS.getPageData()) | raw }}
+  })
+})
+</script>
