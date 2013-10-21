@@ -2,8 +2,8 @@
 .page-header .breadcrumb a { font-size:12pt; }
 .page-header.with-breadcrumbs div.pull-left { margin-top:15px;}
 
-#categories-layout.spliter_panel .vspliter { width: 1px; color: #ddd; background: #ddd; }
-#categories-layout .jstree-default.jstree-focused { background: none; }
-#categories-layout #categories { padding-top: 15px; padding-bottom: 15px; border-top: 1px solid #ddd; }
-#categories-layout .jstree a { height: 18px; line-height: 18px; }
-label[for="categories-tree-lock"] { color: #d40000; }
+.fcom-tree-layout .spliter_panel .vspliter { width: 1px; color: #ddd; background: #ddd; }
+.fcom-tree-layout .jstree-default.jstree-focused { background: none; }
+.fcom-tree-layout .jstree { padding-top: 15px; padding-bottom: 15px; border-top: 1px solid #ddd; }
+.fcom-tree-layout .jstree a { height: 18px; line-height: 18px; }
+label[for="categories-tree-lock"], label[for="nav-tree-lock"] { color: #d40000; }
