@@ -8,13 +8,13 @@ class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
         'sort' => true,
     );
 
-    public function rowsHtml()
+    public function rowsHtml($rows = null)
     {
         $grid = $this->get('grid');
         $rows = $grid['config']['data'];
         $gridId = $grid['config']['id'];
         $columns = $grid['config']['columns'];
-        
+
         $trArr = array();
         foreach ($rows as $rowId => $row) {
             $row->_id = $rowId;
