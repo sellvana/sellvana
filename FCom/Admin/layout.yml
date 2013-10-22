@@ -393,7 +393,7 @@ form:
 
 /users:
     - { include: base }
-    - { hook: main, views: core/htmlgrid-wrapper }
+    - { hook: main, views: admin/grid }
     - { view: admin/nav, do: [[ setNav, system/users ]] }
 
 /users/form:
