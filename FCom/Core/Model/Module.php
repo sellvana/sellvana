@@ -66,20 +66,5 @@ class FCom_Core_Model_Module extends BDbModule
         }
         return $data;
     }
-
-	public static function getCoreRunLevelOptions()
-	{
-		return self::$_fieldOptions['core_run_level'];
-	}
-
-	public static function getAreaLevelOptions()
-	{
-		return self::$_fieldOptions['area_run_level'];
-	}
-
-	public static function getRunStatusOptions()
-	{
-		return self::$_fieldOptions['run_status'];
-	}
 }
 
