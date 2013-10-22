@@ -72,7 +72,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //View for a current login user status
     ChatUserList.Views.Status = Backbone.View.extend({
-        el: 'li#adminStatus',        
+        el: 'li#adminStatus',
         template: _.template($('#statusTemplate').html()),
         events: {
             'change .js-adminuser-status': 'changeStatus',
@@ -175,11 +175,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         defaults: {
             unread: false,
             joinMsg: false,
-            avatar: ''            
+            avatar: ''
         },
         initialize: function(config)
         {
-            this.set('avatar', avatars[this.get('username')]);            
+            this.set('avatar', avatars[this.get('username')]);
         }
     });
 
@@ -245,7 +245,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         events: {
             'click .btn.box-collapse' :'toggleChatWin',
             'click .btn.box-remove' :'closeChatWin',
-            'submit' :'say', 
+            'submit' :'say',
             'keydown textarea' :'checkEnter'
         },
         initialize: function()
@@ -330,7 +330,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 text: this.$el.find('.js-message-body').val(),
                 msg_id: msg_id
             });
-            this.$el.find('textarea').val('').trigger('resize');            
+            this.$el.find('textarea').val('').trigger('resize');
         },
         checkEnter: function(ev) {
             if (ev.keyCode == 13) {
@@ -399,9 +399,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                     var date_day = (date.getDate());
                     timeago.attr('title', date.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (date_day<10 ? '0' : '' ) + date_day + " " + (date.getHours()) + ":" + (date.getMinutes()) + ":" + (date.getSeconds()));
                 } else {
-                    timeago.attr('title', this.model.get('time'));    
+                    timeago.attr('title', this.model.get('time'));
                 }
-                
+
                 timeago.html("" + months[date.getMonth()] + " " + (date.getDate()) + ", " + (date.getFullYear()) + " " + (date.getHours()) + ":" + (date.getMinutes()));
                 setTimeAgo(timeago);
             }
@@ -420,14 +420,14 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //TODO: refactor for AdminChat to be main class
     var AdminChat = function(options) {
-        
+
         initializing = true;
         username = options.username;
         dingPath = options.dingPath;
-                
+
         _.each(options.state.users, user_status);
         _.each(options.state.chats, show_window);
-        
+
 
         PushClient.listen({channel: 'adminuser', callback: channel_adminuser});
         PushClient.listen({channel: 'adminchat', callback: channel_adminchat});
@@ -505,7 +505,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 if (checkUnread && winView.model.get('collapsed')) {
                     winView.model.set('unreadCount',winView.model.get('unreadCount')+1);
                     winView.model.set('badgeDisplay','inline');
-                    chatItem.set('unread',true);                    
+                    chatItem.set('unread',true);
                     if(!initializing)
                         playDing();
 
@@ -564,14 +564,13 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         }
     }
     channel_adminchat.signals = {
-        
         chats: function(msg) {
-            
-            show_window(msg[0]);
-            
+            _.each(msg.chats, function(chat) {
+                show_window(chat);
+            })
         },
         open: function(msg) {
-            show_window({channel: msg.channel});
+            show_window(msg);
         },
         say: function(msg) {
             show_window({channel: msg.channel});
