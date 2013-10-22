@@ -176,7 +176,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts();
+        $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
+
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsData['orm']));
         $paginated = $productsData['orm']->paginate();
         $productsData['rows'] = $paginated['rows'];
@@ -197,6 +199,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+
+        FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
         $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
