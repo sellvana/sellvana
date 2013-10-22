@@ -1,37 +1,40 @@
-<div class="page-main-wrapper">
-    <div class="page-main">
-        <form action="{{ APP.href('login') }}" method="post" id="login-form">
-                    <input type="hidden" name="backroute" value="checkout" />
-            <fieldset class="login-form form-horizontal">
-                <header class="main-title">
-                    <h1 class="title">{{ 'Login' |_ }}</h1>
-                </header>
-                {{ THIS.view('core/messages') | raw }}
-                <div class="control-group">
-                  <label for="#" class="control-label">{{ "Email" |_ }}</label>
-                  <div class="controls">
-                    <input type="email" name="login[email]" class="required"/>
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="#" class="control-label">{{ "Password" |_ }}</label>
-                  <div class="controls">
-                    <input type="password" name="login[password]" class="required"/>
-                  </div>
-                </div>
-                <label for="remember-me" class="checkbox">
-                  <input type="checkbox" id="remember-me" class="checkbox"/>
-                  {{ "Remember Me" |_ }}
-                </label>
-                <div class="btn-group">
-                    <button class="btn btn-primary" type="submit">{{ "Login" |_ }}</button>
-                    <a href="{{ APP.href('customer/password/recover') }}">{{ "Forgot your password?" |_ }}</a>
-                </div>
-                <div class="divider"></div>
-                <p>{{ "No Account?" |_ }} <strong><a href="{{ APP.href('checkout') }}?guest=yes">{{ "Checkout as a guest" |_ }} &raquo;</strong></a></p>
-            </fieldset>
-        </form>
-    </div>
+<div class="f-site-main" role="main">
+  <div class="container">
+    <form action="{{ APP.href('login') }}" method="post" id="login-form" role="form">
+      <input type="hidden" name="backroute" value="checkout" />
+      <fieldset class="f-login-form">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{ 'Login' |_ }}</h1>
+        </header>
+        {{ THIS.view('core/messages') | raw }}
+        <div class="form-group">
+          <label for="#" class="control-label">{{ "Email" |_ }}</label>
+          <div class="controls">
+            <input type="email" name="login[email]" class="required form-control"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="#" class="control-label">{{ "Password" |_ }}</label>
+          <div class="controls">
+            <input type="password" name="login[password]" class="required form-control"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="checkbox">
+            <label for="remember-me">
+              <input type="checkbox" id="remember-me" class="checkbox"/>
+              {{ "Remember Me" |_ }}
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary btn-lg" type="submit">{{ "Login" |_ }}</button>
+          <a href="{{ APP.href('customer/password/recover') }}" class="btn btn-link">{{ "Forgot your password?" |_ }}</a>
+        </div>
+        <div class="alert alert-info">{{ "No Account?" |_ }} <strong><a href="{{ APP.href('checkout') }}?guest=yes">{{ "Checkout as a guest" |_ }} &raquo;</strong></a></div>
+      </fieldset>
+    </form>
+  </div>
 </div>
 <script>
 require(['jquery', 'jquery.validate'], function($) {
