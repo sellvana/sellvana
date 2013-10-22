@@ -2033,7 +2033,8 @@ class BDebug extends BClass
     public static function level($type, $level=null)
     {
         if (!isset(static::$_level[$type])) {
-            throw new BException('Invalid debug level type');
+            //TODO: check back later
+            #throw new BException('Invalid debug level type');
         }
         if (is_null($level)) {
             if (is_null(static::$_level)) {

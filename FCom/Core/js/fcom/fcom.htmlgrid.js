@@ -1,5 +1,5 @@
 define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function(Backbone, _, $) {
-    
+
     var BackboneGrid = {
         Models: {},
         Collections: {},
@@ -9,40 +9,40 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
     BackboneGrid.Models.ThModel = Backbone.Model.extend({
         defaults: {
-            style: '',            
+            style: '',
             type: '',
             no_reorder: false,
             sortState: '',
-            cssClass: ''            
+            cssClass: ''
         },
         url : function() {
-            return this.personalize_url; 
-        } 
+            return this.personalize_url;
+        }
 
     });
 
     BackboneGrid.Collections.ThCollection = Backbone.Collection.extend({
-        model: BackboneGrid.Models.ThModel        
+        model: BackboneGrid.Models.ThModel
     });
 
     BackboneGrid.Views.ThView = Backbone.View.extend({
         events: {
-            'click': 'changesortState'            
+            'click': 'changesortState'
         },
         initialize: function() {
             this.model.on('change', this.render, this);
             this.setElement($(this.template(this.model.toJSON())));
-  
+
         },
         changesortState: function(ev) {
-            
-            var status = this.model.get('sortState');            
+
+            var status = this.model.get('sortState');
             if (status === '')
                 status = 'asc';
             else if (status === 'asc')
                 status = 'desc';
             else
-                status = '';            
+                status = '';
             this.model.set('sortState', status);
 
             columnsCollection.each(function(m) {
@@ -53,18 +53,18 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
             BackboneGrid.currentState.s = status !=='' ? this.model.get('name') : '';
             BackboneGrid.currentState.sd = this.model.get('sortState');
-            
+
             rowsCollection.fetch({reset: true});
-            
+
             //this.model.save();
 
             ev.preventDefault();
             return false;
 
         },
-        render: function() {               
-            
-            this.$el.html($(this.template(this.model.toJSON())));                        
+        render: function() {
+
+            this.$el.html($(this.template(this.model.toJSON())));
 
             return this;
         }
@@ -82,7 +82,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             this.$el.append(th.render().el);
         }
     });
-    BackboneGrid.Models.Row = Backbone.Model.extend({ 
+    BackboneGrid.Models.Row = Backbone.Model.extend({
         defaults: {
             _actions: '',
             description: '',
@@ -92,7 +92,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             run_level_core: '',
             requires: '',
             required_by: ''
-        }       
+        }
     });
 
     BackboneGrid.Collections.Rows = Backbone.Collection.extend({
@@ -106,16 +106,19 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             });
 
             return this.data_url + '?' + append;
+        },
+        parse: function(response) {
+            return response[1];
         }
     });
 
-    BackboneGrid.Views.RowView = Backbone.View.extend({       
+    BackboneGrid.Views.RowView = Backbone.View.extend({
         //template: _.template($('#row-template').html()),
         initialize: function() {
              _.templateSettings.variable = "col";
         },
-        render: function() {            
-            this.setElement($(this.template(this.model.toJSON())));            
+        render: function() {
+            this.setElement($(this.template(this.model.toJSON())));
             return this;
         }
     });
@@ -136,9 +139,9 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         },
         render: function() {
             this.$el.html('');
-            this.collection.each(this.addRow, this);            
+            this.collection.each(this.addRow, this);
             return this;
-        },        
+        },
         addRow: function(row) {
             var rowView = new BackboneGrid.Views.RowView({
                 model: row
@@ -147,7 +150,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         }
     });
 
-    var rowsCollection;    
+    var rowsCollection;
     var columnsCollection;
 
     FCom.BackboneGrid = function(config) {
@@ -157,7 +160,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
         BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.headerTemplate).html());
         BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
-        //Tbody 
+        //Tbody
         BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
         BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
@@ -185,10 +188,10 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
                     //c.cssClass += 'sort';
                     c.sortState = "";
                 }
-                
+
                 var thModel = new BackboneGrid.Models.ThModel(c);
-                columnsCollection.add(thModel);                
-            }            
+                columnsCollection.add(thModel);
+            }
         }
 
         var headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
@@ -199,7 +202,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         rowsCollection = new BackboneGrid.Collections.Rows;
 
         for (var i in rows) {
-                
+
             if (i%2 === 0) {
                 rows[i].cssClass = "even";
             } else {
@@ -222,7 +225,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         });
     }
     FCom.HtmlGrid = function(config) {
-                
+
         var gridEl = $('#'+config.id);
         var gridParent = gridEl.parent();
         var gridSelection = config.selection || {};
@@ -254,14 +257,14 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             setSelection();
 
             var $table = $('table.fcom-htmlgrid__grid', gridParent);
-            
+
             $('.showhide_column').each(function(){
                 $(this).attr('checked','checked');
             })
             $('.showhide_column').bind('click',function(e){
 
                 var id = $(this).data('id');
-                
+
                     $('.table-bordered  tr').each(function() {
                         $(this).children('th').each(function()
                         {
@@ -271,16 +274,16 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
                             }
                         });
 
-                    
+
                     $('td:eq(' + index + ')',this).toggle();
                     $('th:eq(' + index + ')',this).toggle();
                 });
                 //$('.dropdown-toggle').dropdown('toggle');
                 e.stopPropagation();
             })
-            
-            
-             
+
+
+
                 $( ".dropdown_menu" ).sortable({
                     revert: true,
                 });
@@ -290,21 +293,21 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 //                    revert: "invalid"
 //                });
                 $( "ul, li" ).disableSelection();
-            
-            
-            
+
+
+
              $( ".dropdown-menu" ).sortable({
                 revert: true
             });
-	
+
   	  $('.dropdown-menu').droppable({
 	    drop: function(event, ui) {
-                
+
                 var cols = [];
                 $('.dropdown-menu').find("input").each(function(i, el) {
                             cols.push({ name: $(el).data('id') });
                 });
-                
+
                 $.ajaxSetup({ async: false });
 
                     $.post(config.personalize_url,
@@ -319,10 +322,10 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
 	    }
 	  });
-	
-            
+
+
             // resize columns
-            
+
             $('thead th', gridParent).resizable({
                 handles: 'e',
                 minWidth: 20,
@@ -355,7 +358,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             */
 
             // reorder columns
-            
+
 //            $table.dragtable({
 //                handle: 'drag-handle',
 //                items: 'thead .drag-handle',
@@ -378,7 +381,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 //                }
 //            });
 
-            
+
 //            $('thead', gridParent).sortable({
 //                items: 'th',
 //                containment:'parent',
@@ -398,7 +401,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 //                    );
 //                }
 //            });
-            
+
         }
         // initialize DOM first time on page load
         initDOM();
@@ -462,7 +465,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
                 eval(data.eval);
             }
         });
-        
-        
+
+
     }
 })

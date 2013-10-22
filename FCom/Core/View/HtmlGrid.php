@@ -225,6 +225,11 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    protected function _personalizePageState($state)
+    {
+        return $state;
+    }
+
     protected function _processPersonalization()
     {
         $grid = $this->grid;
@@ -349,12 +354,21 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $state = $grid['result']['state'];
         $rows = $grid['result']['rows'];
         $gridId = $grid['config']['id'];
-        $columns = $grid['config']['columns'];
+
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+        foreach ($persState as $k => $v) {
+            if (!empty($v)) {
+                $state[$k] = $v;
+            }
+        }
+
         $data = array();
         foreach ($rows as $rowId => $row) {
             $data[] = $row->as_array();
         }
-        
+
         return json_encode(array('state' => $state, 'data' => $data));
     }
 
@@ -484,9 +498,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         //TODO: add _processFilters and processORM
         $orm = $this->grid['orm'];
         #$data = $this->grid['orm']->paginate();
-        
+
         $data = $this->processORM($this->grid['orm']);
-        
+
         foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {
                 if (!empty($col['cell']) && !empty($col['name'])) {
@@ -562,7 +576,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         return $data;
     }
-    
+
     public function stateDescription($params=null)
     {
         $descrArr = array();
