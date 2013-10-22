@@ -101,7 +101,7 @@ common_js_libs:
 
       - [ requireJs, nicedit, @FCom_Core/js/lib/nicEdit ]
 
-      - [ requireJs, underscore, @FCom_Core/js/lib/underscore.min, { exports: _ } ]
+      - [ requireJs, underscore, @FCom_Core/js/lib/underscore, { exports: _ } ]
       - [ requireJs, bacon, @FCom_Core/js/lib/bacon.min, { exports: Bacon } ]
       - [ requireJs, backbone, @FCom_Core/js/lib/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
       - [ requireJs, backbone.modelbinder, @FCom_Core/js/lib/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
@@ -111,8 +111,6 @@ common_js_libs:
       - [ requireJs, memento, @FCom_Core/js/lib/backbone.memento.min, { deps: [ backbone ], exports: Backbone.Memento } ]
       - [ requireJs, backbone.forms, @FCom_Core/js/lib/backbone-forms, { deps: [ backbone ], exports: Backbone.Form } ]
 
-      - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
-#            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
       - [ requireJs, jquery.bootstrap-growl, @FCom_Core/js/lib/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
       - [ requireJs, mustache, @FCom_Core/js/lib/mustache ]
@@ -395,7 +393,7 @@ form:
 
 /users:
     - { include: base }
-    - { hook: main, views: core/htmlgrid-wrapper }
+    - { hook: main, views: admin/grid }
     - { view: admin/nav, do: [[ setNav, system/users ]] }
 
 /users/form:

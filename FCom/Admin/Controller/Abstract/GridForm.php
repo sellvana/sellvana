@@ -103,7 +103,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     }
 
     public function action_grid_data()
-    {
+    {        
         $view = $this->gridView();
         $grid = $view->get('grid');
         if (empty($grid['orm'])) {
@@ -121,8 +121,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (BRequest::i()->request('export')) {
             $view->export($grid['orm'], $oc);
         } else {
+
             //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
-            $data = $view->outputData();
+            $data = $view->outputData();            
             //$data = $this->gridDataAfter($data);
             BResponse::i()->json(array(
                 array('c' => $data['state']['c']),

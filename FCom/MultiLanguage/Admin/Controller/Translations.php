@@ -4,10 +4,10 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
 {
 	protected static $_origClass = __CLASS__;
     protected $_gridHref = 'translations';
-    //protected $_modelClass = 'FCom_IndexTank_Model_ProductField';
-    //protected $_mainTableAlias = 'pf';
+	protected $_gridTitle = 'All translations';
+	protected $_recordName = 'Translation';
 
-    public function gridConfig()
+    /*public function gridConfig()
     {
         $formUrl = BApp::href("translations/form");
         $config = array();
@@ -48,7 +48,35 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         //exit;
         $config['grid']['data'] = $data;
         return $config;
-    }
+    }*/
+
+	public function gridConfig()
+	{
+		$config = parent::gridConfig();
+		$config['columns'] = array(
+			array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+			array('name' => 'module', 'label'=>'Module', 'width'=>250, 'editable'=>true),
+			array('name' => 'locale', 'label'=>'Locale', 'width'=>50, 'editable'=>true),
+			array('name' => 'file', 'label'=>'File', 'width'=>60, 'editable'=>true),
+			array('name' => 'id', 'label'=>'Id', 'width'=>200)
+		);
+
+		$data = array();
+		$modules = BModuleRegistry::i()->getAllModules();
+		foreach($modules as $module){
+			if (!empty($module->translations)) {
+				foreach($module->translations as $trlocale => $trfile) {
+					$data[] = array(
+						'module' => $module->name,
+						'locale' => $trlocale,
+						'file' => $trfile,
+						'id'=>$module->name.'/'.$trfile);
+				}
+			}
+		}
+		$config['data'] = $data;
+		return $config;
+	}
 
     public function action_form()
     {

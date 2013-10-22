@@ -2,51 +2,6 @@
 
 class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
 {
-    protected function _applyPersonalization(&$config)
-    {
-        $gridId = !empty($config['personalize']['id']) ? $config['personalize']['id'] : $config['id'];
-
-        // retrieve current personalization
-        $pers = FCom_Admin_Model_User::i()->personalize();
-        $persGrid = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : array();
-#var_dump($pers);
-        $req = BRequest::i()->get();
-
-        // prepare array to update personalization
-
-        $personalize = array();
-        foreach (array('p', 'ps', 's', 'sd', 'q') as $k) {
-            if (!isset($persGrid['state'][$k])) {
-                $persGrid['state'][$k] = null;
-            }
-            if (isset($req[$k]) && $persGrid['state'][$k] !== $req[$k]) {
-                $personalize['state'][$k] = $req[$k];
-            } elseif (isset($persGrid[$k])) {
-                $config['state'][$k] = $persGrid[$k];
-            }
-        }
-        // save personalization
-        if (!empty($personalize)) {
-            FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => $personalize)));
-        }
-
-        // get columns personalization
-        $persCols = array();
-        $defPos = 0;
-        foreach ($config['columns'] as $col) {
-            if (!empty($col['name']) && !empty($persGrid['columns'][$col['name']])) {
-                $col = BUtil::arrayMerge($col, $persGrid['columns'][$col['name']]);
-            }
-            if (empty($col['position'])) {
-                $col['position'] = $defPos;
-            }
-            $defPos++;
-            $persCols[] = $col;
-        }
-        usort($persCols, function($a, $b) { return $a['position'] - $b['position']; });
-        $config['columns'] = $persCols;
-    }
-
     public function getBackgridConfigJson()
     {
         $config = $this->grid['config'];

@@ -2,20 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function upgrade__0_2_1__0_2_2()
-    {
-        BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
-            'COLUMNS' => array(
-                'unique_id'     => 'RENAME local_sku varchar(100) not null',
-                'disabled'      => 'RENAME is_hidden tinyint not null default 0',
-                'image_url'     => 'RENAME thumb_url text',
-                'images_data'   => 'text',
-                'markup'        => 'decimal(12,2) null default null',
-            ),
-        ));
-    }
-
-    public function install__0_2_5()
+    public function install__0_2_6()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -66,7 +53,9 @@ class FCom_Catalog_Migrate extends BClass
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
                 'product_id'    => 'int(10) unsigned DEFAULT NULL',
                 'media_type'    => 'char(1) NOT NULL',
-                'file_id'       => 'int(11) unsigned NOT NULL',
+                'file_id'       => 'int(11) unsigned NULL',
+                'file_path'     => 'text',
+                'remote_url'    => 'text',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -141,6 +130,19 @@ class FCom_Catalog_Migrate extends BClass
         BDb::run("REPLACE INTO {$tCategory} (id,id_path) VALUES (1,1)");
     }
 
+    public function upgrade__0_2_1__0_2_2()
+    {
+        BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
+            'COLUMNS' => array(
+                'unique_id'     => 'RENAME local_sku varchar(100) not null',
+                'disabled'      => 'RENAME is_hidden tinyint not null default 0',
+                'image_url'     => 'RENAME thumb_url text',
+                'images_data'   => 'text',
+                'markup'        => 'decimal(12,2) null default null',
+            ),
+        ));
+    }
+
     public function upgrade__0_2_2__0_2_3()
     {
         BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
@@ -175,6 +177,57 @@ class FCom_Catalog_Migrate extends BClass
             ),
             'KEYS' => array(
                 'id_path' => 'UNIQUE (`id_path`, `level`)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_5__0_2_6()
+    {
+        $tMedia = FCom_Catalog_Model_ProductMedia::table();
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'file_id'       => 'int(11) unsigned NULL',
+                'file_path'     => 'text',
+                'remote_url'    => 'text',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_6__0_2_7()
+    {
+        $tSearchHistory = FCom_Catalog_Model_SearchHistory::table();
+        $tSearchAlias = FCom_Catalog_Model_SearchAlias::table();
+
+        BDb::ddlTableDef($tSearchHistory, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'term_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'query' => 'varchar(50) not null',
+                'first_at' => 'datetime not null',
+                'last_at' => 'datetime not null',
+                'num_searches' => 'int not null default 0',
+                'num_products_found_last' => 'int not null default 0',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_query' => 'UNIQUE (term_type, query)',
+            ),
+        ));
+
+        BDb::ddlTableDef($tSearchAlias, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'alias_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'alias_term' => 'varchar(50) not null',
+                'target_term' => 'varchar(50) not null',
+                'num_hits' => 'int not null default 0',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_alias' => 'UNIQUE (alias_type, alias_term)',
+                'IDX_target' => '(target_term)',
             ),
         ));
     }

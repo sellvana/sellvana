@@ -56,6 +56,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = BRequest::i()->get('q');
         $filter = BRequest::i()->get('f');
 
+        $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
+
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsORM));
         $productsData = $productsORM->paginate(null, array('ps'=>25));
@@ -72,6 +74,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+
+        FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
         $layout->view('breadcrumbs')->set('crumbs', array('home', array('label'=>'Search: '.$q, 'active'=>true)));
         $layout->view('catalog/search')->set('query', $q);

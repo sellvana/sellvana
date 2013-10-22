@@ -18,6 +18,7 @@ class FCom_Admin_Admin extends BClass
         if (BRequest::i()->https()) {
             BResponse::i()->httpSTS();
         }
+        BConfig::i()->set('web/hide_script_name', 0);
     }
 
     public static function layout()

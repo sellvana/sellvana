@@ -31,7 +31,7 @@ modules:
 
                     - [ any, /my_account, FCom_Admin_Controller.my_account ]
                     - [ get, /reports, FCom_Admin_Controller.reports ]
-                    - [ post, /my_account/personalize, FCom_Admin_Controller.personalize ]
+                    - [ route, PUT|POST /my_account/personalize, FCom_Admin_Controller.personalize ]
 
                     - [ any, /templates/?.action, FCom_Admin_Controller_Templates ]
 
@@ -47,6 +47,7 @@ modules:
                     - [ any, /settings, FCom_Admin_Controller_Settings.index ]
 
                     - [ any, /modules, FCom_Admin_Controller_Modules.index ]
+                    - [ any, /modules/.action, FCom_Admin_Controller_Modules ]
                     - [ post, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
 
                     - [ get, /test, FCom_Admin_Controller.test ]
