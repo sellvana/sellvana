@@ -14,11 +14,13 @@
       <div class="row">
         <!-- Product Image Column -->
         <div class="col-md-5 f-col-prod-img">
-          <ul class="thumbnails rslides f-prod-imgs">
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-          </ul>
+          <div class="f-rslides-container">
+            <ul class="thumbnails f-rslides f-prod-imgs">
+              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
+              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+            </ul>
+          </div>
           <p class="text-center"><small>Mouse move on Image to zoom</small></p>
           <ul class="f-prod-more-view-imgs row">
             <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
@@ -29,14 +31,14 @@
         </div>
         <script>
           require(['jquery', 'responsiveslides'], function($) {
-            $(".rslides").responsiveSlides({
-              speed: 500,        // Integer: Speed of the transition, in milliseconds
-              timeout: 4000,        // Integer: Time between slide transitions, in milliseconds
-              pager: true,         // Boolean: Show pager, true or false
-              nav: true,         // Boolean: Show navigation, true or false
-              random: true,        // Boolean: Randomize the order of the slides, true or false
-              pause: true,         // Boolean: Pause on hover, true or false
-              pauseControls: true    // Boolean: Pause when hovering controls, true or false
+            $(".f-rslides").responsiveSlides({
+              speed: 500,
+              timeout: 4000,
+              nav: true,
+              random: true,
+              pause: true,
+              pauseControls: true,
+              namespace: "f",
             });
           });
         </script>
@@ -44,7 +46,7 @@
 
         <!-- Product Select Column-->
         <div class="col-md-7 f-col-prod-select">
-          <h1 class="f-prod-name">Realistically longer name {{ prod.get('product_name') }}</h1>
+          <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
           <div class="f-prod-avg-rating">
             <div class="glyphicon f-rating-stars f-sm-stars">
               <span class="f-filled-stars" style="width:100%;"></span>
@@ -52,29 +54,60 @@
             </div>
             <a href="#f-prod-tab-reviews">53 Reviews</a>
           </div>
-          <table class="f-price-group">
-            {% if prod.get('base_price') == 0 %}
-              <tr class="f-reg-price">
-                <th class="f-price-label">Price:</th>
-                <td class="f-price">{{ 'FREE'|_ }}</td>
-              </tr>
-            {% elseif prod.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-              <tr class="f-special-price">
-                <th class="f-price-label">Price:</th>
-                <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
-              </tr>
+          <div class="f-price-group">
+          
+            <table>
               <tr class="f-old-price">
                 <th class="f-price-label">Was:</th>
-                <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+                <td class="f-price">$39.99</td>
               </tr>
-            {% else %}
-              <tr class="f-reg-price">
-                <th class="f-price-label">Price:</th>
-                <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+              <tr class="f-map-price">
+                <td colspan="2">Add to cart to see your price!</td>
               </tr>
-            {% endif %}
-          </table>
-          <!-- /.f-price-group -->
+            </table> <!-- /.f-map-price -->
+            
+            <table>
+              {% if prod.get('base_price') == 0 %}
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">{{ 'FREE'|_ }}</td>
+                </tr>
+              {% elseif prod.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                <tr class="f-special-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
+                </tr>
+                <tr class="f-old-price">
+                  <th class="f-price-label">Was:</th>
+                  <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+                </tr>
+              {% else %}
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">{{ prod.get('base_price') | currency }}</td>
+                </tr>
+              {% endif %}
+            </table>
+            
+            <table class="f-tier-price-group table table-condensed">
+              <caption>Tier Pricing</caption>
+              <tr>
+                <td>Buy 2</td>
+                <td>$59.99 each</td>
+                <td>Save 5%</td>
+              </tr>
+              <tr>
+                <td>Buy 5</td>
+                <td>$49.99 each</td>
+                <td>Save 5%</td>
+              </tr>
+              <tr>
+                <td>Buy 15</td>
+                <td>$39.99 each</td>
+                <td>Save 5%</td>
+              </tr>
+            </table> <!-- /.f-tier-price-group -->
+          </div> <!-- /.f-price-group -->
 
           <div class="f-prod-select">
             <div class="row">
@@ -117,6 +150,7 @@
               </label>
             </div>
             <div class="f-prod-add-cart">
+              <p class="f-stock-notice f-in-stock">In Stock.</p>
               <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>Add to Cart</button>
               <a class="btn btn-link" href="#">Add to Wishlist</a>
               <a class="btn btn-link" href="#">Add to Compare</a>
@@ -412,119 +446,116 @@
             </header>
             <div class="f-prod-listing f-prod-listing-grid">
               <div class="row">
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <table class="f-price-group">
-                          <tr class="f-special-price">
-                            <th class="f-price-label">Price:</th>
-                            <td class="f-price">$59.99</td>
-                          </tr>
-                          <tr class="f-old-price">
-                            <th class="f-price-label">Was:</th>
-                            <td class="f-price">$109.99</td>
-                          </tr>
+                        <tr class="f-special-price">
+                          <th class="f-price-label">Price:</th>
+                          <td class="f-price">$59.99</td>
+                        </tr>
+                        <tr class="f-old-price">
+                          <th class="f-price-label">Was:</th>
+                          <td class="f-price">$109.99</td>
+                        </tr>
                       </table>
                       <!-- /.f-price-group -->
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <table class="f-price-group">
-                          <tr class="f-special-price">
-                            <th class="f-price-label">Price:</th>
-                            <td class="f-price">$59.99</td>
-                          </tr>
-                          <tr class="f-old-price">
-                            <th class="f-price-label">Was:</th>
-                            <td class="f-price">$109.99</td>
-                          </tr>
+                        <tr class="f-special-price">
+                          <th class="f-price-label">Price:</th>
+                          <td class="f-price">$59.99</td>
+                        </tr>
+                        <tr class="f-old-price">
+                          <th class="f-price-label">Was:</th>
+                          <td class="f-price">$109.99</td>
+                        </tr>
                       </table>
                       <!-- /.f-price-group -->
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="clearfix visible-xs"></div>
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <div class="f-price-group">
-                      <span class="f-price">$58.49</span>
+                        <span class="f-price">$58.49</span>
                       </div>
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
                 <div class="clearfix visible-lg visible-md visible-sm"></div>
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <table class="f-price-group">
-                          <tr class="f-special-price">
-                            <th class="f-price-label">Price:</th>
-                            <td class="f-price">$59.99</td>
-                          </tr>
-                          <tr class="f-old-price">
-                            <th class="f-price-label">Was:</th>
-                            <td class="f-price">$109.99</td>
-                          </tr>
+                        <tr class="f-special-price">
+                          <th class="f-price-label">Price:</th>
+                          <td class="f-price">$59.99</td>
+                        </tr>
+                        <tr class="f-old-price">
+                          <th class="f-price-label">Was:</th>
+                          <td class="f-price">$109.99</td>
+                        </tr>
                       </table>
                       <!-- /.f-price-group -->
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="clearfix visible-xs"></div>
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <table class="f-price-group">
-                          <tr class="f-special-price">
-                            <th class="f-price-label">Price:</th>
-                            <td class="f-price">$59.99</td>
-                          </tr>
-                          <tr class="f-old-price">
-                            <th class="f-price-label">Was:</th>
-                            <td class="f-price">$109.99</td>
-                          </tr>
+                        <tr class="f-special-price">
+                          <th class="f-price-label">Price:</th>
+                          <td class="f-price">$59.99</td>
+                        </tr>
+                        <tr class="f-old-price">
+                          <th class="f-price-label">Was:</th>
+                          <td class="f-price">$109.99</td>
+                        </tr>
                       </table>
                       <!-- /.f-price-group -->
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-4 col-sm-4 col-xs-6">
                   <div class="thumbnail">
                     <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
                     <div class="caption">
                       <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
                       <table class="f-price-group">
-                          <tr class="f-special-price">
-                            <th class="f-price-label">Price:</th>
-                            <td class="f-price">$59.99</td>
-                          </tr>
-                          <tr class="f-old-price">
-                            <th class="f-price-label">Was:</th>
-                            <td class="f-price">$109.99</td>
-                          </tr>
+                        <tr class="f-special-price">
+                          <th class="f-price-label">Price:</th>
+                          <td class="f-price">$59.99</td>
+                        </tr>
+                        <tr class="f-old-price">
+                          <th class="f-price-label">Was:</th>
+                          <td class="f-price">$109.99</td>
+                        </tr>
                       </table>
                       <!-- /.f-price-group -->
-                      <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
                     </div>
                   </div>
                 </div>
+                <div class="clearfix visible-xs"></div>
               </div><!-- /.row -->
             </div><!-- /.f-prod-listing -->
           </div><!-- /.f-widget -->
@@ -539,7 +570,7 @@
       </header>
       <div class="f-prod-listing f-prod-listing-grid">
         <div class="row">
-          <div class="col-md-2 col-sm-4">
+          <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -555,11 +586,10 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-4">
+          <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -575,11 +605,10 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-4">
+          <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -595,12 +624,11 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
           <div class="clearfix visible-sm"></div>
-          <div class="col-md-2 col-sm-4">
+          <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -616,11 +644,10 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-4">
+          <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -636,11 +663,10 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
               </div>
             </div>
           </div>
-          <div class="col-md-2 col-sm-4 ">
+          <div class="col-md-2 col-sm-4 col-xs-6 ">
             <div class="thumbnail">
               <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
               <div class="caption">
@@ -656,7 +682,134 @@
                     </tr>
                 </table>
                 <!-- /.f-price-group -->
-                <p><a href="#" class="btn btn-primary btn-sm">Add to Cart</a> <a href="#" class="btn btn-link btn-sm">View Details</a></p>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.row -->
+      </div><!-- /.f-prod-listing -->
+    </div><!-- /.f-widget -->
+    
+    
+
+    <!-- You may also like -->
+    <div class="f-widget f-widget-featured-prods">
+      <header class="f-widget-header">
+        <strong class="f-widget-title">You recently viewed these items</strong>
+      </header>
+      <div class="f-prod-listing f-prod-listing-grid">
+        <div class="row">
+          <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+              </div>
+            </div>
+          </div>
+          <div class="clearfix visible-sm"></div>
+          <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 ">
+            <div class="thumbnail">
+              <a href="#" class="f-prod-img"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="Tommy Hilfiger Montclair 3-piece Duvet Cover Set"></a>
+              <div class="caption">
+                <a href="#" class="f-prod-name">Tommy Hilfiger Montclair 3-piece Duvet Cover Set</a>
+                <table class="f-price-group">
+                    <tr class="f-special-price">
+                      <th class="f-price-label">Price:</th>
+                      <td class="f-price">$59.99</td>
+                    </tr>
+                    <tr class="f-old-price">
+                      <th class="f-price-label">Was:</th>
+                      <td class="f-price">$109.99</td>
+                    </tr>
+                </table>
+                <!-- /.f-price-group -->
               </div>
             </div>
           </div>

@@ -101,6 +101,14 @@ a:hover, a:focus { text-decoration:none; }
   }
 
 /* Table */
+.table caption { 
+  padding:5px; 
+  color:#999;
+  font-weight:bold;
+  font-size:.85em;
+  text-align:left; 
+  text-transform:uppercase;
+  }
 .table th, 
 .table td,
 .table thead > tr > th, 
@@ -650,6 +658,10 @@ select.form-control {
   color:#999;
   text-decoration:line-through;
   }
+.f-price-group .f-map-price {
+  color:#b21919;
+  font-weight:bold;
+  }
   
 /*------------------------------------*\
    CONTAINER-SPECIFIC
@@ -695,6 +707,12 @@ select.form-control {
 .f-col-prod-select .f-prod-select .form-group {
   margin-bottom:10px; 
   }
+.f-stock-notice {
+  margin:10px 0;
+  font-size:15px;
+  }
+.f-stock-notice.f-in-stock { color:#2ca00f; }
+.f-stock-notice.f-out-of-stock { color:#b21919; }
 .f-prod-info > .tab-content .tab-pane {
   border-top:1px solid #eee;
   margin-top:25px;
@@ -769,8 +787,41 @@ select.form-control {
 
 /* Responsive Slides */
 /*! http://responsiveslides.com v1.54 by @viljamis */
+.f-rslides-container {
+  position:relative;
+  }
+.f_nav {
+  opacity:.3;
+  position:absolute;
+  display: inline-block;
+  top:80%;
+  width:45px;
+  height:45px;
+  margin-top:-45px;
+  -webkit-font-smoothing: antialiased;
+  visibility:hidden;
+  text-align:center;
+  z-index:9;
+  }
+.f_nav:before {
+  display: inline-block;
+  margin-top:-45px;
+  width:45px;
+  height:45px;
+  background:#000;
+  color:#fff;
+  font: 15px/45px 'Glyphicons Halflings';
+  visibility:visible;
+  }
+.f_nav:hover {
+  opacity:.5;  
+  }
+.f_nav.prev { left:0; }
+.f_nav.prev:before { content: "\e079"; }
+.f_nav.next { right:0; }
+.f_nav.next:before { content: "\e080"; }
 
-.rslides {
+.f-rslides {
   position: relative;
   list-style: none;
   overflow: hidden;
@@ -778,8 +829,7 @@ select.form-control {
   padding: 0;
   margin: 0;
   }
-
-.rslides li {
+.f-rslides li {
   -webkit-backface-visibility: hidden;
   position: absolute;
   display: none;
@@ -787,14 +837,12 @@ select.form-control {
   left: 0;
   top: 0;
   }
-
-.rslides li:first-child {
+.f-rslides li:first-child {
   position: relative;
   display: block;
   float: left;
   }
-
-.rslides img {
+.f-rslides img {
   display: block;
   height: auto;
   float: left;
@@ -959,7 +1007,6 @@ select.form-control {
     margin:0;
     }
   .f-prod-listing-toolbar [class^='col-'] {
-    width:auto;
     padding-right:3px;
     padding-left:0;
     }
@@ -970,7 +1017,6 @@ select.form-control {
   .f-prod-listing-toolbar select.form-control {
     margin-top:2px;
     width:100%;
-    max-width:100px;
     }
     
   /* Container: Category */
