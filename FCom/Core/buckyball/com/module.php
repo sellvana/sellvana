@@ -1268,7 +1268,8 @@ class BMigrate extends BClass
     public static function getMigrationData()
     {
         $migration = array();
-        foreach (BModuleRegistry::i()->getAllModules() as $modName=>$mod) {
+        $allModules = BModuleRegistry::i()->getAllModules();
+        foreach ($allModules as $modName => $mod) {
             if (empty($mod->migrate) && class_exists($mod->name.'_Migrate')) {
                 $mod->migrate = $mod->name.'_Migrate';
             }
@@ -1335,14 +1336,16 @@ class BMigrate extends BClass
         if (!$migration) {
             return;
         }
+
         if (is_string($limitModules)) {
             $limitModules = explode(',', $limitModules);
         }
         // initialize module tables
         // find all installed modules
-        foreach ($migration as $connectionName=>&$modules) {
+        $num = 0;
+        foreach ($migration as $connectionName => &$modules) {
             if ($limitModules) {
-                foreach ($modules as $modName=>$mod) {
+                foreach ($modules as $modName => $mod) {
                     if ((true===$limitModules && $mod['run_status']==='LOADED')
                         || (is_array($limitModules) && in_array($modName, $limitModules))
                     ) {
@@ -1363,9 +1366,9 @@ class BMigrate extends BClass
                 $modules[$m->module_name]['schema_version'] = $m->schema_version;
             }
             // run required migration scripts
-            foreach ($modules as $modName=>$mod) {
+            foreach ($modules as $modName => $mod) {
                 if (empty($mod['code_version'])) {
-                    continue; // skip migration of registered module that is not current active
+                    continue; // skip migration of registered module that is not currently active
                 }
                 if (!empty($mod['schema_version']) && $mod['schema_version'] === $mod['code_version']) {
                     continue; // no migration necessary
@@ -1374,6 +1377,43 @@ class BMigrate extends BClass
                     BDebug::warning('No migration script found: '.$modName);
                     continue;
                 }
+
+                $modules[$modName]['migrate'] = true;
+                $num++;
+            }
+        }
+        unset($modules);
+
+        if (!$num) {
+            return;
+        }
+
+        // special case for FCom_Admin because some frontend modules require its tables
+        if (empty($migration['DEFAULT']['FCom_Admin']['schema_version'])
+            && empty($migration['DEFAULT']['FCom_Admin']['migrate'])
+        ) {
+            BApp::m('FCom_Admin')->run_status = BModule::LOADED;
+            static::migrateModules('FCom_Core,FCom_Admin');
+        }
+
+        BResponse::i()->startLongResponse();
+        echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
+        $i = 0;
+        foreach ($migration as $connectionName => $modules) {
+            BDb::connect($connectionName);
+
+            foreach ($modules as $modName => $mod) {
+                if (empty($mod['migrate'])) {
+                    continue;
+                }
+
+                echo '<br>['.(++$i).'/'.$num.'] ';
+                if (empty($mod['schema_version'])) {
+                    echo 'Installing <strong>'.$modName.': '.$mod['code_version'].'</strong> ... ';
+                } else {
+                    echo 'Upgrading  <strong>'.$modName.': '.$mod['schema_version'].' -> '.$mod['code_version'].'</strong> ... ';
+                }
+
                 $modReg->currentModule($modName);
                 $script = $mod['script'];
                 if (is_array($script)) {
@@ -1417,9 +1457,15 @@ class BMigrate extends BClass
                 */
             }
         }
-        unset($modules);
         $modReg->currentModule(null);
         static::$_migratingModule = null;
+
+        $url = BRequest::i()->currentUrl();
+        echo '</pre>';
+        echo '<script>location.href="'.$url.'";</script>';
+        echo 'ALL DONE. <a href="'.$url.'">Click here to continue</a>';
+        echo '</body></html>';
+        exit;
     }
 
     protected static function _runClassMethods($class)
@@ -1474,6 +1520,9 @@ class BMigrate extends BClass
         if (!empty($mod['schema_version'])) {
             return true;
         }
+
+        echo '*'.$version.'; ';
+
 BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         // creating module before running install, so the module configuration values can be created within script
         $module = BDbModule::i()->load($mod['module_name'], 'module_name');
@@ -1523,6 +1572,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
     public static function upgrade($fromVersion, $toVersion, $callback)
     {
         $mod =& static::$_migratingModule;
+
         // if no code version set, return
         if (empty($mod['code_version'])) {
             return false;
@@ -1545,6 +1595,8 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
         if (version_compare($schemaVersion, $fromVersion, '>')) {
             return true;
         }
+        echo '^'.$toVersion.'; ';
+
         $module = BDbModule::i()->load($mod['module_name'], 'module_name')->set(array(
             'last_upgrade' => BDb::now(),
             'last_status'=>'UPGRADING',

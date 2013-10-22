@@ -21,6 +21,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
     public function action_index__POST()
     {
+        $xhr = BRequest::i()->xhr();
         try {
             $post = BRequest::i()->post();
 
@@ -37,19 +38,31 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             }
             FCom_Core_Main::i()->writeConfigFiles();
 
-            BSession::i()->addMessage('Settings updated', 'success', 'admin');
+            if (!$xhr) {
+                BSession::i()->addMessage('Settings updated', 'success', 'admin');
+            } else {
+                $result = array('message' => BLocale::_('Settings has been saved successfully'), 'status' => 'success');
+            }
 
         } catch (Exception $e) {
 
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            if (!$xhr) {
+                BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            } else {
+                $result = array('message' => BLocale::_($e->getMessage()), 'status' => 'error');
+            }
         }
         if (!empty($post['current_tab'])) {
             $tab = $post['current_tab'];
         } else {
             $tab = 'FCom_Admin';
         }
-        BResponse::i()->redirect(BApp::href('settings').'?tab='.$tab);
+        if (!$xhr) {
+            BResponse::i()->redirect(BApp::href('settings').'?tab='.$tab);
+        } else {
+            BResponse::i()->json($result);
+        }
     }
 
     public function action_dismiss() {
