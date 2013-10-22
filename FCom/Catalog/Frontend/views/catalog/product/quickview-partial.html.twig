@@ -2,17 +2,32 @@
 <div class="row">
   <!-- Product Image Column -->
   <div class="f-col-prod-img col-sm-6">
-    <ul class="thumbnails rslides f-prod-imgs">
-      <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
-      <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-      <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-    </ul>
+    <div class="f-rslides-container">
+      <ul class="thumbnails f-rslides f-prod-imgs">
+        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
+        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+      </ul>
+    </div>
     <ul class="f-prod-more-view-imgs row">
       <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
       <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
       <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
       <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
     </ul>
+    <script>
+      require(['jquery', 'responsiveslides'], function($) {
+        $(".f-rslides").responsiveSlides({
+          speed: 500,
+          timeout: 4000,
+          nav: true,
+          random: true,
+          pause: true,
+          pauseControls: true,
+          namespace: "f",
+        });
+      });
+    </script>
   </div>
   <div class="tab-content col-sm-6">
     <ul class="nav nav-tabs">
