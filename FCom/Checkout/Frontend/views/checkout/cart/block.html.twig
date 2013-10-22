@@ -13,7 +13,7 @@
       {% for item in items %}{% set p = item.product() %}{% set pUrl = p.url() %}{% set pName = p.get('product_name')  %}
         <li>
           <a href="{{ pUrl }}" class="media">
-            <img class="media-object pull-left" src="{ p.thumbUrl(50) }}" width="50" alt="{{ pName }}">
+            <img class="media-object pull-left" src="{{ p.thumbUrl(50) }}" width="50" alt="{{ pName }}">
             <div class="media-body">
               <h4 class="media-heading">{{ pName }}</h4>
               <div class="f-price-group">
