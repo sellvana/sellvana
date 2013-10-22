@@ -140,9 +140,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
 	public function gridConfig()
 	{
-		$coreRunLevelOptions = FCom_Core_Model_Module::getCoreRunLevelOptions();
-		$areaRunLevelOptions = FCom_Core_Model_Module::getAreaLevelOptions();
-		$runStatusOptions = FCom_Core_Model_Module::getRunStatusOptions();
+		$coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
+		$areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('area_run_level');
+		$runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
 		$config = parent::gridConfig();
 
 		$config['columns'] = array(
