@@ -18,15 +18,15 @@
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
-        <ul class="pagination pagination-sm">
+        <ul class="pagination pagination-sm pagesize">
           {% for ps in THIS.pageSizeOptions() %}
             <li {{ ps==s.ps ? 'class="active"' }}>
-              <a class="js-change-url page-size" >{{ ps }}</a>
+              <a class="js-change-url page-size" href="#">{{ ps }}</a>
             </li>
           {% endfor %}
         </ul>
 
-        <ul class="pagination pagination-sm">
+        <ul class="pagination pagination-sm page">
           {#
           <label>
             {{ 'Page'|_ }}
@@ -35,23 +35,7 @@
           {{ 'of %s'|_(s.mp) }}
           #}
 
-          <li class="first {{ s.p <= 1 ? 'disabled' }}">
-            <a class="js-change-url" href="{{ s.p <= 1 ? '#' : pageUrl|replace({'-VALUE-': 1}) }}">&laquo;</a>
-          </li>
-          <li class="prev {{ s.p <= 1 ? 'disabled' }}">
-            <a class="js-change-url" href="{{ s.p <= 1 ? '#' : pageUrl|replace({'-VALUE-': s.p-1}) }}")>&lsaquo;</a>
-          </li>
-          {% for i in range((s.p-3)|max(1), (s.p+3)|min(s.mp)|max(1)) %}
-              <li {{ i == s.p ? 'class="active"' }}>
-                <a class="js-change-url" data-page="" href="{{ pageUrl|replace({'-VALUE-': i}) }}">{{ i }}</a>
-              </li>
-          {% endfor %}
-          <li class="next {{ s.p >= s.mp ? 'disabled' }}">
-            <a class="js-change-url" href="{{ s.p >= s.mp ? '#' : pageUrl|replace({'-VALUE-': s.p+1}) }}")>&rsaquo;</a>
-          </li>
-          <li class="last {{ s.p >= s.mp ? 'disabled' }}">
-            <a class="js-change-url" href="{{ s.p >= s.mp ? '#' : pageUrl|replace({'-VALUE-': s.mp}) }}">&raquo;</a>
-          </li>
+          
         </ul>
 
         {% for action in THIS.gridActions() %}
