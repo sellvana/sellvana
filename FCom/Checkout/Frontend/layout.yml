@@ -7,7 +7,7 @@ base:
 /checkout/cart:
 	- { include: base }
 	- { hook: main, views: checkout/cart }
-	- { hook: main, views: checkout/also-bought }
+	- { hook: cart_upsell, views: checkout/also-bought }
 
 /checkout/checkout:
 	- { include: base }

@@ -3,179 +3,157 @@
 {% set cartItems = cart.items() %}
 {% set shipping_estimates = SESSION.data('shipping_estimate') %}
 {% set checkout_methods = APP.instance('FCom_Sales_Main').getCheckoutMethods() %}
-
-
-<div id="maincontainer">
-  <section id="product">
-    <div class="container">
-     <!--  breadcrumb -->
-      <ul class="breadcrumb">
-        <li>
-          <a href="#">Home</a>
-          <span class="divider">/</span>
-        </li>
-        <li class="active"> Shopping Cart</li>
-      </ul>
-      <h1 class="heading1"><span class="maintext"> Shopping Cart</span><span class="subtext"> All items in your  Shopping Cart</span></h1>
+<div class="f-site-main" role="main">
+  <div class="container">
+    <ol class="breadcrumb">
+      <li><a href="#">Home</a></li>
+      <li class="active">Shopping Cart</li>
+    </ol>
+    <header class="f-page-header">
+      <h1 class="f-page-title">Shopping Cart</h1>
+    </header>
 {% if false == cartItems %}
-
-      <div class="cart-info">
-        {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"You have an empty cart."|_}]) | raw }}
-      </div>
+    {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"Your cart is empty. "|_}]) | raw }}
 {% else %}
 
-      <!-- Cart-->
-      <div class="cart-info">
-      {{ THIS.view('core/messages') | raw }}
-      <form method="post" action="{{ APP.href('cart/add') }}">
-        <table class="table table-striped table-bordered">
-          <thead>
-          <tr>
-            <th class="image">{{ 'Image'|_ }}</th>
-            <th class="name">{{ 'Product Name'|_ }}</th>
-            <th class="model">{{ 'Model'|_ }}</th>
-            <th class="quantity">{{ 'Qty'|_ }}</th>
-            <th class="total">{{ 'Action'|_ }}</th>
-            <th class="price">{{ 'Unit Price'|_ }}</th>
-            <th class="total">{{ 'Total'|_ }}</th>
-
-          </tr>
-          </thead>
-          <tbody>
-
-            {% for item in cartItems %}
-                {% set p = item.product() %}
-                {% if p %}
-                  {% set pUrl = p.url() %}{% set pName = p.get('product_name') %}
-                    <tr id="tr-product-{{ p.id }}">
-                        <td class="image">
-                          <a href="{{ pUrl }}">
-                            <img src="{{ p.thumbUrl(40, 40) }}" width="40" height="40" class="product-image" alt="{{ pName }}"/>
+    {{ THIS.view('core/messages') | raw }}
+    <div class="row">
+      <div class="f-col-cart-totals col-md-3 col-lg-3">
+        <table class="table">
+        {% for total in cart.getTotals() %}
+          {% if not total.isHidden() %}
+            <tr class="{{ total.getRowClass() }}">
+                <td><span class="extra bold">{{ total.getLabelFormatted() }}</span></td>
+                <td><span class="bold">{{ total.getValueFormatted() }}</span></td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+        </table>
+        <ul class="f-cart-btn-group">
+        {% for checkout in checkout_methods %}
+          {% set button = checkout.getCartCheckoutButton() %}
+          {% if button %}
+            <li>
+              {% if button.html %}
+                  {{ button.html | raw }}
+              {% else %}
+                  <a href="{{ button.href }}" class="btn btn-primary"><span>{{ button.label |_ }}</span></a>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+      </div>
+      <div class="f-widget f-widget-cart f-col-cart-content col-md-9 col-lg-9">
+        <header class="f-widget-header">
+          <strong class="f-widget-title">Items in cart</strong>
+        </header>
+        <div class="table-responsive">
+          <form method="post" action="{{ APP.href('cart/add') }}">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th class="f-cart-col-item" colspan="2">{{ 'Item'|_ }}</th>
+                  <th class="f-cart-col-qty">{{ 'Qty'|_ }}</th>
+                  <th class="f-cart-col-total">{{ 'Action'|_ }}</th>
+                  <th class="f-cart-col-price">{{ 'Unit Price'|_ }}</th>
+                  <th class="f-cart-col-total">{{ 'Total'|_ }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in cartItems %}
+                  {% set p = item.product() %}
+                  {% if p %}
+                    {% set pUrl = p.url() %}{% set pName = p.get('product_name') %}
+                      <tr id="tr-product-{{ p.id }}">
+                        <td class="f-cart-col-img">
+                          <a href="{{ pUrl }}" class="f-prod-img">
+                            <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ pName }}"/>
                           </a>
                         </td>
-                        <td class="name">
+                        <td class="f-cart-col-name">
                             <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
                         </td>
-                        <td class="model">
-                            <span class="product-name"><a href="{{ pUrl }}">{{ p.get('model') }}</a></span>
+                        <td class="f-cart-col-qty">
+                            <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.get('qty')*1 }}" class="f-input-qty input-sm form-control"/>
                         </td>
-                        <td class="quantity">
-                            <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.get('qty')*1 }}" class="col-lg-3"/>
+                        <td class="f-cart-col-total">
+                          <div class="checkbox">
+                            <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.id() }}"> Remove</label></div>
                         </td>
-                        <td class="total">
-                            <label><input type="checkbox" name="remove[]" class="remove-checkbox f-none" value="{{ item.id() }}"> Remove</label>
+                        <td class="f-cart-col-price">
+                          <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+                            <table>
+                              <tr class="f-reg-price">
+                                <td class="f-price">{{ p.get('base_price') | currency }}</td>
+                              </tr>
+                            </table>    
+                          </div>
                         </td>
-                        <td class="price">
-                            <div class="price-box {{ loggedIn ? 'logged-in' : 'logged-out' }}">
-                                <div class=""><span class="price">{{ p.get('base_price') | currency }}</span></div>
-                            </div>
+                        <td class="f-cart-col-total">
+                          <div class="f-price-group">
+                            <table>
+                              <tr class="f-reg-price">
+                                <td class="f-price">{{ item.rowTotal() | currency }}</td>
+                              </tr>
+                            </table>    
+                          </div>
                         </td>
-                        <td class="total">
-                            <div class="price-box">
-                                <div class=""><span class="price">{{ item.rowTotal() | currency }}</span></div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td><button type="submit" class="btn">{{ "Update Cart" |_ }}</button></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </form>
-      </div>
-      <div class="cartoptionbox">
-        <h4 class="heading4"> Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost. </h4>
-        <input type="radio" class="radio">
-        Use Coupon Code <br>
-        <input type="radio" class="radio">
-        Use Gift Voucher <br>
-        <input type="radio" class="radio" checked="checked">
-        Estimate Shipping & Taxes <br><br>
-        <form class="form-vertical form-inline">
-          <h4 class="heading4"> Enter your destination to get a shipping estimate.</h4>
-          <fieldset>
-            <div class="control-group">
-              <label  class="control-label">Select list</label>
-              <div class="controls">
-                <select  class="col-lg-3 cartcountry">
-                  <option>Country:</option>
-                  <option>United Kindom</option>
-                  <option>United States</option>
-                </select>
-                <select class="col-lg-3 cartstate">
-                  <option>Region / State:</option>
-                  <option>Angus</option>
-                  <option>highlands</option>
-                </select>
-                <input type="submit" value="Get Quotes" class="btn btn-orange">
-              </div>
-            </div>
-          </fieldset>
-        </form>
-      </div>
-      <div class="container">
-          <div class="col-lg-4 pull-right">
-            <table class="table table-striped table-bordered ">
-            {% for total in cart.getTotals() %}
-                {% if not total.isHidden() %}
-                    <tr class="{{ total.getRowClass() }}">
-                        <td><span class="extra bold">{{ total.getLabelFormatted() }}</span></td>
-                        <td><span class="bold">{{ total.getValueFormatted() }}</span></td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            <!--
-              <tr>
-                <td><span class="extra bold">Sub-Total :</span></td>
-                <td><span class="bold">$101.0</span></td>
-              </tr>
-              <tr>
-                <td><span class="extra bold">Eco Tax (-5.00) :</span></td>
-                <td><span class="bold">$11.0</span></td>
-              </tr>
-              <tr>
-                <td><span class="extra bold">VAT (18.2%) :</span></td>
-                <td><span class="bold">$21.0</span></td>
-              </tr>
-              <tr>
-                <td><span class="extra bold totalamout">Total :</span></td>
-                <td><span class="bold totalamout">$150.28</span></td>
-              </tr>
-              -->
+                      </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td></td>
+                  <td><button type="submit" class="btn btn-default btn-xs">{{ "Update Cart" |_ }}</button></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
+          </form>
+        </div><!-- /.table-responsive -->
+        {{ THIS.hook('cart_upsell') | raw }}
+      </div>
 
-            <input type="submit" value="CheckOut" class="btn btn-orange pull-right">
-            <!--<input type="submit" value="Continue Shopping" class="btn btn-orange pull-right mr10">-->
-
-            <ul class="checkout-btns">
-            {% for checkout in checkout_methods %}
-                {% set button = checkout.getCartCheckoutButton() %}
-                {% if button %}
-                    <li>
-                        {% if button.html %}
-                            {{ button.html | raw }}
-                        {% else %}
-                            <a href="{{ button.href }}" class="btn btn-orange pull-right"><span>{{ button.label |_ }}</span></a>
-                        {% endif %}
-                    </li>
-                {% endif %}
-            {% endfor %}
-            </ul>
-        </div>
     </div>
+    <!--<div class="cartoptionbox">
+      <h4 class="heading4"> Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost. </h4>
+      <input type="radio" class="radio">
+      Use Coupon Code <br>
+      <input type="radio" class="radio">
+      Use Gift Voucher <br>
+      <input type="radio" class="radio" checked="checked">
+      Estimate Shipping & Taxes <br><br>
+      <form class="form-vertical form-inline">
+        <h4 class="heading4"> Enter your destination to get a shipping estimate.</h4>
+        <fieldset>
+          <div class="control-group">
+            <label  class="control-label">Select list</label>
+            <div class="controls">
+              <select  class="col-lg-3 cartcountry">
+                <option>Country:</option>
+                <option>United Kindom</option>
+                <option>United States</option>
+              </select>
+              <select class="col-lg-3 cartstate">
+                <option>Region / State:</option>
+                <option>Angus</option>
+                <option>highlands</option>
+              </select>
+              <input type="submit" value="Get Quotes" class="btn btn-orange">
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>-->
+    
+
 {% endif %}
 
 
-  </section>
+  </div>
 </div>
 

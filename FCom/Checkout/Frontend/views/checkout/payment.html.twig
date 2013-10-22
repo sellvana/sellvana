@@ -1,20 +1,22 @@
 {% set curMethod = THIS.get('cart').get('payment_method') %}
 {% set payment_html = THIS.get('payment_html') %}
-<header class="main-title">
-    <h1 class="title">{{ "Payment methods" |_ }}</h1>
+<header class="f-page-header">
+  <h1 class="f-page-title">{{ "Payment methods" |_ }}/h1>
 </header>
 <fieldset>
-        {% for method, class in THIS.get('payment_methods') %}
-        <label class="radio">
-          <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' }} id="payment_method_{{ method }}">
-            {{ class.getName()|_ }}
-        </label><br>
-            {% if payment_html[method] %}
-             <div class="payment_html" id="payment_html_{{ method }}">
-                 {{ payment_html[method] |raw}}
-             </div>
-            {% endif %}
-        {% endfor %}
+  {% for method, class in THIS.get('payment_methods') %}
+    <div class="radio">
+      <label>
+        <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' }} id="payment_method_{{ method }}">
+        {{ class.getName()|_ }}
+      </label>
+    </div>
+    {% if payment_html[method] %}
+     <div class="payment_html" id="payment_html_{{ method }}">
+         {{ payment_html[method] |raw}}
+     </div>
+    {% endif %}
+  {% endfor %}
 </fieldset>
 <script type="text/javascript">
     require(['jquery'], function($){

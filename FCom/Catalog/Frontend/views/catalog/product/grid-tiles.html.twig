@@ -42,6 +42,14 @@
           </table>
           <!-- /.f-price-group -->
           <!--{{ p.get('short_description') }}-->
+          <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="qty" value="1">
+            <p>
+              <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">Add to Cart</button>
+              <a href="{{ productUrl }}" class="btn btn-link btn-sm">View Details</a>
+            </p>
+          </form>
         </div>
       </div>
     </div>
