@@ -134,7 +134,8 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         foreach ($products as $p) {
             $f = $field->source_callback ? $field->source_callback : $field->field_name;
             $m = isset($p->$f) ? $p->$f : $p->base_price;
-            if     ($m <   100) $v = '0-99      ==> $0 to $99';
+            if     ($m ===   0) $v = '0         ==> FREE';
+            elseif ($m <   100) $v = '1-99      ==> $1 to $99';
             elseif ($m <   200) $v = '100-199   ==> $100 to $199';
             elseif ($m <   300) $v = '200-299   ==> $200 to $299';
             elseif ($m <   400) $v = '300-399   ==> $300 to $399';
