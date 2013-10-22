@@ -129,6 +129,16 @@
 <script type="template" id="{{ config.id }}-row-template">
   {{ THIS.rowsHtml([APP.instance('FCom_Catalog_Model_Product').create()]) | raw }}
 </script>
+<script type="template" id="row-template">
+  <tr id='<%- id %>' class='<%- cssClass %>'>
+  </tr>
+</script>
+
+<script type="template" id="cell-template">
+  <td data-col='<%- datacol %>'>
+      <%- html %>
+  </td>
+</script>
 
 <script>
 require(['jquery', 'fcom.htmlgrid'], function($) {
