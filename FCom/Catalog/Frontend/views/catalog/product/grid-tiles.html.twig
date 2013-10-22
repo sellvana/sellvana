@@ -5,7 +5,7 @@
   {% for p in THIS.get('products') %}
   {% set productName = p.get('product_name') %}
   {% set productUrl = p.url(THIS.get('category')) %}
-    <div class="col-md-4 col-sm-4">
+    <div class="col-md-4 col-sm-4 col-xs-6">
       <div class="thumbnail">
         {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
             <span class="sale tooltip-test">Sale</span>
@@ -42,7 +42,7 @@
           </table>
           <!-- /.f-price-group -->
           <!--{{ p.get('short_description') }}-->
-          <form method="post" action="{{ addToCartUrl }}">
+          <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="qty" value="1">
             <p>
