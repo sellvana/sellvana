@@ -1,13 +1,9 @@
 {% set category = APP.get('current_category') %}
-<style type="text/css">
-
-</style>
-
-<div class="f-site-main f-page-category" role="main">
+<div class="f-site-main" role="main">
   <div class="container">
    <!--  breadcrumb -->
     <ul class="breadcrumb">
-      <li><a href="#">Home</a></li>
+      <li><a href="{{ APP.href() }}">Home</a></li>
       <li class="active">{{ category.get('node_name') }}</li>
     </ul>
     <header class="f-page-header visible-xs">
@@ -30,7 +26,6 @@
     </div>
   </div>
 </div>
-
 <script>
   require(['jquery'], function($) {
     $( "#button" ).click(function() {

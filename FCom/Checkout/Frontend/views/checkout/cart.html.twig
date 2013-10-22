@@ -6,7 +6,7 @@
 <div class="f-site-main" role="main">
   <div class="container">
     <ol class="breadcrumb">
-      <li><a href="#">Home</a></li>
+      <li><a href="{{ APP.href() }}">Home</a></li>
       <li class="active">Shopping Cart</li>
     </ol>
     <header class="f-page-header">
@@ -15,7 +15,6 @@
 {% if false == cartItems %}
     {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"Your cart is empty. "|_}]) | raw }}
 {% else %}
-
     {{ THIS.view('core/messages') | raw }}
     <div class="row">
       <div class="f-col-cart-totals col-md-3 col-lg-3">
@@ -50,7 +49,7 @@
         </header>
         <div class="table-responsive">
           <form method="post" action="{{ APP.href('cart/add') }}">
-            <table class="table table-hover">
+            <table class="table">
               <thead>
                 <tr>
                   <th class="f-cart-col-item" colspan="2">{{ 'Item'|_ }}</th>
@@ -117,43 +116,8 @@
         </div><!-- /.table-responsive -->
         {{ THIS.hook('cart_upsell') | raw }}
       </div>
-
     </div>
-    <!--<div class="cartoptionbox">
-      <h4 class="heading4"> Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost. </h4>
-      <input type="radio" class="radio">
-      Use Coupon Code <br>
-      <input type="radio" class="radio">
-      Use Gift Voucher <br>
-      <input type="radio" class="radio" checked="checked">
-      Estimate Shipping & Taxes <br><br>
-      <form class="form-vertical form-inline">
-        <h4 class="heading4"> Enter your destination to get a shipping estimate.</h4>
-        <fieldset>
-          <div class="control-group">
-            <label  class="control-label">Select list</label>
-            <div class="controls">
-              <select  class="col-lg-3 cartcountry">
-                <option>Country:</option>
-                <option>United Kindom</option>
-                <option>United States</option>
-              </select>
-              <select class="col-lg-3 cartstate">
-                <option>Region / State:</option>
-                <option>Angus</option>
-                <option>highlands</option>
-              </select>
-              <input type="submit" value="Get Quotes" class="btn btn-orange">
-            </div>
-          </div>
-        </fieldset>
-      </form>
-    </div>-->
-    
-
 {% endif %}
-
-
   </div>
 </div>
 

@@ -72,6 +72,7 @@ a:hover, a:focus { text-decoration:none; }
 .btn-link {
   color:#0452a1;
   }
+a.btn-link { text-transform:none; }
 .btn .glyphicon {
   margin-right:.5em;  
   }
@@ -156,6 +157,10 @@ label { margin-bottom:2px; }
   }
 select.form-control {
   height:26px;
+  }
+.control-label.required:after {
+  content:"*";
+  padding-left:3px;
   }
 
 /* Alerts */
@@ -325,7 +330,6 @@ select.form-control {
 .f-widget {}
 .f-widget .f-widget-header {
   padding-bottom:4px;
-  margin:4px;
   }
 .f-widget .f-widget-header .f-widget-title {
   font-weight:400;
@@ -771,10 +775,23 @@ select.form-control {
   }
 .f-col-cart-totals {
   border-radius:4px;
-  border:1px solid #d3e4f8;
-  margin:15px;
-  background:#e2eefd;
+  border:1px solid #c9ddf6;
+  margin-bottom:15px;
+  background:#dbeafb;
   padding:15px;
+  }
+
+/* Page: CMS */
+.f-cms-content h4 { margin-top:20px; }
+
+/* Page: Login */
+.f-authentification-form {
+  max-width:400px;
+  margin:25px auto;
+  }
+.f-authentification-form .f-page-header { margin-bottom:5px; }
+.f-register-form {
+  max-width:600px;
   }
 
 /*------------------------------------*\
@@ -1265,6 +1282,10 @@ select.form-control {
   .f-btn-prod-listing-filter-toggle {
     margin:0;
     z-index:9;
+  }
+  .f-col-cart-totals {
+    margin-right:15px;
+    margin-left:15px;
   }
 }
 

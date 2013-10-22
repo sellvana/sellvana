@@ -10,6 +10,7 @@ base:
     - { hook: main, views: catalog/category }
     - { hook: main, views: catalog/product/quickview }
     - { hook: sidebar-left, views: catalog/category/sidebar }
+    - { view: root, do: [[ addBodyClass, f-page-category ]] }
 
 /catalog/search:
     - { include: base }
@@ -17,10 +18,12 @@ base:
     - { hook: main, views: catalog/search }
     - { hook: main, views: catalog/product/quickview }
     - { hook: sidebar-left, views: catalog/category/sidebar }
+    - { view: root, do: [[ addBodyClass, f-page-category ]] }
 
 /catalog/product:
     - { include: base }
     - { hook: main, views: catalog/product/details }
+    - { view: root, do: [[ addBodyClass, f-page-product-view ]] }
 
 /catalog/quickview:
     - { root: catalog/product/quickview-partial }
