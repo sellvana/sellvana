@@ -155,7 +155,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_EasyPost' => 'REQUESTED',
                         'FCom_Email' => 'REQUESTED',
                         'FCom_FreshBooks' => 'REQUESTED',
-                        'FCom_FrontendCP' => 'REQUESTED',
+                        //'FCom_FrontendCP' => 'REQUESTED',
                         'FCom_FrontendThemeBootSimple' => 'REQUESTED',
                         'FCom_Geo' => 'REQUESTED',
                         'FCom_MarketClient' => 'REQUESTED',

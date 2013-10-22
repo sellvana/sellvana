@@ -143,6 +143,7 @@
     content = $("#content");
     body = $("body");
     click_event = (jQuery.support.touch ? "tap" : "click");
+
     $("#main-nav .dropdown-collapse").on(click_event, function(e) {
       var link, list;
       e.preventDefault();
@@ -168,6 +169,7 @@
       }
       return false;
     });
+
     if (jQuery.support.touch) {
       nav.on("swiperight", function(e) {
         return $(document).trigger("nav-open");
@@ -189,7 +191,7 @@
       body.removeClass("main-nav-opened").addClass("main-nav-closed");
       return nav_open = false;
     });
-    return $(document).bind("nav-open", function(event, params) {
+    $(document).bind("nav-open", function(event, params) {
       var nav_open;
       body.addClass("main-nav-opened").removeClass("main-nav-closed");
       return nav_open = true;
@@ -205,7 +207,7 @@
     setMaxLength();
     setValidateForm();
     $(".box .box-remove").live("click", function(e) {
-      $(this).parents(".box").first().remove();
+      $(this).parents("li").first().remove();
       e.preventDefault();
       return false;
     });

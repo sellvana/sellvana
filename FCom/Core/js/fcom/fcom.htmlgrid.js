@@ -1,7 +1,232 @@
-define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function($) {
+define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function(Backbone, _, $) {
 
+    var BackboneGrid = {
+        Models: {},
+        Collections: {},
+        Views: {},
+        currentState: {}
+    }
+
+    BackboneGrid.Models.ThModel = Backbone.Model.extend({
+        defaults: {
+            style: '',
+            type: '',
+            no_reorder: false,
+            sortState: '',
+            cssClass: ''
+        },
+        url : function() {
+            return this.personalize_url;
+        }
+
+    });
+
+    BackboneGrid.Collections.ThCollection = Backbone.Collection.extend({
+        model: BackboneGrid.Models.ThModel
+    });
+
+    BackboneGrid.Views.ThView = Backbone.View.extend({
+        events: {
+            'click': 'changesortState'
+        },
+        initialize: function() {
+            this.model.on('change', this.render, this);
+            this.setElement($(this.template(this.model.toJSON())));
+
+        },
+        changesortState: function(ev) {
+
+            var status = this.model.get('sortState');
+            console.log(status);
+            if (status === '')
+                status = 'asc';
+            else if (status === 'asc')
+                status = 'desc';
+            else
+                status = '';
+            this.model.set('sortState', status);
+
+            columnsCollection.each(function(m) {
+                if(m.get('sortState') !== '' && m.get('name')!== this.model.get('name')) {
+                    m.set('sortState', '');
+                }
+            }, this);
+
+            BackboneGrid.currentState.s = status !=='' ? this.model.get('name') : '';
+            BackboneGrid.currentState.sd = this.model.get('sortState');
+
+            rowsCollection.fetch({reset: true});
+
+            //this.model.save();
+
+            ev.preventDefault();
+            return false;
+
+        },
+        render: function() {
+
+            this.$el.attr('class',this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));
+
+            return this;
+        }
+    });
+
+    BackboneGrid.Views.HeaderView = Backbone.View.extend({
+        render: function() {
+            this.collection.each(this.addTh, this);
+            return this;
+        },
+        addTh: function(thModel) {
+            var th = new BackboneGrid.Views.ThView({
+                model: thModel
+            });
+            this.$el.append(th.render().el);
+        }
+    });
+    BackboneGrid.Models.Row = Backbone.Model.extend({
+        defaults: {
+            _actions: '',
+            description: '',
+            version: '',
+            run_status: '',
+            run_level: '',
+            run_level_core: '',
+            requires: '',
+            required_by: ''
+        }
+    });
+
+    BackboneGrid.Collections.Rows = Backbone.Collection.extend({
+        model: BackboneGrid.Models.Row,
+        url: function() {
+            var append = '';
+            _.each(BackboneGrid.currentState, function(v, k, l) {
+                if( append != '')
+                    append += '&';
+                append += (k + '=' + v);
+            });
+
+            return this.data_url + '?' + append;
+        },
+        parse: function(response) {
+            return response[1];
+        }
+    });
+
+    BackboneGrid.Views.RowView = Backbone.View.extend({
+        //template: _.template($('#row-template').html()),
+        initialize: function() {
+             _.templateSettings.variable = "col";
+        },
+        render: function() {
+            this.setElement($(this.template(this.model.toJSON())));
+            return this;
+        }
+    });
+
+    BackboneGrid.Views.GridView = Backbone.View.extend({
+        //el: '.fcom-htmlgrid__grid tbody',
+        initialize: function() {
+            this.collection.on('reset', this.beforeRender, this);
+        },
+        beforeRender: function() {
+            var models = this.collection.models;
+            for(var i in models) {
+                var cssClass = i % 2 == 0 ? 'even' : 'odd';
+                models[i].set('cssClass', cssClass);
+            }
+
+            this.render();
+        },
+        render: function() {
+            this.$el.html('');
+            this.collection.each(this.addRow, this);
+            return this;
+        },
+        addRow: function(row) {
+            var rowView = new BackboneGrid.Views.RowView({
+                model: row
+            });
+            this.$el.append(rowView.render().el);
+        }
+    });
+
+    var rowsCollection;
+    var columnsCollection;
+
+    FCom.BackboneGrid = function(config) {
+
+        //Theader
+        BackboneGrid.Models.ThModel.prototype.personalize_url = config.personalize_url;
+
+        BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.headerTemplate).html());
+        BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
+        //Tbody
+        BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
+        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
+        BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
+
+        BackboneGrid.currentState = config.data.state;
+        //header view
+        var columns = config.columns;
+        columnsCollection = new BackboneGrid.Collections.ThCollection;
+        var state = config.data.state;
+
+        for (var i in columns) {
+            var c = columns[i];
+            if (!c.hidden) {
+                c.id = config.id + '-' + c.name;
+                c.style = c['width'] ? "width:" + c['width'] + "px" : '';
+
+                c.cssClass = '';
+                if (!c['no_reorder'])
+                    c.cssClass += 'js-draggable ';
+
+                if (state['s'] && c['name'] && state['s'] == c['name']) {
+                    //c.cssClass += 'sort-' + state['sd'] + ' ';
+                    c.sortState = state['sd'];
+                } else {
+                    //c.cssClass += 'sort';
+                    c.sortState = "";
+                }
+
+                var thModel = new BackboneGrid.Models.ThModel(c);
+                columnsCollection.add(thModel);
+            }
+        }
+
+        var headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
+        headerView.render();
+
+        //body view
+        var rows = config.data.data;
+        rowsCollection = new BackboneGrid.Collections.Rows;
+
+        for (var i in rows) {
+
+            if (i%2 === 0) {
+                rows[i].cssClass = "even";
+            } else {
+                rows[i].cssClass = "odd";
+            }
+            var rowModel = new BackboneGrid.Models.Row(rows[i]);
+            rowsCollection.add(rowModel);
+        }
+
+        var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
+        gridView.render();
+
+        $('li a.page-size').click(function(ev){
+            parseInt($(this).html())
+            BackboneGrid.currentState.ps = parseInt($(this).html());
+            rowsCollection.fetch();
+            ev.preventDefault();
+            return false;
+
+        });
+    }
     FCom.HtmlGrid = function(config) {
-        
+
         var gridEl = $('#'+config.id);
         var gridParent = gridEl.parent();
         var gridSelection = config.selection || {};
@@ -33,14 +258,14 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
             setSelection();
 
             var $table = $('table.fcom-htmlgrid__grid', gridParent);
-            
+
             $('.showhide_column').each(function(){
                 $(this).attr('checked','checked');
             })
             $('.showhide_column').bind('click',function(e){
 
                 var id = $(this).data('id');
-                
+
                     $('.table-bordered  tr').each(function() {
                         $(this).children('th').each(function()
                         {
@@ -50,16 +275,16 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                             }
                         });
 
-                    
+
                     $('td:eq(' + index + ')',this).toggle();
                     $('th:eq(' + index + ')',this).toggle();
                 });
                 //$('.dropdown-toggle').dropdown('toggle');
                 e.stopPropagation();
             })
-            
-            
-             
+
+
+
                 $( ".dropdown_menu" ).sortable({
                     revert: true,
                 });
@@ -69,21 +294,21 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 //                    revert: "invalid"
 //                });
                 $( "ul, li" ).disableSelection();
-            
-            
-            
+
+
+
              $( ".dropdown-menu" ).sortable({
                 revert: true
             });
-	
+
   	  $('.dropdown-menu').droppable({
 	    drop: function(event, ui) {
-                
+
                 var cols = [];
                 $('.dropdown-menu').find("input").each(function(i, el) {
                             cols.push({ name: $(el).data('id') });
                 });
-                
+
                 $.ajaxSetup({ async: false });
 
                     $.post(config.personalize_url,
@@ -98,10 +323,10 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 
 	    }
 	  });
-	
-            
+
+
             // resize columns
-            
+
             $('thead th', gridParent).resizable({
                 handles: 'e',
                 minWidth: 20,
@@ -134,7 +359,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
             */
 
             // reorder columns
-            
+
 //            $table.dragtable({
 //                handle: 'drag-handle',
 //                items: 'thead .drag-handle',
@@ -157,7 +382,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 //                }
 //            });
 
-            
+
 //            $('thead', gridParent).sortable({
 //                items: 'th',
 //                containment:'parent',
@@ -177,7 +402,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
 //                    );
 //                }
 //            });
-            
+
         }
         // initialize DOM first time on page load
         initDOM();
@@ -241,7 +466,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], fun
                 eval(data.eval);
             }
         });
-        
-        
+
+
     }
 })

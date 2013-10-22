@@ -21,7 +21,7 @@
         <ul class="pagination pagination-sm">
           {% for ps in THIS.pageSizeOptions() %}
             <li {{ ps==s.ps ? 'class="active"' }}>
-              <a class="js-change-url" href="{{ THIS.gridUrl({ps:ps}) }}" >{{ ps }}</a>
+              <a class="js-change-url page-size" >{{ ps }}</a>
             </li>
           {% endfor %}
         </ul>
@@ -66,10 +66,10 @@
                 Columns
                 <b class="caret"></b>
             </a>
-                
+
                 <ul class="dropdown-menu">
                               {% for colId, col in config.columns %}
-         
+
           {% if col.type != 'multiselect' %}
                 <li calss="ui-state-default"><label>
                     <input class="showhide_column" type="checkbox" data-id={{col.name}}>
@@ -86,42 +86,24 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped">
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }} >
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
         {% end %}
       </colgroup>#}
       <thead>
-        <tr id="tr-sort-{{ config.id }}" role="row">
-          {% for colId, col in config.columns %}
-            <th id="th-sort-{{ config.id ~ '-' ~ col.name }}" data-id="{{ col.name }}" style="{{ THIS.sortStyle(col) }}" class="{{ THIS.sortClass(col, s) }}">
-              {% if col.type is empty or col.type == 'default' %}
-                <a class="js-change-url" href="{{ THIS.sortHref(col) }}">
-                  {% if col.no_reorder is empty %}<div class="drag-handle"></div>{% endif %}
-                  {{ col.label }}
-                </a>
-              {% elseif col.type == 'multiselect' %}
-                <select class="js-sel">
-                    {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-                </select>
-              {% endif %}
-            </th>
-          {% endfor %}
-          {% if config.filters %}
-            <tr class="fcom-htmlgrid__inline-filters id="tr-filter-{{ config.id }}>
-              {% for colId, col in config.columns %}
-                  <th id="th-filter-{{ config.id ~ '-' ~ col.name }}">
-                      {{ THIS.colFilterHtml(col) | raw }}
-                  </th>
-              {% endfor %}
-            </tr>
-          {% endif %}
+        <tr id="tr-sort-{{ config.id }}" role="row">                   
+          
         </tr>
       </thead>
       <tbody>
-        {{ THIS.rowsHtml() | raw }}
+        {#{ THIS.rowsHtml() | raw }#}
       </tbody>
     </table>
   </div>
 </div>
+
+
+
+

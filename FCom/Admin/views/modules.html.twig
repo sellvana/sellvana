@@ -15,7 +15,7 @@
         $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
     }
 
-    require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
+    /*require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
         FCom.ModuleModel = Backbone.Model.extend({
             save: function(attributes, options) {
                 var data = {
@@ -86,7 +86,7 @@
             }
         })
 
-    });
+    });*/
 </script>
 
 <form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
@@ -108,7 +108,7 @@
     <div class="box col-sm-12">
         <div class="box-content">
             {{ THIS.view('core/messages') | raw }}
-            {{ THIS.view('core/backgrid') | raw }}
+            {{ THIS.view('core/htmlgrid-wrapper') | raw }}
         </div>
     </div>
 </form>

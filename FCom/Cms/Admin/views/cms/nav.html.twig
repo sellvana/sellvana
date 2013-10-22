@@ -11,37 +11,68 @@
     </div>
 </div>
 
-<div class="box col-sm-12" id="cms-nav-layout">
-    <div class="box-header blue-background">
-        <div class="title">{{ "Pages"|_ }}</div>
-        <div class="actions">
-            <input id="nav-tree-lock" type="checkbox" />
-            <input id="nav-expand-collapse" type="checkbox" />
+{#<div class="box col-sm-12" id="cms-nav-layout">#}
+    {#<div class="box-header blue-background">#}
+        {#<div class="title">{{ "Pages"|_ }}</div>#}
+        {#<div class="actions">#}
+            {#<input id="nav-tree-lock" type="checkbox" />#}
+            {#<input id="nav-expand-collapse" type="checkbox" />#}
+        {#</div>#}
+    {#</div>#}
+    {#<div class="box-content" id="cms_nav"></div>#}
+
+    {#<form id="nav-tree-form" method="post" action="{{ formUrl }}">#}
+        {#<div class="ui-layout-center adm-main" id="nav-form-container"></div>#}
+    {#</form>#}
+
+{#</div>#}
+
+<div class="box col-sm-12 fcom-tree-layout">
+    <div class="box-content row" id="cms-nav-layout">
+        <div id="cms-nav-wrapper">
+            <div class="text-center well-sm">
+                <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
+                <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
+            </div>
+            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-xs-12" id="cms_nav"></div>
         </div>
+        <form class="form form-horizontal" id="cms-tree-form" action="{{ formUrl }}" method="post">
+            <div id="nav-form-container" class="col-xs-12"></div>
+        </form>
     </div>
-    <div class="box-content" id="cms_nav"></div>
-
-    <form id="nav-tree-form" method="post" action="{{ formUrl }}">
-        <div class="ui-layout-center adm-main" id="nav-form-container"></div>
-    </form>
-
 </div>
 
 <script>
-    require(['jquery', 'jstree', 'fcom.admin'], function($) {
+    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter'], function($) {
         $(function() {
             FCom.Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'icon-unlock', label:'Unlocked'}, on:{icon:'icon-lock', label:'Locked'}});
-            FCom.Admin.checkboxButton('#nav-expand-collapse', {
+            /*FCom.Admin.checkboxButton('#nav-expand-collapse', {
                 off:{icon:'triangle-1-e', label:'Expand All'}, on:{icon:'triangle-1-s', label:'Collapse All'},
                 click:function(ev) { $('#cms_nav').jstree(this.checked?'open_all':'close_all', $('#1>ul>li')); }
                 //TODO: fetch ancestors only for root node
+            });*/
+
+            //fix for splitter
+            var cmsNavLayoutEl = $('#cms-nav-layout');
+            cmsNavLayoutEl.css('height', $(this).height());
+            cmsNavLayoutEl.split({
+                orientation: 'vertical',
+                limit: 2,
+                position: '25%'
+            });
+            $(window).resize(function(){
+                cmsNavLayoutEl.trigger('spliter.resize');
             });
 
+            $('.js-expand-all').click(function() { $('#cms_nav').jstree('open_all', $('#1>ul>li')); return false });
+            $('.js-collapse-all').click(function() { $('#cms_nav').jstree('close_all', $('#1>ul>li')); return false });
+
             FCom.Admin.tree('#cms_nav', {
-                url:'{{ APP.href('cms/nav/tree_data') }}'
-                , on_dblclick: function (n) { loadForm(n.attr('id')); }
-                , on_select: function (n) { loadForm(n.attr('id')); }
-                , lock_flag: '#nav-tree-lock'
+                url:'{{ APP.href('cms/nav/tree_data') }}',
+                on_click: function (n) { loadForm(n.attr('id')); },
+                on_select: function (n) { loadForm(n.attr('id')); },
+                lock_flag: '#nav-tree-lock',
+                create_lock: true
             });
 
             /*var cmsNavLayout = $('#cms-nav-layout').height($('.adm-wrapper').height()).layout({
