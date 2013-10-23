@@ -5,8 +5,13 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_reindex()
     {
         BResponse::i()->startLongResponse();
+        BDebug::mode('PRODUCTION');
+        BORM::configure('logging', 0);
+        BConfig::i()->set('db/logging', 0);
+
         if (BRequest::i()->get('CLEAR')) {
-            FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
+            //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
+            FCom_CatalogIndex_Model_Doc::i()->update_many(array('reindex'=>1));
         }
         FCom_CatalogIndex_Indexer::i()->indexProducts(true);
         FCom_CatalogIndex_Indexer::i()->indexGC();

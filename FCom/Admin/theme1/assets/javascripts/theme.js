@@ -63,6 +63,7 @@
   };
 
   var setSortable = function(selector) {
+    return;
     if (selector == null) {
       selector = null;
     }

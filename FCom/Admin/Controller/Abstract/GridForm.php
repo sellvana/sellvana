@@ -103,32 +103,38 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     }
 
     public function action_grid_data()
-    {        
+    {
         $view = $this->gridView();
         $grid = $view->get('grid');
-        if (empty($grid['orm'])) {
-            $mc = $this->_modelClass;
-            $grid['orm'] = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
-            $view->set('grid', $grid);
-        }
-        $this->gridOrmConfig($grid['orm']);
+        $config = $grid['config'];
 
-        $oc = static::$_origClass;
-
-        $config = $view->grid['config'];
-        $gridId = !empty($config['id']) ? $config['id'] : $oc;
-
-        if (BRequest::i()->request('export')) {
-            $view->export($grid['orm'], $oc);
+        if (isset($config['data']) && (!empty($config['data']))) {
+            $data = $config['data'];
+            BResponse::i()->json(array(array('c' => 1), $data));
         } else {
+            if (empty($grid['orm'])) {
+                $mc = $this->_modelClass;
+                $grid['orm'] = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+                $view->set('grid', $grid);
+            }
+            $this->gridOrmConfig($grid['orm']);
 
-            //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
-            $data = $view->outputData();            
-            //$data = $this->gridDataAfter($data);
-            BResponse::i()->json(array(
-                array('c' => $data['state']['c']),
-                BDb::many_as_array($data['rows']),
-            ));
+            $oc = static::$_origClass;
+
+            $gridId = !empty($config['id']) ? $config['id'] : $oc;
+
+            if (BRequest::i()->request('export')) {
+                $view->export($grid['orm'], $oc);
+            } else {
+
+                //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
+                $data = $view->outputData();
+                //$data = $this->gridDataAfter($data);
+                BResponse::i()->json(array(
+                    array('c' => $data['state']['c']),
+                    BDb::many_as_array($data['rows']),
+                ));
+            }
         }
     }
 
