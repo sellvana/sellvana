@@ -68,7 +68,7 @@
 	 * This function allows to remove any enhancements performed by this plugin on a previously processed table.
 	 * @param {jQuery ref} t - table object
 	 */
-	var destroy = function(t){
+	var destroy = function(t){		
 		var id=t.attr(ID), t=tables[id];		//its table object is found
 		if(!t||!t.is("table")) return;			//if none, then it wasnt processed	 
 		t.removeClass(SIGNATURE).gc.remove();	//class and grips are removed
@@ -144,7 +144,7 @@
 	 * Function that places each grip in the correct position according to the current table layout	 * 
 	 * @param {jQuery ref} t - table object
 	 */
-	var syncGrips = function (t){	
+	var syncGrips = function (t){			
 		t.gc.width(t.w);			//the grip's container width is updated				
 		for(var i=0; i<t.ln; i++){	//for each column
 			var c = t.c[i]; 			
@@ -165,7 +165,7 @@
 	* @param {nunmber} i - index of the grip being dragged
 	* @param {bool} isOver - to identify when the function is being called from the onGripDragOver event	
 	*/
-	var syncCols = function(t,i,isOver){
+	var syncCols = function(t,i,isOver){		
 		var inc = drag.x-drag.l, c = t.c[i], c2 = t.c[i+1]; 			
 		var w = c.w + inc;	var w2= c2.w- inc;	//their new width is obtained					
 		c.width( w + PX);	c2.width(w2 + PX);	//and set	
@@ -269,8 +269,8 @@
 	 */
     $.fn.extend({  
         colResizable: function(options) {           
+        	//alert('f');
             var defaults = {
-			
 				//attributes:
                 draggingClass: 'JCLRgripDrag',	//css-class used when a grip is being dragged (for visual feedback purposes)
 				gripInnerHtml: '',				//if it is required to use a custom grip it can be done using some custom HTML				
