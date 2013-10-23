@@ -37,6 +37,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         changesortState: function(ev) {
 
             var status = this.model.get('sortState');
+            console.log(status);
             if (status === '')
                 status = 'asc';
             else if (status === 'asc')
@@ -64,7 +65,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         },
         render: function() {
 
-            this.$el.html($(this.template(this.model.toJSON())));
+            this.$el.attr('class',this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));
 
             return this;
         }
