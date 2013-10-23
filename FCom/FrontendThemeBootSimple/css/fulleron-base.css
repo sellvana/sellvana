@@ -338,7 +338,7 @@ label.error {
 /* General */
 .f-widget {}
 .f-widget .f-widget-header {
-  padding-bottom:4px;
+  padding-bottom:7px;
   }
 .f-widget .f-widget-header .f-widget-title {
   font-weight:400;
@@ -506,7 +506,7 @@ label.error {
   }
 .f-prod-listing-grid .btn-link {
   width:100%;
-  font-size:.8em;
+  font-size:.9em;
   font-weight:500;
   }
 .f-prod-listing-grid .thumbnail {
