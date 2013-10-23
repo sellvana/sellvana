@@ -1,11 +1,11 @@
-{% set logoSrc = APP.src('@FCom_Core/img/logo.svg') %}
+{% set logoSrc = APP.src('@FCom_Core/img/logo.png') %}
 {% set storeName = CONFIG.get('modules/FCom_Core/store_name') %}
 
 <div class="f-site-header">
   <nav class="f-site-header-top" role="navigation">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand" href="{{ APP.href() }}" title="{{ storeName }}"><img src="{{ logoSrc }}" width="140" alt="{{ storeName }}"/></a>
+        <a class="navbar-brand" href="{{ APP.href() }}" title="{{ storeName }}"><img src="{{ logoSrc }}" alt="{{ storeName }}"/></a>
       </div>
       <ul class="nav navbar-nav navbar-right f-header-util-links">
 
