@@ -5,6 +5,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         Collections: {},
         Views: {},
         currentState: {},
+        colsInfo: {},
         personalize_url: '',
         id: ''
     }
@@ -64,15 +65,10 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
 
         },
         render: function() {
-            if (this.model.get('hidden')) {
-                this.$el.html('');
-            } else {
-                var accept = '';
-                if (this.model.get('no_reorder') !== true)
-                    accept = 'accept ';
-
-                this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));    
-            }
+            var accept = '';
+            if (this.model.get('no_reorder') !== true)
+                accept = 'accept ';
+            this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));    
             
             return this;
         }
@@ -85,10 +81,12 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         render: function() {
             this.$el.html('');
             this.collection.each(this.addTh, this);
+
             return this;
         },
         addTh: function(ColModel) {
-            if (ColModel.get('hidden') !== true) {
+            console.log(ColModel.get('hidden'));
+            if (!ColModel.get('hidden')) {
                 var th = new BackboneGrid.Views.ThView({model: ColModel});
                 this.$el.append(th.render().el);
             }
@@ -97,7 +95,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
     });
     BackboneGrid.Models.Row = Backbone.Model.extend({
         defaults: {
-            _actions: '',
+            _actions: ' ',
             description: '',
             version: '',
             run_status: '',
@@ -205,22 +203,28 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                     //'width': $(this).width()
             });
         },
+        resetPlugins: function() {
+
+            /*this.getMainTable().dragtable({
+                dragHandle:'.draghandle',
+                dragaccept:'.accept',
+                //maxMovingRows: 1,
+                persistState: this.saveColumnOrder
+            });*/
+            this.getMainTable().colResizable({                
+                disable: true
+            });
+            this.getMainTable().colResizable({                
+                onResize: this.saveColumnSize
+            });
+        },
         getMainTable : function() {
             return this.$el.parents('table:first');
         },
         render: function() {
             this.$el.html('');
             this.collection.each(this.addRow, this);            
-            this.getMainTable().dragtable({
-                dragHandle:'.draghandle',
-                dragaccept:'.accept',
-                //maxMovingRows: 1,
-                persistState: this.saveColumnOrder
-            });
-
-            this.getMainTable().colResizable({                
-                onResize: this.saveColumnSize
-            });
+            this.resetPlugins();
 
             return this;            
         },
@@ -240,6 +244,21 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         changeState: function() {
             this.model.set('hidden',!this.model.get('hidden'));
             headerView.render();
+
+            var name = 'hidden' + this.model.get('name');
+            var value = this.model.get('hidden');
+            gridView.collection.each(function(row) {
+                row.set(name, value);
+            });
+
+            $.post(columnsCollection.personalize_url,{
+                'do': 'grid.col.hidden',
+                'col': this.model.get('name'),
+                'hidden': value,
+                'grid': columnsCollection.grid                    
+            });
+
+            gridView.render();
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -294,6 +313,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
     var columnsCollection;
     var gridView;
     var headerView;
+
     FCom.BackboneGrid = function(config) {
         
         
@@ -340,12 +360,14 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
 
         //header view
         var columns = config.columns;
-        columnsCollection = new BackboneGrid.Collections.ColsCollection;
-
+        columnsCollection = new BackboneGrid.Collections.ColsCollection;        
         var columnsWidth = {};
         for (var i in columns) {
             var c = columns[i];
-            if (c.name != 'id') {
+            if (c.name != 'id') {  
+
+                if (c.hidden === 'false')
+                    c.hidden = false;
                 c.id = config.id + '-' + c.name;
                 c.style = c['width'] ? "width:" + c['width'] + "px" : '';
 
@@ -360,13 +382,16 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                     //c.cssClass += 'sort';
                     c.sortState = "";
                 }
-        
+                
                 var ColModel = new BackboneGrid.Models.ColModel(c);
                 columnsCollection.add(ColModel);
                 if(c['width'])
                     columnsWidth[c.name+''] = c['width'];
+                console.log(c);
+                BackboneGrid.Models.Row.prototype.defaults['hidden' + c.name] = !(!c['hidden']);
             }
         }
+        
         columnsCollection.columnsWidth = columnsWidth;
 
         headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
@@ -384,6 +409,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
             } else {
                 rows[i].cssClass = "odd";
             }
+
             var rowModel = new BackboneGrid.Models.Row(rows[i]);
             rowsCollection.add(rowModel);
         }
