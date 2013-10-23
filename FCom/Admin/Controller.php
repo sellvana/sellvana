@@ -98,7 +98,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
-        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && ($user->get('token') === $token)
+        ) {
             $this->layout('/password/reset');
         } else {
             BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'admin');
@@ -110,7 +112,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $token = BRequest::i()->request('token');
         $password = BRequest::i()->post('password');
-        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && ($user->get('token') === $token)
+        ) {
             $user->resetPassword($password);
             BSession::i()->addMessage('Password has been reset', 'success', 'admin');
         } else {
@@ -168,9 +172,25 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $columns = array($r['col']=>array('width'=>$r['width']));
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
             break;
+        case 'grid.col.widths':           
+            $cols = $r['cols'];
+            $columns = array();
+            foreach($cols as $col) {
+                if (empty($col['name']) || $col['name']==='cb') {
+                    continue;
+                }
+                $columns[$col['name']] = array('width'=>$col['width']);
+            }
+            $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
+            break;
         case 'grid.col.order':
-            $cols = BUtil::fromJson($r['cols']);
+            if (is_array($r['cols'])) {
+                $cols = $r['cols'];
+            } else {
+                $cols = BUtil::fromJson($r['cols']);    
+            }
+            
             $columns = array();
             foreach ($cols as $i=>$col) {
                 if (empty($col['name']) || $col['name']==='cb') {
@@ -179,6 +199,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 $columns[$col['name']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
             }
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
+
             break;
 
         case 'grid.state':

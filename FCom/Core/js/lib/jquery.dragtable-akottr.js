@@ -184,6 +184,7 @@
      * each li with a separate table representig a single col of the original table.
      */
     _generateSortable: function(e) {
+
       !e.cancelBubble && (e.cancelBubble = true);
       var _this = this;
       // table attributes
@@ -233,6 +234,8 @@
       // assemble the needed html
       thtb.find('> tr > th').each(function(i, v) {
         sortableHtml += '<li>';
+        attrsString=attrsString.replace(' JColResizer', '');
+        console.log(attrsString);
         sortableHtml += '<table ' + attrsString + '>';
         var row = thtb.find('> tr > th:nth-child(' + (i + 1) + ')');
         if (_this.options.maxMovingRows > 1) {
@@ -253,8 +256,10 @@
       sortableHtml += '</ul>';
       this.sortableTable.el = this.originalTable.el.before(sortableHtml).prev();
       // set width if necessary
+      console.log(widthArr);
       this.sortableTable.el.find('th').each(function(i, v) {
         var _this = $(this);
+
         if (widthArr[i] > _this.width()) {
           _this.css({
             'width': widthArr[i]
