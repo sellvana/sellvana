@@ -54,22 +54,7 @@
                 lock_flag: '#categories-tree-lock',
                 create_lock: true
             });
-            /*
-            var cmsNavLayout = $('#categories-layout').height($('.adm-wrapper').height()).layout({
-                useStateCookie: true,
-                west__minWidth:400,
-                west__spacing_open:1,
-                west__closable:false,
-                triggerEventsOnLoad: true,
-                onresize:function(pane, $Pane, paneState) {
-                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
-                        if (!this.id.match(/_t$/)) {
-                            $(this).setGridWidth(paneState.innerWidth - 20);
-                        }
-                    });
-                }
-            });
-            */
+
             function loadForm(id) {
                 var url = '{{ formUrl }}?id='+id;
                 $('#categories-form-container').load(url, function() {
@@ -80,6 +65,8 @@
                         url_get:  url,
                         url_post: url
                     });
+                    adminForm.createSwitchButton();
+                    adminForm.wysiwygInit();
                 });
             }
 

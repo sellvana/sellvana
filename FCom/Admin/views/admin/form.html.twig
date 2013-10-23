@@ -4,7 +4,7 @@
 {% set curTab = THIS.get('cur_tab') %}
 
 <script>
-    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap", "switch"], function($, _) {
+    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
 
         $(function() {
             window.adminForm = FCom.Admin.form({
@@ -20,21 +20,14 @@
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ curTab }}",
                 tab_load_callback: function(i) {
-                    loadSwitchButtons();
+                    adminForm.createSwitchButton();
+                    adminForm.wysiwygInit();
                 }
             });
 
-            //switch button
-            loadSwitchButtons = function() {
-                $('#{{ formId }}').find('.switch-cbx').each(function(){
-                    if ($(this).parents('.make-switch').hasClass('make-switch') == false) {
-                        $(this).wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
-                    }
-                });
-            }
-
             //init
-            loadSwitchButtons();
+            adminForm.createSwitchButton();
+            adminForm.wysiwygInit();
         });
     });
 </script>
