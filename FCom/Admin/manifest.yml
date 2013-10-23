@@ -47,6 +47,7 @@ modules:
                     - [ any, /settings, FCom_Admin_Controller_Settings.index ]
 
                     - [ any, /modules, FCom_Admin_Controller_Modules.index ]
+                    - [ any, /modules/.action, FCom_Admin_Controller_Modules ]
                     - [ post, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
 
                     - [ get, /test, FCom_Admin_Controller.test ]

@@ -552,7 +552,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         $data = $orm->paginate($r);
         //print_r($r);
-print_r($data['state']);
+
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);

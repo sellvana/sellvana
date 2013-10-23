@@ -12,7 +12,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config[['columns'] += array(
+        $config['columns'] = array(
             'role_name' => array('label'=>'Role Name', 'width'=>100),
         );
         return $config;
