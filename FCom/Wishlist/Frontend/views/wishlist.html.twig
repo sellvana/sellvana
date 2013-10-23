@@ -2,7 +2,7 @@
         <div class="main-title category-title">
             <h1>{{ "Wishlist" | _ }}</h1>
         </div>
-{% if THIS.get('wishlist') or THIS.get('wishlist').items()) %}
+{% if THIS.get('wishlist') or THIS.get('wishlist').items() %}
      <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
         <table class="product-list">
             <col width="30"/>
@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-    {% for item in THIS.get('wishlist').items() as item %}
+    {% for item in THIS.get('wishlist').items() %}
         {% set p = item.product() %}
                 <tr id="tr-product-{{ p.get('id')}}">
                     <td class="first text-center">
