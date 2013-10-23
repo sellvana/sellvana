@@ -1,28 +1,28 @@
-define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function(Backbone, _, $) {
+define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], function(Backbone, _, $) {
 
     var BackboneGrid = {
         Models: {},
         Collections: {},
         Views: {},
-        currentState: {}
+        currentState: {},
+        personalize_url: '',
+        id: ''
     }
 
-    BackboneGrid.Models.ThModel = Backbone.Model.extend({
+    BackboneGrid.Models.ColModel = Backbone.Model.extend({
         defaults: {
             style: '',
             type: '',
             no_reorder: false,
             sortState: '',
-            cssClass: ''
-        },
-        url : function() {
-            return this.personalize_url;
+            cssClass: '',
+            hidden: false,
+            label: ''
         }
-
     });
 
-    BackboneGrid.Collections.ThCollection = Backbone.Collection.extend({
-        model: BackboneGrid.Models.ThModel
+    BackboneGrid.Collections.ColsCollection = Backbone.Collection.extend({
+        model: BackboneGrid.Models.ColModel
     });
 
     BackboneGrid.Views.ThView = Backbone.View.extend({
@@ -64,23 +64,35 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
         },
         render: function() {
+            if (this.model.get('hidden')) {
+                this.$el.html('');
+            } else {
+                var accept = '';
+                if (this.model.get('no_reorder') !== true)
+                    accept = 'accept ';
 
-            this.$el.attr('class',this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));
-
+                this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));    
+            }
+            
             return this;
         }
     });
 
     BackboneGrid.Views.HeaderView = Backbone.View.extend({
+        /*initialize: function() {
+            this.collection.on('change', this.render, this);
+        },*/
         render: function() {
+            this.$el.html('');
             this.collection.each(this.addTh, this);
             return this;
         },
-        addTh: function(thModel) {
-            var th = new BackboneGrid.Views.ThView({
-                model: thModel
-            });
-            this.$el.append(th.render().el);
+        addTh: function(ColModel) {
+            if (ColModel.get('hidden') !== true) {
+                var th = new BackboneGrid.Views.ThView({model: ColModel});
+                this.$el.append(th.render().el);
+            }
+            
         }
     });
     BackboneGrid.Models.Row = Backbone.Model.extend({
@@ -139,7 +151,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
     });
 
     BackboneGrid.Views.GridView = Backbone.View.extend({
-        //el: '.fcom-htmlgrid__grid tbody',
+        el: 'div.scrollable-area',
         initialize: function() {
             this.collection.on('reset', this.beforeRender, this);
         },
@@ -152,12 +164,65 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
             this.render();
         },
+        saveColumnOrder: function(table) {
+            var persParam = {};
+            var columnsOrder = [];
+            table.el.find('th').each(function(i) { 
+                columnsOrder[i] = {name: $(this).attr('data-id')};                        
+            }); 
+                    
+            persParam['do'] = 'grid.col.order';
+            persParam['cols'] = columnsOrder;
+            persParam['grid'] = columnsCollection.grid;
+            //        console.log(columnsOrder);
+            $.post(columnsCollection.personalize_url,persParam).done(function(data) {
+                console.log(data);
+            });
+            //destory resize div
+            gridView.getMainTable().colResizable({                
+                disable: true
+            });
+            //recreate resize div
+            gridView.getMainTable().colResizable({                
+                onResize: this.saveColumnSize
+            });
+        },
+        saveColumnSize: function(ev) {
+            var table = $(ev.currentTarget);
+            var cols = [];
+            table.find('th').each(function () {
+                var name = $(this).attr('data-id');
+                if (columnsCollection.columnsWidth[name] && columnsCollection.columnsWidth[name]!=$(this).width()) {
+                    columnsCollection.columnsWidth[name] = $(this).width();
+                    cols[cols.length] = {name: name, width: $(this).width()};
+                }                
+            });
+
+            $.post(columnsCollection.personalize_url,{
+                'do': 'grid.col.widths',
+                'cols': cols,
+                'grid': columnsCollection.grid
+                    //'width': $(this).width()
+            });
+        },
+        getMainTable : function() {
+            return this.$el.parents('table:first');
+        },
         render: function() {
             this.$el.html('');
-            this.collection.each(this.addRow, this);
+            this.collection.each(this.addRow, this);            
+            this.getMainTable().dragtable({
+                dragHandle:'.draghandle',
+                dragaccept:'.accept',
+                //maxMovingRows: 1,
+                persistState: this.saveColumnOrder
+            });
 
-            this.$el.parents('table:first').dragtable({dragHandle:'.draghandle'});
-            return this;
+            this.getMainTable().colResizable({                
+                onResize: this.saveColumnSize
+            });
+
+            return this;            
         },
         addRow: function(row) {
             var rowView = new BackboneGrid.Views.RowView({
@@ -166,7 +231,34 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             this.$el.append(rowView.render().el);
         }
     });
-
+    BackboneGrid.Views.ColCheckView = Backbone.View.extend({
+        tagName: 'li',
+        className: '',
+        events: {         
+            'change input.showhide_column': 'changeState'
+        },
+        changeState: function() {
+            this.model.set('hidden',!this.model.get('hidden'));
+            headerView.render();
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        }
+    });
+    BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
+        el: 'ul.dropdown-menu',
+        render: function() {
+            this.$el.html('');
+            this.collection.each(this.addLiTag, this); 
+        },
+        addLiTag: function(model) {
+            if(model.get('label') !== '') {
+                var checkView = new BackboneGrid.Views.ColCheckView({model:model});
+                this.$el.append(checkView.render().el);
+            }
+        }
+    });
     function updatePageHtml(p,mp) {
 
             p = BackboneGrid.currentState.p;
@@ -200,10 +292,15 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
     }
     var rowsCollection;
     var columnsCollection;
-
+    var gridView;
+    var headerView;
     FCom.BackboneGrid = function(config) {
+        
+        
         //Theader
-        BackboneGrid.Models.ThModel.prototype.personalize_url = config.personalize_url;
+        BackboneGrid.Collections.ColsCollection.prototype.personalize_url = config.personalize_url;
+        BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
+        BackboneGrid.Models.ColModel.prototype.personalize_url = config.personalize_url;
 
         BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.headerTemplate).html());
         BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
@@ -211,8 +308,9 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
         BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
-        //pager
-        //BackboneGrid.Views.PageView.prototype.template = _.template($('#'+config.pageTemplate).html());
+        
+        //column visiblity checkbox view
+        BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.colTemplate).html());
         var state = config.data.state;
 
 
@@ -242,12 +340,12 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
         //header view
         var columns = config.columns;
-        columnsCollection = new BackboneGrid.Collections.ThCollection;
+        columnsCollection = new BackboneGrid.Collections.ColsCollection;
 
-
+        var columnsWidth = {};
         for (var i in columns) {
             var c = columns[i];
-            if (!c.hidden) {
+            if (c.name != 'id') {
                 c.id = config.id + '-' + c.name;
                 c.style = c['width'] ? "width:" + c['width'] + "px" : '';
 
@@ -262,15 +360,19 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
                     //c.cssClass += 'sort';
                     c.sortState = "";
                 }
-
-                var thModel = new BackboneGrid.Models.ThModel(c);
-                columnsCollection.add(thModel);
+        
+                var ColModel = new BackboneGrid.Models.ColModel(c);
+                columnsCollection.add(ColModel);
+                if(c['width'])
+                    columnsWidth[c.name+''] = c['width'];
             }
         }
+        columnsCollection.columnsWidth = columnsWidth;
 
-        var headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
+        headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
         headerView.render();
-
+        var colsVisibiltyView = new BackboneGrid.Views.ColsVisibiltyView({collection: columnsCollection});
+        colsVisibiltyView.render();
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
@@ -286,7 +388,8 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             rowsCollection.add(rowModel);
         }
 
-        var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
+        gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});        
+        //gridView.tableId = '#' + config.id;
         gridView.render();
 
         $('ul.pagination.pagesize a').click(function(ev){
