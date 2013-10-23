@@ -1,163 +1,166 @@
 {% set cart = THIS.get('cart') %}
-
-<div class="page-checkout-review">
-    <form action="{{ APP.href('checkout') }}" method="post">
-        <div class="col-checkout-review-left">
-            <header class="main-title">
-                <h1 class="title">{{ 'Review and Place Order'|_ }}</h1>
-            </header>
-
-            {{ THIS.view('core/messages') | raw }}
-
-            <h2>{{ 'Review the information below then click "Place your order"' |_ }}</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>{{ "Shipping to" |_}}</h4>
-                    {{ THIS.get('shipping_address').as_html() | raw }}
-                    {% if THIS.get('guest_checkout') %}
-                        <small><a href="{{ APP.href('checkout/address?t=s') }}">{{ 'Change' |_ }}</a></small>
-                    {% else %}
-                        <small><a href="{{ APP.href('customer/address/choose?t=s') }}">{{ 'Change' |_ }}</a></small>
-                    {% endif %}
-                </div>
-            {% if THIS.get('shipping_methods') %}
-                <div class="col-md-6">
-                    <h4>{{ "Shipping Options" |_ }}:</h4>
-                    <ul>
-                        {% for shippingMethod, shippingClass in THIS.get('shipping_methods') %}
-                        <li>{{ shippingClass.getDescription() }} ({{ shippingClass.getEstimate() }})
-                            <ul>
-                            {% for serviceKey, service in shippingClass.getServicesSelected() %}
-                                <li style="margin-left: 20px;">
-                                    <input type="radio" name="shipping" value="{{ shippingMethod ~ ':' ~ serviceKey }}"
-                                    {{ shippingMethod == cart.get('shipping_method') and
-                                            serviceKey == cart.get('shipping_service') ? 'checked' }}> {{service}}</li>
-                            {% endfor %}
-                            </ul>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    <button type="submit" name="update" class="btn btn-small">{{ "Apply changes" |_ }}</button>
-                </div>
-            {% endif %}
-            </div>
-            <div class="divider"></div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>{{ "Billing address" |_ }}</h4>
-                    {% if cart.get('shipping_same') %}
-                        <p>{{ 'Same as shipping' |_ }}</p>
-                    {% else %}
-                        {{ THIS.get('billing_address').as_html() | raw }}
-                    {% endif %}
-
-                    {% if THIS.get('guest_checkout') %}
-                        <small><a href="{{ APP.href('checkout/address?t=b') }}">{{ "Change" |_ }}</a></small>
-                    {% else %}
-                        <small><a href="{{ APP.href('customer/address/choose?t=b') }}">{{ "Change" |_ }}</a></small>
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    {{ THIS.view('checkout/payment') | raw }}
-                </div>
-            </div>
-            <div class="divider"></div>
-            <table class="table">
-                <col width="500"/>
-                <col width="70"/>
-                <col width="70"/>
-                <col width="70"/>
-                <thead>
-                    <tr>
-                        <th class="text-left">{{ "Product" |_ }}</th>
-                        <th class="text-right">{{ "Price" |_ }}</th>
-                        <th class="text-center">{{ "Qty" |_ }}</th>
-                        <th class="text-right">{{ "Subtotal" |_ }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-            {% for item in cart.items() %}
-                {% set p = item.product() %}
-                {% if p %}
-                    <tr id="tr-product-{{p.get('id')}}">
-                        <td class="text-left">
-                            <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
-                        </td>
-                        <td class="text-right">
-                            <div class="price-box">
-                                {{ p.get('base_price') | currency }}
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="price-box">
-                                {{ item.get('qty') | number_format }}
-                            </div>
-                        </td>
-                        <td class="text-right">
-                            <span class="price">{{ item.rowTotal() | currency }}</span>
-                        </td>
-                    </tr>
+<div class="f-site-main" role="main">
+  <div class="container">
+    <header class="f-page-header">
+      <h1 class="f-page-title">{{ 'Review and Place Order'|_ }}</h1>
+    </header>
+    <div class="row">
+      <div class="f-col-main col-sm-9">
+        <form action="{{ APP.href('checkout') }}" method="post">
+          <div class="alert alert-info"><strong>{{ 'Review the information below then click "Place your order"!' |_ }}</strong></div>
+  
+          {{ THIS.view('core/messages') | raw }}
+          <div class="row">
+            <div class="col-sm-6">
+                <h4>{{ "Shipping to" |_}}</h4>
+                {{ THIS.get('shipping_address').as_html() | raw }}
+                {% if THIS.get('guest_checkout') %}
+                    <small><a href="{{ APP.href('checkout/address?t=s') }}">{{ 'Change' |_ }}</a></small>
+                {% else %}
+                    <small><a href="{{ APP.href('customer/address/choose?t=s') }}">{{ 'Change' |_ }}</a></small>
                 {% endif %}
-            {% endfor %}
-                </tbody>
-                <tfoot>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tfoot>
-            </table>
-            <p><a href="{{APP.href('cart')}}">{{ "Need to change quantities or remove items?" |_ }}</a></p>
-
-            {% if THIS.get('guest_checkout') %}
-                <div class="control-group">
-                  <label for="#" class="checkbox">
-                    <input type="checkbox" name="create_account" value="1" class="required">
-                    {{ "Create an account?" |_ }}
-                  </label>
-                </div>
-                <div class="control-group">
-                  <label for="#" class="control-label">{{ 'E-mail' |_ }}</label>
-                  <div class="controls">
-                    <input type="text" name="account[email]" value="{{ THIS.billing_address.email }}" class="required">
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="#" class="control-label">{{ "Password" |_ }}</label>
-                  <div class="controls">
-                    <input type="password" name="account[password]" class="required" id="model-password"/>
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
-                  <div class="controls">
-                    <input type="password" name="account[password_confirm]" class="required" equalto="#model-password"/>
-                  </div>
-                </div>
-            {% endif %}
-        </div>
-        <!-- .col-checkout-left ends -->
-        <div class="col-checkout-review-right">
-            {% if THIS.get('totals') %}
-            <div class="cart-totals">
-                <div class="block-promo">
-                    <header class="block-title">{{ "Coupon, discount or promo code" |_ }}</header>
-                    <p><input type="text" name="coupon_code"><button type="submit" name="coupon_submit" class="button btn-aux btn-sz1"><span>{{ "Apply" |_ }}</span></button></p>
-                </div>
-                <table>
-                {% for total in THIS.get('totals') %}
-                    <tr class="{{ total.getRowClass() }}">
-                        <td class="title">{{ total.getLabelFormatted() }}</td>
-                        <td>{{ total.getValueFormatted() }}{% if total.getError() %}<br/>(<span class="error">{{ total.getError() }}</span>){% endif %}</td>
-                    </tr>
-                {% endfor %}
-                </table>
             </div>
+          {% if THIS.get('shipping_methods') %}
+            <div class="col-sm-6">
+              <h4>{{ "Shipping Options" |_ }}:</h4>
+              <dl>
+                {% for shippingMethod, shippingClass in THIS.get('shipping_methods') %}
+                  <dt>{{ shippingClass.getDescription() }} ({{ shippingClass.getEstimate() }})
+                  {% for serviceKey, service in shippingClass.getServicesSelected() %}
+                    <dd>
+                      <input type="radio" name="shipping" value="{{ shippingMethod ~ ':' ~ serviceKey }}"
+                      {{ shippingMethod == cart.get('shipping_method') and
+                              serviceKey == cart.get('shipping_service') ? 'checked' }}> {{service}}
+                    </dd>
+                  {% endfor %}
+                {% endfor %}
+              </dl>
+              <button type="submit" name="update" class="btn btn-default btn-sm">{{ "Apply changes" |_ }}</button>
+            </div>
+          {% endif %}
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <h4>{{ "Billing address" |_ }}</h4>
+              {% if cart.get('shipping_same') %}
+                  <p>{{ 'Same as shipping' |_ }}</p>
+              {% else %}
+                  {{ THIS.get('billing_address').as_html() | raw }}
+              {% endif %}
+
+              {% if THIS.get('guest_checkout') %}
+                  <small><a href="{{ APP.href('checkout/address?t=b') }}">{{ "Change" |_ }}</a></small>
+              {% else %}
+                  <small><a href="{{ APP.href('customer/address/choose?t=b') }}">{{ "Change" |_ }}</a></small>
+              {% endif %}
+            </div>
+            <div class="col-sm-6">
+              {{ THIS.view('checkout/payment') | raw }}
+            </div>
+          </div>
+          <div class="responsible-table">
+            <table class="table">
+              <col width="500"/>
+              <col width="70"/>
+              <col width="70"/>
+              <col width="70"/>
+              <thead>
+                <tr>
+                  <th>{{ "Product" |_ }}</th>
+                  <th>{{ "Price" |_ }}</th>
+                  <th>{{ "Qty" |_ }}</th>
+                  <th>{{ "Subtotal" |_ }}</th>
+                </tr>
+              </thead>
+              <tbody>
+          {% for item in cart.items() %}
+              {% set p = item.product() %}
+              {% if p %}
+                <tr id="tr-product-{{p.get('id')}}">
+                  <td>
+                      <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
+                  </td>
+                  <td>
+                      <div class="price-box">
+                          {{ p.get('base_price') | currency }}
+                      </div>
+                  </td>
+                  <td>
+                      <div class="price-box">
+                          {{ item.get('qty') | number_format }}
+                      </div>
+                  </td>
+                  <td>
+                    <span class="f-price-group">
+                      <span class="f-price">{{ item.rowTotal() | currency }}</span>
+                    </span>
+                  </td>
+                </tr>
+              {% endif %}
+          {% endfor %}
+              </tbody>
+              <tfoot>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tfoot>
+            </table>
+          </div>
+          <p><strong><a href="{{APP.href('cart')}}">{{ "Need to change quantities or remove items?" |_ }}</a></strong></p>
+
+          {% if THIS.get('guest_checkout') %}
+          <div class="form-group">
+            <label for="#" class="checkbox">
+              <input type="checkbox" name="create_account" value="1" class="required form-control">
+              {{ "Create an account?" |_ }}
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="#" class="control-label">{{ 'E-mail' |_ }}</label>
+            <div class="controls">
+              <input type="text" name="account[email]" value="{{ THIS.billing_address.email }}" class="required form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="#" class="control-label">{{ "Password" |_ }}</label>
+            <div class="controls">
+              <input type="password" name="account[password]" class="required form-control" id="model-password"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
+            <div class="controls">
+              <input type="password" name="account[password_confirm]" class="required form-control" equalto="#model-password"/>
+            </div>
+          </div>
+          {% endif %}
+        
+        </form>
+        </div><!-- /.f-col-main -->
+        
+        <div class="f-col-sidebar f-col-cart-totals col-sm-3">
+            {% if THIS.get('totals') %}
+              <div class="form-group">
+                <label class="control-label">{{ "Coupon, discount or promo code" |_ }}</label>
+                <input type="text" name="coupon_code" class="form-control">
+              </div>
+              <button type="submit" name="coupon_submit" class="btn btn-sm btn-default">{{ "Apply" |_ }}</button>
+              <hr/>
+              <table class="table">
+              {% for total in THIS.get('totals') %}
+                  <tr class="{{ total.getRowClass() }}">
+                      <td class="title">{{ total.getLabelFormatted() }}</td>
+                      <td>{{ total.getValueFormatted() }}{% if total.getError() %}<br/>(<span class="error">{{ total.getError() }}</span>){% endif %}</td>
+                  </tr>
+              {% endfor %}
+              </table>
             {% endif %}
-            <ul class="checkout-btns">
-                <li><button type="submit" name="place_order" value="new_order" class="btn btn-primary btn-large">{{ "Place your order" |_ }}</span></li>
+            <ul class="f-cart-btn-group">
+                <li><button type="submit" name="place_order" value="new_order" class="btn btn-primary btn-lg">{{ "Place your order" |_ }}</span></li>
             </ul>
         </div>
-        <!-- .col-checkout-right ends -->
-    </form>
+        <!-- /.f-col-sidebar -->
+    </div><!-- /.row -->
+  </div>
 </div>
