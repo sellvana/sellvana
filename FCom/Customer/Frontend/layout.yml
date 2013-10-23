@@ -17,32 +17,40 @@
 /customer/account:
 	- { include: base }
 	- { hook: main, views: customer/account/dashboard }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/account/edit:
 	- { include: base }
 	- { hook: main, views: customer/account/edit }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/account/editpassword:
 	- { include: base }
 	- { hook: main, views: customer/account/editpassword }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/address/edit:
 	- { include: base }
 	- { hook: main, views: customer/address/edit }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/address/list:
 	- { include: base }
 	- { hook: main, views: customer/address/list }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/address/choose:
 	- { include: base }
 	- { hook: main, views: customer/address/choose }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/order/list:
 	- { include: base }
 	- { hook: main, views: customer/order/list }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 
 /customer/order/view:
 	- { include: base }
 	- { hook: main, views: customer/order/view }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
 

@@ -4,3 +4,4 @@ base:
 /wishlist:
 	- { include: base }
 	- { hook: main, views: wishlist }
+	- { view: root, do: [[ addBodyClass, page-customer ]] }
