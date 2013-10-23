@@ -58,7 +58,8 @@
               {{ THIS.view('checkout/payment') | raw }}
             </div>
           </div>
-          <div class="responsible-table">
+          <h4>{{ "Items in cart" |_ }}</h4>
+          <div class="responsive-table">
             <table class="table">
               <col width="500"/>
               <col width="70"/>
@@ -139,11 +140,11 @@
         </form>
         </div><!-- /.f-col-main -->
         
-        <div class="f-col-sidebar f-col-cart-totals col-sm-3">
+        <div class="f-col-sidebar f-col-cart-totals gray col-sm-3">
             {% if THIS.get('totals') %}
               <div class="form-group">
-                <label class="control-label">{{ "Coupon, discount or promo code" |_ }}</label>
-                <input type="text" name="coupon_code" class="form-control">
+                <label class="control-label">{{ "Enter Coupon/promo code" |_ }}</label>
+                <input type="text" name="coupon_code" class="form-control input-sm">
               </div>
               <button type="submit" name="coupon_submit" class="btn btn-sm btn-default">{{ "Apply" |_ }}</button>
               <hr/>
