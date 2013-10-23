@@ -10,8 +10,8 @@
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-text">{{ 'Text'|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" id="model-text" name="model[text]" rows="5" cols="35">{{ m.get('text') }}</textarea>
+        <div class="col-md-10">
+            <textarea class="form-control ckeditor" id="model-text" name="model[text]" rows="5" cols="35">{{ m.get('text') }}</textarea>
         </div>
     </div>
 
@@ -32,6 +32,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-approved">{{ 'Approved'|_ }}</label>
         <div class="col-md-5">
+            <input type="hidden" name="model[approved]" value="0" />
             <input class="switch-cbx" id="model-approved" type="checkbox" name="model[approved]" value="1" {% if m.get('approved') == 1 %}checked="checked" {% endif %} />
         </div>
     </div>
