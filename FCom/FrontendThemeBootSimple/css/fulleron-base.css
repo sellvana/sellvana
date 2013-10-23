@@ -669,6 +669,7 @@ select.form-control {
   font-size:.9em;
   }
 .f-price-group th {
+  width:45px;
   padding-right:5px;
   color:#777;
   font-weight:normal;
