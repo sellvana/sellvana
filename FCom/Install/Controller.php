@@ -28,8 +28,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         $errors = BDebug::i()->getCollectedErrors();
         BLayout::i()->view('index')->errors = $errors;
-
-        $this->messages('root', 'install');
     }
 
     public function action_index__POST()
@@ -48,7 +46,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (empty($sData['w']['db'])) {
             $sData['w']['db'] = array('host'=>'127.0.0.1', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
         }
-        $this->messages('root', 'install');
     }
 
     public function action_step1__POST()
@@ -59,6 +56,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         try {
             $w = BRequest::i()->post('w');
             BConfig::i()->add(array('db'=>$w['db']), true);
+
+            BDb::connect(null, true);
+
             FCom_Core_Main::i()->writeConfigFiles('db');
 
             if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
@@ -74,7 +74,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 $url = BApp::href('install/step2');
             }
         } catch (Exception $e) {
-            print_r($e);
+            //print_r($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
             $url = BApp::href('install/step1');
         }
@@ -88,7 +88,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (empty($sData['w']['admin'])) {
             $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
         }
-        $this->messages('root', 'install');
     }
 
     public function action_step2__POST()
@@ -119,7 +118,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             'run_level_bundles' => array('min' => 'Minimal', 'all' => 'All Bundled'),
         ));
         BLayout::i()->applyLayout('/step3');
-        $this->messages('root', 'install');
     }
 
     public function action_step3__POST()
