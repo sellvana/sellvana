@@ -162,7 +162,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
@@ -201,7 +201,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->view('breadcrumbs')->set('crumbs', array('home', array('label'=>'Search: '.$q, 'active'=>true)));
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;

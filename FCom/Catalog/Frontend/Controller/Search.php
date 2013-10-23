@@ -36,7 +36,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
@@ -69,7 +69,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             ->set('current_category', $category)
             ->set('products_data', $productsData);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
