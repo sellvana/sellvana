@@ -36,10 +36,10 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
             array('urls'=>&$urls, 'page'=>$page, 'filetype'=>$type));
 
         switch ($type) {
-        case '.txt':
+        case 'txt':
             $output = '';
             break;
-        case '.xml':
+        case 'xml':
             $output = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"

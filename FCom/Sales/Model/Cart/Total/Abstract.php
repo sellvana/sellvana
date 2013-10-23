@@ -44,7 +44,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function getRowClass()
     {
-        return $this->_rowClass ? $this->_rowClass : BUtil::simplifyString($this->_label);
+        return $this->_rowClass ? $this->_rowClass : 'f-'.BUtil::simplifyString($this->_label);
     }
 
     public function getLabel()

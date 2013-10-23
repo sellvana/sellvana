@@ -98,7 +98,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
-        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && ($user->get('token') === $token)
+        ) {
             $this->layout('/password/reset');
         } else {
             BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'admin');
@@ -110,7 +112,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $token = BRequest::i()->request('token');
         $password = BRequest::i()->post('password');
-        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))) {
+        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && ($user->get('token') === $token)
+        ) {
             $user->resetPassword($password);
             BSession::i()->addMessage('Password has been reset', 'success', 'admin');
         } else {
