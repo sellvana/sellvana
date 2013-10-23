@@ -31,7 +31,7 @@ modules:
 
                     - [ any, /my_account, FCom_Admin_Controller.my_account ]
                     - [ get, /reports, FCom_Admin_Controller.reports ]
-                    - [ post, /my_account/personalize, FCom_Admin_Controller.personalize ]
+                    - [ route, PUT|POST /my_account/personalize, FCom_Admin_Controller.personalize ]
 
                     - [ any, /templates/?.action, FCom_Admin_Controller_Templates ]
 

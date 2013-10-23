@@ -358,6 +358,12 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return json_encode(array('state' => $state, 'data' => $data));
     }
 
+    public function getColumnsData()
+    {
+        $grid = $this->get('grid');
+        return json_encode($grid['config']['columns']);
+    }
+
     public function getPageHtmlData($rows = null)
     {
         $grid = $this->get('grid');
@@ -478,7 +484,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         //TODO: add _processFilters and processORM
         $orm = $this->grid['orm'];
         #$data = $this->grid['orm']->paginate();
+        
         $data = $this->processORM($this->grid['orm']);
+        
         foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {
                 if (!empty($col['cell']) && !empty($col['name'])) {
@@ -509,15 +517,18 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         } elseif (!empty($r['filters'])) {
             $r['filters'] = BUtil::fromJson($r['filters']);
         }
+        $r = BUtil::arrayMask($r, 's,sd,p,ps,q');
 
         $gridId = $this->grid['config']['id'];
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
         foreach ($persState as $k => $v) {
-            if (empty($r[$k]) && !empty($v)) {
+            if (!isset($r[$k]) && !empty($v)) {
                 $r[$k] = $v;
             }
         }
+
         FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => array('state' => $r))));
 
         if ($stateKey) {
@@ -529,7 +540,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
-#print_r($r); exit;
+
         if (!empty($r['filters'])) {
             $where = $this->_processFilters($r['filters']);
             $orm->where($where);
@@ -540,7 +551,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
 
         $data = $orm->paginate($r);
-
+        //print_r($r);
+print_r($data['state']);
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);

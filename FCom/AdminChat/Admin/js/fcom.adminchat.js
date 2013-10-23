@@ -158,6 +158,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             } else {
                 this.$el.find('span.badge').css('display', 'none');
             }
+            
             return this;
         }
     });
