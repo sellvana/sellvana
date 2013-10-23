@@ -86,7 +86,7 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped">
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }} >
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -120,31 +120,12 @@
         </tr>
       </thead>
       <tbody>
-        {{ THIS.rowsHtml() | raw }}
+        {#{ THIS.rowsHtml() | raw }#}
       </tbody>
     </table>
   </div>
 </div>
 
-<script type="template" id="{{ config.id }}-row-template">
-  <tr id="<%= row.id %>">
-  {% for col in THIS.get('grid').config.columns %}
-    <td class="{{ td.class }} <%= col.class %>" style="{{ col.style }}">
-      {% if col.col_type == 'select-row' %}
-        <input type="checkbox" name="grid[{{ config.id}}][checked][<%= row.id %>]">
-      {% else %}
-        <%= row[{{ td.col_name }}] %>
-      {% endif %}
-    </td>
-  {% endfor %}
-  </tr>
-</script>
 
-<script>
-require(['jquery', 'fcom.htmlgrid'], function($) {
-  new FCom.HtmlGrid({
-    template: '#{{ config.id }}-row-template',
-    data: {{ UTIL.toJson(THIS.getPageRowsData()) | raw }}
-  })
-})
-</script>
+
+

@@ -7,7 +7,38 @@
 
 <input type="hidden" id="{{ config.id }}-selection" name="htmlgrid[{{ config.id }}][selection]" value="{{ defSel }}">
 
+<script type="template" id="{{ config.id }}-row-template">
+  <tr id="<%- id %>" class="<%- cssClass %>">
+  {% for col in config.columns %}
+    {% if not col.hidden %}
+        <td class="{{ col.class }}" style="{{ col.style }}">
+            {% if col.cell == 'select-row' %}
+                <input type="checkbox" name="[{{ config.id}}][checked][<%- id %>]">
+            {% elseif col.href %}
+                <a href='{{ col.href|raw }}'>
+                    <%= {{ col.name }} %>
+                </a>    
+            {% else %}
+                <%= {{ col.name }} %>
+          {% endif %}
+        </td>
+    {% endif %}
+  {% endfor %}
+  </tr>
+</script>
+
 <script>
+    require(['jquery', 'fcom.htmlgrid'], function($) {
+        $(function() {
+            var grid = new FCom.BackboneGrid({
+                id: "{{ config.id }}",                
+                personalize_url: "{{ APP.href('my_account/personalize') }}",
+                data_url: "{{ config.data_url }}",
+                data: {{ gridView.getPageRowsData()|raw }},
+                templateId: "{{ config.id }}-row-template"
+            })
+        })
+    })
   /*  require(['jquery', 'fcom.htmlgrid'], function($) {
         $(function() {
             var grid = new FCom.HtmlGrid({

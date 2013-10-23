@@ -334,7 +334,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $this->_resetPersonalization();
             throw $e;
         }
-
+        //var_dump($grid['result']);exit;
         $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
         BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
@@ -354,7 +354,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         foreach ($rows as $rowId => $row) {
             $data[] = $row->as_array();
         }
-        return array('state' => $state, 'data' => $data);
+        
+        return json_encode(array('state' => $state, 'data' => $data));
     }
 
     public function getPageHtmlData($rows = null)
@@ -471,6 +472,85 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return $out;
     }
 
+    public function outputData()
+    {
+        $config = $this->grid['config'];
+        //TODO: add _processFilters and processORM
+        $orm = $this->grid['orm'];
+        #$data = $this->grid['orm']->paginate();
+        $data = $this->processORM($this->grid['orm']);
+        foreach ($data['rows'] as $row) {
+            foreach ($config['columns'] as $col) {
+                if (!empty($col['cell']) && !empty($col['name'])) {
+                    $field = $col['name'];
+                    $value = $row->get($field);
+                    switch ($col['cell']) {
+                        case 'number':
+                            $value1 = floatval($value);
+                            break;
+                        case 'integer':
+                            $value1 = intval($value);
+                            break;
+                    }
+                    if ($value !== $value1) {
+                        $row->set($field, $value1);
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function processORM($orm, $method=null, $stateKey=null, $forceRequest=array())
+    {
+        $r = BRequest::i()->request();
+        if (!empty($r['hash'])) {
+            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+        } elseif (!empty($r['filters'])) {
+            $r['filters'] = BUtil::fromJson($r['filters']);
+        }
+
+        $gridId = $this->grid['config']['id'];
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        foreach ($persState as $k => $v) {
+            if (empty($r[$k]) && !empty($v)) {
+                $r[$k] = $v;
+            }
+        }
+        FCom_Admin_Model_User::i()->personalize(array('grid' => array($gridId => array('state' => $r))));
+
+        if ($stateKey) {
+            $sess =& BSession::i()->dataToUpdate();
+            $sess['grid_state'][$stateKey] = $r;
+        }
+        if ($forceRequest) {
+            $r = array_replace_recursive($r, $forceRequest);
+        }
+//print_r($r); exit;
+        //$r = array_replace_recursive($hash, $r);
+#print_r($r); exit;
+        if (!empty($r['filters'])) {
+            $where = $this->_processFilters($r['filters']);
+            $orm->where($where);
+        }
+        if (!is_null($method)) {
+            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
+        }
+
+        $data = $orm->paginate($r);
+
+        $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
+        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
+        $data['reloadGrid'] = !empty($r['hash']);
+        if (!is_null($method)) {
+            BEvents::i()->fire($method.'.data', array('data'=>&$data));
+        }
+
+        return $data;
+    }
+    
     public function stateDescription($params=null)
     {
         $descrArr = array();

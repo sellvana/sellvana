@@ -1,88 +1,67 @@
 define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter','jquery.dragtable'], function(Backbone, _, $) {
     
-    var HtmlGrid = {
+    var BackboneGrid = {
         Models: {},
         Collections: {},
         Views: {}
     }
     
 
-    HtmlGrid.Models.Cell = Backbone.Model.extend({        
+    BackboneGrid.Models.Row = Backbone.Model.extend({ 
+        defaults: {
+            _actions: ''
+        }       
     });
 
-    HtmlGrid.Collections.Cells = Backbone.Collection.extend({
-        model: HtmlGrid.Models.Cell
+    BackboneGrid.Collections.Rows = Backbone.Collection.extend({
+        model: BackboneGrid.Models.Row
     });
 
-    HtmlGrid.Models.Row = Backbone.Model.extend({                
-    });
-
-    HtmlGrid.Collections.Rows = Backbone.Collection.extend({
-        model: HtmlGrid.Models.Row
-    });
-    
-    HtmlGrid.Views.CellView = Backbone.View.extend({        
-        template: _.template($('#cell-template').html()),
+    BackboneGrid.Views.RowView = Backbone.View.extend({       
+        //template: _.template($('#row-template').html()),
         render: function() {
-            //console.log($(this.template(this.model.toJSON())));
-            this.setElement($(this.template(this.model.toJSON())));
+            this.setElement($(this.template(this.model.toJSON())));            
             return this;
         }
     });
 
-    HtmlGrid.Views.RowView = Backbone.View.extend({       
-        template: _.template($('#row-template').html()),
-        render: function() {
-            this.setElement($(this.template(this.model.toJSON())));
-            this.model.cells.each(this.addCell, this);
-            return this;
-        },
-        addCell: function(cell) {
-            var cellView = new HtmlGrid.Views.CellView({
-                model: cell
-            });
-            this.$el.append(cellView.render().$el);
-        }
-
-    });
-
-    HtmlGrid.Views.GridView = Backbone.View.extend({
-        el: '.fcom-htmlgrid__grid tbody',
+    BackboneGrid.Views.GridView = Backbone.View.extend({
+        //el: '.fcom-htmlgrid__grid tbody',
         render: function() {
             this.collection.each(this.addRow, this);
             return this;
         },
         addRow: function(row) {
-            var rowView = new HtmlGrid.Views.RowView({
+            var rowView = new BackboneGrid.Views.RowView({
                 model: row
             });
             this.$el.append(rowView.render().el);
         }
     });
 
-    FCom.HtmlGrid = function(config) {
-        //is backbone based grid?
-        if(config.data) {
-            var rowsCollection = new HtmlGrid.Collections.Rows;
-            var data = config.data;
-            for(var i in data) {
-                var tr = data[i];
-                var rowModel = new HtmlGrid.Models.Row({id: tr.attr.id, cssClass: tr.attr.class});
-                var cellCollection = new HtmlGrid.Collections.Cells;
-                for( var j in tr.cells) {
-                    var td = tr.cells[j];
-                    //alert(td.html);
-                    var cellModel = new HtmlGrid.Models.Cell({'datacol': td.attr['data-col'], html: td.html});
-                    cellCollection.add(cellModel);
-                }
-                rowModel.cells = cellCollection;
-                rowsCollection.add(rowModel);
-            }
+    FCom.BackboneGrid = function(config) {
+        BackboneGrid.Views.GridView.prototype.el = "#"+config.id+" tbody";
+        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.templateId).html());
+        console.log(config.data_url);
+        var rows = config.data.data;
+        var rowsCollection = new BackboneGrid.Collections.Rows;
 
-            var gridView = new HtmlGrid.Views.GridView({collection: rowsCollection});
-            gridView.render();
-            return;
+        for(var i in rows) {
+                
+            if (i%2 === 0) {
+                rows[i].cssClass = "even";
+            } else {
+                rows[i].cssClass = "odd";
+            }
+            var rowModel = new BackboneGrid.Models.Row(rows[i]);
+            rowsCollection.add(rowModel);
         }
+
+        var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
+        gridView.render();
+    }
+    FCom.HtmlGrid = function(config) {
+                
         var gridEl = $('#'+config.id);
         var gridParent = gridEl.parent();
         var gridSelection = config.selection || {};
