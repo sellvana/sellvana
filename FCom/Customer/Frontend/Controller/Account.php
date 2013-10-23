@@ -44,7 +44,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $crumbs[] = array('label'=>'Edit', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
 
-        $this->messages('customer/account/edit');
+        //$this->messages('customer/account/edit');
         $this->view('customer/account/edit')->customer = $customer;
         $this->layout('/customer/account/edit');
     }
@@ -80,7 +80,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Edit Password', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $this->messages('customer/account/editpassword');
+        //$this->messages('customer/account/editpassword');
         $this->view('customer/account/editpassword')->customer = $customer;
         $this->layout('/customer/account/editpassword');
     }

@@ -83,8 +83,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 */
 
-        $this->messages('checkout/checkout');
-
         $layout->view('checkout/checkout')->set(array(
             'cart' => $cart,
             'guest_checkout' => !$customer,

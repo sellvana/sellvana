@@ -15,18 +15,19 @@ class FCom_CustomerGroups_Migrate
         BDb::ddlTableDef($tableCustomerGroup,
             array(
                 'COLUMNS' => array(
-                  'id'    => 'int(10) unsigned primary key auto_increment',
+                  'id'    => 'int(10) unsigned auto_increment',
                   'title' => 'varchar(100) not null',
                   'code'  => 'varchar(50) not null',
                 ),
+                'PRIMARY' => '(id)',
                 'KEYS'    => array(
-                  'cg_code' => 'UNIQUE(code)'
+                  'cg_code' => 'UNIQUE (code)'
                 ),
             )
         );
 
         BDb::run("
-        INSERT INTO `{$tableCustomerGroup}` (`title`, `code`)
+        replace INTO `{$tableCustomerGroup}` (`title`, `code`)
         VALUES('General', 'general'), ('NOT LOGGED IN', 'guest'), ('Retailer', 'retailer')
         ");
 
@@ -51,13 +52,14 @@ class FCom_CustomerGroups_Migrate
         BDb::ddlTableDef($tableTierPrices,
             array(
                 'COLUMNS' => array(
-                    'id'         => 'int(10) unsigned not null auto_increment primary key',
+                    'id'         => 'int(10) unsigned not null auto_increment',
                     'product_id' => 'int(10) unsigned not null',
                     'group_id'   => 'int(10) unsigned not null',
                     'base_price' => 'decimal(12,2) not null',
                     'sale_price' => 'decimal(12,2) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ),
+                'PRIMARY' => '(id)',
                 'KEYS' => array(
                     'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
                 ), // should we add unique key from product_id + group_id + qty ???

@@ -9,16 +9,16 @@
         <div class="myaccountbox">
           <ul>
             <li>
-              <a href="#"> Edit your account information</a>
+              <a href="{{ APP.href('customer/myaccount/edit') }}"> Edit your account information</a>
             </li>
             <li>
-              <a href="#"> Change your password</a>
+              <a href="{{ APP.href('customer/myaccount/editpassword') }}"> Change your password</a>
             </li>
             <li>
-              <a href="#">Modify your address book entries</a>
+              <a href="{{ APP.href('customer/address') }}">Modify your address book entries</a>
             </li>
             <li>
-              <a href="#">Modify your wish list</a>
+              <a href="{{ APP.href('wishlist') }}">Modify your wish list</a>
             </li>
           </ul>
         </div>
@@ -26,7 +26,7 @@
         <div class="myaccountbox">
           <ul>
             <li>
-              <a href="#"> View your order history</a>
+              <a href="{{ APP.href('customer/order') }}"> View your order history</a>
             </li>
             <li>
               <a href="#"> Downloads</a>
