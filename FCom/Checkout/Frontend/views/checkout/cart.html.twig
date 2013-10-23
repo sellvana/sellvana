@@ -54,14 +54,14 @@
                           <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
                             <span class="f-reg-price">
                               <span class="f-price">{{ p.get('base_price') | currency }}</span>
-                            </span>  
+                            </span>
                           </div>
                         </td>
                         <td class="f-cart-col-total text-right">
                           <div class="f-price-group">
                             <span class="f-reg-price">
                               <span class="f-price">{{ item.rowTotal() | currency }}</span>
-                            </span>    
+                            </span>
                           </div>
                         </td>
                       </tr>
@@ -85,7 +85,7 @@
         <table class="table">
         {% for total in cart.getTotals() %}
           {% if not total.isHidden() %}
-            <tr class="f-{{ total.getRowClass() }}">
+            <tr class="{{ total.getRowClass() }}">
               <td>{{ total.getLabelFormatted() }}</td>
               <td>{{ total.getValueFormatted() }}</td>
             </tr>
