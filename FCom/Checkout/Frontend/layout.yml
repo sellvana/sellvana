@@ -8,6 +8,7 @@ base:
 	- { include: base }
 	- { hook: main, views: checkout/cart }
 	- { hook: cart_upsell, views: checkout/also-bought }
+	- { view: root, do: [[ addBodyClass, page-cart ]] }
 
 /checkout/checkout:
 	- { include: base }
