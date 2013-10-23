@@ -8,12 +8,13 @@
 <input type="hidden" id="{{ config.id }}-selection" name="htmlgrid[{{ config.id }}][selection]" value="{{ defSel }}">
 
 <script type="template" id="{{ config.id }}-row-template">
-  <tr id="<%- id %>" class="<%- cssClass %>">
+  <tr id="<%= id %>" class="<%= cssClass %>">
   {% for col in config.columns %}
+
     {% if not col.hidden %}
         <td class="{{ col.class }}" style="{{ col.style }}">
             {% if col.cell == 'select-row' %}
-                <input type="checkbox" name="[{{ config.id}}][checked][<%- id %>]">
+                <input type="checkbox" name="[{{ config.id}}][checked][<%= id %>]">
             {% elseif col.href %}
                 <a href='{{ col.href|raw }}'>
                     <%= {{ col.name }} %>
@@ -27,18 +28,40 @@
   </tr>
 </script>
 
+<script type='template' id="{{ config.id }}-header-template">
+    <th id="th-sort-<%= id %>" data-id="<%= name %>" style="<%= style%>" class="<%= cssClass %> sort-<%= sortState %>">
+    
+        <% if(type === '' || type === 'default') { %>
+            <a class="js-change-url" style="cursor: pointer;">
+                <% if (no_reorder) { %>
+                    <div class="drag-handle"></div>
+                <% } %>
+                <%= label %>
+            </a>
+        <% } else if (type === 'multiselect') { %>
+            <select class="js-sel">
+                {{ UTIL.optionsHtml(gridView.multiselectToggleOptions(), gridView.multiselectCurrent()) | raw }}
+            </select>
+        <% } %>
+    </th>
+</script>
+
 <script>
-    require(['jquery', 'fcom.htmlgrid'], function($) {
-        $(function() {
-            var grid = new FCom.BackboneGrid({
-                id: "{{ config.id }}",                
-                personalize_url: "{{ APP.href('my_account/personalize') }}",
-                data_url: "{{ config.data_url }}",
-                data: {{ gridView.getPageRowsData()|raw }},
-                templateId: "{{ config.id }}-row-template"
-            })
-        })
-    })
+require(['jquery', 'fcom.htmlgrid'], function($) {
+
+    $(function() {
+        var grid = new FCom.BackboneGrid({
+            id: "{{ config.id }}",                
+            personalize_url: "{{ APP.href('my_account/personalize') }}",
+            data_url: "{{ config.data_url }}",
+            data: {{ gridView.getPageRowsData() | raw }},
+            headerTemplate: "{{ config.id }}-header-template",
+            rowTemplate: "{{ config.id }}-row-template",
+            columns: {{ gridView.getColumnsData() | raw }}
+        });
+    });
+
+});
   /*  require(['jquery', 'fcom.htmlgrid'], function($) {
         $(function() {
             var grid = new FCom.HtmlGrid({

@@ -3,23 +3,118 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
     var BackboneGrid = {
         Models: {},
         Collections: {},
-        Views: {}
+        Views: {},
+        currentState: {}
     }
-    
 
+    BackboneGrid.Models.ThModel = Backbone.Model.extend({
+        defaults: {
+            style: '',            
+            type: '',
+            no_reorder: false,
+            sortState: '',
+            cssClass: ''            
+        },
+        url : function() {
+            return this.personalize_url; 
+        } 
+
+    });
+
+    BackboneGrid.Collections.ThCollection = Backbone.Collection.extend({
+        model: BackboneGrid.Models.ThModel        
+    });
+
+    BackboneGrid.Views.ThView = Backbone.View.extend({
+        events: {
+            'click': 'changesortState'            
+        },
+        initialize: function() {
+            this.model.on('change', this.render, this);
+            this.setElement($(this.template(this.model.toJSON())));
+  
+        },
+        changesortState: function(ev) {
+            
+            var status = this.model.get('sortState');            
+            if (status === '')
+                status = 'asc';
+            else if (status === 'asc')
+                status = 'desc';
+            else
+                status = '';            
+            this.model.set('sortState', status);
+
+            columnsCollection.each(function(m) {
+                if(m.get('sortState') !== '' && m.get('name')!== this.model.get('name')) {
+                    m.set('sortState', '');
+                }
+            }, this);
+
+            BackboneGrid.currentState.s = status !=='' ? this.model.get('name') : '';
+            BackboneGrid.currentState.sd = this.model.get('sortState');
+            
+            rowsCollection.fetch({reset: true});
+            
+            //this.model.save();
+
+            ev.preventDefault();
+            return false;
+
+        },
+        render: function() {               
+            
+            this.$el.html($(this.template(this.model.toJSON())));                        
+
+            return this;
+        }
+    });
+
+    BackboneGrid.Views.HeaderView = Backbone.View.extend({
+        render: function() {
+            this.collection.each(this.addTh, this);
+            return this;
+        },
+        addTh: function(thModel) {
+            var th = new BackboneGrid.Views.ThView({
+                model: thModel
+            });
+            this.$el.append(th.render().el);
+        }
+    });
     BackboneGrid.Models.Row = Backbone.Model.extend({ 
         defaults: {
-            _actions: ''
+            _actions: '',
+            description: '',
+            version: '',
+            run_status: '',
+            run_level: '',
+            run_level_core: '',
+            requires: '',
+            required_by: ''
         }       
     });
 
     BackboneGrid.Collections.Rows = Backbone.Collection.extend({
-        model: BackboneGrid.Models.Row
+        model: BackboneGrid.Models.Row,
+        url: function() {
+            var append = '';
+            _.each(BackboneGrid.currentState, function(v, k, l) {
+                if( append != '')
+                    append += '&';
+                append += (k + '=' + v);
+            });
+
+            return this.data_url + '?' + append;
+        }
     });
 
     BackboneGrid.Views.RowView = Backbone.View.extend({       
         //template: _.template($('#row-template').html()),
-        render: function() {
+        initialize: function() {
+             _.templateSettings.variable = "col";
+        },
+        render: function() {            
             this.setElement($(this.template(this.model.toJSON())));            
             return this;
         }
@@ -27,10 +122,23 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
     BackboneGrid.Views.GridView = Backbone.View.extend({
         //el: '.fcom-htmlgrid__grid tbody',
-        render: function() {
-            this.collection.each(this.addRow, this);
-            return this;
+        initialize: function() {
+            this.collection.on('reset', this.beforeRender, this);
         },
+        beforeRender: function() {
+            var models = this.collection.models;
+            for(var i in models) {
+                var cssClass = i % 2 == 0 ? 'even' : 'odd';
+                models[i].set('cssClass', cssClass);
+            }
+
+            this.render();
+        },
+        render: function() {
+            this.$el.html('');
+            this.collection.each(this.addRow, this);            
+            return this;
+        },        
         addRow: function(row) {
             var rowView = new BackboneGrid.Views.RowView({
                 model: row
@@ -39,14 +147,58 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         }
     });
 
-    FCom.BackboneGrid = function(config) {
-        BackboneGrid.Views.GridView.prototype.el = "#"+config.id+" tbody";
-        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.templateId).html());
-        console.log(config.data_url);
-        var rows = config.data.data;
-        var rowsCollection = new BackboneGrid.Collections.Rows;
+    var rowsCollection;    
+    var columnsCollection;
 
-        for(var i in rows) {
+    FCom.BackboneGrid = function(config) {
+
+        //Theader
+        BackboneGrid.Models.ThModel.prototype.personalize_url = config.personalize_url;
+
+        BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.headerTemplate).html());
+        BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
+        //Tbody 
+        BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
+        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
+        BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
+
+        BackboneGrid.currentState = config.data.state;
+        //header view
+        var columns = config.columns;
+        columnsCollection = new BackboneGrid.Collections.ThCollection;
+        var state = config.data.state;
+
+        for (var i in columns) {
+            var c = columns[i];
+            if (!c.hidden) {
+                c.id = config.id + '-' + c.name;
+                c.style = c['width'] ? "width:" + c['width'] + "px" : '';
+
+                c.cssClass = '';
+                if (!c['no_reorder'])
+                    c.cssClass += 'js-draggable ';
+
+                if (state['s'] && c['name'] && state['s'] == c['name']) {
+                    //c.cssClass += 'sort-' + state['sd'] + ' ';
+                    c.sortState = state['sd'];
+                } else {
+                    //c.cssClass += 'sort';
+                    c.sortState = "";
+                }
+                
+                var thModel = new BackboneGrid.Models.ThModel(c);
+                columnsCollection.add(thModel);                
+            }            
+        }
+
+        var headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
+        headerView.render();
+
+        //body view
+        var rows = config.data.data;
+        rowsCollection = new BackboneGrid.Collections.Rows;
+
+        for (var i in rows) {
                 
             if (i%2 === 0) {
                 rows[i].cssClass = "even";
@@ -59,6 +211,15 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
         var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
         gridView.render();
+
+        $('li a.page-size').click(function(ev){
+            parseInt($(this).html())
+            BackboneGrid.currentState.ps = parseInt($(this).html());
+            rowsCollection.fetch();
+            ev.preventDefault();
+            return false;
+
+        });
     }
     FCom.HtmlGrid = function(config) {
                 
