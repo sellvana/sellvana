@@ -70,6 +70,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                     $url = BApp::href('install/step3');
                 }
             } else {
+                BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
                 BMigrate::i()->migrateModules('FCom_Admin');
                 $url = BApp::href('install/step2');
             }
