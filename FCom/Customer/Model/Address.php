@@ -11,15 +11,15 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
             $obj = $this;
         }
         $countries = FCom_Geo_Model_Country::i()->options();
-        return '<div class="adr">'
-            .'<div class="street-address">'.$obj->street1.'</div>'
-            .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
-            .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
-            .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->region.'</span> '
-            .'<span class="postal-code">'.$obj->postcode.'</span>'
-            .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
-            .'</div>';
+        return '<address>'
+            .'<div class="f-street-address">'.$obj->street1.'</div>'
+            .($obj->street2 ? '<div class="f-extended-address">'.$obj->street2.'</div>' : '')
+            .($obj->street3 ? '<div class="f-extended-address">'.$obj->street3.'</div>' : '')
+            .'<span class="f-city">'.$obj->city.'</span>, '
+            .'<span class="f-region">'.$obj->region.'</span> '
+            .'<span class="f-postal-code">'.$obj->postcode.'</span>'
+            .'<div class="f-country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
+            .'</address>';
 
     }
 

@@ -21,71 +21,69 @@
 {% endif %}
 
 
-<!-- Sorting-->
 <form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
-    <div class="row">
-      <div class="col-sm-2 col-xs-2 hidden-xs">
-        <div class="btn-group">
-          <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
-          <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
-        </div>
-      </div>
-      <div class="col-sm-2 col-xs-4">
-        <select class="form-control visible-xs" name="p" onchange="this.form.submit()">
-          <option value="">Go to:</option>
-          {% for p in range(1, s.mp) %}
-            <option value="{{ p }}" {{ p==s.p ? 'selected'}}>{{ p }}</option>
-          {% endfor %}
-        </select>
-        <ul class="pagination f-search-pages-pagination">
-            {% if s.p > 1 %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
-            {% endif %}
-            {% if s.p > showPageNumsHalf+1 %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-':1}) }}">1</a></li>
-            {% endif %}
-            {% if s.p > showPageNumsHalf+2 %}
-              <li><a href="#">...</a></li>
-            {% endif %}
-            {% for p in startPageList..endPageList %}
-              <li {{ p == s.p ? 'class="active"' }}>
-                <a href="{{ pageUrl|replace({'-PAGE-':p}) }}">{{ p }}</a>
-              </li>
-            {% endfor %}
-            {% if s.p < s.mp-showPageNumsHalf-2 %}
-              <li><a href="#">...</a></li>
-            {% endif %}
-            {% if s.p < s.mp-showPageNumsHalf-1 %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-':s.mp}) }}">{{ s.mp }}</a></li>
-            {% endif %}
-            {% if s.p < s.mp %}
-              <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
-            {% endif %}
-        </ul>
-      </div>
-      <div class="col-sm-4 col-xs-4">
-        <select class="form-control visible-xs" name="ps" onchange="this.form.submit()">
-          <option value="">Per page:</option>
-          {% for ps in psOptions %}
-            <option value="{{ ps }}" {{ ps==s.ps ? 'selected'}}>{{ ps }}</option>
-          {% endfor %}
-        </select>
-        <ul class="pagination">
-        {% for ps in psOptions %}
-            <li {{ ps == s.ps ? 'class="active"' }}>
-                <a href="{{ UTIL.setUrlQuery(url, {ps:ps}) }}">{{ ps }}</a>
-            </li>
-        {% endfor %}
-        </ul>
-      </div>
-      <div class="col-sm-4 col-xs-4">
-        <label for="#" class="control-label">Sort by:</label>
-        <select name="sc" onchange="this.form.submit()" class="form-control">
-          {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
-        </select>
-      </div>
-      {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
+    <div class="form-group pull-right">
+      <label for="#" class="control-label">Sort by:</label>
+      <select name="sc" onchange="this.form.submit()" class="form-control">
+        {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
+      </select>
     </div>
+    <div class="form-group pull-right">
+      <select class="form-control visible-xs" name="ps" onchange="this.form.submit()">
+        <option value="">Per page:</option>
+        {% for ps in psOptions %}
+          <option value="{{ ps }}" {{ ps==s.ps ? 'selected'}}>{{ ps }}</option>
+        {% endfor %}
+      </select>
+      <ul class="pagination">
+      {% for ps in psOptions %}
+          <li {{ ps == s.ps ? 'class="active"' }}>
+              <a href="{{ UTIL.setUrlQuery(url, {ps:ps}) }}">{{ ps }}</a>
+          </li>
+      {% endfor %}
+      </ul>
+    </div>
+    <div class="form-group hidden-xs">
+      <div class="btn-group">
+        <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
+        <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="#" class="control-label">Go to:</label>
+      <select class="form-control" name="p" onchange="this.form.submit()">
+        <option value="">Go to:</option>
+        {% for p in range(1, s.mp) %}
+          <option value="{{ p }}" {{ p==s.p ? 'selected'}}>Page: {{ p }}</option>
+        {% endfor %}
+      </select>
+      <!--<ul class="pagination f-search-pages-pagination">
+        {% if s.p > 1 %}
+          <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+        {% endif %}
+        {% if s.p > showPageNumsHalf+1 %}
+          <li><a href="{{ pageUrl|replace({'-PAGE-':1}) }}">1</a></li>
+        {% endif %}
+        {% if s.p > showPageNumsHalf+2 %}
+          <li><a href="#">...</a></li>
+        {% endif %}
+        {% for p in startPageList..endPageList %}
+          <li {{ p == s.p ? 'class="active"' }}>
+            <a href="{{ pageUrl|replace({'-PAGE-':p}) }}">{{ p }}</a>
+          </li>
+        {% endfor %}
+        {% if s.p < s.mp-showPageNumsHalf-2 %}
+          <li><a href="#">...</a></li>
+        {% endif %}
+        {% if s.p < s.mp-showPageNumsHalf-1 %}
+          <li><a href="{{ pageUrl|replace({'-PAGE-':s.mp}) }}">{{ s.mp }}</a></li>
+        {% endif %}
+        {% if s.p < s.mp %}
+          <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+        {% endif %}
+      </ul>-->
+    </div>
+    {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
   </fieldset>
 </form>
