@@ -1,11 +1,10 @@
 {# Logic provided by FCom_Core_View_Backgrid #}
 
 {% set data = THIS.getGridData() %}
-{% set config = THIS.grid['config'] %}
+{% set grid = THIS.getGrid() %}
+{% set config = grid.config %}
 {% set s = data.result.state %}
 {% set pageUrl = THIS.pageChangeHref() %}
-
-
 
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
@@ -35,7 +34,7 @@
           {{ 'of %s'|_(s.mp) }}
           #}
 
-          
+
         </ul>
 
         {% for action in THIS.gridActions() %}
@@ -77,8 +76,8 @@
         {% end %}
       </colgroup>#}
       <thead>
-        <tr id="tr-sort-{{ config.id }}" role="row">                   
-          
+        <tr id="tr-sort-{{ config.id }}" role="row">
+
         </tr>
       </thead>
       <tbody>
@@ -102,7 +101,7 @@
             {% elseif col.href %}
                 <a href='{{ col.href|raw }}'>
                     <%= {{ col.name }} %>
-                </a>    
+                </a>
             {% else %}
                 <%= {{ col.name }} %>
           {% endif %}
@@ -114,9 +113,9 @@
 
 <script type='template' id="{{ config.id }}-header-template">
     <th id="th-sort-<%= id %>" data-id="<%= name %>" style="<%= style%>" class="<%= cssClass %> sort-<%= sortState %>">
-    
+
         <% if(type === '' || type === 'default') { %>
-            
+
             <% if (no_reorder!==true) { %>
                     <div class="draghandle" style='width:100%;height:18px;background-color:#eeeeee;'></div>
             <% } %>
@@ -138,7 +137,7 @@
     <li class="prev <%= s.p <= 1 ? 'disabled' : '' %>">
         <a class="js-change-url" href="#")>&lsaquo;</a>
     </li>
-    <% for (var i= 1; i<=2;i++) { %>        
+    <% for (var i= 1; i<=2;i++) { %>
         <li <%= i == s.p ? 'class="active"' : '' %>>
             <a class="js-change-url" data-page="" href="#"><%= i %></a>
         </li>
@@ -153,10 +152,17 @@
 
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
-    $(function() {
-
-        var grid = new FCom.BackboneGrid();
-    });
-
+    //$(function() {
+        var grid = new FCom.BackboneGrid({
+            id: "{{ config.id }}",
+            personalize_url: "{{ APP.href('my_account/personalize') }}",
+            data_url: "{{ config.data_url }}",
+            data: {{ THIS.getPageRowsData() | raw }},
+            headerTemplate: "{{ config.id }}-header-template",
+            rowTemplate: "{{ config.id }}-row-template",
+            pageTemplate: "{{ config.id }}-pagination-template",
+            columns: {{ THIS.getColumnsData() | raw }}
+        });
+    //});
 });
 </script>

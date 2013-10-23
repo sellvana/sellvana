@@ -124,7 +124,7 @@ common_js_libs:
       - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, @FCom_Core/js/lib/angular.min ], { deps: [ jquery ], exports: angular } ]
 
       - [ requireJs, fcom.core, @FCom_Core/js/fcom.core ]
-      - [ requireJs, fcom.htmlgrid, @FCom_Core/js/fcom/fcom.htmlgrid ]
+      #- [ requireJs, fcom.htmlgrid, @FCom_Core/js/fcom/fcom.htmlgrid ]
       - [ requireJs, fcom.backbonegrid, @FCom_Core/js/fcom/fcom.backbonegrid ]
       - [ requireJs, backgrid, @FCom_Core/js/lib/backgrid/backgrid, { deps: [ backbone, backbone-pageable ], exports: Backgrid } ]
       - [ requireJs, backgrid-filter, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter, { deps: [ backgrid ] } ]
