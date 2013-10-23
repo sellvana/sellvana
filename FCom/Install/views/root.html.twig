@@ -13,7 +13,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            {{ THIS.view('core/messages') | raw }}
+            {{ THIS.view('core/messages').set('namespace', 'install') | raw }}
 
             <div class="panel">
                 {{ THIS.hook('main') | raw }}
