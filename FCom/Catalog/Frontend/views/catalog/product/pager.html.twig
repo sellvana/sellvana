@@ -5,7 +5,7 @@
 {% set showPageNumsHalf = (showPageNums/2)|floor %}
 {% set startPageList = (s.p-showPageNumsHalf)|min(s.mp-showPageNums)|max(1) %}
 {% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
-{% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'list' %}
+{% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'grid' %}
 
 {% set psOptions = { 10:10, 25:25, 50:50, 100:100 } %}
 {% set sortOptions = THIS.get("sort_options") %}
@@ -27,8 +27,8 @@
     <div class="row">
       <div class="col-sm-2 col-xs-2 hidden-xs">
         <div class="btn-group">
-          <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
           <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
+          <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
         </div>
       </div>
       <div class="col-sm-2 col-xs-4">
