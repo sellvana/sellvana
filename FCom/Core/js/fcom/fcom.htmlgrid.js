@@ -109,6 +109,13 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             return this.data_url + '?' + append;
         },
         parse: function(response) {
+            if (response[0].c) {
+                var mp = Math.round(response[0].c / BackboneGrid.currentState.ps);
+                if (mp !== BackboneGrid.currentState.ps) {
+                    BackboneGrid.currentState.ps = mp;
+                    updatePageHtml();
+                }
+            }
             return response[1];
         }
     });
@@ -151,11 +158,42 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         }
     });
 
+    function updatePageHtml(p,mp) {
+
+            p = BackboneGrid.currentState.p;
+            mp = BackboneGrid.currentState.mp;
+            var html = '';
+
+            html += '<li class="first'+ (p<=1 ? ' disabled' : '') + '">';
+            html += '<a class="js-change-url" href="#">&laquo;</a>';
+            html += '</li>';
+            
+            html += '<li class="prev'+ (p<=1 ? ' disabled' : '') + '">';
+            html += '<a class="js-change-url" href="#">&lsaquo;</a>';
+            html += '</li>';
+
+
+            for (var i= Math.max(p-3,1); i<=Math.min(p+3,mp);i++) { 
+                html += '<li class="page' + (i == p ? ' active' : '') + '">';
+                html += '<a class="js-change-url" data-page="" href="#">' +  i +'</a>';
+                html += '</li>';
+            } 
+
+            html += '<li class="next'+ (p>=mp ? ' disabled' : '') + '">';
+            html += '<a class="js-change-url" href="#">&rsaquo;</a>';
+            html += '</li>';
+            
+            html += '<li class="last'+ (p>=mp ? ' disabled' : '') + '">';
+            html += '<a class="js-change-url" href="#">&raquo;</a>';
+            html += '</li>';         
+
+            $('ul.pagination.page').html(html);
+    }
     var rowsCollection;
     var columnsCollection;
 
     FCom.BackboneGrid = function(config) {
-
+        
         //Theader
         BackboneGrid.Models.ThModel.prototype.personalize_url = config.personalize_url;
 
@@ -165,12 +203,39 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
         BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
+        //pager
+        //BackboneGrid.Views.PageView.prototype.template = _.template($('#'+config.pageTemplate).html());
+        var state = config.data.state;
 
-        BackboneGrid.currentState = config.data.state;
+        
+        state.p = parseInt(state.p);
+        state.mp = parseInt(state.mp);
+        BackboneGrid.currentState = state;
+
+        $('ul.pagination.page').on('click', 'li', function(ev) {
+            var li = $(this);
+            if(li.hasClass('first'))
+                BackboneGrid.currentState.p = 1;
+            if(li.hasClass('next'))
+                BackboneGrid.currentState.p ++;
+            if(li.hasClass('prev'))
+                BackboneGrid.currentState.p --;
+            if(li.hasClass('last'))
+                BackboneGrid.currentState.p = BackboneGrid.currentState.mp;
+            if(li.hasClass('page'))
+                BackboneGrid.currentState.p = parseInt(li.find('a').html());
+            updatePageHtml();
+            rowsCollection.fetch({reset: true});
+            ev.preventDefault();
+            return;
+        });
+        
+        updatePageHtml();
+
         //header view
         var columns = config.columns;
         columnsCollection = new BackboneGrid.Collections.ThCollection;
-        var state = config.data.state;
+        
 
         for (var i in columns) {
             var c = columns[i];
@@ -216,11 +281,14 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
         gridView.render();
 
-        $('li a.page-size').click(function(ev){
-            parseInt($(this).html())
+        $('ul.pagination.pagesize a').click(function(ev){            
+            $('ul.pagination.pagesize li').removeClass('active');
             BackboneGrid.currentState.ps = parseInt($(this).html());
-            rowsCollection.fetch();
+            BackboneGrid.currentState.p = 1;
+            rowsCollection.fetch({reset: true});
+            $(this).parents('li:first').addClass('active');            
             ev.preventDefault();
+
             return false;
 
         });

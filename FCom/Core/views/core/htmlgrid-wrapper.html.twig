@@ -46,6 +46,26 @@
     </th>
 </script>
 
+<script type='template' id="{{ config.id }}-pagination-template">
+    <li class="first <% if (p <= 1) { %> 'disabled' <%} %>">
+        <a class="js-change-url" href="#">&laquo;</a>
+    </li>
+    <li class="prev <%= s.p <= 1 ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&lsaquo;</a>
+    </li>
+    <% for (var i= 1; i<=2;i++) { %>        
+        <li <%= i == s.p ? 'class="active"' : '' %>>
+            <a class="js-change-url" data-page="" href="#"><%= i %></a>
+        </li>
+    <% } %>
+    <li class="next <%= s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&rsaquo;</a>
+    </li>
+    <li class="last <%= s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#">&raquo;</a>
+    </li>
+</script>
+
 <script>
 require(['jquery', 'fcom.htmlgrid'], function($) {
 
@@ -57,6 +77,7 @@ require(['jquery', 'fcom.htmlgrid'], function($) {
             data: {{ gridView.getPageRowsData() | raw }},
             headerTemplate: "{{ config.id }}-header-template",
             rowTemplate: "{{ config.id }}-row-template",
+            pageTemplate: "{{ config.id }}-pagination-template",
             columns: {{ gridView.getColumnsData() | raw }}
         });
     });
