@@ -171,6 +171,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             }
             $columns = array($r['col']=>array('width'=>$r['width']));
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
+
             break;
         case 'grid.col.widths':           
             $cols = $r['cols'];
@@ -181,6 +182,14 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 }
                 $columns[$col['name']] = array('width'=>$col['width']);
             }
+            $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
+
+            break;
+        case 'grid.col.hidden':
+            if (empty($r['grid']) || empty($r['col']) || empty($r['hidden'])) {
+                break;
+            }
+            $columns = array($r['col'] =>array('hidden'=>$r['hidden']));
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
             break;
@@ -201,7 +210,6 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
             break;
-
         case 'grid.state':
             if (empty($r['grid'])) {
                 break;

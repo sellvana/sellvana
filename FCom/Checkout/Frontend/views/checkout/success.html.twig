@@ -1,10 +1,18 @@
 {% set order = THIS.get('order') %}
 {% set billing = order.billing() %}
-<header class="main-title">
-  <h1>{{ "Payment is done successfully" |_ }}</h1>
-{% if THIS.get('user') %}
-    {{ "Order" |_ }} #<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>
-    <br/>
+<div class="f-site-main" role="main">
+  <div class="container">
+    <header class="f-page-header">
+      <h1 class="f-page-title">{{ 'Thank you for your order!'|_ }}</h1>
+    </header>
+    <p>{{ "Your order has successfully been submitted." |_ }}
+{% if THIS.get('user') %}<br/>
+    Your {{ "order number is" |_ }} #<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>. Please note for your record.
 {% endif %}
-{{ "Billing information" |_ }}:<br/>
-{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}
+    </p>
+    <h4>{{ "Your billing information" |_ }}</h4>
+    <address>
+      {{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}
+    </address>
+  </div>
+</div>
