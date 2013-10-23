@@ -109,18 +109,18 @@ class BDb
     * @throws BException
     * @return PDO
     */
-    public static function connect($name=null)
+    public static function connect($name = null, $force = false)
     {
-        if (!$name && static::$_currentConnectionName) { // continue connection to current db, if no value
+        if (!$force && !$name && static::$_currentConnectionName) { // continue connection to current db, if no value
             return BORM::get_db();
         }
         if (is_null($name)) { // if first time connection, connect to default db
             $name = static::$_defaultConnectionName;
         }
-        if ($name===static::$_currentConnectionName) { // if currently connected to requested db, return
+        if (!$force && $name === static::$_currentConnectionName) { // if currently connected to requested db, return
             return BORM::get_db();
         }
-        if (!empty(static::$_namedConnections[$name])) { // if connection already exists, switch to it
+        if (!$force && !empty(static::$_namedConnections[$name])) { // if connection already exists, switch to it
             BDebug::debug('DB.SWITCH '.$name);
             static::$_currentConnectionName = $name;
             static::$_config = static::$_namedConnectionConfig[$name];
@@ -968,6 +968,9 @@ class BORM extends ORMWrapper
             $driver_options = static::$_config['driver_options'];
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
                 $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
+            }
+            if (empty($driver_options[PDO::ATTR_TIMEOUT])) {
+                $driver_options[PDO::ATTR_TIMEOUT] = 5;
             }
             try { //ADDED: hide connection details from the error if not in DEBUG mode
                 $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED

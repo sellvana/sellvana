@@ -37,7 +37,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         changesortState: function(ev) {
 
             var status = this.model.get('sortState');
-            
+
             if (status === '')
                 status = 'asc';
             else if (status === 'asc')
@@ -111,7 +111,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         parse: function(response) {
             if (response[0].c) {
 
-                
+
 
                 var mp = Math.round(response[0].c / BackboneGrid.currentState.ps);
                 /*console.log('c=', response[0].c);
@@ -176,32 +176,32 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             html += '<li class="first'+ (p<=1 ? ' disabled' : '') + '">';
             html += '<a class="js-change-url" href="#">&laquo;</a>';
             html += '</li>';
-            
+
             html += '<li class="prev'+ (p<=1 ? ' disabled' : '') + '">';
             html += '<a class="js-change-url" href="#">&lsaquo;</a>';
             html += '</li>';
 
 
-            for (var i= Math.max(p-3,1); i<=Math.min(p+3,mp);i++) { 
+            for (var i= Math.max(p-3,1); i<=Math.min(p+3,mp);i++) {
                 html += '<li class="page' + (i == p ? ' active' : '') + '">';
                 html += '<a class="js-change-url" data-page="" href="#">' +  i +'</a>';
                 html += '</li>';
-            } 
+            }
 
             html += '<li class="next'+ (p>=mp ? ' disabled' : '') + '">';
             html += '<a class="js-change-url" href="#">&rsaquo;</a>';
             html += '</li>';
-            
+
             html += '<li class="last'+ (p>=mp ? ' disabled' : '') + '">';
             html += '<a class="js-change-url" href="#">&raquo;</a>';
-            html += '</li>';         
+            html += '</li>';
 
             $('ul.pagination.page').html(html);
     }
     var rowsCollection;
     var columnsCollection;
 
-    FCom.BackboneGrid12 = function(config) {
+    FCom.BackboneGrid = function(config) {
         //Theader
         BackboneGrid.Models.ThModel.prototype.personalize_url = config.personalize_url;
 
@@ -215,7 +215,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         //BackboneGrid.Views.PageView.prototype.template = _.template($('#'+config.pageTemplate).html());
         var state = config.data.state;
 
-        
+
         state.p = parseInt(state.p);
         state.mp = parseInt(state.mp);
         BackboneGrid.currentState = state;
@@ -237,13 +237,13 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
             ev.preventDefault();
             return;
         });
-        
+
         updatePageHtml();
 
         //header view
         var columns = config.columns;
         columnsCollection = new BackboneGrid.Collections.ThCollection;
-        
+
 
         for (var i in columns) {
             var c = columns[i];
@@ -289,12 +289,12 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         var gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
         gridView.render();
 
-        $('ul.pagination.pagesize a').click(function(ev){            
+        $('ul.pagination.pagesize a').click(function(ev){
             $('ul.pagination.pagesize li').removeClass('active');
             BackboneGrid.currentState.ps = parseInt($(this).html());
             BackboneGrid.currentState.p = 1;
             rowsCollection.fetch({reset: true});
-            $(this).parents('li:first').addClass('active');            
+            $(this).parents('li:first').addClass('active');
             ev.preventDefault();
 
             return false;
@@ -302,6 +302,6 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
         });
 
         //table column reordering
-        
+
     }
-}
+});

@@ -8,7 +8,6 @@ class FCom_CatalogIndex_Indexer extends BClass
 
     static public function indexProducts($products)
     {
-        BDebug::mode('PRODUCTION');
         if ($products === true) {
             $i = 0;
             //$start = 0;
