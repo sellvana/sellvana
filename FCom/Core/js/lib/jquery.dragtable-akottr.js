@@ -344,6 +344,7 @@
       });
     },
     destroy: function() {
+      alert('distry');
       this.bindTo.unbind('mousedown');
       $.Widget.prototype.destroy.apply(this, arguments); // default destroy
       // now do other stuff particular to this widget
