@@ -2,12 +2,11 @@
 
 abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Controller_Abstract
 {
-//    protected $_origClass = __CLASS__;
-//    protected $_permission = 'cms/nav';
-//    protected $_navModelClass = 'FCom_Cms_Model_Nav';
-//    protected $_treeLayoutName = '/cms/nav';
-//    protected $_formLayoutName = '/cms/nav/tree_form';
-//    protected $_formViewName = 'cms/nav-tree-form';
+    protected $_permission;
+    protected $_navModelClass;
+    protected $_treeLayoutName;
+    protected $_formLayoutName;
+    protected $_formViewName;
 
     public function action_index()
     {
@@ -125,7 +124,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     {
         $class = $this->_navModelClass;
         $this->layout($this->_formLayoutName);
-        if ($id = BRequest::i()->params('id', true)) {
+        if ($id = BRequest::i()->param('id', true)) {
             $id = preg_replace('#^[^0-9]+#', '', $id);
             $model = $class::i()->load($id);
             $this->_prepareTreeForm($model);
@@ -139,16 +138,25 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     {
         $class = $this->_navModelClass;
         try {
-            $id = BRequest::i()->params('id', true);
+            $id = BRequest::i()->param('id', true);
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
             $model->set(BRequest::i()->post('model'))
                 ->set(array('url_path'=>null, 'full_name'=>null));
-            $model->save();
-            $model->refreshDescendants(true, true);
 
-            $result = array('status'=>'success', 'message'=>'Node updated');
+	        if ($model->validate()) {
+		        $model->save();
+		        $model->refreshDescendants(true, true);
+		        $result = array('status'=>'success', 'message'=>'Node updated');
+	        } else {
+		        $messages = array();
+		        foreach($model->errors as $msg) {
+			        foreach ($msg as $m)
+				        $messages[] = $m;
+		        }
+		        $result = array('status'=>'error', 'message'=> implode("<br />", $messages));
+	        }
         } catch (Exception $e) {
             $result = array('status'=>'error', 'message'=>$e->getMessage());
         }
