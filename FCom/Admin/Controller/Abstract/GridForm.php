@@ -156,7 +156,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function action_form()
     {
         $class = $this->_modelClass;
-        $id = BRequest::i()->params('id', true);
+        $id = BRequest::i()->param('id', true);
         if ($id && !($model = $class::i()->load($id))) {
             BDebug::error('Invalid ID: '.$id);
         }
@@ -197,7 +197,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $args = array();
         try {
             $class = $this->_modelClass;
-            $id = $r->params('id', true);
+            $id = $r->param('id', true);
             $model = $id ? $class::i()->load($id) : $class::i()->create();
             $data = $r->post('model');
             $args = array('id'=>$id, 'do'=>$r->post('do'), 'data'=>&$data, 'model'=>&$model);
@@ -206,8 +206,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 $model->delete();
                 BSession::i()->addMessage('The record has been deleted', 'success', 'admin');
             } else {
-                $model->set($data)->save();
-                BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+	            $model->set($data);
+	            if ($model->validate()) {
+		            $model->set($data)->save();
+		            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+	            } else {
+		            $messages = array();
+		            foreach($model->errors as $errors) {
+			            foreach ($errors as $error)
+			                $messages[] = array('msg' => $error, 'error');
+		            }
+		            $this->view('core/message')->set('messages', $messages);
+	            }
             }
             $this->formPostAfter($args);
         } catch (Exception $e) {
