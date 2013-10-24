@@ -1,4 +1,4 @@
-define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl'], function($, angular) {
+define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'], function($, angular) {
 /*
     var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
         $interpolateProvider.startSymbol("<%");
@@ -678,13 +678,29 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
 
         function wysiwygCreate(id) {
-            if (!editors[id]) {
+            if (!editors[id] && CKEDITOR !== 'undefined') {
                 editors[id] = true; // prevent double loading
-                $('#'+id).ckeditor(function() {
-                    this.dataProcessor.writer.indentationChars = '  ';
-                    editors[id] = this;
-                });
+                CKEDITOR.replace(id); //todo: add pre-define options for ckeditor
+//
+//                $('#'+id).ckeditor(function() {
+//                    this.dataProcessor.writer.indentationChars = '  ';
+//                    editors[id] = this;
+//                });
             }
+        }
+
+        // this function almost use to init ckeditor after load ajax form
+        function wysiwygInit() {
+            var form = this;
+            $('textarea.ckeditor').each(function(){
+                var id = $(this).attr('id');
+                if (!id) {
+                    var cntEditors = editors.length;
+                    id = cntEditors + 1;
+                    $(this).attr('id', 'textarea-ckeditor-'+id);
+                }
+                form.wysiwygCreate(id);
+            });
         }
 
         function wysiwygDestroy(id) {
@@ -696,6 +712,14 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 }
                 editors[id] = null;
             }
+        }
+
+        function createSwitchButton() { //todo: add options class to add switch button
+            $('.switch-cbx').each(function(){
+                if ($(this).parents('.make-switch').hasClass('make-switch') == false) {
+                    $(this).wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+                }
+            });
         }
 
         function tabClass(id, cls) {
@@ -824,8 +848,10 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         return {
             setOptions:setOptions,
             loadTabs:loadTabs,
+            wysiwygInit: wysiwygInit,
             wysiwygCreate:wysiwygCreate,
             wysiwygDestroy:wysiwygDestroy,
+            createSwitchButton:createSwitchButton,
             tabClass:tabClass,
             tabAction:tabAction,
             saveAll:saveAll,

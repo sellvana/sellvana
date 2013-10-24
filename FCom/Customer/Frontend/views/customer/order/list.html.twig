@@ -1,22 +1,40 @@
-<h2>{{ "Orders history" | _ }}</h2>
-
-{% if THIS.get('orders') %}
-    <table class="table">
+<div class="f-site-main" role="main">
+  <div class="container">
+    <div class="row f-mb-slideout-menu">
+      <div class="col-sm-9 f-col-main">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{ "Orders History" | _ }}</h1>
+          <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
+        </header>
+  {% if THIS.get('orders') %}
+      <table class="table">
         <tr>
-            <th width="50px;">{{ "ID" }}</th>
-            <th width="200px;">{{ "Shipping" | _ }}</th>
-            <th width="200px;">{{ "Payment" | _ }}</th>
-            <th width="200px;">{{ "Status" | _ }}</th>
-            <th width="200px;">{{ "Balance" | _ }}</th>
+          <th>{{ "ID" }}</th>
+          <th>{{ "Shipping" | _ }}</th>
+          <th>{{ "Payment" | _ }}</th>
+          <th>{{ "Status" | _ }}</th>
+          <th class="text-right">{{ "Balance" | _ }}</th>
         </tr>
-    {% for order in THIS.get('orders')  %}
+      {% for order in THIS.get('orders')  %}
         <tr>
-            <td align="center"><a href="{{ APP.href('customer/order/view') }}?id={{ order.get('id') }}">{{ order.get('id') }}</a> </td>
-            <td align="center">{{ order.get('shipping_method') }} </td>
-            <td align="center">{{ order.get('payment_method') }} </td>
-            <td align="center">{{ order.get('status') }} </td>
-            <td align="center">{{ order.get('balance') }} </td>
+          <td><a href="{{ APP.href('customer/order/view') }}?id={{ order.get('id') }}">{{ order.get('id') }}</a> </td>
+          <td>{{ order.get('shipping_method') }} </td>
+          <td>{{ order.get('payment_method') }} </td>
+          <td>{{ order.get('status') }} </td>
+          <td class="text-right">{{ order.get('balance') }} </td>
         </tr>
-    {% endfor %}
-    </table>
-{% endif %}
+      {% endfor %}
+      </table>
+  {% endif %}
+      </div>
+      {{ THIS.view('customer/account/sidebar') | raw }}
+    </div>
+  </div>
+</div>
+<script>
+require(['jquery'], function($) {
+  $( "#button" ).click(function() {
+    $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+  });
+});
+</script>

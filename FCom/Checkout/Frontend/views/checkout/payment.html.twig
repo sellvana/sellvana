@@ -1,8 +1,6 @@
 {% set curMethod = THIS.get('cart').get('payment_method') %}
 {% set payment_html = THIS.get('payment_html') %}
-<header class="f-page-header">
-  <h1 class="f-page-title">{{ "Payment methods" |_ }}/h1>
-</header>
+<h4>{{ "Payment methods" |_ }}</h4>
 <fieldset>
   {% for method, class in THIS.get('payment_methods') %}
     <div class="radio">
