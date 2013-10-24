@@ -779,7 +779,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
 
         function saveAll(el) {
-            //return true;
+            return true;
             //TODO
             var form = $(el).closest('form');
             var postData = form.serializeArray();
