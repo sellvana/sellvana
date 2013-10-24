@@ -779,12 +779,13 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
 
         function saveAll(el) {
-            return true;
+            //return true;
             //TODO
             var form = $(el).closest('form');
             var postData = form.serializeArray();
             var url_post = options.url_get+(options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post+'tabs=ALL&mode=view', postData, function(data, status, req) {
+                console.log(data);
                 $.pnotify({
                     pnotify_title: data.message || 'The form has been saved',
                     pnotify_type: data.status=='error' ? 'error' : null,
