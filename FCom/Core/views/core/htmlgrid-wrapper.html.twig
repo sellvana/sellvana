@@ -68,7 +68,7 @@
 </script>
 
 <script>
-require(['jquery', 'fcom.backbonegrid'], function($) {
+require(['jquery', 'fcom.htmlgrid'], function($) {
 
     $(function() {
         var grid = new FCom.BackboneGrid({
@@ -84,4 +84,14 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
     });
 
 });
+  /*  require(['jquery', 'fcom.htmlgrid'], function($) {
+        $(function() {
+            var grid = new FCom.HtmlGrid({
+                id: "{{ config.id }}",
+                grid_url: "{{ config.grid_url }}",
+                personalize_url: "{{ APP.href('my_account/personalize') }}",
+                selection: {{ config.selection ? UTIL.toJson(config.selection) : '{}' }}
+            })
+        })
+    })*/
 </script>
