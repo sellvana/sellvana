@@ -1,3 +1,9 @@
+<style>
+.zoom:after { content:''; display:block; width:33px; height:33px; position:absolute; top:0; right:0;
+  background:url("{{ APP.src('@FCom_Core/img/icon.png') }}"); }
+.zoom img { display: block; }
+.zoom img::selection { background-color: transparent; }
+</style>
 {% set prod = THIS.get('product') %}
 {% set cat = THIS.get('category') %}
 {% set imgBaseUrl = APP.src('@FCom_FrontendTheme1/img') %}
@@ -15,31 +21,32 @@
         <!-- Product Image Column -->
         <div class="col-md-5 f-col-prod-img">
           <div class="f-rslides-container">
-            <ul class="thumbnails f-rslides f-prod-imgs">
+            <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
               <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
               <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
+              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
             </ul>
           </div>
           <p class="text-center"><small>Mouse move on Image to zoom</small></p>
-          <ul class="f-prod-more-view-imgs row">
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+          <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
+            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
+            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
           </ul>
         </div>
         <script>
-          require(['jquery', 'responsiveslides'], function($) {
-            $(".f-rslides").responsiveSlides({
+          require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
+            $("#product-rslides").responsiveSlides({
+              auto: false,
               speed: 500,
-              timeout: 4000,
               nav: true,
-              random: true,
-              pause: true,
-              pauseControls: true,
               namespace: "f",
+              manualControls: '#product-rslides-pager'
             });
+
+            $('#product-rslides li').addClass('zoom').zoom();
           });
         </script>
         <!-- /.f-col-prod-img -->
@@ -47,15 +54,18 @@
         <!-- Product Select Column-->
         <div class="col-md-7 f-col-prod-select">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
+
+{% if MODULES.isLoaded('FCom_ProductReviews') %}
           <div class="f-prod-avg-rating">
             <div class="glyphicon f-rating-stars f-sm-stars">
-              <span class="f-filled-stars" style="width:100%;"></span>
+              <span class="f-filled-stars" style="width:{{ prod.getAverageStars() }}%;"></span>
               <span class="f-empty-stars"></span>
             </div>
-            <a href="#f-prod-tab-reviews">53 Reviews</a>
+            <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(prod.getNumReviews()) }}</a>
           </div>
+{% endif %}
           <div class="f-price-group">
-          
+
             <table>
               <tr class="f-old-price">
                 <th class="f-price-label">Was:</th>
@@ -65,7 +75,7 @@
                 <td colspan="2">Add to cart to see your price!</td>
               </tr>
             </table> <!-- /.f-map-price -->
-            
+
             <table>
               {% if prod.get('base_price') == 0 %}
                 <tr class="f-reg-price">
@@ -88,7 +98,7 @@
                 </tr>
               {% endif %}
             </table>
-            
+
             <table class="f-tier-price-group table table-condensed">
               <caption>Tier Pricing</caption>
               <tr>
@@ -152,8 +162,8 @@
             <div class="f-prod-add-cart">
               <p class="f-stock-notice f-in-stock">In Stock.</p>
               <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>Add to Cart</button>
-              <a class="btn btn-link" href="#">Add to Wishlist</a>
-              <a class="btn btn-link" href="#">Add to Compare</a>
+              <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}" rel="nofollow">Add to Wishlist</a>
+              <a class="btn btn-link" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}" rel="nofollow">Add to Compare</a>
             </div>
           </div>
           <!-- /.f-prod-select -->
@@ -272,167 +282,7 @@
                   </table>
                 </div>
               </section>
-              <section class="tab-pane active f-prod-reviews" id="f-prod-tab-reviews">
-                <div class="f-tab-heading">
-                  <h5 class="f-tab-title">Customer Reviews</h5>
-                  <a href="#" class="btn btn-sm btn-primary">Write your own review</a>
-                </div>
-                <div class="f-prod-review-avg clearfix">
-                  <h5>Avg. Customer Rating (53 Reviews):</h5>
-                  <div class="glyphicon f-rating-stars f-lg-stars">
-                    <span class="f-filled-stars" style="width:80%;"></span>
-                    <span class="f-empty-stars"></span>
-                  </div>
-                  <strong>4 / 5</strong>
-                  <div class="f-prod-review-attrs">
-                    <dl class="dl-horizontal">
-                      <dt>Value</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:80%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        4</dd>
-                      <dt>Features</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Quality</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:80%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        4</dd>
-                    </dl>
-                  </div>
-                </div>
-                <article class="f-prod-review-post clearfix">
-                  <h5>I love Fulleron!! Great value and service.</h5>
-                  <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
-                    <dl class="dl-horizontal">
-                      <dt><strong>Overall</strong></dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        <strong>5 / 5</strong>
-                      </dd>
-                      <dt>Value</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Features</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Quality</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                    </dl>
-                  </div>
-                  <div class="col-md-7 col-sm-7 f-prod-review">
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'.</p>
-                    <p>Making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
-                  </div>
-                </article>
-                <article class="f-prod-review-post clearfix">
-                  <h5>I love Fulleron!! Great value and service.</h5>
-                  <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
-                    <dl class="dl-horizontal">
-                      <dt><strong>Overall</strong></dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        <strong>5 / 5</strong>
-                      </dd>
-                      <dt>Value</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Features</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Quality</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                    </dl>
-                  </div>
-                  <div class="col-md-7 col-sm-7 f-prod-review">
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
-                  </div>
-                </article>
-                <article class="f-prod-review-post clearfix">
-                  <h5>I love Fulleron!! Great value and service.</h5>
-                  <span class="meta">by John Doe on October 12, 2013</span>
-                  <div class="col-md-5 col-sm-5 f-prod-review-attrs">
-                    <dl class="dl-horizontal">
-                      <dt><strong>Overall</strong></dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        <strong>5 / 5</strong>
-                      </dd>
-                      <dt>Value</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Features</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                      <dt>Quality</dt>
-                      <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                          <span class="f-filled-stars" style="width:100%;"></span>
-                          <span class="f-empty-stars"></span>
-                        </div>
-                        5</dd>
-                    </dl>
-                  </div>
-                  <div class="col-md-7 col-sm-7 f-prod-review">
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
-                  </div>
-                </article>
-                <p><a href="#"><strong>Read all 53 customer reviews &rsaquo;</strong></a></p>
-              </section>
+              {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
             </div>
           </div>
         </div><!-- /.f-col-prod-select -->
@@ -700,8 +550,8 @@
         </div><!-- /.row -->
       </div><!-- /.f-prod-listing -->
     </div><!-- /.f-widget -->
-    
-    
+
+
 
     <!-- You may also like -->
     <div class="f-widget f-widget-featured-prods">

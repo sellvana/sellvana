@@ -8,20 +8,20 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     }
 
 
-    public function action_wishlist()
+    public function action_index()
     {
         $layout = BLayout::i();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Wishlist', 'active'=>true));
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
+        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
         $layout->view('wishlist')->wishlist = $wishlist;
         $this->layout('/wishlist');
     }
 
-    public function action_wishlist__POST()
+    public function action_index__POST()
     {
         $wishlistHref = BApp::href('wishlist');
         $post = BRequest::i()->post();
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
+        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
         if (BRequest::i()->xhr()) {
             $result = array();
             switch ($post['action']) {
@@ -48,6 +48,24 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             BResponse::i()->redirect($wishlistHref);
         }
+    }
+
+    public function action_add()
+    {
+        $id = BRequest::i()->get('id');
+        $p = FCom_Catalog_Model_Product::i()->load($id);
+        if (!$p) {
+            BSession::i()->addMessage(BLocale::_('Invalid product'), 'error', 'frontend');
+        } else {
+            $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
+            if (!$wishlist) {
+                $this->forward('unauthenticated');
+                return;
+            }
+            $wishlist->addItem($id);
+            BSession::i()->addMessage(BLocale::_('Product was added to wishlist'), 'success', 'frontend');
+        }
+        BResponse::i()->redirect('wishlist');
     }
 
     public static function onAddToWishlist($args)

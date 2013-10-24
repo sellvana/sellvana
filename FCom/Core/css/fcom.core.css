@@ -19,8 +19,8 @@ form label.required:after { color:#e32; content:' *'; display:inline; }
 .fcom-htmlgrid__grid th.label a:hover { text-decoration: underline; }
 .fcom-htmlgrid__grid th.sort-asc a:after { content: ' v'; font-size:8px; color:#F00; }
 .fcom-htmlgrid__grid th.sort-desc a:after { content: ' ^'; font-size:10px; color:#F00; }
-.fcom-htmlgrid__grid th.label .drag-handle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
-.fcom-htmlgrid__grid th.label:hover .drag-handle { display:block; cursor: move; }
+.fcom-htmlgrid__grid th.js-draggable .draghandle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
+.fcom-htmlgrid__grid th.js-draggable:hover .draghandle { display:block; cursor: move; }
 
 .fcom-htmlgrid__grid { width: 100%; }
 .fcom-htmlgrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
@@ -36,3 +36,4 @@ form label.required:after { color:#e32; content:' *'; display:inline; }
 .backgrid th .drag-handle i { font-size:8pt; color:#AAA; }
 .backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
 .backgrid th .ui-resizable-handle { z-index:1000; right:0; width:5px; }
+

@@ -1,10 +1,12 @@
 {% set s = THIS.get('state') %}
 {% set url = REQUEST.currentUrl() %}
 {% set pageUrl = UTIL.setUrlQuery(url, {p:'-PAGE-'}) %}
-{% set showPageNums = 4 %}
-{% set showPageNumsHalf = (showPageNums/2)|floor %}
-{% set startPageList = (s.p-showPageNumsHalf)|min(s.mp-showPageNums)|max(1) %}
-{% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
+{#
+  {% set showPageNums = 4 %}
+  {% set showPageNumsHalf = (showPageNums/2)|floor %}
+  {% set startPageList = (s.p-showPageNumsHalf)|min(s.mp-showPageNums)|max(1) %}
+  {% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
+#}
 {% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'grid' %}
 
 {% set psOptions = { 10:10, 25:25, 50:50, 100:100 } %}
@@ -58,7 +60,9 @@
           <option value="{{ p }}" {{ p==s.p ? 'selected'}}>Page: {{ p }}</option>
         {% endfor %}
       </select>
-      <!--<ul class="pagination f-search-pages-pagination">
+      <span class="hidden-xs">{{ 'of %s product(s)'|_(s.c) }}</span>
+      {#
+      <ul class="pagination f-search-pages-pagination">
         {% if s.p > 1 %}
           <li><a href="{{ pageUrl|replace({'-PAGE-':s.p-1}) }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
         {% endif %}
@@ -82,7 +86,8 @@
         {% if s.p < s.mp %}
           <li><a href="{{ pageUrl|replace({'-PAGE-': s.p+1}) }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
         {% endif %}
-      </ul>-->
+      </ul>
+      #}
     </div>
     {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
   </fieldset>
