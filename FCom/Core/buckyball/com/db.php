@@ -2461,20 +2461,23 @@ class BModel extends Model
      * Event will be fired if validation fails.
      *
      * @see BValidate::validateInput()
-     * @param array $data
      * @param array $rules
+     * @param array $data
      * @return bool
      */
-    public function validate($data, $rules = array())
+    public function validate($rules = array(), $data = array())
     {
         $rules = array_merge($this->_validationRules, $rules);
+	    if (!$data)
+	        $data = $this->as_array();
         BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
-        $valid = BValidate::i()->validateInput($data, $rules, 'address-form');
-        if (!$valid) {
+        $validate = BValidate::i()->validateInput($data, $rules);
+        if (!$validate['result']) {
             BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
+	        $this->set('errors', $validate['errors']);
         }
 
-        return $valid;
+        return $validate['result'];
     }
 
     public function __call($name, $args)
