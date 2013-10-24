@@ -20,12 +20,6 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <label for="register-street1" class="control-label required">{{ "Address" | _ }}</label>
-          <div class="controls">
-            <input type="text" name="address[street1]" class="required form-control" id="register-street1"/>
-          </div>
-        </div>
         <div class="row">
           <div class="form-group col-sm-6">
             <label for="register-email" class="control-label required">{{ "Email" | _ }}</label>
@@ -50,6 +44,7 @@
         </div>
         <div class="form-group">
           <input type="submit" class="btn btn-primary btn-lg" value="{{ "Register" | _ }}"/>
+          <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; Back to login</a>
           <span class="help-block f-required-notice">* {{ "Indicates Required Fields" | _ }}</span>
         </div>
       </fieldset>

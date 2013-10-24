@@ -1,0 +1,47 @@
+<form class="form form-horizontal">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <h1 class="pull-left">
+                    <i class="icon-cog"></i>
+                    <span>{{ "Tests" |_ }}</span>
+                </h1>
+                <div class="pull-right">
+                    <div class="button-group">
+                        <button class="btn" onclick="ajax_tests_run(); return false;">Run tests cgi</button>
+                        <button class="btn" onclick="ajax_tests_run2(); return false;">Run tests web</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box col-sm-12">
+        <div class="box-content" id="results" style="display: none; max-height:480px; overflow:auto;">
+            hello
+        </div>
+    </div>
+</form>
+
+
+
+<script type="text/javascript">
+    function ajax_tests_run() {
+        $.ajax({
+            type: "GET",
+            url: "{{ APP.href('tests/run') }}"
+        }).done(function( msg ) {
+            $('#results').show().html(msg);
+        });
+        return false;
+    }
+    function ajax_tests_run2() {
+        $.ajax({
+            type: "GET",
+            url: "{{ APP.href('tests/run2') }}"
+        }).done(function( msg ) {
+            $('#results').show().html(msg);
+        });
+        return false;
+    }
+</script>
