@@ -9,7 +9,6 @@ class FCom_Seo_Frontend extends BClass
 
     static public function rememberReferrer()
     {
-
         $referrer =& BSession::i()->dataToUpdate('referrer');
         if (empty($referrer)) {
             $url = BRequest::i()->referrer();

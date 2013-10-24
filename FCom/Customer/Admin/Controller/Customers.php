@@ -13,17 +13,18 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            'id' => array('index'=>'c.id'),
-            'firstname' => array('label'=>'First Name', 'index'=>'c.firstname'),
-            'lastname' => array('label'=>'Last Name', 'index'=>'c.lastname'),
-            'email' => array('label'=>'Email', 'index'=>'c.email'),
-            'street1' => array('label'=>'Address', 'index'=>'a.street1'),
-            'city' => array('label'=>'City', 'index'=>'a.city'),
-            'region' => array('label'=>'Region', 'index'=>'a.region'),
-            'postcode' => array('label'=>'Postal Code', 'index'=>'a.postcode'),
-            'country' => array('label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
-            'create_at' => array('label'=>'Created', 'index'=>'c.create_at'),
-            'update_at' => array('label'=>'Updated', 'index'=>'c.update_at'),
+	        array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index'=>'c.id'),
+            array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
+            array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
+            array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
+            array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
+            array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
+            array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
+            array('name' => 'postcode', 'label'=>'Postal Code', 'index'=>'a.postcode'),
+            array('name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
+            array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
+            array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),
         );
         $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         return $config;

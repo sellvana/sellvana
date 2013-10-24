@@ -50,7 +50,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
@@ -95,7 +95,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;

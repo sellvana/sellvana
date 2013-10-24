@@ -10,15 +10,15 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function wishlist()
     {
-        $user = FCom_Customer_Model_Customer::i()->sessionUser();
-        if (!$user){
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+        if (!$customer){
             return false;
         }
         if (!$this->wishlist) {
-            $wishlist = static::i()->load(array("user_id", $user->id));
+            $wishlist = static::i()->load(array("customer_id", $customer->id()));
             if (!$wishlist) {
-                $this->orm()->create()->set("user_id", $user->id())->save();
-                $wishlist = static::i()->load(array("user_id", $user->id));
+                $this->orm()->create()->set("customer_id", $customer->id())->save();
+                $wishlist = static::i()->load(array("customer_id", $customer->id));
             }
 
             $this->wishlist = $wishlist;
