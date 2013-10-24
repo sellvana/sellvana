@@ -3260,6 +3260,16 @@ class BValidate extends BClass
 
     protected $_validateErrors = array();
 
+	/**
+	 * @param bool  $new
+	 * @param array $args
+	 * @return BValidate
+	 */
+	public static function i($new=false, array $args=array())
+	{
+		return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+	}
+
     public function addValidator($name, $rule)
     {
         $this->_defaultRules[$name] = $rule;
@@ -3373,7 +3383,22 @@ class BValidate extends BClass
                 }
             }
         }
-        return $this->_validateErrors ? false : true;
+	    //return $this->_validateErrors ? false : true;
+
+	    $validate = array();
+	    if ($this->_validateErrors) {
+		    $validate =  array(
+			    'result' => false,
+			    'errors' => $this->_validateErrors
+		    );
+	    } else {
+		    $validate['result'] = array(
+			    'result' => true,
+			    'errors' => array()
+		    );
+	    }
+
+	    return $validate;
     }
 
     public function validateErrors()
