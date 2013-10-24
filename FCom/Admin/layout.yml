@@ -135,8 +135,8 @@ common_js_libs:
 
       - [ requireJs, wysihtml5, @FCom_Core/js/lib/wysihtml5/wysihtml5-0.4.0pre ]
       - [ requireJs, bootstrap-wysihtml5, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5, { deps: [ jquery, bootstrap, wysihtml5 ] } ]
-#           - [ requireJs, store, @FCom_Core/js/lib/store ]
-#           - [ requireJs, jquery.resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns ]
+      #- [ requireJs, store, @FCom_Core/js/lib/store ]
+      #- [ requireJs, resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns, { deps: [ jquery] } ]
       - [ requireJs, fcom.backbone.grid, @FCom_Core/js/fcom.backbone.grid ]
 
 lib_admin_theme1:

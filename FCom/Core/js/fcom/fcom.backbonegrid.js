@@ -205,12 +205,12 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         },
         resetPlugins: function() {
 
-            /*this.getMainTable().dragtable({
+            this.getMainTable().dragtable({
                 dragHandle:'.draghandle',
                 dragaccept:'.accept',
                 //maxMovingRows: 1,
                 persistState: this.saveColumnOrder
-            });*/
+            });
             this.getMainTable().colResizable({                
                 disable: true
             });
