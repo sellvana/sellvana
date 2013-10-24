@@ -368,7 +368,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         foreach ($rows as $rowId => $row) {
             $data[] = $row->as_array();
         }
-
+        
         return json_encode(array('state' => $state, 'data' => $data));
     }
 
