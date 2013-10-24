@@ -11,7 +11,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
     #protected $_gridViewName = 'admin/grid';
-    protected $_gridViewName = 'core/htmlgrid';
+    protected $_gridViewName = 'core/backbonegrid';
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';

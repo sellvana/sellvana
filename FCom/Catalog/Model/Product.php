@@ -607,5 +607,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         FCom_Catalog_Model_CategoryProduct::i()->delete_many(array('product_id'=>$this->id, 'category_id'=>$categoryIds));
         return $this;
     }
+
+    public function getAverageStars()
+    {
+        return $this->get('average_rating')/5*100;
+    }
+
+    public function getNumReviews()
+    {
+        return $this->get('num_reviews');
+    }
 }
 

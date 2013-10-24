@@ -3,29 +3,31 @@
   <!-- Product Image Column -->
   <div class="f-col-prod-img col-sm-6">
     <div class="f-rslides-container">
-      <ul class="thumbnails f-rslides f-prod-imgs">
+      <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
         <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
         <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
+        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
       </ul>
     </div>
-    <ul class="f-prod-more-view-imgs row">
-      <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+    <ul class="f-prod-more-view-imgs row" id="quickview-rslides-pager">
+      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
+      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
+      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
+      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
     </ul>
     <script>
-      require(['jquery', 'responsiveslides'], function($) {
-        $(".f-rslides").responsiveSlides({
+      require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
+        $("#quickview-rslides").responsiveSlides({
           speed: 500,
           timeout: 4000,
           nav: true,
-          random: true,
+          manualControls: '#quickview-rslides-pager',
           pause: true,
           pauseControls: true,
-          namespace: "f",
+          namespace: "f"
         });
+        $('#quickview-rslides li').addClass('zoom').zoom();
       });
     </script>
   </div>
@@ -35,14 +37,18 @@
       <li><a href="#f-tab-detail" data-toggle="tab">Details</a></li>
     </ul>
     <div class="tab-pane active" id="f-tab-summary">
-      <h4 class="f-prod-name">Realistically longer name {{ m.get('product_name') }}</h4>
+      <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.get('product_name') }}</a></h4>
+
+{% if MODULES.isLoaded('FCom_ProductReviews') %}
       <div class="f-prod-avg-rating">
         <div class="glyphicon f-rating-stars f-xs-stars">
-          <span class="f-filled-stars" style="width:{{ m.get('average_rating')/5*100 }}%;"></span>
+          <span class="f-filled-stars" style="width:{{ m.getAverageStars() }}%;"></span>
           <span class="f-empty-stars"></span>
         </div>
-        <a href="#f-prod-tab-reviews">{{ m.get('num_reviews') }} Reviews</a>
+        <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(m.getNumReviews()) }}</a>
       </div>
+{% endif %}
+
       <table class="f-price-group">
           <tr class="f-special-price">
             <th class="f-price-label">Price:</th>
@@ -88,8 +94,8 @@
         <div class="f-prod-add-cart">
           <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
           <ul class="f-add-to-links">
-            <li><a href="#">{{ 'Add to Wishlist'|_ }}</a></li>
-            <li><a href="#">{{ 'Add to Compare'|_ }}</a></li>
+            <li><a href="{{ APP.href('wishlist/add?id=') ~ m.id() }}" rel="nofollow">{{ 'Add to Wishlist'|_ }}</a></li>
+            <li><a href="{{ APP.href('catalog/compare/add?id=') ~ m.id() }}" rel="nofollow">{{ 'Add to Compare'|_ }}</a></li>
           </ul>
         </div>
       </form>
@@ -97,7 +103,7 @@
     <!-- /.tab-pane -->
     <div class="tab-pane" id="f-tab-detail">
       <div class="f-prod-short-description">
-        <p>{{ m.get('description') }}It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+        <p>{{ m.get('description') }}</p>
       </div>
     </div>
   </div>

@@ -98,10 +98,10 @@
         <input type="checkbox" name="[{{ config.id}}][checked][<%= id %>]">
       </td>
     {% endif %}
-    {% if col.name != 'id'  %}   
-      <% if(hidden{{ col.name }} === false) { %>     
+    {% if col.name != 'id'  %}
+      <% if(hidden{{ col.name }} === false) { %>
         <td class="{{ col.class }}" style="{{ col.style }}">
-    
+
             {% if col.href %}
                 <a href='{{ col.href|raw }}'>
                     <%= {{ col.name }} %>

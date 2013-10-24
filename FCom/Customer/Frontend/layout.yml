@@ -1,13 +1,16 @@
 /customer/login:
 	- { include: base }
+	- { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
 	- { hook: main, views: customer/login }
 
 /customer/register:
 	- { include: base }
+	- { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
 	- { hook: main, views: customer/register }
 
 /customer/password/recover:
 	- { include: base }
+	- { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
 	- { hook: main, views: customer/password/recover }
 
 /customer/password/reset:

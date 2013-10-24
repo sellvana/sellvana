@@ -120,4 +120,9 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ));
         }
     }
+
+    public function action_compare_add()
+    {
+
+    }
 }

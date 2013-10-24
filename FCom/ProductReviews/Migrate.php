@@ -73,4 +73,16 @@ class FCom_ProductReviews_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_2__0_2_3()
+    {
+        $table = FCom_ProductReviews_Model_Review::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                'rating1' => 'tinyint(1) unsigned not null after rating',
+                'rating2' => 'tinyint(1) unsigned not null after rating1',
+                'rating3' => 'tinyint(1) unsigned not null after rating2',
+            ),
+        ));
+    }
 }

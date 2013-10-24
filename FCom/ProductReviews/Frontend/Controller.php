@@ -17,7 +17,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         }
 
         $this->view('prodreviews/add')->pid = $product->id();
-        $this->layout('/prodreviews/add');
+        $this->layout('/prodreview/add');
     }
 
     public function action_add__POST()

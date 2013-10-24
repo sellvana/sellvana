@@ -68,8 +68,8 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
             var accept = '';
             if (this.model.get('no_reorder') !== true)
                 accept = 'accept ';
-            this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));    
-            
+            this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));
+
             return this;
         }
     });
@@ -90,7 +90,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 var th = new BackboneGrid.Views.ThView({model: ColModel});
                 this.$el.append(th.render().el);
             }
-            
+
         }
     });
     BackboneGrid.Models.Row = Backbone.Model.extend({
@@ -165,10 +165,10 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         saveColumnOrder: function(table) {
             var persParam = {};
             var columnsOrder = [];
-            table.el.find('th').each(function(i) { 
-                columnsOrder[i] = {name: $(this).attr('data-id')};                        
-            }); 
-                    
+            table.el.find('th').each(function(i) {
+                columnsOrder[i] = {name: $(this).attr('data-id')};
+            });
+
             persParam['do'] = 'grid.col.order';
             persParam['cols'] = columnsOrder;
             persParam['grid'] = columnsCollection.grid;
@@ -177,11 +177,11 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 console.log(data);
             });
             //destory resize div
-            gridView.getMainTable().colResizable({                
+            gridView.getMainTable().colResizable({
                 disable: true
             });
             //recreate resize div
-            gridView.getMainTable().colResizable({                
+            gridView.getMainTable().colResizable({
                 onResize: this.saveColumnSize
             });
         },
@@ -193,7 +193,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 if (columnsCollection.columnsWidth[name] && columnsCollection.columnsWidth[name]!=$(this).width()) {
                     columnsCollection.columnsWidth[name] = $(this).width();
                     cols[cols.length] = {name: name, width: $(this).width()};
-                }                
+                }
             });
 
             $.post(columnsCollection.personalize_url,{
@@ -211,10 +211,10 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 //maxMovingRows: 1,
                 persistState: this.saveColumnOrder
             });
-            this.getMainTable().colResizable({                
+            this.getMainTable().colResizable({
                 disable: true
             });
-            this.getMainTable().colResizable({                
+            this.getMainTable().colResizable({
                 onResize: this.saveColumnSize
             });
         },
@@ -223,10 +223,10 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         },
         render: function() {
             this.$el.html('');
-            this.collection.each(this.addRow, this);            
+            this.collection.each(this.addRow, this);
             this.resetPlugins();
 
-            return this;            
+            return this;
         },
         addRow: function(row) {
             var rowView = new BackboneGrid.Views.RowView({
@@ -238,7 +238,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
     BackboneGrid.Views.ColCheckView = Backbone.View.extend({
         tagName: 'li',
         className: '',
-        events: {         
+        events: {
             'change input.showhide_column': 'changeState'
         },
         changeState: function() {
@@ -255,7 +255,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 'do': 'grid.col.hidden',
                 'col': this.model.get('name'),
                 'hidden': value,
-                'grid': columnsCollection.grid                    
+                'grid': columnsCollection.grid
             });
 
             gridView.render();
@@ -266,10 +266,10 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         }
     });
     BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
-        el: 'ul.dropdown-menu',
         render: function() {
+            this.setElement('#' + BackboneGrid.id + ' .dropdown-menu');
             this.$el.html('');
-            this.collection.each(this.addLiTag, this); 
+            this.collection.each(this.addLiTag, this);
         },
         addLiTag: function(model) {
             if(model.get('label') !== '') {
@@ -315,8 +315,8 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
     var headerView;
 
     FCom.BackboneGrid = function(config) {
-        
-        
+
+
         //Theader
         BackboneGrid.Collections.ColsCollection.prototype.personalize_url = config.personalize_url;
         BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
@@ -328,7 +328,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
         BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";
         BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
-        
+
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.colTemplate).html());
         var state = config.data.state;
@@ -336,6 +336,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
 
         state.p = parseInt(state.p);
         state.mp = parseInt(state.mp);
+        BackboneGrid.id = config.id;
         BackboneGrid.currentState = state;
 
         $('ul.pagination.page').on('click', 'li', function(ev) {
@@ -360,11 +361,11 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
 
         //header view
         var columns = config.columns;
-        columnsCollection = new BackboneGrid.Collections.ColsCollection;        
+        columnsCollection = new BackboneGrid.Collections.ColsCollection;
         var columnsWidth = {};
         for (var i in columns) {
             var c = columns[i];
-            if (c.name != 'id') {  
+            if (c.name != 'id') {
 
                 if (c.hidden === 'false')
                     c.hidden = false;
@@ -382,7 +383,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                     //c.cssClass += 'sort';
                     c.sortState = "";
                 }
-                
+
                 var ColModel = new BackboneGrid.Models.ColModel(c);
                 columnsCollection.add(ColModel);
                 if(c['width'])
@@ -391,7 +392,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
                 BackboneGrid.Models.Row.prototype.defaults['hidden' + c.name] = !(!c['hidden']);
             }
         }
-        
+
         columnsCollection.columnsWidth = columnsWidth;
 
         headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
@@ -414,7 +415,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable','jquery.dragtable'], 
             rowsCollection.add(rowModel);
         }
 
-        gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});        
+        gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
         //gridView.tableId = '#' + config.id;
         gridView.render();
 

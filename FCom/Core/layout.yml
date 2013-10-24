@@ -12,6 +12,8 @@ common_js_libs:
             - [ requireJs, jquery.tablesorter, @FCom_Core/js/lib/jquery.tablesorter.min, { deps: [ jquery ] }]
             - [ requireJs, jquery.widgets, @FCom_Core/js/lib/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
 
+            - [ requireJs, jquery.zoom, @FCom_Core/js/lib/jquery.zoom, { deps: [ jquery ] } ]
+
             - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
 #            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
 
