@@ -1,4 +1,4 @@
-{# Logic provided by FCom_Core_View_Backgrid #}
+﻿{# Logic provided by FCom_Core_View_Backgrid #}
 
 {% set data = THIS.getGridData() %}
 {% set config = THIS.grid['config'] %}
@@ -91,3 +91,74 @@
 
 
 
+<script type="template" id="{{ config.id }}-row-template">
+  <tr id="<%= id %>" class="<%= cssClass %>">
+  {% for col in config.columns %}
+
+    {% if not col.hidden %}
+        <td class="{{ col.class }}" style="{{ col.style }}">
+            {% if col.cell == 'select-row' %}
+                <input type="checkbox" name="[{{ config.id}}][checked][<%= id %>]">
+            {% elseif col.href %}
+                <a href='{{ col.href|raw }}'>
+                    <%= {{ col.name }} %>
+                </a>    
+            {% else %}
+                <%= {{ col.name }} %>
+          {% endif %}
+        </td>
+    {% endif %}
+  {% endfor %}
+  </tr>
+</script>
+
+<script type='template' id="{{ config.id }}-header-template">
+    <th id="th-sort-<%= id %>" data-id="<%= name %>" style="<%= style%>" class="<%= cssClass %> sort-<%= sortState %>">
+    
+        <% if(type === '' || type === 'default') { %>
+            
+            <% if (no_reorder!==true) { %>
+                    <div class="draghandle" style='width:100%;height:18px;background-color:#eeeeee;'></div>
+            <% } %>
+            <a class="js-change-url" style="cursor: pointer;">
+                <%= label %>
+            </a>
+        <% } else if (type === 'multiselect') { %>
+            <select class="js-sel">
+                {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
+            </select>
+        <% } %>
+    </th>
+</script>
+
+<script type='template' id="{{ config.id }}-pagination-template">
+    <li class="first <% if (p <= 1) { %> 'disabled' <%} %>">
+        <a class="js-change-url" href="#">&laquo;</a>
+    </li>
+    <li class="prev <%= s.p <= 1 ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&lsaquo;</a>
+    </li>
+    <% for (var i= 1; i<=2;i++) { %>        
+        <li <%= i == s.p ? 'class="active"' : '' %>>
+            <a class="js-change-url" data-page="" href="#"><%= i %></a>
+        </li>
+    <% } %>
+    <li class="next <%= s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&rsaquo;</a>
+    </li>
+    <li class="last <%= s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#">&raquo;</a>
+    </li>
+</script>
+
+<script>
+require(['jquery', 'fcom.backbonegrid'], function($) {
+
+    $(function() {
+        var grid = new FCom.BackboneGrid12({
+            
+        });
+    });
+
+});
+</script>
