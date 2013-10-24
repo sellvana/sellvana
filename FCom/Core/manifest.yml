@@ -18,7 +18,7 @@ modules:
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
-            
+            - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid} ]
 
         observe:
             - [ BTwig::init, FCom_Core_Main::onTwigInit ]
