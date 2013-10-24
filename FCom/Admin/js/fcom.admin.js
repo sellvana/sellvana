@@ -680,7 +680,14 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         function wysiwygCreate(id) {
             if (!editors[id] && CKEDITOR !== 'undefined') {
                 editors[id] = true; // prevent double loading
-                CKEDITOR.replace(id); //todo: add pre-define options for ckeditor
+                CKEDITOR.replace(id, {
+                    toolbarGroups: [
+                        { name: 'mode' },
+                        { name: 'basicstyles' },
+                        { name: 'links' }
+                    ],
+                    startupMode: 'wysiwyg'
+                });
 //
 //                $('#'+id).ckeditor(function() {
 //                    this.dataProcessor.writer.indentationChars = '  ';
