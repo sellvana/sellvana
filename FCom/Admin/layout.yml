@@ -95,7 +95,6 @@ common_js_libs:
 #            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
       - [ requireJs, select2, @FCom_Core/js/select2/select2, { deps: [ jquery ] } ]
       - [ requireJs, jquery.form, @FCom_Core/js/lib/jquery.form, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.validate, @FCom_Core/js/lib/jquery.validate.min, { deps: [ jquery ] } ]
       - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, @FCom_Core/js/lib/jquery-ui.min ], { deps: [ jquery ] } ]
       #- [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-jebaird, { deps: [ jquery, jquery-ui ] } ]
 
