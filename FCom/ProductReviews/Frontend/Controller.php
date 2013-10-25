@@ -13,10 +13,11 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         }
 
         if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
-            BResponse::i()->redirect(Bapp::href("login"));
+            $this->forward('unauthenticated');
+            return;
         }
 
-        $this->view('prodreviews/add')->pid = $product->id();
+        $this->view('prodreviews/review-form')->pid = $product->id();
         $this->layout('/prodreview/add');
     }
 

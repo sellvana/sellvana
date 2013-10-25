@@ -26,8 +26,8 @@
             </tr>
           </table>
         </div>
-        
-        
+
+
         {% if THIS.get('orderItems') %}
         <h4>{{"Order items" | _ }}</h4>
         <div class="table-responsive">
@@ -50,7 +50,7 @@
         </div>
         {% endif %}
       </div>
-      {{ THIS.view('customer/account/sidebar') | raw }}
+      {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
     </div>
   </div>
 </div>

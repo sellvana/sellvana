@@ -29,7 +29,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         } catch (Exception $e) {
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 
@@ -47,7 +47,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.',
                 'success', 'frontend');
-        BResponse::i()->redirect(BApp::href('login'));
+        BResponse::i()->redirect('login');
     }
 
     public function action_password_reset()
@@ -58,7 +58,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $this->layout('/customer/password/reset');
         } else {
             BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 
@@ -72,7 +72,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect(BApp::baseUrl());
         } else {
             BSession::i()->addMessage('Invalid form data', 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 

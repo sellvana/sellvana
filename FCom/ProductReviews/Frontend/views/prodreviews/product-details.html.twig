@@ -1,4 +1,6 @@
+{% set isLoggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
 
+{% if isLoggedIn %}
 <!-- Modal -->
 <div class="modal fade" id="f-prod-review-form" tabindex="-1" role="dialog" aria-labelledby="f-prod-review-form-label" aria-hidden="true" data-backdrop="false">
   <div class="modal-dialog f-prod-review-form">
@@ -8,7 +10,7 @@
         <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
       </div>
       <div class="modal-body">
-        {{ THIS.view('prodreviews/add') | raw }}
+        {{ THIS.view('prodreviews/review-form') | raw }}
       </div><!-- /.modal-body -->
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -19,6 +21,7 @@
     $('#f-prod-review-open').attr('href', '#f-prod-review-form');
   })
 </script>
+{% endif %}
 
 <section class="tab-pane active f-prod-reviews" id="f-prod-tab-reviews">
   <div class="f-tab-heading">

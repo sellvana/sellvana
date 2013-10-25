@@ -29,11 +29,6 @@
         'root_dir' => 'BUI',
         'bootstrap' => array('file' => 'BUI.php', 'callback' => 'BUI::bootstrap' ),
     ),
-    'BFireLogger' => array(
-        'version' => '1.0.0',
-        'root_dir' => 'BFireLogger',
-        'bootstrap' => array('file' => 'BFireLogger.php', 'callback' => 'BFireLogger::bootstrap' ),
-    ),
     'BMarkdown' => array(
         'version' => '1.0.0',
         'root_dir' => 'BMarkdown',
