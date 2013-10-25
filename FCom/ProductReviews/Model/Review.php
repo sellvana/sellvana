@@ -5,6 +5,19 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_product_review';
     protected static $_origClass = __CLASS__;
 
+	protected $_validationRules = array(
+		array('product_id', '@required'),
+		array('customer_id', '@required'),
+		array('rating', '@required'),
+		array('title', '@required'),
+		array('create_at', '@required'),
+
+		array('rating', '@integer'),
+		array('approved', '@integer'),
+		array('helpful', '@integer'),
+		array('offensive', '@integer'),
+	);
+
     public function addNew($customerId, $productId, $dataInput)
     {
         $data = array(

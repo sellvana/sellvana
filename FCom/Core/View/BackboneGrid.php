@@ -351,11 +351,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function getPageRowsData()
     {
+
         $grid = $this->get('grid');
         $state = $grid['result']['state'];
         $rows = $grid['result']['rows'];
-        $gridId = $grid['config']['id'];
-
+        $gridId = $grid['config']['id'];        
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');

@@ -33,6 +33,8 @@ modules:
                     #- [ get, /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
                 observe:
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
+                views:
+                    - [ customer/account/sidebar, { view_class: FCom_Customer_Frontend_View_Sidebar } ]
 
             FCom_ApiServer:
                 routing:

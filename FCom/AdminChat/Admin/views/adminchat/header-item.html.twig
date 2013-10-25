@@ -7,12 +7,12 @@
         <script type='text/template' class='template' id='statusTemplate'>
         <div class="widget-body">
           <div class="pull-left icon">
-            <img width="23" height="23" src="<%= avatar %>" alt="<%= username %>">
+            <img width="23" height="23" src="<%= rc.avatar %>" alt="<%= rc.username %>">
           </div>
           <div class="pull-left text">
-            <%= username %>&nbsp;
+            <%= rc.username %>&nbsp;
             <small class="text-muted">
-              <select class='js-adminuser-status' value='<%= status %>'>
+              <select class='js-adminuser-status' value='<%= rc.status %>'>
                 {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
               </select>
             </small>
@@ -23,11 +23,11 @@
       <script type='text/template' class='template' id= 'userTemplate'>
         <div class="widget-body">
           <div class="pull-left icon">
-            <img width="23" height="23" src="<%= avatar %>" alt="<%= username %>">
+            <img width="23" height="23" src="<%= rc.avatar %>" alt="<%= rc.username %>">
           </div>
           <div class="pull-left text">
-            <%= username %>&nbsp;
-            <small class="text-muted">-<%= status %>&nbsp;
+            <%= rc.username %>&nbsp;
+            <small class="text-muted">-<%= rc.status %>&nbsp;
               <span class="badge badge-inverse" style="display:none;"></span>
             </small>
           </div>
