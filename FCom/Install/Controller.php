@@ -56,34 +56,25 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         try {
             $w = BRequest::i()->post('w');
             BConfig::i()->add(array('db'=>$w['db']), true);
-
             BDb::connect(null, true);
-
             FCom_Core_Main::i()->writeConfigFiles('db');
-
-            if (class_exists('FCom_Admin_Model_User') && BDb::ddlTableExists(FCom_Admin_Model_User::table())
-                && FCom_Admin_Model_User::i()->orm('u')->find_one()
-            ) {
-                if (BConfig::i()->get('install_status')==='installed') {
-                    $url = BApp::href();
-                } else {
-                    $url = BApp::href('install/step3');
-                }
-            } else {
-                BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
-                BMigrate::i()->migrateModules('FCom_Admin');
-                $url = BApp::href('install/step2');
-            }
+            BResponse::i()->redirect('install/step2');
         } catch (Exception $e) {
             //print_r($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
-            $url = BApp::href('install/step1');
+            BResponse::i()->redirect('install/step1');
         }
-        BResponse::i()->redirect($url);
     }
 
     public function action_step2()
     {
+        $userHlp = FCom_Admin_Model_User::i();
+        if (BDb::ddlTableExists($userHlp->table()) && $userHlp->orm('u')->find_one()) {
+            BResponse::i()->redirect('install/step3');
+        } else {
+            BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
+            BMigrate::i()->migrateModules('FCom_Admin');
+        }
         BLayout::i()->applyLayout('/step2');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['admin'])) {
@@ -104,12 +95,11 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ->set('is_superadmin', 1)
                 ->save()
                 ->login();
-            $url = BApp::href('install/step3');
+            BResponse::i()->redirect('install/step3');
         } catch (Exception $e) {
             BSession::i()->addMessage($e->getMessage(), 'error', 'install');
-            $url = BApp::href('install/step2');
+            BResponse::i()->redirect('install/step2');
         }
-        BResponse::i()->redirect($url);
     }
 
     public function action_step3()
@@ -180,13 +170,14 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                     break;
             }
         }
+
         BConfig::i()->add(array(
             'install_status' => 'installed',
             'db' => array('implicit_migration' => 1),
             'module_run_levels' => array('FCom_Core' => $runLevels),
             'mode_by_ip' => array(
-                'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'PRODUCTION',
-                'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'PRODUCTION',
+                'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'DEBUG',
+                'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'DEBUG',
             ),
             'modules' => array(
                 'FCom_Frontend' => array(
@@ -194,7 +185,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ),
             ),
         ), true);
+
         FCom_Core_Main::i()->writeConfigFiles();
-        BResponse::i()->redirect(BApp::baseUrl());
+
+        BResponse::i()->redirect('');
     }
 }
