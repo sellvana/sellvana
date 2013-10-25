@@ -163,6 +163,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (empty($model)) {
             $model = $class::i()->create();
         }
+	    $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
         $this->layout($this->_formLayoutName);
@@ -184,7 +185,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
         $args['view']->set(array(
-            'form_id' => BLocale::transliterate($this->_formLayoutName),
+            'form_id' => $this->formId(),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
         ));
@@ -195,6 +196,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $r = BRequest::i();
         $args = array();
+	    $formId = $this->formId();
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
@@ -204,19 +206,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->formPostBefore($args);
             if ($r->post('do')==='DELETE') {
                 $model->delete();
-                BSession::i()->addMessage('The record has been deleted', 'success', 'admin');
+                BSession::i()->addMessage(BLocale::_('The record has been deleted'), 'success', $formId);
             } else {
 	            $model->set($data);
-	            if ($model->validate()) {
+	            if ($model->validate($model->as_array(), array(), $formId)) {
 		            $model->set($data)->save();
-		            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+		            BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', $formId);
 	            } else {
-		            $messages = array();
-		            foreach($model->errors as $errors) {
-			            foreach ($errors as $error)
-			                $messages[] = array('msg' => $error, 'error');
-		            }
-		            $this->view('core/message')->set('messages', $messages);
+		            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
 	            }
             }
             $this->formPostAfter($args);
@@ -228,7 +225,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if ($r->xhr()) {
             $this->forward('form', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href($this->_gridHref));
+            BResponse::i()->redirect(BApp::href($this->_formHref).'?id='.$id);
         }
     }
 
@@ -246,4 +243,30 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         BEvents::i()->fire(static::$_origClass.'::formPostError', $args);
     }
+
+	/**
+	 * use form id for html and namespace in messages
+	 * @return string
+	 */
+	public function formId()
+	{
+		return BLocale::transliterate($this->_formLayoutName);
+	}
+
+	/**
+	 * prepare message for form
+	 * @param string $viewName
+	 */
+	public function formMessages($viewName = 'core/messages')
+	{
+		$formId = $this->formId();
+		$messages = BSession::i()->messages('validator-errors:'.$formId);
+		if (count($messages)) {
+			foreach ($messages as &$m)
+				$m['msg'] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+			$this->view($viewName)->set('messages', $messages);
+			$this->view($viewName)->set('namespace', '');
+		} else
+			$this->view($viewName)->set('namespace', $formId);
+	}
 }
