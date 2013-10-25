@@ -79,7 +79,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
         }
-
+        /* @var FCom_Sales_Model_Cart_Address $address */
         $address = $cart->getAddressByType($addressType);
         if (!$address) {
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
