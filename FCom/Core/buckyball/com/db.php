@@ -2465,16 +2465,16 @@ class BModel extends Model
      * @param array $data
      * @return bool
      */
-    public function validate($rules = array(), $data = array())
+    public function validate($data = array(), $rules = array())
     {
         $rules = array_merge($this->_validationRules, $rules);
-	    if (!$data)
-	        $data = $this->as_array();
-        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
+        if (!$data)
+            $data = $this->as_array();
+        BEvents::i()->fire($this->_origClass() . "::validate:before", array("rules" => &$rules, "data" => &$data));
         $validate = BValidate::i()->validateInput($data, $rules);
         if (!$validate['result']) {
-            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
-	        $this->set('errors', $validate['errors']);
+            BEvents::i()->fire($this->_origClass() . "::validate:failed", array("rules" => &$rules, "data" => &$data));
+            $this->set('errors', $validate['errors']);
         }
 
         return $validate['result'];
