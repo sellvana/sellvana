@@ -6,6 +6,7 @@ customer_account_sidebar:
         do:
             - [ addNavItem, wishlist, { label: Wishlist, position: 30, href: wishlist } ]
 
+/wishlist:
 	- { include: base }
 	- { hook: main, views: wishlist }
-	- { view: root, do: [[ addBodyClass, page-customer ]] }
+    - { include: customer_account_sidebar }
