@@ -28,7 +28,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
         model: BackboneGrid.Models.ColModel,
         append: 1,
         comparator: function(col) {
-            return col.get('position');
+            return parseInt(col.get('position'));
         }    
     });
 
@@ -90,14 +90,12 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
 
 
             gridParent = $('#'+BackboneGrid.id).parent();
-            console.log(gridParent.html());
-
+            
             $('thead th', gridParent).resizable({
                 handles: 'e',
                 minWidth: 20,
                 stop: function(ev, ui) {
-                    var $el = ui.element, width = $el.width();
-                    console.log(width);
+                    var $el = ui.element, width = $el.width();                    
                     $('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
                     $.post(columnsCollection.personalize_url,
                         { 'do': 'grid.col.width', grid: BackboneGrid.id, col: $el.data('id'), width: width },
@@ -105,6 +103,9 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
                             //console.log(response, status, xhr);
                         }
                     );
+
+                    colModel = columnsCollection.findWhere({name: $el.data('id')});
+                    colModel.set('width', width);
                 }
             });
 
@@ -146,10 +147,11 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
                 colInfo.name = c.get('name');
                 colInfo.hidden = c.get('hidden');
                 colInfo.cell =c.get('cell');
-                colInfo.position = c.get('position');
+                colInfo.position = c.get('position');   
+                //colInfo.width = c.get('width');             
                 colsInfo[colsInfo.length] = colInfo;
             },this);
-            console.log(colsInfo);
+            
             this.each(function(row) {
                 row.set('colsInfo', colsInfo);
             },this);
@@ -257,9 +259,15 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
             return {'data-id': this.model.get('name')};
         },
         events: {
-            'change input.showhide_column': 'changeState'
+            'change input.showhide_column': 'changeState',
+            'click input.showhide_column': 'preventDefault'
         },
-        changeState: function() {
+        preventDefault: function(ev){
+
+            ev.stopPropagation();
+        },
+        changeState: function(ev) {
+           
             this.model.set('hidden',!this.model.get('hidden'));
             headerView.render();
 
@@ -277,6 +285,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
             });
             rowsCollection.updateColsInfo();
             gridView.render();
+
+            
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -287,7 +297,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
         initialize: function() {
             this.setElement('#' + BackboneGrid.id + ' .dd-list');            
         },
-        orderChanged: function() {
+        orderChanged: function(ev) {
             var orderJson = $('.dd').nestable('serialize');
             for(var i in orderJson) {
                 var key = orderJson[i].id;
@@ -296,8 +306,9 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
             }
             
             columnsCollection.sort();            
-            console.log(columnsCollection.pluck('position'));
-            console.log(columnsCollection.pluck('label'));
+            //console.log(columnsCollection.pluck('position'));
+            //console.log(columnsCollection.pluck('label'));
+            //console.log(columnsCollection.pluck('width'));
             
             rowsCollection.updateColsInfo();
             gridView.render();
@@ -307,6 +318,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
                 'cols': colsInfo,
                 'grid': columnsCollection.grid
             });
+            
+           
         },
         render: function() {            
             this.$el.html('');
@@ -423,7 +436,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $
                 }
 
                 c.id = config.id + '-' + c.name;
-                c.style = c['width'] ? "width:" + c['width'] + "px" : '';
+                //c.style = c['width'] ? "width:" + c['width'] + "px" : '';
 
                 c.cssClass = '';
                 if (!c['no_reorder'])
