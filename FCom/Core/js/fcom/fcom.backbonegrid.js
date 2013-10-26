@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 'jquery.nestable'], function(Backbone, _, $) {
+define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 'nestable'], function(Backbone, _, $) {
 
     var BackboneGrid = {
         Models: {},
@@ -28,7 +28,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
         model: BackboneGrid.Models.ColModel,
         append: 1,
         comparator: function(col) {
-            return parseInt(col.get('index')) + this.append;
+            return col.get('position');
         }    
     });
 
@@ -126,6 +126,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
                 colInfo.name = c.get('name');
                 colInfo.hidden = c.get('hidden');
                 colInfo.cell =c.get('cell');
+                colInfo.position = c.get('position');
                 colsInfo[colsInfo.length] = colInfo;
             },this);
             console.log(colsInfo);
@@ -272,15 +273,18 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
             for(var i in orderJson) {
                 var key = orderJson[i].id;
                 colModel = columnsCollection.findWhere({name: key});
-                colModel.set('index', i);
+                colModel.set('position', parseInt(i) + columnsCollection.append);
             }
             
             columnsCollection.sort();            
+            console.log(columnsCollection.pluck('position'));
+            console.log(columnsCollection.pluck('label'));
+            
             rowsCollection.updateColsInfo();
             gridView.render();
 
              $.post(columnsCollection.personalize_url,{
-                'do': 'grid.col.order',
+                'do': 'grid.col.orders',
                 'cols': colsInfo,
                 'grid': columnsCollection.grid
             });
