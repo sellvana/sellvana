@@ -1,4 +1,5 @@
 define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago', 'autosize'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago, autosize) {
+    _.templateSettings.variable = 'rc';
     var dingPath, username = '', initializing, avatars={};
 
     function playDing() {
@@ -421,7 +422,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //TODO: refactor for AdminChat to be main class
     var AdminChat = function(options) {
-
+        
         initializing = true;
         username = options.username;
         dingPath = options.dingPath;
@@ -435,7 +436,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         PushClient.listen({regexp: /^adminchat:(.*)$/, callback: channel_adminchat});
 
         initializing = false;
-        _.templateSettings.variable = 'rc';
+        
     }
 
     // send to server

@@ -125,7 +125,7 @@
 </script>
 
 <script type='template' id="{{ config.id }}-header-template">
-    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" style="<%= rc.style%>" class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
+    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" <% if (rc.width) { %> style="width:<%= rc.width %>px;" <% } %> class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
 
         <% if(rc.type === '' || rc.type === 'default') { %>
             <a class="js-change-url" style="cursor: pointer;">
