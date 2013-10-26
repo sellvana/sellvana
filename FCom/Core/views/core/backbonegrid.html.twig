@@ -44,18 +44,21 @@
             {{ action.html | raw }}
           {% endif %}
         {% endfor %}
-        <span class="dropdown">
+        
+        <span class="dropdown dd dd-nestable" style="display:inline;">
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
                 Columns
                 <b class="caret"></b>
             </a>
-
-            <ul class="dropdown-menu">
-                <!--li calss="ui-state-default"-->
-                <!-- visibiility template -->
-                <!--/li -->
-            </ul>
+            
+                <ol class="dd-list dropdown-menu">
+                    <!--li calss="ui-state-default"-->
+                    <!-- visibiility template -->
+                    <!--/li -->
+                </ol>
+          
         </span>
+
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
@@ -63,6 +66,9 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
+    
+          
+    
     <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }} >
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
@@ -85,49 +91,47 @@
 
 
 <script type="template" id="{{ config.id }}-col-template">
-  <label>
-      <input class="showhide_column" type="checkbox" data-id=<%= name %> <% if (hidden === false) { %>checked <% } %> >
-      <%= label %>
-  </label>
+  <div class="dd-handle dd3-handle">
+    &nbsp;
+  </div>
+  <div class="dd3-content">
+    <label>
+        <input class="showhide_column" type="checkbox" datid=<%= rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%= rc.label %>
+    </label>
+  </div>
 </script>
 <script type="template" id="{{ config.id }}-row-template">
-  <tr id="<%= id %>" class="<%= cssClass %>">
-  {% for col in config.columns %}
-    {% if col.cell == 'select-row' %}
-      <td>
-        <input type="checkbox" name="[{{ config.id}}][checked][<%= id %>]">
-      </td>
-    {% endif %}
-    {% if col.name != 'id'  %}
-      <% if(hidden{{ col.name }} === false) { %>
-        <td class="{{ col.class }}" style="{{ col.style }}">
+  <tr id="<%= rc.id %>" class="<%= rc.cssClass %>">
+  <% for (var index in rc.colsInfo) {          
+    var col = rc.colsInfo[index];    
+    if(col.hidden ) {      
+      continue;
+    }  
 
-            {% if col.href %}
-                <a href='{{ col.href|raw }}'>
-                    <%= {{ col.name }} %>
-                </a>
-            {% else %}
-                <%= {{ col.name }} %>
-          {% endif %}
-        </td>
-      <% } %>
-    {% endif %}
-  {% endfor %}
+    print('<td>');
+
+    if (col.cell === 'select-row') { 
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']">');      
+    } else if (col.href!='') { 
+        print('<a href="{{ col.href|raw }}">' + rc[col.name] + '</a>');
+    } else {
+        print(rc[col.name]);
+    } 
+
+    print('</td>');
+  } %>
   </tr>
 </script>
 
 <script type='template' id="{{ config.id }}-header-template">
-    <th id="th-sort-<%= id %>" data-id="<%= name %>" style="<%= style%>" class="<%= cssClass %> sort-<%= sortState %> <%= no_reorder!==true ? 'accept' : '' %>">
+    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" style="<%= rc.style%>" class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
 
-        <% if(type === '' || type === 'default') { %>
-
-            <% if (no_reorder!==true) { %>
-                    <div class="draghandle" style='margin:10px;height:18px;background-color:#eeeeee;'></div>
-            <% } %>
+        <% if(rc.type === '' || rc.type === 'default') { %>
             <a class="js-change-url" style="cursor: pointer;">
-                <%= label %>
+                <%= rc.label %>
             </a>
-        <% } else if (type === 'multiselect') { %>
+        <% } else if (rc.type === 'multiselect') { %>
             <select class="js-sel">
                 {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
             </select>
@@ -135,25 +139,7 @@
     </th>
 </script>
 
-<script type='template' id="{{ config.id }}-pagination-template">
-    <li class="first <% if (p <= 1) { %> 'disabled' <%} %>">
-        <a class="js-change-url" href="#">&laquo;</a>
-    </li>
-    <li class="prev <%= s.p <= 1 ? 'disabled' : '' %>">
-        <a class="js-change-url" href="#")>&lsaquo;</a>
-    </li>
-    <% for (var i= 1; i<=2;i++) { %>
-        <li <%= i == s.p ? 'class="active"' : '' %>>
-            <a class="js-change-url" data-page="" href="#"><%= i %></a>
-        </li>
-    <% } %>
-    <li class="next <%= s.p >= s.mp ? 'disabled' : '' %>">
-        <a class="js-change-url" href="#")>&rsaquo;</a>
-    </li>
-    <li class="last <%= s.p >= s.mp ? 'disabled' : '' %>">
-        <a class="js-change-url" href="#">&raquo;</a>
-    </li>
-</script>
+
 
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
