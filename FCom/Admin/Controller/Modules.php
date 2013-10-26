@@ -68,8 +68,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 $sd = empty($s['sd']) || $s['sd']==='asc' ? 1 : -1;
                 return $a1 < $b1 ? -$sd : ($a1 > $b1 ? $sd : 0);
             });
-        }
-
+        }        
         return $data;
     }
 
@@ -95,7 +94,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 		);
 
 		$config['data'] = $this->getModulesData();
-        
+        //$config['state'] =array(5,6,7,8);
 		return $config;
 	}
 

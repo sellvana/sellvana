@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 'nestable'], function(Backbone, _, $) {
+define(['backbone', 'underscore', 'jquery', 'nestable'], function(Backbone, _, $) {
 
     var BackboneGrid = {
         Models: {},
@@ -87,6 +87,26 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
         render: function() {
             this.$el.html('');            
             this.collection.each(this.addTh, this);
+
+
+            gridParent = $('#'+BackboneGrid.id).parent();
+            console.log(gridParent.html());
+
+            $('thead th', gridParent).resizable({
+                handles: 'e',
+                minWidth: 20,
+                stop: function(ev, ui) {
+                    var $el = ui.element, width = $el.width();
+                    console.log(width);
+                    $('tbody td[data-col="'+$el.data('id')+'"]', gridParent).width(width);
+                    $.post(columnsCollection.personalize_url,
+                        { 'do': 'grid.col.width', grid: BackboneGrid.id, col: $el.data('id'), width: width },
+                        function(response, status, xhr) {
+                            //console.log(response, status, xhr);
+                        }
+                    );
+                }
+            });
 
             return this;
         },
@@ -187,7 +207,7 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
                 models[i].set('cssClass', cssClass);
             }
         },        
-        saveColumnSize: function(ev) {
+        /*saveColumnSize: function(ev) {
             var table = $(ev.currentTarget);
             var cols = [];
             table.find('th').each(function () {
@@ -211,17 +231,16 @@ define(['backbone', 'underscore', 'jquery', 'colResizable', 'jquery.dragtable', 
             this.getMainTable().colResizable({
                 onResize: this.saveColumnSize
             });
-        },
+        },*/
         getMainTable : function() {
-            return this.$el.parents('table:first');
+            return $('#' + BackboneGrid.id);
         },
         render: function() {     
             //console.log('gridview-render');
             this.setCss();
             this.$el.html('');
             this.collection.each(this.addRow, this);
-            this.resetColResizer();
-
+            
             return this;
         },
         addRow: function(row) {
