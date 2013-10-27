@@ -88,7 +88,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 70, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
 			array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell")),
 			array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
- 			array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options' => $areaRunLevelOptions, 'width' => 220, 'editable' => true, 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell"),'type' => 'select'),
+ 			array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 220, 'editable' => true, 'editor' => 'select', 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
 			array('name' => 'requires', 'label' => 'Requires', 'width' => 250),
 			array('name' => 'required_by', 'label' => 'Required By', 'width' => 800)
 		);
