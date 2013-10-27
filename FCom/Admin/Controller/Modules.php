@@ -84,16 +84,17 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 			//array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
 			array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 150),
 			array('name' => 'description', 'label' => 'Description', 'width' => 250),
-			array('name' => 'version', 'label' => 'Code', 'width' => 50),
-			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 50, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
+			array('name' => 'version', 'label' => 'Code', 'width' => 90),
+			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 70, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell")),
 			array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell")),
 			array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell")),
-			array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options' => $areaRunLevelOptions, 'width' => 120, 'editable' => true, 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell")),
+ 			array('name' => 'run_level_core', 'label' => 'Run Level (Core)', 'options' => $areaRunLevelOptions, 'width' => 220, 'editable' => true, 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell"),'type' => 'select'),
 			array('name' => 'requires', 'label' => 'Requires', 'width' => 250),
-			array('name' => 'required_by', 'label' => 'Required By', 'width' => 800),
+			array('name' => 'required_by', 'label' => 'Required By', 'width' => 800)
 		);
 
 		$config['data'] = $this->getModulesData();
+        $config['data_mode'] = 'local';
         //$config['state'] =array(5,6,7,8);
 		return $config;
 	}
