@@ -42,6 +42,7 @@ base:
       #- [ requireModulePath, FCom_Admin ]
       - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
       - [ requireJs, jquery.hotkeys, @FCom_Core/js/lib/jquery.hotkeys, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
       #- [ requireJs, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       #- [ js, @FCom_Core/js/select2/select2.min.js ]

@@ -17,25 +17,26 @@
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
-        <ul class="pagination pagination-sm pagesize">
-          {% for ps in THIS.pageSizeOptions() %}
-            <li {{ ps==s.ps ? 'class="active"' }}>
-              <a class="js-change-url page-size" href="#">{{ ps }}</a>
-            </li>
-          {% endfor %}
-        </ul>
 
-        <ul class="pagination pagination-sm page">
-          {#
-          <label>
-            {{ 'Page'|_ }}
-          </label>
-          <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
-          {{ 'of %s'|_(s.mp) }}
-          #}
+        {% if config['data_mode']!= 'local' %}
+          <ul class="pagination pagination-sm pagesize">
+            {% for ps in THIS.pageSizeOptions() %}
+              <li {{ ps==s.ps ? 'class="active"' }}>
+                <a class="js-change-url page-size" href="#">{{ ps }}</a>
+              </li>
+            {% endfor %}
+          </ul>
 
-
-        </ul>
+          <ul class="pagination pagination-sm page">
+            {#
+            <label>
+              {{ 'Page'|_ }}
+            </label>
+            <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
+            {{ 'of %s'|_(s.mp) }}
+            #}
+          </ul>
+        {% endif %}
 
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
@@ -69,7 +70,7 @@
     
           
     
-    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }} >
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -109,7 +110,7 @@
       continue;
     }  
 
-    print('<td>');
+    print('<td data-col="' + col.name + '">');
 
     if (col.cell === 'select-row') { 
         print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']">');      
@@ -125,7 +126,7 @@
 </script>
 
 <script type='template' id="{{ config.id }}-header-template">
-    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" <% if (rc.width) { %> style="width:<%= rc.width %>px;" <% } %> class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
+    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" style="<% if (rc.width) { %> width:<%= rc.width %>px; <% } %>" class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
 
         <% if(rc.type === '' || rc.type === 'default') { %>
             <a class="js-change-url" style="cursor: pointer;">
@@ -148,12 +149,14 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             id: "{{ config.id }}",
             personalize_url: "{{ APP.href('my_account/personalize') }}",
             data_url: "{{ config.data_url }}",
+            edit_url: "{{ config.edit_url }}",
             data: {{ THIS.getPageRowsData() | raw }},
             headerTemplate: "{{ config.id }}-header-template",
             rowTemplate: "{{ config.id }}-row-template",
             pageTemplate: "{{ config.id }}-pagination-template",
             colTemplate: "{{ config.id }}-col-template",
-            columns: {{ THIS.getColumnsData() | raw }}
+            columns: {{ THIS.getColumnsData() | raw }}, 
+            data_mode: "{{ config.data_mode | raw }}"
         });
     //});
 });

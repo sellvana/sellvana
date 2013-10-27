@@ -326,17 +326,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
 		    $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
-		    try {
-			    $grid['result'] = $orm->paginate($grid['request'], array(
-				    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
-				    'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
-				    'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
-				    'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
-			    ));
-		    } catch (Exception $e) {
-			    $this->_resetPersonalization();
-			    throw $e;
-		    }
+            //TODO: $config['state'] is not fectch from db
+            //var_dump($config['state']);exit;
+            try {
+    			$grid['result'] = $orm->paginate($grid['request'], array(
+    			    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
+    			    'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
+    			    'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
+    			    'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
+    			));
+    		} catch (Exception $e) {
+    		    $this->_resetPersonalization();
+    		    throw $e;
+    		}
+            
 		    //var_dump($grid['result']);exit;
 		    $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
@@ -355,7 +358,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->get('grid');
         $state = $grid['result']['state'];
         $rows = $grid['result']['rows'];
-        $gridId = $grid['config']['id'];        
+        $gridId = $grid['config']['id'];
+        
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
