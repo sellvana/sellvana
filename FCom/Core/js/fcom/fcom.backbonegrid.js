@@ -296,21 +296,21 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
             //inline editor
             columnsCollection.each(function(col) {
                 if(col.has('editable') && col.get('editable')) {                    
-                    var type = 'default';
-                    if (col.has('type') && col.get('type')) {                    
-                        type = col.get('type');
+                    var editorType = 'default';
+                    if (col.has('editor') && col.get('editor')) {                    
+                        editorType = col.get('editor');
                     }   
                     
                     var tds = this.$el.find("td[data-col='"+col.get('name')+"']");
                     if (tds.length && tds.length>0) {                                                
-                        if (type === 'default') {
+                        if (editorType === 'default') {
                             tds.editable(this.colValChanged, { 
                                 type: "text",
                                 onblur: 'submit'
                             });
                         }
 
-                        if (type === 'select') {
+                        if (editorType === 'select') {
                             tds.editable(this.colValChanged, {
                                 type: "select",
                                 onblur: 'submit',
