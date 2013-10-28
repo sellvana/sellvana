@@ -81,6 +81,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
+	    $this->messages('core/messages', $this->formId());
         $view = $this->gridView();
         $this->gridViewBefore(array('view' => $view));
         $this->layout($this->_gridLayoutName);
@@ -197,6 +198,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $r = BRequest::i();
         $args = array();
 	    $formId = $this->formId();
+	    $redirectUrl = BApp::href($this->_gridHref);
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
@@ -210,10 +212,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             } else {
 	            $model->set($data);
 	            if ($model->validate($model->as_array(), array(), $formId)) {
-		            $model->set($data)->save();
+		            $model->save();
 		            BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', $formId);
 	            } else {
 		            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+		            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
 	            }
             }
             $this->formPostAfter($args);
@@ -225,7 +228,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if ($r->xhr()) {
             $this->forward('form', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href($this->_formHref).'?id='.$id);
+            BResponse::i()->redirect($redirectUrl);
         }
     }
 
@@ -262,11 +265,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 		$formId = $this->formId();
 		$messages = BSession::i()->messages('validator-errors:'.$formId);
 		if (count($messages)) {
-			foreach ($messages as &$m)
-				$m['msg'] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-			$this->view($viewName)->set('messages', $messages);
+			$mergedMessages = array();
+			foreach ($messages as $m)
+				$mergedMessages['msg'][] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+
+			$mergedMessages['msg']  = implode('<br />', $mergedMessages['msg']);
+			$mergedMessages['type'] = 'error';
+
+			$this->view($viewName)->set('messages', array($mergedMessages));
 			$this->view($viewName)->set('namespace', '');
 		} else
-			$this->view($viewName)->set('namespace', $formId);
+			$this->messages($viewName, $formId);
 	}
 }

@@ -6,6 +6,6 @@
         {% else %}
             <i class="icon-{{ alert.icon }}-sign"></i>
         {% endif %}
-        {{ alert.msg }}
+        {{ alert.msg|raw }}
     </div>
 {% endfor %}
