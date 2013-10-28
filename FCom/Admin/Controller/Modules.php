@@ -69,7 +69,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 $sd = empty($s['sd']) || $s['sd']==='asc' ? 1 : -1;
                 return $a1 < $b1 ? -$sd : ($a1 > $b1 ? $sd : 0);
             });
-        }        
+        }
         return $data;
     }
 
@@ -94,7 +94,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 			array('name' => 'required_by', 'label' => 'Required By', 'width' => 800)
 		);
 
-		$config['data'] = $this->getModulesData();        
+		$config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         //$config['state'] =array(5,6,7,8);
 		return $config;
@@ -106,7 +106,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
         $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
         BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
-        $this->messages('modules')->layout('/modules');
+        $this->layout('/modules');
     }*/
 
     public function action_index__POST()

@@ -5,12 +5,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
-    public function messages($viewName, $namespace='admin')
-    {
-        $this->view($viewName)->set('messages', BSession::i()->messages($namespace));
-        return $this;
-    }
-
     public function authenticate($args=array())
     {
         return FCom_Admin_Model_User::i()->isLoggedIn();
