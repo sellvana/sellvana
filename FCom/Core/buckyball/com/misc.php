@@ -3415,7 +3415,7 @@ class BValidateViewHelper extends BClass
 
     public function __construct($args)
     {
-        if(!isset($args['form'])){
+        if (!isset($args['form'])) {
             return;
         }
         if (isset($args['data'])) {

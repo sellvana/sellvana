@@ -10,7 +10,7 @@
         <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
       </div>
       <div class="modal-body">
-        {{ THIS.view('prodreviews/review-form') | raw }}
+        {{ THIS.view('prodreviews/review-form').set('prod', THIS.get('prod')) | raw }}
       </div><!-- /.modal-body -->
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -1,20 +1,45 @@
-<form action="" method="post">
-    <input type="hidden" name="pid" value="{{THIS.get('pid')}}">
+{% set prod = THIS.get('prod') %}
+<form action="{{ APP.href('prodreviews/add') }}" method="post" class="f-prod-reviews">
+    <input type="hidden" name="pid" value="{{ prod.id() }}">
 
-    <input type="range" min="0" max="5" value="0" step="0.5" id="prodreview-rating">
-    <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
+    <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
 
-    <input type="range" min="0" max="5" value="0" step="0.5" id="prodreview-rating1">
-    <div class="rateit" data-rateit-backingfld="#prodreview-rating1"></div>
-
-    <input type="range" min="0" max="5" value="0" step="0.5" id="prodreview-rating2">
-    <div class="rateit" data-rateit-backingfld="#prodreview-rating2"></div>
-
-    <input type="range" min="0" max="5" value="0" step="0.5" id="prodreview-rating3">
-    <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
-
-    <input type="text" name="review[title]" placeholder="{{"Title" | _ }}" /><br/>
-    <textarea name="review[text]" placeholder="{{"Your review here" | _ }}"></textarea><br/>
+    <div class="f-prod-review-attrs">
+        <dl class="dl-horizontal">
+            <dt><strong>{{ 'Overall'|_ }}</strong></dt>
+            <dd>
+                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating" name="review[rating]">
+                <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
+            </dd>
+            <dt>{{ 'Value'|_ }}</dt>
+            <dd>
+                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating1" name="review[rating1]">
+                <div class="rateit" data-rateit-backingfld="#prodreview-rating1"></div>
+            </dd>
+            <dt>{{ 'Features'|_ }}</dt>
+            <dd>
+                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating2" name="review[rating2]">
+                <div class="rateit" data-rateit-backingfld="#prodreview-rating2"></div>
+            </dd>
+            <dt>{{ 'Quality'|_ }}</dt>
+            <dd>
+                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating3" name="review[rating3]">
+                <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
+            </dd>
+        </dl>
+    </div>
+    <div class="form-group">
+        <label for="review-title">{{ 'Review Title'|_ }}</label>
+        <div class="controls">
+            <input type="text" name="review[title]" placeholder="{{"Title" | _ }}" class="form-control"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="review-text">{{ 'Review Text'|_ }}</label>
+        <div class="controls">
+            <textarea name="review[text]" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical"></textarea><br/>
+        </div>
+    </div>
     <input type="submit" class="btn">
 </form>
 

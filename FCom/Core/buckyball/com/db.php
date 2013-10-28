@@ -2468,8 +2468,9 @@ class BModel extends Model
 	 */
 	public function validate($data = array(), $rules = array(), $formName = 'admin')
 	{
-		if (!$data)
+		if (!$data) {
 			$data = $this->as_array();
+        }
 		$rules = array_merge($this->_validationRules, $rules);
 		BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
 		$valid = BValidate::i()->validateInput($data, $rules, $formName);

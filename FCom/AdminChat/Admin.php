@@ -44,7 +44,8 @@ class FCom_AdminChat_Admin extends BClass
         $userId = $user->id();
         $userName = $user->get('username');
 
-        FCom_PushServer_Model_Client::i()->sessionClient()->subscribe(FCom_PushServer_Model_Channel::i()->getChannel('adminuser'));
+        $sessionClient = FCom_PushServer_Model_Client::i()->sessionClient();
+        $sessionClient->subscribe('adminuser');
 
         $chats = array();
 
@@ -64,6 +65,9 @@ class FCom_AdminChat_Admin extends BClass
             );
         }
         if ($chats) {
+            foreach ($chats as $chatId => $chat) {
+                $sessionClient->subscribe($chat['channel']);
+            }
             $history = FCom_AdminChat_Model_History::i()->orm('h')
                 ->join('FCom_Admin_Model_User', array('u.id','=','h.user_id'), 'u')
                 ->where_in('h.chat_id', array_keys($chats))

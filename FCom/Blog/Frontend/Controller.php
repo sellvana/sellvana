@@ -104,7 +104,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $postsOrm->where('author_user_id', $user->id);
         }
         $data = array(
-            'title' => 'Fulleron Blog',
+            'title' => BConfig::i()->get('modules/FCom_Blog/blog_title'),
             'link' => $tagKey ? $tag->getUrl() : BApp::href('blog'),
             'items' => array(),
         );

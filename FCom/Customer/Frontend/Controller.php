@@ -4,7 +4,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 {
     public function action_login()
     {
-        //$this->messages('customer/login');
         $this->layout('/customer/login');
     }
 
@@ -35,7 +34,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_recover()
     {
-        //$this->messages('customer/password-recover');
         $this->layout('/customer/password/recover');
     }
 
@@ -54,7 +52,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         $token = BRequest::i()->request('token');
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token===$token) {
-            //$this->messages('customer/password-reset');
             $this->layout('/customer/password/reset');
         } else {
             BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'frontend');
@@ -84,7 +81,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_register()
     {
-        //$this->messages('customer/register');
         $this->layout('/customer/register');
     }
 
