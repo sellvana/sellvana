@@ -262,9 +262,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 		$formId = $this->formId();
 		$messages = BSession::i()->messages('validator-errors:'.$formId);
 		if (count($messages)) {
-			foreach ($messages as &$m)
-				$m['msg'] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-			$this->view($viewName)->set('messages', $messages);
+			$mergedMessages = array();
+			foreach ($messages as $m)
+				$mergedMessages['msg'][] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+
+			$mergedMessages['msg']  = implode('<br />', $mergedMessages['msg']);
+			$mergedMessages['type'] = 'error';
+
+			$this->view($viewName)->set('messages', array($mergedMessages));
 			$this->view($viewName)->set('namespace', '');
 		} else
 			$this->view($viewName)->set('namespace', $formId);
