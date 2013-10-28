@@ -26,7 +26,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
 
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
-        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/htmlgrid';
+        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/backbonegrid';
 
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
         if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
@@ -81,7 +81,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
-	    $this->messages('core/messages', $this->formId());
+	    //$this->messages('core/messages', $this->formId());
         $view = $this->gridView();
         $this->gridViewBefore(array('view' => $view));
         $this->layout($this->_gridLayoutName);
@@ -257,7 +257,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 	}
 
 	/**
-	 * prepare message for form
+	 * Prepare message for form
+     *
+     * This is a temporary solution to save dev time
+     *
+     * @todo implement form errors inside form as error labels instead of group on top
 	 * @param string $viewName
 	 */
 	public function formMessages($viewName = 'core/messages')
@@ -265,16 +269,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 		$formId = $this->formId();
 		$messages = BSession::i()->messages('validator-errors:'.$formId);
 		if (count($messages)) {
-			$mergedMessages = array();
-			foreach ($messages as $m)
-				$mergedMessages['msg'][] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-
-			$mergedMessages['msg']  = implode('<br />', $mergedMessages['msg']);
-			$mergedMessages['type'] = 'error';
-
-			$this->view($viewName)->set('messages', array($mergedMessages));
-			$this->view($viewName)->set('namespace', '');
-		} else
-			$this->messages($viewName, $formId);
+            $msg = array();
+#BDebug::dump($messages); exit;
+			foreach ($messages as $m) {
+				$msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'admin');
+		}
 	}
 }
