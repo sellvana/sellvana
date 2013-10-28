@@ -150,7 +150,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
     BackboneGrid.Collections.Rows = Backbone.Collection.extend({
         model: BackboneGrid.Models.Row,
         initialize: function(models) {
-            this.updateColsInfo();
+            //this.updateColsInfo();
             if (BackboneGrid.dataMode === 'local') {       
                 //console.log('collection initialize', models);         
                 this.originalCol = new Backbone.Collection(models);
@@ -163,6 +163,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         },
         addInOriginal: function(model){
             this.originalCol.add(model);
+            console.log('add');
         },
         removeInOriginal: function(model){
             this.originalCol.remove(model);
@@ -459,6 +460,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
     FCom.BackboneGrid = function(config) {
 
         _.templateSettings.variable = 'rc';
+
         //Theader
         BackboneGrid.personalize_url = config.personalize_url;
         console.log(BackboneGrid.personalize_url);
@@ -560,14 +562,16 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
-
-        for (var i in rows) {            
+        //console.log(rows.length);
+        for (var i in rows) {    
+        
             var rowModel = new BackboneGrid.Models.Row(rows[i]);            
             rowsCollection.add(rowModel);
         }
+        
         rowsCollection.updateColsInfo();
         gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});    
-
+        
         if (BackboneGrid.dataMode === 'local' && BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.s!=='') {
             rowsCollection.sortLocalData();
         }

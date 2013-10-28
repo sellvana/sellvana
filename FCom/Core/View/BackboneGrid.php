@@ -315,7 +315,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             throw new BException('Either ORM or data is required');
         }
 
-	    if (isset($config['data']) && !empty($config['data'])) {
+	    if (isset($config['data']) && !empty($config['data'])) {            
 		    $grid['result']['state'] = array(); //todo: add pagination for reserved data
 		    $grid['result']['rows'] = $config['data'];
 	    } elseif (!empty($config['orm'])) {
@@ -325,15 +325,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
             BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
+
 		    $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
             //TODO: $config['state'] is not fectch from db
             //var_dump($config['state']);exit;
             try {
+                
+                $ps = !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0];
+                /*if (isset($config['data_mode']) && $config['data_mode'] == 'local') {
+                    $ps = 1000;
+                }*/
+
     			$grid['result'] = $orm->paginate($grid['request'], array(
     			    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
     			    'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
     			    'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
-    			    'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
+    			    'ps' => $ps,
     			));
     		} catch (Exception $e) {
     		    $this->_resetPersonalization();
