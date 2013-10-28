@@ -60,6 +60,7 @@
           <option value="{{ p }}" {{ p==s.p ? 'selected'}}>Page: {{ p }}</option>
         {% endfor %}
       </select>
+      <button type="submit" tabindex="-1" class="btn btn-sm js-hidden">{{ 'Go'|_ }}</button>
       <span class="hidden-xs">{{ 'of %s product(s)'|_(s.c) }}</span>
       {#
       <ul class="pagination f-search-pages-pagination">
@@ -92,3 +93,13 @@
     {{ THIS.hook('catalog/product/pager.fields', { pager_view: THIS }) | raw }}
   </fieldset>
 </form>
+
+<script>
+(function() {
+  var hide = document.getElementsByClassName('js-hidden');
+  console.log(hide);
+  for (var i=0; i<hide.length; i++) {
+    hide[i].style.display = 'none';
+  }
+})();
+</script>

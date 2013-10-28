@@ -26,7 +26,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
 
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
-        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/htmlgrid';
+        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/backbonegrid';
 
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
         if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
@@ -81,6 +81,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
+	    //$this->messages('core/messages', $this->formId());
         $view = $this->gridView();
         $this->gridViewBefore(array('view' => $view));
         $this->layout($this->_gridLayoutName);
@@ -163,6 +164,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (empty($model)) {
             $model = $class::i()->create();
         }
+	    $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
         $this->layout($this->_formLayoutName);
@@ -184,7 +186,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
         $args['view']->set(array(
-            'form_id' => BLocale::transliterate($this->_formLayoutName),
+            'form_id' => $this->formId(),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
         ));
@@ -195,6 +197,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $r = BRequest::i();
         $args = array();
+	    $formId = $this->formId();
+	    $redirectUrl = BApp::href($this->_gridHref);
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
@@ -204,19 +208,15 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->formPostBefore($args);
             if ($r->post('do')==='DELETE') {
                 $model->delete();
-                BSession::i()->addMessage('The record has been deleted', 'success', 'admin');
+                BSession::i()->addMessage(BLocale::_('The record has been deleted'), 'success', $formId);
             } else {
 	            $model->set($data);
-	            if ($model->validate()) {
-		            $model->set($data)->save();
-		            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+	            if ($model->validate($model->as_array(), array(), $formId)) {
+		            $model->save();
+		            BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', $formId);
 	            } else {
-		            $messages = array();
-		            foreach($model->errors as $errors) {
-			            foreach ($errors as $error)
-			                $messages[] = array('msg' => $error, 'error');
-		            }
-		            $this->view('core/message')->set('messages', $messages);
+		            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+		            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
 	            }
             }
             $this->formPostAfter($args);
@@ -228,7 +228,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if ($r->xhr()) {
             $this->forward('form', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href($this->_gridHref));
+            BResponse::i()->redirect($redirectUrl);
         }
     }
 
@@ -246,4 +246,35 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         BEvents::i()->fire(static::$_origClass.'::formPostError', $args);
     }
+
+	/**
+	 * use form id for html and namespace in messages
+	 * @return string
+	 */
+	public function formId()
+	{
+		return BLocale::transliterate($this->_formLayoutName);
+	}
+
+	/**
+	 * Prepare message for form
+     *
+     * This is a temporary solution to save dev time
+     *
+     * @todo implement form errors inside form as error labels instead of group on top
+	 * @param string $viewName
+	 */
+	public function formMessages($viewName = 'core/messages')
+	{
+		$formId = $this->formId();
+		$messages = BSession::i()->messages('validator-errors:'.$formId);
+		if (count($messages)) {
+            $msg = array();
+#BDebug::dump($messages); exit;
+			foreach ($messages as $m) {
+				$msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'admin');
+		}
+	}
 }

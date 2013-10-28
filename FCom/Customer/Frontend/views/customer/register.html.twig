@@ -4,7 +4,7 @@
     <form action="{{ APP.href('customer/register') }}" method="post" id="register-form" role="form">
       <fieldset class="f-authentification-form f-register-form">
       <header class="f-page-header">
-        <h1 class="f-page-title">{{ 'Register on Fulleron' |_ }}</h1>
+        <h1 class="f-page-title">{{ 'Register on ' |_(CONFIG.get('modules/FCom_Core/site_title')) }}</h1>
       </header>
         <div class="row">
           <div class="form-group col-sm-6">

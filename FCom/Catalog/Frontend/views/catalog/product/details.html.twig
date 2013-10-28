@@ -6,7 +6,6 @@
 </style>
 {% set prod = THIS.get('product') %}
 {% set cat = THIS.get('category') %}
-{% set imgBaseUrl = APP.src('@FCom_FrontendTheme1/img') %}
 <div class="f-site-main" role="main">
   <div class="container">
     <ol class="breadcrumb">
@@ -14,45 +13,45 @@
       <li><a href="#">Category</a></li>
       <li class="active">{{ prod.get('product_name') }}</li>
     </ol>
-    <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="" >
-      <input type="hidden" name="id" value="{{ prod.id() }}">
-      <input type="hidden" name="action" value="add">
-      <div class="row">
-        <!-- Product Image Column -->
-        <div class="col-md-5 f-col-prod-img">
-          <div class="f-rslides-container">
-            <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
-              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
-              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
-              <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
-            </ul>
-          </div>
-          <p class="text-center"><small>Mouse move on Image to zoom</small></p>
-          <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
-            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
-            <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+    <div class="row">
+      <!-- Product Image Column -->
+      <div class="col-md-5 f-col-prod-img">
+        <div class="f-rslides-container">
+          <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
           </ul>
         </div>
-        <script>
-          require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
-            $("#product-rslides").responsiveSlides({
-              auto: false,
-              speed: 500,
-              nav: true,
-              namespace: "f",
-              manualControls: '#product-rslides-pager'
-            });
-
-            $('#product-rslides li').addClass('zoom').zoom();
+        <p class="text-center"><small>Mouse move on Image to zoom</small></p>
+        <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+        </ul>
+      </div>
+      <script>
+        require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
+          $("#product-rslides").responsiveSlides({
+            auto: false,
+            speed: 500,
+            nav: true,
+            namespace: "f",
+            manualControls: '#product-rslides-pager'
           });
-        </script>
-        <!-- /.f-col-prod-img -->
 
-        <!-- Product Select Column-->
-        <div class="col-md-7 f-col-prod-select">
+          $('#product-rslides li').addClass('zoom').zoom();
+        });
+      </script>
+      <!-- /.f-col-prod-img -->
+
+      <!-- Product Select Column-->
+      <div class="col-md-7 f-col-prod-select">
+        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="" >
+          <input type="hidden" name="id" value="{{ prod.id() }}">
+          <input type="hidden" name="action" value="add">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
 
 {% if MODULES.isLoaded('FCom_ProductReviews') %}
@@ -404,7 +403,7 @@
             </div>
         </div><!-- /.f-prod-listing -->
       </div><!-- /.f-widget -->
-  
+
       <!-- You may also like -->
       <div class="f-widget f-widget-featured-prods">
         <header class="f-widget-header">
@@ -535,9 +534,9 @@
             </div>
         </div><!-- /.f-prod-listing -->
       </div><!-- /.f-widget -->
-  
-  
-  
+
+
+
       <!-- You may also like -->
       <div class="f-widget f-widget-featured-prods">
         <header class="f-widget-header">

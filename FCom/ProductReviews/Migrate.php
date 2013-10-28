@@ -85,4 +85,14 @@ class FCom_ProductReviews_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        $table = FCom_ProductReviews_Model_Review::table();
+        BDb::ddlTableDef($table, array(
+            'KEYS' => array(
+                'IDX_product_approved' => '(product_id, approved)',
+            ),
+        ));
+    }
 }

@@ -17,15 +17,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true, 'cell'=>'integer'),
             array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'href' => BApp::href('catalog/products/form?id=<%= id %>'), 'width' => 250),
-            array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),
-            array('name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100),
-            array('name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100),
+            array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100, 'editable' => true),
+            array('name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100/*, 'filtering' => true, 'filter_type' => 'date-range'*/),
+            array('name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100/*, 'filtering' => true, 'filter_type' => 'date-range'*/),
             array('name' => 'uom', 'label' => 'UOM', 'index' => 'p.uom', 'width' => 60),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false),
         );
         $config['actions'] = array(
             'refresh' => true,
             'link_to_page' => true,
+        );
+        $config['filters'] = array(
+            array('field' => 'product_name', 'type' => 'text'),
+            array('field' => 'local_sku', 'type' => 'text'),
+            array('field' => 'uom', 'type' => 'text')
         );
         $config['format_callback'] = function($args) {
             foreach ($args['rows'] as $row) {

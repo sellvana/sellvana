@@ -38,12 +38,6 @@ class FCom_Core_Controller_Abstract extends BActionController
         return $this;
     }
 
-    public function messages($viewName, $namespace='frontend')
-    {
-        $this->view($viewName)->set('messages', BSession::i()->messages($namespace));
-        return $this;
-    }
-
     public function action_noroute()
     {
         $this->layout('404');

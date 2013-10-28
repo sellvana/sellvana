@@ -1,4 +1,5 @@
 define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago', 'autosize'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago, autosize) {
+    _.templateSettings.variable = 'rc';
     var dingPath, username = '', initializing, avatars={};
 
     function playDing() {
@@ -82,9 +83,9 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             this.model.on('change', this.render,this);
         },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.$el.find('#adminuser-status').val(this.model.get('status'));
-
+            var status = $.trim(this.model.get('status'));            
+            this.$el.html(this.template(this.model.toJSON()));            
+            $('select.js-adminuser-status option[value="' + status + '"]').prop('selected',true);
             return this;
         },
         changeStatus: function(ev) {
@@ -421,7 +422,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //TODO: refactor for AdminChat to be main class
     var AdminChat = function(options) {
-
+        
         initializing = true;
         username = options.username;
         dingPath = options.dingPath;
@@ -435,6 +436,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         PushClient.listen({regexp: /^adminchat:(.*)$/, callback: channel_adminchat});
 
         initializing = false;
+        
     }
 
     // send to server
@@ -521,17 +523,28 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     }
 
     function user_status(user) {
-        avatars[user.username] = user.avatar;
-        if (user.username === username) {
-            statusModel.set('status', user.status);
-            statusModel.set('avatar', user.avatar);
+        //alert('fff');
+        var avatarSet = false;
+        if(user.avatar) {
+            avatars[user.username] = user.avatar;
+            avatarSet = true;
+        }
+        
+        var status = $.trim(user.status);
+
+        if (user.username == username) { 
+
+            if (avatarSet)
+                statusModel.set('avatar', avatars[user.username]);
+            statusModel.set('status', status);
 
             return;
         }
         var temps = users.where({username: user.username});
         if (temps.length > 0) {
-            temps[0].set("status", user.status);
-            temps[0].set("avatar", user.avatar);
+            if (avatarSet)                
+                temps[0].set("avatar", user.avatar);
+            temps[0].set("status", status);
         } else {
             users.add(user);
         }
@@ -560,6 +573,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     }
 
     function channel_adminchat(msg) {
+
         if (channel_adminchat.signals[msg.signal]) {
             channel_adminchat.signals[msg.signal](msg);
         }

@@ -20,9 +20,21 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 	protected $_validationRules = array(
 		array('product_name', '@required'),
 		array('base_price', '@required'),
-		array('is_hidden', '@required'),
+		array('local_sku', '@required'),
+		/*array('is_hidden', '@required'),
+		array('uom', '@required'),*/
+
 		array('is_hidden', '@integer'),
-		array('uom', '@required'),
+		array('num_reviews', '@integer'),
+
+		array('cost', '@numeric'),
+		array('msrp', '@numeric'),
+		array('map', '@numeric'),
+		array('markup', '@numeric'),
+		array('sale_price', '@numeric'),
+		array('net_weight', '@numeric'),
+		array('ship_weight', '@numeric'),
+		array('avg_rating', '@numeric'),
 	);
 
     private $_importErrors = null;
@@ -618,7 +630,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getAverageStars()
     {
-        return $this->get('average_rating')/5*100;
+        return $this->get('avg_rating')/5*100;
     }
 
     public function getNumReviews()
