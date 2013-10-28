@@ -4,7 +4,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 {
     public function action_login()
     {
-        //$this->messages('customer/login');
         $this->layout('/customer/login');
     }
 
@@ -29,13 +28,12 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         } catch (Exception $e) {
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 
     public function action_password_recover()
     {
-        //$this->messages('customer/password-recover');
         $this->layout('/customer/password/recover');
     }
 
@@ -47,18 +45,17 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.',
                 'success', 'frontend');
-        BResponse::i()->redirect(BApp::href('login'));
+        BResponse::i()->redirect('login');
     }
 
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token===$token) {
-            //$this->messages('customer/password-reset');
             $this->layout('/customer/password/reset');
         } else {
             BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 
@@ -72,7 +69,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect(BApp::baseUrl());
         } else {
             BSession::i()->addMessage('Invalid form data', 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('login'));
+            BResponse::i()->redirect('login');
         }
     }
 
@@ -84,7 +81,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_register()
     {
-        //$this->messages('customer/register');
         $this->layout('/customer/register');
     }
 

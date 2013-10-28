@@ -5,10 +5,10 @@
       <h1 class="f-page-title">{{ 'Review and Place Order'|_ }}</h1>
     </header>
     <div class="row">
+      <form action="{{ APP.href('checkout') }}" method="post">
       <div class="f-col-main col-sm-9">
-        <form action="{{ APP.href('checkout') }}" method="post">
           <div class="alert alert-info"><strong>{{ 'Review the information below then click "Place your order"!' |_ }}</strong></div>
-  
+
           {{ THIS.view('core/messages') | raw }}
           <div class="row">
             <div class="col-sm-6">
@@ -136,10 +136,9 @@
             </div>
           </div>
           {% endif %}
-        
-        </form>
+
         </div><!-- /.f-col-main -->
-        
+
         <div class="f-col-sidebar f-col-cart-totals gray col-sm-3">
             {% if THIS.get('totals') %}
               <div class="form-group">
@@ -162,6 +161,8 @@
             </ul>
         </div>
         <!-- /.f-col-sidebar -->
+
+        </form>
     </div><!-- /.row -->
   </div>
 </div>

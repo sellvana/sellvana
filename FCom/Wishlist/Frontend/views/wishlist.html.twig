@@ -6,7 +6,7 @@
           <h1 class="f-page-title">{{ "Wishlist" | _ }}</h1>
           <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
         </header>
-        
+
 {% if THIS.get('wishlist') or THIS.get('wishlist').items() %}
        <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
           <div class="table-responsive">
@@ -58,7 +58,7 @@
         <div class="alert alert-info">{{ "There are no products in wishlist" | _ }}.</div>
       {% endif %}
       </div>
-      {{ THIS.view('customer/account/sidebar') | raw }}
+      {{ THIS.view('customer/account/sidebar').set('current', 'wishlist') | raw }}
     </div>
   </div>
 </div>

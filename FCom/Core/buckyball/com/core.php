@@ -1896,6 +1896,7 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
     /**
     * Add session message
     *
+    * @todo come up with sensible data structure
     * @param string $msg
     * @param string $type
     * @param string $tag
@@ -1904,7 +1905,13 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
     public function addMessage($msg, $type='info', $tag='_')
     {
         $this->setDirty();
-        $this->data['_messages'][$tag][] = array('msg'=>$msg, 'type'=>$type);
+        $message = array('type' => $type);
+        if (is_array($msg) && !empty($msg[0])) {
+            $message['msgs'] = $msg;
+        } else {
+            $message['msg'] = $msg;
+        }
+        $this->data['_messages'][$tag][] = $message;
         return $this;
     }
 

@@ -210,6 +210,23 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
             break;
+        case 'grid.col.orders':
+            if (is_array($r['cols'])) {
+                $cols = $r['cols'];
+            } else {
+                $cols = BUtil::fromJson($r['cols']);    
+            }
+            
+            $columns = array();
+            foreach ($cols as $i=>$col) {
+                if (empty($col['name']) || $col['name']==='cb') {
+                    continue;
+                }
+                $columns[$col['name']] = array('position'=>$col['position'], 'hidden'=>empty($col['hidden'])?false:$col['hidden']);
+            }
+            $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
+
+            break;
         case 'grid.state':
             if (empty($r['grid'])) {
                 break;
@@ -218,11 +235,11 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 $r['sd'] = 'asc';
             }
 
-            if ($r['sd']==='ascending') {
+            /*if ($r['sd']==='ascending') {
                 $r['sd'] = 'asc';
             } elseif ($r['sd']==='descending') {
                 $r['sd'] = 'desc';
-            }
+            }*/
 
             $data = array('grid' => array($r['grid'] => array('state' => BUtil::arrayMask($r, 'p,ps,s,sd,q'))));
             break;

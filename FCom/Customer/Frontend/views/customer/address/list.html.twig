@@ -23,7 +23,7 @@
         {% endfor %}
         </div>
       </div>
-      {{ THIS.view('customer/account/sidebar') | raw }}
+      {{ THIS.view('customer/account/sidebar').set('current', 'addresses') | raw }}
     </div>
   </div>
 </div>

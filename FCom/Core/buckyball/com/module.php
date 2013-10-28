@@ -1329,7 +1329,7 @@ class BMigrate extends BClass
     *   - true: migrate only enabled modules in current request
     *   - array or comma separated string: migrate only specified modules
     */
-    public static function migrateModules($limitModules=false)
+    public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
         $modReg = BModuleRegistry::i();
         $migration = static::getMigrationData();
@@ -1388,79 +1388,105 @@ class BMigrate extends BClass
             return;
         }
 
+        // TODO: move special cases from buckyball to fulleron
         // special case for FCom_Admin because some frontend modules require its tables
         if (empty($migration['DEFAULT']['FCom_Admin']['schema_version'])
             && empty($migration['DEFAULT']['FCom_Admin']['migrate'])
         ) {
             BApp::m('FCom_Admin')->run_status = BModule::LOADED;
             static::migrateModules('FCom_Core,FCom_Admin');
+            //return;
+        }
+
+        if (!$force && BConfig::i()->get('core/currently_migrating')) {
+            return;
+        }
+
+        BConfig::i()->set('core/currently_migrating', 1, false, true);
+        if (class_exists('FCom_Core_Main')) {
+            FCom_Core_Main::i()->writeConfigFiles('core');
         }
 
         BResponse::i()->startLongResponse();
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
-        foreach ($migration as $connectionName => $modules) {
-            BDb::connect($connectionName);
 
-            foreach ($modules as $modName => $mod) {
-                if (empty($mod['migrate'])) {
-                    continue;
-                }
+        try {
+            foreach ($migration as $connectionName => $modules) {
+                BDb::connect($connectionName);
 
-                echo '<br>['.(++$i).'/'.$num.'] ';
-                if (empty($mod['schema_version'])) {
-                    echo 'Installing <strong>'.$modName.': '.$mod['code_version'].'</strong> ... ';
-                } else {
-                    echo 'Upgrading  <strong>'.$modName.': '.$mod['schema_version'].' -> '.$mod['code_version'].'</strong> ... ';
-                }
-
-                $modReg->currentModule($modName);
-                $script = $mod['script'];
-                if (is_array($script)) {
-                     if (!empty($script['file'])) {
-                         $filename = BApp::m($modName)->root_dir.'/'.$script['file'];
-                         if (!file_exists($filename)) {
-                             BDebug::warning('Migration file not exists: '.$filename);
-                             continue;
-                         }
-                         require_once $filename;
-                     }
-                     $script = $script['callback'];
-                }
-                $module = $modReg->module($modName);
-                static::$_migratingModule =& $mod;
-                /*
-                try {
-                    BDb::transaction();
-                */
-                    BDb::ddlClearCache(); // clear DDL cache before each migration step
-                    BDebug::debug('DB.MIGRATE '.$script);
-                    if (is_callable($script)) {
-                        $result = call_user_func($script);
-                    } elseif (is_file($module->root_dir.'/'.$script)) {
-                        $result = include_once($module->root_dir.'/'.$script);
-                    } elseif (is_dir($module->root_dir.'/'.$script)) {
-                        //TODO: process directory of migration scripts
-                    } elseif (class_exists($script, true)) {
-                        if (method_exists($script, 'run')) {
-                            $script::i()->run();
-                        } else {
-                            static::_runClassMethods($script);
-                        }
+                foreach ($modules as $modName => $mod) {
+                    if (empty($mod['migrate'])) {
+                        continue;
                     }
-                /*
-                    BDb::commit();
-                } catch (Exception $e) {
-                    BDb::rollback();
-                    throw $e;
+
+                    echo '<br>['.(++$i).'/'.$num.'] ';
+                    if (empty($mod['schema_version'])) {
+                        echo 'Installing <strong>'.$modName.': '.$mod['code_version'].'</strong> ... ';
+                    } else {
+                        echo 'Upgrading  <strong>'.$modName.': '.$mod['schema_version'].' -> '.$mod['code_version'].'</strong> ... ';
+                    }
+
+                    $modReg->currentModule($modName);
+                    $script = $mod['script'];
+                    if (is_array($script)) {
+                         if (!empty($script['file'])) {
+                             $filename = BApp::m($modName)->root_dir.'/'.$script['file'];
+                             if (!file_exists($filename)) {
+                                 BDebug::warning('Migration file not exists: '.$filename);
+                                 continue;
+                             }
+                             require_once $filename;
+                         }
+                         $script = $script['callback'];
+                    }
+                    $module = $modReg->module($modName);
+                    static::$_migratingModule =& $mod;
+                    /*
+                    try {
+                        BDb::transaction();
+                    */
+                        BDb::ddlClearCache(); // clear DDL cache before each migration step
+                        BDebug::debug('DB.MIGRATE '.$script);
+                        if (is_callable($script)) {
+                            $result = call_user_func($script);
+                        } elseif (is_file($module->root_dir.'/'.$script)) {
+                            $result = include_once($module->root_dir.'/'.$script);
+                        } elseif (is_dir($module->root_dir.'/'.$script)) {
+                            //TODO: process directory of migration scripts
+                        } elseif (class_exists($script, true)) {
+                            if (method_exists($script, 'run')) {
+                                $script::i()->run();
+                            } else {
+                                static::_runClassMethods($script);
+                            }
+                        }
+                    /*
+                        BDb::commit();
+                    } catch (Exception $e) {
+                        BDb::rollback();
+                        throw $e;
+                    }
+                    */
                 }
-                */
             }
+
+            BConfig::i()->set('core/currently_migrating', 0, false, true);
+            if (class_exists('FCom_Core_Main')) {
+                FCom_Core_Main::i()->writeConfigFiles('core');
+            }
+
+        } catch (Exception $e) {
+            BConfig::i()->set('core/currently_migrating', 0, false, true);
+            if (class_exists('FCom_Core_Main')) {
+                FCom_Core_Main::i()->writeConfigFiles('core');
+            }
+            throw $e;
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
-        $url = BRequest::i()->currentUrl();
+        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
         echo '</pre>';
         echo '<script>location.href="'.$url.'";</script>';
         echo 'ALL DONE. <a href="'.$url.'">Click here to continue</a>';

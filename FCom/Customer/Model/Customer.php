@@ -19,6 +19,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     private static $lastImportedCustomer = 0;
 
+	protected $_validationRules = array(
+		array('email', '@required'),
+		array('firstname', '@required'),
+		array('lastname', '@required'),
+		array('create_at', '@required'),
+		array('update_at', '@required'),
+		array('payment_method', '@required'),
+		array('payment_details', '@required'),
+
+		array('email', '@email'),
+
+		array('default_shipping_id', '@integer'),
+		array('default_billing_id', '@integer'),
+		array('customer_group', '@integer'),
+	);
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
