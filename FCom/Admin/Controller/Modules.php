@@ -51,7 +51,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
-	        $r['id'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('id') : '';
+	        $r['id'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('id') : uniqid();
             $data[] = $r;
         }
 
@@ -60,6 +60,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $gridId = 'modules';
         $pers = FCom_Admin_Model_User::i()->personalize();
         $s = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+
         //BDebug::dump($pers); exit;
         if (!empty($s['s'])) {
             usort($data, function($a, $b) use($s) {
@@ -93,7 +94,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 			array('name' => 'required_by', 'label' => 'Required By', 'width' => 800)
 		);
 
-		$config['data'] = $this->getModulesData();
+		$config['data'] = $this->getModulesData();        
         $config['data_mode'] = 'local';
         //$config['state'] =array(5,6,7,8);
 		return $config;
