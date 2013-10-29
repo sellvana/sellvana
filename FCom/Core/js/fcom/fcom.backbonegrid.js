@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'], function(Backbone, _, $) {
+define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 'select2'], function(Backbone, _, $) {
 
     var BackboneGrid = {
         Models: {},
@@ -6,7 +6,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         Views: {},
         currentState: {},
         colsInfo: {},                
-        dataMode: 'server'
+        data_mode: 'server'
 
     }
 
@@ -20,7 +20,9 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
             hidden: false,
             label: '',
             href: '',
-            cell: ''
+            cell: '',
+            filtering: false,
+            filterVal: '',
         }
     });
 
@@ -64,7 +66,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
             BackboneGrid.currentState.sd = this.model.get('sortState');
 
             
-            if(BackboneGrid.dataMode === 'local') {     
+            if(BackboneGrid.data_mode === 'local') {     
                 rowsCollection.sortLocalData();                
             } else {
                 rowsCollection.fetch({reset: true});    
@@ -85,7 +87,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
             var accept = '';
             if (this.model.get('no_reorder') !== true)
                 accept = 'accept ';
-            this.$el.attr('class',accept + this.model.get('cssClass') + ' sort-' + this.model.get('sortState'));
+            this.$el.attr('class',accept + this.model.get('cssClass') + ' sorting_' + this.model.get('sortState'));
 
             return this;
         }
@@ -151,9 +153,9 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         model: BackboneGrid.Models.Row,
         initialize: function(models) {
             //this.updateColsInfo();
-            if (BackboneGrid.dataMode === 'local') {       
+            if (BackboneGrid.data_mode === 'local') {       
                 //console.log('collection initialize', models);         
-                this.originalCol = new Backbone.Collection(models);
+                this.originalRows = new Backbone.Collection(models);
                 
                 this.on('add', this.addInOriginal, this);
                 this.on('remove', this.removeInOriginal, this);
@@ -161,12 +163,96 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
 
             //this.on.reset('reset', this.updateColsInfo, this);            
         },
+        filter: function() {
+                var temp = this.originalRows.clone();            
+                for(var filter_key in BackboneGrid.current_filters) {
+                    
+                    var filter_val = BackboneGrid.current_filters[filter_key];                    
+                    var type = columnsCollection.findWhere({name: filter_key}).get('filter_type');
+
+                    switch(type) {
+                        case 'text':
+                            var filterVal = filter_val.val+'';                            
+                            var op = filter_val.op;
+                            var check = {};
+                            switch(op) {
+                                case 'contains':
+                                    check.contain = true;
+                                    break;
+                                case 'start':
+                                    check.contain = true;
+                                    check.start = true;                                    
+                                    break;
+                                case 'end':
+                                    check.contain = true;
+                                    check.end = true;
+                                    break;
+                                case 'equal':
+                                    check.contain = true;
+                                    check.end = true;
+                                    check.start = true;
+                                    break;
+                                case 'not':
+                                    check.contain = false;
+                                    break;
+                            }
+                            filterVal = filterVal.toLowerCase();
+                            temp.models = _.filter(temp.models, function(model){                                        
+                                var flag = true;                                
+                                var modelVal= model.get(filter_key)+'';
+                                modelVal = modelVal.toLowerCase();
+                                var first_index = modelVal.indexOf(filterVal);
+                                var last_index = modelVal.lastIndexOf(filterVal);                                
+                                for(key in check) {
+                                    switch(key) {
+                                        case 'contain':
+                                            flag = flag && ((first_index!==-1) === check.contain);
+                                            break;
+                                        case 'start':
+                                            flag = flag && first_index === 0;
+                                            break;
+                                        case 'end':
+                                            flag = flag && (last_index + filterVal.length) === modelVal.length;
+                                            break;
+                                    }
+
+                                    if(!flag)
+                                        return flag;
+                                }
+
+                                return flag;
+                            }, this);
+
+                            break;
+                        case 'multiselect':
+                            filter_val = filter_val.split(',');
+                            
+                            temp.models = _.filter(temp.models, function(model){                                        
+
+                                var flag = false;
+                                for(var i in filter_val) {
+                                    flag = flag || filter_val[i].toLowerCase() === model.get(filter_key).toLowerCase();
+                                }
+
+                                return flag;
+                            }, this);
+                            
+
+                            break;
+                    }
+
+                }
+                console.log(temp.models.length);
+                this.reset(temp.models);
+                this.updateColsInfo();
+                gridView.render();
+        },
         addInOriginal: function(model){
-            this.originalCol.add(model);
+            this.originalRows.add(model);
             console.log('add');
         },
         removeInOriginal: function(model){
-            this.originalCol.remove(model);
+            this.originalRows.remove(model);
         },
         sortLocalData: function() {
             if (BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.sd !=='') {   
@@ -177,8 +263,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
                 this.sort();
                 gridView.render();
             } else {          
-                //console.log(rowsCollection.originalCol);
-                this.reset(this.originalCol.models);
+                //console.log(rowsCollection.originalRows);
+                this.reset(this.originalRows.models);
                 gridView.render();
             }
         },
@@ -201,17 +287,18 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         },
         url: function() {
             var append = '';
-            _.each(BackboneGrid.currentState, function(v, k, l) {
+            var keys = ['p', 's', 'sd', 'ps'];
+            for (var i in keys) {
                 if( append != '')
                     append += '&';
-                append += (k + '=' + v);
-            });
-
+                append += (keys[i] + '=' + BackboneGrid.currentState[keys[i]]);
+            }            
+            append += ('&filters=' + JSON.stringify(BackboneGrid.current_filters));            
             return this.data_url + '?' + append;
         },
         parse: function(response) {
             if (response[0].c) {
-                var mp = Math.round(response[0].c / BackboneGrid.currentState.ps);
+                var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
                 /*console.log('c=', response[0].c);
                 console.log('ps=', BackboneGrid.currentState.ps);
                 console.log('mp=', mp);
@@ -260,7 +347,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
     });
         
     BackboneGrid.Views.GridView = Backbone.View.extend({
-        el: 'div.scrollable-area',
+      //  el: 'table tbody',
         initialize: function () {
             this.collection.on('reset', this.updateColsAndRender, this);
         },        
@@ -350,6 +437,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
            
             this.model.set('hidden',!this.model.get('hidden'));
             headerView.render();
+            filterView.render();
 
             var name = 'hidden' + this.model.get('name');
             var value = this.model.get('hidden');
@@ -419,7 +507,125 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
             }
         }
     });
+    BackboneGrid.Views.FilterCell = Backbone.View.extend({         
+        className: 'btn-group dropdown',        
+        attributes: {
+            style: 'margin-right:20px;'
+        },
+        preventDefault: function(ev) {          
+                ev.stopPropagation();
+                return false;
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));            
+            return this;
+        }       
+    });
+    BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({         
+        events: {
+            'click input': 'preventDefault', 
+            'click button.update': 'filter',
+            //'click .filter-box': 'preventDefault',
+            'click .filter-text-sub': 'subButtonClicked',
+            'click a.filter_op': 'filterOperatorSelected',
+            'keyup': 'filterValChanged'
+        },       
+        filterValChanged: function(ev) {
+            this.model.set('filterVal', this.$el.find('input:first').val());
+        },
+        filterOperatorSelected: function(ev) {
+            this.filterValChanged();
+            var operator = $(ev.target);            
+            this.model.set('filterOp',operator.attr('data-id'));
+            this.model.set('filterLabel', operator.html());            
+            this.$el.find('ul.filter-sub').css('display','none');            
+            this.render();
+            return false;
+        },
+        subButtonClicked: function(ev) {       
+            this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+            return false;
+        },
+        filter: function() {
+            var field = this.model.get('name');
+            var filterVal = this.$el.find('input:first').val();
+            var op = this.model.get('filterOp');
+            BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+            this.model.set('filterVal', filterVal);
+            //this.$el.find('ul.filter-sub').css('display','none');        
+            this.render();
+            
+            if (BackboneGrid.data_mode === 'server') {
+                rowsCollection.fetch({reset:true});
+            } else {
+                rowsCollection.filter();
+            }
+
+            return true;
+        }
+    });
     
+    BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({                    
+        filter: function(val) {
+
+            BackboneGrid.current_filters[this.model.get('name')] = val;
+            if (BackboneGrid.data_mode === 'local') {
+                rowsCollection.filter();
+            } else {
+                rowsCollection.fetch({reset:true});
+            }
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));   
+            var options = this.model.get('options');
+            var data = [];
+            for(var key in options) {
+                data[data.length] = {id: key, text: options[key]};
+            }
+            
+            this.$el.find('#multi_hidden:first').select2({
+                multiple: true,
+                allowClear: true,
+                data: data,
+                placeholder: 'All'
+            });
+            var self = this;
+            this.$el.find('#multi_hidden:first').on('change', function() {                
+                self.filter($(this).val());
+            });
+
+            return this;
+        }
+        
+    });
+    
+    BackboneGrid.Views.FilterView = Backbone.View.extend({         
+        initialize: function() {            
+            var div = 'div.row.datatables-top.'+BackboneGrid.id + ' div.col-sm-9';
+            console.log(div);
+            this.setElement(div);
+            this.collection.on('sort', this.render, this);
+        },
+        render: function() {            
+            this.$el.html('');
+            this.collection.each(this.addFilterCol, this);
+        },
+        addFilterCol: function(model) {
+            if(model.get('hidden') !== true && model.get('filtering')) {
+                var filterCell;
+                switch (model.get('filter_type')) {
+                    case 'text':
+                        filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
+                        break;
+                    case 'multiselect':
+                        filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
+                        break;
+                }
+                this.$el.append(filterCell.render().el);
+            }
+        }
+    });
+
     function updatePageHtml(p,mp) {
 
             p = BackboneGrid.currentState.p;
@@ -455,43 +661,47 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
     var rowsCollection;
     var columnsCollection;
     var gridView;
-    var headerView;    
+    var headerView; 
+    var filterView;
     var colsInfo;
     FCom.BackboneGrid = function(config) {
-
-        _.templateSettings.variable = 'rc';
-
-        //Theader
+        //general settings
+        _.templateSettings.variable = 'rc';        
+        BackboneGrid.id = config.id;
         BackboneGrid.personalize_url = config.personalize_url;
-        console.log(BackboneGrid.personalize_url);
+        BackboneGrid.edit_url = config.edit_url;
+        BackboneGrid.current_filters= {};
+        //personal settings
+        var state = config.data.state;
+        state.p = parseInt(state.p);
+        state.mp = parseInt(state.mp);
+        BackboneGrid.currentState = state;
+
+        //check data mode
+        if(config.data_mode) {
+            BackboneGrid.data_mode = config.data_mode;               
+        }
+        
+        //theader                
         BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
         BackboneGrid.Models.ColModel.prototype.personalize_url = config.personalize_url;
         
-        BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.headerTemplate).html());
+        BackboneGrid.Views.ThView.prototype.template = _.template($('#' + config.id + '-header-template').html());
         BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
-        //Tbody
-        BackboneGrid.Views.GridView.prototype.el = "#" + config.id + " tbody";        
-        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.rowTemplate).html());
+        //tbody
+        BackboneGrid.Views.GridView.prototype.el = "table#" + config.id + " tbody";        
+        BackboneGrid.Views.RowView.prototype.template = _.template($('#' + config.id + '-row-template').html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
 
+        //filtering settings
+        BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#' + config.id + '-text-filter-template').html());
+        BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#' + config.id + '-multiselect-filter-template').html());
         //column visiblity checkbox view
-        BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.colTemplate).html());
-        var state = config.data.state;
-
-        //check data mode
-
-        state.p = parseInt(state.p);
-        state.mp = parseInt(state.mp);
+        BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
         
-        BackboneGrid.id = config.id;
-        BackboneGrid.currentState = state;
-        BackboneGrid.edit_url = config.edit_url;
-        if(config.data_mode) {
-            BackboneGrid.dataMode = config.data_mode;     
-            console.log(BackboneGrid.dataMode);
-        }
+        
 
-        /*if (BackboneGrid.dataMode === 'local') {
+        /*if (BackboneGrid.data_mode === 'local') {
             state.mp = config.data.data.length;
         }*/
         if (config.data_mode != 'local') {
@@ -518,11 +728,10 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         //header view
         var columns = config.columns;
         columnsCollection = new BackboneGrid.Collections.ColsCollection;
-        var columnsWidth = {};
+        var filters = config.filters;        
         for (var i in columns) {
             var c = columns[i];
-            if (c.name != 'id') {
-
+            if (c.name != 'id') {                
                 if (c.hidden === 'false')
                     c.hidden = false;                
                 if (c.name === 0) {                    
@@ -543,22 +752,28 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
                     //c.cssClass += 'sort';
                     c.sortState = "";
                 }
-
+                var filter = _.findWhere(filters, {field: c.name});
+                if (typeof(filter) !== 'undefined') {
+                    c.filtering = true;
+                    c.filter_type = filter['type'];
+                    
+                    if (filter.type === 'text') 
+                            {
+                                c.filterOp = 'contains';
+                                c.filterLabel = 'Contains';
+                            }
+                }
                 var ColModel = new BackboneGrid.Models.ColModel(c);
-                columnsCollection.add(ColModel);
-                if(c['width'])
-                    columnsWidth[c.name+''] = c['width'];
-                //console.log(c);
-                //BackboneGrid.Models.Row.prototype.defaults['hidden' + c.name] = !(!c['hidden']);
+                columnsCollection.add(ColModel);                
             }
         }
-
-        columnsCollection.columnsWidth = columnsWidth;
-
+        
         headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
         headerView.render();
         var colsVisibiltyView = new BackboneGrid.Views.ColsVisibiltyView({collection: columnsCollection});
         colsVisibiltyView.render();
+        filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
+        filterView.render();
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
@@ -572,7 +787,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         rowsCollection.updateColsInfo();
         gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});    
         
-        if (BackboneGrid.dataMode === 'local' && BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.s!=='') {
+        if (BackboneGrid.data_mode === 'local' && BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.s!=='') {
             rowsCollection.sortLocalData();
         }
 
@@ -594,5 +809,6 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor'],
         
         //table column reordering
 
+    
     }
 });
