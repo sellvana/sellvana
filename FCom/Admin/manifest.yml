@@ -17,6 +17,7 @@ modules:
                     - [ admin/header, { view_class: FCom_Admin_View_Header } ]
                     - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
                     - [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
+                    - [ dashboard, { view_class: FCom_Admin_View_Dashboard } ]
                 auto_use: [ bootstrap, views ]
                 before_bootstrap: FCom_Admin_Admin::beforeBootstrap
                 routing:

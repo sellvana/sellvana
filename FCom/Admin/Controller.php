@@ -173,7 +173,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
             break;
-        case 'grid.col.widths':           
+        case 'grid.col.widths':
             $cols = $r['cols'];
             $columns = array();
             foreach($cols as $col) {
@@ -197,9 +197,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
-                $cols = BUtil::fromJson($r['cols']);    
+                $cols = BUtil::fromJson($r['cols']);
             }
-            
+
             $columns = array();
             foreach ($cols as $i=>$col) {
                 if (empty($col['name']) || $col['name']==='cb') {
@@ -214,9 +214,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
-                $cols = BUtil::fromJson($r['cols']);    
+                $cols = BUtil::fromJson($r['cols']);
             }
-            
+
             $columns = array();
             foreach ($cols as $i=>$col) {
                 if (empty($col['name']) || $col['name']==='cb') {
@@ -248,6 +248,22 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             break;
 
         case 'settings.sections.order':
+            break;
+
+        case 'dashboard.widget.pos':
+            if (empty($r['widgets'])) {
+                break;
+            }
+            foreach ($r['widgets'] as $wKey => $wPos) {
+                $data['dashboard']['widgets'][$wKey]['pos'] = $wPos;
+            }
+            break;
+
+        case 'dashboard.widget.state':
+            if (empty($r['key'])) {
+                break;
+            }
+            $data = array('dashboard' => array('widgets' => array($r['key'] => BUtil::arrayMask($r, 'pos,hidden,collapsed'))));
             break;
         }
         FCom_Admin_Model_User::i()->personalize($data);
