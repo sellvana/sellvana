@@ -96,6 +96,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
 		$config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
+        $config['filters'] = array(
+                                    array('field' => 'name', 'type' => 'text'),
+                                    array('field' => 'run_level_core', 'type' => 'multiselect')
+                                 );
         //$config['state'] =array(5,6,7,8);
 		return $config;
 	}

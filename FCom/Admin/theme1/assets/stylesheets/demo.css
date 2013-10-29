@@ -95,3 +95,44 @@ overflow: hidden;
   margin: 0px;
   height: 22px;
 }
+
+.filter-span {
+   margin-right: 50px;
+}
+
+.filter-box {
+    text-align: left;   
+    padding: 15px;
+    width: 470px;
+}
+.filter-text-btn {
+    
+}
+
+.dropdown-menu1 {
+    background-clip: padding-box;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+    display: none;
+    float: left;
+    font-size: 14px;
+    left: 0;
+    list-style: none outside none;
+    margin: 2px 0 0;
+    min-width: 160px;
+    padding: 5px 0;
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+}
+
+ul.dropdown-menu1 {
+    display: none;
+    position: absolute;
+}
+
+div.dropdown1.open > ul.dropdown-menu1 {
+    display: block;
+}
