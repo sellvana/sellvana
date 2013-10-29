@@ -36,7 +36,6 @@ class FCom_Promo_Model_Promo extends BModel
 	protected $_validationRules = array(
 		array('description', '@required'),
 		array('manuf_vendor_id', '@required'),
-		array('create_at', '@required'),
 
 		array('buy_amount', '@integer'),
 		array('get_amount', '@integer'),
