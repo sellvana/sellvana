@@ -27,7 +27,7 @@
 
     <ul class='js-sortable-container row'>
 {% for widget in widgets %}
-      <li class="col-sm-{{ widget.size }}" id="dashboard-widget__{{ widget.key }}" {{ widget.hidden ? 'style="display:none"' }}>
+      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" {{ widget.hidden ? 'style="display:none"' }}>
         <div class='box'>
           <div class='box-header js-sortable-handle {{ widget.header_class }}'>
             <div class='title'>
@@ -39,9 +39,12 @@
               <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
             </div>
           </div>
-          <div class='box-content'>
+
+          {% if widget.view %}
+            {{ THIS.view(widget.view) | raw }}
+          {% else %}
             {{ widget.content | raw }}
-          </div>
+          {% endif %}
         </div>
       </li>
 {% endfor %}
@@ -53,7 +56,13 @@
 require(['jquery', 'jquery-ui'], function($) {
   $('.js-sortable-container').sortable({
     connectWith: '.js-sortable-container',
-    handle: '.js-sortable-handle'
+    handle: '.js-sortable-handle',
+    update: function(ev, ui) {
+      //console.log(this, ev, ui);
+      $(this).children().each(function(idx, el) {
+        console.log(el);
+      })
+    }
     //delay: 100,
   })
 })
