@@ -11,11 +11,11 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         ),
     );
 
-	static protected $_validationRules = array(
-		'author_user_id' => '@required',
-		'title' => '@required',
-		'url_key' => '@required',
-	);
+    protected $_validationRules = array(
+        array('author_user_id', '@required'),
+        array('title', '@required'),
+        array('url_key', '@required'),
+    );
 
 
     static public function getPostsOrm()
