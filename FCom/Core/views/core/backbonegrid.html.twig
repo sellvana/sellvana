@@ -12,7 +12,7 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
   {% if filterData %}
     <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-9">          
+          <div class="col-sm-9">
           {% if filterData[0] %}
             <span><label>Filters:&nbsp;</label></span>
             <span>
@@ -25,13 +25,13 @@
               <div class="dataTables_filter">
                   <label>
                     Search:
-                  </label> 
+                  </label>
                   <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
-                  
+
               </div>
             {% endif %}
           </div>
-    </div> 
+    </div>
   {% endif %}
   {# %form(method="get" action="#{$this->gridUrl()") #}
   {# %fieldset #}
@@ -46,12 +46,12 @@
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
                 Columns
                 <b class="caret"></b>
-            </a>            
+            </a>
                 <ol class="dd-list dropdown-menu" style="margin-left:20px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
-                </ol>          
+                </ol>
         </span>
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
@@ -61,7 +61,7 @@
           {% endif %}
         {% endfor %}
       </div>
-      
+
       <div class="col-sm-4 text-right">
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize">
@@ -81,15 +81,15 @@
             {{ 'of %s'|_(s.mp) }}
             #}
           </ul>
-        {% endif %}        
-      </div>        
+        {% endif %}
+      </div>
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
       {{ s.description|raw }}
     </div>
-  {% endif %}      
-  <div class="scrollable-area">    
+  {% endif %}
+  <div class="scrollable-area">
     <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
@@ -104,7 +104,7 @@
       <tbody>
         {#{ THIS.rowsHtml() | raw }#}
         <!-- row template -->
-      </tbody>      
+      </tbody>
     </table>
   </div>
 
@@ -132,7 +132,7 @@
 
 
 
-<script type="template" id="{{ config.id }}-edit-template">    
+<script type="template" id="{{ config.id }}-edit-template">
     <label for="<%= rc.name %>"><%= rc.label%></label>
     <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
       <input type="text" id="<%= rc.name %>" class="form-control">
@@ -142,7 +142,7 @@
           <option value="<%= key %>"><%= rc.options[key] %></option>
         <% } %>
       </select>
-    <% } %>  
+    <% } %>
 </script>
 <script type="template" id="{{ config.id }}-col-template">
   <div class="dd-handle dd3-handle">
@@ -155,40 +155,40 @@
     </label>
   </div>
 </script>
-<script type="template" id="{{ config.id }}-row-template">  
-  <% for (var index in rc.colsInfo) {          
-    var col = rc.colsInfo[index];    
-    if(col.hidden ) {      
+<script type="template" id="{{ config.id }}-row-template">
+  <% for (var index in rc.colsInfo) {
+    var col = rc.colsInfo[index];
+    if(col.hidden ) {
       continue;
-    }  
+    }
 
     print('<td data-col="' + col.name + '">');
-    
-    if (col.cell === 'select-row') { 
+
+    if (col.cell === 'select-row') {
         var isSelected = '';
         if (rc.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + '>');      
-    } else if (col.name === '_actions') {     
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + '>');
+    } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof (col.data.edit) != 'undefined') {
           print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc[col.data.edit.col] + '">');
             print('<i class=" icon-edit-sign"></i>');
           print('</a>');
-        }        
+        }
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
           print('<a class="btn btn-danger btn-xs btn-delete" >');
             print('<i class="icon-remove"></i>');
           print('</a>');
         }
-        
+
     } else {
         print(rc[col.name]);
-    } 
+    }
 
     print('</td>');
-  } %>  
+  } %>
 </script>
 
 <script type='template' id="{{ config.id | raw }}-header-template">
@@ -203,7 +203,7 @@
     <select class="{{ config.id | raw }} js-sel">
       {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
     </select>
-  <% } %>    
+  <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <span><%= rc.label %>:</span>
@@ -211,56 +211,61 @@
         <input type="hidden" id="multi_hidden" style="width:300px"/>
       </span>
 </script>
-<script type='template' id="{{ config.id }}-text-filter-template">    
+<script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%= rc.label %>: 
-        <% if(rc.filterVal ==='') { %> 
-            All 
+        <%= rc.label %>:
+        <% if(rc.filterVal ==='') { %>
+            All
         <%} else { %>
             <%= rc.filterLabel %> "<%= rc.filterVal %>"
         <% } %>
         <span class="caret"></span>
     </button>
-    
-    <ul class="dropdown-menu filter-box">
-        <div class="row">
-          <div class="input-group">
-                        <div class="btn-group dropdown">                        
-                          <button class='btn dropdown-toggle filter-text-sub' data-toggle='dropdown' style='width:155px;margin-left:5px;margin-right:5px;'>
-                              <%= rc.filterLabel%>
-                              <span class='caret'></span>                
-                          </button>            
 
-                          <ul class='dropdown-menu filter-sub'>
-                              <li>
-                                  <a class='filter_op' data-id='contains' href='#'>contains</a>
-                              </li>                                  
-                              <li>
-                                 <a class='filter_op' data-id='not' href='#'>does not contain</a>
-                              </li>                                  
-                              <li>
-                                  <a class='filter_op' data-id='equal' href='#'>is equal to</a>
-                              </li>                                  
-                              <li>
-                                  <a  class='filter_op' data-id='start' href='#'>start with</a>
-                              </li>              
-                              <li>
-                                  <a class='filter_op' data-id='end' href='#'>end with</a>
-                              </li>              
-                          </ul>
-                        </div>
-                    
-                        <input type="text" class="form-control" value="<%= rc.filterVal  %>" style = 'width:250px;margin-right:20px;' ></input>
-                   
-                        <button type="submit" class="btn btn-primary update">
-                            <i class=" icon-check-sign"></i>
-                            Update
-                        </button>
-        </div>
-      </div>
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <div class="input-group-btn dropdown">
+              <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
+                  <%= rc.filterLabel%>
+                  <span class='caret'></span>
+              </button>
+
+              <ul class='dropdown-menu filter-sub'>
+                <li>
+                    <a class='filter_op' data-id='contains' href='#'>contains</a>
+                </li>
+                <li>
+                   <a class='filter_op' data-id='not' href='#'>does not contain</a>
+                </li>
+                <li>
+                    <a class='filter_op' data-id='equal' href='#'>is equal to</a>
+                </li>
+                <li>
+                    <a  class='filter_op' data-id='start' href='#'>start with</a>
+                </li>
+                <li>
+                    <a class='filter_op' data-id='end' href='#'>end with</a>
+                </li>
+              </ul>
+            </div>
+
+            <input type="text" class="form-control" value="<%= rc.filterVal  %>">
+
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default clear">
+                  <i class=" icon-remove"></i>
+              </button>
+              <button type="submit" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  Update
+              </button>
+            </div>
+          </div>
+      </li>
     </ul>
  </script>
- 
+
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
     //$(function() {
@@ -269,8 +274,8 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             personalize_url: "{{ APP.href('my_account/personalize') }}",
             data_url: "{{ config.data_url }}",
             edit_url: "{{ config.edit_url }}",
-            data: {{ THIS.getPageRowsData() | raw }},            
-            columns: {{ THIS.getColumnsData() | raw }}, 
+            data: {{ THIS.getPageRowsData() | raw }},
+            columns: {{ THIS.getColumnsData() | raw }},
             data_mode: "{{ config.data_mode | raw }}",
             filters: {{ THIS.getFilterData()  | raw }}
         });
