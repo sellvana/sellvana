@@ -52,7 +52,7 @@
                 <b class="caret"></b>
             </a>
             
-                <ol class="dd-list dropdown-menu filter-box">
+                <ol class="dd-list dropdown-menu">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
@@ -73,7 +73,7 @@
         <div class="col-sm-3 text-right">
             <div class="dataTables_filter" id="DataTables_Table_1_filter">
                 <label>
-                    Search: <input type="text" aria-controls="DataTables_Table_1" style="width: 200px;" class="form-control input-sm" placeholder="Search">
+                    Search: <input type="text" aria-controls="DataTables_Table_1" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search">
                 </label>
             </div>
         </div>

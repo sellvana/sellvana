@@ -701,8 +701,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         
         foreach ($config['filters'] as $fId=>$f) {            
             $f['field'] = !empty($f['field']) ? $f['field'] : $fId;             
-            if ($fId === '_quick') {
-                echo 'dirty';exit;
+            if ($fId === '_quick') {                
                 if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                     $args = array();
                     foreach ($f['args'] as $a) {
