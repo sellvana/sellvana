@@ -1,7 +1,7 @@
 {% set formUrl = APP.href('catalog/categories/tree_form/') %}
 
 <script>
-    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter'], function($) {
+    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter', 'jquery.equalHeights'], function($) {
         $(function() {
             /*
             $('.fcom-admin-nav-sidebar').resizable({
@@ -13,7 +13,7 @@
             */
             //fix for splitter
             var categoriesLayoutEl = $('#categories-layout');
-            categoriesLayoutEl.css('height', $(this).height());
+            categoriesLayoutEl.css('min-height', $(this).height());
             categoriesLayoutEl.split({
                 orientation: 'vertical',
                 limit: 2,
@@ -55,6 +55,11 @@
                 create_lock: true
             });
 
+            $('#categories').bind('loaded.jstree open_node.jstree create_node.jstree select_node.jstree move_node.jstree', function(e){
+                categoriesLayoutEl.equalHeights();
+                categoriesLayoutEl.css('min-height', categoriesLayoutEl.find(':first-child').height());
+            });
+
             function loadForm(id) {
                 var url = '{{ formUrl }}?id='+id;
                 $('#categories-form-container').load(url, function() {
@@ -88,15 +93,15 @@
 </div>
 
 <div class="box col-sm-12 fcom-tree-layout">
-    <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content row" id="categories-layout">
-        <div id="categories-wrapper">
+    <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content row clearfix" id="categories-layout">
+        <div id="categories-wrapper" class="clearfix">
             <div class="text-center well-sm">
                 <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
                 <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
             </div>
             <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-xs-12" id="categories"></div>
         </div>
-        <form class="form form-horizontal" id="categories-tree-form" action="{{ formUrl }}" method="post">
+        <form class="form form-horizontal clearfix" id="categories-tree-form" action="{{ formUrl }}" method="post">
             <div id="categories-form-container" class="col-xs-12"></div>
         </form>
     </div>

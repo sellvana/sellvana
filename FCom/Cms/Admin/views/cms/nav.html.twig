@@ -43,7 +43,7 @@
 </div>
 
 <script>
-    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter'], function($) {
+    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter', 'jquery.equalHeights'], function($) {
         $(function() {
             FCom.Admin.checkboxButton('#nav-tree-lock', {def:true, off:{icon:'icon-unlock', label:'Unlocked'}, on:{icon:'icon-lock', label:'Locked'}});
             /*FCom.Admin.checkboxButton('#nav-expand-collapse', {
@@ -54,7 +54,7 @@
 
             //fix for splitter
             var cmsNavLayoutEl = $('#cms-nav-layout');
-            cmsNavLayoutEl.css('height', $(this).height());
+            cmsNavLayoutEl.css('min-height', $(this).height());
             cmsNavLayoutEl.split({
                 orientation: 'vertical',
                 limit: 2,
@@ -73,6 +73,11 @@
                 on_select: function (n) { loadForm(n.attr('id')); },
                 lock_flag: '#nav-tree-lock',
                 create_lock: true
+            });
+
+            $('#cms_nav').bind('loaded.jstree open_node.jstree create_node.jstree select_node.jstree move_node.jstree', function(e){
+                cmsNavLayoutEl.equalHeights();
+                cmsNavLayoutEl.css('min-height', cmsNavLayoutEl.find(':first-child').height());
             });
 
             /*var cmsNavLayout = $('#cms-nav-layout').height($('.adm-wrapper').height()).layout({
