@@ -766,8 +766,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
     
     BackboneGrid.Views.FilterView = Backbone.View.extend({         
         initialize: function() {            
-            var div = 'div.row.datatables-top.'+BackboneGrid.id + ' div.col-sm-9';
-            console.log(div);
+            var div = 'div.row.datatables-top.'+BackboneGrid.id + ' div.col-sm-9 span:nth-child(2)';            
             this.setElement(div);
             this.collection.on('sort', this.render, this);
         },
