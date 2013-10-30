@@ -254,8 +254,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (empty($r['widgets'])) {
                 break;
             }
-            foreach ($r['widgets'] as $wKey => $wPos) {
-                $data['dashboard']['widgets'][$wKey]['pos'] = $wPos;
+            foreach ($r['widgets'] as $i => $wKey) {
+                $data['dashboard']['widgets'][$wKey]['pos'] = $i+1;
             }
             break;
 
