@@ -6,6 +6,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         'refresh' => true,
         'link_to_page' => true,
         'columns' => true,
+        'delete' => true,
+        'edit' => true 
     );
 
     public function gridUrl($changeRequest=array())
@@ -33,7 +35,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     }
 
     public function gridActions()
-    {
+    {        
         if (empty($this->grid['config']['actions'])) {
             return array();
         }
@@ -195,8 +197,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (empty($this->grid['config']['actions'])) {
             return;
         }
-        $grid = $this->grid;
-
+        $grid = $this->grid;        
         foreach ($grid['config']['actions'] as $k => &$action) {
             if (true === $action && !empty(static::$_defaultActions[$k])) {
                 switch ($k) {
@@ -212,7 +213,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             BLocale::_('Link')
                         ));
                         break;
-
+                    case 'edit':                        
+                        $action = array('html' => BUtil::tagHtml('button',
+                            array('class' => 'btn grid-mass-edit btn-success disabled'),
+                            BLocale::_('edit')
+                        ));
+                        break;
+                    case 'delete':                        
+                        $action = array('html' => BUtil::tagHtml('button',
+                            array('class' => 'btn grid-mass-delete btn-danger disabled'),
+                            BLocale::_('delete')
+                        ));
+                        break;
                     default:
                         $action = static::$_defaultActions[$k];
                 }
@@ -220,7 +232,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if (is_string($action)) {
                 $action = array('html' => $action);
             }
-        }
+        }        
         unset($action);
         $this->grid = $grid;
     }
