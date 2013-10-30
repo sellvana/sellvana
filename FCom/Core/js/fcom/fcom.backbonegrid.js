@@ -225,8 +225,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
 
                             break;
                         case 'multiselect':
-                            filter_val = filter_val.split(',');
-                            
+                            filter_val = filter_val.split(',');                            
                             temp.models = _.filter(temp.models, function(model){                                        
 
                                 var flag = false;
@@ -551,6 +550,10 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             var filterVal = this.$el.find('input:first').val();
             var op = this.model.get('filterOp');
             BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+            
+            if(filterVal.length === 0)
+                delete BackboneGrid.current_filters[field];
+            
             this.model.set('filterVal', filterVal);
             //this.$el.find('ul.filter-sub').css('display','none');        
             this.render();
@@ -569,6 +572,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         filter: function(val) {
 
             BackboneGrid.current_filters[this.model.get('name')] = val;
+            if (val.length === 0)
+                delete BackboneGrid.current_filters[this.model.get('name')];            
             if (BackboneGrid.data_mode === 'local') {
                 rowsCollection.filter();
             } else {
