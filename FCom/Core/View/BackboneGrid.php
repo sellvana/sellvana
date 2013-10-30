@@ -329,6 +329,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $pers = FCom_Admin_Model_User::i()->personalize();
             $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+
             $config['state'] = $persState;
             
             try {
@@ -361,19 +362,19 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->get('grid');
         $state = $grid['result']['state'];
         $rows = $grid['result']['rows'];
-
+        //var_dump($state);
         //$gridId = $grid['config']['id'];        
-        $persState = $grid['config']['state'];
+        //$persState = $grid['config']['state'];
         //$pers = FCom_Admin_Model_User::i()->personalize();
         //$persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         //$persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
 
-        foreach ($persState as $k => $v) {
+        /*foreach ($persState as $k => $v) {
             if (!empty($v)) {
                 $state[$k] = $v;
             }
-        }
-
+        }*/
+        //var_dump($state);
         $data = array();
         foreach ($rows as $rowId => $row) {
             $data[] = is_array($row) ? $row : $row->as_array();

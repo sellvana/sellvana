@@ -622,12 +622,20 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         orderChanged: function(ev) {
             console.log('orderChanged');
             var orderJson = $('.dd').nestable('serialize');
+            var changedFlag = false;
             for(var i in orderJson) {
                 var key = orderJson[i].id;
                 colModel = columnsCollection.findWhere({name: key});
-                colModel.set('position', parseInt(i) + columnsCollection.append);
+                if (parseInt(colModel.get('position')) !== parseInt(i) + columnsCollection.append) {
+                    colModel.set('position', parseInt(i) + columnsCollection.append);
+                    changedFlag = true;
+                }
+                
             }
             
+            if (!changedFlag)
+                return;
+
             columnsCollection.sort();            
             rowsCollection.updateColsInfo();
             gridView.render();
