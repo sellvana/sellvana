@@ -1,10 +1,11 @@
 {% set m = THIS.model %}
+{% set validator = THIS.get('validator') %}
 
 <fieldset name="main-product">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-product-name" name="model[product_name]" value="{{ m.get('product_name') }}" />
+            <input class="form-control" type="text" id="model-product-name" name="model[product_name]" value="{{ validator.fieldValue('product_name') }}" />
         </div>
     </div>
 

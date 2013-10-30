@@ -2,6 +2,7 @@
 {% set formUrl = THIS.get('form_url') %}
 {% set formId = THIS.get('form_id') %}
 {% set curTab = THIS.get('cur_tab') %}
+{% set validator = THIS.validator(formId) %}
 
 <script>
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
@@ -72,7 +73,7 @@
                 <div class="tab-content">
                     {% for k, tab in tabs %}
                         <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
-                            {% if tab.async is empty %}{{ THIS.view(tab.view) | raw }}{% endif %}
+                            {% if tab.async is empty %}{{ THIS.view(tab.view).set('validator', validator) | raw }}{% endif %}
                         </div>
                     {% endfor %}
                 </div>
