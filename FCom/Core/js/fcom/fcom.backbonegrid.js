@@ -128,10 +128,18 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             }
         }
     });
-    BackboneGrid.Models.Row = Backbone.Model.extend({
+    BackboneGrid.Models.Row = Backbone.Model.extend({        
         defaults: {
             _actions: ' ',                        
             colsInfo: []
+        },        
+        destroy: function() {
+            var id = this.get('id');
+            var hash = {};
+            hash.id = id;
+            hash.oper = 'del';
+            $.post(BackboneGrid.edit_url, hash);
+            return false;
         },
         save: function() {
             if (typeof rowModelEx !== "undefined") {
@@ -276,6 +284,10 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                 colInfo.hidden = c.get('hidden');
                 colInfo.cell =c.get('cell');
                 colInfo.position = c.get('position');   
+
+                if (c.has('data')) { //_action column                    
+                    colInfo.data = c.get('data');
+                }
                 //colInfo.width = c.get('width');             
                 colsInfo[colsInfo.length] = colInfo;
             },this);
@@ -326,14 +338,19 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         //template: _.template($('#row-template').html()),                
         initialize: function() {                 
              
-             this.model.on('change',this.render,this);
+            this.model.on('change',this.render, this);
+            this.model.on('remove', this._destorySelf, this);
         },
-        
-
+        _destorySelf: function() {
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+            this.remove();
+            this.model.destroy();   
+        },
         render: function() {            
             this.setElement($(this.template(this.model.toJSON())));
             return this;
-        }
+        }        
     });
 
     $.editable.addInputType('text', {
@@ -347,6 +364,17 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         
     BackboneGrid.Views.GridView = Backbone.View.extend({
       //  el: 'table tbody',
+        events: {
+            'click a.btn-delete': '_deleteRow'
+        },
+        _deleteRow: function(ev) {
+            var confirm = window.confirm("Do you want to really delete?");
+            if (confirm) {
+                var id = $(ev.target).parents('tr:first').attr('id');                
+                var row = this.collection.findWhere({id:id});
+                this.collection.remove(row);
+            }
+        },
         initialize: function () {
             this.collection.on('reset', this.updateColsAndRender, this);
         },        

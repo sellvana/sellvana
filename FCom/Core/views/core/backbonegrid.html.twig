@@ -119,11 +119,23 @@
     }  
 
     print('<td data-col="' + col.name + '">');
-
+    
     if (col.cell === 'select-row') { 
         print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']">');      
-    } else if (col.href!='') { 
-        print('<a href="{{ col.href|raw }}">' + rc[col.name] + '</a>');
+    } else if (col.name === '_actions') {     
+        print('&nbsp;&nbsp;');
+        if (typeof (col.data.edit) != 'undefined') {
+          print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc[col.data.edit.col] + '">');
+            print('<i class=" icon-edit-sign"></i>');
+          print('</a>');
+        }        
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.delete) !== 'undefined') {
+          print('<a class="btn btn-danger btn-xs btn-delete" >');
+            print('<i class="icon-remove"></i>');
+          print('</a>');
+        }
+        
     } else {
         print(rc[col.name]);
     } 
