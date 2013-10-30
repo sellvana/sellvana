@@ -11,7 +11,7 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
   {# %form(method="get" action="#{$this->gridUrl()") #}
   {# %fieldset #}
-  <div class="fcom-htmlgrid__toolbar btn-toolbar" style="height:45px">
+  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }}" style="height:45px">
     {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
     {# %input(type="submit" value="#{$this->_('Search')}") #}
       <!--
@@ -110,8 +110,7 @@
     </label>
   </div>
 </script>
-<script type="template" id="{{ config.id }}-row-template">
-  <tr id="<%= rc.id %>" class="<%= rc.cssClass %>">
+<script type="template" id="{{ config.id }}-row-template">  
   <% for (var index in rc.colsInfo) {          
     var col = rc.colsInfo[index];    
     if(col.hidden ) {      
@@ -121,7 +120,10 @@
     print('<td data-col="' + col.name + '">');
     
     if (col.cell === 'select-row') { 
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']">');      
+        var isSelected = '';
+        if (rc.selected)
+          isSelected = 'checked';
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + '>');      
     } else if (col.name === '_actions') {     
         print('&nbsp;&nbsp;');
         if (typeof (col.data.edit) != 'undefined') {
@@ -141,23 +143,22 @@
     } 
 
     print('</td>');
-  } %>
-  </tr>
+  } %>  
 </script>
 
 <script type='template' id="{{ config.id }}-header-template">
-    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" style="<% if (rc.width) { %> width:<%= rc.width %>px; <% } %>" class="<%= rc.cssClass %> sorting_<%= rc.sortState %>">
-
-        <% if(rc.type === '' || rc.type === 'default') { %>
-            <a class="js-change-url" style="cursor: pointer;">
-                <%= rc.label %>
-            </a>
-        <% } else if (rc.type === 'multiselect') { %>
-            <select class="js-sel">
-                {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-            </select>
-        <% } %>
-    </th>
+  <% if(rc.type === '' || rc.type === 'default') { %>
+    <a class="js-change-url" style="cursor: pointer;">
+      <%= rc.label %>
+    </a>
+  <% } else if (rc.type === 'multiselect') { %>
+   <% if (rc.selectedCount>0) { %>
+      <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+    <% } %>
+    <select class="js-sel">
+      {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
+    </select>
+  <% } %>    
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <span><%= rc.label %>:</span>

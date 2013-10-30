@@ -51,12 +51,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             '' => '',
             '@Show' => array(
                 'show_all' => 'All',
-                'show_sel' => 'Sel',
-                'show_unsel' => 'Unsel',
+                'show_sel' => 'Sel'                
             ),
             '@Select' => array(
                 'upd_sel' => 'Sel',
                 'upd_unsel' => 'Unsel',
+                'upd_clear' => 'Clear'
             ),
         );
     }
@@ -324,7 +324,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
             BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 		    $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
-            //TODO: $config['state'] is not fectch from db            
+
+            $gridId = $config['id'];
+            $pers = FCom_Admin_Model_User::i()->personalize();
+            $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+            $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+            $config['state'] = $persState;
+            
             try {
     			$grid['result'] = $orm->paginate($grid['request'], array(
     			    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
@@ -355,11 +361,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->get('grid');
         $state = $grid['result']['state'];
         $rows = $grid['result']['rows'];
-        $gridId = $grid['config']['id'];
-        
-        $pers = FCom_Admin_Model_User::i()->personalize();
-        $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
-        $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+
+        //$gridId = $grid['config']['id'];        
+        $persState = $grid['config']['state'];
+        //$pers = FCom_Admin_Model_User::i()->personalize();
+        //$persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+        //$persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+
         foreach ($persState as $k => $v) {
             if (!empty($v)) {
                 $state[$k] = $v;
@@ -369,8 +377,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $data = array();
         foreach ($rows as $rowId => $row) {
             $data[] = is_array($row) ? $row : $row->as_array();
-        }
-        
+        }        
         return json_encode(array('state' => $state, 'data' => $data));
     }
 
