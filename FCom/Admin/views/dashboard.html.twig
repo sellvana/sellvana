@@ -27,7 +27,7 @@
 
     <ul class='js-sortable-container row'>
 {% for widget in widgets %}
-      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" {{ widget.hidden ? 'style="display:none"' }}>
+      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}" {{ widget.hidden ? 'style="display:none"' }}>
         <div class='box'>
           <div class='box-header js-sortable-handle {{ widget.header_class }}'>
             <div class='title'>
@@ -59,11 +59,17 @@ require(['jquery', 'jquery-ui'], function($) {
     handle: '.js-sortable-handle',
     update: function(ev, ui) {
       //console.log(this, ev, ui);
+      var widgetIds = [], personalizeUrl = "{{ APP.href('my_account/personalize') }}";
       $(this).children().each(function(idx, el) {
-        console.log(el);
+        widgetIds.push($(el).data('id'));
+      });
+      var postData = { do:'dashboard.widget.pos', widgets:widgetIds };
+      $.post(personalizeUrl, postData, function(response, status, xhr) {
+        console.log(response);
       })
     }
     //delay: 100,
   })
+  $('.js-sortable-')
 })
 </script>
