@@ -23,8 +23,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 		array('email', '@required'),
 		array('firstname', '@required'),
 		array('lastname', '@required'),
-		array('create_at', '@required'),
-		array('update_at', '@required'),
 		array('payment_method', '@required'),
 		array('payment_details', '@required'),
 

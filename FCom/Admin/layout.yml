@@ -53,6 +53,8 @@ base:
       - [ requireJs, jquery.splitter, @FCom_Core/js/lib/splitter/jquery.splitter, { deps: [ jquery ] } ]
       - [ css, @FCom_Core/js/lib/splitter/jquery.splitter.css ]
 
+      - [ requireJs, jquery.equalHeights, @FCom_Core/js/lib/jquery.equalHeights, { deps: [ jquery ] } ]
+
       - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
       - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/js/fcom.admin ]
