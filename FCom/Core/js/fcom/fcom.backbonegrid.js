@@ -718,10 +718,18 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
             'keyup': 'filterValChanged',
-            'click button.clear': '_closeFilter'
+            'click button.clear': '_closeFilter',
+            'keyup input': '_checkEnter'
         },
         _closeFilter: function(ev) {
             this._filter(false);
+        },
+        _checkEnter: function(ev) {
+            var evt = ev || window.event;
+            var charCode = evt.keyCode || evt.which;
+            if (charCode === 13) {
+                this.$el.find('button.update').trigger('click');
+            }
         },
         filterValChanged: function(ev) {
             this.model.set('filterVal', this.$el.find('input:first').val());
@@ -747,12 +755,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             this._filter(filterVal);
             this.model.set('filterVal',filterVal);
             this.render();
-        }
+        },
+
     });
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
         events: {
-        'click button.clear': '_closeFilter'
+        'click button.clear': '_closeFilter'        
+        },
+        checkEnter: function(ev) {
+
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
