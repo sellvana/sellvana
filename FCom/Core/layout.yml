@@ -13,7 +13,8 @@ common_js_libs:
             - [ requireJs, jquery.widgets, @FCom_Core/js/lib/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
             - [ requireJs, jquery.validate, @FCom_Core/js/lib/jquery.validate.min, { deps: [ jquery ] } ]
             - [ requireJs, jquery.rateit, @FCom_Core/js/lib/jquery.rateit.min, { deps: [ jquery ] } ]
-
+            - [ requireJs, jquery.quicksearch, @FCom_Core/js/lib/jquery.quicksearch, { deps: [ jquery ] } ]
+            - [ requireJs, ngprogress, @FCom_Core/js/lib/ngprogress, { deps: [ jquery ] } ]
             - [ requireJs, jquery.zoom, @FCom_Core/js/lib/jquery.zoom, { deps: [ jquery ] } ]
 
             - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
@@ -22,6 +23,7 @@ common_js_libs:
             - [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
             #- [ requireJs, jquery.tools, @FCom_Core/js/lib/jquery.tools.min, { deps: [ jquery ] } ]
+            - [ css, @FCom_Core/js/lib/css/ngprogress.css ]
 
 lib_visualsearch:
     - view: head
