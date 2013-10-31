@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 'select2'], function(Backbone, _, $) {
+define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 'select2', 'jquery.quicksearch', 'ngprogress'], function(Backbone, _, $) {
 
     var BackboneGrid = {
         Models: {},
@@ -23,7 +23,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             cell: '',
             filtering: false,
             filterVal: '',
-            selectedCount: 0
+            selectedCount: 0,
+            filterShow: true
         },
         initialize: function() {
             if (this.type === 'multiselect') {
@@ -101,8 +102,6 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                             rowsCollection.filter();
                         }
                         
-                        $(BackboneGrid.massDeleteButton).addClass('disabled');
-                        $(BackboneGrid.massEditButton).addClass('disabled');
                     }
                     break;
                 case 'show_sel':                    
@@ -116,12 +115,6 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                         BackboneGrid.data_mode = 'local';
                         rowsCollection.originalRows = selectedRows;                                        
                         rowsCollection.reset(selectedRows.models);
-
-                        if (rowsCollection.length > 0) {
-                            $(BackboneGrid.massDeleteButton).removeClass('disabled');
-                            $(BackboneGrid.massEditButton).removeClass('disabled');
-                        }
-                        
                     }
                     break;
             }
@@ -285,6 +278,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             //this.on.reset('reset', this.updateColsInfo, this);            
         },
         filter: function() {
+
                 var temp = this.originalRows.clone();            
                 for(var filter_key in BackboneGrid.current_filters) {
                     
@@ -366,7 +360,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                 this.reset(temp.models);
                 this.updateColsInfo();
                 gridView.render();
-        },
+        },       
         addInOriginal: function(model){
             this.originalRows.add(model);
             console.log('add');
@@ -574,6 +568,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                     
                 }
             }, this);
+
+            $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
             return this;
         },
         addRow: function(row) {
@@ -591,7 +587,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         },
         events: {
             'change input.showhide_column': 'changeState',
-            'click input.showhide_column': 'preventDefault'
+            'click input.showhide_column': 'preventDefault',
+            'click .dd3-content': 'preventDefault'
         },
         preventDefault: function(ev){
 
@@ -618,7 +615,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             rowsCollection.updateColsInfo();
             gridView.render();
 
-            
+            ev.stopPropagation();
+            return false;
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -681,6 +679,27 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         attributes: {
             style: 'margin-right:20px;'
         },
+       
+        _closeFilter: function() {
+            this.model.set('filterShow',false);
+            this._filter(false);
+            this.$el.remove();
+        },
+        _filter: function(val) {
+            if (val === false) {
+                delete BackboneGrid.current_filters[this.model.get('name')];            
+            } else {            
+                BackboneGrid.current_filters[this.model.get('name')] = val;
+                if (val.length === 0)
+                    delete BackboneGrid.current_filters[this.model.get('name')];            
+            }
+
+            if (BackboneGrid.data_mode === 'local') {
+                rowsCollection.filter();
+            } else {
+                rowsCollection.fetch({reset:true});
+            }
+        },
         preventDefault: function(ev) {          
                 ev.stopPropagation();
                 return false;
@@ -697,7 +716,8 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             //'click .filter-box': 'preventDefault',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-            'keyup': 'filterValChanged'
+            'keyup': 'filterValChanged',
+            'click button.clear': '_closeFilter'
         },       
         filterValChanged: function(ev) {
             this.model.set('filterVal', this.$el.find('input:first').val());
@@ -720,35 +740,18 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             var filterVal = this.$el.find('input:first').val();
             var op = this.model.get('filterOp');
             BackboneGrid.current_filters[field] = {val: filterVal, op: op};
-            
-            if(filterVal.length === 0)
-                delete BackboneGrid.current_filters[field];
-            
-            this.model.set('filterVal', filterVal);
-            //this.$el.find('ul.filter-sub').css('display','none');        
+            this._filter(filterVal);
+            this.model.set('filterVal',filterVal);
             this.render();
-            
-            if (BackboneGrid.data_mode === 'server') {
-                rowsCollection.fetch({reset:true});
-            } else {
-                rowsCollection.filter();
-            }
-
-            return true;
         }
     });
     
-    BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({                    
+    BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({  
+        events: {
+        'click button.clear': '_closeFilter'                  
+        },
         filter: function(val) {
-
-            BackboneGrid.current_filters[this.model.get('name')] = val;
-            if (val.length === 0)
-                delete BackboneGrid.current_filters[this.model.get('name')];            
-            if (BackboneGrid.data_mode === 'local') {
-                rowsCollection.filter();
-            } else {
-                rowsCollection.fetch({reset:true});
-            }
+            this._filter(val);            
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));   
@@ -785,7 +788,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             this.collection.each(this.addFilterCol, this);
         },
         addFilterCol: function(model) {
-            if(model.get('hidden') !== true && model.get('filtering')) {
+            if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
                 var filterCell;
                 switch (model.get('filter_type')) {
                     case 'text':
@@ -906,6 +909,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         BackboneGrid.personalize_url = config.personalize_url;
         BackboneGrid.edit_url = config.edit_url;
         BackboneGrid.current_filters= {};
+        BackboneGrid.quickInputId = '#' + config.id + '-quick-search';
         //personal settings
         var state = config.data.state;
         state.p = parseInt(state.p);
@@ -1021,6 +1025,14 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         mutiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){            
             mutiselectCol.set('selectedCount', selectedRows.length);
+
+            if (selectedRows.length > 0) {
+                $(BackboneGrid.massDeleteButton).removeClass('disabled');
+                $(BackboneGrid.massEditButton).removeClass('disabled');
+            } else {
+                $(BackboneGrid.massDeleteButton).addClass('disabled');
+                $(BackboneGrid.massEditButton).addClass('disabled');
+            }
         });
         
         for (var i in rows) {    
@@ -1078,18 +1090,28 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
 
         //quick search
         var quickInputId = '#' + config.id + '-quick-search';
-        $(quickInputId).on('keyup', function(ev){
-            var prevVal = BackboneGrid.current_filters['_quick'];
-            var val = $(this).val();
-            if (prevVal !== val) {
-                BackboneGrid.current_filters['_quick'] = val;
-                if (BackboneGrid.data_mode !== 'local') {
-                    rowsCollection.fetch({reset: true});
-                } else {
-                    rowsCollection.filter();
-                }
-            }
+        
+        
+        $(quickInputId).on('keyup', function(ev){                
+                var evt = ev || window.event;
+                var charCode = evt.keyCode || evt.which;                
+                if (BackboneGrid.data_mode !== 'local' && charCode == 13) {
 
+                    BackboneGrid.current_filters['_quick'] = $(ev.target).val();
+                    rowsCollection.fetch({reset: true});
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return false;
+                } 
+                return true;
+        });
+
+        //ajax loading...
+        $( document ).ajaxComplete(function() {
+            NProgress.done(); 
+        });
+        $( document ).ajaxStart(function() {
+            NProgress.start();
         });
     }
 });

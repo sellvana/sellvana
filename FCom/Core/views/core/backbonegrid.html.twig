@@ -21,7 +21,7 @@
           {% endif %}
           </div>
           <div class="col-sm-3 text-right">
-            {% if filterData._quick  %}
+            
               <div class="dataTables_filter">
                   <label>
                     Search:
@@ -29,7 +29,7 @@
                   <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
 
               </div>
-            {% endif %}
+            
           </div>
     </div>
   {% endif %}
@@ -209,6 +209,9 @@
       <span><%= rc.label %>:</span>
       <span>
         <input type="hidden" id="multi_hidden" style="width:300px"/>
+        <button class="btn btn-default clear" type="button">
+          <i class=" icon-remove"></i>
+        </button>
       </span>
 </script>
 <script type='template' id="{{ config.id }}-text-filter-template">
