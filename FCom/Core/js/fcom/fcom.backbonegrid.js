@@ -66,16 +66,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
            // this.model.on('change', this.render, this);
         },
         _selectPageAction: function(flag) {
-            rowsCollection.each(function(model) {
-                if(!flag === model.get('selected')) {
-                    if (flag)
+            rowsCollection.each(function(model) {                
+                if (model.get('editable')) {
+                    if (!flag === model.get('selected')) {                    
                         selectedRows.add(model);
-                    else {
-                        selectedRows.remove(model,{silent: true});
-                        selectedRows.trigger('remove');
-                    }
+                    } else {
+                            selectedRows.remove(model,{silent: true});
+                            selectedRows.trigger('remove');
+                    }                    
                     model.set('selected', flag);
-                }
+                    model.trigger('render');                
+                }                
             });
         },
         _checkAction: function(ev) {
@@ -136,6 +137,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                     rowsCollection.each(function(model) {
                         if(model.get('selected'))
                             model.set('selected', false);
+                        model.trigger('render');
                     });
                     break;
             }
@@ -1124,15 +1126,26 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         if ($(BackboneGrid.massDeleteButton).length > 0) {
             $(BackboneGrid.massDeleteButton).on('click', function(){
                 var confirm = window.confirm("Do you really want to delete selected rows?");
-                if (confirm) {
-                    var ids = selectedRows.pluck('id').join(",");
-                    $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
-                    .done(function(data) {
-                        $.bootstrapGrowl("Successfully deleted.", { type:'success', align:'center', width:'auto' });
-                        $('select.'+BackboneGrid.id).val('show_all').trigger('change');
-                        selectedRows.reset();
-                        //sel.trigger('change');
-                    });;
+                if (confirm) {                    
+                    if (BackboneGrid.callBacks && BackboneGrid.callBacks['mass-delete']) {
+                        var funcName = BackboneGrid.callBacks['mass-delete'];
+                        var jsons = selectedRows.toJSON();
+                        var command = funcName + '(jsons);';
+                        eval(command);
+                        rowsCollection.remove(selectedRows.models, {slient:true});
+                        gridView.render();
+                    } else {
+                        var ids = selectedRows.pluck('id').join(",");
+                        $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
+                        .done(function(data) {
+                            $.bootstrapGrowl("Successfully deleted.", { type:'success', align:'center', width:'auto' });
+                            rowsCollection.fetch({reset: true});                            
+                            //gridView.render();
+                        });
+                    }
+
+                    selectedRows.reset();
+
                 }
             });
         }
