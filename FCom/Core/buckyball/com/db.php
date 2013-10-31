@@ -2452,33 +2452,33 @@ class BModel extends Model
         return $values;
     }
 
-	/**
-	 * Model validation
-	 *
-	 * Validate provided data using model rules and parameter rules.
-	 * Parameter rules will be merged with model rules and can override them.
-	 * Event will be fired prior validation which will enable adding of rules or editing data
-	 * Event will be fired if validation fails.
-	 *
-	 * @see BValidate::validateInput()
-	 * @param array $data
-	 * @param array $rules
-	 * @param string $formName
-	 * @return bool
-	 */
-	public function validate($data = array(), $rules = array(), $formName = 'admin')
-	{
-		if (!$data)
-			$data = $this->as_array();
-		$rules = array_merge($this->_validationRules, $rules);
-		BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
-		$valid = BValidate::i()->validateInput($data, $rules, $formName);
-		if (!$valid) {
-			BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
-		}
+    /**
+     * Model validation
+     *
+     * Validate provided data using model rules and parameter rules.
+     * Parameter rules will be merged with model rules and can override them.
+     * Event will be fired prior validation which will enable adding of rules or editing data
+     * Event will be fired if validation fails.
+     *
+     * @see BValidate::validateInput()
+     * @param array  $data
+     * @param array  $rules
+     * @param string $formName
+     * @return bool
+     */
+    public function validate($data = array(), $rules = array(), $formName = 'admin')
+    {
+        if (!$data)
+            $data = $this->as_array();
+        $rules = array_merge($this->_validationRules, $rules);
+        BEvents::i()->fire($this->_origClass() . "::validate:before", array("rules" => &$rules, "data" => &$data));
+        $valid = BValidate::i()->validateInput($data, $rules, $formName);
+        if (!$valid) {
+            BEvents::i()->fire($this->_origClass() . "::validate:failed", array("rules" => &$rules, "data" => &$data));
+        }
 
-		return $valid;
-	}
+        return $valid;
+    }
 
     public function __call($name, $args)
     {
