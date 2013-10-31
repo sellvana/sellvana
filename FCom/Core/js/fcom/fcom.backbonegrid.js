@@ -955,6 +955,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
     var colsInfo;
     var selectedRows;
     FCom.BackboneGrid = function(config) {
+        NProgress.start();
         //general settings
         _.templateSettings.variable = 'rc';
         BackboneGrid.id = config.id;
@@ -1166,5 +1167,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         $( document ).ajaxStart(function() {
             NProgress.start();
         });
+        NProgress.done();
     }
+
 });
