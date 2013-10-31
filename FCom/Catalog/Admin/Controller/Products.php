@@ -32,7 +32,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['filters'] = array(
             array('field' => 'product_name', 'type' => 'text'),
             array('field' => 'local_sku', 'type' => 'text'),
-            array('field' => 'uom', 'type' => 'text')
+            array('field' => 'uom', 'type' => 'text'),
+            '_quick' => array('expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' =>  array('?%', '%?%', '?'))
         );
         $config['format_callback'] = function($args) {
             foreach ($args['rows'] as $row) {
