@@ -1075,5 +1075,21 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             var massEditForm = new BackboneGrid.Views.MassEditForm({collection: columnsCollection});
             massEditForm.render();
         }
+
+        //quick search
+        var quickInputId = '#' + config.id + '-quick-search';
+        $(quickInputId).on('keyup', function(ev){
+            var prevVal = BackboneGrid.current_filters['_quick'];
+            var val = $(this).val();
+            if (prevVal !== val) {
+                BackboneGrid.current_filters['_quick'] = val;
+                if (BackboneGrid.data_mode !== 'local') {
+                    rowsCollection.fetch({reset: true});
+                } else {
+                    rowsCollection.filter();
+                }
+            }
+
+        });
     }
 });

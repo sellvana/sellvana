@@ -403,13 +403,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function getFilterData()
     {
         $grid = $this->get('grid');
-        if (isset($grid['config']['filters'])) {
+        if (isset($grid['config']['filters'])) {                        
             return json_encode($grid['config']['filters']);
         } else {
-            return '[]';
+            return [];
         }
             
-    }
+    }    
     public function getPageHtmlData($rows = null)
     {
         $grid = $this->get('grid');
@@ -717,11 +717,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         
         if (empty($config['filters'])) {
             return;
-        }   
-        
+        }           
         foreach ($config['filters'] as $fId=>$f) {            
             $f['field'] = !empty($f['field']) ? $f['field'] : $fId;             
-            if ($fId === '_quick') {                
+            if ($fId === '_quick') {                                         
                 if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                     $args = array();
                     foreach ($f['args'] as $a) {
