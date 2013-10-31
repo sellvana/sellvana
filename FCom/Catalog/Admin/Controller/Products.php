@@ -26,6 +26,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['actions'] = array(
             'refresh' => true,
             'link_to_page' => true,
+            'edit' => true,
+            'delete' => true
         );
         $config['filters'] = array(
             array('field' => 'product_name', 'type' => 'text'),
