@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.inline-editor', 'select2', 'jquery.quicksearch'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.inline-editor', 'select2', 'jquery.quicksearch', 'colResizable'], function(Backbone, _, $, NProgress) {
 
     var BackboneGrid = {
         Models: {},
@@ -63,7 +63,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             'change select.js-sel': '_checkAction'
         },
         initialize: function() {
-            this.model.on('change', this.render, this);
+           // this.model.on('change', this.render, this);
         },
         _selectPageAction: function(flag) {
             rowsCollection.each(function(model) {
@@ -177,9 +177,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                 rowsCollection.fetch({reset: true});
                 //gridView.render();
             }
-
+            this.$el.attr('class', this.className());
             ev.preventDefault();
-
+            
             return false;
         },
         render: function() {
@@ -195,9 +195,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             this.collection.on('sort', this.render, this);
         },
         render: function() {
+            console.log('fwfwf');
             this.$el.html('');
             this.collection.each(this.addTh, this);
             gridParent = $('#'+BackboneGrid.id).parent();
+            //this.$el.parents('table:first').colResizable();
             $('thead th', gridParent).resizable({
                 handles: 'e',
                 minWidth: 20,
@@ -212,6 +214,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                     );
                     colModel = columnsCollection.findWhere({name: $el.data('id')});
                     colModel.set('width', width);
+                    //$(ev.target).append('<div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div>');
+                    return true;
                 }
             });
 
