@@ -22,7 +22,7 @@ form label.required:after { color:#e32; content:' *'; display:inline; }
 .fcom-htmlgrid__grid th.js-draggable .draghandle { display:none; float:right; background:#888; width:10px; height:10px; margin:2px; }
 .fcom-htmlgrid__grid th.js-draggable:hover .draghandle { display:block; cursor: move; }
 
-.fcom-htmlgrid__grid { width: 100%; }
+.fcom-htmlgrid__grid { width: auto; }
 .fcom-htmlgrid__grid td { padding: 5px 10px; border-right: solid 1px #DDD; }
 .fcom-htmlgrid__grid tr.even td { background: #FCFCFC; }
 .fcom-htmlgrid__grid tr.odd td { background: #FFF; }

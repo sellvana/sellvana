@@ -5,38 +5,54 @@
 {% set config = grid.config %}
 {% set s = data.result.state %}
 {% set pageUrl = THIS.pageChangeHref() %}
+{% set filterData = config.filters %}
 
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
+  {% if filterData %}
+    <div class="row datatables-top  {{ config.id | raw }}">
+          <div class="col-sm-9">
+          {% if filterData[0] %}
+            <span><label>Filters:&nbsp;</label></span>
+            <span>
+              <!-- filter buttons here -->
+            </span>
+          {% endif %}
+          </div>
+          <div class="col-sm-3 text-right">
+            
+              <div class="dataTables_filter">
+                  <label>
+                    Search:
+                  </label>
+                  <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
+
+              </div>
+            
+          </div>
+    </div>
+  {% endif %}
   {# %form(method="get" action="#{$this->gridUrl()") #}
   {# %fieldset #}
-  <div class="fcom-htmlgrid__toolbar btn-toolbar" style="height:45px">
+  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
     {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
     {# %input(type="submit" value="#{$this->_('Search')}") #}
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
-        <ul class="pagination pagination-sm pagesize">
-          {% for ps in THIS.pageSizeOptions() %}
-            <li {{ ps==s.ps ? 'class="active"' }}>
-              <a class="js-change-url page-size" href="#">{{ ps }}</a>
-            </li>
-          {% endfor %}
-        </ul>
-
-        <ul class="pagination pagination-sm page">
-          {#
-          <label>
-            {{ 'Page'|_ }}
-          </label>
-          <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
-          {{ 'of %s'|_(s.mp) }}
-          #}
-
-
-        </ul>
-
+      <div class="col-sm-7">
+        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+                Columns
+                <b class="caret"></b>
+            </a>
+                <ol class="dd-list dropdown-menu" style="margin-left:20px;">
+                    <!--li calss="ui-state-default"-->
+                    <!-- visibiility template -->
+                    <!--/li -->
+                </ol>
+        </span>
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
             {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
@@ -44,21 +60,31 @@
             {{ action.html | raw }}
           {% endif %}
         {% endfor %}
-        
-        <span class="dropdown dd dd-nestable" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
-                Columns
-                <b class="caret"></b>
-            </a>
-            
-                <ol class="dd-list dropdown-menu">
-                    <!--li calss="ui-state-default"-->
-                    <!-- visibiility template -->
-                    <!--/li -->
-                </ol>
-          
-        </span>
+      </div>      
+      <div class="col-sm-5 text-right pagination">
+        {% if config['data_mode']!= 'local' %}          
+          <ul class="pagination pagination-sm pagesize">
+            {% for ps in THIS.pageSizeOptions() %}
+              <li {{ ps==s.ps ? 'class="active"' }}>
+                <a class="js-change-url page-size" href="#">{{ ps }}</a>
+              </li>
+            {% endfor %}
+          </ul>
 
+          <ul class="pagination pagination-sm page">
+            {#
+            <label>
+              {{ 'Page'|_ }}
+            </label>
+            <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
+            {{ 'of %s'|_(s.mp) }}
+            #}
+          </ul>
+        {% endif %}
+      </div>
+  </div>
+  <div class='row'>
+    <div class="text-center {{ config.id }}-pagination"></div>
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
@@ -66,10 +92,7 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    
-          
-    
-    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped" id = {{ config.id | raw }} >
+    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -86,10 +109,44 @@
       </tbody>
     </table>
   </div>
+
+  <div class='modal fade' id='mass-edit' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+            </div>
+            <div class='modal-body'>
+                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
+                  <!-- mass edit form element template is here -->
+                </form>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
+                <button class='btn btn-primary save' type='button'>Save changes</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
 </div>
 
 
 
+<script type="template" id="{{ config.id }}-edit-template">
+
+    <label for="<%= rc.name %>"><%= rc.label%></label>
+    <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
+      <input type="text" id="<%= rc.name %>" class="form-control">
+    <% } else if(rc.editor === 'select') { %>
+      <select id="<%= rc.name %>" class="form-control">
+        <% for(var key in rc.options) { %>
+          <option value="<%= key %>"><%= rc.options[key] %></option>
+        <% } %>
+      </select>
+    <% } %>
+</script>
 <script type="template" id="{{ config.id }}-col-template">
   <div class="dd-handle dd3-handle">
     &nbsp;
@@ -102,44 +159,116 @@
   </div>
 </script>
 <script type="template" id="{{ config.id }}-row-template">
-  <tr id="<%= rc.id %>" class="<%= rc.cssClass %>">
-  <% for (var index in rc.colsInfo) {          
-    var col = rc.colsInfo[index];    
-    if(col.hidden ) {      
+  <% for (var index in rc.colsInfo) {
+    var col = rc.colsInfo[index];
+    if(col.hidden ) {
       continue;
-    }  
+    }
 
-    print('<td>');
+    print('<td data-col="' + col.name + '">');
 
-    if (col.cell === 'select-row') { 
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']">');      
-    } else if (col.href!='') { 
-        print('<a href="{{ col.href|raw }}">' + rc[col.name] + '</a>');
+    if (col.cell === 'select-row') {
+        var isSelected = '';
+        var isEditable = rc.editable ? '' : 'DISABLED';
+        if (rc.editable && rc.selected)
+          isSelected = 'checked';        
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
+    } else if (col.name === '_actions') {
+        print('&nbsp;&nbsp;');
+        if (typeof (col.data.edit) != 'undefined') {
+          print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc[col.data.edit.col] + '">');
+            print('<i class=" icon-edit-sign"></i>');
+          print('</a>');
+        }
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.delete) !== 'undefined') {
+          print('<a class="btn btn-danger btn-xs btn-delete" >');
+            print('<i class="icon-remove"></i>');
+          print('</a>');
+        }
+
     } else {
         print(rc[col.name]);
-    } 
+    }
 
     print('</td>');
   } %>
-  </tr>
 </script>
 
-<script type='template' id="{{ config.id }}-header-template">
-    <th id="th-sort-<%= rc.id %>" data-id="<%= rc.name %>" <% if (rc.width) { %> style="width:<%= rc.width %>px;" <% } %> class="<%= rc.cssClass %> sort-<%= rc.sortState %>">
-
-        <% if(rc.type === '' || rc.type === 'default') { %>
-            <a class="js-change-url" style="cursor: pointer;">
-                <%= rc.label %>
-            </a>
-        <% } else if (rc.type === 'multiselect') { %>
-            <select class="js-sel">
-                {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-            </select>
+<script type='template' id="{{ config.id | raw }}-header-template">
+  <% if(rc.type === '' || rc.type === 'default') { %>
+    <a class="js-change-url" style="cursor: pointer;">
+      <%= rc.label %>
+    </a>
+  <% } else if (rc.type === 'multiselect') { %>
+   <% if (rc.selectedCount>0) { %>
+      <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+    <% } %>
+    <select class="{{ config.id | raw }} js-sel">
+      {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
+    </select>
+  <% } %>
+</script>
+<script type='template' id="{{ config.id }}-multiselect-filter-template">
+      <span><%= rc.label %>:</span>
+      <span>
+        <input type="hidden" id="multi_hidden" style="width:300px"/>        
+      </span>
+</script>
+<script type='template' id="{{ config.id }}-text-filter-template">
+    <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+        <%= rc.label %>:
+        <% if(rc.filterVal ==='') { %>
+            All
+        <%} else { %>
+            <%= rc.filterLabel %> "<%= rc.filterVal %>"
         <% } %>
-    </th>
-</script>
+        <span class="caret"></span>
+    </button>
 
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <div class="input-group-btn dropdown">
+              <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
+                  <%= rc.filterLabel%>
+                  <span class='caret'></span>
+              </button>
 
+              <ul class='dropdown-menu filter-sub'>
+                <li>
+                    <a class='filter_op' data-id='contains' href='#'>contains</a>
+                </li>
+                <li>
+                   <a class='filter_op' data-id='not' href='#'>does not contain</a>
+                </li>
+                <li>
+                    <a class='filter_op' data-id='equal' href='#'>is equal to</a>
+                </li>
+                <li>
+                    <a  class='filter_op' data-id='start' href='#'>start with</a>
+                </li>
+                <li>
+                    <a class='filter_op' data-id='end' href='#'>end with</a>
+                </li>
+              </ul>
+            </div>
+
+            <input type="text" class="form-control" value="<%= rc.filterVal  %>">
+
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default clear">
+                  <i class=" icon-remove"></i>
+              </button>
+              <button type="submit" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  Update
+              </button>
+            </div>
+          </div>
+      </li>
+    </ul>
+ </script>
 
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
@@ -148,12 +277,14 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             id: "{{ config.id }}",
             personalize_url: "{{ APP.href('my_account/personalize') }}",
             data_url: "{{ config.data_url }}",
+            edit_url: "{{ config.edit_url }}",
             data: {{ THIS.getPageRowsData() | raw }},
-            headerTemplate: "{{ config.id }}-header-template",
-            rowTemplate: "{{ config.id }}-row-template",
-            pageTemplate: "{{ config.id }}-pagination-template",
-            colTemplate: "{{ config.id }}-col-template",
-            columns: {{ THIS.getColumnsData() | raw }}
+            columns: {{ THIS.getColumnsData() | raw }},
+            data_mode: "{{ config.data_mode }}",
+            filters: {{ THIS.getFilterData()  | raw }}
+            {% if config._callbacks %}
+            ,callBacks : {{ config._callbacks| raw }}
+            {% endif %}
         });
     //});
 });

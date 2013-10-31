@@ -1,0 +1,44 @@
+{% set m= THIS.model %}
+{% set prodCtrl = APP.instance('FCom_Catalog_Admin_Controller_Products') %}
+
+<div class="col-sm-12" id="linked-products-layout">
+    <div class="box ui-layout-west">
+        <div class="box-content">
+            {{ THIS.view('jqgrid').set('config', prodCtrl.linkedProductGridConfig(m, 'related'))|raw }}
+            {{ THIS.view('jqgrid').set('config', prodCtrl.linkedProductGridConfig(m, 'similar'))|raw }}
+        </div>
+    </div>
+    <div class="box ui-layout-west">
+        <div class="box-content">
+            {{ THIS.view('jqgrid').set('config', prodCtrl.productLibraryGridConfig('products'))|raw }}
+        </div>
+    </div>
+</div>
+
+<script>
+    require(['jquery', 'fcom.admin'], function($) {
+        $(function() {
+            /*
+            var linkedProductslayout = $('#linked-products-layout').height($('.adm-wrapper').height()).layout({
+                useStateCookie: true,
+                west__minWidth:'40%',
+                west__spacing_open:20,
+                west__closable:false,
+                triggerEventsOnLoad: true,
+                onresize:function(pane, $Pane, paneState) {
+                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                        $(this).setGridWidth(paneState.innerWidth - 20);
+                    });
+                }
+            });
+            */
+            $('#linked-products-layout').resizeWithWindow();
+
+            $('#linked-products-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
+                new FCom.Admin.TargetGrid({source:'#linked-products-all', target:el});
+            });
+        })
+    })
+</script>
+
+{{ THIS.hook('catalog/products/tab/linked-products', {'model':THIS.model}) }}

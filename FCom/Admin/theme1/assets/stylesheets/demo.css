@@ -31,7 +31,9 @@
 
 .wysihtml5-sandbox {
   box-sizing: border-box; }
-
+/* 
+  wen defined stylesheets
+*/
 .dropdown-menu {
   display: none;
   position: absolute;
@@ -49,6 +51,7 @@
 
 .dd-list {
     list-style: none outside none;
+    text-align: left;
 }
 
 .dd3-handle {
@@ -82,3 +85,27 @@
     padding: 5px 10px 5px 40px;
     text-decoration: none;
 }
+
+.responsive-table {
+position: relative;
+overflow: hidden; 
+}
+
+.inline-editor {
+  padding: 0px;
+  margin: 0px;
+  height: 22px;
+}
+
+.filter-span {
+   margin-right: 50px;
+}
+
+.filter-box {
+    text-align: left;   
+    padding: 15px;
+    width: 535px;
+}
+
+
+

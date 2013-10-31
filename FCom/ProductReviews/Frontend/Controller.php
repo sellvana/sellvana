@@ -26,19 +26,26 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
 
         $product = FCom_Catalog_Model_Product::i()->load($post['pid']);
-        if (!$product) {
-            BResponse::i()->redirect(Bapp::baseUrl());
+        if (!$product || empty($post['review'])) {
+            BResponse::i()->redirect('');
         }
 
-        if (!empty($post['review'])) {
-            $customerId = 0;
-            if (BModuleRegistry::i()->isLoaded('FCom_Customer')) {
-                $customer = FCom_Customer_Model_Customer::i()->sessionUser();
-                $customerId = $customer->id();
-            }
-            FCom_ProductReviews_Model_Review::i()->addNew($customerId, $product->id(), $post['review']);
+        if (BModuleRegistry::i()->isLoaded('FCom_Customer')) {
+            $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+            $customerId = $customer->id();
+            $post['review']['customer_id'] = $customerId;
         }
-        BResponse::i()->redirect($product->url());
+        $post['review']['product_id'] = $product->id();
+        if (FCom_ProductReviews_Model_Review::i()->validate($post['review'])) {
+            $review = FCom_ProductReviews_Model_Review::i()->create($post['review'])->save();
+            $review->notify();
+        }
+        if (BRequest::i()->xhr()) {
+            BResponse::i()->json(array('status' => 'success'));
+        } else {
+            BSession::i()->addMessage('Thank you for your review!');
+            BResponse::i()->redirect($product->url());
+        }
     }
 
     public function action_helpful__POST()

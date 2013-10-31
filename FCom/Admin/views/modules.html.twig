@@ -1,14 +1,4 @@
-<style>
-    tr.module-disabled td { background:#DDD !important; }
-    tr.module-requested {}
 
-    td.run-level-DISABLED, option[value="DISABLED"] { background:#CCC !important; }
-    td.run-level-REQUESTED, option[value="REQUESTED"] { background:#CFC !important; }
-    td.run-level-REQUIRED, option[value="REQUIRED"] { background:#FFC !important; }
-    td.run-status-LOADED { background:#CFC !important; }
-    td.run-status-ERROR { background:#FCC !important; }
-    td.schema-migration-available { background:#FCC !important; }
-</style>
 
 <script>
     function runMigrationScripts() {
@@ -88,7 +78,37 @@
 
     });*/
 </script>
+<script>
+    function RowModelEx() {
 
+    }
+    RowModelEx.prototype.save = function(attributes) {        
+        
+        var data = {
+                    module_name: attributes.name,
+                    run_level_core: attributes.run_level_core,
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                };        
+        $.post("#{$this->form_url}", data, function(response, status, xhr) {
+            $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+        });
+    }
+
+    RowModelEx.prototype.mass_save = function(jsons) {        
+        for (var i in jsons) {
+            var data = {
+                        module_name: jsons[i].name,
+                        run_level_core: jsons[i].run_level_core,
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    };
+            $.post("#{$this->form_url}", data, function(response, status, xhr) {
+                //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+            });
+        }
+    }
+
+    var rowModelEx = new RowModelEx();        
+</script>
 <form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
     <div class="row">
         <div class="col-sm-12">
@@ -104,12 +124,13 @@
             </div>
         </div>
     </div>
-
+</form>
     <div class="box col-sm-12">
         <div class="box-content">
             {{ THIS.view('core/messages') | raw }}
-            {{ THIS.view('core/backbonegrid') | raw }}
+            {{ THIS.view('core/backbonegrid') | raw }}            
         </div>
     </div>
-</form>
+
+
 

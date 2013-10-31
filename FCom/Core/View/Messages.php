@@ -18,7 +18,7 @@ class FCom_Core_View_Messages extends BView
         'error' => 'remove',
     );
 
-    public function getAlerts()
+    public function getMessages()
     {
         $namespace = $this->get('namespace');
         $messages = $this->get('messages');
@@ -29,7 +29,8 @@ class FCom_Core_View_Messages extends BView
         foreach ((array)$messages as $m) {
             $out[] = array(
                 'type' => $m['type'],
-                'msg' => $m['msg'],
+                'msg' => !empty($m['msg']) ? $m['msg'] : null,
+                'msgs' => !empty($m['msgs']) ? $m['msgs'] : null,
                 'class' => !empty($this->_classes[$m['type']]) ? $this->_classes[$m['type']] : $m['type'],
                 'title' => !empty($m['title']) ? $m['title'] :
                     (!empty($this->_titles[$m['type']]) ? BLocale::_($this->_titles[$m['type']]) : null),

@@ -48,4 +48,50 @@ FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/js/codemirror').'"
             }
         }
     }
+
+    public function onSettingsPost($args)
+    {
+        if (!empty($args['post']['config']['db'])) {
+            $db =& $args['post']['config']['db'];
+            if (empty($db['password']) || $db['password']==='*****') {
+                unset($db['password']);
+            }
+        }
+
+        $ip = BRequest::i()->ip();
+        foreach (array('Frontend','Admin') as $area) {
+            if (!empty($args['post']['config']['mode_by_ip']['FCom_'.$area])) {
+                $modes =& $args['post']['config']['mode_by_ip']['FCom_'.$area];
+                $modes = str_replace('@', $ip, $modes);
+                unset($modes);
+            }
+        }
+    }
+
+    public function onGetDashboardWidgets($args)
+    {
+        $view = $args['view'];
+        $view->addWidget('orders-list', array(
+            'title' => 'Recent Orders',
+            'icon' => 'inbox',
+            'view' => 'dashboard/orders-list',
+        ));
+        $view->addWidget('customers-list', array(
+            'title' => 'Recent Customers',
+            'icon' => 'group',
+            'view' => 'dashboard/customers-list',
+        ));
+        $view->addWidget('orders-totals', array(
+            'title' => 'Order Totals',
+            'icon' => 'inbox',
+            'view' => 'dashboard/orders-totals',
+            'cols' => 4,
+        ));
+        $view->addWidget('visitors-totals', array(
+            'title' => 'Visitors',
+            'icon' => 'group',
+            'view' => 'dashboard/visitors-totals',
+            'cols' => 2,
+        ));
+    }
 }

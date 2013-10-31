@@ -18,7 +18,7 @@ modules:
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
-            - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid} ]
+            - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
 
         observe:
             - [ BTwig::init, FCom_Core_Main::onTwigInit ]
@@ -30,3 +30,13 @@ modules:
                 logging: false
             web:
                 csrf_check_method: referrer
+            modules:
+                FCom_Core:
+                    company_name: Fulleron
+                    site_title: Fulleron
+                    copyright_message: Fulleron
+                    admin_email: admin@example.com
+                    support_name: Fulleron Support
+                    support_email: support@example.com
+                    sales_name: Fulleron Sales
+                    sales_email: support@example.com

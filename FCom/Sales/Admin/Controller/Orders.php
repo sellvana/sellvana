@@ -57,10 +57,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function action_form()
     {
-        $orderId = BRequest::i()->params('id', true);
-        $act = BRequest::i()->params('act', true);
+        $orderId = BRequest::i()->param('id', true);
+        $act = BRequest::i()->param('act', true);
 
         $order = FCom_Sales_Model_Order::i()->load($orderId);
+        if (empty($order)) {
+            $order = FCom_Sales_Model_Order::i()->create();
+        }
         $shipping = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId,'shipping');
         $billing = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId,'billing');
         if ($shipping) {
