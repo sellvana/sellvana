@@ -51,6 +51,7 @@
 
 .dd-list {
     list-style: none outside none;
+    text-align: left;
 }
 
 .dd3-handle {
