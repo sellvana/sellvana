@@ -19,8 +19,10 @@
         <div class="col-sm-3 text-right">
             <div class="dataTables_filter" id="DataTables_Table_1_filter">
                 <label>
-                    Search: <input type="text" aria-controls="DataTables_Table_1" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search">
-                </label>
+                  Search:
+                </label> 
+                <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
+                
             </div>
         </div>
     </div> 
@@ -32,7 +34,28 @@
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
-      <div class="col-sm-8">
+      <div class="col-sm-8 pagination">
+        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+                Columns
+                <b class="caret"></b>
+            </a>            
+                <ol class="dd-list dropdown-menu" style="margin-left:20px;">
+                    <!--li calss="ui-state-default"-->
+                    <!-- visibiility template -->
+                    <!--/li -->
+                </ol>          
+        </span>
+        {% for action in THIS.gridActions() %}
+          {% if action.renderer %}
+            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+          {% elseif action.html %}
+            {{ action.html | raw }}
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+      <div class="col-sm-4 text-right">
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize">
             {% for ps in THIS.pageSizeOptions() %}
@@ -51,28 +74,7 @@
             {{ 'of %s'|_(s.mp) }}
             #}
           </ul>
-        {% endif %}
-      </div>
-      
-      <div class="col-sm-4 text-right">
-        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
-                Columns
-                <b class="caret"></b>
-            </a>            
-                <ol class="dd-list dropdown-menu">
-                    <!--li calss="ui-state-default"-->
-                    <!-- visibiility template -->
-                    <!--/li -->
-                </ol>          
-        </span>
-        {% for action in THIS.gridActions() %}
-          {% if action.renderer %}
-            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
-          {% elseif action.html %}
-            {{ action.html | raw }}
-          {% endif %}
-        {% endfor %}
+        {% endif %}        
       </div>        
   </div>
   {% if s.description %}
@@ -98,10 +100,43 @@
       </tbody>      
     </table>
   </div>
+
+  <div class='modal fade' id='mass-edit' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+            </div>
+            <div class='modal-body'>
+                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
+                  <!-- mass edit form element template is here -->
+                </form>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
+                <button class='btn btn-primary save' type='button'>Save changes</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
 </div>
 
 
 
+<script type="template" id="{{ config.id }}-edit-template">    
+    <label for="<%= rc.name %>"><%= rc.label%></label>
+    <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
+      <input type="text" id="<%= rc.name %>" class="form-control">
+    <% } else if(rc.editor === 'editor') { %>
+      <select id="<%= rc.name %>" class="form-control select2">
+        <% for(var key in rc.options) { %>
+          <option value="<%= key %>"><%= rc.options[key] %></option>
+        <% } %>
+      </select>
+    <% } %>  
+</script>
 <script type="template" id="{{ config.id }}-col-template">
   <div class="dd-handle dd3-handle">
     &nbsp;
@@ -149,7 +184,7 @@
   } %>  
 </script>
 
-<script type='template' id="{{ config.id }}-header-template">
+<script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
     <a class="js-change-url" style="cursor: pointer;">
       <%= rc.label %>
@@ -158,7 +193,7 @@
    <% if (rc.selectedCount>0) { %>
       <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
     <% } %>
-    <select class="js-sel">
+    <select class="{{ config.id | raw }} js-sel">
       {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
     </select>
   <% } %>    
