@@ -83,14 +83,28 @@
 
     }
     RowModelEx.prototype.save = function(attributes) {        
+        
         var data = {
                     module_name: attributes.name,
                     run_level_core: attributes.run_level_core,
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                };
+                };        
         $.post("#{$this->form_url}", data, function(response, status, xhr) {
             $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
         });
+    }
+
+    RowModelEx.prototype.mass_save = function(jsons) {        
+        for (var i in jsons) {
+            var data = {
+                        module_name: jsons[i].name,
+                        run_level_core: jsons[i].run_level_core,
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    };
+            $.post("#{$this->form_url}", data, function(response, status, xhr) {
+                //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+            });
+        }
     }
 
     var rowModelEx = new RowModelEx();        
@@ -110,13 +124,13 @@
             </div>
         </div>
     </div>
-
+</form>
     <div class="box col-sm-12">
         <div class="box-content">
             {{ THIS.view('core/messages') | raw }}
             {{ THIS.view('core/backbonegrid') | raw }}            
         </div>
     </div>
-</form>
+
 
 

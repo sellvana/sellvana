@@ -52,6 +52,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
 	        $r['id'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('id') : uniqid();
+            $r['editable'] = !empty($schemaVersions[$modName]) ? true : false;
             $data[] = $r;
         }
 
@@ -100,6 +101,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                                     array('field' => 'name', 'type' => 'text'),
                                     array('field' => 'run_level_core', 'type' => 'multiselect')
                                  );
+        $config['actions'] = array(
+            'edit' => true            
+        );
+        $config['_callbacks'] = "{
+            'edit':'rowModelEx.save',
+            'mass-edit':'rowModelEx.mass_save'
+        }";
         //$config['state'] =array(5,6,7,8);
 		return $config;
 	}
