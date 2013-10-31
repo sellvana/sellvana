@@ -423,6 +423,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                 console.log('bb.mp=', BackboneGrid.currentState.mp);*/
                 if (mp !== BackboneGrid.currentState.mp) {
                     BackboneGrid.currentState.mp = mp;
+                    BackboneGrid.currentState.c = response[0].c;
                     updatePageHtml();
                 }
             }
@@ -827,7 +828,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                     delete BackboneGrid.massEditVals[key];
             }
 
-            var ids = rowsCollection.pluck('id').join(",");
+            var ids = selectedRows.pluck('id').join(",");
             var hash = BackboneGrid.massEditVals;
             hash.id = ids;
             hash.oper = 'mass-edit';
@@ -893,7 +894,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             html += '<a class="js-change-url" href="#">&raquo;</a>';
             html += '</li>';
 
+
             $('ul.pagination.page').html(html);
+
+            var caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
+            $('div.'+BackboneGrid.id+'-pagination').html(caption);
     }
     var rowsCollection;
     var columnsCollection;
@@ -1071,7 +1076,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             $(BackboneGrid.massDeleteButton).on('click', function(){
                 var confirm = window.confirm("Do you really want to delete selected rows?");
                 if (confirm) {
-                    var ids = rowsCollection.pluck('id').join(",");
+                    var ids = selectedRows.pluck('id').join(",");
                     $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                     .done(function(data) {
                         $.bootstrapGrowl("Successfully deleted.", { type:'success', align:'center', width:'auto' });

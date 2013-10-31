@@ -41,7 +41,7 @@
       <!--
         <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
         -->
-      <div class="col-sm-8 pagination">
+      <div class="col-sm-7">
         <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
                 Columns
@@ -60,10 +60,9 @@
             {{ action.html | raw }}
           {% endif %}
         {% endfor %}
-      </div>
-
-      <div class="col-sm-4 text-right">
-        {% if config['data_mode']!= 'local' %}
+      </div>      
+      <div class="col-sm-5 text-right pagination">
+        {% if config['data_mode']!= 'local' %}          
           <ul class="pagination pagination-sm pagesize">
             {% for ps in THIS.pageSizeOptions() %}
               <li {{ ps==s.ps ? 'class="active"' }}>
@@ -83,6 +82,9 @@
           </ul>
         {% endif %}
       </div>
+  </div>
+  <div class='row'>
+    <div class="text-center {{ config.id }}-pagination"></div>
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
