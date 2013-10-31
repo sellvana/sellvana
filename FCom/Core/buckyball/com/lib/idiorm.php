@@ -580,7 +580,7 @@
          * of the call to _quote_identifier
          */
         protected function _add_simple_where($column_name, $separator, $value) {
-            $column_name = $this->_quote_identifier($column_name);
+            $column_name = $this->_quote_identifier($column_name);            
             return $this->_add_where("{$column_name} {$separator} ?", $value);
         }
 
@@ -627,7 +627,7 @@
         /**
          * Add a WHERE ... LIKE clause to your query.
          */
-        public function where_like($column_name, $value) {
+        public function where_like($column_name, $value) {                        
             return $this->_add_simple_where($column_name, 'LIKE', $value);
         }
 

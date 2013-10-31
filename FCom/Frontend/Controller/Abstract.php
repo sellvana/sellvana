@@ -3,12 +3,6 @@
 
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
-    public function messages($viewName, $namespace='frontend')
-    {
-        $this->view($viewName)->messages = BSession::i()->messages($namespace);
-        return $this;
-    }
-
     public function action_unauthenticated()
     {
         $r = BRequest::i();

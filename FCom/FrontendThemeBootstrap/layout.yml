@@ -1,7 +1,0 @@
-base:
-    - view: head
-        do:
-            - [ css, @FCom_FrontendThemeBootstrap/compass/css/screen.css ]
-
-            - [ requireJs, fcom.frontend, @FCom_FrontendThemeBootstrap/js/fcom.frontend ]
-            - [ requireRun, fcom.frontend ]

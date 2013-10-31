@@ -35,6 +35,8 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
         </div>
     </div>
 
+    {{ THIS.view('core/messages') | raw }}
+
     <div class="row adm-content-box info-view-mode col-sm-12 box">
         {% if m.get('id')  %}
             <div class="adm-product-summary adm-section-group box-header blue-background">

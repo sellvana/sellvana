@@ -16,5 +16,5 @@ require(['jquery', 'fcom.admin.form'], function($) {
     $(function() {
         //adminForm.wysiwygCreate('main-content');
     });
-}
+});
 </script>

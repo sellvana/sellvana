@@ -5,12 +5,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
-    public function messages($viewName, $namespace='admin')
-    {
-        $this->view($viewName)->set('messages', BSession::i()->messages($namespace));
-        return $this;
-    }
-
     public function authenticate($args=array())
     {
         return FCom_Admin_Model_User::i()->isLoggedIn();
@@ -193,6 +187,21 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             $model->load($id)->delete();
             $result = array('success'=>true);
             break;
+        case 'mass-delete':
+            $ids = explode(",",$id);
+            foreach($ids as $id) {
+                $model->load($id)->delete();
+            }
+            $result = array('success'=>true);
+            break;
+        case 'mass-edit':
+            $ids = explode(',',$id);
+            foreach($ids as $id) {
+                $set = $model->load($id)->set($data)->save();
+            }
+            $result = array('success'=>true);
+            break;
+
         }
 
         $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));

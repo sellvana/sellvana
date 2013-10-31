@@ -3232,6 +3232,10 @@ class BValidate extends BClass
             'rule'    => '/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
             'message' => 'Invalid Email',
         ),
+        'string'    => array(
+            'rule'    => 'BValidate::ruleString',
+            'message' => 'Invalid string length', // this is default, actual message supplied by callback
+        ),
         'numeric'   => array(
             'rule'    => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
             'message' => 'Invalid number: :field',
@@ -3317,6 +3321,11 @@ class BValidate extends BClass
                 $result = BUtil::call($r['rule'], array($data, $r['args']), true);
             } else {
                 throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+            }
+
+            if (is_string($result)) {
+                $r['message'] = $result;
+                $result = false;
             }
 
             if (!$result) {
@@ -3408,6 +3417,12 @@ class BValidate extends BClass
 
     static public function ruleRequired($data, $args)
     {
+        if (!isset($data[$args['field']])) {
+            return false;
+        }
+        if ($data[$args['field']]===0) {
+            return true;
+        }
         return !empty($data[$args['field']]);
     }
 
@@ -3415,6 +3430,21 @@ class BValidate extends BClass
     {
         return empty($data[$args['original']])
             || !empty($data[$args['field']]) && $data[$args['field']] === $data[$args['original']];
+    }
+
+    static public function ruleString($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return true;
+        }
+        $value = $data[$args['field']];
+        if (!empty($args['min']) && strlen($value) < $args['min']) {
+            return 'The field should be at least '.$args['min'].' characters long: :field';
+        }
+        if (!empty($args['max']) && strlen($value) > $args['max']) {
+            return 'The field can not exceed '.$args['min'].' characters: :field';
+        }
+        return true;
     }
 }
 
@@ -3430,7 +3460,7 @@ class BValidateViewHelper extends BClass
 
     public function __construct($args)
     {
-        if(!isset($args['form'])){
+        if (!isset($args['form'])) {
             return;
         }
         if (isset($args['data'])) {

@@ -1,0 +1,49 @@
+{% set m = THIS.model %}
+{% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
+{% set mediaLibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id':'all_attachments', 'folder' : 'media/product/attachment'}) %}
+
+<div class="col-sm-12" id="attachments-layout">
+    <div class="box ui-layout-west">
+        <div class="box-content">
+           {{ THIS.view('jqgrid').set('config', prodAttachConfig)|raw }}
+        </div>
+    </div>
+    <div class="box ui-layout-west">
+        <div class="box-content">
+            {{ THIS.view('jqgrid').set('config', mediaLibConfig)|raw }}
+        </div>
+    </div>
+</div>
+
+<script>
+    var attachmentsLayout, attachmentsGrid;
+    require(['jquery'], function($) {
+        $(function() {
+            /*
+            attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+                useStateCookie: true,
+                west__minWidth:'40%',
+                west__spacing_open:20,
+                west__closable:false,
+                triggerEventsOnLoad: true,
+                onresize:function(pane, $Pane, paneState) {
+                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                        $(this).setGridWidth(paneState.innerWidth - 20);
+                    });
+                }
+            });
+            */
+            $('#attachments-layout').resizeWithWindow();
+
+            attachmentsGrid = new FCom.Admin.MediaLibrary({
+                grid:'#all_attachments',
+                url:'{{ APP.href('media/grid') }}',
+                folder:'media/product/attachment'
+            });
+
+            new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#product_attachments'});
+        });
+    });
+</script>
+
+{{ THIS.hook('catalog/products/tab/attachments', {'model':THIS.model}) }}
