@@ -349,6 +349,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 this.$el.find('div.box').addClass('box-collapsed');
             }
             this.$el.find('textarea').autosize();
+            this.$el.find('div.scrollable').height(250);
             return this;
         },
         addOne: function (item) {
