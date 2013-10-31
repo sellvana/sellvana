@@ -680,17 +680,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         attributes: {
             style: 'margin-right:20px;'
         },
-
-        _closeFilter: function() {
-            this.model.set('filterShow',false);
-            this._filter(false);
-            this.$el.remove();
-        },
+        
         _filter: function(val) {
             if (val === false) {
-                delete BackboneGrid.current_filters[this.model.get('name')];
+                this.model.set('filterVal','');
+                this.render();                
+                if(typeof(BackboneGrid.current_filters[this.model.get('name')]) === 'undefined')
+                    return;
+                delete BackboneGrid.current_filters[this.model.get('name')];                
+                
             } else {
-                BackboneGrid.current_filters[this.model.get('name')] = val;
+                
                 if (val.length === 0)
                     delete BackboneGrid.current_filters[this.model.get('name')];
             }
@@ -719,6 +719,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             'click a.filter_op': 'filterOperatorSelected',
             'keyup': 'filterValChanged',
             'click button.clear': '_closeFilter'
+        },
+        _closeFilter: function(ev) {
+            this._filter(false);
         },
         filterValChanged: function(ev) {
             this.model.set('filterVal', this.$el.find('input:first').val());
@@ -752,6 +755,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         'click button.clear': '_closeFilter'
         },
         filter: function(val) {
+            BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
         },
         render: function() {
