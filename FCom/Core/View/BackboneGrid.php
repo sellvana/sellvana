@@ -401,12 +401,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     }
     
     public function getFilterData()
-    {
-        $grid = $this->get('grid');
+    {        
+        $grid = $this->get('grid');        
         if (isset($grid['config']['filters'])) {                        
             return json_encode($grid['config']['filters']);
         } else {
-            return [];
+            return '[]';
         }
             
     }    

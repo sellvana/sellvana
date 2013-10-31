@@ -179,7 +179,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             }
             this.$el.attr('class', this.className());
             ev.preventDefault();
-            
+
             return false;
         },
         render: function() {
@@ -194,8 +194,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         initialize: function() {
             this.collection.on('sort', this.render, this);
         },
-        render: function() {
-            console.log('fwfwf');
+        render: function() {            
             this.$el.html('');
             this.collection.each(this.addTh, this);
             gridParent = $('#'+BackboneGrid.id).parent();
@@ -233,7 +232,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         defaults: {
             _actions: ' ',
             colsInfo: [],
-            selected: false
+            selected: false, 
+            editable: true
         },
         initialize: function() {
             this.checkSelectVal();
@@ -252,17 +252,22 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             return false;
         },
         save: function() {
-            if (typeof rowModelEx !== "undefined") {
+            /*if (typeof rowModelEx !== "undefined") {
                 console.log(this.attributes);
                 rowModelEx.save(this.attributes);
                 return;
-            }
+            }*/
             var id = this.get('id');
             var hash = this.changedAttributes();
             hash.id = id;
             hash.oper = 'edit';
-
-            $.post(BackboneGrid.edit_url, hash);
+            if (BackboneGrid.callBacks && BackboneGrid.callBacks['edit']) {
+                var funcName = BackboneGrid.callBacks['edit'];
+                var command = funcName+'(this.toJSON());';
+                eval(command);
+            } else {
+                $.post(BackboneGrid.edit_url, hash);
+            }
         }
     });
 
@@ -395,9 +400,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                 colInfo.hidden = c.get('hidden');
                 colInfo.cell =c.get('cell');
                 colInfo.position = c.get('position');
-
+                colInfo.editor = c.get('editor');
+                colInfo.editable = c.get('editable');
                 if (c.has('data')) { //_action column
                     colInfo.data = c.get('data');
+                }
+                if (c.has('options')) {
+                    colInfo.options = c.get('options');
                 }
                 //colInfo.width = c.get('width');
                 colsInfo[colsInfo.length] = colInfo;
@@ -459,7 +468,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             'click a.btn-delete': '_deleteRow'
         },
         initialize: function() {
-            this.model.on('change',this.render, this);
+            this.model.on('render',this.render, this);
             //this.model.on('remove', this._destorySelf, this);
         },
         _selectRow: function(ev) {
@@ -494,9 +503,52 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             this.remove();
             this.model.destroy();
         },
+        colValChanged: function(value, settings) {
+            
+            var id = $(this).parents('tr:first').attr('id');            
+            var rowModel = rowsCollection.findWhere({id:id});
+            var col = $(this).attr('data-col');
+            
+            if (rowModel.get(col) !== value) {
+                rowModel.set(col, value);
+                rowModel.save();
+                $(this).html(value);
+            }
+            
+            return value;
+        },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
+            var cols = this.model.get('colsInfo');            
+            for(var i in cols) {
+                var col = cols[i];
+                if (col.editable && this.model.get('editable')) {
+                    var editorType = 'default';
+                    if (col.editor) {
+                        editorType = col.editor;
+                    }
+                    //BackboneGrid.editingModel = this.model;
+                    var tds = this.$el.find("td[data-col='"+col.name+"']");
+                    if (tds.length && tds.length>0) {                          
+                        if (editorType === 'default') {                            
+                            tds.editable(this.colValChanged, {
+                                type: "text",
+                                onblur: 'submit'
+                            });
+                        }
 
+                        if (editorType === 'select') {                            
+                            tds.editable(this.colValChanged, {
+                                type: "select",
+                                onblur: 'submit',
+                                data: col.options,
+                                tooltip: ''
+                            });
+                        }
+                    }
+
+                }
+            }            
             return this;
         }
     });
@@ -528,52 +580,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         },
         getMainTable : function() {
             return $('#' + BackboneGrid.id);
-        },
-        colValChanged: function(value, settings) {
-            console.log(value);
-            var id = $(this).parents('tr:first').attr('id');
-            var col = $(this).attr('data-col');
-            var rowModel = rowsCollection.findWhere({id: id});
-            rowModel.set(col, value);
-            rowModel.save();
-
-            return value;
-        },
+        },        
         render: function() {
             console.log('gridview-render');
             this.setCss();
             this.$el.html('');
-            this.collection.each(this.addRow, this);
-            //inline editor
-            columnsCollection.each(function(col) {
-                if(col.has('editable') && col.get('editable')) {
-                    var editorType = 'default';
-                    if (col.has('editor') && col.get('editor')) {
-                        editorType = col.get('editor');
-                    }
-
-                    var tds = this.$el.find("td[data-col='"+col.get('name')+"']");
-                    if (tds.length && tds.length>0) {
-                        if (editorType === 'default') {
-                            tds.editable(this.colValChanged, {
-                                type: "text",
-                                onblur: 'submit'
-                            });
-                        }
-
-                        if (editorType === 'select') {
-                            tds.editable(this.colValChanged, {
-                                type: "select",
-                                onblur: 'submit',
-                                data: col.get('options'),
-                                tooltip: ''
-                            });
-                        }
-                    }
-
-                }
-            }, this);
-
+            this.collection.each(this.addRow, this);            
+       
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
             return this;
         },
@@ -829,14 +842,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         events: {
             'change': '_setVal'
         },
-        _setVal: function(ev) {
+        _setVal: function(ev) {            
             var key = $(ev.target).attr('id');
-            var val = $(ev.target).val();
-            console.log(key);
-            console.log(val);
+            var val = $(ev.target).val();            
             BackboneGrid.massEditVals[key] = val;
         },
-        render: function() {
+        render: function() {                     
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         }
@@ -849,27 +860,42 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             }
 
             var ids = selectedRows.pluck('id').join(",");
-            var hash = BackboneGrid.massEditVals;
-            hash.id = ids;
-            hash.oper = 'mass-edit';
-
-            $.post(BackboneGrid.edit_url, hash)
+           
+            if (BackboneGrid.callBacks && BackboneGrid.callBacks['mass-edit']) {
+                var funcName = BackboneGrid.callBacks['mass-edit'];
+                var jsons = selectedRows.toJSON();
+                for  (var i in jsons) {
+                    for(var key in BackboneGrid.massEditVals)
+                        jsons[i][key] = BackboneGrid.massEditVals[key];
+                }
+                var command = funcName + '(jsons);'
+                eval(command);
+            } else {
+                var hash = BackboneGrid.massEditVals;
+                hash.id = ids;
+                hash.oper = 'mass-edit';
+                $.post(BackboneGrid.edit_url, hash)
                 .done(function(data) {
-                    $.bootstrapGrowl("Successfully saved.", { type:'success', align:'center', width:'auto' });
-                    delete BackboneGrid.massEditVals.id;
-                    delete BackboneGrid.massEditVals.oper;
-                    selectedRows.each(function(model) {
-                        for(var key in BackboneGrid.massEditVals) {
-                            model.set(key, BackboneGrid.massEditVals[key]);
-                        }
-                    });
-                    $(ev.target).parents('div.modal-dialog:first').find('form:first')[0].reset();
-                    $(ev.target).prev().trigger('click');
-                    BackboneGrid.massEditVals = {};
-                });
+                    $.bootstrapGrowl("Successfully saved.", { type:'success', align:'center', width:'auto' });                
+                });    
+                delete BackboneGrid.massEditVals.id;
+                delete BackboneGrid.massEditVals.oper;
+            }
+
+            
+            selectedRows.each(function(model) {
+                for(var key in BackboneGrid.massEditVals) {
+                    model.set(key, BackboneGrid.massEditVals[key]);
+                    model.trigger('render');
+                }
+            });
+            $(ev.target).parents('div.modal-dialog:first').find('form:first')[0].reset();
+            $(ev.target).prev().trigger('click');
+            BackboneGrid.massEditVals = {};
+            
         },
         initialize: function() {
-            this.collection.on('sort change reset', this.render, this);
+            //this.collection.on('sort change reset', this.render, this);
             this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
         },
         render: function() {
@@ -878,7 +904,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             this.collection.each(this.addElementDiv, this);
         },
         addElementDiv: function(model) {
-            if (model.has('editable') && model.get('editable')) {
+
+            if (model.has('editable')) {            
                 var elementView = new BackboneGrid.Views.MassEditElement({model: model});
                 this.$el.append(elementView.render().el);
             }
@@ -935,6 +962,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         BackboneGrid.edit_url = config.edit_url;
         BackboneGrid.current_filters= {};
         BackboneGrid.quickInputId = '#' + config.id + '-quick-search';
+        BackboneGrid.callBacks = config.callBacks;
         //personal settings
         var state = config.data.state;
         state.p = parseInt(state.p);

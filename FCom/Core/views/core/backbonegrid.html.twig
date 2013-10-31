@@ -135,11 +135,12 @@
 
 
 <script type="template" id="{{ config.id }}-edit-template">
+
     <label for="<%= rc.name %>"><%= rc.label%></label>
     <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
       <input type="text" id="<%= rc.name %>" class="form-control">
-    <% } else if(rc.editor === 'editor') { %>
-      <select id="<%= rc.name %>" class="form-control select2">
+    <% } else if(rc.editor === 'select') { %>
+      <select id="<%= rc.name %>" class="form-control">
         <% for(var key in rc.options) { %>
           <option value="<%= key %>"><%= rc.options[key] %></option>
         <% } %>
@@ -168,9 +169,10 @@
 
     if (col.cell === 'select-row') {
         var isSelected = '';
+        var isEditable = rc.editable ? '' : 'DISABLED';
         if (rc.selected)
-          isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + '>');
+          isSelected = 'checked';        
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof (col.data.edit) != 'undefined') {
@@ -278,8 +280,11 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             edit_url: "{{ config.edit_url }}",
             data: {{ THIS.getPageRowsData() | raw }},
             columns: {{ THIS.getColumnsData() | raw }},
-            data_mode: "{{ config.data_mode | raw }}",
+            data_mode: "{{ config.data_mode }}",
             filters: {{ THIS.getFilterData()  | raw }}
+            {% if config._callbacks %}
+            ,callBacks : {{ config._callbacks| raw }}
+            {% endif %}
         });
     //});
 });
