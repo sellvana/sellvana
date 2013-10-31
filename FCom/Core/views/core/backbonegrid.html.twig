@@ -170,7 +170,7 @@
     if (col.cell === 'select-row') {
         var isSelected = '';
         var isEditable = rc.editable ? '' : 'DISABLED';
-        if (rc.selected)
+        if (rc.editable && rc.selected)
           isSelected = 'checked';        
         print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
     } else if (col.name === '_actions') {
