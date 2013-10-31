@@ -214,8 +214,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         ));
                         break;
                     case 'edit':                        
-                        $action = array('html' => BUtil::tagHtml('button',
-                            array('class' => 'btn grid-mass-edit btn-success disabled'),
+                        $action = array('html' => BUtil::tagHtml('a',
+                            array('class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal', 'href' => '#mass-edit', 'role' => 'button'),
                             BLocale::_('edit')
                         ));
                         break;

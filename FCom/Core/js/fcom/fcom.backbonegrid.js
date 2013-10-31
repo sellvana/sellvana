@@ -23,7 +23,7 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             cell: '',
             filtering: false,
             filterVal: '',
-            selectedCount: 0            
+            selectedCount: 0
         },
         initialize: function() {
             if (this.type === 'multiselect') {
@@ -88,17 +88,21 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         _showAction: function() {
             var key = this.$el.find('select.js-sel').val();
             switch (key) {
-                case 'show_all':                    
+                case 'show_all':            
+                    console.log('show_all!!!');
                     if(BackboneGrid.showingSelected) {
                         BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                         rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                         BackboneGrid.showingSelected = false;
                         if(BackboneGrid.data_mode !== 'local') {
-                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id).css('display','block');    
+                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','block');    
                             rowsCollection.fetch({reset:true});
                         } else {
                             rowsCollection.filter();
                         }
+                        
+                        $(BackboneGrid.massDeleteButton).addClass('disabled');
+                        $(BackboneGrid.massEditButton).addClass('disabled');
                     }
                     break;
                 case 'show_sel':                    
@@ -107,11 +111,17 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
                         BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                         BackboneGrid.showingSelected = true;                    
                         if(BackboneGrid.data_mode !== 'local')
-                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id).css('display','none');
+                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','none');
 
                         BackboneGrid.data_mode = 'local';
                         rowsCollection.originalRows = selectedRows;                                        
                         rowsCollection.reset(selectedRows.models);
+
+                        if (rowsCollection.length > 0) {
+                            $(BackboneGrid.massDeleteButton).removeClass('disabled');
+                            $(BackboneGrid.massEditButton).removeClass('disabled');
+                        }
+                        
                     }
                     break;
             }
@@ -789,7 +799,67 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             }
         }
     });
+    
+    BackboneGrid.Views.MassEditElement = Backbone.View.extend({
+        className: 'form-group',
+        events: {
+            'change': '_setVal'            
+        },
+        _setVal: function(ev) {
+            var key = $(ev.target).attr('id');
+            var val = $(ev.target).val();
+            console.log(key);
+            console.log(val);
+            BackboneGrid.massEditVals[key] = val;
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));            
+            return this;
+        }  
+    });
+    BackboneGrid.Views.MassEditForm = Backbone.View.extend({        
+        _saveChanges: function(ev) {            
+            for( var key in BackboneGrid.massEditVals) {
+                if (BackboneGrid.massEditVals[key] === '')
+                    delete BackboneGrid.massEditVals[key];
+            }
 
+            var ids = rowsCollection.pluck('id').join(",");      
+            var hash = BackboneGrid.massEditVals;
+            hash.id = ids;
+            hash.oper = 'mass-edit';
+
+            $.post(BackboneGrid.edit_url, hash)
+                .done(function(data) {
+                    $.bootstrapGrowl("Successfully saved.", { type:'success', align:'center', width:'auto' });
+                    delete BackboneGrid.massEditVals.id;
+                    delete BackboneGrid.massEditVals.oper;
+                    selectedRows.each(function(model) {
+                        for(var key in BackboneGrid.massEditVals) {
+                            model.set(key, BackboneGrid.massEditVals[key]);
+                        }
+                    });
+                    $(ev.target).parents('div.modal-dialog:first').find('form:first')[0].reset();
+                    $(ev.target).prev().trigger('click');
+                    BackboneGrid.massEditVals = {};
+                });
+        },
+        initialize: function() {
+            this.collection.on('sort change reset', this.render, this);
+            this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
+        },
+        render: function() {
+            this.$el.html('');
+            BackboneGrid.massEditVals = {};
+            this.collection.each(this.addElementDiv, this);
+        },
+        addElementDiv: function(model) {
+            if (model.has('editable') && model.get('editable')) {
+                var elementView = new BackboneGrid.Views.MassEditElement({model: model});
+                this.$el.append(elementView.render().el);
+            }
+        }
+    });
     function updatePageHtml(p,mp) {
 
             p = BackboneGrid.currentState.p;
@@ -864,6 +934,9 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
         
+        //mass edit modal view
+        BackboneGrid.Views.MassEditForm.prototype.el = "div#" + config.id + " div#mass-edit form";
+        BackboneGrid.Views.MassEditElement.prototype.template = _.template($('#' + config.id + '-edit-template').html());
         
 
         /*if (BackboneGrid.data_mode === 'local') {
@@ -979,8 +1052,28 @@ define(['backbone', 'underscore', 'jquery', 'nestable', 'jquery.inline-editor', 
             });    
         }
         
-        //table column reordering
-
-    
+        //mass action logic
+        BackboneGrid.massDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
+        BackboneGrid.massEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
+        if ($(BackboneGrid.massDeleteButton).length > 0) {
+            $(BackboneGrid.massDeleteButton).on('click', function(){
+                var confirm = window.confirm("Do you really want to delete selected rows?");
+                if (confirm) {
+                    var ids = rowsCollection.pluck('id').join(",");    
+                    $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
+                    .done(function(data) {
+                        $.bootstrapGrowl("Successfully deleted.", { type:'success', align:'center', width:'auto' });
+                        $('select.'+BackboneGrid.id).val('show_all').trigger('change');
+                        selectedRows.reset();                    
+                        //sel.trigger('change');
+                    });;
+                }            
+            });
+        }
+        
+        if ($(BackboneGrid.massEditButton).length > 0) {
+            var massEditForm = new BackboneGrid.Views.MassEditForm({collection: columnsCollection});
+            massEditForm.render();
+        }
     }
 });

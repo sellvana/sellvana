@@ -16,7 +16,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true),
-            array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250),
+            array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250, 'editable' => true),
             array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100, 'editable' => true),
             array('name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100/*, 'filtering' => true, 'filter_type' => 'date-range'*/),
             array('name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100/*, 'filtering' => true, 'filter_type' => 'date-range'*/),
