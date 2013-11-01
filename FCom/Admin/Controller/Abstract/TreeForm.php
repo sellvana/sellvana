@@ -137,11 +137,13 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     public function action_tree_form__POST()
     {
         $class = $this->_navModelClass;
+
         try {
             $id = BRequest::i()->param('id', true);
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
+            
             $model->set(BRequest::i()->post('model'))
                 ->set(array('url_path'=>null, 'full_name'=>null));
 

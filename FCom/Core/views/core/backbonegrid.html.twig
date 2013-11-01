@@ -71,7 +71,7 @@
             {% endfor %}
           </ul>
 
-          <ul class="pagination pagination-sm page">
+          <ul class="{{ config.id }} pagination pagination-sm page">
             {#
             <label>
               {{ 'Page'|_ }}
@@ -118,7 +118,7 @@
                 <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
             </div>
             <div class='modal-body'>
-                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
+                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8">
                   <!-- mass edit form element template is here -->
                 </form>
             </div>

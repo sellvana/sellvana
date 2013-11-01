@@ -2,14 +2,14 @@
 {% set prodCtrl = APP.instance('FCom_Catalog_Admin_Controller_Products') %}
 
 <div class="col-sm-12" id="linked-products-layout">
-    <div class="box ui-layout-west">
-        <div class="box-content">
+    <div class="box ui-layout-west">gfh
+        <div class="box-content">fghfgh
             {{ THIS.view('jqgrid').set('config', prodCtrl.linkedProductGridConfig(m, 'related'))|raw }}
             {{ THIS.view('jqgrid').set('config', prodCtrl.linkedProductGridConfig(m, 'similar'))|raw }}
         </div>
     </div>
     <div class="box ui-layout-west">
-        <div class="box-content">
+        <div class="box-content">gfhgfh
             {{ THIS.view('jqgrid').set('config', prodCtrl.productLibraryGridConfig('products'))|raw }}
         </div>
     </div>

@@ -60,7 +60,7 @@ catalog_product_form_tabs:
     do:
       - [ addTab, main, { label: Category, pos: 10 } ]
       - [ addTab, content, { label: Page Content, pos: 20 } ]
-      - [ addTab, products, { label: Products, pos: 30, async: true } ]
+      - [ addTab, products, { label: Products, pos: 30 } ]
       # - [ addTab, main, { label: History, pos: 100 } ]
 
 /catalog/families:
