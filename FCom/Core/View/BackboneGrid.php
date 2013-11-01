@@ -7,7 +7,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         'link_to_page' => true,
         'columns' => true,
         'delete' => true,
-        'edit' => true 
+        'edit' => true,
+        'add' => true
     );
 
     public function gridUrl($changeRequest=array())
@@ -199,30 +200,37 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         $grid = $this->grid;        
         foreach ($grid['config']['actions'] as $k => &$action) {
-            if (true === $action && !empty(static::$_defaultActions[$k])) {
+            if (!empty(static::$_defaultActions[$k])) {
+
                 switch ($k) {
                     case 'refresh':
                         $action = array('html' => BUtil::tagHtml('a',
                             array('href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh btn'),
-                            BLocale::_('Refresh')
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
                         ));
                         break;
                     case 'link_to_page':
                         $action = array('html' => BUtil::tagHtml('a',
                             array('href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page btn'),
-                            BLocale::_('Link')
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Link')
                         ));
                         break;
                     case 'edit':                        
                         $action = array('html' => BUtil::tagHtml('a',
                             array('class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal', 'href' => '#mass-edit', 'role' => 'button'),
-                            BLocale::_('edit')
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Edit')
                         ));
                         break;
                     case 'delete':                        
                         $action = array('html' => BUtil::tagHtml('button',
-                            array('class' => 'btn grid-mass-delete btn-danger disabled'),
-                            BLocale::_('delete')
+                            array('class' => 'btn grid-mass-delete btn-danger disabled', 'type' => 'button'),
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Delete')
+                        ));
+                        break;
+                    case 'add':                        
+                        $action = array('html' => BUtil::tagHtml('button',
+                            array('class' => 'btn grid-add btn-primary', 'type' => 'button'),
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
                         ));
                         break;
                     default:
@@ -567,8 +575,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         } elseif (!empty($r['filters'])) {
             $r['filters'] = BUtil::fromJson($r['filters']);            
         }
-        $r = BUtil::arrayMask($r, 's,sd,p,ps,q,filters,hash');        
-        $gridId = $grid['config']['id'];
+        $r = BUtil::arrayMask($r, 's,sd,p,ps,q,filters,hash,gridId');        
+        $gridId = isset($r['gridId']) ? $r['gridId'] :$grid['config']['id'];        
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');

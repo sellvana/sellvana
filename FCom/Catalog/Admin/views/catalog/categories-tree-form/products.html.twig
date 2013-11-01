@@ -1,39 +1,51 @@
 {% set m = THIS.get('model') %}
 {% set prodCtrl = APP.instance('FCom_Catalog_Admin_Controller_Products') %}
-<div id="category-products-layout">
-  <div class="ui-layout-west">
-    <div class="group-container">
-      {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_Categories').categoryProductGridConfig(m)) | raw }}
-    </div>
-  </div>
-  <div class="ui-layout-center">
-    {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('products')) | raw }}
-  </div>
-</div>
-
 <script>
-    require(['jquery', 'fcom.admin'], function($) {
-        $(function() {
-            /*
-            var linkedProductslayout = $('#category-products-layout').height($('.adm-wrapper').height()).layout({
-                useStateCookie: true,
-                west__minWidth:'40%',
-                west__spacing_open:20,
-                west__closable:false,
-                triggerEventsOnLoad: true,
-                onresize:function(pane, $Pane, paneState) {
-                    console.log(pane, $Pane, paneState);
-                    $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
-                        $(this).setGridWidth(paneState.innerWidth - 20);
-                    });
-                }
-            });
-            */
-            $('#category-products-layout').resizeWithWindow();
+    /**Event Aggregator
+    This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
+    var g_vent = _.extend({}, Backbone.Events);
 
-            $('#category-products-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
-                new FCom.Admin.TargetGrid({source:'#products', target:el});
-            });
-        })
-    })
+    function CategoryProdsMng() {
+        //main grid id
+        //this.mainGridId = 'cateogry_prods_grid-{{ m.id }}';        
+        this.mainGridId = 'cateogry_prods_grid';
+        console.log(this.mainGridId);
+    }
+    CategoryProdsMng.prototype.clickedAddBtn = function() {            
+        $('#btn_add_prod').trigger('click');
+        
+    }
+    CategoryProdsMng.prototype.clickedRemoveBtn = function(jsons) {        
+        console.log(_.pluck(jsons,'id'));
+    }
+    CategoryProdsMng.prototype.addSelectedProds =function(jsons) {
+        //tell main grid to add selected rows from modal grid
+        g_vent.trigger('slient_inject', {targetId: this.mainGridId, jsons: jsons});       
+        console.log(_.pluck(jsons,'id'));
+    }
+
+    var categoryProdsMng = new CategoryProdsMng();     
 </script>
+<div class="box col-sm-12">
+    <div class="box-content">
+        {{ THIS.view('core/messages') | raw }}        
+        {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}       
+    </div>
+</div>
+<a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>Add</a>
+<div class='modal fade' id='prod-grid-add' tabindex='-1'>
+    <div class='modal-dialog' style='width:900px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>Add products</h4>
+            </div>
+            <div class='modal-body'>
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getAllProdConfig(m)) | raw }}               
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>                
+            </div>
+        </div>
+    </div>
+</div>

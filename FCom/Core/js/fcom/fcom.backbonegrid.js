@@ -1,5 +1,16 @@
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.inline-editor', 'select2', 'jquery.quicksearch', 'colResizable'], function(Backbone, _, $, NProgress) {
 
+    
+    
+FCom.BackboneGrid = function(config) {
+    var rowsCollection;
+    var columnsCollection;
+    var gridView;
+    var headerView;
+    var filterView;
+    var colsInfo;
+    var selectedRows;
+    var settings;
     var BackboneGrid = {
         Models: {},
         Collections: {},
@@ -284,9 +295,28 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
 
                 this.on('add', this.addInOriginal, this);
                 this.on('remove', this.removeInOriginal, this);
+
+                if (typeof(g_vent) !== 'undefined') {
+                    g_vent.bind('slient_inject', this._slientInjectRows);
+                }
             }
 
             //this.on.reset('reset', this.updateColsInfo, this);
+        },
+        _slientInjectRows: function(ev) {
+            if (ev.targetId !== BackboneGrid.id)
+                return;
+
+            var jsons = ev.jsons;
+            for (var i in jsons) {
+                if (typeof(rowsCollection.findWhere({id:jsons[i].id})) === 'undefined') {
+                    var row = new BackboneGrid.Models.Row(jsons[i]);
+                    rowsCollection.add(row);    
+                }
+                
+            }
+
+            gridView.render();
         },
         filter: function() {
 
@@ -427,7 +457,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
                 append += (keys[i] + '=' + BackboneGrid.currentState[keys[i]]);
             }
             append += ('&filters=' + JSON.stringify(BackboneGrid.current_filters));
-            return this.data_url + '?' + append;
+            return this.data_url + '?' + append + '&gridId='+BackboneGrid.id;
         },
         parse: function(response) {
             if (response[0].c) {
@@ -944,19 +974,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
             html += '</li>';
 
 
-            $('ul.pagination.page').html(html);
+            $('ul.' + BackboneGrid.id + '.pagination.page').html(html);
 
             var caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
             $('div.'+BackboneGrid.id+'-pagination').html(caption);
     }
-    var rowsCollection;
-    var columnsCollection;
-    var gridView;
-    var headerView;
-    var filterView;
-    var colsInfo;
-    var selectedRows;
-    FCom.BackboneGrid = function(config) {
+
         NProgress.start();
         //general settings
         _.templateSettings.variable = 'rc';
@@ -1122,6 +1145,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
 
         //mass action logic
         BackboneGrid.massDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
+        BackboneGrid.AddButton = 'Div #' + config.id + ' button.grid-add';
         BackboneGrid.massEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
         if ($(BackboneGrid.massDeleteButton).length > 0) {
             $(BackboneGrid.massDeleteButton).on('click', function(){
@@ -1153,6 +1177,23 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.in
         if ($(BackboneGrid.massEditButton).length > 0) {
             var massEditForm = new BackboneGrid.Views.MassEditForm({collection: columnsCollection});
             massEditForm.render();
+        }
+
+        if ($(BackboneGrid.AddButton).length > 0) {            
+            $(BackboneGrid.AddButton).on('click', function(ev){                    
+                if (BackboneGrid.callBacks && BackboneGrid.callBacks['add']) {                        
+                        var funcName = BackboneGrid.callBacks['add'];                      
+                        var jsons = selectedRows.toJSON();
+                        eval(funcName+'(jsons);');
+                } else {
+                    //to do 
+                    // standard grid modal should be displayed
+                }                
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                return false;
+            });
         }
 
         //quick search

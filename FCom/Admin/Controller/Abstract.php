@@ -64,13 +64,14 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function initFormTabs($view, $model, $mode='view', $allowed=null)
     {
+
         $r = BRequest::i();
         $layout = BLayout::i();
         $curTab = $r->request('tab');
         if (is_string($allowed)) {
             $allowed = explode(',', $allowed);
-        }
-        $tabs = $view->tabs;
+        }        
+        $tabs = $view->tabs;                
         if ($tabs) {
             foreach ($tabs as $k=>&$tab) {
                 if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
@@ -131,7 +132,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function outFormTabsJson($view, $model, $defMode='view')
     {
-        $r = BRequest::i();
+        $r = BRequest::i();        
         $mode = $r->request('mode');
         if (!$mode) {
             $mode = $defMode;
