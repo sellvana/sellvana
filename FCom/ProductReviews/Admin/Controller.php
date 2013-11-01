@@ -7,6 +7,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_modelClass = 'FCom_ProductReviews_Model_Review';
     protected $_mainTableAlias = 'prr';
 	protected $_gridTitle = 'Product Reviews';
+    protected $_recordName = 'Product Review';
 
     public function gridConfig($productModel = false)
     {

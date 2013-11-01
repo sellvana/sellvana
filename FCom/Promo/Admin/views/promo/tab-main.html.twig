@@ -1,12 +1,13 @@
 {% set m = THIS.model %}
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set locale = APP.instance('BLocale') %}
+{% set validator = THIS.get('validator') %}
 
 <fieldset class="adm-section-group">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-description">{{ 'Description'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control"id="model-description"  type="text" name="model[description]" value="{{ m.get('description') }}"/>
+            <input class="form-control"id="model-description"  type="text" name="model[description]" value="{{ validator.fieldValue('description') }}"/>
         </div>
     </div>
 
@@ -14,10 +15,24 @@
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Date Range'|_ }}</label>
         <div class="col-md-5">
             {{ 'Start:'|_ }}
-            <input type="text" id="model-from_date" name="model[from_date]" value="{{ locale.datetimeDbToLocal(m.get('from_date'))|raw }}" class="datepicker form-control"/>
+            <div>
+                <div class='datepicker input-group' id='model-from_date'>
+                    <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
+                    <span class='input-group-addon'>
+                        <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
+                    </span>
+                </div>
+            </div>
             <br />
             {{ ' End:'|_ }}
-            <input type="text" id="model-to_date" name="model[to_date]" value="{{ locale.datetimeDbToLocal(m.get('to_date'))|raw }}" class="datepicker form-control"/>
+            <div>
+                <div class='datepicker input-group' id='model-from_date'>
+                    <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
+                    <span class='input-group-addon'>
+                        <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -25,23 +40,23 @@
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Promotion Structure'|_ }}</label>
         <div class="col-md-5">
             {{ 'BUY'|_ }}
-            <select class="form-control" name="model[buy_type]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_type'), m.get('buy_type'))|raw }}</select>
+            <select class="form-control" name="model[buy_type]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_type'), validator.fieldValue('buy_type'))|raw }}</select>
             <br />
             {{ 'FROM'|_ }}
-            <select class="form-control" name="model[buy_group]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_group'), m.get('buy_group'))|raw }}</select>
+            <select class="form-control" name="model[buy_group]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_group'), validator.fieldValue('buy_group'))|raw }}</select>
             <br />
             {{ 'GET'|_ }}
-            <select class="form-control" name="model[get_type]">{{ UTIL.optionsHtml(promo.fieldOptions('get_type'), m.get('get_type'))|raw }}</select>
+            <select class="form-control" name="model[get_type]">{{ UTIL.optionsHtml(promo.fieldOptions('get_type'), validator.fieldValue('get_type'))|raw }}</select>
             <br />
             {{ 'OF'|_ }}
-            <select class="form-control" name="model[get_group]">{{ UTIL.optionsHtml(promo.fieldOptions('get_group'), m.get('get_group'))|raw }}</select>
+            <select class="form-control" name="model[get_group]">{{ UTIL.optionsHtml(promo.fieldOptions('get_group'), validator.fieldValue('get_group'))|raw }}</select>
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-details">{{ 'Details'|_ }}</label>
         <div class="col-md-5">
-            <textarea class="form-control" id="model-details" name="model[details]" rows="5">{{ m.get('details')  }}</textarea>
+            <textarea class="form-control" id="model-details" name="model[details]" rows="5">{{ validator.fieldValue('details')  }}</textarea>
         </div>
     </div>
 
@@ -50,7 +65,7 @@
     require(['jquery', 'bootstrap', 'datetimepicker', 'fcom.admin.form'], function($) {
         $(function() {
             //adminForm.wysiwygCreate('model-details');
-            $('#model-from_date,#model-to_date').datepicker();
+            //$('#model-from_date,#model-to_date').datepicker();
         })
     })
 </script>

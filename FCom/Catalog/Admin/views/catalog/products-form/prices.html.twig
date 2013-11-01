@@ -4,42 +4,42 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-cost">{{ 'Cost'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-cost" name="model[cost]" value="{{ m.get('cost') }}" />
+            <input class="form-control" type="text" id="model-cost" name="model[cost]" value="{{ validator.fieldValue('cost') }}" />
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-msrp">{{ 'MSRP'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-msrp" name="model[msrp]" value="{{ m.get('msrp') }}" />
+            <input class="form-control" type="text" id="model-msrp" name="model[msrp]" value="{{ validator.fieldValue('msrp') }}" />
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-map">{{ 'MAP'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-map" name="model[map]" value="{{ m.get('map') }}" />
+            <input class="form-control" type="text" id="model-map" name="model[map]" value="{{ validator.fieldValue('map') }}" />
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-base-price">{{ 'Default Base Price'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-base-price" name="model[base_price]" value="{{ m.get('base_price') }}" />
+            <input class="form-control" type="text" id="model-base-price" name="model[base_price]" value="{{ validator.fieldValue('base_price') }}" />
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-sale-price">{{ 'Default Sale Price'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-sale-price" name="model[sale_price]" value="{{ m.get('sale_price') }}" />
+            <input class="form-control" type="text" id="model-sale-price" name="model[sale_price]" value="{{ validator.fieldValue('sale_price') }}" />
         </div>
     </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-markup">{{ 'Default Markup'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-markup" name="model[markup]" value="{{ m.get('markup') }}" />
+            <input class="form-control" type="text" id="model-markup" name="model[markup]" value="{{ validator.fieldValue('markup') }}" />
         </div>
     </div>
 </fieldset>
