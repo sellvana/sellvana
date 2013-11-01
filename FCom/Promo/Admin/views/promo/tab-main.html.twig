@@ -15,10 +15,24 @@
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Date Range'|_ }}</label>
         <div class="col-md-5">
             {{ 'Start:'|_ }}
-            <input type="text" id="model-from_date" name="model[from_date]" value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}" class="datepicker form-control"/>
+            <div>
+                <div class='datepicker input-group' id='model-from_date'>
+                    <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
+                    <span class='input-group-addon'>
+                        <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
+                    </span>
+                </div>
+            </div>
             <br />
             {{ ' End:'|_ }}
-            <input type="text" id="model-to_date" name="model[to_date]" value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}" class="datepicker form-control"/>
+            <div>
+                <div class='datepicker input-group' id='model-from_date'>
+                    <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
+                    <span class='input-group-addon'>
+                        <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -51,7 +65,7 @@
     require(['jquery', 'bootstrap', 'datetimepicker', 'fcom.admin.form'], function($) {
         $(function() {
             //adminForm.wysiwygCreate('model-details');
-            $('#model-from_date,#model-to_date').datepicker();
+            //$('#model-from_date,#model-to_date').datepicker();
         })
     })
 </script>
