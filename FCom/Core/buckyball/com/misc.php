@@ -3392,22 +3392,7 @@ class BValidate extends BClass
                 }
             }
         }
-        //return $this->_validateErrors ? false : true;
-
-        $validate = array();
-        if ($this->_validateErrors) {
-            $validate = array(
-                'result' => false,
-                'errors' => $this->_validateErrors
-            );
-        } else {
-            $validate['result'] = array(
-                'result' => true,
-                'errors' => array()
-            );
-        }
-
-        return $validate;
+        return $this->_validateErrors ? false : true;
     }
 
     public function validateErrors()
