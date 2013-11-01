@@ -3427,7 +3427,7 @@ class BValidate extends BClass
             return 'The field should be at least '.$args['min'].' characters long: :field';
         }
         if (!empty($args['max']) && strlen($value) > $args['max']) {
-            return 'The field can not exceed '.$args['min'].' characters: :field';
+            return 'The field can not exceed '.$args['max'].' characters: :field';
         }
         return true;
     }
