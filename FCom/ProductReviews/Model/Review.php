@@ -10,7 +10,9 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 		array('customer_id', '@required'),
 		array('rating', '@required'),
 		array('title', '@required'),
-		array('create_at', '@required'),
+
+        array('title', '@string', null, array('max' => 255)),
+        array('helpful_voices', '@string', null, array('max' => 11)),
 
         array('rating', '@integer'),
         array('rating1', '@integer'),
