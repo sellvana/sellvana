@@ -3264,15 +3264,15 @@ class BValidate extends BClass
 
     protected $_validateErrors = array();
 
-	/**
-	 * @param bool  $new
-	 * @param array $args
-	 * @return BValidate
-	 */
-	public static function i($new=false, array $args=array())
-	{
-		return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
-	}
+    /**
+     * @param bool  $new
+     * @param array $args
+     * @return BValidate
+     */
+    public static function i($new = false, array $args = array())
+    {
+        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
 
     public function addValidator($name, $rule)
     {
@@ -3392,7 +3392,7 @@ class BValidate extends BClass
                 }
             }
         }
-	    return $this->_validateErrors ? false : true;
+        return $this->_validateErrors ? false : true;
     }
 
     public function validateErrors()
@@ -3427,7 +3427,7 @@ class BValidate extends BClass
             return 'The field should be at least '.$args['min'].' characters long: :field';
         }
         if (!empty($args['max']) && strlen($value) > $args['max']) {
-            return 'The field can not exceed '.$args['min'].' characters: :field';
+            return 'The field can not exceed '.$args['max'].' characters: :field';
         }
         return true;
     }
