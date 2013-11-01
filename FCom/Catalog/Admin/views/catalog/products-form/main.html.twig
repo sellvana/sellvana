@@ -1,8 +1,6 @@
 {% set m = THIS.model %}
 {% set validator = THIS.get('validator') %}
 
-{{ dump(validator.fieldValue('product_name')) }}
-
 <fieldset name="main-product">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
