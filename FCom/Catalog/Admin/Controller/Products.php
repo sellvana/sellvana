@@ -146,34 +146,33 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
     // modal grid on category/product tab
     public function getAllProdConfig($model) {
-        
-        $config = parent::gridConfig();        
-        //$config['id'] = 'cateogry_all_prods_grid-'.$model->id;
-        $config['id'] = 'cateogry_all_prods_grid';
+
+        $config = parent::gridConfig();
+        //$config['id'] = 'category_all_prods_grid-'.$model->id;
+        $config['id'] = 'category_all_prods_grid';
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true),
             array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250),
-            array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),            
+            array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 100),
         );
         $config['actions'] = array(
             'add' => array('caption' => 'Add selected products')
         );
         $config['filters'] = array(
             array('field' => 'product_name', 'type' => 'text'),
-            array('field' => 'local_sku', 'type' => 'text'),            
+            array('field' => 'local_sku', 'type' => 'text'),
             '_quick' => array('expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' =>  array('?%', '%?%', '?'))
         );
-        
+
         $config['_callbacks'] = "{
-            'add':'categoryProdsMng.addSelectedProds'        
+            'add':'categoryProdsMng.addSelectedProds'
         }";
 
         return array('config' =>$config);
     }
     // main grid on category/product tab
     public function getCatProdConfig($model) {
-
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
             ->select(array('p.id', 'p.product_name', 'p.local_sku'))
             ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')
@@ -183,22 +182,24 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
 
         $config = parent::gridConfig();
-        $config['orm'] = $orm;
-        //$config['id'] = 'cateogry_prods_grid-'.$model->id;
-        $config['id'] = 'cateogry_prods_grid';
+        $config['data'] = $orm->find_many();
+        //var_dump($config['data']);exit;
+        //$config['orm'] = $orm;
+        //$config['id'] = 'category_prods_grid-'.$model->id;
+        $config['id'] = 'category_prods_grid';
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true),
             array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400),
             array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 200)
         );
-        $config['actions'] = array(            
+        $config['actions'] = array(
             'add' => array('caption' => 'Add products'),
             'delete' => array('caption' => 'Remove')
         );
         $config['filters'] = array(
             array('field' => 'product_name', 'type' => 'text'),
-            array('field' => 'local_sku', 'type' => 'text')            
+            array('field' => 'local_sku', 'type' => 'text')
         );
         $config['data_mode'] = 'local';
         $config['_callbacks'] = "{

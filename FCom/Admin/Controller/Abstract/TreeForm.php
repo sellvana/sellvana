@@ -143,22 +143,27 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
-            
+
             $model->set(BRequest::i()->post('model'))
                 ->set(array('url_path'=>null, 'full_name'=>null));
 
-	        if ($model->validate()) {
+
+            //always return false
+	        //if ($model->validate()) {
 		        $model->save();
 		        $model->refreshDescendants(true, true);
 		        $result = array('status'=>'success', 'message'=>'Node updated');
-	        } else {
+	        /*} else {
 		        $messages = array();
-		        foreach($model->errors as $msg) {
-			        foreach ($msg as $m)
-				        $messages[] = $m;
-		        }
+                if(isset($model->errors)) {
+                    foreach ($model->errors as $msg) {
+                        foreach ($msg as $m)
+                            $messages[] = $m;
+                    }
+                }
+
 		        $result = array('status'=>'error', 'message'=> implode("<br />", $messages));
-	        }
+	        }*/
         } catch (Exception $e) {
             $result = array('status'=>'error', 'message'=>$e->getMessage());
         }
