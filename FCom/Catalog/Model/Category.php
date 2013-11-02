@@ -107,4 +107,19 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         return array_values($categories);
     }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $hlp = FCom_Catalog_Model_CategoryProduct::i();
+        if ($this->get('product_ids_add')) {
+            foreach ($this->get('product_ids_add') as $pId) {
+                $hlp->create(array('category_id' => $this->id(), 'product_id' => $pId))->save();
+            }
+        }
+        if ($this->get('product_ids_remove')) {
+            $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $this->get('product_ids_remove')));
+        }
+    }
 }

@@ -25,8 +25,9 @@ class FCom_Admin_Admin extends BClass
     {
         if (($head = BLayout::i()->view('head'))) {
             $head->js_raw('admin_init', '
-FCom.Admin = {}
-FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/js/codemirror').'"
+FCom.Admin = {};
+FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/js/codemirror').'";
+FCom.Admin.upload_href = "'.BApp::href('upload').'";
             ');
 
             $config = BConfig::i()->get('modules/FCom_Admin');
