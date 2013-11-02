@@ -3,7 +3,7 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
-    $('form#categories-tree-form').submit(function() {
+    $('form#categories-tree-form').submit(function(ev) {
         var url = $(this).attr('action');
         $.ajax({
            type: "POST",
@@ -15,6 +15,9 @@
            }
          });
 
+        ev.preventDefault();
+        ev.stopPropagation();
+
         return false;
     });
 
@@ -23,7 +26,7 @@
     var g_vent = _.extend({}, Backbone.Events);
 
     function CategoryProdsMng() {
-        this.mainGridId = 'category_prods_grid';
+        this.mainGridId = 'category_prods_grid_{{ m.id }}';
         g_vent.bind('orginal_ids', this._getOriginalIds);
 
         this.add_ids = [];
@@ -68,9 +71,7 @@
     var categoryProdsMng = new CategoryProdsMng();
 </script>
 
-
-        {{ THIS.view('core/messages') | raw }}
-        {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}
+{{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}
 
 <a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>Add</a>
 <div class='modal fade' id='prod-grid-add' tabindex='-1'>
