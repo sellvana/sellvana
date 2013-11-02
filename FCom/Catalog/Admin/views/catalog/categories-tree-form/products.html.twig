@@ -3,12 +3,12 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
-    $('form#categories-tree-form').submit(function(ev) {
-        var url = $(this).attr('action');
+    $('button#category_save').click(function(ev) {
+        var url = $('form#categories-tree-form').attr('action');
         $.ajax({
            type: "POST",
            url: url,
-           data: $(this).serialize(),
+           data: $('form#categories-tree-form').serialize(),
            success: function(data)
            {
                 $.bootstrapGrowl("Saved", { type:'success', align:'center', width:'auto' });
