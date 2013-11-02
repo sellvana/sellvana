@@ -149,7 +149,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $config = parent::gridConfig();
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
-        $config['id'] = 'category_all_prods_grid';
+        $config['id'] = 'category_all_prods_grid_'.$model->id;
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true),
@@ -186,7 +186,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         //var_dump($config['data']);exit;
         //$config['orm'] = $orm;
         //$config['id'] = 'category_prods_grid-'.$model->id;
-        $config['id'] = 'category_prods_grid';
+        $config['id'] = 'category_prods_grid_'.$model->id;
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true),
