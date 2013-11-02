@@ -179,13 +179,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
 
-
-
         $config = parent::gridConfig();
+
+        // TODO for empty local grid, it throws exception
+        unset($config['orm']);
         $config['data'] = $orm->find_many();
-        //var_dump($config['data']);exit;
-        //$config['orm'] = $orm;
-        //$config['id'] = 'category_prods_grid-'.$model->id;
         $config['id'] = 'category_prods_grid_'.$model->id;
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
