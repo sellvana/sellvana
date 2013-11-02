@@ -681,11 +681,11 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
                 editors[id] = true; // prevent double loading
                 CKEDITOR.replace(id, {
-                    toolbarGroups: [
+                    /*toolbarGroups: [
                         { name: 'mode' },
                         { name: 'basicstyles' },
                         { name: 'links' }
-                    ],
+                    ],*/
                     startupMode: 'wysiwyg'
                 });
 //
@@ -1060,7 +1060,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         if (typeof CKEDITOR !== 'undefined') {
             CKEDITOR.config.autoUpdateElement = true;
             CKEDITOR.config.toolbarStartupExpanded = false;
-            CKEDITOR.config.startupMode = 'source';
+            CKEDITOR.config.startupMode = 'wysiwyg';//'source';
+            //CKEDITOR.config.filebrowserUploadUrl = '/';
         }
         //$('.datepicker').datepicker();
         $(document).bind('ajaxSuccess', function(event, request, settings) {
