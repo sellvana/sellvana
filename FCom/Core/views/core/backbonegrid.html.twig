@@ -21,7 +21,7 @@
           {% endif %}
           </div>
           <div class="col-sm-3 text-right">
-            
+
               <div class="dataTables_filter">
                   <label>
                     Search:
@@ -29,7 +29,7 @@
                   <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
 
               </div>
-            
+
           </div>
     </div>
   {% endif %}
@@ -60,9 +60,9 @@
             {{ action.html | raw }}
           {% endif %}
         {% endfor %}
-      </div>      
+      </div>
       <div class="col-sm-5 text-right pagination">
-        {% if config['data_mode']!= 'local' %}          
+        {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize">
             {% for ps in THIS.pageSizeOptions() %}
               <li {{ ps==s.ps ? 'class="active"' }}>
@@ -171,7 +171,7 @@
         var isSelected = '';
         var isEditable = rc.editable ? '' : 'DISABLED';
         if (rc.editable && rc.selected)
-          isSelected = 'checked';        
+          isSelected = 'checked';
         print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
@@ -212,7 +212,7 @@
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <span><%= rc.label %>:</span>
       <span>
-        <input type="hidden" id="multi_hidden" style="width:300px"/>        
+        <input type="hidden" id="multi_hidden" style="width:300px"/>
       </span>
 </script>
 <script type='template' id="{{ config.id }}-text-filter-template">

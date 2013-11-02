@@ -111,15 +111,17 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function onAfterSave()
     {
         parent::onAfterSave();
-
+        $add_ids = explode(',', $this->get('product_ids_add'));
+        $remove_ids = explode(',', $this->get('product_ids_remove'));
         $hlp = FCom_Catalog_Model_CategoryProduct::i();
-        if ($this->get('product_ids_add')) {
-            foreach ($this->get('product_ids_add') as $pId) {
+
+        if (sizeof($add_ids)>0 && $add_ids[0] != '') {
+            foreach ($add_ids as $pId) {
                 $hlp->create(array('category_id' => $this->id(), 'product_id' => $pId))->save();
             }
         }
-        if ($this->get('product_ids_remove')) {
-            $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $this->get('product_ids_remove')));
+        if (sizeof($remove_ids)>0 && $remove_ids[0] != '') {
+            $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $remove_ids));
         }
     }
 }
