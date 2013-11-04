@@ -148,7 +148,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 ->set(array('url_path'=>null, 'full_name'=>null));
 
 
-            //always return false
+            //TODO figure out why validation always return false
 	        //if ($model->validate()) {
 		        $model->save();
 		        $model->refreshDescendants(true, true);
