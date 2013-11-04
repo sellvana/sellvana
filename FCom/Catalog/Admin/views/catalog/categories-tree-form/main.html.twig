@@ -16,7 +16,7 @@
     <label class="col-md-2 control-label" for="model-is-top-menu">{{ 'Show in top menu'|_ }}</label>
     <div class="col-md-5">
         <input type="hidden" name="model[is_top_menu]" value="0" />
-        <input id="model-is-top-menu" class="switch-cbx" name="model[is_top_menu]" {% if m.get('is_hidden') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <input id="model-is-top-menu" class="switch-cbx" name="model[is_top_menu]" {% if m.get('is_top_menu') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
         {#<select class="form-control" id="model-is-top-menu" name="model[is_top_menu]">
             {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, m.get('is_top_menu'))|raw }}
         </select>#}

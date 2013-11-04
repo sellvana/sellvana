@@ -32,7 +32,7 @@ base:
 
 /orderstatus:
     - { include: base }
-    - { hook: main, views: orderstatus/grid }
+    - { hook: main, views: admin/grid }
     - { view: admin/nav, do: [[ setNav, sales/orderstatus ]] }
 
 /orderstatus/form:

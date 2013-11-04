@@ -12,14 +12,14 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] += array(
-            'id' => array('label' => 'ID'),
-            'title' => array('label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
-            'author_user_id' => array('label'=>'Author'),
-            'version' => array('label'=>'Version'),
-            'create_at' => array('label'=>'Created', 'cell'=>'date'),
-            'update_at' => array('label'=>'Updated', 'cell'=>'date'),
-            '_actions' => array('label' => 'Actions', 'sortable' => false),
+        $config['columns'] = array(
+            array('name' => 'id', 'label' => 'ID'),
+            array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
+            array('name' => 'author_user_id', 'label'=>'Author'),
+            array('name' => 'version', 'label'=>'Version'),
+            array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
+            array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),'delete' => true)),
         );
         return $config;
     }
