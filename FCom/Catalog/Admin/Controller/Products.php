@@ -165,9 +165,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             '_quick' => array('expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' =>  array('?%', '%?%', '?'))
         );
 
-        $config['_callbacks'] = "{
+        $config['events'] = array('add');
+        /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
-        }";
+        }";*/
+
 
         return array('config' =>$config);
     }
@@ -200,10 +202,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field' => 'local_sku', 'type' => 'text')
         );
         $config['data_mode'] = 'local';
-        $config['_callbacks'] = "{
-            'add':'categoryProdsMng.clickedAddBtn',
-            'mass-delete':'categoryProdsMng.clickedRemoveBtn'
-        }";
+        $config['events'] = array('init', 'add','mass-delete');
+
         return array('config' => $config);
     }
     public function linkedProductGridConfig($model, $type)

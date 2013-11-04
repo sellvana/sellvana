@@ -279,12 +279,18 @@ FCom.BackboneGrid = function(config) {
             var hash = this.changedAttributes();
             hash.id = id;
             hash.oper = 'edit';
-            if (BackboneGrid.callBacks && BackboneGrid.callBacks['edit']) {
-                var funcName = BackboneGrid.callBacks['edit'];
+            if (BackboneGrid.data_mode === 'local') {
+                /*var funcName = BackboneGrid.callBacks['edit'];
                 var command = funcName+'(this.toJSON());';
-                eval(command);
+                eval(command);*/
             } else {
                 $.post(BackboneGrid.edit_url, hash);
+            }
+
+            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "edit") !== -1) {
+                var row = this.toJSON();
+                var ev = {grid: BackboneGrid.id, row: row};
+                g_vent.trigger('edit', ev);
             }
         }
     });
@@ -309,13 +315,13 @@ FCom.BackboneGrid = function(config) {
             //this.on.reset('reset', this.updateColsInfo, this);
         },
         _slientInjectRows: function(ev) {
-            if (ev.targetId !== BackboneGrid.id)
+            if (ev.grid !== BackboneGrid.id)
                 return;
 
-            var jsons = ev.jsons;
-            for (var i in jsons) {
-                if (typeof(rowsCollection.findWhere({id:jsons[i].id})) === 'undefined') {
-                    var row = new BackboneGrid.Models.Row(jsons[i]);
+            var rows = ev.rows;
+            for (var i in rows) {
+                if (typeof(rowsCollection.findWhere({id:rows[i].id})) === 'undefined') {
+                    var row = new BackboneGrid.Models.Row(rows[i]);
                     rowsCollection.add(row);
                 }
 
@@ -899,15 +905,15 @@ FCom.BackboneGrid = function(config) {
 
             var ids = selectedRows.pluck('id').join(",");
 
-            if (BackboneGrid.callBacks && BackboneGrid.callBacks['mass-edit']) {
-                var funcName = BackboneGrid.callBacks['mass-edit'];
+            if (BackboneGrid.data_mode === 'local') {
+                /*var funcName = BackboneGrid.callBacks['mass-edit'];
                 var jsons = selectedRows.toJSON();
                 for  (var i in jsons) {
                     for(var key in BackboneGrid.massEditVals)
                         jsons[i][key] = BackboneGrid.massEditVals[key];
                 }
                 var command = funcName + '(jsons);'
-                eval(command);
+                eval(command);*/
             } else {
                 var hash = BackboneGrid.massEditVals;
                 hash.id = ids;
@@ -920,6 +926,15 @@ FCom.BackboneGrid = function(config) {
                 delete BackboneGrid.massEditVals.oper;
             }
 
+            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-edit") !== -1) {
+                var rows = selectedRows.toJSON();
+                for  (var i in rows) {
+                    for(var key in BackboneGrid.massEditVals)
+                        rows[i][key] = BackboneGrid.massEditVals[key];
+                }
+                var evt = {grid: BackboneGrid.id, rows: rows};
+                g_vent.trigger('mass-edit', evt);
+            }
 
             selectedRows.each(function(model) {
                 for(var key in BackboneGrid.massEditVals) {
@@ -994,7 +1009,8 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.edit_url = config.edit_url;
         BackboneGrid.current_filters= {};
         BackboneGrid.quickInputId = '#' + config.id + '-quick-search';
-        BackboneGrid.callBacks = config.callBacks;
+        BackboneGrid.events = config.events;
+        //BackboneGrid.callBacks = config.callBacks;
         //personal settings
         var state = config.data.state;
         state.p = parseInt(state.p);
@@ -1157,14 +1173,11 @@ FCom.BackboneGrid = function(config) {
             $(BackboneGrid.massDeleteButton).on('click', function(){
                 var confirm = window.confirm("Do you really want to delete selected rows?");
                 if (confirm) {
-                    if (BackboneGrid.callBacks && BackboneGrid.callBacks['mass-delete']) {
-                        var funcName = BackboneGrid.callBacks['mass-delete'];
-                        var jsons = selectedRows.toJSON();
-                        var command = funcName + '(jsons);';
-                        eval(command);
+                    if (BackboneGrid.data_mode === 'local') {
+
                         rowsCollection.remove(selectedRows.models, {slient:true});
                         gridView.render();
-                        console.log(rowsCollection.toJSON());
+
                     } else {
                         var ids = selectedRows.pluck('id').join(",");
                         $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
@@ -1173,6 +1186,12 @@ FCom.BackboneGrid = function(config) {
                             rowsCollection.fetch({reset: true});
                             //gridView.render();
                         });
+                    }
+
+                    if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-delete") !== -1) {
+                        var rows = selectedRows.toJSON();
+                        var ev = {grid: BackboneGrid.id, rows: rows};
+                        g_vent.trigger('mass-delete', ev);
                     }
 
                     selectedRows.reset();
@@ -1189,14 +1208,19 @@ FCom.BackboneGrid = function(config) {
 
         if ($(BackboneGrid.AddButton).length > 0) {
             $(BackboneGrid.AddButton).on('click', function(ev){
-                if (BackboneGrid.callBacks && BackboneGrid.callBacks['add']) {
-                        var funcName = BackboneGrid.callBacks['add'];
-                        var jsons = selectedRows.toJSON();
-                        eval(funcName+'(jsons);');
+                if (BackboneGrid.data_mode === 'local') {
+
                 } else {
                     //to do
                     // standard grid modal should be displayed
                 }
+
+                if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "add") !== -1) {
+                    var rows = selectedRows.toJSON();
+                    var evt = {grid: BackboneGrid.id, rows: rows};
+                    g_vent.trigger('add', evt);
+                }
+
                 ev.preventDefault();
                 ev.stopPropagation();
 
@@ -1231,9 +1255,11 @@ FCom.BackboneGrid = function(config) {
         });
         NProgress.done();
 
-        if (typeof(g_vent) !== 'undefined') {
-            var ev= {sourceId: config.id, ids: rowsCollection.pluck('id')};
-            g_vent.trigger('orginal_ids', ev);
+        if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init") !== -1) {
+
+            var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
+            console.log(ev);
+            g_vent.trigger('init', ev);
         }
     }
 });

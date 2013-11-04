@@ -3,6 +3,13 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
+/**Event Aggregator
+This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
+
+if(typeof(g_vent) === 'undefined')
+    g_vent = _.extend({}, Backbone.Events);
+
+require(['jquery'], function($) {
     $('button#category_save').click(function(ev) {
         var url = $('form#categories-tree-form').attr('action');
         $.ajax({
@@ -21,22 +28,25 @@
         return false;
     });
 
-    /**Event Aggregator
-    This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
-    var g_vent = _.extend({}, Backbone.Events);
+
 
     function CategoryProdsMng() {
         this.mainGridId = 'category_prods_grid_{{ m.id }}';
-        g_vent.bind('orginal_ids', this._getOriginalIds);
+        this.modalGridId = 'category_all_prods_grid_{{ m.id }}';
+
+        g_vent.bind('init', this._getOriginalIds);
+        g_vent.bind('add', this._addRows);
+        g_vent.bind('mass-delete', this._removeRows);
 
         this.add_ids = [];
         this.remove_ids = [];
-        this.orginal_ids = [];
+        this.original_ids = [];
 
     }
 
     CategoryProdsMng.prototype._setFormValues = function() {
-        this.add_ids = _.difference(this.add_ids,this.orginal_ids);
+
+        this.add_ids = _.difference(this.add_ids,this.original_ids);
         this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
         $("input[id='product_ids_add']").val(this.add_ids.join(','));
         $("input[id='product_ids_remove']").val(this.remove_ids.join(','));
@@ -44,31 +54,35 @@
 
     CategoryProdsMng.prototype._getOriginalIds = function(ev) {
 
-        if (ev.sourceId === categoryProdsMng.mainGridId) {
-            categoryProdsMng.original_ids = ev.ids;
+        if (ev.grid === self.mainGridId) {
+            self.original_ids = ev.ids;
         }
     }
 
-    CategoryProdsMng.prototype.clickedAddBtn = function() {
-        $('#btn_add_prod').trigger('click');
-    }
-    CategoryProdsMng.prototype.clickedRemoveBtn = function(jsons) {
-        this.remove_ids = _.union(_.pluck(jsons,'id'), this.remove_ids);
-        this.add_ids = _.difference(this.add_ids, _.pluck(jsons,'id'));
+    CategoryProdsMng.prototype._addRows = function(ev) {
 
-        this._setFormValues();
-    }
-    CategoryProdsMng.prototype.addSelectedProds =function(jsons) {
-        //tell main grid to add selected rows from modal grid
-        g_vent.trigger('slient_inject', {targetId: this.mainGridId, jsons: jsons});
+        if (ev.grid === self.mainGridId)
+            $('#btn_add_prod').trigger('click');
 
-        this.add_ids = _.union(_.pluck(jsons,'id'), this.add_ids);
-        this.remove_ids = _.difference(this.remove_ids, _.pluck(jsons,'id'));
+        if (ev.grid === self.modalGridId) {
+            g_vent.trigger('slient_inject', {grid: self.mainGridId, rows: ev.rows});
+            self.add_ids = _.union(_.pluck(ev.rows,'id'), this.add_ids);
+            self.remove_ids = _.difference(this.remove_ids, _.pluck(ev.rows,'id'));
+            self._setFormValues();
+        }
 
-        this._setFormValues();
+
     }
 
-    var categoryProdsMng = new CategoryProdsMng();
+    CategoryProdsMng.prototype._removeRows = function(ev) {
+        if(ev.grid === self.mainGridId) {
+            self.remove_ids = _.union(_.pluck(ev.rows,'id'), self.remove_ids);
+            self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows,'id'));
+            self._setFormValues();
+        }
+    }
+    var self = new CategoryProdsMng();
+});
 </script>
 
 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}

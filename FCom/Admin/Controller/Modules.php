@@ -102,12 +102,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                                     array('field' => 'run_level_core', 'type' => 'multiselect')
                                  );
         $config['actions'] = array(
-            'edit' => true            
+            'edit' => true
         );
-        $config['_callbacks'] = "{
-            'edit':'rowModelEx.save',
-            'mass-edit':'rowModelEx.mass_save'
-        }";
+        $config['events'] = array('edit', 'mass-edit');
+
         //$config['state'] =array(5,6,7,8);
 		return $config;
 	}

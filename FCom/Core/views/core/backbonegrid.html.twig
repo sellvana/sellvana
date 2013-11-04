@@ -281,10 +281,8 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             data: {{ THIS.getPageRowsData() | raw }},
             columns: {{ THIS.getColumnsData() | raw }},
             data_mode: "{{ config.data_mode }}",
-            filters: {{ THIS.getFilterData()  | raw }}
-            {% if config._callbacks %}
-            ,callBacks : {{ config._callbacks| raw }}
-            {% endif %}
+            filters: {{ THIS.getFilterData()  | raw }},
+            events: {{ THIS.getEventData() | raw }}
         });
     //});
 });

@@ -4,101 +4,40 @@
     function runMigrationScripts() {
         $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
     }
-
-    /*require(['jquery', 'backgrid', 'fcom.backbone.grid'], function($) {
-        FCom.ModuleModel = Backbone.Model.extend({
-            save: function(attributes, options) {
-                var data = {
-                    module_name: this.attributes.name,
-                    run_level_core: this.attributes.run_level_core,
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                };
-                $.post("#{$this->form_url}", data, function(response, status, xhr) {
-                    $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
-                });
-            }
-        });
-
-        FCom.Backgrid.RunLevelCell = Backgrid.Cell.extend({
-            render: function() {
-                var val = this.model.get(this.column.get("name"));
-                this.$el.addClass('run-level-' + val);
-                return Backgrid.Cell.prototype.render.apply(this, arguments);
-            }
-        });
-        FCom.Backgrid.RunStatusCell = Backgrid.Cell.extend({
-            render: function() {
-                var val = this.model.get(this.column.get("name"));
-                this.$el.addClass('run-status-' + val);
-                return Backgrid.Cell.prototype.render.apply(this, arguments);
-            }
-        });
-        FCom.Backgrid.SchemaVersionCell = Backgrid.Cell.extend({
-            render: function() {
-                var val = this.model.get(this.column.get("name"));
-                if (this.model.get('migration_available') && val != this.model.get('version')) {
-                    this.$el.addClass('schema-migration-available');
-                }
-                return Backgrid.Cell.prototype.render.apply(this, arguments);
-            }
-        });
-
-        FCom.Backgrid.RunLevelSelectCellEditor = Backgrid.SelectCellEditor.extend({
-            save: function(e) {
-                Backgrid.SelectCellEditor.prototype.save.apply(this, arguments);
-                this.model.save();
-            }
-        });
-
-        FCom.Backgrid.RunLevelSelectCell = Backgrid.SelectCell.extend({
-            initialize: function(options) {
-                var optionValues = [];
-                _.each(options.column.attributes.options, function(v, k) {
-                    optionValues.push([v, k]);
-                })
-                this.optionValues = optionValues;
-                if (this.options.model.get('auto_run_level')) {
-                    this.editable = false;
-                }
-                return Backgrid.SelectCell.prototype.initialize.apply(this, arguments);
-            },
-
-            editor: FCom.Backgrid.RunLevelSelectCellEditor,
-
-            render: function() {
-                var val = this.model.get(this.column.get("name"));
-                if (val==='AUTO') {
-                    return Backgrid.Cell.prototype.render.apply(this, arguments);
-                }
-                this.$el.removeClass('run-level-DISABLED run-level-REQUESTED runl-level-DISABLED')
-                this.$el.addClass('run-level-' + val);
-                return Backgrid.SelectCell.prototype.render.apply(this, arguments);
-            }
-        })
-
-    });*/
 </script>
 <script>
+/**Event Aggregator
+This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
+
+require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
+    if(typeof(g_vent) === 'undefined')
+        g_vent = _.extend({}, Backbone.Events);
+
     function RowModelEx() {
+        g_vent.bind('mass-edit', this.mass_save);
+        g_vent.bind('edit', this.save);
 
     }
-    RowModelEx.prototype.save = function(attributes) {        
-        
+    RowModelEx.prototype.save = function(ev) {
+        if (ev.grid !== 'FCom_Admin_Controller_Modules')
+            return;
         var data = {
-                    module_name: attributes.name,
-                    run_level_core: attributes.run_level_core,
+                    module_name: ev.row.name,
+                    run_level_core: ev.row.run_level_core,
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                };        
+                };
         $.post("#{$this->form_url}", data, function(response, status, xhr) {
             $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
         });
     }
 
-    RowModelEx.prototype.mass_save = function(jsons) {        
-        for (var i in jsons) {
+    RowModelEx.prototype.mass_save = function(ev) {
+        if (ev.grid !== 'FCom_Admin_Controller_Modules')
+            return;
+        for (var i in ev.rows) {
             var data = {
-                        module_name: jsons[i].name,
-                        run_level_core: jsons[i].run_level_core,
+                        module_name: ev.rows[i].name,
+                        run_level_core: ev.rows[i].run_level_core,
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     };
             $.post("#{$this->form_url}", data, function(response, status, xhr) {
@@ -107,7 +46,8 @@
         }
     }
 
-    var rowModelEx = new RowModelEx();        
+    var rowModelEx = new RowModelEx();
+});
 </script>
 <form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
     <div class="row">
@@ -128,7 +68,7 @@
     <div class="box col-sm-12">
         <div class="box-content">
             {{ THIS.view('core/messages') | raw }}
-            {{ THIS.view('core/backbonegrid') | raw }}            
+            {{ THIS.view('core/backbonegrid') | raw }}
         </div>
     </div>
 
