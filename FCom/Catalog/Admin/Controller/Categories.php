@@ -9,7 +9,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     protected $_formLayoutName = '/catalog/categories/tree_form';
     protected $_formViewName = 'catalog/categories-tree-form';
 
-    
+    public $formId = 'category_tree_form';
 
     public function categoryProductGridConfig($model)
     {        
