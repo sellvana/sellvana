@@ -3,6 +3,7 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
+<<<<<<< HEAD
 /**Event Aggregator
 This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
 
@@ -29,6 +30,11 @@ require(['jquery'], function($) {
     });
 
 
+=======
+    /**Event Aggregator
+    This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
+    var g_vent = _.extend({}, Backbone.Events);
+>>>>>>> bbca8faf826480bf674908fa7dffb371d0925030
 
     function CategoryProdsMng() {
         this.mainGridId = 'category_prods_grid_{{ m.id }}';
@@ -87,19 +93,19 @@ require(['jquery'], function($) {
 
 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}
 
-<a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>Add</a>
+<a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>{{ "Add"|_ }}</a>
 <div class='modal fade' id='prod-grid-add' tabindex='-1'>
     <div class='modal-dialog' style='width:900px;'>
         <div class='modal-content'>
             <div class='modal-header'>
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>Add products</h4>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
             </div>
             <div class='modal-body'>
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getAllProdConfig(m)) | raw }}
             </div>
             <div class='modal-footer'>
-                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>Close</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>

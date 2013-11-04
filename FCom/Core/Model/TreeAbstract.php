@@ -8,13 +8,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     protected static $_cacheFlags = array('full_name'=>array('key_lower'));
 
 	protected $_validationRules = array(
-		array('parent_id', '@required'),
+		/*array('parent_id', '@required'),
 		array('id_path', '@required'),
-		array('sort_order', '@required'),
+		array('sort_order', '@required'),*/
 		array('node_name', '@required'),
-		array('full_name', '@required'),
-		array('url_key', '@required'),
-		array('url_path', '@required'),
+        array('url_key', '@required'),
+		/*array('full_name', '@required'),
+		array('url_path', '@required'),*/
 	);
 
     public static function load($id, $field=null, $cache=false)

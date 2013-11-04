@@ -100,7 +100,7 @@
             function loadForm(id) {
                 var url = '{{ formUrl }}?id='+id;
                 $('#nav-form-container').load(url, function() {
-                    $('#nav-tree-form').attr('action', url);
+                    $('#cms-tree-form').attr('action', url);
                     window.adminForm = FCom.Admin.form({
                         tabs:     '.adm-tabs li',
                         panes:    '.adm-tabs-content',

@@ -8,6 +8,8 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     protected $_formLayoutName;
     protected $_formViewName;
 
+    public $formId = 'tree_form';
+
     public function action_index()
     {
         $this->layout($this->_treeLayoutName);
@@ -148,26 +150,40 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 ->set(array('url_path'=>null, 'full_name'=>null));
 
 
+<<<<<<< HEAD
             //TODO figure out why validation always return false
 	        //if ($model->validate()) {
+=======
+            //always return false -> update rules in FCom_Core_Model_Abstract
+            /** @see FCom_Core_Model_Abstract */
+            $formId = $this->formId;
+	        if ($model->validate($model->as_array(), array(), $formId)) {
+>>>>>>> bbca8faf826480bf674908fa7dffb371d0925030
 		        $model->save();
 		        $model->refreshDescendants(true, true);
 		        $result = array('status'=>'success', 'message'=>'Node updated');
-	        /*} else {
-		        $messages = array();
-                if(isset($model->errors)) {
-                    foreach ($model->errors as $msg) {
-                        foreach ($msg as $m)
-                            $messages[] = $m;
-                    }
-                }
-
-		        $result = array('status'=>'error', 'message'=> implode("<br />", $messages));
-	        }*/
+	        } else {
+                BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+		        $result = array('status'=>'error', 'message'=> $this->getErrorMessages());
+	        }
         } catch (Exception $e) {
             $result = array('status'=>'error', 'message'=>$e->getMessage());
         }
         BResponse::i()->json($result);
+    }
+
+    public function getErrorMessages()
+    {
+        $messages = BSession::i()->messages('validator-errors:'.$this->formId);
+        $errorMessages = array();
+        foreach($messages as $m) {
+            if (is_array($m['msg']))
+                $errorMessages[] = $m['msg']['error'];
+            else
+                $errorMessages[] = $m['msg'];
+        }
+
+        return implode("<br />", $errorMessages);
     }
 
     protected function _prepareTreeForm($model)
