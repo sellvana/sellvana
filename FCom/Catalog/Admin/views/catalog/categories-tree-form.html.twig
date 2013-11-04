@@ -7,7 +7,35 @@
             url_get: "{{ THIS.get('form_url') }}",
             cur_tab: "{{ THIS.get('cur_tab') }}"
         });
-    })
+    });
+
+    var mainForm = $('form#categories-tree-form');
+
+    $('button#category_save').click(function (ev)
+    {
+        $.ajax({
+            type: "POST",
+            url: mainForm.attr('action'),
+            data: mainForm.serialize(),
+            success: function (data)
+            {
+                if (data.status == 'error') {
+                    $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                } else {
+                    $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown)
+            {
+                alert("[ERROR]<br>" + textStatus);
+            }
+        });
+
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        return false;
+    });
 </script>
 
 <div class="box fcom-admin-main-content">
