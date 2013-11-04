@@ -3,17 +3,26 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
-    $('button#category_save').click(function(ev) {
+    $('button#category_save').click(function (ev)
+    {
         var url = $('form#categories-tree-form').attr('action');
         $.ajax({
-           type: "POST",
-           url: url,
-           data: $('form#categories-tree-form').serialize(),
-           success: function(data)
-           {
-                $.bootstrapGrowl("Saved", { type:'success', align:'center', width:'auto' });
-           }
-         });
+            type: "POST",
+            url: url,
+            data: $('form#categories-tree-form').serialize(),
+            success: function (data)
+            {
+                if (data.status == 'error') {
+                    $.bootstrapGrowl("Error\n" + data.message, { type: 'danger', align: 'center', width: 'auto'});
+                } else {
+                    $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                }
+            },
+            error: function (xhr, textStatus, errorThrown)
+            {
+                alert("[ERROR]\n" + textStatus);
+            }
+        });
 
         ev.preventDefault();
         ev.stopPropagation();
@@ -73,19 +82,19 @@
 
 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}
 
-<a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>Add</a>
+<a role="button" href="#prod-grid-add" data-toggle="modal" style='display:none;' id='btn_add_prod'>{{ "Add"|_ }}</a>
 <div class='modal fade' id='prod-grid-add' tabindex='-1'>
     <div class='modal-dialog' style='width:900px;'>
         <div class='modal-content'>
             <div class='modal-header'>
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>Add products</h4>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
             </div>
             <div class='modal-body'>
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getAllProdConfig(m)) | raw }}
             </div>
             <div class='modal-footer'>
-                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>Close</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
