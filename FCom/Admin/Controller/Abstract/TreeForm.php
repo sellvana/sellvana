@@ -150,15 +150,14 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 ->set(array('url_path'=>null, 'full_name'=>null));
 
 
-<<<<<<< HEAD
+
             //TODO figure out why validation always return false
 	        //if ($model->validate()) {
-=======
             //always return false -> update rules in FCom_Core_Model_Abstract
             /** @see FCom_Core_Model_Abstract */
             $formId = $this->formId;
 	        if ($model->validate($model->as_array(), array(), $formId)) {
->>>>>>> bbca8faf826480bf674908fa7dffb371d0925030
+
 		        $model->save();
 		        $model->refreshDescendants(true, true);
 		        $result = array('status'=>'success', 'message'=>'Node updated');
