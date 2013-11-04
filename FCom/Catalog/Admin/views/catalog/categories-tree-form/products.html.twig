@@ -3,33 +3,6 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
-    $('button#category_save').click(function (ev)
-    {
-        var url = $('form#categories-tree-form').attr('action');
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $('form#categories-tree-form').serialize(),
-            success: function (data)
-            {
-                if (data.status == 'error') {
-                    $.bootstrapGrowl("Error\n" + data.message, { type: 'danger', align: 'center', width: 'auto'});
-                } else {
-                    $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
-                }
-            },
-            error: function (xhr, textStatus, errorThrown)
-            {
-                alert("[ERROR]\n" + textStatus);
-            }
-        });
-
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        return false;
-    });
-
     /**Event Aggregator
     This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
     var g_vent = _.extend({}, Backbone.Events);
