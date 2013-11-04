@@ -10,6 +10,7 @@ This aggregator is for triggering slient_inject that causes main grid adding sel
 if(typeof(g_vent) === 'undefined')
     g_vent = _.extend({}, Backbone.Events);
 
+var categoryProdMng;
 require(['jquery'], function($) {
 
     function CategoryProdsMng() {
@@ -67,8 +68,18 @@ require(['jquery'], function($) {
             self._setFormValues();
         }
     }
+
+    CategoryProdsMng.prototype.reset = function() {
+        this.add_ids = [];
+        this.remove_ids = [];
+        $("input[id='product_ids_add']").val('');
+        $("input[id='product_ids_remove']").val('');
+    }
     var self = new CategoryProdsMng();
+    categoryProdMng = self;
 });
+
+
 </script>
 
 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}
