@@ -23,6 +23,7 @@
                     $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                 } else {
                     $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                    categoryProdMng.reset();
                 }
 
                 console.log(self);
