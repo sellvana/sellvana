@@ -17,8 +17,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
     }
 
     FCom.Admin.Tabs = function(containerSel, options) {
-        console.log(containerSel);
-        console.log(options);
         var $container = $(containerSel);
         $('.js-form-tab-toggle', $container).click(function(ev) {
             ev.preventDefault();
@@ -28,8 +26,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
                 $.getJSON(url_get+'tabs='+tabId, function(data, status, req) {
                     _.each(data.tabs, function(tabHtml, i) {
-                        console.log(tabHtml);
-
                         $('#tab-'+i).html(tabHtml).data('loaded', true);
                         $('#tab-'+i+' .collapse').collapse();
                         if (options.tab_load_callback) {

@@ -5,7 +5,7 @@
 <script>
 
 /**Event Aggregator
-This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
+This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.**/
 
 if(typeof(g_vent) === 'undefined')
     g_vent = _.extend({}, Backbone.Events);
@@ -52,7 +52,7 @@ require(['jquery'], function($) {
             $('#btn_add_prod').trigger('click');
 
         if (ev.grid === self.modalGridId) {
-            g_vent.trigger('slient_inject', {grid: self.mainGridId, rows: ev.rows});
+            g_vent.trigger('silent_inject', {grid: self.mainGridId, rows: ev.rows});
             self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
             self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
             self._setFormValues();
