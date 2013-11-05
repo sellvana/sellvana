@@ -1,18 +1,19 @@
 {% set m = THIS.model %}
+{% set validator = THIS.get('validator') %}
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
 
 <fieldset class="form-horizontal">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-username">{{ 'User Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-username" name="model[username]" class="validate[required] form-control" value="{{ m.get('username') }}" />
+            <input type="text" id="model-username" name="model[username]" class="validate[required] form-control" value="{{ validator.fieldValue('username') }}" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-superadmin">{{ 'Super Admin'|_ }}</label>
         <div class="col-md-5">
             <select id="model-superadmin" name="model[is_superadmin]" class="form-control">
-                {{ UTIL.optionsHtml(hlp.fieldOptions('is_superadmin'), m.get('is_superadmin'))|raw }}
+                {{ UTIL.optionsHtml(hlp.fieldOptions('is_superadmin'), validator.fieldValue('is_superadmin'))|raw }}
             </select>
         </div>
     </div>
@@ -21,7 +22,7 @@
         <div class="col-md-5">
             <select id="model-role-id" name="model[role_id]" class="form-control">
                 <option></option>
-                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_Role').options(), m.get('role_id'))|raw }}
+                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_Role').options(), validator.fieldValue('role_id'))|raw }}
             </select>
         </div>
     </div>
@@ -29,14 +30,14 @@
         <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
         <div class="col-md-5">
             <select id="model-status" name="model[status]" class="form-control">
-                {{ UTIL.optionsHtml(hlp.fieldOptions('status'), m.get('status'))|raw }}
+                {{ UTIL.optionsHtml(hlp.fieldOptions('status'), validator.fieldValue('status'))|raw }}
             </select>
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-email" name="model[email]" class="validate[required,custom[email]] form-control" value="{{ m.get('email') }}" />
+            <input type="text" id="model-email" name="model[email]" class="validate[required,custom[email]] form-control" value="{{ validator.fieldValue('email') }}" />
         </div>
     </div>
     <div class="form-group">
@@ -54,19 +55,19 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-firstname" name="model[firstname]" class="validate[required] form-control" value="{{ m.get('firstname') }}" />
+            <input type="text" id="model-firstname" name="model[firstname]" class="validate[required] form-control" value="{{ validator.fieldValue('firstname') }}" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-lastname" name="model[lastname]" class="validate[required] form-control" value="{{ m.get('lastname') }}" />
+            <input type="text" id="model-lastname" name="model[lastname]" class="validate[required] form-control" value="{{ validator.fieldValue('lastname') }}" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-api_username">{{ 'API Username'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" class="form-control" id="model-api_username" name="model[api_username]" value="{{ m.get('api_username') }}" />
+            <input type="text" class="form-control" id="model-api_username" name="model[api_username]" value="{{ validator.fieldValue('api_username') }}" />
         </div>
     </div>
     <div class="form-group">

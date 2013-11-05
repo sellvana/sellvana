@@ -1,16 +1,17 @@
 {% set m = THIS.model %}
+{% set validator = THIS.get('validator') %}
 
 <fieldset class="adm-section-group">
     <div class="form-group">
         <label class="col-md-2 label-control">{{ 'Label'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" class="form-control" name="model[name]" value="{{ m.get('name') }}"/>
+            <input type="text" class="form-control" name="model[name]" value="{{ validator.fieldValue('name') }}"/>
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 label-control">{{ 'Code'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" class="form-control" name="model[code]" value="{{ m.get('code') }}"/>
+            <input type="text" class="form-control" name="model[code]" value="{{ validator.fieldValue('code') }}"/>
         </div>
     </div>
 </fieldset>
