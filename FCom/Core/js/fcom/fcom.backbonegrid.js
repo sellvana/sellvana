@@ -73,6 +73,13 @@ FCom.BackboneGrid = function(config) {
         },
         initialize: function() {
            // this.model.on('change', this.render, this);
+           if (typeof(g_vent)!== 'undefined') {
+                var self = this;
+                g_vent.bind('clear_selection', function(ev) {
+                    if (ev.grid === BackboneGrid.id)
+                        self._clearSelection();
+                });
+           }
         },
         _selectPageAction: function(flag) {
             rowsCollection.each(function(model) {
@@ -132,6 +139,14 @@ FCom.BackboneGrid = function(config) {
             }
 
         },
+        _clearSelection: function() {
+            selectedRows.reset();
+            rowsCollection.each(function(model) {
+                if(model.get('selected'))
+                    model.set('selected', false);
+                model.trigger('render');
+            });
+        },
         //function to select or unselect all rows of page and empty selected rows
         _selectAction: function() {
             var key = this.$el.find('select.js-sel').val();
@@ -144,15 +159,7 @@ FCom.BackboneGrid = function(config) {
                     this._selectPageAction(false);
                     break;
                 case 'upd_clear': //empty selected rows collection
-                    selectedRows.reset();
-                    console.log(selectedRows);
-                    rowsCollection.each(function(model) {
-                        console.log(model);
-                        if(model.get('selected'))
-                            model.set('selected', false);
-                        model.trigger('render');
-                    });
-                    console.log('sr=',selectedRows);
+                    this._clearSelection();
                     break;
             }
 
