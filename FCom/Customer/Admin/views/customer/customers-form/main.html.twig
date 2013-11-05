@@ -2,6 +2,7 @@
 {% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
+{% set validator = THIS.get('validator') %}
 
 <script>
     //var custModule = angular.module('custModule', []);
@@ -42,25 +43,25 @@
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-firstname" class="form-control" type="text" name="model[firstname]" value="{{ m.get('firstname') }}" />
+                    <input id="model-firstname" class="form-control" type="text" name="model[firstname]" value="{{ validator.fieldValue('firstname') }}" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-lastname" class="form-control" type="text" name="model[lastname]" value="{{ m.get('lastname') }}" />
+                    <input id="model-lastname" class="form-control" type="text" name="model[lastname]" value="{{ validator.fieldValue('lastname') }}" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-email" class="form-control" type="email" name="model[email]" value="{{ m.get('email') }}" />
+                    <input id="model-email" class="form-control" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-email" class="form-control" type="email" name="model[email]" value="{{ m.get('email') }}" />
+                    <input id="model-email" class="form-control" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
                 </div>
             </div>
             {% if customerGroups is defined %}
@@ -68,7 +69,7 @@
                     <label class="col-md-2 control-label" for="model-group">{{ 'Customer Group'|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="model[customer_group]" id="model-group">
-                            {{ UTIL.optionsHtml(customerGroups, m.get('customer_group'))|raw }}
+                            {{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_group'))|raw }}
                         </select>
                     </div>
                 </div>
@@ -76,20 +77,20 @@
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-phone">{{ 'Daytime Phone'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-phone" class="form-control" type="text" name="model[phone]" value="{{ m.get('phone') }}" />
+                    <input id="model-phone" class="form-control" type="text" name="model[phone]" value="{{ validator.fieldValue('phone') }}" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-phone_evening">{{ 'Evening Phone'|_ }}</label>
                 <div class="col-md-5">
-                    <input id="model-phone_evening" class="form-control" type="text" name="model[phone_evening]" value="{{ m.get('phone_evening') }}" />
+                    <input id="model-phone_evening" class="form-control" type="text" name="model[phone_evening]" value="{{ validator.fieldValue('phone_evening') }}" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
                 <div class="col-md-5">
                     <input type="hidden" name="model[status]" value="0" />
-                    <input id="model-status" type="checkbox" class="switch-cbx" name="model[status]" value="1" {% if m.get('status') == 1 %}checked="checked" {% endif %} />
+                    <input id="model-status" type="checkbox" class="switch-cbx" name="model[status]" value="1" {% if validator.fieldValue('status') == 1 %}checked="checked" {% endif %} />
                 </div>
             </div>
         </fieldset>

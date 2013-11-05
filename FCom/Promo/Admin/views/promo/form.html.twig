@@ -2,6 +2,7 @@
 {% set tabs = THIS.sortedTabs() %}
 {% set formId = THIS.get('form_id') %}
 {% set formUrl = THIS.get('form_url') %}
+{% set validator = THIS.validator(formId, THIS.model) %}
 
 <script>
 require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
@@ -73,7 +74,7 @@ require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
                                  {% if k != THIS.get('cur_tab') %}hidden{% endif %}
                                 {% if tab.async is empty %}data-loaded="true"{% endif %}
                                 >
-                            {% if tab.async is empty %} {{ THIS.view(tab.view)|raw }}{% endif %}
+                            {% if tab.async is empty %} {{ THIS.view(tab.view).set('validator', validator)|raw }}{% endif %}
                         </section>
                     {% endfor %}
 
