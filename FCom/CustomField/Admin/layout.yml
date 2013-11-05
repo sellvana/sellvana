@@ -10,8 +10,8 @@ base:
 catalog_product_form_tabs:
     - view: admin/form
         do:
-            - [ addTab, fields, { label: Custom Fields, pos: 15, view: customfields/products/fields-tab } ]
-            - [ addTab, variants, { label: Variants, pos: 18, view: customfields/products/variants-tab } ]
+            - [ addTab, fields, { label: Custom Fields, pos: 15, view: customfields/products/fields-tab, async: true } ]
+            - [ addTab, variants, { label: Variants, pos: 18, view: customfields/products/variants-tab, async: true } ]
 
 /customfields/fieldsets:
     - { include: base }

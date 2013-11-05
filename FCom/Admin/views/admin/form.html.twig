@@ -72,8 +72,10 @@
                 </ul>
                 <div class="tab-content">
                     {% for k, tab in tabs %}
-                        <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
-                            {% if tab.async is empty %}{{ THIS.view(tab.view).set('validator', validator) | raw }}{% endif %}
+                        <div class="tab-pane" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
+                            {% if not tab.async %}
+                                {{ THIS.view(tab.view).set('validator', validator) | raw }}
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

@@ -331,7 +331,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->getGrid();
         $config = $grid['config'];
 
-        if (empty($config['orm']) && !$config['data']) {
+        if (empty($config['orm']) && !isset($config['data'])) {
             throw new BException('Either ORM or data is required');
         }
         if (isset($config['data']) && !empty($config['data'])) {
@@ -380,8 +380,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
 
         $grid = $this->get('grid');
-        $state = $grid['result']['state'];
-        $rows = $grid['result']['rows'];
+        $state = isset($grid['result']['state']) ? $grid['result']['state'] : array();
+        $rows = isset($grid['result']['rows']) ? $grid['result']['rows'] : array();
         //var_dump($state);
         $gridId = $grid['config']['id'];
         $persState = $grid['config']['state'];
@@ -395,7 +395,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
         //var_dump($state);
+
         $data = array();
+
         foreach ($rows as $rowId => $row) {
             $data[] = is_array($row) ? $row : $row->as_array();
         }

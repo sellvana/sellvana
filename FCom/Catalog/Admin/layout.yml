@@ -16,7 +16,7 @@ catalog_product_form_tabs:
     do:
       - [ addTab, main, { label: General Info, pos: 10 } ]
       - [ addTab, prices, { label: "Prices", pos: 15 } ]
-      - [ addTab, linked-products, { label: Linked Products, pos: 20 } ]
+      - [ addTab, linked-products, { label: Linked Products, pos: 20, async: true } ]
       - [ addTab, categories, { label: Categories, pos: 30, async: true } ]
       - [ addTab, attachments, { label: Attachments, pos: 40, async: true } ]
       - [ addTab, images, { label: Images, pos: 50, async: true } ]
