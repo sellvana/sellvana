@@ -226,46 +226,46 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
         $gridId = 'linked_products_'.$type;
+
         $config = array(
-            'grid' => array(
                 'id'            => $gridId,
                 'data'          => null,
-                'datatype'      => 'local',
-                'caption'       => $caption,
+                'data_mode'      => 'local',
+                //'caption'       => $caption,
                 'columns'       => array(
-                    'id' => array('label'=>'ID', 'width'=>30),
-                    'product_name' => array('label'=>'Product name', 'width'=>250),
-                    'local_sku' => array('label'=>'Local SKU', 'width'=>250),
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true),
+                    array('name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400),
+                    array('name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 200)
                 ),
-                'rowNum'        => 10,
-                'sortname'      => 'product_name',
-                'sortorder'     => 'asc',
-                'autowidth'     => false,
-                'multiselect'   => true,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
-            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
-        );
+                'actions' => array(
+                    'add' => array('caption' => 'Add products'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'filters' => array(
+                    array('field' => 'product_name', 'type' => 'text'),
+                    array('field' => 'local_sku', 'type' => 'text')
+                ),
+                'events' => array('init', 'add','mass-delete')
+            );
 
-        BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+
+        //BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
         $data = BDb::many_as_array($orm->find_many());
         //unset unused columns
-        $columnKeys = array_keys($config['grid']['columns']);
+        /*$columnKeys = array_keys($config['columns']);
         foreach($data as &$prod){
             foreach($prod as $k => $p) {
                 if (!in_array($k, $columnKeys)) {
                     unset($prod[$k]);
                 }
             }
-        }
-        $config['grid']['data'] = $data;
+        }*/
 
-        BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        $config['data'] = $data;
 
-        return $config;
+        //BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        return array('config' => $config);
     }
 
     public function formPostAfter($args)
