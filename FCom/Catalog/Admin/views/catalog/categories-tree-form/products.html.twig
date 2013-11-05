@@ -56,6 +56,9 @@ require(['jquery'], function($) {
             self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
             self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
             self._setFormValues();
+            g_vent.trigger('clear_selection', {grid: self.modalGridId});
+            $('button.btn-close.category-prod-modal-close').trigger('click');
+
         }
 
 
@@ -96,7 +99,7 @@ require(['jquery'], function($) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getAllProdConfig(m)) | raw }}
             </div>
             <div class='modal-footer'>
-                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+                <button class='btn btn-default btn-close category-prod-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
