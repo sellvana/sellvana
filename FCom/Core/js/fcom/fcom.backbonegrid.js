@@ -308,13 +308,13 @@ FCom.BackboneGrid = function(config) {
                 this.on('remove', this.removeInOriginal, this);
 
                 if (typeof(g_vent) !== 'undefined') {
-                    g_vent.bind('slient_inject', this._slientInjectRows);
+                    g_vent.bind('silent_inject', this._silentInjectRows);
                 }
             }
 
             //this.on.reset('reset', this.updateColsInfo, this);
         },
-        _slientInjectRows: function(ev) {
+        _silentInjectRows: function(ev) {
             if (ev.grid !== BackboneGrid.id)
                 return;
 
@@ -1175,7 +1175,7 @@ FCom.BackboneGrid = function(config) {
                 if (confirm) {
                     if (BackboneGrid.data_mode === 'local') {
 
-                        rowsCollection.remove(selectedRows.models, {slient:true});
+                        rowsCollection.remove(selectedRows.models, {silent:true});
                         gridView.render();
 
                     } else {
@@ -1256,9 +1256,7 @@ FCom.BackboneGrid = function(config) {
         NProgress.done();
 
         if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init") !== -1) {
-
             var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
-            console.log(ev);
             g_vent.trigger('init', ev);
         }
     }

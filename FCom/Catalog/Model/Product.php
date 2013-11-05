@@ -21,10 +21,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 		array('product_name', '@required'),
 		array('base_price', '@required'),
 		array('local_sku', '@required'),
-		array('is_hidden', '@required'),
+        //TODO validation fails on is_hidden field
+		/*array('is_hidden', '@required'),*/
 		/*array('uom', '@required'),*/
 
-		array('is_hidden', '@integer'),
+		/*array('is_hidden', '@integer'),*/
 		array('num_reviews', '@integer'),
 
         array('local_sku', '@string', null, array('max' => 100)),
