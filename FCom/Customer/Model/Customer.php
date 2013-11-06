@@ -23,14 +23,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 		array('email', '@required'),
 		array('firstname', '@required'),
 		array('lastname', '@required'),
-		array('payment_method', '@required'),
-		array('payment_details', '@required'),
+		array('password', '@required'),
+		array('password_confirm', '@password_confirm'),
+		/*array('payment_method', '@required'),
+		array('payment_details', '@required'),*/
 
 		array('email', '@email'),
 
 		array('default_shipping_id', '@integer'),
 		array('default_billing_id', '@integer'),
-		array('customer_group', '@integer'),
+		/*array('customer_group', '@integer'),*/
 	);
 
     public function setPassword($password)
