@@ -1254,11 +1254,15 @@ FCom.BackboneGrid = function(config) {
         });
 
         //ajax loading...
-        $( document ).ajaxComplete(function() {
-            NProgress.done();
+        $( document ).ajaxSend(function(event, jqxhr, settings) {
+            console.log(settings.url);
+            console.log(settings.url.indexOf('FCom/PushServer/index.php'));
+            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
+                NProgress.start();
         });
-        $( document ).ajaxStart(function() {
-            NProgress.start();
+        $( document ).ajaxComplete(function(event, jqxhr, settings) {
+            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
+                NProgress.done();
         });
         NProgress.done();
 
