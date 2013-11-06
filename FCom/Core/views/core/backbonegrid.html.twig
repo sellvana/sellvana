@@ -118,9 +118,7 @@
                 <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
             </div>
             <div class='modal-body'>
-                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8">
                   <!-- mass edit form element template is here -->
-                </form>
             </div>
             <div class='modal-footer'>
                 <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
@@ -187,7 +185,10 @@
           print('</a>');
         }
 
-    } else {
+    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
+        print(col.options[rc[col.name]]);
+    }
+    else {
         print(rc[col.name]);
     }
 

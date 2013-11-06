@@ -8,7 +8,7 @@ common_js_libs:
 
             - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
             - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
-            - [ requireJs, jquery.resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns.js, { deps: [ jquery ] } ]
+            #- [ requireJs, jquery.resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns.js, { deps: [ jquery ] } ]
             - [ requireJs, jquery.tablesorter, @FCom_Core/js/lib/jquery.tablesorter.min, { deps: [ jquery ] }]
             - [ requireJs, jquery.widgets, @FCom_Core/js/lib/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
             - [ requireJs, jquery.validate, @FCom_Core/js/lib/jquery.validate.min, { deps: [ jquery ] } ]
