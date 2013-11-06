@@ -2,6 +2,8 @@
 
 class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public $formId = 'product-review';
+
     public function action_add()
     {
         $r = BRequest::i()->get();
@@ -35,16 +37,28 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $customerId = $customer->id();
             $post['review']['customer_id'] = $customerId;
         }
+
         $post['review']['product_id'] = $product->id();
-        if (FCom_ProductReviews_Model_Review::i()->validate($post['review'])) {
-            $review = FCom_ProductReviews_Model_Review::i()->create($post['review'])->save();
+        $review = FCom_ProductReviews_Model_Review::i()->create();
+        if ($valid = $review->validate($post['review'], array(), $this->formId)) {
+            $review->set($post['review'])->save();
             $review->notify();
-        }
-        if (BRequest::i()->xhr()) {
-            BResponse::i()->json(array('status' => 'success'));
+            BSession::i()->addMessage(BLocale::_('Thank you for your review!'), 'success', 'frontend');
         } else {
-            BSession::i()->addMessage('Thank you for your review!');
-            BResponse::i()->redirect($product->url());
+            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$this->formId);
+        }
+
+        if (BRequest::i()->xhr()) {
+            if ($valid) {
+                BResponse::i()->json(array('status' => 'success'));
+            } else {
+                BResponse::i()->json(array('status' => 'error', 'message' => $this->getErrorMessage()));
+            }
+        } else {
+            $url = $product->url();
+            if (!$valid)
+                $url = BApp::href('prodreviews/add?pid='.$product->id());
+            BResponse::i()->redirect($url);
         }
     }
 
@@ -112,5 +126,19 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $review->save();
             $record->set('offensive', 1)->save();
         }
+    }
+
+    public function getErrorMessage()
+    {
+        $messages = BSession::i()->messages('validator-errors:'.$this->formId);
+        $errorMessages = array();
+        foreach($messages as $m) {
+            if (is_array($m['msg']))
+                $errorMessages[] = $m['msg']['error'];
+            else
+                $errorMessages[] = $m['msg'];
+        }
+
+        return implode("<br />", $errorMessages);
     }
 }

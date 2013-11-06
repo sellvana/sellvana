@@ -165,6 +165,7 @@
               <a class="btn btn-link" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}" rel="nofollow">Add to Compare</a>
             </div>
           </div> <!-- /.f-prod-select -->
+        </form>
         </div> <!-- /.f-col-prod-select -->
       </div> <!-- /.row -->
       <div class="f-prod-info">
@@ -271,7 +272,6 @@
           {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
           </div>
         </div><!-- /.f-prod-info -->
-      </form>
       <br/>
       <!-- You may also like -->
       <div class="f-widget f-widget-featured-prods">
