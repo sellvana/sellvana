@@ -1,5 +1,5 @@
 {% set prod = THIS.get('prod') %}
-<form action="{{ APP.href('prodreviews/add') }}" method="post" class="f-prod-reviews">
+<form action="{{ APP.href('prodreviews/add') }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
     <input type="hidden" name="pid" value="{{ prod.id() }}">
 
     <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
@@ -40,11 +40,40 @@
             <textarea name="review[text]" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical"></textarea><br/>
         </div>
     </div>
-    <input type="submit" class="btn">
+    <input type="submit" class="btn" id="review_save">
 </form>
 
 <script>
-    require(['jquery', 'jquery.rateit'], function($) {
+    require(['jquery', 'jquery.rateit', 'jquery.bootstrap-growl'], function($) {
+        {% if (THIS.get('isModalBox') == 1) %}
+        var mainForm = $('form#f-prod-reviews-main-form');
 
-    })
+        $('input#review_save').click(function (ev) //todo: write function for same feature in fcom
+        {
+            $.ajax({
+                type: "POST",
+                url: mainForm.attr('action'),
+                data: mainForm.serialize(),
+                success: function (data)
+                {
+                    if (data.status == 'error') {
+                        $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    } else {
+                        $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                        //todo: add code to update list product review
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown)
+                {
+                    alert("[ERROR]<br>" + textStatus);
+                }
+            });
+
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            return false;
+        });
+        {% endif %}
+    });
 </script>
