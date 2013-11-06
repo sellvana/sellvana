@@ -2507,6 +2507,7 @@ class BLocale extends BClass
      * Collect all translation keys & values start from $rootDir and save into $targetFile
      * @param string $rootDir - start directory to look for translation calls BLocale::_
      * @param string $targetFile - output file which contain translation values
+     * @throws Exception
      * @return boolean - TRUE on success
      * @example BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
      */
@@ -2522,6 +2523,7 @@ class BLocale extends BClass
         $keys = array();
         foreach($files as $file) {
             $source = file_get_contents($file);
+            $source = self::getTwigSource($file, $source);
             $tokens = token_get_all($source);
             $func = 0;
             $class = 0;
@@ -2566,27 +2568,28 @@ class BLocale extends BClass
             }
         }
         //add undefined translation to $targetFile
-        $newtranslations = array();
+        $newTranslations = array();
         if ($translations) {
-            foreach($translations as $trkey => $tr){
-                list(,$newtranslations[$trkey]) = each($tr);
+            foreach($translations as $trKey => $tr){
+                list(,$newTranslations[$trKey]) = each($tr);
             }
         }
-        $newtranslations = array_merge($newtranslations, $keys);
+        $newTranslations = array_merge($newTranslations, $keys);
 
         $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
         switch ($ext) {
             case 'php':
-                static::saveToPHP($targetFile, $newtranslations);
+                static::saveToPHP($targetFile, $newTranslations);
                 break;
             case 'csv':
-                static::saveToCSV($targetFile, $newtranslations);
+                static::saveToCSV($targetFile, $newTranslations);
                 break;
             case 'json':
-                static::saveToJSON($targetFile, $newtranslations);
+                static::saveToJSON($targetFile, $newTranslations);
                 break;
             case 'po':
-                static::saveToJSON($targetFile, $newtranslations);
+                static::saveToJSON($targetFile, $newTranslations);
+                break;
             default:
                 throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
         }
@@ -2717,6 +2720,58 @@ class BLocale extends BClass
         }
 
         return BUtil::sprintfn($tr, $params);
+    }
+
+    /**
+     * @param string $file filename
+     * @param string $source file content
+     * @return Twig_Node_Module
+     */
+    protected static function getTwigSource($file, $source)
+    {
+        self::initTwig();
+        $info = pathinfo($file, PATHINFO_EXTENSION);
+        if ($info == 'twig') {
+            $stringTwig = self::getTwigEnv();
+            try {
+                $source = $stringTwig->compile($stringTwig->parse($stringTwig->tokenize($source)));
+            } catch (Twig_Error_Syntax $e) {
+                BDebug::log(sprintf("\n\n%s: Exception %s in file %s",date("Y-m-d H:i:s"), get_class($e), $file),
+                            "translations_error.log");
+                BDebug::log($e->getMessage(), "translations_error.log");
+                return "";
+            }
+        }
+        return $source;
+    }
+    protected static $twig;
+    protected static function initTwig()
+    {
+        if(!self::$twig){
+            BEvents::i()->on("BTwig::init", __CLASS__ . "::setTwigEnv");
+            $bDir = BModuleRegistry::i()->module("FCom_Core")->baseDir();
+            echo $bDir;
+            BTwig::init($bDir);
+            echo "after Initing twig event\n";
+            self::$twig = 1;
+        }
+    }
+
+    /**
+     * @var Twig_Environment
+     */
+    protected static $twigEnv;
+    public static function setTwigEnv($args)
+    {
+        self::$twigEnv = $args['string_adapter'];
+    }
+
+    /**
+     * @return null|Twig_Environment
+     */
+    private static function getTwigEnv()
+    {
+        return self::$twigEnv;
     }
 
     /*
