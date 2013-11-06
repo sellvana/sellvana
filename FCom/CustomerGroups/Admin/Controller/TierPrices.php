@@ -110,35 +110,36 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      */
     public function getTierPricesGrid($model)
     {
-        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id);
+        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id());
         $grid = array(
             'config' => array(
                 'id' => 'tier-prices',
                 'columns' => array(
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name' => 'id', 'label' => 'ID'),
-                    array('name' => 'product_id', 'label' => 'Product'),
-                    array('name' => 'group_id', 'label' => 'Group', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true),
-                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true),
-                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true),
-                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true),
+                    array('name' => 'product_id', 'default' => $model->id(), 'hidden' => true),
+                    array('name' => 'group_id', 'label' => 'Group', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'editor' => 'select', 'width' => 150),
+                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true, 'width' => 150),
+                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true, 'width' => 150),
+                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true, 'width' => 150),
                 ),
-                'collection' => BDb::many_as_array($orm->find_many()),
-            ),
+                'data' => BDb::many_as_array($orm->find_many()),
+                'data_mode' => 'local',
+                'filters' => array(
+                                    array('field' => 'name', 'type' => 'text'),
+                                    array('field' => 'group_id', 'type' => 'multiselect')
+                ),
+                'actions' => array(
+                    'new' => true,
+                    'edit' => true,
+                    'delete' => true
+                ),
+                'events' => array(
+                    'init', 'edit', 'delete', 'mass-edit', 'mass-delete'
+                )
+            )
         );
         return $grid;
-        $config = $this->gridConfig();
-        if(!$model){
-            return $config;
-        }
-        $config['grid']['columns']['product_id']['editoptions']['value'] = $model->id;
-        $config['grid']['columns']['product_id']['editoptions']['custom_element'] = "function (value, options) {
-                            value = value || options.value
-                            var el = $('<span>' + value +'</span><input type=\"hidden\" name=\"product_id\">');
-                            el.val(value);
-
-                            return el;
-                        }";
-        return $config;
     }
 
     public function addTitle($title = '')
