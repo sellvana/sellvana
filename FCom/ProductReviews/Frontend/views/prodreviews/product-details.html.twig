@@ -2,7 +2,7 @@
 
 {% if isLoggedIn %}
 <!-- Modal -->
-<div class="modal fade" id="f-prod-review-form" tabindex="-1" role="dialog" aria-labelledby="f-prod-review-form-label" aria-hidden="true" data-backdrop="false">
+<div class="modal fade" id="f-prod-review-form" tabindex="-1" role="dialog" aria-labelledby="f-prod-review-form-label" aria-hidden="true" data-backdrop="true">
   <div class="modal-dialog f-prod-review-form">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,7 +10,7 @@
         <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
       </div>
       <div class="modal-body">
-        {{ THIS.view('prodreviews/review-form').set('prod', THIS.get('prod')) | raw }}
+        {{ THIS.view('prodreviews/review-form').set({'prod': THIS.get('prod'), 'isModalBox': 1}) | raw }}
       </div><!-- /.modal-body -->
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
