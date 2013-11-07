@@ -68,7 +68,7 @@ var g_vent;
                     return row.id === ev.row.id;
                 });
                 rows[rows.length] = _getDbFields(ev.row);
-                json.rows =
+                json.rows = rows;
                 _setFormVal();
             }
         });
