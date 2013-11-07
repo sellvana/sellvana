@@ -42,7 +42,7 @@ base:
       #- [ requireModulePath, FCom_Admin ]
       - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
       - [ requireJs, jquery.hotkeys, @FCom_Core/js/lib/jquery.hotkeys, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
+      #- [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
       #- [ requireJs, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       #- [ js, @FCom_Core/js/select2/select2.min.js ]
@@ -66,9 +66,9 @@ base:
       - [ css, @FCom_Admin/js/dynatree/skin-vista/ui.dynatree.css ]
 
   - { include: grid }
-  - { include: jqgrid }
+  #- { include: jqgrid }
   - { include: jstree }
-  - { include: lib_backgrid }
+ # - { include: lib_backgrid }
 
   - view: head
     do:
@@ -118,7 +118,7 @@ common_js_libs:
       - [ requireJs, mustache, @FCom_Core/js/lib/mustache ]
       - [ requireJs, recline, @FCom_Core/js/lib/recline, { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
 
-      - [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source, { deps: [ jquery ] } ]
+      #- [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source, { deps: [ jquery ] } ]
       #- [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-akottr, { deps: [ jquery, jquery-ui ] } ]
       - [ requireJs, lunr, @FCom_Core/js/lib/lunr.min, { exports: lunr } ]
       - [ requireJs, moment, @FCom_Core/js/lib/moment.min, { exports: moment } ]
@@ -214,42 +214,7 @@ lib_admin_theme1:
 htmlgrid:
   - { hook: main, view: core/htmlgrid-wrapper }
 
-jqgrid:
-  - view: head
-    do:
-      - [ css, @FCom_Core/js/lib/jqGrid/ui.jqgrid.css ]
-      - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
 
-      # - [ css, @FCom_Core/js/lib/jqGrid/css/ui.jqgrid.css ]
-
-      # - [ css, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.css ]
-
-      - [ requireJs, jqgrid.ui.multiselect, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect ]
-      - [ requireJs, jqgrid.i18n.en, @FCom_Core/js/lib/jqGrid/i18n/grid.locale-en, { deps: [ jquery ] } ]
-      - [ requireJs, jqgrid, @FCom_Core/js/lib/jqGrid/jquery.jqGrid.min, { deps: [ jquery, jqgrid.i18n.en ], exports: $.fn.jqgrid } ]
-      - [ requireJs, jqgrid.contextmenu, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu, { deps: [ jqgrid ] } ]
-      - [ requireJs, jqgrid.tablednd, @FCom_Core/js/lib/jqGrid/plugins/jquery.tablednd, { deps: [ jqgrid ] } ]
-
-      # - [ js, @FCom_Core/js/lib/jqGrid/plugins/ui.multiselect.js ]
-
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/i18n/grid.locale-en.js ]
-      # - [ js, @FCom_Core/js/lib/jqGrid/dist/jquery.jqGrid.min.js ]
-
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.base.js ] # jqGrid base
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.common.js ] # jqGrid common for editing
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.formedit.js ] # jqGrid Form editing
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.inlinedit.js ] # jqGrid inline editing
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.celledit.js ] # jqGrid cell editing
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.subgrid.js ] #jqGrid subgrid
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.treegrid.js ] #jqGrid treegrid
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.grouping.js ] #jqGrid grouping
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.custom.js ] #jqGrid custom
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.tbltogrid.js ] #jqGrid table to grid
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.import.js ] #jqGrid import
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/jquery.fmatter.js ] #jqGrid formater
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/JsonXml.js ] # xmljson utils
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.jqueryui.js ] # jQuery UI utils
-      # - [ js, @FCom_Core/js/lib/jqGrid/js/grid.filter.js ] # filter Plugin
 
 jstree:
   - view: head
@@ -292,53 +257,9 @@ flot:
       - [ requireJs, flot.time, @FCom_Admin/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
       - [ requireJs, flot.threshold, @FCom_Admin/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]
 
-lib_backgrid:
-  - view: head
-    do:
-      #- [ css, @FCom_Core/js/lib/css/dragtable-jebaird.css ]
-      - [ css, @FCom_Core/js/lib/css/dragtable-akottr.css ]
-      - [ css, @FCom_Core/js/lib/backgrid/backgrid.css ]
-      - [ css, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter.css ]
-      - [ css, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator.css ]
-      - [ css, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all.css ]
-      - [ css, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell.css ]
 
-lib_slickgrid:
-  - view: head
-    do:
-      - [ css, @FCom_Core/js/lib/slickgrid/slick.grid.css ]
-      - [ css, @FCom_Core/js/lib/slickgrid/controls/slick.columnpicker.css ]
-      - [ css, @FCom_Core/js/lib/slickgrid/controls/slick.pager.css ]
-      - [ css, @FCom_Core/js/lib/slickgrid/plugins/slick.headerbuttons.css ]
-      - [ css, @FCom_Core/js/lib/slickgrid/plugins/slick.headermenu.css ]
 
-      - [ requireJs, firebugx, @FCom_Core/js/lib/slickgrid/lib/firebugx ]
-      - [ requireJs, jquery.event.drag, @FCom_Core/js/lib/slickgrid/lib/jquery.event.drag-2.2, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.event.drop, @FCom_Core/js/lib/slickgrid/lib/jquery.event.drop-2.2, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.jsonp, @FCom_Core/js/lib/slickgrid/lib/jquery.jsonp-2.4.min, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.sparkleline, @FCom_Core/js/lib/slickgrid/lib/jquery.sparkleline.min, { deps: [ jquery ] } ]
 
-      - [ requireJs, slick.core, @FCom_Core/js/lib/slickgrid/slick.core, { deps: [ jquery, jquery-ui ] } ]
-      - [ requireJs, slick.dataview, @FCom_Core/js/lib/slickgrid/slick.grid, { deps: [ slick.core ] } ]
-      - [ requireJs, slick.editors, @FCom_Core/js/lib/slickgrid/slick.grid, { deps: [ slick.core ] } ]
-      - [ requireJs, slick.formatters, @FCom_Core/js/lib/slickgrid/slick.formatters, { deps: [ slick.core ] } ]
-      - [ requireJs, slick.grid, @FCom_Core/js/lib/slickgrid/slick.grid, { deps: [ slick.core ] } ]
-      - [ requireJs, slick.groupitemmetadataprovider, @FCom_Core/js/lib/slickgrid/slick.groupitemmetadataprovider, { deps: [ slick.core ] } ]
-      - [ requireJs, slick.remotemodel, @FCom_Core/js/lib/slickgrid/slick.remotemodel, { deps: [ slick.core ] } ]
-
-      - [ requireJs, slick.columnpicker, @FCom_Core/js/lib/slickgrid/lib/controls/slick.columnpicker.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.pager, @FCom_Core/js/lib/slickgrid/lib/controls/slick.pager.js, { deps: [ slick.grid ] } ]
-
-      - [ requireJs, slick.autotooltips, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.autotooltips.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.cellcopymanager, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.cellcopymanager.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.cellrangedecorator, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.cellrangedecorator.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.cellrangeselector, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.cellrangeselector.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.cellselectionmodel, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.cellselectionmodel.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.checkboxselectcolumn, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.checkboxselectcolumn.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.headerbuttons, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.headerbuttons.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.headermenu, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.headermenu.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.rowmovemanager, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.rowmovemanager.js, { deps: [ slick.grid ] } ]
-      - [ requireJs, slick.rowselectionmodel, @FCom_Core/js/lib/slickgrid/lib/plugins/slick.rowselectionmodel.js, { deps: [ slick.grid ] } ]
 
 form:
   - view: head

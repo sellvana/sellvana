@@ -118,9 +118,7 @@
                 <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
             </div>
             <div class='modal-body'>
-                <form class="form" style="margin-bottom: 0;" method="post" action="#" accept-charset="UTF-8">
                   <!-- mass edit form element template is here -->
-                </form>
             </div>
             <div class='modal-footer'>
                 <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
@@ -169,14 +167,14 @@
 
     if (col.cell === 'select-row') {
         var isSelected = '';
-        var isEditable = rc.editable ? '' : 'DISABLED';
-        if (rc.editable && rc.selected)
+        var isEditable = rc.row.editable ? '' : 'DISABLED';
+        if (rc.row.editable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof (col.data.edit) != 'undefined') {
-          print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc[col.data.edit.col] + '">');
+          print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc.row[col.data.edit.col] + '">');
             print('<i class=" icon-edit-sign"></i>');
           print('</a>');
         }
@@ -187,8 +185,17 @@
           print('</a>');
         }
 
-    } else {
-        print(rc[col.name]);
+    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
+        print('<select data-col="' + col.name +'" class="form-control">');
+          for(var val in col.options) {
+            print('<option value="' + val + '"'+ (rc.row[col.name] === val ? ' selected' : '') +'>' + col.options[val] + '</option>');
+          }
+        print('</select>');
+    } else if (typeof(col.editable) !=='undefined') {
+        print('<input data-col="' + col.name + '" value = "' + rc.row[col.name] + '" class="form-control"/>');
+    }
+    else {
+        print(rc.row[col.name]);
     }
 
     print('</td>');
