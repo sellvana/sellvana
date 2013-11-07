@@ -8,7 +8,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         'columns' => true,
         'delete' => true,
         'edit' => true,
-        'add' => true
+        'add' => true,
+        'new' => true,
     );
 
     public function gridUrl($changeRequest=array())
@@ -230,6 +231,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     case 'add':
                         $action = array('html' => BUtil::tagHtml('button',
                             array('class' => 'btn grid-add btn-primary', 'type' => 'button'),
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                        ));
+                        break;
+                     case 'new':
+                        $action = array('html' => BUtil::tagHtml('button',
+                            array('class' => 'btn grid-new btn-primary', 'type' => 'button'),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
                         ));
                         break;
