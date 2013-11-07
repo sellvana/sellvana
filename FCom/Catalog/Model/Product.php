@@ -667,5 +667,47 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return $this->get('num_reviews');
     }
+
+    public function reviews($incAvgRating = true)
+    {
+        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')
+            ->join('FCom_Customer_Model_Customer', array('pr.customer_id','=','c.id'), 'c')
+            ->where('pr.product_id', $this->id())->order_by_expr('pr.create_at DESC')->find_many();
+
+        if ($incAvgRating) {
+            $avgRating = $this->calcAverageRating($reviews);
+        }
+        return array(
+            'items' => $reviews,
+            'avgRating' => isset($avgRating) ? $avgRating : array(),
+            'numReviews' => count($reviews),
+        );
+    }
+
+    public function calcAverageRating($reviews = array())
+    {
+        $rs = array(
+            'rating' => 0,
+            'rating1' => 0,
+            'rating2' => 0,
+            'rating3' => 0,
+        );
+        if (!empty($reviews)) {
+            $numReviews = count($reviews);
+            foreach ($reviews as $review) {
+                $rs['rating'] += $review->rating;
+                $rs['rating1'] += $review->rating1;
+                $rs['rating2'] += $review->rating2;
+                $rs['rating3'] += $review->rating3;
+            }
+
+            $rs['rating'] = $rs['rating'] / $numReviews;
+            $rs['rating1'] = $rs['rating1'] / $numReviews;
+            $rs['rating2'] = $rs['rating2'] / $numReviews;
+            $rs['rating3'] = $rs['rating3'] / $numReviews;
+        }
+
+        return $rs;
+    }
 }
 
