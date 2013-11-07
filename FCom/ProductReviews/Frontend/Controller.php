@@ -141,4 +141,25 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         return implode("<br />", $errorMessages);
     }
+
+    public function action_reviews_list()
+    {
+        $r = BRequest::i();
+        $this->layout(null);
+        if ($r->xhr()) {
+            $pid = $r->param('pid', true);
+            if (!$pid) {
+                BDebug::error('Invalid ID');
+                die;
+            }
+
+            if (!($product = FCom_Catalog_Model_Product::i()->load($pid))) {
+                BDebug::error('Cannot load product with this id');
+                die;
+            }
+
+            $reviews = $product->reviews();
+            BLayout::i()->view('prodreviews/product-reviews-list')->set('reviews', $reviews)->render();
+        }
+    }
 }
