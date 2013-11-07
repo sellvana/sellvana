@@ -104,25 +104,28 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function productAttachmentsGridConfig($model)
     {
         return array(
-            'grid' => array(
+            'config' => array(
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
-                'datatype' => 'local',
+                'data_mode' => 'local',
                 'data' => BDb::many_as_array($model->mediaORM('A')->select('a.id')->select('a.file_name')->find_many()),
-                'colModel' => array(
+                'columns' => array(
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
-                'multiselect' => true,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Product', 'cursor'=>'pointer'),
-            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Product', 'cursor'=>'pointer'),
+                'actions' => array(
+                    'add' => array('caption' => 'Add a attachment'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'events' => array('init', 'add','mass-delete', 'delete'),
+                'filters' => array(
+                    '_quick' => array('expr' => 'file_name like ? ', 'args' =>  array('%?%'))
+                )
+            )
         );
     }
-
     public function productImagesGridConfig($model)
     {
         return array(
