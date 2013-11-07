@@ -14,10 +14,10 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         array('title', '@string', null, array('max' => 255)),
         array('helpful_voices', '@string', null, array('max' => 11)),
 
-        array('rating', '@integer'),
+        /*array('rating', '@integer'),
         array('rating1', '@integer'),
         array('rating2', '@integer'),
-        array('rating3', '@integer'),
+        array('rating3', '@integer'),*/
 		array('approved', '@integer'),
 		array('helpful', '@integer'),
 		array('offensive', '@integer'),
