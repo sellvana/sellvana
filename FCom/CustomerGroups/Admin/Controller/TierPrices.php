@@ -71,17 +71,20 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
 		    'base_price'      => array(
 			    'label' => BLocale::_('Regular Price'),
 			    'index' => $this->_mainTableAlias . '.base_price', 'width' => 200,
-			    'editable' => true
+			    'editable' => true,
+                'validate' =>'number'
 		    ),
 		    'sale_price' => array(
 			    'label' => BLocale::_('Sale Price'),
 			    'index' => $this->_mainTableAlias . '.sale_price', 'width' => 200,
-			    'editable' => true
+			    'editable' => true,
+                'validate' =>'number'
 		    ),
 		    'qty'        => array(
 			    'label' => BLocale::_('Qty'),
 			    'index' => $this->_mainTableAlias . '.qty', 'width' => 200,
-			    'editable' => true
+			    'editable' => true,
+                'validate' =>'number'
 		    ),
 	    );
 	    $config['multiselect'] = true;
@@ -119,9 +122,9 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     array('name' => 'id', 'label' => 'ID'),
                     array('name' => 'product_id', 'default' => $model->id(), 'hidden' => true),
                     array('name' => 'group_id', 'label' => 'Group', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'editor' => 'select', 'width' => 150),
-                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true, 'width' => 150),
-                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true, 'width' => 150),
-                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true, 'width' => 150),
+                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true, 'width' => 150, 'validate' => 'number'),
+                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
+                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
                 ),
                 'data' => BDb::many_as_array($orm->find_many()),
                 'data_mode' => 'local',

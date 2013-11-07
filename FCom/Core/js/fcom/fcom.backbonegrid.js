@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'jquery.inline-editor', 'select2', 'jquery.quicksearch', 'colResizable'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch'], function(Backbone, _, $, NProgress) {
 
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
@@ -283,11 +283,6 @@ FCom.BackboneGrid = function(config) {
             return false;
         },
         save: function() {
-            /*if (typeof rowModelEx !== "undefined") {
-                console.log(this.attributes);
-                rowModelEx.save(this.attributes);
-                return;
-            }*/
             var id = this.get('id');
             var hash = this.changedAttributes();
             hash.id = id;
@@ -313,7 +308,6 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Collections.Rows = Backbone.Collection.extend({
         model: BackboneGrid.Models.Row,
         initialize: function(models) {
-            //this.updateColsInfo();
             if (BackboneGrid.data_mode === 'local') {
                 //console.log('collection initialize', models);
                 this.originalRows = new Backbone.Collection(models);
@@ -325,8 +319,6 @@ FCom.BackboneGrid = function(config) {
                     g_vent.bind('silent_inject', this._silentInjectRows);
                 }
             }
-
-            //this.on.reset('reset', this.updateColsInfo, this);
         },
         _silentInjectRows: function(ev) {
             if (ev.grid !== BackboneGrid.id)
@@ -424,7 +416,6 @@ FCom.BackboneGrid = function(config) {
                 }
                 console.log(temp.models.length);
                 this.reset(temp.models);
-                this.updateColsInfo();
                 gridView.render();
         },
         addInOriginal: function(model){
@@ -448,31 +439,6 @@ FCom.BackboneGrid = function(config) {
                 this.reset(this.originalRows.models);
                 gridView.render();
             }
-        },
-        updateColsInfo: function() {
-            colsInfo = [];
-            columnsCollection.each(function(c) {
-                var colInfo = {};
-                colInfo.href = c.get('href');
-                colInfo.name = c.get('name');
-                colInfo.hidden = c.get('hidden');
-                colInfo.cell =c.get('cell');
-                colInfo.position = c.get('position');
-                colInfo.editor = c.get('editor');
-                colInfo.editable = c.get('editable');
-                if (c.has('data')) { //_action column
-                    colInfo.data = c.get('data');
-                }
-                if (c.has('options')) {
-                    colInfo.options = c.get('options');
-                }
-                //colInfo.width = c.get('width');
-                colsInfo[colsInfo.length] = colInfo;
-            },this);
-
-            this.each(function(row) {
-                row.set('colsInfo', colsInfo);
-            },this);
         },
         url: function() {
             var append = '';
@@ -523,12 +489,31 @@ FCom.BackboneGrid = function(config) {
         },
         events: {
             'change input.select-row': '_selectRow',
+            'change .form-control': '_cellValChanged',
+            //'keydown .form-control': '_validate',
             'click a.btn-delete': '_deleteRow'
         },
         initialize: function() {
             this.model.on('render',this.render, this);
             this.model.on('remove', this._destorySelf, this);
             //this.model.on('change', this.render, this);
+        },
+        _validate: function(ev) {
+            console.log('validate init');
+            var val = $(ev.target).val();
+            var name = $(ev.target).attr('data-col');
+            var col = columnsCollection.findWhere({name: name});
+            if (typeof(col) != 'undefined') {
+                if (typeof(col.get('validate')) !== 'undefined') {
+                    switch(col.get('validate')) {
+                        case 'number':
+                            $(ev.target).toggleClass('unvalid', isNaN(val));
+                            return  !isNaN(val);
+                        break;
+                    }
+                }
+            }
+
         },
         _selectRow: function(ev) {
             var checked = $(ev.target).is(':checked');
@@ -548,6 +533,30 @@ FCom.BackboneGrid = function(config) {
 
 
         },
+        _cellValChanged: function(ev) {
+
+            var val = $(ev.target).val();
+            var name = $(ev.target).attr('data-col');
+            if(!this._validate(ev))
+            {
+                //console.log('validate fail');
+                /*if(typeof(g_vent) != 'undefined') {
+                    g_vent.trigger('validate_fail',{
+                                                        grid:BackboneGrid.id,
+                                                        data: {
+                                                                name:name,
+                                                                val:val,
+                                                                id:this.model.get('id')
+                                                            }
+                                                    }
+                                  );
+                }*/
+                return;
+            }
+            this.model.set(name, val);
+            this.model.save();
+
+        },
         _deleteRow: function(ev) {
             var confirm = window.confirm("Do you want to really delete?");
             if (confirm) {
@@ -562,78 +571,19 @@ FCom.BackboneGrid = function(config) {
             this.remove();
             this.model.destroy();
         },
-        colValChanged: function(value, settings) {
-
-            var id = $(this).parents('tr:first').attr('id');
-            var rowModel = rowsCollection.findWhere({id:id});
-            var col = $(this).attr('data-col');
-
-            if (rowModel.get(col) !== value) {
-                rowModel.set(col, value);
-                rowModel.save();
-            }
-            //trigger next cell edit
-            //$(this).next().trigger('click');
-
-            if ($(this).find('select').length > 0) {
-                var sel = $(this).find('select');
-                return sel.find('option:selected').text();
-            }
-            return value;
-        },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            var cols = this.model.get('colsInfo');
-            for(var i in cols) {
-                var col = cols[i];
-                if (col.editable && this.model.get('editable')) {
-                    var editorType = 'default';
-                    if (col.editor) {
-                        editorType = col.editor;
-                    }
-                    //BackboneGrid.editingModel = this.model;
-                    var tds = this.$el.find("td[data-col='"+col.name+"']");
-                    if (tds.length && tds.length>0) {
-                        if (editorType === 'default') {
-                            tds.editable(this.colValChanged, {
-                                type: "text",
-                                onblur: 'submit'
-                            });
-                        }
-
-                        if (editorType === 'select') {
-                            tds.editable(this.colValChanged, {
-                                type: "select",
-                                onblur: 'submit',
-                                data: col.options,
-                                tooltip: ''
-                            });
-                        }
-                    }
-
-                }
-            }
+            var colsInfo = columnsCollection.toJSON();
+            this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
             return this;
         }
-    });
-
-    $.editable.addInputType('text', {
-            element : function(settings, original) {
-                console.log('element');
-                var inputbox = $('<input class="form-control inline-editor" type="text">');
-                $(this).append(inputbox);
-
-                return (inputbox);
-            }
     });
 
     BackboneGrid.Views.GridView = Backbone.View.extend({
       //  el: 'table tbody',
         initialize: function () {
-            this.collection.on('reset', this.updateColsAndRender, this);
+            this.collection.on('reset', this.render, this);
         },
         updateColsAndRender: function() {
-            this.collection.updateColsInfo();
             this.render();
         },
         setCss: function() {
@@ -695,7 +645,6 @@ FCom.BackboneGrid = function(config) {
                 'hidden': value,
                 'grid': columnsCollection.grid
             });
-            rowsCollection.updateColsInfo();
             gridView.render();
 
             ev.stopPropagation();
@@ -728,7 +677,6 @@ FCom.BackboneGrid = function(config) {
                 return;
 
             columnsCollection.sort();
-            rowsCollection.updateColsInfo();
             gridView.render();
 
              $.post(BackboneGrid.personalize_url,{
@@ -1179,7 +1127,6 @@ FCom.BackboneGrid = function(config) {
             rowsCollection.add(rowModel);
         }
 
-        rowsCollection.updateColsInfo();
         gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
 
         if (BackboneGrid.data_mode === 'local' && BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.s!=='') {
@@ -1211,8 +1158,6 @@ FCom.BackboneGrid = function(config) {
             $(BackboneGrid.NewButton).on('click', function(ev){
                 var newRow = new BackboneGrid.Models.Row({id: guid(), _new: true});
                 rowsCollection.add(newRow);
-                //TODO make row level func for appending cols info
-                rowsCollection.updateColsInfo();
                 gridView.render();
             });
         }

@@ -42,7 +42,7 @@ base:
       #- [ requireModulePath, FCom_Admin ]
       - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
       - [ requireJs, jquery.hotkeys, @FCom_Core/js/lib/jquery.hotkeys, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
+      #- [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
       #- [ requireJs, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
       #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
       #- [ js, @FCom_Core/js/select2/select2.min.js ]
@@ -118,7 +118,7 @@ common_js_libs:
       - [ requireJs, mustache, @FCom_Core/js/lib/mustache ]
       - [ requireJs, recline, @FCom_Core/js/lib/recline, { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
 
-      - [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source, { deps: [ jquery ] } ]
+      #- [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source, { deps: [ jquery ] } ]
       #- [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-akottr, { deps: [ jquery, jquery-ui ] } ]
       - [ requireJs, lunr, @FCom_Core/js/lib/lunr.min, { exports: lunr } ]
       - [ requireJs, moment, @FCom_Core/js/lib/moment.min, { exports: moment } ]

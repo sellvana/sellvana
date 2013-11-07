@@ -31,7 +31,7 @@
 
 .wysihtml5-sandbox {
   box-sizing: border-box; }
-/* 
+/*
   wen defined stylesheets
 */
 .dropdown-menu {
@@ -88,7 +88,7 @@
 
 .responsive-table {
 position: relative;
-overflow: hidden; 
+overflow: hidden;
 }
 
 .inline-editor {
@@ -102,10 +102,15 @@ overflow: hidden;
 }
 
 .filter-box {
-    text-align: left;   
+    text-align: left;
     padding: 15px;
     width: 535px;
 }
+
+input.unvalid {
+  border: 1px solid red;
+}
+
 
 
 
