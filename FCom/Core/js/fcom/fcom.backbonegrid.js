@@ -499,7 +499,6 @@ FCom.BackboneGrid = function(config) {
             //this.model.on('change', this.render, this);
         },
         _validate: function(ev) {
-            console.log('validate init');
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-col');
             var col = columnsCollection.findWhere({name: name});
@@ -513,6 +512,8 @@ FCom.BackboneGrid = function(config) {
                     }
                 }
             }
+
+            return true;
 
         },
         _selectRow: function(ev) {
