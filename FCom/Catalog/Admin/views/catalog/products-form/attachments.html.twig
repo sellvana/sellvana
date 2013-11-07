@@ -1,0 +1,174 @@
+{% set m = THIS.model %}
+{% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
+{% set mediaLibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
+
+<script>
+if(typeof(g_vent) === 'undefined')
+    g_vent = _.extend({}, Backbone.Events);
+require(['jquery'], function($) {
+    g_vent.bind('add', function(ev) {
+        if(ev.grid == 'product_attachments') {
+            $('#btn_prod_attach_modal').trigger('click');
+        }
+    });
+});
+</script>
+
+
+{{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
+
+<a role="button" href="#prod-attach-grid-modal" data-toggle="modal" style='display:none;' id='btn_prod_attach_modal'>{{ "Add"|_ }}</a>
+<div class='modal fade' id='prod-attach-grid-modal' tabindex='-1'>
+    <div class='modal-dialog' style='width:1050px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Attachments"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                <div class='row'>
+                    <div class='col-sm-12'>
+                    <div class='tabbable'>
+                        <ul class='nav nav-tabs prod-type'>
+                            <li class='active'>
+                                <a data-toggle='tab' href='#library'>
+                                    Library
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle='tab' href='#upload'>
+                                    Upload
+                                </a>
+                            </li>
+                        </ul>
+                        <div class='tab-content'>
+                            <div class='tab-pane active' id='library'>
+                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibConfig) | raw }}
+                            </div>
+                            <div class='tab-pane' id='upload'>
+                                <div class='box-content'>
+                                    <form action='//jquery-file-upload.appspot.com/' enctype='multipart/form-data' id='fileupload' method='POST'>
+                                        <div class='row fileupload-buttonbar'>
+                                                          <div class='col-sm-7'>
+                                                            <span class='btn btn-success fileinput-button'>
+                                                              <i class='icon-plus icon-white'></i>
+                                                              <span>Add files...</span>
+                                                              <input data-bfi-disabled='' multiple='' name='files[]' type='file'>
+                                                            </span>
+                                                            <button class='btn btn-primary start' type='submit'>
+                                                              <i class='icon-upload icon-white'></i>
+                                                              <span>Start upload</span>
+                                                            </button>
+                                                            <button class='btn btn-warning cancel' type='reset'>
+                                                              <i class='icon-ban-circle icon-white'></i>
+                                                              <span>Cancel upload</span>
+                                                            </button>
+                                                            <button class='btn btn-danger delete' type='button'>
+                                                              <i class='icon-trash icon-white'></i>
+                                                              <span>Delete</span>
+                                                            </button>
+                                                            <input class='toggle' type='checkbox'>
+                                                          </div>
+                                                          <div class='col-sm-5 fileupload-progress fade'>
+                                                            <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
+                                                              <div class='bar' style='width:0%;'></div>
+                                                            </div>
+                                                            <div class='progress-extended'> </div>
+                                                          </div>
+                                        </div>
+                                        <div class='fileupload-loading'></div>
+                                        <br>
+                                        <table class='table table-striped' role='presentation'>
+                                            <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+                                        </table>
+                                    </form>
+                                </div>
+                                {% verbatim %}
+                                <script id="template-upload" type="text/x-tmpl">
+                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
+                                        <tr class="template-upload fade">
+                                            <td class="preview"><span class="fade"></span></td>
+                                            <td class="name"><span>{%=file.name%}</span></td>
+                                            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                                            {% if (file.error) { %}
+                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                                            {% } else if (o.files.valid && !i) { %}
+                                            <td>
+                                                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                                    <div class="bar" style="width:0%;"></div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if (!o.options.autoUpload) { %}
+                                                    <button class="btn btn-primary start">
+                                                        <i class="icon-upload icon-white"></i>
+                                                        <span>Start</span>
+                                                    </button>
+                                                {% } %}
+                                            </td>
+                                            {% } else { %}
+                                                <td colspan="2"></td>
+                                            {% } %}
+                                            <td>
+                                               {% if (!i) { %}
+                                                <button class="btn btn-warning cancel">
+                                                    <i class="icon-ban-circle icon-white"></i>
+                                                    <span>Cancel</span>
+                                                </button>
+                                                {% } %}
+                                            </td>
+                                        </tr>
+                                    {% } %}
+                                </script>
+                                <!-- The template to display files available for download -->
+
+                                <script id="template-download" type="text/x-tmpl">
+                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
+                                        <tr class="template-download fade">
+                                           {% if (file.error) { %}
+                                                <td></td>
+                                                <td class="name"><span>{%=file.name%}</span></td>
+                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                                            {% } else { %}
+                                                <td class="preview">
+                                                {% if (file.thumbnail_url) { %}
+                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}">
+                                                        <img src="{%=file.thumbnail_url%}">
+                                                    </a>
+                                                {% } %}
+                                                </td>
+                                                <td class="name">
+                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
+                                                        {%=file.name%}
+                                                    </a>
+                                                </td>
+                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                                                <td colspan="2"></td>
+                                            {% } %}
+                                            <td>
+                                               <button class="btn btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
+                                                    <i class="icon-trash icon-white"></i>
+                                                <span>Delete</span>
+                                                </button>
+                                                <input type="checkbox" name="delete" value="1" class="toggle">
+                                            </td>
+                                        </tr>
+                                    {% } %}
+                                </script>
+                                {% endverbatim %}
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default btn-close category-prod-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

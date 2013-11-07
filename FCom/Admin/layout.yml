@@ -154,6 +154,7 @@ lib_admin_theme1:
       - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/jquery_fileupload/jquery.fileupload-ui.css ]
 
       - [ requireJs, autosize, @FCom_Admin/theme1/assets/javascripts/plugins/autosize/jquery.autosize-min, { deps: [ jquery ] } ]
       - [ requireJs, bootbox, @FCom_Admin/theme1/assets/javascripts/plugins/bootbox/bootbox.min, { deps: [ jquery ] } ]
@@ -209,7 +210,7 @@ lib_admin_theme1:
       - [ requireJs, admin.theme, @FCom_Admin/theme1/assets/javascripts/theme, { deps: [ jquery, timeago ] } ]
       - [ requireJs, admin.demo, @FCom_Admin/theme1/assets/javascripts/demo, { deps: [ jquery ] } ]
 
-      - [ requireRun, [ jquery-mobile, jquery-ui, jquery-migrate, bootstrap, admin.theme, admin.demo ] ]
+      - [ requireRun, [ jquery-mobile, jquery-ui, jquery-migrate, bootstrap, admin.theme, admin.demo, tmpl ] ]
 
 htmlgrid:
   - { hook: main, view: core/htmlgrid-wrapper }
@@ -256,11 +257,6 @@ flot:
       - [ requireJs, flot.symbol, @FCom_Admin/js/flot/jquery.flot.symbol.min, { deps: [ flot ] } ]
       - [ requireJs, flot.time, @FCom_Admin/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
       - [ requireJs, flot.threshold, @FCom_Admin/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]
-
-
-
-
-
 form:
   - view: head
     do:

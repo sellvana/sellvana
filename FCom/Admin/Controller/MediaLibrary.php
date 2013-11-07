@@ -18,38 +18,45 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
         return $folder;
     }
-
+    public function test() {
+        return array('test' => 'test');
+    }
     public function gridConfig($options=array())
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
         $folder = $options['folder'];
         $url = BApp::href('/media/grid');
+        $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
+                ->where('folder', $folder)
+                ->select(array('a.id', 'a.file_name', 'a.file_size'))
+            ;
         $config = array(
-            'grid' => array(
+            'config' => array(
                 'id' => $id,
                 'caption' => 'Media Library',
-                'datatype' => 'json',
-                'url' => $url.'/data?folder='.urlencode($folder),
-                'editurl' => $url.'/edit?folder='.urlencode($folder),
-                'colModel' => array(
+                'orm' => $orm,
+                //'data_mode' => 'json',
+                //'url' => $url.'/data?folder='.urlencode($folder),
+                //'editurl' => $url.'/edit?folder='.urlencode($folder),
+                'columns' => array(
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400, 'editable'=>true),
-                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>60, 'search'=>false),
-                    array('name'=>'act', 'label'=>'Actions', 'width'=>80, 'search'=>false, 'sortable'=>false, 'resizable'=>false),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false),
+                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
                 ),
-                'multiselect' => true,
-                'multiselectWidth' => 30,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>true),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
-            array('navButtonAdd', 'id'=>'upload-btn', 'caption' => 'Upload', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Library', 'cursor'=>'pointer'),
-            array('navButtonAdd', 'caption' => 'Delete', 'buttonicon'=>'ui-icon-trash', 'title' => 'Delete Attachments from Library', 'cursor'=>'pointer'),
+                'actions' => array(
+                    'add' => true
+                ),
+                'filters' => array(
+                    array('field' => 'file_name', 'type' => 'text')
+                )
+            )
         );
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }
-        BEvents::i()->fire(__METHOD__, array('config'=>&$config));
-        BEvents::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
+        //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
+        //BEvents::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
         return $config;
     }
 

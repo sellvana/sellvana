@@ -12,7 +12,7 @@
 /*jslint nomen: true, unparam: true, regexp: true */
 /*global $, window, document */
 
-
+alert('init');
 if($("#fileupload").length != 0) {
     $(function () {
         'use strict';
