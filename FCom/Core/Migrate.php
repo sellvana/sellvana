@@ -42,4 +42,19 @@ class FCom_Core_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        BDb::ddlTableDef(FCom_Core_Model_MediaLibrary::table(), array(
+            'COLUMNS' => array(
+                'data_json' => 'DROP',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'KEYS' => array(
+                'IDX_create_at' => '(create_at)',
+            ),
+        ));
+    }
 }
