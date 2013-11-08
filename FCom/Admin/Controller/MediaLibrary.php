@@ -13,9 +13,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function getFolder()
     {
         $folder = BRequest::i()->get('folder');
-        if (empty($this->_allowedFolders[$folder])) {
+        /*if (empty($this->_allowedFolders[$folder])) {
             BDebug::error('Folder '.$folder.' is not allowed');
-        }
+        }*/
         return $folder;
     }
     public function test() {
@@ -34,11 +34,14 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             'config' => array(
                 'id' => $id,
                 'caption' => 'Media Library',
-                'orm' => $orm,
+                'data' => $orm->find_many(),
+                'data_mode' => 'local',
                 //'data_mode' => 'json',
                 //'url' => $url.'/data?folder='.urlencode($folder),
-                //'editurl' => $url.'/edit?folder='.urlencode($folder),
+                'data_url' => $url.'/edit?folder='.urlencode($folder),
+                'edit_url' => $url.'/edit?folder='.urlencode($folder),
                 'columns' => array(
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400, 'editable'=>true),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false),
@@ -113,6 +116,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     */
     public function processGridPost($options=array())
     {
+
         $r = BRequest::i();
         $gridId = $r->get('grid');
         $folder = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
@@ -121,6 +125,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $attModel::i() : $attModel;
+
         switch($r->params('do')) {
         case 'upload':
             //set_time_limit(0);
@@ -156,14 +161,15 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                //$row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
-                //echo BUtil::toJson($row);
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
+                echo BUtil::toJson($row);
+
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
                 // TODO: properly refresh grid after file upload
                 // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
                 // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".BUtil::toJson($row)."); </script>";
                 // solution two is to find a way to pass rowid to the server side
-                echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
+                //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
             }
             exit;
