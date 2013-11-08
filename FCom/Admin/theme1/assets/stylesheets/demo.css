@@ -92,7 +92,8 @@ overflow: hidden;
 }
 
 .responsive-table table td {
-  white-space:normal
+  white-space:pre-line;
+  overflow: hidden;
 }
 .inline-editor {
   padding: 0px;
