@@ -92,7 +92,7 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
+    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }} style='width:auto;'>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
