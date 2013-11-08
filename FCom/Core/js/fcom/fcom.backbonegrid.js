@@ -290,11 +290,7 @@ FCom.BackboneGrid = function(config) {
             var hash = this.changedAttributes();
             hash.id = id;
             hash.oper = 'edit';
-            if (BackboneGrid.data_mode === 'local') {
-                /*var funcName = BackboneGrid.callBacks['edit'];
-                var command = funcName+'(this.toJSON());';
-                eval(command);*/
-            } else {
+            if (typeof(BackboneGrid.edit_url) !== 'undefined') {
                 $.post(BackboneGrid.edit_url, hash);
             }
 
@@ -323,7 +319,16 @@ FCom.BackboneGrid = function(config) {
 
                 if (typeof(g_vent) !== 'undefined') {
                     g_vent.bind('silent_inject', this._silentInjectRows);
+                    g_vent.bind('add_row', this._addRow);
                 }
+
+            }
+        },
+        _addRow: function(ev) {
+            if (ev.grid === BackboneGrid.id) {
+                var newRow = new BackboneGrid.Models.Row(ev.row);
+                rowsCollection.add(newRow);
+                gridView.render();
             }
         },
         _silentInjectRows: function(ev) {
@@ -1120,6 +1125,7 @@ FCom.BackboneGrid = function(config) {
         selectedRows = new Backbone.Collection;
         multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){
+            console.log('aaaa');
             multiselectCol.set('selectedCount', selectedRows.length);
             multiselectCol.trigger('render');
             if (selectedRows.length > 0) {
@@ -1243,17 +1249,23 @@ FCom.BackboneGrid = function(config) {
                 }
                 return true;
         });
-
+        var restricts = ['FCom/PushServer/index.php', 'media/grid/upload'];
         //ajax loading...
         $( document ).ajaxSend(function(event, jqxhr, settings) {
-            console.log(settings.url);
-            console.log(settings.url.indexOf('FCom/PushServer/index.php'));
-            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
-                NProgress.start();
+            var url = settings.url;
+            for(var i in restricts) {
+                if (url.indexOf(restricts[i]) !== -1)
+                    return;
+            }
+            NProgress.start();
         });
         $( document ).ajaxComplete(function(event, jqxhr, settings) {
-            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
-                NProgress.done();
+            var url = settings.url;
+            for(var i in restricts) {
+                if (url.indexOf(restricts[i]) !== -1)
+                    return;
+            }
+            NProgress.done();
         });
         NProgress.done();
 

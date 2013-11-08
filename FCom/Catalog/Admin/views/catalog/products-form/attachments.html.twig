@@ -46,14 +46,14 @@ require(['jquery'], function($) {
                                 {{ THIS.view('core/backbonegrid').set('grid', mediaLibConfig) | raw }}
                             </div>
                             <div class='tab-pane' id='upload'>
-                                <div class='box-content'>
-                                    <form action='//jquery-file-upload.appspot.com/' enctype='multipart/form-data' id='fileupload' method='POST'>
+                                <div class='box-content' id='fileupload'>
+
                                         <div class='row fileupload-buttonbar'>
                                                           <div class='col-sm-7'>
                                                             <span class='btn btn-success fileinput-button'>
                                                               <i class='icon-plus icon-white'></i>
                                                               <span>Add files...</span>
-                                                              <input data-bfi-disabled='' multiple='' name='files[]' type='file'>
+                                                              <input data-bfi-disabled='' multiple='' name='upload[]' type='file' >
                                                             </span>
                                                             <button class='btn btn-primary start' type='submit'>
                                                               <i class='icon-upload icon-white'></i>
@@ -62,10 +62,6 @@ require(['jquery'], function($) {
                                                             <button class='btn btn-warning cancel' type='reset'>
                                                               <i class='icon-ban-circle icon-white'></i>
                                                               <span>Cancel upload</span>
-                                                            </button>
-                                                            <button class='btn btn-danger delete' type='button'>
-                                                              <i class='icon-trash icon-white'></i>
-                                                              <span>Delete</span>
                                                             </button>
                                                             <input class='toggle' type='checkbox'>
                                                           </div>
@@ -81,7 +77,7 @@ require(['jquery'], function($) {
                                         <table class='table table-striped' role='presentation'>
                                             <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
                                         </table>
-                                    </form>
+
                                 </div>
                                 {% verbatim %}
                                 <script id="template-upload" type="text/x-tmpl">
@@ -147,10 +143,6 @@ require(['jquery'], function($) {
                                                 <td colspan="2"></td>
                                             {% } %}
                                             <td>
-                                               <button class="btn btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
-                                                    <i class="icon-trash icon-white"></i>
-                                                <span>Delete</span>
-                                                </button>
                                                 <input type="checkbox" name="delete" value="1" class="toggle">
                                             </td>
                                         </tr>
@@ -170,6 +162,30 @@ require(['jquery'], function($) {
     </div>
 </div>
 <script>
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'fileupload', 'fileupload-fp', 'fileupload-ui']);
+    if (typeof(g_vent) === 'undefined') {
+        g_vent = _.extend(Backbone.Event);
+    }
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+
+        $('#fileupload').fileupload({
+            url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
+            multiple:true
+        })
+        .bind('fileuploadalways', function(e, data) {
+            if(data.result.id) {
+                g_vent.trigger('add_row', {grid: 'all_attachments', row:data.result});
+                console.log($('td.name span').length);
+                $('td.name span').each(function(i) {
+                    console.log($(this).html());
+                    console.log(data.result.file_name);
+                    if($(this).html() === data.result.file_name)
+                        $(this).parents('tr:first').remove();
+                });
+            }
+        });
+
+    });
+
+
 </script>
 

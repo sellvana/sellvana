@@ -605,14 +605,14 @@
                         </a>
                       </div>
                     </div>
-                    <div class='box-content'>
-                      <form action='//jquery-file-upload.appspot.com/' enctype='multipart/form-data' id='fileupload' method='POST'>
+                    <div class='box-content' id='fileupload'>
+                      <!--form action='' enctype='multipart/form-data' id='fileupload' method='POST' -->
                         <div class='row fileupload-buttonbar'>
                           <div class='col-sm-7'>
                             <span class='btn btn-success fileinput-button'>
                               <i class='icon-plus icon-white'></i>
                               <span>Add files...</span>
-                              <input data-bfi-disabled='' multiple='' name='files[]' type='file'>
+                              <input data-bfi-disabled='' multiple='' name='files[]' type='file' >
                             </span>
                             <button class='btn btn-primary start' type='submit'>
                               <i class='icon-upload icon-white'></i>
@@ -640,7 +640,7 @@
                         <table class='table table-striped' role='presentation'>
                           <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
                         </table>
-                      </form>
+                      <!--/form-->
                     </div>
                   </div>
                 </div>
