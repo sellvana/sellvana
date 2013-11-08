@@ -147,8 +147,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Images From Product', 'cursor'=>'pointer'),
         );
     }
-    // modal grid on category/product tab
-    public function getAllProdConfig($model) {
+
+    /**
+    * modal grid on category/product tab
+    */
+    public function getAllProdConfig($model)
+    {
 
         $config = parent::gridConfig();
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
@@ -176,8 +180,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         return array('config' =>$config);
     }
-    // main grid on category/product tab
-    public function getCatProdConfig($model) {
+
+    /*
+    *main grid on category/product tab
+    */
+    public function getCatProdConfig($model)
+    {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
             ->select(array('p.id', 'p.product_name', 'p.local_sku'))
             ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')
@@ -209,6 +217,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         return array('config' => $config);
     }
+
     public function linkedProductGridConfig($model, $type)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')

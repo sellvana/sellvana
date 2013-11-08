@@ -1,8 +1,6 @@
-define(["jquery", "backbone", "backbone-pageable", "backbone.modelbinder", "lunr", "transparency",
-    "backgrid", "backgrid-filter", "backgrid-select-all",
-    "backgrid-paginator", "backgrid-select-all", "backgrid-moment-cell", "jquery.widgets"],
+define(["jquery", "backbone", "transparency", "jquery.widgets"],
 
-function($, Backbone, PageableCollection) {
+function($, Backbone) {
     /*
     FCom.tabs = function(options) {
         var tabs = $(options.tabs);

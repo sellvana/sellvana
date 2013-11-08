@@ -64,7 +64,8 @@ FCom.BackboneGrid = function(config) {
             hash['data-id'] = this.model.get('name');
             if(this.model.has('width'))
                 hash['style'] = "width: " + this.model.get('width') + 'px;';
-
+            if(this.model.has('overflow'))
+                hash['style'] += hash['style'] +'overflow:hidden;'
             return hash;
         },
         events: {
@@ -80,6 +81,8 @@ FCom.BackboneGrid = function(config) {
                         self._clearSelection();
                 });
            }
+
+           this.model.on('render', this.render, this);
         },
         _selectPageAction: function(flag) {
             rowsCollection.each(function(model) {
@@ -301,6 +304,9 @@ FCom.BackboneGrid = function(config) {
                 var ev = {grid: BackboneGrid.id, row: row};
                 g_vent.trigger('edit', ev);
             }
+
+            this.trigger('render');
+            $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
         }
     });
 
@@ -602,7 +608,6 @@ FCom.BackboneGrid = function(config) {
             this.setCss();
             this.$el.html('');
             this.collection.each(this.addRow, this);
-
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
             return this;
         },
@@ -792,7 +797,11 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
         events: {
-        'click button.clear': '_closeFilter'
+        'click button.clear': '_closeFilter',
+        'blur input[type="text"]': '_onBlur'
+        },
+        _onBlur: function(ev) {
+            //$('div.select2-drop.select2-drop-multi').css('display','none');
         },
         checkEnter: function(ev) {
 
@@ -811,9 +820,9 @@ FCom.BackboneGrid = function(config) {
 
             this.$el.find('#multi_hidden:first').select2({
                 multiple: true,
-                allowClear: true,
                 data: data,
-                placeholder: 'All'
+                placeholder: 'All',
+                //closeOnSelect: true
             });
             var self = this;
             this.$el.find('#multi_hidden:first').on('change', function() {
@@ -1109,10 +1118,10 @@ FCom.BackboneGrid = function(config) {
 
         //showing selected rows count
         selectedRows = new Backbone.Collection;
-        mutiselectCol = columnsCollection.findWhere({type: 'multiselect'});
+        multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){
-            mutiselectCol.set('selectedCount', selectedRows.length);
-
+            multiselectCol.set('selectedCount', selectedRows.length);
+            multiselectCol.trigger('render');
             if (selectedRows.length > 0) {
                 $(BackboneGrid.massDeleteButton).removeClass('disabled');
                 $(BackboneGrid.massEditButton).removeClass('disabled');

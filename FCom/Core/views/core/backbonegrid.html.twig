@@ -162,8 +162,11 @@
     if(col.hidden ) {
       continue;
     }
-
-    print('<td data-col="' + col.name + '">');
+    var overflow = '';
+    if(col.overflow) {
+      overflow = ' style="overflow:hidden;"';
+    }
+    print('<td data-col="' + col.name + '" ' + overflow +'>');
 
     if (col.cell === 'select-row') {
         var isSelected = '';
@@ -186,12 +189,14 @@
         }
 
     } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
+        print('<span style="display:none;">' + rc.row[col.name] + '</span>');
         print('<select data-col="' + col.name +'" class="form-control">');
           for(var val in col.options) {
             print('<option value="' + val + '"'+ (rc.row[col.name] === val ? ' selected' : '') +'>' + col.options[val] + '</option>');
           }
         print('</select>');
     } else if (typeof(col.editable) !=='undefined') {
+        print('<span style="display:none;">' + rc.row[col.name] + '</span>');
         print('<input data-col="' + col.name + '" value = "' + rc.row[col.name] + '" class="form-control"/>');
     }
     else {
@@ -218,9 +223,8 @@
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <span><%= rc.label %>:</span>
-      <span>
-        <input type="hidden" id="multi_hidden" style="width:300px"/>
-      </span>
+      <input type="hidden" id="multi_hidden" style="width:300px"/>
+
 </script>
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
