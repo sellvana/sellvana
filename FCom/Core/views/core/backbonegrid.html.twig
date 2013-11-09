@@ -33,14 +33,8 @@
           </div>
     </div>
   {% endif %}
-  {# %form(method="get" action="#{$this->gridUrl()") #}
-  {# %fieldset #}
+
   <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
-    {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
-    {# %input(type="submit" value="#{$this->_('Search')}") #}
-      <!--
-        <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
-        -->
       <div class="col-sm-7">
         <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
@@ -61,9 +55,9 @@
           {% endif %}
         {% endfor %}
       </div>
-      <div class="col-sm-5 text-right pagination">
+      <div class="col-sm-5 text-right pagination" style='margin:0px;'>
         {% if config['data_mode']!= 'local' %}
-          <ul class="pagination pagination-sm pagesize">
+          <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
             {% for ps in THIS.pageSizeOptions() %}
               <li {{ ps==s.ps ? 'class="active"' }}>
                 <a class="js-change-url page-size" href="#">{{ ps }}</a>
@@ -71,7 +65,7 @@
             {% endfor %}
           </ul>
 
-          <ul class="{{ config.id }} pagination pagination-sm page">
+          <ul class="{{ config.id }} pagination pagination-sm page" style='margin:0px;'>
             {#
             <label>
               {{ 'Page'|_ }}

@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique'], function(Backbone, _, $, NProgress) {
 
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
@@ -290,15 +290,12 @@ FCom.BackboneGrid = function(config) {
             var hash = this.changedAttributes();
             hash.id = id;
             hash.oper = 'edit';
-            if (typeof(BackboneGrid.edit_url) !== 'undefined') {
-                $.post(BackboneGrid.edit_url, hash);
-            }
-
             if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "edit") !== -1) {
                 var row = this.toJSON();
-                console.log(row);
                 var ev = {grid: BackboneGrid.id, row: row};
                 g_vent.trigger('edit', ev);
+            } else {
+                $.post(BackboneGrid.edit_url, hash);
             }
 
             this.trigger('render');
@@ -334,7 +331,7 @@ FCom.BackboneGrid = function(config) {
         _silentInjectRows: function(ev) {
             if (ev.grid !== BackboneGrid.id)
                 return;
-
+            console.log(ev.rows);
             var rows = ev.rows;
             for (var i in rows) {
                 if (typeof(rowsCollection.findWhere({id:rows[i].id})) === 'undefined') {
@@ -987,14 +984,6 @@ FCom.BackboneGrid = function(config) {
             $('div.'+BackboneGrid.id+'-pagination').html(caption);
     }
 
-    function guid() {
-        function _p8(s) {
-            var p = (Math.random().toString(16)+"000000000").substr(2,8);
-            return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
-        }
-        return _p8() + _p8(true) + _p8(true) + _p8();
-    }
-
         NProgress.start();
         //general settings
         _.templateSettings.variable = 'rc';
@@ -1125,7 +1114,7 @@ FCom.BackboneGrid = function(config) {
         selectedRows = new Backbone.Collection;
         multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){
-            console.log('aaaa');
+
             multiselectCol.set('selectedCount', selectedRows.length);
             multiselectCol.trigger('render');
             if (selectedRows.length > 0) {
@@ -1134,6 +1123,10 @@ FCom.BackboneGrid = function(config) {
             } else {
                 $(BackboneGrid.massDeleteButton).addClass('disabled');
                 $(BackboneGrid.massEditButton).addClass('disabled');
+            }
+
+            if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('select-rows') !== -1) {
+                g_vent.trigger('select-rows', {grid: config.id, rows: selectedRows.toJSON()});
             }
         });
 
@@ -1272,6 +1265,11 @@ FCom.BackboneGrid = function(config) {
         if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init") !== -1) {
             var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
             g_vent.trigger('init', ev);
+        }
+        console.log(BackboneGrid.events);
+        if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
+            var ev= {grid: config.id, rows: rowsCollection.toJSON()};
+            g_vent.trigger('init-detail', ev);
         }
     }
 });
