@@ -15,4 +15,14 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
         }
         return $path;
     }
+
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
+        $this->set('create_at', BDb::now(), null);
+        $this->set('update_at', BDb::now());
+
+        return true;
+    }
 }
