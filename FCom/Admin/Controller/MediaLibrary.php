@@ -37,13 +37,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'orm' => $orm,
                 //'data_mode' => 'json',
                 //'url' => $url.'/data?folder='.urlencode($folder),
-                'data_url' => $url.'/edit?folder='.urlencode($folder),
+                'data_url' => $url.'/data?folder='.urlencode($folder),
                 'edit_url' => $url.'/edit?folder='.urlencode($folder),
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
-                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false)
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
                 ),
                 'filters' => array(
@@ -69,10 +69,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.file_name', 'a.file_size'))
             ;
-            $data = FCom_Admin_View_JqGrid::i()->processORM($orm, __METHOD__.'.'.$folder);
-            BResponse::i()->json($data);
+            $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
+            BResponse::i()->json(array(
+                    array('c' => $data['state']['c']),
+                    BDb::many_as_array($data['rows']),
+                ));
             break;
-
         case 'download':
             $folder = $this->getFolder();
             $r = BRequest::i();

@@ -115,7 +115,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default' => $model->id()),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>200),
-                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>200),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>200, 'editable' => true),
                     array('name'=>'position', 'label'=>'Position', 'width'=>200, 'editable' => true, 'validate' => 'number'),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('/media/grid/download?folder=media/product/attachment&file='), 'col'=>'file_name'),'delete' => true))
