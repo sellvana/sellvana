@@ -189,12 +189,28 @@
             print('<option value="' + val + '"'+ (rc.row[col.name] === val ? ' selected' : '') +'>' + col.options[val] + '</option>');
           }
         print('</select>');
-    } else if (typeof(col.editable) !=='undefined') {
+    } else if (typeof(col.editable) !== 'undefined') {
         print('<span style="display:none;">' + rc.row[col.name] + '</span>');
         print('<input data-col="' + col.name + '" value = "' + rc.row[col.name] + '" class="form-control"/>');
     }
     else {
+      if (typeof(col.display) === 'undefined')
         print(rc.row[col.name]);
+      else if (col.display === 'file_size') {
+        var size = parseInt(rc.row[col.name]);
+        if (size/(1024*1024) > 1) {
+          size = size/(1024*1024);
+          size = size.toFixed(2) + ' MB';
+        } else if (size/1024 > 1) {
+          size = size/1024;
+          size = size.toFixed(2) + ' KB';
+        } else {
+          size = size + ' Byte';
+        }
+        print(size);
+      }
+
+
     }
 
     print('</td>');

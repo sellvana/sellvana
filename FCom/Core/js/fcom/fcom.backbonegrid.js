@@ -457,7 +457,8 @@ FCom.BackboneGrid = function(config) {
                 append += (keys[i] + '=' + BackboneGrid.currentState[keys[i]]);
             }
             append += ('&filters=' + JSON.stringify(BackboneGrid.current_filters));
-            return this.data_url + '?' + append + '&gridId='+BackboneGrid.id;
+            var c = this.data_url.indexOf('?') === -1 ? '?' : '&';
+            return this.data_url + c + append + '&gridId='+BackboneGrid.id;
         },
         parse: function(response) {
             if (response[0].c) {
