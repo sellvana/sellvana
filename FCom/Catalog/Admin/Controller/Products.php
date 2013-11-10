@@ -108,7 +108,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size'))->select('a.id','file_id')->find_many()),
+                'data' => BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
@@ -118,6 +118,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>200, 'editable' => true),
                     array('name'=>'position', 'label'=>'Position', 'width'=>200, 'editable' => true, 'validate' => 'number'),
+                    array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
+                    array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('/media/grid/download?folder=media/product/attachment&file='), 'col'=>'file_name'),'delete' => true))
                 ),
                 'actions' => array(
