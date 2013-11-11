@@ -278,6 +278,7 @@ form:
       do:
         - [ requireJs, ModalLauncher, @FCom_Admin/js/BackboneViews/ModalLauncher ]
         - [ requireJs, FormView, @FCom_Admin/js/BackboneViews/FormView ]
+        - [ css, @FCom_Core/js/lib/css/dragtable-akottr.css ]
 
 /denied:
     - { include: base }
