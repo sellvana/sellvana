@@ -14,19 +14,24 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $formUrl = BApp::href("prodreviews/form");
         $config = parent::gridConfig();
         $columns = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'editable'=>true),
-            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'editable'=>true),
-            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'editable'=>true),
-            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No')),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),'delete'=>true))
+            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
+            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
+            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select'),
+            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id', 'render_partial'=>true),'delete'=>true))
         );
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
+            array('field'=>'approved', 'type'=>'select'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
-
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
+        );
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
         //$config['multiselect'] = false;
