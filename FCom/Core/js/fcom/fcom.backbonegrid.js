@@ -825,7 +825,7 @@ FCom.BackboneGrid = function(config) {
             }
 
             this.$el.find('#multi_hidden:first').select2({
-                multiple: true,
+                multiple: this.model.get('filter_type') === 'select' ? false : true,
                 data: data,
                 placeholder: 'All',
                 //closeOnSelect: true
@@ -851,13 +851,14 @@ FCom.BackboneGrid = function(config) {
             this.collection.each(this.addFilterCol, this);
         },
         addFilterCol: function(model) {
+
             if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
                 var filterCell;
                 switch (model.get('filter_type')) {
                     case 'text':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                         break;
-                    case 'multiselect':
+                    case 'multiselect': case 'select':
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
                         break;
                 }
