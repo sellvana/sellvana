@@ -21,15 +21,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     throw new Exception('Invalid email or password.');
                 }
             } else {
-                //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-                $messages = BSession::i()->messages('validator-errors:frontend');
-                if (count($messages)) {
-                    $msg = array();
-                    foreach ($messages as $m) {
-                        $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-                    }
-                    BSession::i()->addMessage($msg, 'error', 'frontend');
-                }
+                $this->formMessages();
             }
             if (BRequest::i()->post('backroute')) {
                 $url = BApp::href(BRequest::i()->post('backroute'));
@@ -101,16 +93,37 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         try {
             $r = BRequest::i()->post('model');
             $a = BRequest::i()->post('address');
-
-            $customer = FCom_Customer_Model_Customer::i()->register($r);
-            FCom_Customer_Model_Address::i()->import($a, $customer);
-            $customer->login();
-            BSession::i()->addMessage('Thank you for your registration', 'success', 'frontend');
-            BResponse::i()->redirect(BApp::href());
+            $customerModel = FCom_Customer_Model_Customer::i();
+            if ($customerModel->validate($r, array(), 'frontend')) {
+                $customer = FCom_Customer_Model_Customer::i()->register($r);
+                FCom_Customer_Model_Address::i()->import($a, $customer);
+                $customer->login();
+                BSession::i()->addMessage('Thank you for your registration', 'success', 'frontend');
+                BResponse::i()->redirect(BApp::href());
+            } else {
+                $this->formMessages();
+                BResponse::i()->redirect(BApp::href('customer/register'));
+            }
         } catch (Exception $e) {
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
             BResponse::i()->redirect(BApp::href('customer/register'));
+        }
+    }
+
+    /**
+     * form error message
+     */
+    public function formMessages()
+    {
+        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
+        $messages = BSession::i()->messages('validator-errors:frontend');
+        if (count($messages)) {
+            $msg = array();
+            foreach ($messages as $m) {
+                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'frontend');
         }
     }
 }
