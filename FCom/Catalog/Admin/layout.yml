@@ -27,7 +27,7 @@ catalog_product_form_tabs:
 
 /catalog/products:
   - { include: base }
-  - { include: lib_backgrid }
+  #- { include: lib_backgrid }
   - { hook: main, views: admin/grid }
   - { view: admin/nav, do: [[ setNav, catalog/products ]] }
 

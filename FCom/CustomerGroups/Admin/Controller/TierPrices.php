@@ -125,6 +125,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     array('name' => 'qty', 'label' => 'Qty', 'editable' => true, 'width' => 150, 'validate' => 'number'),
                     array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
                     array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
                 'data' => BDb::many_as_array($orm->find_many()),
                 'data_mode' => 'local',

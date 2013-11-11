@@ -559,8 +559,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //TODO: add _processFilters and processORM
         //$orm = $this->grid['orm'];
         #$data = $this->grid['orm']->paginate();
+        if (isset($grid['orm'])) {
+            $orm = $grid['orm'];
+        }
 
-        $data = $this->processORM($grid['orm']);
+        if (isset($config['orm'])) {
+            $orm = $config['orm'];
+        }
+        $data = $this->processORM($orm);
 
         foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {

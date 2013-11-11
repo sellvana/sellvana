@@ -104,22 +104,35 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function productAttachmentsGridConfig($model)
     {
         return array(
-            'grid' => array(
+            'config' => array(
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
-                'datatype' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('A')->select('a.id')->select('a.file_name')->find_many()),
-                'colModel' => array(
+                'data_mode' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
+                'columns' => array(
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                    array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default' => $model->id()),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>200, 'editable' => true),
+                    array('name'=>'position', 'label'=>'Position', 'width'=>200, 'editable' => true, 'validate' => 'number'),
+                    array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
+                    array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('/media/grid/download?folder=media/product/attachment&file='), 'col'=>'file_name'),'delete' => true))
                 ),
-                'multiselect' => true,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Product', 'cursor'=>'pointer'),
-            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Product', 'cursor'=>'pointer'),
+                'actions' => array(
+                    'add' => array('caption' => 'Add a attachment'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'events' => array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'filters' => array(
+                    array('field' => 'file_name', 'type' => 'text'),
+                    array('field' => 'label', 'type' => 'text'),
+                    '_quick' => array('expr' => 'file_name like ? ', 'args' =>  array('%?%'))
+                )
+            )
         );
     }
 
@@ -144,8 +157,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Images From Product', 'cursor'=>'pointer'),
         );
     }
-    // modal grid on category/product tab
-    public function getAllProdConfig($model) {
+
+    /**
+    * modal grid on category/product tab
+    */
+    public function getAllProdConfig($model)
+    {
 
         $config = parent::gridConfig();
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
@@ -173,8 +190,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         return array('config' =>$config);
     }
-    // main grid on category/product tab
-    public function getCatProdConfig($model) {
+
+    /*
+    *main grid on category/product tab
+    */
+    public function getCatProdConfig($model)
+    {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
             ->select(array('p.id', 'p.product_name', 'p.local_sku'))
             ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')
@@ -206,6 +227,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         return array('config' => $config);
     }
+
     public function linkedProductGridConfig($model, $type)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
@@ -353,16 +375,35 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
-            $typeName = 'product_'.$typeName;
+            //$typeName = 'product_'.$typeName;
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many(array(
                     'product_id' => $model->id,
                     'media_type' => $type,
-                    'file_id'    => explode(',', $data['grid'][$typeName]['del']),
+                    'id'    => explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
 
-            if (!empty($data['grid'][$typeName]['add'])) {
+            if (!empty($data['grid'][$typeName]['rows'])) {
+                $rows = json_decode($data['grid'][$typeName]['rows'], true);
+                foreach($rows as $row) {
+                    if(isset($row['_new'])) {
+
+                        $hlp->create(array(
+                            'product_id' => $model->id,
+                            'media_type' => $type,
+                            'file_id' => $row['file_id'],
+                            'label' => isset($row['label']) ? $row['label'] : '',
+                            'position' => isset($row['position']) ? $row['position'] : '',
+                            //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
+                            //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
+
+                        ))->save();
+                    } else {
+                        $hlp->load($row['id'])->set($row)->save();
+                    }
+                }
+/*
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
                     ->find_many_assoc('file_id');
@@ -384,7 +425,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     }
                 }
 //echo "</pre>";
-//exit;
+//exit;**/
             }
         }
         return $this;
