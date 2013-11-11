@@ -29,6 +29,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.file_name', 'a.file_size'))
+                ->order_by_expr('id asc');
             ;
         $config = array(
             'config' => array(
