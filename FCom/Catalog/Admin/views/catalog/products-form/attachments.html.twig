@@ -274,6 +274,8 @@ require(['jquery', 'unique'], function($) {
 </div>
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        console.log('all_attachments');
+
         var prod_img_rows = [];
         $('#prod-attach-checkbox').change(function() {
             prod_img_rows = [];
@@ -292,7 +294,6 @@ require(['jquery', 'unique'], function($) {
                 });
 
                 if ($('#prod-attach-checkbox').is(':checked')) {
-                    console.log(data.result);
                     prod_img_rows[prod_img_rows.length] = data.result;
                     if ($('tr.template-upload').length === 0) {
                         g_vent.trigger('select-rows', {grid: 'all_attachments', rows:prod_img_rows});

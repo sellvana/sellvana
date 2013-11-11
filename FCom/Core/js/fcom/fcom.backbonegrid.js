@@ -313,13 +313,11 @@ FCom.BackboneGrid = function(config) {
 
                 this.on('add', this.addInOriginal, this);
                 this.on('remove', this.removeInOriginal, this);
+            }
 
-                if (typeof(g_vent) !== 'undefined') {
+            if (typeof(g_vent) !== 'undefined') {
                     g_vent.bind('silent_inject', this._silentInjectRows);
-                    console.log('add_row_register', BackboneGrid.id);
                     g_vent.bind('add_row', this._addRow);
-                }
-
             }
         },
         _addRow: function(ev) {
@@ -1271,6 +1269,15 @@ FCom.BackboneGrid = function(config) {
         if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
             var ev= {grid: config.id, rows: rowsCollection.toJSON()};
             g_vent.trigger('init-detail', ev);
+        }
+
+        if (typeof(g_vent) !== 'undefined') {
+            console.log('fetch_rows');
+            g_vent.bind('fetch_rows', function(ev) {
+                if(ev.grid === config.id) {
+                    rowsCollection.fetch({reset:true});
+                }
+            });
         }
     }
 });
