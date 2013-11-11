@@ -43,8 +43,6 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['id'] = 'products_reviews';
             $config['columns']['product_name'] = array('label'=>'Product name', 'width'=>250, 'editable'=>false);
             $config['data_mode'] = 'local';
-            $config['editurl'] = '';
-            $config['url'] = '';
             $config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
@@ -52,6 +50,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 ->select('pr.*')->select('p.product_name');
 
             $data = BDb::many_as_array($orm->find_many());
+            unset($config['orm']);
             /*$columnKeys = array_keys($config['grid']['columns']);
             foreach($data as &$prod){
                 foreach($prod as $k=>$p) {
