@@ -2,6 +2,13 @@
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn()) {
+            BResponse::i()->redirect(BApp::href());
+        }
+    }
+
     public function action_login()
     {
         $this->layout('/customer/login');
