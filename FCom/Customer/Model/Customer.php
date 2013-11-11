@@ -35,6 +35,28 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 		/*array('customer_group', '@integer'),*/
 	);
 
+    /**
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_Customer_Model_Customer
+     */
+    public static function i($new=false, array $args=array())
+    {
+        return parent::i($new, $args);
+    }
+
+    /**
+     * override default rules for login form
+     */
+    public function setLoginRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('email', '@email'),
+        );
+    }
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
