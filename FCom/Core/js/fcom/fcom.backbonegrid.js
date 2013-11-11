@@ -693,7 +693,7 @@ FCom.BackboneGrid = function(config) {
 
              $.post(BackboneGrid.personalize_url,{
                 'do': 'grid.col.orders',
-                'cols': colsInfo,
+                'cols': columnsCollection.toJSON(),
                 'grid': columnsCollection.grid
             });
 
