@@ -701,10 +701,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $rs['rating3'] += $review->rating3;
             }
 
-            $rs['rating'] = $rs['rating'] / $numReviews;
-            $rs['rating1'] = $rs['rating1'] / $numReviews;
-            $rs['rating2'] = $rs['rating2'] / $numReviews;
-            $rs['rating3'] = $rs['rating3'] / $numReviews;
+            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
+            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
+            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
+            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
         }
 
         return $rs;
