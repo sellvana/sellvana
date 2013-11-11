@@ -522,7 +522,6 @@ class BLayout extends BClass
 
     public function hookClear($hookName, $viewNames)
     {
-
         $eventHlp = BEvents::i();
         $eventName = 'BLayout::hook:' . $hookName;
         if (true === $viewNames || 'ALL' === $viewNames) {
