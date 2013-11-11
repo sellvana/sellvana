@@ -6,7 +6,7 @@ base:
 catalog_product_form_tabs:
 	- view: admin/form
 		do:
-			- [ addTab, product_reviews, { label: Product Reviews, pos: 70, view: prodreviews/products/tab, async: true } ]
+			- [ addTab, product_reviews, { label: Product Reviews, pos: 70, view: prodreviews/product, async: true } ]
 
 /prodreviews:
 	- { include: base }
@@ -18,7 +18,7 @@ catalog_product_form_tabs:
 	- { include: form }
 	- { hook: main, views: admin/form }
 	- { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
-	- view: admin/form	
+	- view: admin/form
 		set: { tab_view_prefix: prodreviews/ }
 		do:
 			- [ addTab, main, { label: Product Review, pos: 10 } ]
