@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique'], function(Backbone, _, $, NProgress) {
 
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
@@ -64,7 +64,8 @@ FCom.BackboneGrid = function(config) {
             hash['data-id'] = this.model.get('name');
             if(this.model.has('width'))
                 hash['style'] = "width: " + this.model.get('width') + 'px;';
-
+            if(this.model.has('overflow'))
+                hash['style'] += hash['style'] +'overflow:hidden;'
             return hash;
         },
         events: {
@@ -80,6 +81,8 @@ FCom.BackboneGrid = function(config) {
                         self._clearSelection();
                 });
            }
+
+           this.model.on('render', this.render, this);
         },
         _selectPageAction: function(flag) {
             rowsCollection.each(function(model) {
@@ -287,20 +290,16 @@ FCom.BackboneGrid = function(config) {
             var hash = this.changedAttributes();
             hash.id = id;
             hash.oper = 'edit';
-            if (BackboneGrid.data_mode === 'local') {
-                /*var funcName = BackboneGrid.callBacks['edit'];
-                var command = funcName+'(this.toJSON());';
-                eval(command);*/
+            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "edit") !== -1) {
+                var row = this.toJSON();
+                var ev = {grid: BackboneGrid.id, row: row};
+                g_vent.trigger('edit', ev);
             } else {
                 $.post(BackboneGrid.edit_url, hash);
             }
 
-            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "edit") !== -1) {
-                var row = this.toJSON();
-                console.log(row);
-                var ev = {grid: BackboneGrid.id, row: row};
-                g_vent.trigger('edit', ev);
-            }
+            this.trigger('render');
+            $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
         }
     });
 
@@ -317,13 +316,22 @@ FCom.BackboneGrid = function(config) {
 
                 if (typeof(g_vent) !== 'undefined') {
                     g_vent.bind('silent_inject', this._silentInjectRows);
+                    g_vent.bind('add_row', this._addRow);
                 }
+
+            }
+        },
+        _addRow: function(ev) {
+            if (ev.grid === BackboneGrid.id) {
+                var newRow = new BackboneGrid.Models.Row(ev.row);
+                rowsCollection.add(newRow);
+                gridView.render();
             }
         },
         _silentInjectRows: function(ev) {
             if (ev.grid !== BackboneGrid.id)
                 return;
-
+            console.log(ev.rows);
             var rows = ev.rows;
             for (var i in rows) {
                 if (typeof(rowsCollection.findWhere({id:rows[i].id})) === 'undefined') {
@@ -449,7 +457,8 @@ FCom.BackboneGrid = function(config) {
                 append += (keys[i] + '=' + BackboneGrid.currentState[keys[i]]);
             }
             append += ('&filters=' + JSON.stringify(BackboneGrid.current_filters));
-            return this.data_url + '?' + append + '&gridId='+BackboneGrid.id;
+            var c = this.data_url.indexOf('?') === -1 ? '?' : '&';
+            return this.data_url + c + append + '&gridId='+BackboneGrid.id;
         },
         parse: function(response) {
             if (response[0].c) {
@@ -602,7 +611,6 @@ FCom.BackboneGrid = function(config) {
             this.setCss();
             this.$el.html('');
             this.collection.each(this.addRow, this);
-
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
             return this;
         },
@@ -792,7 +800,11 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
         events: {
-        'click button.clear': '_closeFilter'
+        'click button.clear': '_closeFilter',
+        'blur input[type="text"]': '_onBlur'
+        },
+        _onBlur: function(ev) {
+            //$('div.select2-drop.select2-drop-multi').css('display','none');
         },
         checkEnter: function(ev) {
 
@@ -811,9 +823,9 @@ FCom.BackboneGrid = function(config) {
 
             this.$el.find('#multi_hidden:first').select2({
                 multiple: true,
-                allowClear: true,
                 data: data,
-                placeholder: 'All'
+                placeholder: 'All',
+                //closeOnSelect: true
             });
             var self = this;
             this.$el.find('#multi_hidden:first').on('change', function() {
@@ -973,14 +985,6 @@ FCom.BackboneGrid = function(config) {
             $('div.'+BackboneGrid.id+'-pagination').html(caption);
     }
 
-    function guid() {
-        function _p8(s) {
-            var p = (Math.random().toString(16)+"000000000").substr(2,8);
-            return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
-        }
-        return _p8() + _p8(true) + _p8(true) + _p8();
-    }
-
         NProgress.start();
         //general settings
         _.templateSettings.variable = 'rc';
@@ -1109,16 +1113,21 @@ FCom.BackboneGrid = function(config) {
 
         //showing selected rows count
         selectedRows = new Backbone.Collection;
-        mutiselectCol = columnsCollection.findWhere({type: 'multiselect'});
+        multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){
-            mutiselectCol.set('selectedCount', selectedRows.length);
 
+            multiselectCol.set('selectedCount', selectedRows.length);
+            multiselectCol.trigger('render');
             if (selectedRows.length > 0) {
                 $(BackboneGrid.massDeleteButton).removeClass('disabled');
                 $(BackboneGrid.massEditButton).removeClass('disabled');
             } else {
                 $(BackboneGrid.massDeleteButton).addClass('disabled');
                 $(BackboneGrid.massEditButton).addClass('disabled');
+            }
+
+            if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('select-rows') !== -1) {
+                g_vent.trigger('select-rows', {grid: config.id, rows: selectedRows.toJSON()});
             }
         });
 
@@ -1234,23 +1243,34 @@ FCom.BackboneGrid = function(config) {
                 }
                 return true;
         });
-
+        var restricts = ['FCom/PushServer/index.php', 'media/grid/upload'];
         //ajax loading...
         $( document ).ajaxSend(function(event, jqxhr, settings) {
-            console.log(settings.url);
-            console.log(settings.url.indexOf('FCom/PushServer/index.php'));
-            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
-                NProgress.start();
+            var url = settings.url;
+            for(var i in restricts) {
+                if (url.indexOf(restricts[i]) !== -1)
+                    return;
+            }
+            NProgress.start();
         });
         $( document ).ajaxComplete(function(event, jqxhr, settings) {
-            if (settings.url.indexOf('FCom/PushServer/index.php') === -1)
-                NProgress.done();
+            var url = settings.url;
+            for(var i in restricts) {
+                if (url.indexOf(restricts[i]) !== -1)
+                    return;
+            }
+            NProgress.done();
         });
         NProgress.done();
 
         if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init") !== -1) {
             var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
             g_vent.trigger('init', ev);
+        }
+        console.log(BackboneGrid.events);
+        if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
+            var ev= {grid: config.id, rows: rowsCollection.toJSON()};
+            g_vent.trigger('init-detail', ev);
         }
     }
 });

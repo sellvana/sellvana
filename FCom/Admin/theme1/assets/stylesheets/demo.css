@@ -91,6 +91,11 @@ position: relative;
 overflow: hidden;
 }
 
+.responsive-table table td {
+  white-space:pre-line;
+  word-wrap:break-word;
+  overflow: hidden;
+}
 .inline-editor {
   padding: 0px;
   margin: 0px;
@@ -109,6 +114,13 @@ overflow: hidden;
 
 input.unvalid {
   border: 1px solid red;
+}
+
+div.ui-resizable-handle {
+  margin-right: -16px;
+  width: 15px;
+  height: 100%;
+  min-height: 38px;
 }
 
 
