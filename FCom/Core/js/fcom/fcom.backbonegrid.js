@@ -55,7 +55,7 @@ FCom.BackboneGrid = function(config) {
         className: function() {
             var cssClass = this.model.get('cssClass');
             if (this.model.get('sortState').length >0) {
-                cssClass += (' sorting_' + this.model.get('sortState'));
+                cssClass += (' sorting_'+this.model.get('sortState'));
             }
             return cssClass;
         },
@@ -63,7 +63,7 @@ FCom.BackboneGrid = function(config) {
             var hash = {};
             hash['data-id'] = this.model.get('name');
             if(this.model.has('width'))
-                hash['style'] = "width: " + this.model.get('width') + 'px;';
+                hash['style'] = "width: "+this.model.get('width')+'px;';
             if(this.model.has('overflow'))
                 hash['style'] += hash['style'] +'overflow:hidden;'
             return hash;
@@ -396,7 +396,7 @@ FCom.BackboneGrid = function(config) {
                                             flag = flag && first_index === 0;
                                             break;
                                         case 'end':
-                                            flag = flag && (last_index + filterVal.length) === modelVal.length;
+                                            flag = flag && (last_index+filterVal.length) === modelVal.length;
                                             break;
                                     }
 
@@ -457,11 +457,11 @@ FCom.BackboneGrid = function(config) {
             for (var i in keys) {
                 if( append != '')
                     append += '&';
-                append += (keys[i] + '=' + BackboneGrid.currentState[keys[i]]);
+                append += (keys[i]+'='+BackboneGrid.currentState[keys[i]]);
             }
-            append += ('&filters=' + JSON.stringify(BackboneGrid.current_filters));
+            append += ('&filters='+JSON.stringify(BackboneGrid.current_filters));
             var c = this.data_url.indexOf('?') === -1 ? '?' : '&';
-            return this.data_url + c + append + '&gridId='+BackboneGrid.id;
+            return this.data_url+c+append+'&gridId='+BackboneGrid.id;
         },
         parse: function(response) {
             if (response[0].c) {
@@ -607,7 +607,7 @@ FCom.BackboneGrid = function(config) {
             }
         },
         getMainTable : function() {
-            return $('#' + BackboneGrid.id);
+            return $('#'+BackboneGrid.id);
         },
         render: function() {
             //console.log('gridview-render');
@@ -645,7 +645,7 @@ FCom.BackboneGrid = function(config) {
             headerView.render();
             filterView.render();
 
-            var name = 'hidden' + this.model.get('name');
+            var name = 'hidden'+this.model.get('name');
             var value = this.model.get('hidden');
             gridView.collection.each(function(row) {
                 row.set(name, value);
@@ -669,7 +669,7 @@ FCom.BackboneGrid = function(config) {
     });
     BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
         initialize: function() {
-            this.setElement('#' + BackboneGrid.id + ' .dd-list');
+            this.setElement('#'+BackboneGrid.id+' .dd-list');
         },
         orderChanged: function(ev) {
             //console.log('orderChanged');
@@ -678,8 +678,8 @@ FCom.BackboneGrid = function(config) {
             for(var i in orderJson) {
                 var key = orderJson[i].id;
                 colModel = columnsCollection.findWhere({name: key});
-                if (parseInt(colModel.get('position')) !== parseInt(i) + columnsCollection.append) {
-                    colModel.set('position', parseInt(i) + columnsCollection.append);
+                if (parseInt(colModel.get('position')) !== parseInt(i)+columnsCollection.append) {
+                    colModel.set('position', parseInt(i)+columnsCollection.append);
                     changedFlag = true;
                 }
 
@@ -842,7 +842,7 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterView = Backbone.View.extend({
         initialize: function() {
-            var div = 'div.row.datatables-top.'+BackboneGrid.id + ' div.col-sm-9 span:nth-child(2)';
+            var div = 'div.row.datatables-top.'+BackboneGrid.id+' div.col-sm-9 span:nth-child(2)';
             this.setElement(div);
             this.collection.on('sort', this.render, this);
         },
@@ -891,15 +891,14 @@ FCom.BackboneGrid = function(config) {
 
             var ids = selectedRows.pluck('id').join(",");
 
-            if (BackboneGrid.data_mode === 'local') {
-                /*var funcName = BackboneGrid.callBacks['mass-edit'];
-                var jsons = selectedRows.toJSON();
-                for  (var i in jsons) {
+            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-edit") !== -1) {
+                var rows = selectedRows.toJSON();
+                for  (var i in rows) {
                     for(var key in BackboneGrid.massEditVals)
-                        jsons[i][key] = BackboneGrid.massEditVals[key];
+                        rows[i][key] = BackboneGrid.massEditVals[key];
                 }
-                var command = funcName + '(jsons);'
-                eval(command);*/
+                var evt = {grid: BackboneGrid.id, rows: rows};
+                g_vent.trigger('mass-edit', evt);
             } else {
                 var hash = BackboneGrid.massEditVals;
                 hash.id = ids;
@@ -912,15 +911,7 @@ FCom.BackboneGrid = function(config) {
                 delete BackboneGrid.massEditVals.oper;
             }
 
-            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-edit") !== -1) {
-                var rows = selectedRows.toJSON();
-                for  (var i in rows) {
-                    for(var key in BackboneGrid.massEditVals)
-                        rows[i][key] = BackboneGrid.massEditVals[key];
-                }
-                var evt = {grid: BackboneGrid.id, rows: rows};
-                g_vent.trigger('mass-edit', evt);
-            }
+
 
             selectedRows.each(function(model) {
                 for(var key in BackboneGrid.massEditVals) {
@@ -959,31 +950,31 @@ FCom.BackboneGrid = function(config) {
             //console.log(BackboneGrid.currentState.mp);
             var html = '';
 
-            html += '<li class="first'+ (p<=1 ? ' disabled' : '') + '">';
+            html += '<li class="first'+ (p<=1 ? ' disabled' : '')+'">';
             html += '<a class="js-change-url" href="#">&laquo;</a>';
             html += '</li>';
 
-            html += '<li class="prev'+ (p<=1 ? ' disabled' : '') + '">';
+            html += '<li class="prev'+ (p<=1 ? ' disabled' : '')+'">';
             html += '<a class="js-change-url" href="#">&lsaquo;</a>';
             html += '</li>';
 
 
             for (var i= Math.max(p-3,1); i<=Math.min(p+3,mp);i++) {
-                html += '<li class="page' + (i == p ? ' active' : '') + '">';
-                html += '<a class="js-change-url" data-page="" href="#">' +  i +'</a>';
+                html += '<li class="page'+(i == p ? ' active' : '')+'">';
+                html += '<a class="js-change-url" data-page="" href="#">'+ i +'</a>';
                 html += '</li>';
             }
 
-            html += '<li class="next'+ (p>=mp ? ' disabled' : '') + '">';
+            html += '<li class="next'+ (p>=mp ? ' disabled' : '')+'">';
             html += '<a class="js-change-url" href="#">&rsaquo;</a>';
             html += '</li>';
 
-            html += '<li class="last'+ (p>=mp ? ' disabled' : '') + '">';
+            html += '<li class="last'+ (p>=mp ? ' disabled' : '')+'">';
             html += '<a class="js-change-url" href="#">&raquo;</a>';
             html += '</li>';
 
 
-            $('ul.' + BackboneGrid.id + '.pagination.page').html(html);
+            $('ul.'+BackboneGrid.id+'.pagination.page').html(html);
 
             var caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
             $('div.'+BackboneGrid.id+'-pagination').html(caption);
@@ -996,7 +987,7 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.personalize_url = config.personalize_url;
         BackboneGrid.edit_url = config.edit_url;
         BackboneGrid.current_filters= {};
-        BackboneGrid.quickInputId = '#' + config.id + '-quick-search';
+        BackboneGrid.quickInputId = '#'+config.id+'-quick-search';
         BackboneGrid.events = config.events;
         //BackboneGrid.callBacks = config.callBacks;
         //personal settings
@@ -1014,22 +1005,22 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
         BackboneGrid.Models.ColModel.prototype.personalize_url = config.personalize_url;
 
-        BackboneGrid.Views.ThView.prototype.template = _.template($('#' + config.id + '-header-template').html());
-        BackboneGrid.Views.HeaderView.prototype.el = "#" + config.id + " thead tr";
+        BackboneGrid.Views.ThView.prototype.template = _.template($('#'+config.id+'-header-template').html());
+        BackboneGrid.Views.HeaderView.prototype.el = "#"+config.id+" thead tr";
         //tbody
-        BackboneGrid.Views.GridView.prototype.el = "table#" + config.id + " tbody";
-        BackboneGrid.Views.RowView.prototype.template = _.template($('#' + config.id + '-row-template').html());
+        BackboneGrid.Views.GridView.prototype.el = "table#"+config.id+" tbody";
+        BackboneGrid.Views.RowView.prototype.template = _.template($('#'+config.id+'-row-template').html());
         BackboneGrid.Collections.Rows.prototype.data_url = config.data_url;
 
         //filtering settings
-        BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#' + config.id + '-text-filter-template').html());
-        BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#' + config.id + '-multiselect-filter-template').html());
+        BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#'+config.id+'-text-filter-template').html());
+        BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
         //column visiblity checkbox view
-        BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
+        BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
 
         //mass edit modal view
-        BackboneGrid.Views.MassEditForm.prototype.el = "div#" + config.id + " div#mass-edit div.modal-body";
-        BackboneGrid.Views.MassEditElement.prototype.template = _.template($('#' + config.id + '-edit-template').html());
+        BackboneGrid.Views.MassEditForm.prototype.el = "div#"+config.id+" div#"+config.id+"-mass-edit div.modal-body";
+        BackboneGrid.Views.MassEditElement.prototype.template = _.template($('#'+config.id+'-edit-template').html());
 
 
         /*if (BackboneGrid.data_mode === 'local') {
@@ -1069,15 +1060,15 @@ FCom.BackboneGrid = function(config) {
                     columnsCollection.append = 2;
                 }
 
-                c.id = config.id + '-' + c.name;
-                //c.style = c['width'] ? "width:" + c['width'] + "px" : '';
+                c.id = config.id+'-'+c.name;
+                //c.style = c['width'] ? "width:"+c['width']+"px" : '';
 
                 c.cssClass = '';
                 if (!c['no_reorder'])
                     c.cssClass += 'js-draggable ';
 
                 if (state['s'] && c['name'] && state['s'] == c['name']) {
-                    //c.cssClass += 'sort-' + state['sd'] + ' ';
+                    //c.cssClass += 'sort-'+state['sd']+' ';
                     c.sortState = state['sd'];
                 } else {
                     //c.cssClass += 'sort';
@@ -1164,10 +1155,10 @@ FCom.BackboneGrid = function(config) {
         }
 
         //mass action logic
-        BackboneGrid.massDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
-        BackboneGrid.AddButton = 'Div #' + config.id + ' button.grid-add';
-        BackboneGrid.massEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
-        BackboneGrid.NewButton = 'Div #' + config.id + ' button.grid-new';
+        BackboneGrid.massDeleteButton = 'Div #'+config.id+' button.grid-mass-delete';
+        BackboneGrid.AddButton = 'Div #'+config.id+' button.grid-add';
+        BackboneGrid.massEditButton = 'Div #'+config.id+' a.grid-mass-edit';
+        BackboneGrid.NewButton = 'Div #'+config.id+' button.grid-new';
         if ($(BackboneGrid.NewButton).length > 0) {
             $(BackboneGrid.NewButton).on('click', function(ev){
                 var newRow = new BackboneGrid.Models.Row({id: guid(), _new: true});
@@ -1177,11 +1168,13 @@ FCom.BackboneGrid = function(config) {
         }
         if ($(BackboneGrid.massDeleteButton).length > 0) {
             $(BackboneGrid.massDeleteButton).on('click', function(){
+                console.log(BackboneGrid.id);
+                console.log(rowsCollection.toJSON());
                 var confirm = window.confirm("Do you really want to delete selected rows?");
                 if (confirm) {
                     if (BackboneGrid.data_mode === 'local' && typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('mass-delete') !== -1) {
                         g_vent.trigger('mass-delete', {grid: BackboneGrid.id, rows: selectedRows.toJSON()});
-                        rowsCollection.remove(selectedRows.models, {silent:true});
+                        rowsCollection.remove(selectedRows.models, {silent: true});
                         gridView.render();
 
                     } else {
@@ -1189,7 +1182,8 @@ FCom.BackboneGrid = function(config) {
                         $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                         .done(function(data) {
                             $.bootstrapGrowl("Successfully deleted.", { type:'success', align:'center', width:'auto' });
-                            rowsCollection.fetch({reset: true});
+                            if (BackboneGrid.data_mode !== 'local')
+                                rowsCollection.fetch({reset: true});
                             //gridView.render();
                         });
                     }
@@ -1200,8 +1194,9 @@ FCom.BackboneGrid = function(config) {
                         g_vent.trigger('mass-delete', ev);
                     }
 
+                    rowsCollection.remove(selectedRows.models, {silent:true});
                     selectedRows.reset();
-                    $('select.' + config.id + '.js-sel').val('');
+                    $('select.'+config.id+'.js-sel').val('');
 
                 }
             });
@@ -1231,7 +1226,7 @@ FCom.BackboneGrid = function(config) {
         }
 
         //quick search
-        var quickInputId = '#' + config.id + '-quick-search';
+        var quickInputId = '#'+config.id+'-quick-search';
 
 
         $(quickInputId).keypress(function(ev){
