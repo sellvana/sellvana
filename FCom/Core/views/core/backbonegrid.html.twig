@@ -9,7 +9,7 @@
 
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
-<div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
+<div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
     <div class="row datatables-top  {{ config.id | raw }}">
           <div class="col-sm-9">
@@ -41,7 +41,7 @@
                 Columns
                 <b class="caret"></b>
             </a>
-                <ol class="dd-list dropdown-menu" style="margin-left:20px;">
+                <ol class="dd-list dropdown-menu" style="margin-left:20px;min-width:200px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
