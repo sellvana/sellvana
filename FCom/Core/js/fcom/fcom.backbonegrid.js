@@ -110,7 +110,7 @@ FCom.BackboneGrid = function(config) {
             var key = this.$el.find('select.js-sel').val();
             switch (key) {
                 case 'show_all':
-                    console.log('show_all!!!');
+                    //console.log('show_all!!!');
                     if(BackboneGrid.showingSelected) {
                         BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                         rowsCollection.originalRows = BackboneGrid.prev_originalRows;
@@ -126,7 +126,7 @@ FCom.BackboneGrid = function(config) {
                     break;
                 case 'show_sel':
                     if(!BackboneGrid.showingSelected) {
-                        console.log('show_sel!');
+                        //console.log('show_sel!');
                         BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
                         BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                         BackboneGrid.showingSelected = true;
@@ -136,7 +136,7 @@ FCom.BackboneGrid = function(config) {
                         BackboneGrid.data_mode = 'local';
                         rowsCollection.originalRows = selectedRows;
                         rowsCollection.reset(selectedRows.models);
-                        console.log(selectedRows);
+                        //console.log(selectedRows);
                     }
                     break;
             }
@@ -222,7 +222,7 @@ FCom.BackboneGrid = function(config) {
             this.collection.on('sort', this.render, this);
         },
         render: function() {
-            console.log('headerver_render');
+            //console.log('headerver_render');
             this.$el.html('');
             this.collection.each(this.addTh, this);
             gridParent = $('#'+BackboneGrid.id).parent();
@@ -316,6 +316,7 @@ FCom.BackboneGrid = function(config) {
 
                 if (typeof(g_vent) !== 'undefined') {
                     g_vent.bind('silent_inject', this._silentInjectRows);
+                    console.log('add_row_register', BackboneGrid.id);
                     g_vent.bind('add_row', this._addRow);
                 }
 
@@ -323,6 +324,8 @@ FCom.BackboneGrid = function(config) {
         },
         _addRow: function(ev) {
             if (ev.grid === BackboneGrid.id) {
+                console.log(ev.grid);
+                console.log(BackboneGrid.id);
                 var newRow = new BackboneGrid.Models.Row(ev.row);
                 rowsCollection.add(newRow);
                 gridView.render();
@@ -331,7 +334,7 @@ FCom.BackboneGrid = function(config) {
         _silentInjectRows: function(ev) {
             if (ev.grid !== BackboneGrid.id)
                 return;
-            console.log(ev.rows);
+            //console.log(ev.rows);
             var rows = ev.rows;
             for (var i in rows) {
                 if (typeof(rowsCollection.findWhere({id:rows[i].id})) === 'undefined') {
@@ -422,17 +425,17 @@ FCom.BackboneGrid = function(config) {
                     }
 
                 }
-                console.log(temp.models.length);
+                //console.log(temp.models.length);
                 this.reset(temp.models);
                 gridView.render();
         },
         addInOriginal: function(model){
             this.originalRows.add(model);
-            console.log('add');
+            //console.log('add');
         },
         removeInOriginal: function(model){
             this.originalRows.remove(model);
-            console.log('remove');
+            //console.log('remove');
         },
         sortLocalData: function() {
             if (BackboneGrid.currentState.s !=='' && BackboneGrid.currentState.sd !=='') {
@@ -607,7 +610,7 @@ FCom.BackboneGrid = function(config) {
             return $('#' + BackboneGrid.id);
         },
         render: function() {
-            console.log('gridview-render');
+            //console.log('gridview-render');
             this.setCss();
             this.$el.html('');
             this.collection.each(this.addRow, this);
@@ -669,7 +672,7 @@ FCom.BackboneGrid = function(config) {
             this.setElement('#' + BackboneGrid.id + ' .dd-list');
         },
         orderChanged: function(ev) {
-            console.log('orderChanged');
+            //console.log('orderChanged');
             var orderJson = $('.dd').nestable('serialize');
             var changedFlag = false;
             for(var i in orderJson) {
@@ -952,7 +955,7 @@ FCom.BackboneGrid = function(config) {
 
             p = BackboneGrid.currentState.p;
             mp = BackboneGrid.currentState.mp;
-            console.log(BackboneGrid.currentState.mp);
+            //console.log(BackboneGrid.currentState.mp);
             var html = '';
 
             html += '<li class="first'+ (p<=1 ? ' disabled' : '') + '">';
@@ -1230,15 +1233,16 @@ FCom.BackboneGrid = function(config) {
         var quickInputId = '#' + config.id + '-quick-search';
 
 
-        $(quickInputId).on('keyup', function(ev){
-                var evt = ev || window.event;
-                var charCode = evt.keyCode || evt.which;
-                if (BackboneGrid.data_mode !== 'local' && charCode == 13) {
-
-                    BackboneGrid.current_filters['_quick'] = $(ev.target).val();
-                    rowsCollection.fetch({reset: true});
+        $(quickInputId).keypress(function(ev){
+                var k=ev.keyCode || ev.which;
+                if (k == 13) {
                     ev.preventDefault();
                     ev.stopPropagation();
+
+                    if (BackboneGrid.data_mode !== 'local') {
+                        BackboneGrid.current_filters['_quick'] = $(ev.target).val();
+                        rowsCollection.fetch({reset: true});
+                    }
                     return false;
                 }
                 return true;
@@ -1267,7 +1271,7 @@ FCom.BackboneGrid = function(config) {
             var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
             g_vent.trigger('init', ev);
         }
-        console.log(BackboneGrid.events);
+        //console.log(BackboneGrid.events);
         if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
             var ev= {grid: config.id, rows: rowsCollection.toJSON()};
             g_vent.trigger('init-detail', ev);
