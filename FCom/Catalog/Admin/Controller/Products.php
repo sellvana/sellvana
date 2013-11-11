@@ -114,7 +114,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default' => $model->id()),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200),
+                    array('name'=>'file_name', 'label'=>'Preview', 'width'=>200),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>200, 'editable' => true),
                     array('name'=>'position', 'label'=>'Position', 'width'=>200, 'editable' => true, 'validate' => 'number'),
@@ -123,7 +123,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('/media/grid/download?folder=media/product/attachment&file='), 'col'=>'file_name'),'delete' => true))
                 ),
                 'actions' => array(
-                    'add' => array('caption' => 'Add a attachment'),
+                    'add' => array('caption' => 'Add attachments'),
                     'delete' => array('caption' => 'Remove')
                 ),
                 'events' => array('init-detail', 'add','mass-delete', 'delete', 'edit'),
@@ -138,23 +138,43 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function productImagesGridConfig($model)
     {
+
+        $download_url = BApp::href('/media/grid/download?folder=media/product/images&file=');
+        $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
+
         return array(
-            'grid' => array(
+            'config' => array(
                 'id' => 'product_images',
                 'caption' => 'Product Images',
-                'datatype' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('I')->select('a.id')->select('a.file_name')->find_many()),
-                'colModel' => array(
-                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                'data_mode' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('I')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
+                'columns' => array(
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('name'=>'id', 'hidden'=>true),
+                    array('name'=>'file_id',  'hidden'=>true),
+                    array('name'=>'product_id', 'hidden'=>true,'default' => $model->id()),
+                    array('name'=>'download_url',  'hidden'=>true, 'default' => $download_url),
+                    array('name'=>'thumb_url',  'hidden'=>true, 'default' => $thumb_url),
+                    array('name'=>'file_name',  'hidden'=>true),
+                    array('name'=>'prev_img', 'label'=>'Thumb image', 'width'=>200, 'print'=>'print("<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>");', 'sortable'=>false),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>200, 'editable' => true),
+                    array('name'=>'position', 'label'=>'Position', 'width'=>200, 'editable' => true, 'validate' => 'number'),
+                    array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
+                    array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
-                'multiselect' => true,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Images to Product', 'cursor'=>'pointer'),
-            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Images From Product', 'cursor'=>'pointer'),
+                'actions' => array(
+                    'add' => array('caption' => 'Add images'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'events' => array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'filters' => array(
+                    array('field' => 'file_name', 'type' => 'text'),
+                    array('field' => 'label', 'type' => 'text'),
+                    '_quick' => array('expr' => 'file_name like ? ', 'args' =>  array('%?%'))
+                )
+            )
         );
     }
 

@@ -194,24 +194,26 @@
         print('<input data-col="' + col.name + '" value = "' + rc.row[col.name] + '" class="form-control"/>');
     }
     else {
-      if (typeof(col.display) === 'undefined')
-        print(rc.row[col.name]);
-      else if (col.display === 'file_size') {
-        var size = parseInt(rc.row[col.name]);
-        if (size/(1024*1024) > 1) {
-          size = size/(1024*1024);
-          size = size.toFixed(2) + ' MB';
-        } else if (size/1024 > 1) {
-          size = size/1024;
-          size = size.toFixed(2) + ' KB';
-        } else {
-          size = size + ' Byte';
+      if (typeof(col.print) !== 'undefined') {
+        eval(col.print);
+      } else {
+        if (typeof(col.display) === 'undefined')
+          print(rc.row[col.name]);
+        else if (col.display === 'file_size') {
+          var size = parseInt(rc.row[col.name]);
+          if (size/(1024*1024) > 1) {
+            size = size/(1024*1024);
+            size = size.toFixed(2) + ' MB';
+          } else if (size/1024 > 1) {
+            size = size/1024;
+            size = size.toFixed(2) + ' KB';
+          } else {
+            size = size + ' Byte';
+          }
+          print(size);
         }
-        print(size);
-      }
-
-
     }
+  }
 
     print('</td>');
   } %>
@@ -219,9 +221,9 @@
 
 <script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
-    <a class="js-change-url" style="cursor: pointer;">
+    <% if (typeof(rc.sortable) == 'undefined') { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
       <%= rc.label %>
-    </a>
+    <% if (typeof(rc.sortable) == 'undefined') { %> </a> <% } %>
   <% } else if (rc.type === 'multiselect') { %>
    <% if (rc.selectedCount>0) { %>
       <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
