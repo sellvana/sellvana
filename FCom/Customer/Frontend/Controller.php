@@ -10,13 +10,25 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_login__POST()
     {
         try {
+            $customerModel = FCom_Customer_Model_Customer::i();
             $r = BRequest::i()->post('login');
-            if (!empty($r['email']) && !empty($r['password'])) {
-                $user = FCom_Customer_Model_Customer::i()->authenticate($r['email'], $r['password']);
+            $customerModel->setLoginRules();
+            if ($customerModel->validate($r, array(), 'frontend')) {
+                $user = $customerModel->authenticate($r['email'], $r['password']);
                 if ($user) {
                     $user->login();
                 } else {
                     throw new Exception('Invalid email or password.');
+                }
+            } else {
+                //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
+                $messages = BSession::i()->messages('validator-errors:frontend');
+                if (count($messages)) {
+                    $msg = array();
+                    foreach ($messages as $m) {
+                        $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+                    }
+                    BSession::i()->addMessage($msg, 'error', 'frontend');
                 }
             }
             if (BRequest::i()->post('backroute')) {
