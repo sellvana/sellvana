@@ -63,9 +63,11 @@
                         $('#f-prod-review-form').modal('hide');
                         mainForm[0].reset();
                         mainForm.find('.rateit-reset').click();
-                        //todo: add code to update list product review
+                        //update list previews
+                        $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}')
                     } else {
-
+                        console.log(data);
+                        alert("Invalid data, please check again");
                     }
                 },
                 error: function (xhr, textStatus, errorThrown)
