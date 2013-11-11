@@ -31,9 +31,11 @@
     <h5 class="f-tab-title">{{ 'Customer Reviews'|_ }}</h5>
     <a data-toggle="modal" href="{{ APP.href('prodreviews/add?pid=') ~ THIS.get('prod').id() }}" class="btn btn-sm btn-primary" id="f-prod-review-open">{{ 'Write your own review'|_ }}</a>
   </div>
+    <div id="f-prod-reviews-container">
     {% if (reviews.numReviews > 0) %}
-        {{ THIS.view('prodreviews/product-reviews-list').set('reviews', reviews) }}
+        {{ THIS.view('prodreviews/product-reviews-list').set('reviews', reviews)|raw }}
     {% else %}
         <p>{{ "No reviews. Become first person review this products"|_ }}</p>
     {% endif %}
+    </div>
 </section>

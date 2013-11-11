@@ -1,4 +1,5 @@
 {% set reviews = THIS.get('reviews') %}
+{% set rate = APP.instance('FCom_ProductReviews_Model_Review').config() %}
 
 <div class="f-prod-review-avg clearfix">
     <h5>{{ "Avg. Customer Rating"|_ }} ({{ reviews.numReviews }} {{ "Reviews"|_ }}):</h5>

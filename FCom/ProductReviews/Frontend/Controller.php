@@ -145,21 +145,18 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     public function action_reviews_list()
     {
         $r = BRequest::i();
-        $this->layout(null);
         if ($r->xhr()) {
             $pid = $r->param('pid', true);
             if (!$pid) {
-                BDebug::error('Invalid ID');
+                BDebug::error(BLocale::_('Invalid ID'));
                 die;
             }
-
             if (!($product = FCom_Catalog_Model_Product::i()->load($pid))) {
-                BDebug::error('Cannot load product with this id');
+                BDebug::error(BLocale::_('Cannot load product with this id'));
                 die;
             }
-
             $reviews = $product->reviews();
-            BLayout::i()->view('prodreviews/product-reviews-list')->set('reviews', $reviews)->render();
+            BResponse::i()->set($this->view('prodreviews/product-reviews-list')->set('reviews', $reviews));
         }
     }
 }
