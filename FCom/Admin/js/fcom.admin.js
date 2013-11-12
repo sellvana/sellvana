@@ -110,7 +110,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 return grid.jqGrid('getGridParam', 'selarrrow');
             } else {
                 var sel = grid.jqGrid('getGridParam', 'selrow');
-    console.log(sel);
                 return sel===null ? [] : [sel];
             }
         }
@@ -679,7 +678,11 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
 
         function wysiwygCreate(id) {
+            console.log('1=',!editors[id]);
+            console.log('2=',CKEDITOR !== 'undefined');
+            console.log('3=',!CKEDITOR.instances[id]);
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
+                console.log(id,'wysiwygcreate');
                 editors[id] = true; // prevent double loading
                 CKEDITOR.replace(id, {
                     /*toolbarGroups: [
@@ -741,7 +744,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             var tabId = pane.attr('id').replace(/^tab-/,'');
             var url_get = options.url_get+(options.url_get.match(/\?/) ? '&' : '?');
             var url_post = options.url_get+(options.url_post.match(/\?/) ? '&' : '?');
-    console.log(url_get, url_post);
             switch (action) {
             case 'edit':
                 $.get(url_get+'tabs='+tabId+'&mode=edit', function(data, status, req) {

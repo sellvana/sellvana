@@ -42,7 +42,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         if ($productModel) {
 
             $config['columns'][6]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
-            $config['columns'][6]['data']['edit']['ajax'] = true;
+            $config['columns'][6]['data']['edit']['async_edit'] = true;
 
             $config['id'] = 'products_reviews';
             $config['columns']['product_name'] = array('label'=>'Product name', 'width'=>250, 'editable'=>false);
@@ -64,6 +64,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 }
             }*/
             //print_r($data);
+            $config['events'] = array('async_edit');
             $config['data'] = $data;
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
@@ -86,5 +87,4 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         ));
 
     }
-
 }

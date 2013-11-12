@@ -5,9 +5,12 @@
 {% set validator = THIS.validator(formId, THIS.get('model')) %}
 
 <script>
+
+
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
 
         $(function() {
+
             window.adminForm = FCom.Admin.form({
                 form:     '{{ formId }}',
                 tabs:     '.adm-tabs-sidebar li',
