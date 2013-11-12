@@ -3,10 +3,11 @@ modules:
         version: 0.1.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
+        translations: { de: de.php }
 
         areas:
             FCom_Frontend:
-                auto_use: [ views ]
+                auto_use: [ views, bootstrap ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]
