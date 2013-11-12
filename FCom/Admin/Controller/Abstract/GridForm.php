@@ -175,32 +175,6 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
     }
 
-    public function action_form_only()
-    {
-
-        $this->_formViewName = $this->_formViewName.'_only';
-
-        $class = $this->_modelClass;
-        $id = BRequest::i()->param('id', true);
-        if ($id && !($model = $class::i()->load($id))) {
-            BDebug::error('Invalid ID: '.$id);
-        }
-        if (empty($model)) {
-            $model = $class::i()->create();
-        }
-        $this->formMessages();
-
-        //$view = $this->view($this->_formViewName)->set('model', $model);
-
-        BLayout::i()->setRootView($this->_formViewName);
-        //$this->formViewBefore(array('view'=>$view, 'model'=>$model));
-        //$this->layout($this->_formLayoutName);
-        //$this->processFormTabs($view, $model, 'edit');
-        if ($this->_formTitle && ($head = $this->view('head'))) {
-            $head->addTitle($this->_formTitle);
-        }
-    }
-
     public function formViewBefore($args)
     {
         $m = $args['model'];

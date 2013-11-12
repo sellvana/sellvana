@@ -30,6 +30,9 @@ modules:
                 logging: false
             web:
                 csrf_check_method: referrer
+                headers:
+                    X-UA-Compatible: IE=edge
+                    X-Frame-Options: SAMEORIGIN
             modules:
                 FCom_Core:
                     company_name: Fulleron
