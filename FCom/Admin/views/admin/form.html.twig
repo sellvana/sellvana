@@ -2,7 +2,7 @@
 {% set formUrl = THIS.get('form_url') %}
 {% set formId = THIS.get('form_id') %}
 {% set curTab = THIS.get('cur_tab') %}
-{% set validator = THIS.validator(formId, THIS.model) %}
+{% set validator = THIS.validator(formId, THIS.get('model')) %}
 
 <script>
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
