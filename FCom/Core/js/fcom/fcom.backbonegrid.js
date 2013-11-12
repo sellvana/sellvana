@@ -1275,7 +1275,9 @@ FCom.BackboneGrid = function(config) {
             console.log('fetch_rows');
             g_vent.bind('fetch_rows', function(ev) {
                 if(ev.grid === config.id) {
-                    rowsCollection.fetch({reset:true});
+                    rowsCollection.fetch({reset:true, success: function() {
+                        console.log('success');
+                    }});
                 }
             });
         }

@@ -20,7 +20,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
             array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select'),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id', 'render_partial'=>true),'delete'=>true))
+            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),'delete'=>true))
         );
 
         $config['filters'] = array(
@@ -40,6 +40,10 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
+
+            $config['columns'][6]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
+            $config['columns'][6]['data']['edit']['ajax'] = true;
+
             $config['id'] = 'products_reviews';
             $config['columns']['product_name'] = array('label'=>'Product name', 'width'=>250, 'editable'=>false);
             $config['data_mode'] = 'local';
