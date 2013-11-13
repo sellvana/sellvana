@@ -332,4 +332,21 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $user->save();
         }
     }
+
+    /**
+     * rule email unique
+     * @param $data
+     * @param $args
+     * @return bool
+     */
+    public static function ruleEmailUnique($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return false;
+        }
+        $model = self::i()->orm()->where('email', $data[$args['field']])->find_one();
+        if ($model)
+            return false;
+        return true;
+    }
 }
