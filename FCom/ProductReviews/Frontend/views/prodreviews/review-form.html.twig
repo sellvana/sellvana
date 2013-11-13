@@ -1,11 +1,11 @@
 {% set prod = THIS.get('prod') %}
+{% set needApprove = CONFIG.get('modules/FCom_ProductReviews/need_approve') %}
 {% set config = APP.instance('FCom_ProductReviews_Model_Review').config() %}
 {% set max = config.max %}
 {% set min = config.min %}
 {% set step = config.step %}
 {% if (THIS.get('isModalBox') != 1) %}
     {% set validator = THIS.validator(THIS.get('formId')) %}
-    {{ dump(validator) }}
 {% endif %}
 
 <form action="{{ APP.href('prodreviews/add') }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
@@ -53,7 +53,10 @@
             <textarea name="review[text]" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{{ validator is defined ? validator.fieldValue('text') : '' }}</textarea><br/>
         </div>
     </div>
-    <input type="submit" class="btn" id="review_save">
+    <input type="submit" class="btn btn-primary" id="review_save">
+    {% if (THIS.get('isModalBox') != 1) %}
+        <a href="{{ prod.url() }}" class="btn">{{ "Return product"|_ }}</a>
+    {% endif %}
 </form>
 
 <script>
@@ -72,13 +75,15 @@
                         if (data.status == 'error') {
                             $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                         } else if (data.status == 'success'){
-                            $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                            var message = data.message || "Saved";
+                            $.bootstrapGrowl(message, { type: 'success', align: 'center', width: 'auto' });
                             $('#f-prod-review-form').modal('hide');
                             mainForm[0].reset();
                             mainForm.find('.rateit-reset').click();
-                            //todo: check if need approve in config to show list reviews
-                            //update list previews
-                            $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}')
+                            {% if needApprove == 0 %}
+                                //update list previews
+                                $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}');
+                            {% endif %}
                         } else {
                             console.log(data);
                             alert("Invalid data, please check again");
