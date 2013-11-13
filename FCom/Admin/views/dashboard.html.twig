@@ -1,4 +1,5 @@
 {% set widgets = THIS.getWidgets() %}
+{% set asyncWidgets = [] %}
 <style>
 .js-sortable-container { list-style-type: none; }
 .js-sortable-handle { cursor: move; }
@@ -11,55 +12,100 @@
         <i class='icon-dashboard'></i>
         <span>Dashboard</span>
       </h1>
+      <div class="pull-left">
+        <div class="btn-group">
+        <!--
+          <select id="dashboard-add-widget" class="select2">
+            <option value="">{{ 'Select to add...'|_ }}</option>
+{% for widget in widgets %}
+  {% if widget.state.closed %}
+            <option value="{{ widget.key }}">{{ widget.title|_ }}</option>
+  {% endif %}
+{% endfor %}
+          </select>
+          -->
+        </div>
+      </div>
       <div class='pull-right'>
         <div class='btn-group'>
           <a class="btn btn-white hidden-xs" href="#">Last month</a>
           <a class="btn btn-white" href="#">Last week</a>
           <a class="btn btn-white " href="#">Today</a>
-                <a class="btn btn-white" id="daterange" href="#"><i class='icon-calendar'></i>
-          <span>Custom</span>
-          <b class='caret'></b>
-          </a>
-
+          <a class="btn btn-white" id="daterange" href="#"><i class='icon-calendar'></i><span>Custom</span><b class='caret'></b></a>
         </div>
       </div>
     </div>
 
     <ul class='js-sortable-container row'>
 {% for widget in widgets %}
-      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}" {{ widget.hidden ? 'style="display:none"' }}>
-        <div class='box'>
+  {% if not widget.state.closed %}
+      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
+        <div class='box {{ widget.state.collapsed ? 'box-collapsed' }}'>
           <div class='box-header js-sortable-handle {{ widget.header_class }}'>
-            <div class='title'>
-              <i class='icon-{{ widget.icon }}'></i>
-              {{ widget.title }}
-            </div>
+            <div class='title'><i class='icon-{{ widget.icon }}'></i>{{ widget.title }}</div>
             <div class='actions'>
               <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class='icon-remove'></i></a>
               <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
             </div>
           </div>
 
-          {% if widget.view %}
+          {% if widget.async %}
+            {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
+          {% elseif widget.view %}
             {{ THIS.view(widget.view) | raw }}
           {% else %}
             {{ widget.content | raw }}
           {% endif %}
         </div>
       </li>
+  {% endif %}
 {% endfor %}
     </ul>
 
   </div>
 </div>
+
+<script type="text/template" id="dashboard-widget-template">
+  <li class="col-sm-<%- widget.cols %>" id="dashboard-widget__<%- widget.key %>" data-id="<%- widget.key %>">
+    <div class='box'>
+      <div class='box-header js-sortable-handle <%- widget.header_class %>'>
+        <div class='title'><i class='icon-<%- widget.icon %>'></i><%- widget.title %></div>
+        <div class='actions'>
+          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class='icon-remove'></i></a>
+          <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
+        </div>
+      </div>
+      <%= widget.content %>
+    </div>
+  </li>
+</script>
+
 <script>
 require(['jquery', 'jquery-ui'], function($) {
+  var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+
+  function load(widgets, wrapped) {
+    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped }, function(response, status, xhr) {
+      $.each(response.widgets, function(key, widget) {
+        _.template($('dashboard-widget-template').html(), widget)
+        //$('dashboard-widget__'+widget.key+' > .box').append(widget.content);
+      });
+    });
+  }
+{% if asyncWidgets %}
+  load({{ UTIL.toJson(asyncWidgets) }}.join(','));
+{% endif %}
+
+  $('#dashboard-add-widget').change(function(ev) {
+    load($(this).val(), true);
+  });
+
   $('.js-sortable-container').sortable({
     connectWith: '.js-sortable-container',
     handle: '.js-sortable-handle',
     update: function(ev, ui) {
       //console.log(this, ev, ui);
-      var widgetIds = [], personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+      var widgetIds = [];
       $(this).children().each(function(idx, el) {
         widgetIds.push($(el).data('id'));
       });
@@ -70,6 +116,21 @@ require(['jquery', 'jquery-ui'], function($) {
     }
     //delay: 100,
   })
-  $('.js-sortable-')
+
+  $('.js-sortable-container').on('click', '.js-remove', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+      console.log(response);
+    });
+  })
+
+  $('.js-sortable-container').on('click', '.js-collapse', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+      console.log(response);
+    });
+  })
 })
 </script>

@@ -2,7 +2,7 @@ base:
     - view: head
         do:
             - [ meta, viewport, "width=device-width, initial-scale=1.0" ]
-            - [ meta, X-UA-Compatible, IE=100, true ]
+            #- [ meta, X-UA-Compatible, IE=100, true ]
             - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
             - [ css, @FCom_FrontendThemeBootSimple/css/bootstrap.css ]
             - [ css, @FCom_Core/css/flags.css ]
