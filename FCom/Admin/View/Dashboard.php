@@ -25,8 +25,18 @@ class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
             foreach ($pers['dashboard']['widgets'] as $wKey => $wState) {
                 $widgets[$wKey]['state'] = $wState;
             }
+
+            $pos = 0;
+            foreach ($widgets as $wKey => $widget) {
+                $pos++;
+                if (empty($widget['state']['pos'])) {
+                    $widgets[$wKey]['state']['pos'] = $pos;
+                }
+            }
+            uasort($widgets, function($a, $b) {
+                return $a['state']['pos'] < $b['state']['pos'] ? -1 : ($a['state']['pos'] > $b['state']['pos'] ? 1 : 0);
+            });
         }
         return $widgets;
     }
-
 }

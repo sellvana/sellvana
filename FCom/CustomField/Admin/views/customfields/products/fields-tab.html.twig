@@ -1,12 +1,12 @@
 <script type="template" id="products-customfield-template">
 
-    <div id="cf_field_<%= field.id %>" style="margin-top: 15px;">
-      <h3><%= field.frontend_label %></h3>
+    <div id="cf_field_<%- field.id %>" style="margin-top: 15px;">
+      <h3><%- field.frontend_label %></h3>
       <% switch (field.admin_input_type) { case 'select': %>
-        <select name="model[<%= field.field_code %>]">
+        <select name="model[<%- field.field_code %>]">
           <% f_.each(field.options, function(opt) { %>
-            <option value="<%= opt.label %>" <%= model[field.field_code] == opt.label ? 'selected' %> >
-              <%= opt.label %>
+            <option value="<%- opt.label %>" <%- model[field.field_code] == opt.label ? 'selected' %> >
+              <%- opt.label %>
             </option>
           <% } %>
         </select>
@@ -14,19 +14,19 @@
       <% break; case 'text': %>
         <% if (field.table_field_type == 'date' || field.table_field_type == 'datetime' %>
           <div class="datepicker_wrapper">
-            <input type="text" name="model[<%= field.field_code %>]" value="<%= model[field.field_code] %>" class="datepicker">
+            <input type="text" name="model[<%- field.field_code %>]" value="<%- model[field.field_code] %>" class="datepicker">
           </div>
         <% } else { %>
-          <input type="text" name="model[<%= field.field_code %>]" value="<%= model[field.field_code] %>">
+          <input type="text" name="model[<%- field.field_code %>]" value="<%- model[field.field_code] %>">
         <% } %>
 
       <% break; case 'textarea': %>
 
-        <textarea name="model[<%= field.field_code %>]"><%= model[field.field_code] %></textarea>
+        <textarea name="model[<%- field.field_code %>]"><%- model[field.field_code] %></textarea>
 
       <% break; case 'boolean': %>
 
-        <select name="model[<%= field.field_code %>]">
+        <select name="model[<%- field.field_code %>]">
             <option value="0">No</option><option value="1">Yes</option>
         </select>
 
@@ -34,7 +34,7 @@
 
       <% if (!field.system) { %>
         <br/>
-        <a href="javascript:void(0);" onclick="cf_field_remove(<%= field.id %>)">{{ 'remove'|_ }}</a>
+        <a href="javascript:void(0);" onclick="cf_field_remove(<%- field.id %>)">{{ 'remove'|_ }}</a>
       <% } %>
     </div>
 </script>
