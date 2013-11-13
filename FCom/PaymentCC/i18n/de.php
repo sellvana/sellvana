@@ -1,7 +1,10 @@
-<?php return array('"Credit Card"' => '',
-'"Card Type"' => '',
-'"Card number"' => '',
-'"Name on card"' => '',
-'"Expires"' => '',
-'"Choose"' => '',
-'"Apply changes"' => '');
+<?php return array('Credit Card' => '',
+'Card Type' => '',
+'Visa' => '',
+'MasterCard' => '',
+'Card number' => '',
+'Name on card' => '',
+'Expires' => '',
+'Choose' => '',
+'CVV' => '',
+'Apply changes' => '');

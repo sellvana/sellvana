@@ -318,15 +318,21 @@ FCom.BackboneGrid = function(config) {
             if (typeof(g_vent) !== 'undefined') {
                     g_vent.bind('silent_inject', this._silentInjectRows);
                     g_vent.bind('add_row', this._addRow);
+                    g_vent.bind('update_row', this._updateRow);
             }
         },
         _addRow: function(ev) {
             if (ev.grid === BackboneGrid.id) {
-                console.log(ev.grid);
-                console.log(BackboneGrid.id);
                 var newRow = new BackboneGrid.Models.Row(ev.row);
                 rowsCollection.add(newRow);
                 gridView.render();
+            }
+        },
+        _updateRow: function(ev) {
+            if (ev.grid === BackboneGrid.id) {
+                var rowModel = rowsCollection.get(ev.row.id);
+                rowModel.set(ev.row);
+                rowModel.save();
             }
         },
         _silentInjectRows: function(ev) {
@@ -501,12 +507,24 @@ FCom.BackboneGrid = function(config) {
             'change input.select-row': '_selectRow',
             'change .form-control': '_cellValChanged',
             //'keydown .form-control': '_validate',
-            'click a.btn-delete': '_deleteRow'
+            'click a.btn-delete': '_deleteRow',
+            'click a.btn-edit.async_edit': '_asyncEditLoad'
         },
         initialize: function() {
             this.model.on('render',this.render, this);
             this.model.on('remove', this._destorySelf, this);
             //this.model.on('change', this.render, this);
+        },
+        _asyncEditLoad: function(ev) {
+            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "async_edit") !== -1) {
+                g_vent.trigger('async_edit', {grid: BackboneGrid.id, row:this.model.toJSON()});
+                ev.stopPropagation();
+                ev.preventDefault();
+
+                return false;
+            }
+
+            return true;
         },
         _validate: function(ev) {
             var val = $(ev.target).val();
@@ -1275,7 +1293,9 @@ FCom.BackboneGrid = function(config) {
             console.log('fetch_rows');
             g_vent.bind('fetch_rows', function(ev) {
                 if(ev.grid === config.id) {
-                    rowsCollection.fetch({reset:true});
+                    rowsCollection.fetch({reset:true, success: function() {
+                        console.log('success');
+                    }});
                 }
             });
         }
