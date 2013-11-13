@@ -22,3 +22,8 @@ catalog_product_form_tabs:
 		set: { tab_view_prefix: prodreviews/ }
 		do:
 			- [ addTab, main, { label: Product Review, pos: 10 } ]
+
+/settings:
+  - view: settings
+    do:
+      - [ addTab, FCom_ProductReviews, { label: Product Reviews, group: catalog, async: true } ]

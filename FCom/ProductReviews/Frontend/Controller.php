@@ -19,7 +19,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             return;
         }
 
-        $this->view('prodreviews/review-form')->pid = $product->id();
+        $this->formMessages();
+        $this->view('prodreviews/review-form')->set(array('prod' => $product, 'formId' => $this->formId));
         $this->layout('/prodreview/add');
     }
 
@@ -40,24 +41,34 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         $post['review']['product_id'] = $product->id();
         $review = FCom_ProductReviews_Model_Review::i()->create();
+        $needApprove = BConfig::i()->get('modules/FCom_ProductReviews/need_approve');
         if ($valid = $review->validate($post['review'], array(), $this->formId)) {
+            if (!$needApprove) {
+                $post['review']['approved'] = 1;
+            }
             $review->set($post['review'])->save();
             $review->notify();
-            BSession::i()->addMessage(BLocale::_('Thank you for your review!'), 'success', 'frontend');
-        } else {
-            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$this->formId);
         }
 
-        if (BRequest::i()->xhr()) {
+        $successMessage = BLocale::_('Thank you for your review!');
+        if ($needApprove && $valid) {
+            $successMessage = BLocale::_('Thank you for your review! We will check and approve this review in 24 hours.');
+        }
+
+        if (BRequest::i()->xhr()) { //ajax request
             if ($valid) {
-                BResponse::i()->json(array('status' => 'success'));
+                BResponse::i()->json(array('status' => 'success', 'message' => $successMessage));
             } else {
-                BResponse::i()->json(array('status' => 'error', 'message' => $this->getErrorMessage()));
+                BResponse::i()->json(array('status' => 'error', 'message' => $this->getAjaxErrorMessage()));
             }
         } else {
-            $url = $product->url();
-            if (!$valid)
+            if ($valid) {
+                BSession::i()->addMessage($successMessage, 'success', 'frontend');
+                $url = $product->url();
+            } else {
+                BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$this->formId);
                 $url = BApp::href('prodreviews/add?pid='.$product->id());
+            }
             BResponse::i()->redirect($url);
         }
     }
@@ -128,7 +139,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         }
     }
 
-    public function getErrorMessage()
+    public function getAjaxErrorMessage()
     {
         $messages = BSession::i()->messages('validator-errors:'.$this->formId);
         $errorMessages = array();
@@ -157,6 +168,22 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             $reviews = $product->reviews();
             BResponse::i()->set($this->view('prodreviews/product-reviews-list')->set('reviews', $reviews));
+        }
+    }
+
+    /**
+     * form error message
+     */
+    public function formMessages()
+    {
+        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
+        $messages = BSession::i()->messages('validator-errors:'.$this->formId);
+        if (count($messages)) {
+            $msg = array();
+            foreach ($messages as $m) {
+                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'frontend');
         }
     }
 }
