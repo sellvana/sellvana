@@ -54,13 +54,28 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_recover__POST()
     {
-        $user = FCom_Customer_Model_Customer::i()->load(BRequest::i()->request('email'), 'email');
-        if ($user) {
-            $user->recoverPassword();
+        try {
+            $email = BRequest::i()->request('email');
+            $customerModel = FCom_Customer_Model_Customer::i();
+            $customerModel->setPasswordRecoverRules();
+            if ($customerModel->validate(array('email' => $email), array(), 'frontend')) {
+                $user = $customerModel->load($email, 'email');
+                if ($user) {
+                    $user->recoverPassword();
+                }
+                BSession::i()->addMessage(
+                    BLocale::_('If the email address was correct, you should receive an email shortly with password recovery instructions.'),
+                    'success', 'frontend');
+                BResponse::i()->redirect('login');
+            } else {
+                $this->formMessages();
+                BResponse::i()->redirect('/customer/password/recover');
+            }
+        } catch (Exception $e) {
+            BDebug::logException($e);
+            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            BResponse::i()->redirect('customer/password/recover');
         }
-        BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.',
-                'success', 'frontend');
-        BResponse::i()->redirect('login');
     }
 
     public function action_password_reset()

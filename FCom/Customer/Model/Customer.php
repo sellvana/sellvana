@@ -57,6 +57,17 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         );
     }
 
+    /**
+     * override default rules for password recover form
+     */
+    public function setPasswordRecoverRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('email', '@email'),
+        );
+    }
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
