@@ -308,7 +308,8 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             columns: {{ THIS.getColumnsData() | raw }},
             data_mode: "{{ config.data_mode }}",
             filters: {{ THIS.getFilterData()  | raw }},
-            events: {{ THIS.getEventData() | raw }}
+            events: {{ THIS.getEventData() | raw }},
+            callbacks: {{ THIS.getCallbacks() | raw }}
         });
     //});
 });
