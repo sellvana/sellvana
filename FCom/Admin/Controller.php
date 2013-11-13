@@ -10,34 +10,6 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         return parent::authenticate($args);
     }
 
-    public function action_test()
-    {
-        $config = array(
-            'id' => 'test',
-            'orm' => 'FCom_Admin_Model_User',
-            'columns' => array(
-                'id' => array('title' => 'ID'),
-            ),
-            'data' => array(
-                array('id' => '123'),
-            ),
-        );
-        $this->view('core/htmlgrid-wrapper')->set('grid', array('config' => $config));
-        $this->layout('/test');
-
-/*
-        $c = BConfig::i();
-        echo $this->view('settings/FCom_Admin')->set('model', $c);
-        $timer = microtime(true);
-        echo $this->view('settings/FCom_Core')->set('model', $c);
-        echo microtime(true)-$timer.', ';
-
-        $timer = microtime(true);
-        echo $this->view('settings/FCom_Core-php')->set('model', $c);
-        echo microtime(true)-$timer.', ';
-*/
-    }
-
     public function action_index()
     {
         $this->layout('/');
@@ -127,6 +99,28 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         FCom_Admin_Model_User::i()->logout();
         BResponse::i()->redirect(BApp::href());
+    }
+
+    public function action_dashboard()
+    {
+        if (!BRequest::i()->xhr()) {
+            BResponse::i()->redirect('');
+        }
+        $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
+        $widgetKeys = explode(',', BRequest::i()->get('widgets'));
+        $result = array();
+        foreach ($widgetKeys as $wKey) {
+            if (empty($widgets[$wKey])) {
+                continue;
+            }
+            if (!empty($widgets[$wKey]['view'])) {
+                $html = (string)$this->view($widgets[$wKey]['view']);
+            } else {
+                $html = $widgets[$wKey]['content'];
+            }
+            $result['widgets'][] = array('key' => $wKey, 'html' => $html);
+        }
+        BResponse::i()->json($result);
     }
 
     public function action_my_account()
@@ -259,14 +253,21 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             }
             break;
 
-        case 'dashboard.widget.state':
+        case 'dashboard.widget.close': case 'dashboard.widget.collapse':
             if (empty($r['key'])) {
                 break;
             }
-            $data = array('dashboard' => array('widgets' => array($r['key'] => BUtil::arrayMask($r, 'pos,hidden,collapsed'))));
+            $data = array();
+            if ($r['do'] == 'dashboard.widget.close') {
+                $data['closed'] = true;
+            }
+            if ($r['do'] == 'dashboard.widget.collapse') {
+                $data['collapsed'] = !empty($r['collapsed']) && $r['collapsed']!=='0' && $r['collapsed']!=='false';
+            }
+            $data = array('dashboard' => array('widgets' => array($r['key'] => $data)));
             break;
         }
         FCom_Admin_Model_User::i()->personalize($data);
-        BResponse::i()->json(array('success'=>true, 'data' => $data));
+        BResponse::i()->json(array('success'=>true, 'data' => $data, 'r' => $r));
     }
 }
