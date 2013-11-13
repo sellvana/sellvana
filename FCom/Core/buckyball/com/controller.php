@@ -1167,7 +1167,13 @@ class BResponse extends BClass
         }
         //BSession::i()->close();
         header('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
-        header('X-Frame-Options: SAMEORIGIN');
+
+        foreach ((array)BConfig::i()->get('web/headers') as $header => $content) {
+            header($header.': '.$content);
+            //header('X-Frame-Options: SAMEORIGIN');
+            //header('X-UA-Compatible: IE=edge');
+        }
+
         if ($this->_contentType=='application/json') {
             if (!empty($this->_content)) {
                 $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);

@@ -141,13 +141,17 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $download_url = BApp::href('/media/grid/download?folder=media/product/images&file=');
         $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
-
+        $data = BDb::many_as_array($model->mediaORM('I')
+                ->order_by_expr('pa.position asc')
+                ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))
+                ->select('a.id','file_id')
+                ->find_many());
         return array(
             'config' => array(
                 'id' => 'product_images',
                 'caption' => 'Product Images',
                 'data_mode' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('I')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
+                'data' => $data,
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'hidden'=>true),
@@ -408,7 +412,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $rows = json_decode($data['grid'][$typeName]['rows'], true);
                 foreach($rows as $row) {
                     if(isset($row['_new'])) {
-
                         $hlp->create(array(
                             'product_id' => $model->id,
                             'media_type' => $type,
