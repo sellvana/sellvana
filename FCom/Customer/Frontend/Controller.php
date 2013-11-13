@@ -2,14 +2,16 @@
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    /*
-    public function beforeDispatch()
+    public function beforeDispatch($args)
     {
-        if (FCom_Customer_Model_Customer::i()->isLoggedIn()) {
+        if (!parent::beforeDispatch($args)) {
+            return false;
+        }
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, array('login', 'register', 'password_recover'))) {
             BResponse::i()->redirect(BApp::href());
         }
+        return true;
     }
-    */
 
     public function action_login()
     {

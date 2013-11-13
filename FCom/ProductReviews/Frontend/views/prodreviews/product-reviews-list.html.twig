@@ -38,7 +38,7 @@
 {% for review in reviews.items %}
     <article class="f-prod-review-post clearfix">
         <h5>{{ review.get('title') }}</h5>
-        <span class="meta">{{ "by"|_ }} {{ review.get('firstname') }} {{ review.get('lastname') }} {{ "on"|_ }} {{ review.get('create_at')|date('F j, Y') }}</span>
+        <span class="meta">{{ "by"|_ }} {{ review.get('firstname') }} {{ review.get('lastname') }} {{ "on"|_ }} {{ review.get('created_at')|date('F j, Y') }}</span>
         <div class="col-md-5 col-sm-5 f-prod-review-attrs">
             <dl class="dl-horizontal">
                 <dt><strong>{{ "Overall"|_ }}</strong></dt>
