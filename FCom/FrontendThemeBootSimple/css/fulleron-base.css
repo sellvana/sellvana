@@ -673,6 +673,9 @@ label.error {
 .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd:first-of-type {
   font-size:1.05em;
   }
+#f-prod-review-form-container {
+  max-width: 500px;
+  }
 
 /* Prices */
 .f-price-group {

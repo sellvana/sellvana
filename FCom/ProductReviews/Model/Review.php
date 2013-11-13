@@ -5,11 +5,11 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_product_review';
     protected static $_origClass = __CLASS__;
 
-   protected static $_config = array(
+    protected static $_config = array(
        'max' => 5,
        'min' => 0,
        'step' => 1,
-   );
+    );
 
 	protected $_validationRules = array(
 		array('product_id', '@required'),

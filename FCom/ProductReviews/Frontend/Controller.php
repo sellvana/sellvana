@@ -19,7 +19,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             return;
         }
 
-        $this->view('prodreviews/review-form')->pid = $product->id();
+        $this->formMessages();
+        $this->view('prodreviews/review-form')->set(array('prod' => $product, 'formId' => $this->formId));
         $this->layout('/prodreview/add');
     }
 
@@ -52,7 +53,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             if ($valid) {
                 BResponse::i()->json(array('status' => 'success'));
             } else {
-                BResponse::i()->json(array('status' => 'error', 'message' => $this->getErrorMessage()));
+                BResponse::i()->json(array('status' => 'error', 'message' => $this->getAjaxErrorMessage()));
             }
         } else {
             $url = $product->url();
@@ -128,7 +129,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         }
     }
 
-    public function getErrorMessage()
+    public function getAjaxErrorMessage()
     {
         $messages = BSession::i()->messages('validator-errors:'.$this->formId);
         $errorMessages = array();
@@ -157,6 +158,22 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             $reviews = $product->reviews();
             BResponse::i()->set($this->view('prodreviews/product-reviews-list')->set('reviews', $reviews));
+        }
+    }
+
+    /**
+     * form error message
+     */
+    public function formMessages()
+    {
+        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
+        $messages = BSession::i()->messages('validator-errors:'.$this->formId);
+        if (count($messages)) {
+            $msg = array();
+            foreach ($messages as $m) {
+                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'frontend');
         }
     }
 }
