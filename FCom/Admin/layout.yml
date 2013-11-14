@@ -151,7 +151,7 @@ lib_admin_theme1:
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_switch/bootstrap-switch.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/fulleron-base.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/jquery_fileupload/jquery.fileupload-ui.css ]
