@@ -57,6 +57,17 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         );
     }
 
+    /**
+     * override default rules for password recover form
+     */
+    public function setPasswordRecoverRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('email', '@email'),
+        );
+    }
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);
@@ -320,5 +331,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $user->session_cart_id = $cart->id();
             $user->save();
         }
+    }
+
+    /**
+     * rule email unique
+     * @param $data
+     * @param $args
+     * @return bool
+     */
+    public static function ruleEmailUnique($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return false;
+        }
+        $model = self::i()->orm()->where('email', $data[$args['field']])->find_one();
+        if ($model)
+            return false;
+        return true;
     }
 }
