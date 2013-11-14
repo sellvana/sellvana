@@ -58,13 +58,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
             $r      = BRequest::i()->post('model');
             $formId = 'account-edit';
-
-            //set validate rules
-            $incChangePassword = false;
-            if ($r['password'] != '' || $r['password_confirm'] != '') {
-                $incChangePassword = true;
-            }
-            $customer->setAccountEditRules($incChangePassword);
+            $customer->setAccountEditRules(false);
 
             //set rule email unique if customer update email
             $expandRules = array();
