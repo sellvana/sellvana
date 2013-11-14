@@ -32,20 +32,6 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="form-group col-md-6">
-                <label for="model-password" class="control-label required">{{ "Password" | _ }}</label>
-                <div class="controls">
-                  <input type="password" name="model[password]" class="required form-control" id="model-password"/>
-                </div>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="edit-password_confirm" class="control-label required">{{ "Confirm Password" | _ }}</label>
-                <div class="controls">
-                  <input type="password" name="model[password_confirm]" class="required form-control" equalto="#model-password" id="edit-password_confirm"/>
-                </div>
-              </div>
-            </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary btn-lg" value="{{ "Save" | _ }}"/>
                 <span class="help-block f-required-notice">* {{ "Indicates Required Fields" | _ }}</span>
@@ -58,14 +44,13 @@
   </div>
 </div>
 <script>
-/*require(['jquery', 'jquery.validate'], function($) {
+require(['jquery', 'jquery.validate'], function($) {
     $(function() {
         $('#edit-form').validate();
     });
-});*/
-  require(['jquery'], function($) {
+
     $( "#button" ).click(function() {
-      $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+        $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
     });
-  });
+});
 </script>
