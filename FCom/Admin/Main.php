@@ -11,6 +11,7 @@ class FCom_Admin_Main extends BClass
             'system/roles' => 'Manage Roles and Permissions',
             'system/settings' => 'Update Settings',
             'system/modules' => 'Manage Modules',
+            'system/templates' => 'Edit System Templates',
         ));
     }
 
