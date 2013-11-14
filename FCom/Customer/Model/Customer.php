@@ -68,6 +68,28 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         );
     }
 
+    public function setAccountEditRules($incChangePassword = false)
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('firstname', '@required'),
+            array('lastname', '@required'),
+        );
+
+        if ($incChangePassword) {
+            $this->_validationRules[] = array('password', '@required');
+            $this->_validationRules[] = array('password_confirm', '@password_confirm');
+        }
+    }
+
+    public function setChangePasswordRules()
+    {
+        $this->_validationRules = array(
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);

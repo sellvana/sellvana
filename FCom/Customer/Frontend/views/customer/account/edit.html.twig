@@ -1,10 +1,11 @@
+{% set validator = THIS.validator(THIS.get('formId'), customer) %}
 <div class="f-site-main" role="main">
   <div class="container">
     <div class="row f-mb-slideout-menu">
       <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
           <h1 class="f-page-title">{{"Edit Account" | _ }}</h1>
-          <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
+          <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ "Menu"|_ }}</a>
         </header>
         {{ THIS.view('core/messages') | raw }}
         <form action="{{ APP.href('customer/myaccount/edit') }}" method="post" id="edit-form" role="form">
@@ -13,13 +14,13 @@
               <div class="form-group col-md-6">
                 <label for="edit-firstname" class="control-label required">{{ "First Name" | _ }}</label>
                 <div class="controls">
-                  <input type="text" name="model[firstname]" class="required form-control" value="{{ THIS.get('customer').get('firstname') }}" id="edit-firstname"/>
+                  <input type="text" name="model[firstname]" class="required form-control" value="{{ validator.fieldValue('firstname') }}" id="edit-firstname"/>
                 </div>
               </div>
               <div class="form-group col-md-6">
                 <label for="edit-lastname" class="control-label required">{{ "Last Name" | _ }}</label>
                 <div class="controls">
-                  <input type="text" name="model[lastname]" class="required form-control" value="{{ THIS.get('customer').get('lastname') }}" id="edit-lastname"/>
+                  <input type="text" name="model[lastname]" class="required form-control" value="{{ validator.fieldValue('lastname') }}" id="edit-lastname"/>
                 </div>
               </div>
             </div>
@@ -27,21 +28,7 @@
               <div class="form-group col-md-6">
                 <label for="edit-email" class="control-label required">{{ "Email" | _ }}</label>
                 <div class="controls">
-                  <input type="email" name="model[email]" class="required form-control"  value="{{ THIS.get('customer').get('email') }}" id="edit-email"/>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group col-md-6">
-                <label for="model-password" class="control-label required">{{ "Password" | _ }}</label>
-                <div class="controls">
-                  <input type="password" name="model[password]" class="required form-control" id="model-password"/>
-                </div>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="edit-password_confirm" class="control-label required">{{ "Confirm Password" | _ }}</label>
-                <div class="controls">
-                  <input type="password" name="model[password_confirm]" class="required form-control" equalto="#model-password" id="edit-password_confirm"/>
+                  <input type="email" name="model[email]" class="required form-control"  value="{{ validator.fieldValue('email') }}" id="edit-email"/>
                 </div>
               </div>
             </div>
@@ -57,14 +44,13 @@
   </div>
 </div>
 <script>
-/*require(['jquery', 'jquery.validate'], function($) {
+require(['jquery', 'jquery.validate'], function($) {
     $(function() {
         $('#edit-form').validate();
     });
-});*/
-  require(['jquery'], function($) {
+
     $( "#button" ).click(function() {
-      $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+        $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
     });
-  });
+});
 </script>

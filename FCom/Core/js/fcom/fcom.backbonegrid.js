@@ -149,6 +149,9 @@ FCom.BackboneGrid = function(config) {
                     model.set('selected', false);
                 model.trigger('render');
             });
+
+            $(BackboneGrid.massDeleteButton).addClass('disabled');
+            $(BackboneGrid.massEditButton).addClass('disabled');
         },
         //function to select or unselect all rows of page and empty selected rows
         _selectAction: function() {
@@ -276,7 +279,9 @@ FCom.BackboneGrid = function(config) {
             if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('delete') !== -1) {
                 var ev = {grid: BackboneGrid.id, id: id};
                 g_vent.trigger('delete', ev);
-            } else {
+            }
+
+            if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
                 var hash = {};
                 hash.id = id;
                 hash.oper = 'del';
@@ -286,6 +291,7 @@ FCom.BackboneGrid = function(config) {
             return false;
         },
         save: function() {
+            var self = this;
             var id = this.get('id');
             var hash = this.changedAttributes();
             hash.id = id;
@@ -294,8 +300,19 @@ FCom.BackboneGrid = function(config) {
                 var row = this.toJSON();
                 var ev = {grid: BackboneGrid.id, row: row};
                 g_vent.trigger('edit', ev);
-            } else {
-                $.post(BackboneGrid.edit_url, hash);
+            }
+
+            if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
+                if(this.get('_new')) {
+                    hash.oper = 'add';
+                    $.post(BackboneGrid.edit_url, hash, function(data) {
+                        self.set('id', data.id);
+                        self.set('_new', false);
+                    });
+                } else {
+                    $.post(BackboneGrid.edit_url, hash);
+                }
+
             }
 
             this.trigger('render');
@@ -477,7 +494,8 @@ FCom.BackboneGrid = function(config) {
                 if (mp !== BackboneGrid.currentState.mp) {
                     BackboneGrid.currentState.mp = mp;
                     BackboneGrid.currentState.c = response[0].c;
-                    updatePageHtml();
+                    if (BackboneGrid.data_mode !== 'local')
+                        updatePageHtml();
                 }
             }
             return response[1];
@@ -601,8 +619,14 @@ FCom.BackboneGrid = function(config) {
             this.model.destroy();
         },
         render: function() {
+
             var colsInfo = columnsCollection.toJSON();
             this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
+            if (typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
+                var func = BackboneGrid.callbacks['after_render'];
+                var script = func+'(this.$el,this.model.toJSON());';
+                eval(script);
+            }
             return this;
         }
     });
@@ -915,7 +939,9 @@ FCom.BackboneGrid = function(config) {
                 }
                 var evt = {grid: BackboneGrid.id, rows: rows};
                 g_vent.trigger('mass-edit', evt);
-            } else {
+            }
+
+            if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
                 var hash = BackboneGrid.massEditVals;
                 hash.id = ids;
                 hash.oper = 'mass-edit';
@@ -1002,10 +1028,11 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.id = config.id;
         BackboneGrid.personalize_url = config.personalize_url;
         BackboneGrid.edit_url = config.edit_url;
+        BackboneGrid.data_url = config.data_url;
         BackboneGrid.current_filters= {};
         BackboneGrid.quickInputId = '#'+config.id+'-quick-search';
         BackboneGrid.events = config.events;
-        //BackboneGrid.callBacks = config.callBacks;
+        BackboneGrid.callbacks = config.callbacks;
         //personal settings
         var state = config.data.state;
         state.p = parseInt(state.p);
@@ -1124,9 +1151,8 @@ FCom.BackboneGrid = function(config) {
 
         //showing selected rows count
         selectedRows = new Backbone.Collection;
-        multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
+        var multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
         selectedRows.on('add remove reset',function(){
-
             multiselectCol.set('selectedCount', selectedRows.length);
             multiselectCol.trigger('render');
             if (selectedRows.length > 0) {
@@ -1170,11 +1196,31 @@ FCom.BackboneGrid = function(config) {
             });
         }
 
-        //mass action logic
+        //action logic
         BackboneGrid.massDeleteButton = 'Div #'+config.id+' button.grid-mass-delete';
         BackboneGrid.AddButton = 'Div #'+config.id+' button.grid-add';
         BackboneGrid.massEditButton = 'Div #'+config.id+' a.grid-mass-edit';
         BackboneGrid.NewButton = 'Div #'+config.id+' button.grid-new';
+        BackboneGrid.RefreshButton = 'Div #'+config.id+' button.grid-refresh';
+        BackboneGrid.ExportButton = 'Div #'+config.id+' button.grid-export';
+        if ($(BackboneGrid.ExportButton).length > 0) {
+            $(BackboneGrid.ExportButton).on('click', function(ev) {
+
+                if (typeof(BackboneGrid.data_url) !== '') {
+                    window.location.href= rowsCollection.url()+'&export=true';
+                }
+            });
+        }
+
+        if ($(BackboneGrid.RefreshButton).length > 0) {
+            $(BackboneGrid.RefreshButton).on('click', function(ev) {
+                rowsCollection.fetch({reset:true});
+                ev.stopPropagation();
+                ev.preventDefault();
+
+                return false;
+            });
+        }
         if ($(BackboneGrid.NewButton).length > 0) {
             $(BackboneGrid.NewButton).on('click', function(ev){
                 var newRow = new BackboneGrid.Models.Row({id: guid(), _new: true});
@@ -1289,13 +1335,35 @@ FCom.BackboneGrid = function(config) {
             g_vent.trigger('init-detail', ev);
         }
 
+
         if (typeof(g_vent) !== 'undefined') {
-            console.log('fetch_rows');
+            //console.log('fetch_rows');
             g_vent.bind('fetch_rows', function(ev) {
                 if(ev.grid === config.id) {
-                    rowsCollection.fetch({reset:true, success: function() {
-                        console.log('success');
-                    }});
+                    if(typeof(ev.url) !== 'undefined') {
+                        var prevUrl = rowsCollection.url;
+                        rowsCollection.url = ev.url;
+                        rowsCollection.fetch({
+                                                reset:true,
+                                                success: function() {
+                                                    rowsCollection.url = prevUrl;
+                                                    if (typeof(ev.callback) !== 'undefined') {
+                                                        ev.callback();
+                                                    }
+                                                }
+                                            });
+                    } else {
+                        rowsCollection.fetch({reset:true});
+                    }
+
+                }
+            });
+        }
+
+        if (typeof(g_vent) !== 'undefined') {
+            g_vent.bind('get_rows', function (ev) {
+                if(ev.grid === config.id) {
+                    ev.callback(rowsCollection.toJSON());
                 }
             });
         }
