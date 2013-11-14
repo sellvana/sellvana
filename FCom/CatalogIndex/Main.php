@@ -74,7 +74,8 @@ class FCom_CatalogIndex_Main extends BClass
         if (static::$_autoReindex && !$args['model']->isNewRecord()) {
             $indexField = FCom_CatalogIndex_Model_Field::i()->load($args['model']->field_code, 'field_name');
             if ($indexField) {
-                static::reindexField($indexField); // todo missing method??
+                //TODO when a edited field is saved, it throws error
+                //static::reindexField($indexField);
             }
         }
     }
