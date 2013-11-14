@@ -1,4 +1,4 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery-ui'], function(Backbone, _, $, NProgress) {
 
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
