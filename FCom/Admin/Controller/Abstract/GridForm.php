@@ -113,6 +113,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $config['data'];
             BResponse::i()->json(array(array('c' => 1), $data));
         } else {
+
             if (empty($grid['orm'])) {
                 $mc = $this->_modelClass;
                 $grid['orm'] = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
@@ -125,7 +126,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $gridId = !empty($config['id']) ? $config['id'] : $oc;
 
             if (BRequest::i()->request('export')) {
-                $view->export($grid['orm'], $oc);
+                $data = $view->outputData(true);
+                $view->export($data['rows'], $oc);
             } else {
 
                 //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);

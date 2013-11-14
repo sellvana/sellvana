@@ -1028,6 +1028,7 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.id = config.id;
         BackboneGrid.personalize_url = config.personalize_url;
         BackboneGrid.edit_url = config.edit_url;
+        BackboneGrid.data_url = config.data_url;
         BackboneGrid.current_filters= {};
         BackboneGrid.quickInputId = '#'+config.id+'-quick-search';
         BackboneGrid.events = config.events;
@@ -1195,15 +1196,29 @@ FCom.BackboneGrid = function(config) {
             });
         }
 
-        //mass action logic
+        //action logic
         BackboneGrid.massDeleteButton = 'Div #'+config.id+' button.grid-mass-delete';
         BackboneGrid.AddButton = 'Div #'+config.id+' button.grid-add';
         BackboneGrid.massEditButton = 'Div #'+config.id+' a.grid-mass-edit';
         BackboneGrid.NewButton = 'Div #'+config.id+' button.grid-new';
         BackboneGrid.RefreshButton = 'Div #'+config.id+' button.grid-refresh';
+        BackboneGrid.ExportButton = 'Div #'+config.id+' button.grid-export';
+        if ($(BackboneGrid.ExportButton).length > 0) {
+            $(BackboneGrid.ExportButton).on('click', function(ev) {
+
+                if (typeof(BackboneGrid.data_url) !== '') {
+                    window.location.href= rowsCollection.url()+'&export=true';
+                }
+            });
+        }
+
         if ($(BackboneGrid.RefreshButton).length > 0) {
             $(BackboneGrid.RefreshButton).on('click', function(ev) {
                 rowsCollection.fetch({reset:true});
+                ev.stopPropagation();
+                ev.preventDefault();
+
+                return false;
             });
         }
         if ($(BackboneGrid.NewButton).length > 0) {
@@ -1319,6 +1334,7 @@ FCom.BackboneGrid = function(config) {
             var ev= {grid: config.id, rows: rowsCollection.toJSON()};
             g_vent.trigger('init-detail', ev);
         }
+
 
         if (typeof(g_vent) !== 'undefined') {
             //console.log('fetch_rows');

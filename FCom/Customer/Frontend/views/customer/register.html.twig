@@ -1,3 +1,4 @@
+{% set validator = THIS.validator(THIS.get('formId')) %}
 <div class="f-site-main" role="main">
   <div class="container">
     {{ THIS.view('core/messages') | raw }}
@@ -10,13 +11,13 @@
           <div class="form-group col-sm-6">
             <label for="register-firstname" class="control-label required">{{ "First Name" | _ }}</label>
             <div class="controls">
-              <input type="text" name="model[firstname]" class="required form-control" id="register-firstname"/>
+              <input type="text" name="model[firstname]" class="required form-control" id="register-firstname" value="{{ validator.fieldValue('firstname') }}"/>
             </div>
           </div>
           <div class="form-group col-sm-6">
             <label for="register-lastname" class="control-label required">{{ "Last Name" | _ }}</label>
             <div class="controls">
-              <input type="text" name="model[lastname]" class="required form-control" id="register-lastname"/>
+              <input type="text" name="model[lastname]" class="required form-control" id="register-lastname" value="{{ validator.fieldValue('lastname') }}"/>
             </div>
           </div>
         </div>
@@ -24,7 +25,7 @@
           <div class="form-group col-sm-6">
             <label for="register-email" class="control-label required">{{ "Email" | _ }}</label>
             <div class="controls">
-              <input type="email" name="model[email]" class="required form-control" id="register-email"/>
+              <input type="email" name="model[email]" class="required form-control" id="register-email" value="{{ validator.fieldValue('email') }}"/>
             </div>
           </div>
         </div>
