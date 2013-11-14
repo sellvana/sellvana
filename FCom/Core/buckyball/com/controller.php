@@ -1093,7 +1093,6 @@ class BResponse extends BClass
         header('Last-Modified: ' . date('r'));
         header('Content-Type: '. $this->fileContentType($fileName));
         header('Content-Disposition: '.$disposition.'; filename=' . $fileName);
-
         //echo file_get_contents($source);
         $fs = fopen($source, 'rb');
         $fd = fopen('php://output', 'wb');

@@ -83,8 +83,8 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             this.model.on('change', this.render,this);
         },
         render: function() {
-            var status = $.trim(this.model.get('status'));            
-            this.$el.html(this.template(this.model.toJSON()));            
+            var status = $.trim(this.model.get('status'));
+            this.$el.html(this.template(this.model.toJSON()));
             $('select.js-adminuser-status option[value="' + status + '"]').prop('selected',true);
             return this;
         },
@@ -407,6 +407,8 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
                 timeago.html("" + months[date.getMonth()] + " " + (date.getDate()) + ", " + (date.getFullYear()) + " " + (date.getHours()) + ":" + (date.getMinutes()));
                 setTimeAgo(timeago);
+
+                timeago.removeClass('has-tooltip');
             }
 
             if (this.model.get('time') === -1) {
@@ -423,7 +425,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     //TODO: refactor for AdminChat to be main class
     var AdminChat = function(options) {
-        
+
         initializing = true;
         username = options.username;
         dingPath = options.dingPath;
@@ -437,7 +439,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         PushClient.listen({regexp: /^adminchat:(.*)$/, callback: channel_adminchat});
 
         initializing = false;
-        
+
     }
 
     // send to server
@@ -530,10 +532,10 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             avatars[user.username] = user.avatar;
             avatarSet = true;
         }
-        
+
         var status = $.trim(user.status);
 
-        if (user.username == username) { 
+        if (user.username == username) {
 
             if (avatarSet)
                 statusModel.set('avatar', avatars[user.username]);
@@ -543,7 +545,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         }
         var temps = users.where({username: user.username});
         if (temps.length > 0) {
-            if (avatarSet)                
+            if (avatarSet)
                 temps[0].set("avatar", user.avatar);
             temps[0].set("status", status);
         } else {

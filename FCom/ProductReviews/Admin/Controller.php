@@ -15,7 +15,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config = parent::gridConfig();
         $columns = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-            array('name'=>'id','label'=>'ID', 'width'=>55),
+            array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'editable'=>true),
             array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
@@ -29,6 +29,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
         $config['actions'] = array(
+            'export' => true,
             'edit' => true,
             'delete' => true
         );

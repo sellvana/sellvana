@@ -211,7 +211,7 @@ lib_admin_theme1:
       - [ requireJs, admin.theme, @FCom_Admin/theme1/assets/javascripts/theme, { deps: [ jquery, timeago ] } ]
       - [ requireJs, admin.demo, @FCom_Admin/theme1/assets/javascripts/demo, { deps: [ jquery ] } ]
 
-      - [ requireRun, [ jquery-mobile, jquery-ui, jquery-migrate, bootstrap, admin.theme, admin.demo] ]
+      - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
 
 htmlgrid:
   - { hook: main, view: core/htmlgrid-wrapper }
