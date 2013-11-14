@@ -28,6 +28,8 @@ modules:
                     - [ any, /password/reset, FCom_Admin_Controller.password_reset ]
                     - [ get, /logout, FCom_Admin_Controller.logout ]
 
+                    - [ get, /dashboard, FCom_Admin_Controller.dashboard ]
+
                     - [ any, /my_account, FCom_Admin_Controller.my_account ]
                     - [ get, /reports, FCom_Admin_Controller.reports ]
                     - [ route, PUT|POST /my_account/personalize, FCom_Admin_Controller.personalize ]

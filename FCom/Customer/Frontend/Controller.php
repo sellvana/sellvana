@@ -2,14 +2,16 @@
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    /*
-    public function beforeDispatch()
+    public function beforeDispatch($args)
     {
-        if (FCom_Customer_Model_Customer::i()->isLoggedIn()) {
+        if (!parent::beforeDispatch($args)) {
+            return false;
+        }
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, array('login', 'register', 'password_recover'))) {
             BResponse::i()->redirect(BApp::href());
         }
+        return true;
     }
-    */
 
     public function action_login()
     {
@@ -52,13 +54,28 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_recover__POST()
     {
-        $user = FCom_Customer_Model_Customer::i()->load(BRequest::i()->request('email'), 'email');
-        if ($user) {
-            $user->recoverPassword();
+        try {
+            $email = BRequest::i()->request('email');
+            $customerModel = FCom_Customer_Model_Customer::i();
+            $customerModel->setPasswordRecoverRules();
+            if ($customerModel->validate(array('email' => $email), array(), 'frontend')) {
+                $user = $customerModel->load($email, 'email');
+                if ($user) {
+                    $user->recoverPassword();
+                }
+                BSession::i()->addMessage(
+                    $this->_('If the email address was correct, you should receive an email shortly with password recovery instructions.'),
+                    'success', 'frontend');
+                BResponse::i()->redirect('login');
+            } else {
+                $this->formMessages();
+                BResponse::i()->redirect('/customer/password/recover');
+            }
+        } catch (Exception $e) {
+            BDebug::logException($e);
+            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            BResponse::i()->redirect('customer/password/recover');
         }
-        BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.',
-                'success', 'frontend');
-        BResponse::i()->redirect('login');
     }
 
     public function action_password_reset()
@@ -103,14 +120,17 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $r = BRequest::i()->post('model');
             $a = BRequest::i()->post('address');
             $customerModel = FCom_Customer_Model_Customer::i();
-            if ($customerModel->validate($r, array(), 'frontend')) {
-                $customer = FCom_Customer_Model_Customer::i()->register($r);
+            $formId = 'register-form';
+            $emailUniqueRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist'));
+            if ($customerModel->validate($r, $emailUniqueRules, $formId)) {
+                $customer = $customerModel->register($r);
                 FCom_Customer_Model_Address::i()->import($a, $customer);
                 $customer->login();
-                BSession::i()->addMessage('Thank you for your registration', 'success', 'frontend');
+                BSession::i()->addMessage($this->_('Thank you for your registration'), 'success', 'frontend');
                 BResponse::i()->redirect(BApp::href());
             } else {
-                $this->formMessages();
+                BSession::i()->addMessage($this->_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+                $this->formMessages($formId);
                 BResponse::i()->redirect(BApp::href('customer/register'));
             }
         } catch (Exception $e) {
@@ -123,10 +143,10 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     /**
      * form error message
      */
-    public function formMessages()
+    public function formMessages($formId = 'frontend')
     {
         //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-        $messages = BSession::i()->messages('validator-errors:frontend');
+        $messages = BSession::i()->messages('validator-errors:'.$formId);
         if (count($messages)) {
             $msg = array();
             foreach ($messages as $m) {

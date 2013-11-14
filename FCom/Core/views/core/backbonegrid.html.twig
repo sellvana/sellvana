@@ -128,13 +128,13 @@
 
 <script type="template" id="{{ config.id }}-edit-template">
 
-    <label for="<%= rc.name %>"><%= rc.label%></label>
+    <label for="<%- rc.name %>"><%- rc.label%></label>
     <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-      <input type="text" id="<%= rc.name %>" class="form-control">
+      <input type="text" id="<%- rc.name %>" class="form-control">
     <% } else if(rc.editor === 'select') { %>
-      <select id="<%= rc.name %>" class="form-control">
+      <select id="<%- rc.name %>" class="form-control">
         <% for(var key in rc.options) { %>
-          <option value="<%= key %>"><%= rc.options[key] %></option>
+          <option value="<%- key %>"><%- rc.options[key] %></option>
         <% } %>
       </select>
     <% } %>
@@ -145,8 +145,8 @@
   </div>
   <div class="dd3-content">
     <label>
-        <input class="showhide_column" type="checkbox" datid=<%= rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
-        <%= rc.label %>
+        <input class="showhide_column" type="checkbox" datid=<%- rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%- rc.label %>
     </label>
   </div>
 </script>
@@ -226,11 +226,11 @@
 <script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
     <% if (typeof(rc.sortable) == 'undefined') { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
-      <%= rc.label %>
+      <%- rc.label %>
     <% if (typeof(rc.sortable) == 'undefined') { %> </a> <% } %>
   <% } else if (rc.type === 'multiselect') { %>
    <% if (rc.selectedCount>0) { %>
-      <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+      <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
     <% } %>
     <select class="{{ config.id | raw }} js-sel">
       {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
@@ -238,16 +238,16 @@
   <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
-      <span><%= rc.label %>:</span>
+      <span><%- rc.label %>:</span>
       <input type="hidden" id="multi_hidden" style="width:auto;min-width:120px;"/>
 </script>
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%= rc.label %>:
+        <%- rc.label %>:
         <% if(rc.filterVal ==='') { %>
             All
         <%} else { %>
-            <%= rc.filterLabel %> "<%= rc.filterVal %>"
+            <%- rc.filterLabel %> "<%- rc.filterVal %>"
         <% } %>
         <span class="caret"></span>
     </button>
@@ -257,7 +257,7 @@
           <div class="input-group">
             <div class="input-group-btn dropdown">
               <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
-                  <%= rc.filterLabel%>
+                  <%- rc.filterLabel%>
                   <span class='caret'></span>
               </button>
 
@@ -280,7 +280,7 @@
               </ul>
             </div>
 
-            <input type="text" class="form-control" value="<%= rc.filterVal  %>">
+            <input type="text" class="form-control" value="<%- rc.filterVal  %>">
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-default clear">
@@ -308,7 +308,8 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             columns: {{ THIS.getColumnsData() | raw }},
             data_mode: "{{ config.data_mode }}",
             filters: {{ THIS.getFilterData()  | raw }},
-            events: {{ THIS.getEventData() | raw }}
+            events: {{ THIS.getEventData() | raw }},
+            callbacks: {{ THIS.getCallbacks() | raw }}
         });
     //});
 });

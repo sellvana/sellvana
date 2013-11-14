@@ -676,6 +676,10 @@ class BModule extends BClass
             self::ERROR   => 'ERROR'
         ),
     );
+    /**
+     * @var array
+     */
+    protected $translations;
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -1017,7 +1021,7 @@ class BModule extends BClass
     protected function _processTranslations()
     {
         //load translations
-        $language = BSession::i()->data('_language');
+        $language = BSession::i()->get('_language');
         if (!empty($language) && !empty($this->translations[$language])) {
             if (!is_array($this->translations[$language])) {
                 $this->translations[$language] = array($this->translations[$language]);

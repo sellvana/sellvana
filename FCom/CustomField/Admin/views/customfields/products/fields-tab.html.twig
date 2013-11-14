@@ -1,129 +1,52 @@
-<script type="template" id="products-customfield-template">
+<div class="row">
+    <div class="col-sm-10">
+        <div class="pull-right">
+            <div class="btn-group">
+                <button class="btn">Reset</button>
+                <button class="btn">Clone</button>
+                <button class="btn btn-danger">Delete</button>
+                <button class="btn btn-primary">Save</button>
+            </div>
+        </div>
+        <table>
+            <tr>
+                <td style='padding-right:20px;'>
+                    <select id="product-edit-available-sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+                        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Set').as_values('set_name')) | raw }}
+                    </select>
 
-    <div id="cf_field_<%= field.id %>" style="margin-top: 15px;">
-      <h3><%= field.frontend_label %></h3>
-      <% switch (field.admin_input_type) { case 'select': %>
-        <select name="model[<%= field.field_code %>]">
-          <% f_.each(field.options, function(opt) { %>
-            <option value="<%= opt.label %>" <%= model[field.field_code] == opt.label ? 'selected' %> >
-              <%= opt.label %>
-            </option>
-          <% } %>
-        </select>
+                </td>
+                <td style='padding-right:70px;'>
+                    <button class="btn btn-primary" id="product-edit-add-set" type="button">Add Field Set</button>
 
-      <% break; case 'text': %>
-        <% if (field.table_field_type == 'date' || field.table_field_type == 'datetime' %>
-          <div class="datepicker_wrapper">
-            <input type="text" name="model[<%= field.field_code %>]" value="<%= model[field.field_code] %>" class="datepicker">
-          </div>
-        <% } else { %>
-          <input type="text" name="model[<%= field.field_code %>]" value="<%= model[field.field_code] %>">
-        <% } %>
+                </td>
+                <td style='padding-right:20px;'>
+                    <select id="product-edit-available-fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+                        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
+                    </select>
 
-      <% break; case 'textarea': %>
+                </td>
+                <td>
+                    <button class="btn btn-primary" type="button" id="product-edit-add-field">Add Field</button>
+                </td>
+            </tr>
+        </table>
 
-        <textarea name="model[<%= field.field_code %>]"><%= model[field.field_code] %></textarea>
+        <div class="box box-bordered blue-border box-nomargin">
+            <div class="box-header box-header-small blue-background">
+                <div class="title">Small &amp; Bordered</div>
+                <div class="actions">
+                    <a href="#" class="btn box-remove btn-xs btn-link"><i class="icon-remove"></i>
+                    </a>
 
-      <% break; case 'boolean': %>
-
-        <select name="model[<%= field.field_code %>]">
-            <option value="0">No</option><option value="1">Yes</option>
-        </select>
-
-      <% } %>
-
-      <% if (!field.system) { %>
-        <br/>
-        <a href="javascript:void(0);" onclick="cf_field_remove(<%= field.id %>)">{{ 'remove'|_ }}</a>
-      <% } %>
-    </div>
-</script>
-
-<fieldset class="product-edit-customfields">
-    <div id="product-edit-customfields-tab">
-        Set: <select id="product-edit-available-sets">
-            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Set').as_values('set_name')) | raw }}
-        </select>
-        <button type="button" id="product-edit-add-set">Add</button>
-        <br/>
-        Field: <select id="product-edit-available-fields">
-            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
-        </select>
-        <button type="button" id="product-edit-add-field">Add</button>
-{#
-            <td>
-                {{ THIS.view('jqgrid').set('config', APP.instance('FCom_CustomField_Admin_Controller_Products').fieldsetsGridConfig()) | raw }}
-            </td>
-            <td width="50%">
-                {{ THIS.view('jqgrid').set('config', APP.instance('FCom_CustomField_Admin_Controller_Products').fieldsGridConfig()) | raw }}
-            </td>
-        </tr>
-#}
-    <div id="products-customfield-fields"></div>
-
-    <div id="custom-fields-partial" data-src="{{ APP.href('customfields/products/fields_partial/?id=' ~ THIS.get('model').id()) }}">
-        {{ THIS.view('customfields/products/fields-partial').set('model', THIS.get('model')) | raw }}
-    </div>
-</fieldset>
-
-<script>
-    require(['jquery', 'fcom.customfields', 'jquery-ui'], function($, CustomFields) {
-        $(function() {
-            $( ".datepicker" ).datepicker({ dateFormat: "yy-mm-dd", constrainInput: false });
-        });
-
-        var customFields = new CustomFields({
-
-        })
-    })
-
-    function addCustomFieldSets() {
-        var sel = $(this).jqGrid('getGridParam', 'selarrrow');
-        console.log(sel);
-        partial('#custom-fields-partial', {params:{add_fieldset_ids:sel}});
-    }
-    function addCustomFields() {
-        var sel = $(this).jqGrid('getGridParam', 'selarrrow');
-        console.log(sel);
-        partial('#custom-fields-partial', {params:{add_field_ids:sel}});
-    }
-
-    function cf_field_remove(field_id)
-    {
-        var addfields = $('#cf_add_fields_ids').val();
-        var addfield_ar=addfields.split(",");
-        for(fid in addfield_ar){
-            if(addfield_ar[fid] == field_id){
-                addfield_ar.splice(fid,1);
-            }
-        }
-        var addfields_new = addfield_ar.join(",");
-        var replaced = false;
-        if(addfields_new != addfields){
-            replaced = true;
-            $('#cf_add_fields_ids').val(addfields_new);
-        }
-
-        if(false == replaced){
-            var hidefields = $('#cf_hide_fields_ids').val();
-            if(hidefields){
-                $('#cf_hide_fields_ids').val(hidefields + ',' + field_id);
-            } else {
-                $('#cf_hide_fields_ids').val(field_id);
-            }
-        }
-        //TODO: REMOVE FIELDS ONLY ON SAVE!
-        $.ajax({
-            url: "{{ APP.href('customfields/products/field_remove?id=' ~ m.id()) }}&hide_field="+field_id
-        }).done(function() {
-            $('#cf_field_'+field_id).remove();
-        });
-
-    }
-</script>
-
-<style>
-    #pager-product_fieldsets .ui-pg-table,
-    #pager-product_fields .ui-pg-table { table-layout:auto !important; }
-</style>
+                    <a href="#" class="btn box-collapse btn-xs btn-link"><i></i>
+                    </a>
+                </div>
+            </div>
+            <div class="box-content">
+                Explicabo voluptate eos ipsam et recusandae quasi laudantium est velit nihil perspiciatis minima corrupti neque sint dolores lorum consequatur voluptatem
+            </div>
+        </div>
+	</div>
+</div>
 

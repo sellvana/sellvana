@@ -2429,12 +2429,13 @@ class BLocale extends BClass
     }
 
     /**
-    * Import translations to the tree
-    *
-    * @todo make more flexible with file location
-    * @todo YAML
-    * @param mixed $data array or file name string
-    */
+     * Import translations to the tree
+     *
+     * @todo make more flexible with file location
+     * @todo YAML
+     * @param mixed $data array or file name string
+     * @param array $params
+     */
     public static function importTranslations($data, $params=array())
     {
         $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::i()->currentModuleName();
@@ -2493,7 +2494,7 @@ class BLocale extends BClass
                         break;
                 }
             } else {
-                BDebug::warning('Could not load translation file: '.$data);
+                BDebug::info('Could not load translation file: '.$data);
                 return;
             }
         } elseif (is_array($data)) {
@@ -2547,7 +2548,7 @@ class BLocale extends BClass
                     continue;
                 }
                 if($func) {
-                    $token[1] = trim($token[1], "'");
+                    $token[1] = trim($token[1], "'\"");
                     $keys[$token[1]] = '';
                     $func = 0;
                     continue;

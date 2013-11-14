@@ -337,7 +337,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         // fetch grid configuration
         $grid = $this->getGrid();
         $config = $grid['config'];
-
         if (empty($config['orm']) && !isset($config['data'])) {
             throw new BException('Either ORM or data is required');
         }
@@ -437,6 +436,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return '[]';
         }
     }
+
+    public function getCallbacks()
+    {
+        $grid = $this->get('grid');
+        if (isset($grid['config']['callbacks'])) {
+            return json_encode($grid['config']['callbacks']);
+        } else {
+            return '[]';
+        }
+    }
+
     public function getPageHtmlData($rows = null)
     {
         $grid = $this->get('grid');

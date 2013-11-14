@@ -174,7 +174,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         $args = array('data'=>&$data, 'model'=>&$model);
         $this->gridPostBefore(array('data'=>&$data, 'model'=>&$model));
-
         switch ($r->post('oper')) {
         case 'add':
             $set = $model->create($data)->save();
@@ -198,7 +197,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         case 'mass-edit':
             $ids = explode(',',$id);
             foreach($ids as $id) {
-                $set = $model->load($id)->set($data)->save();
+                if (isset($data['_new'])) {
+                    unset($data['_new']);
+                    $set = $model->create($data)->save();
+                } else {
+                    $set = $model->load($id)->set($data)->save();
+                }
             }
             $result = array('success'=>true);
             break;
