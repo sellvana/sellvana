@@ -150,4 +150,47 @@ class FCom_Cms_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tForm = FCom_Cms_Model_Form::table();
+        $tFormData = FCom_Cms_Model_FormData::table();
+
+        BDb::ddlTableDef($tForm, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'form_name' => 'varchar(100)',
+                'form_url' => 'varchar(255)',
+                'form_status' => "char(1) not null default 'P'",
+                'validation_rules' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_form_name' => 'UNIQUE (form_name)',
+            ),
+        ));
+
+        BDb::ddlTableDef($tFormData, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'form_id' => 'int unsigned not null',
+                'customer_id' => 'int unsigned',
+                'session_id' => 'varchar(100)',
+                'remote_ip' => 'varchar(15)',
+                'post_status' => "char(1) not null default 'N'",
+                'email' => 'varchar(100)',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+    }
 }
