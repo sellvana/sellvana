@@ -181,9 +181,14 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         return $config;
     }
 
-    public function action_index()
+    public function action_fieldsets()
     {
         $this->layout('/customfields/fieldsets');
+    }
+
+    public function action_fields()
+    {
+        $this->layout('/customfields/fields');
     }
 
     public function action_grid_data()
