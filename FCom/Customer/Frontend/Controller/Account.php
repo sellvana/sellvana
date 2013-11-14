@@ -54,8 +54,6 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         try {
             $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
             $customer   = FCom_Customer_Model_Customer::i()->load($customerId);
-            /** @var $customer FCom_Customer_Model_Customer */
-
             $r      = BRequest::i()->post('model');
             $formId = 'account-edit';
             $customer->setAccountEditRules(false);
@@ -85,7 +83,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
     public function action_editpassword()
     {
-        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
+        /*$customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
 
         $post = BRequest::i()->post();
@@ -114,8 +112,32 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Edit Password', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $this->view('customer/account/editpassword')->customer = $customer;
+        $this->view('customer/account/editpassword')->customer = $customer;*/
         $this->layout('/customer/account/editpassword');
+    }
+
+    public function action_editpassword__POST()
+    {
+        try {
+            $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
+            $customer = FCom_Customer_Model_Customer::i()->load($customerId);
+            $r = BRequest::i()->post('model');
+            $formId = 'change-password';
+            $customer->setChangePasswordRules();
+
+            if ($customer->validate($r, array(), $formId)) {
+                $customer->set($r)->save();
+                BSession::i()->addMessage($this->_('Your password has been updated'), 'success', 'frontend');
+                BResponse::i()->redirect(BApp::href('customer/myaccount'));
+            } else {
+                $this->formMessages($formId);
+                BResponse::i()->redirect(BApp::href('customer/myaccount/editpassword'));
+            }
+        } catch(Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $url = Bapp::href('customer/myaccount/editpassword');
+            BResponse::i()->redirect($url);
+        }
     }
 
     public function formMessages($formId = 'frontend')
