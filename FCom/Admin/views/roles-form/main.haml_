@@ -1,9 +1,9 @@
 - $m = $this->model; $hlp = FCom_Admin_Model_Role::i();
 
-%header.fcom-admin-main-title
+%header.f-admin-main-title
     %span.title = $this->_('Permissions')
-.fcom-admin-main-content-container
-    .fcom-admin-main-content
+.f-admin-main-content-container
+    .f-admin-main-content
         %fieldset.form-horizontal
             .control-group
                 %label.control-label(for="model-role_name") = $this->_('Role Name')
