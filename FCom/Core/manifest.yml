@@ -28,6 +28,7 @@ modules:
                 dbname: fulleron
                 username: root
                 logging: false
+                implicit_migration: true
             web:
                 csrf_check_method: referrer
                 headers:
