@@ -32,6 +32,8 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 static::$_indexedFields['all'][$k] = $f;
                 if ($f->get('sort_type')!=='none') {
                     static::$_indexedFields['sort'][$k] = $f;
+                    $ft = $f->get('field_type');
+                    $f->set('sort_method', $ft === 'varchar' || $ft === 'text');
                 }
                 if ($f->get('filter_type')!=='none') {
                     static::$_indexedFields['filter'][$k] = $f;
@@ -158,5 +160,11 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             $data[$p->id] = $v;
         }
         return $data;
+    }
+
+    public function getSortMethod()
+    {
+        $ft = $this->get('field_type');
+        return $ft==='varchar' || $ft==='text' ? 'join' : 'column';
     }
 }

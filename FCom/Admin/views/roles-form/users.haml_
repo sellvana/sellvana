@@ -1,2 +1,0 @@
-%header.fcom-admin-main-title
-    %span.title = $this->_('Users')
