@@ -16,11 +16,14 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $columns = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
-            array('name'=>'title', 'label'=>'Title', 'width'=>250, 'editable'=>true),
-            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
-            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'editable'=>true, 'validate'=>'number'),
-            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select'),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),'delete'=>true))
+            array('name'=>'title', 'label'=>'Title', 'width'=>250),
+            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'validate'=>'number'),
+            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'validate'=>'number'),
+            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No')),
+            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array(
+                'edit'   => array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),
+                'delete' => true,
+            )),
         );
 
         $config['filters'] = array(
@@ -45,8 +48,6 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['columns'][6]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
             $config['columns'][6]['data']['edit']['async_edit'] = true;
 
-            $config['id'] = 'products_reviews';
-            $config['columns']['product_name'] = array('label'=>'Product name', 'width'=>250, 'editable'=>false);
             $config['data_mode'] = 'local';
             $config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = array('personalize'=>true);
@@ -69,6 +70,10 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['data'] = $data;
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
+            $config['id'] = 'products_reviews';
+            $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250, 'editable'=>false);
+            $grid['orm'] = FCom_ProductReviews_Model_Review::i()->orm('prr')->select('prr.*')
+                ->join('FCom_Catalog_Model_Product', array('p.id','=','prr.product_id'), 'p')->select('p.product_name');
         }
 
         return $config;
