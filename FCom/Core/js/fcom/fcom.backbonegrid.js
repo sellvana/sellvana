@@ -262,7 +262,6 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Models.Row = Backbone.Model.extend({
         defaults: {
             _actions: ' ',
-            colsInfo: [],
             selected: false,
             editable: true
         },
@@ -858,7 +857,7 @@ FCom.BackboneGrid = function(config) {
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
-            var options = this.model.get('options');
+            var options = this.model.get('_multipulFilterOptions');
             var data = [];
             for(var key in options) {
                 data[data.length] = {id: key, text: options[key]};
@@ -1127,6 +1126,13 @@ FCom.BackboneGrid = function(config) {
                                 c.filterOp = 'contains';
                                 c.filterLabel = 'Contains';
                             }
+                    if (filter.type === 'multiselect') {
+                        if(typeof(filter.options) !== 'undefined') {
+                            c._multipulFilterOptions = filter.options;
+                        } else if( typeof(c.options) !== 'undefined') {
+                            c._multipulFilterOptions = c.options;
+                        }
+                    }
                 }
 
                 if (typeof(c.default) !== 'undefined') {
