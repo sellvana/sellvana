@@ -13,8 +13,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $layout = BLayout::i();
         $crumbs = array('home');
-        $r = explode('/', BRequest::i()->params('product'));
-        $p = array_pop($r);
+        $p = BRequest::i()->params('product');
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             $this->forward(false);
@@ -25,8 +24,9 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $layout->view('catalog/product/details')->set('product', $product);
 
-        if ($r) {
-            $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
+        $categoryPath = BRequest::i()->params('category');
+        if ($categoryPath) {
+            $category = FCom_Catalog_Model_Category::i()->load($categoryPath, 'url_path');
             if (!$category) {
                 $this->forward(false);
                 return $this;
