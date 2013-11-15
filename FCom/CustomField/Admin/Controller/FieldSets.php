@@ -18,14 +18,14 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'data'=>$data,
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
-                    array('name'=>'id','label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true),
-                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100, 'editable'=>true),
-                    array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200, 'editable'=>true),
+                    array('name'=>'id','label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true, 'hidden'=>true),
+                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true),
+                    array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('async_edit'=>true),'delete'=>true))
                 ),
                 'actions'=>array(
-                            'new'=> array('caption'=>'Add', 'madal'=>true),
+                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                             'edit'=>true,
                             'delete'=>true
                 ),
@@ -116,22 +116,22 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'edit_url'=>BApp::href('customfields/fieldsets/field_grid_data'),
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
-                    array('name'=>'id', 'label'=>'ID', 'width'=>30),
-                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>'new', 'defualt'=>''),
-                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>''),
-                    array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>''),
-                    array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true,
+                    array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
+                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>'new', 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true),
+                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true),
+                    array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true),
+                    array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true,
                         'options'=>$fld->fieldOptions('frontend_show'), 'editor'=>'select'),
-                    array('name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,/*'editor'=>'select',*/ 'validate'=>'number'/*,
+                    array('name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,/*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true, 'mass-editable'=>true/*,
                     'options'=>range(0,20)*/),
                     /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                         'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
-                    array('name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editable'=>true,'editor'=>'select',
+                    array('name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
                     'options'=>$fld->fieldOptions('table_field_type')),
-                    array('name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180, 'editable'=>true,'editor'=>'select',
+                    array('name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
                         'options'=>$fld->fieldOptions('admin_input_type')),
                     array('name'=>'num_options', 'label'=>'Options', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select',
+                    array('name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
                         'options'=>array('0'=>'No', '1'=>'Yes')),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('async_edit'=>true),'delete'=>true))
                 ),
@@ -142,7 +142,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new'=>array('caption'=>'Add a field', 'madal'=>true),
+                                    'new'=>array('caption'=>'Add a field', 'modal'=>true),
                                     'edit'=>true,
                                     'delete'=>true
                                 ),
@@ -163,7 +163,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'data'=>array(),
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
-                    array('name'=>'id', 'label'=>'ID', 'width'=>30),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
                     array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>true),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
@@ -171,7 +171,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new' => array('caption' => 'Insert New Option'),
+                                    'new' => array('caption' => 'Insert New Option', 'modal'=>false),
                                     'delete' => array('caption' => 'Remove')
                                 ),
                 'events'=>array('init')
@@ -269,8 +269,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $model = FCom_CustomField_Model_FieldOption::i();
         $model->delete_many(array('field_id'=>$p['field_id']));
         foreach ($p['rows'] as $row) {
-            $row['field_id'] = $p['field_id'];
-            $model->create($row)->save();
+            $data = array('field_id'=>$p['field_id'], 'label'=>$row['label']);
+            print_r($data);
+            $model->create($data)->save();
         }
         BResponse::i()->json(array('success'=>true));
         //$this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
