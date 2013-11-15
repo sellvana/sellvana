@@ -25,7 +25,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('async_edit'=>true),'delete'=>true))
                 ),
                 'actions'=>array(
-                            'new'=> array('caption'=>'Add'),
+                            'new'=> array('caption'=>'Add','inline'=>false),
                             'edit'=>true,
                             'delete'=>true
                 ),
