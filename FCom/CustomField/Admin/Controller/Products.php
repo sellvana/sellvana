@@ -96,4 +96,27 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         BLayout::i()->rootView('customfields/products/fields-partial');
         BResponse::i()->render();
     }
+
+    public function fieldsetAry()
+    {
+        $sets= BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')->find_many());
+        $ret = array();
+        foreach($sets as $set) {
+            $id = $set['id'];
+            $ret[] = array($id=>$set);
+        }
+        return json_encode($ret);
+    }
+
+    public function fieldAry()
+    {
+        $fields = BDb::many_as_array(FCom_CustomField_Model_SetField::i()->orm('s')->select('s.*')->find_many());
+        $ret = array();
+        foreach($fields as $field) {
+            $id = $field['id'];
+            $ret[] = array($id=>$field);
+        }
+        return json_encode($ret);
+
+    }
 }

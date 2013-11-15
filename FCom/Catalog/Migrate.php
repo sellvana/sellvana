@@ -254,4 +254,19 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_9__0_2_10()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tProduct, array(
+            'COLUMNS' => array(
+                'is_featured' => 'tinyint',
+                'is_popular' => 'tinyint',
+            ),
+            'KEYS' => array(
+                'IDX_featured' => '(is_featured)',
+                'IDX_popular' => '(is_popular)',
+            ),
+        ));
+    }
 }

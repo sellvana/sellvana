@@ -18,15 +18,16 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 		array('title', '@required'),
 
         array('title', '@string', null, array('max' => 255)),
-        array('helpful_voices', '@string', null, array('max' => 11)),
 
-        /*array('rating', '@integer'),
+        /*array('helpful_voices', '@string', null, array('max' => 11)),
+        array('rating', '@integer'),
         array('rating1', '@integer'),
         array('rating2', '@integer'),
-        array('rating3', '@integer'),*/
+        array('rating3', '@integer'),
 		array('approved', '@integer'),
 		array('helpful', '@integer'),
-		array('offensive', '@integer'),
+        array('offensive', '@integer'),
+		array('offensive', '@integer'),*/
 	);
 
     public function notify()
@@ -39,22 +40,28 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
     public function confirm()
     {
         $this->set('approved', 1)->save();
-        $this->udpateProductStats();
         BLayout::i()->view('email/prodreview-confirm-customer')->email();
         return $this;
     }
 
-    public function updateProductStats()
+    public function afterSave()
     {
+        parent::afterSave();
+
+        //TODO: condition on relevant changes only (approved, rating)
         $rating = static::i()->orm()->where('product_id', $this->product_id)
             ->where('approved', 1)
             ->select('(avg(rating))', 'avg')
+            #->select('(avg(rating1))', 'avg1')
+            #->select('(avg(rating2))', 'avg2')
+            #->select('(avg(rating3))', 'avg3')
             ->select('(count(1))', 'num')
             ->find_one();
         FCom_Catalog_Model_Product::i()->load($this->product_id)
             ->set('avg_rating', $rating->get('avg'))
             ->set('num_reviews', $rating->get('num'))
             ->save();
+
         return $this;
     }
 
