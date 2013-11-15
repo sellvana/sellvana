@@ -52,7 +52,7 @@
 
             //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
 
-            FCom.Admin.Tabs('.fcom-admin-main-container', {
+            FCom.Admin.Tabs('.f-admin-main-container', {
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ THIS.cur_tab }}",
                 tab_load_callback: function(i) {
@@ -84,7 +84,7 @@
 {{ THIS.view('core/messages') | raw }}
 
 <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
-    <div class="row fcom-admin-main-title">
+    <div class="row f-admin-main-title">
         <div class="col-sm-12">
             <div class="page-header">
                 <h1 class="pull-left">
@@ -100,8 +100,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12 fcom-admin-main-container">
-            <div class="fcom-admin-main-content">
+        <div class="col-sm-12 f-admin-main-container">
+            <div class="f-admin-main-content">
                 <ul class="nav nav-tabs">
                     {% for group in THIS.tab_groups %}
                         <li class="dropdown">
