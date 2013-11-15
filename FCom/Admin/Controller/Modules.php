@@ -78,6 +78,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
 	public function gridConfig()
 	{
+        $modules = BModuleRegistry::i()->getAllModules();
+        $moduleNames = array_keys($modules);
+        $moduleNames = array_combine($moduleNames, $moduleNames);
+
 		$coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
 		$areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('area_run_level');
 		$runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
@@ -101,8 +105,11 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $config['data_mode'] = 'local';
         $config['filters'] = array(
             array('field' => 'name', 'type' => 'text'),
-            array('field' => 'run_level', 'type' => 'multiselect'),
             array('field' => 'run_status', 'type' => 'multiselect'),
+            array('field' => 'run_level', 'type' => 'multiselect'),
+            //array('field' => 'run_level_core', 'type' => 'multiselect'),
+            array('field' => 'requires', 'type' => 'multiselect', 'options' => $moduleNames),
+            array('field' => 'required_by', 'type' => 'multiselect', 'options' => $moduleNames),
         );
         $config['actions'] = array(
             'edit' => array('caption'=>'Change Status')
