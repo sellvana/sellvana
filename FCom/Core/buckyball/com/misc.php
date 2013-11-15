@@ -441,6 +441,31 @@ class BUtil extends BClass
     }
 
     /**
+     * Find index of array item that matches filter values
+     *
+     * @param array $array
+     * @param array $filter
+     * @return boolean|int
+     */
+    static public function arrayFind(array $array, array $filter)
+    {
+        foreach ($array as $i => $item) {
+            $found = true;
+            foreach ($filter as $k=>$v) {
+                if (!(isset($item[$k]) && $item[$k]===$v)) {
+                    $found = false;
+                    break;
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+            return $i;
+        }
+        return false;
+    }
+
+    /**
     * Clean array of ints from empty and non-numeric values
     *
     * If parameter is a string, splits by comma

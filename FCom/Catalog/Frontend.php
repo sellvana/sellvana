@@ -21,4 +21,9 @@ class FCom_Catalog_Frontend extends BClass
     {
         return FCom_Catalog_Model_Product::i()->orm()->where('is_popular', 1)->limit(6)->find_many();
     }
+
+    public function getRecentlyViewedProducts()
+    {
+        return array();
+    }
 }
