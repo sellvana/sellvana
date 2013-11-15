@@ -979,7 +979,7 @@ FCom.BackboneGrid = function(config) {
             this.$el.parents('div.modal-dialog:first').find('select').val('');
         },
         addElementDiv: function(model) {
-            if (model.has('editable')) {
+            if (model.has('mass-editable')) {
                 var elementView = new BackboneGrid.Views.MassEditElement({model: model});
                 this.$el.append(elementView.render().el);
             }

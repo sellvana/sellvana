@@ -7,7 +7,6 @@
 {% set pageUrl = THIS.pageChangeHref() %}
 {% set filterData = config.filters %}
 
-
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
@@ -164,10 +163,10 @@
 
     if (col.cell === 'select-row') {
         var isSelected = '';
-        var isEditable = rc.row.editable ? '' : 'DISABLED';
-        if (rc.row.editable && rc.row.selected)
+        var isSelectable = rc.row._selectable ? '' : 'DISABLED';
+        if (rc.row._selectable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isEditable+' >');
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
@@ -186,7 +185,7 @@
           print('</a>');
         }
 
-    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
+    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select' && typeof(col.editable) !== 'undefined') {
         print('<span style="display:none;">'+rc.row[col.name]+'</span>');
         print('<select data-col="'+col.name +'" class="form-control">');
           for(var val in col.options) {
