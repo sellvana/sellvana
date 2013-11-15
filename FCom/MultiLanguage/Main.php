@@ -22,7 +22,7 @@ class FCom_MultiLanguage_Main extends BClass
         return BRequest::i()->request("lang");
     }
 
-    public function productLoadLocale($args)
+    public function productCollectionLoadLocale($args)
     {
         $lang = self::getLanguage();
         if (!$lang || count($args['result']) == 0) {
@@ -51,11 +51,34 @@ class FCom_MultiLanguage_Main extends BClass
 
         foreach ($localized as $locale) {
             /* @var FCom_MultiLanguage_Model_Translation $locale */
-            $id = $locale->get('entity_id');
-            $product = &$result[$prIdIdx[$id]];
-            $field = $locale->get('field');
+            $id      = $locale->get('entity_id');
+            $product = & $result[$prIdIdx[$id]];
+            $field   = $locale->get('field');
             $product->set($field, $locale->get('value'));
         }
 
+    }
+
+    public function productLoadLocale($args)
+    {
+        $lang = self::getLanguage();
+        if (!$lang || !($args['result'] instanceof BModel)) { // should instance check be more strict?
+            return;
+        }
+
+        $product = $args['result'];
+        $id = $product->id();
+
+        // todo, filter by actual fields selected in product
+        $localized = FCom_MultiLanguage_Model_Translation::i()->orm('ml')
+            ->select(array('entity_id', 'field', 'value', 'data_serialized'), 'ml')
+            ->where(array('entity_id' => $id, 'entity_type' => 'product', 'locale' => $lang))
+            ->find_many(); // localized fields for current product ids and language
+
+        foreach ($localized as $locale) {
+            /* @var FCom_MultiLanguage_Model_Translation $locale */
+            $field   = $locale->get('field');
+            $product->set($field, $locale->get('value'));
+        }
     }
 }

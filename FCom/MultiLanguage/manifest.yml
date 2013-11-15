@@ -9,7 +9,9 @@ modules:
             FCom_Frontend:
                 auto_use: [ views, bootstrap ]
                 observe:
-                    - [ FCom_Catalog_Model_Product::find_many:after, FCom_MultiLanguage_Main.productLoadLocale ]
+                    - [ FCom_Catalog_Model_Product::find_many:after,
+                    FCom_MultiLanguage_Main.productCollectionLoadLocale ]
+                    - [ FCom_Catalog_Model_Product::find_one:after, FCom_MultiLanguage_Main.productLoadLocale ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]
