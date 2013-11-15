@@ -441,6 +441,31 @@ class BUtil extends BClass
     }
 
     /**
+     * Find index of array item that matches filter values
+     *
+     * @param array $array
+     * @param array $filter
+     * @return boolean|int
+     */
+    static public function arrayFind(array $array, array $filter)
+    {
+        foreach ($array as $i => $item) {
+            $found = true;
+            foreach ($filter as $k=>$v) {
+                if (!(isset($item[$k]) && $item[$k]===$v)) {
+                    $found = false;
+                    break;
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+            return $i;
+        }
+        return false;
+    }
+
+    /**
     * Clean array of ints from empty and non-numeric values
     *
     * If parameter is a string, splits by comma
@@ -3297,7 +3322,7 @@ class BValidate extends BClass
             'message' => 'Invalid number: :field',
         ),
         'integer'   => array(
-            'rule'    => '/^[+-][0-9]+$/',
+            'rule'    => '/^[+-]?[0-9]+$/',
             'message' => 'Invalid integer: :field',
         ),
         'alphanum'  => array(
@@ -3370,7 +3395,7 @@ class BValidate extends BClass
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
-                $result = empty($data[$r['field']]) || preg_match($m[0], $data[$r['field']]);
+                $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
             } elseif($r['rule'] instanceof Closure){
                 $result = $r['rule']($data, $r['args']);
             } elseif (is_callable($r['rule'])) {
@@ -3590,7 +3615,7 @@ class Bcrypt extends BClass
         return strlen($hash) > 13 ? $hash : false;
     }
 
-    public function verify($input, $existingHash)
+    public static function verify($input, $existingHash)
     {
         // md5 for protection against timing side channel attack (needed)
         return md5(crypt($input, $existingHash)) === md5($existingHash);

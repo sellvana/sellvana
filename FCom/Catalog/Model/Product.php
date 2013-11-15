@@ -709,5 +709,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         return $rs;
     }
+
+    public function getRelatedProducts()
+    {
+        return array();
+    }
+
+    public function getUpsellProducts()
+    {
+        return array();
+    }
 }
 

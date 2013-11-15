@@ -1074,6 +1074,12 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 }
             }
         });
+        $('header .navbar .toggle-nav').click(function(ev) {
+            var postData = { do: 'nav.collapse', collapsed: $('body').hasClass('main-nav-closed') ? 1 : 0 };
+            $.post(FCom.Admin.personalize_href, postData, function(response, status, xhr) {
+                console.log(response);
+            });
+        })
         $('.nav-group header').click(function(ev) {
             $(ev.currentTarget).parent('li').find('ul').animate({
                 opacity:'toggle',

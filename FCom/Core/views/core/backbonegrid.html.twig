@@ -7,7 +7,6 @@
 {% set pageUrl = THIS.pageChangeHref() %}
 {% set filterData = config.filters %}
 
-
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
@@ -103,8 +102,8 @@
       </tbody>
     </table>
   </div>
-
-  <div class='modal fade' id='{{ config.id }}-mass-edit' tabindex='-1'>
+  <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
+  <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
     <div class='modal-dialog'>
         <div class='modal-content'>
             <div class='modal-header'>
@@ -126,7 +125,7 @@
 
 
 
-<script type="template" id="{{ config.id }}-edit-template">
+<script type="template" id="{{ config.id }}-modal-element-template">
 
     <label for="<%- rc.name %>"><%- rc.label%></label>
     <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
@@ -164,10 +163,10 @@
 
     if (col.cell === 'select-row') {
         var isSelected = '';
-        var isEditable = rc.row.editable ? '' : 'DISABLED';
-        if (rc.row.editable && rc.row.selected)
+        var isSelectable = rc.row._selectable ? '' : 'DISABLED';
+        if (rc.row._selectable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isEditable+' >');
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
@@ -186,18 +185,19 @@
           print('</a>');
         }
 
-    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
-        print('<span style="display:none;">'+rc.row[col.name]+'</span>');
-        print('<select data-col="'+col.name +'" class="form-control">');
-          for(var val in col.options) {
-            print('<option value="'+val+'"'+ (rc.row[col.name] === val ? ' selected' : '') +'>'+col.options[val]+'</option>');
-          }
-        print('</select>');
-    } else if (typeof(col.editable) !== 'undefined') {
-        print('<span style="display:none;">'+rc.row[col.name]+'</span>');
-        print('<input data-col="'+col.name+'" value = "'+rc.row[col.name]+'" class="form-control"/>');
-    }
-    else {
+    } else if (typeof(col.editable) !== 'undefined' && col.editable) {
+        if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
+          print('<span style="display:none;">'+rc.row[col.name]+'</span>');
+          print('<select data-col="'+col.name +'" class="form-control">');
+            for(var val in col.options) {
+              print('<option value="'+val+'"'+ (rc.row[col.name] === val ? ' selected' : '') +'>'+col.options[val]+'</option>');
+            }
+          print('</select>');
+      } else if (typeof(col.editable) !== 'undefined') {
+          print('<span style="display:none;">'+rc.row[col.name]+'</span>');
+          print('<input data-col="'+col.name+'" value = "'+rc.row[col.name]+'" class="form-control"/>');
+      }
+    } else {
       if (typeof(col.print) !== 'undefined') {
         eval(col.print);
       } else {
