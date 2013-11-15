@@ -750,6 +750,7 @@ FCom.BackboneGrid = function(config) {
             $('.dd').nestable().on('change',this.orderChanged);
         },
         addLiTag: function(model) {
+            console.log(model.toJSON());
             if(model.get('label') !== '') {
                 var checkView = new BackboneGrid.Views.ColCheckView({model:model});
                 this.$el.append(checkView.render().el);
@@ -1095,7 +1096,7 @@ FCom.BackboneGrid = function(config) {
         var filters = config.filters;
         for (var i in columns) {
             var c = columns[i];
-            if (c.name != 'id') {
+            //if (c.name != 'id') {
                 if (c.hidden === 'false')
                     c.hidden = false;
                 if (c.name === 0) {
@@ -1142,7 +1143,7 @@ FCom.BackboneGrid = function(config) {
                 }
                 var ColModel = new BackboneGrid.Models.ColModel(c);
                 columnsCollection.add(ColModel);
-            }
+           // }
         }
 
         headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
