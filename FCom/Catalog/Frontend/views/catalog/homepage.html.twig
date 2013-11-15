@@ -1,19 +1,24 @@
 {% set hlp = APP.instance('FCom_Catalog_Frontend') %}
+{% set featured = hlp.getFeaturedProducts() %}
+{% set popular = hlp.getPopularProducts() %}
 
-<div class="f-widget f-widget-featured-prods">
-  <header class="f-widget-header">
-    <strong class="f-widget-title">Featured Products</strong>
-  </header>
-  {{ THIS.view('catalog/product/grid-tiles').set('products', hlp.getFeaturedProducts()) | raw }}
-</div><!-- /.widget-featured-prods -->
+{% if featured %}
+  <div class="f-widget f-widget-featured-prods">
+    <header class="f-widget-header">
+      <strong class="f-widget-title">Featured Products</strong>
+    </header>
+    {{ THIS.view('catalog/product/grid-tiles').set('products', featured) | raw }}
+  </div><!-- /.widget-featured-prods -->
+{% endif %}
 
-<div class="f-widget f-widget-featured-prods">
-  <header class="f-widget-header">
-    <strong class="f-widget-title">Popular Products</strong>
-  </header>
-  {{ THIS.view('catalog/product/grid-tiles').set('products', hlp.getPopularProducts()) | raw }}
-</div><!-- /.f-widget-featured-prods -->
-
+{% if popular %}
+  <div class="f-widget f-widget-featured-prods">
+    <header class="f-widget-header">
+      <strong class="f-widget-title">Popular Products</strong>
+    </header>
+    {{ THIS.view('catalog/product/grid-tiles').set('products', popular) | raw }}
+  </div><!-- /.f-widget-featured-prods -->
+{% endif %}
 
 
   {#
