@@ -53,7 +53,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
 	        $r['id'] = $r['name'];
-            $r['_selectable'] = !empty($schemaVersions[$modName]) ? true : false;
+            $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
         }
 
