@@ -7,8 +7,12 @@ modules:
         description: "Customer Groups Management"
         areas:
             FCom_Admin:
-                auto_use: all
+                auto_use: [ views, layout, bootstrap ]
                 routing:
                     - [ get, /customer-groups, FCom_CustomerGroups_Admin_Controller_CustomerGroups.index ]
                     - [ any, /customer-groups/.action, FCom_CustomerGroups_Admin_Controller_CustomerGroups ]
                     - [ any, /tier-prices/.action, FCom_CustomerGroups_Admin_Controller_TierPrices ]
+            FCom_Frontend:
+                auto_use: [ views, layout ]
+        observe:
+            - [ FCom_Catalog_Model_Product::onAfterSave, FCom_CustomerGroups_Admin::onProductAfterSave ]

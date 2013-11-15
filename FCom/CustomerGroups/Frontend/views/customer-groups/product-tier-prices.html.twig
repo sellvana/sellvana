@@ -1,0 +1,12 @@
+{% set tiers = APP.instance('FCom_CustomerGroups_Model_TierPrice').getProductTiers(THIS.get('product')) %}
+
+<table class="f-tier-price-group table table-condensed">
+  <caption>{{ 'Tier Pricing'|_ }}</caption>
+{% for tier in tiers %}
+  <tr>
+    <td>Buy {{ tier.qty }}</td>
+    <td>{{ tier.sale_price|currency }} each</td>
+    <td>Save {{ tier.save_percent }}%</td>
+  </tr>
+{% endfor %}
+</table> <!-- /.f-tier-price-group -->

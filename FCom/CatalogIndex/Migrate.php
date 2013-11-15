@@ -176,4 +176,29 @@ VALUES
             ),
         ));
     }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $tDoc = FCom_CatalogIndex_Model_Doc::table();
+        $tField = FCom_CatalogIndex_Model_Field::table();
+        $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
+
+        BDb::ddlTableDef($tDocSort, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'doc_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'value' => 'varchar(255) not null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'IDX_field_value' => '(field_id, value)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tDocSort}_doc" => "FOREIGN KEY (doc_id) REFERENCES {$tDoc} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tDocSort}_field" => "FOREIGN KEY (field_id) REFERENCES {$tField} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+        //TODO: delete doc.sort_product_name
+    }
 }

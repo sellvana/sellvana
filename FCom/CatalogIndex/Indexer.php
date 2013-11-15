@@ -71,12 +71,12 @@ class FCom_CatalogIndex_Indexer extends BClass
             switch ($field->source_type) {
             case 'field':
                 foreach ($products as $p) {
-                    static::$_indexData[$p->id][$fName] = $p->get($source);
+                    static::$_indexData[$p->id()][$fName] = $p->get($source);
                 }
                 break;
             case 'method':
                 foreach ($products as $p) {
-                    static::$_indexData[$p->id][$fName] = $p->$source($field);
+                    static::$_indexData[$p->id()][$fName] = $p->$source($field);
                 }
                 break;
             case 'callback':
@@ -94,14 +94,31 @@ class FCom_CatalogIndex_Indexer extends BClass
     static protected function _indexSaveDocs()
     {
         $docHlp = FCom_CatalogIndex_Model_Doc::i();
+        $sortHlp = FCom_CatalogIndex_Model_DocSort::i();
         $now = BDb::now();
         $sortFields = FCom_CatalogIndex_Model_Field::i()->getFields('sort');
-        foreach (static::$_indexData as $pId=>$pData) {
+        $sortColumn = array();
+        $sortJoin = array();
+        foreach ($sortFields as $fName => $field) {
+            if ($field->get('sort_method') === 'column') {
+                $sortColumn[$fName] = $field;
+            } else {
+                $sortJoin[$fName] = $field;
+            }
+        }
+        foreach (static::$_indexData as $pId => $pData) {
             $row = array('id'=>$pId, 'last_indexed'=>$now);
-            foreach ($sortFields as $fName=>$field) {
+
+            foreach ($sortColumn as $fName => $field) {
                 $row['sort_'.$fName] = $pData[$fName];
             }
+
             $docHlp->create($row)->save();
+
+            foreach ($sortJoin as $fName => $field) {
+                $row = array('doc_id' => $pId, 'field_id' => $field->id(), 'value' => $pData[$fName]);
+                $sortHlp->create($row)->save();
+            }
         }
     }
 
@@ -112,7 +129,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
         foreach (static::$_indexData as $pId=>$pData) {
             foreach ($filterFields as $fName=>$field) {
-                $fId = $field->id;
+                $fId = $field->id();
                 $value = !empty($pData[$fName]) ? $pData[$fName] : null;
                 if (is_null($value) || $value==='' || $value===array()) {
                     continue;
@@ -130,7 +147,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                                 'display' => $vDisplay!=='' ? $vDisplay : null,
                             ))->save();
                         }
-                        static::$_filterValues[$fId][$vVal] = $fieldValue->id;
+                        static::$_filterValues[$fId][$vVal] = $fieldValue->id();
                     }
                     $row = array('doc_id'=>$pId, 'field_id'=>$fId, 'value_id'=>static::$_filterValues[$fId][$vVal]);
                     $docValueHlp->create($row)->save();
@@ -156,7 +173,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         $allTerms = array();
         foreach (static::$_indexData as $pId=>$pData) {
             foreach ($searchFields as $fName=>$field) {
-                $fId = $field->id;
+                $fId = $field->id();
                 $terms = static::_retrieveTerms($pData[$fName]);
                 foreach ($terms as $i=>$v) {
                     // index term per product only once
