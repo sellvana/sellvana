@@ -105,7 +105,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             array('field' => 'run_status', 'type' => 'multiselect'),
         );
         $config['actions'] = array(
-            'edit' => true
+            'edit' => array('caption'=>'Change Status')
         );
         $config['events'] = array('edit', 'mass-edit');
         $config['callbacks'] = array('after_render'=>'afterModuleGridRowRendered');
