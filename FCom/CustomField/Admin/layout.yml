@@ -23,6 +23,7 @@ catalog_product_form_tabs:
     - { include: base }
     - { hook: main, views: customfields/fields }
     - { view: admin/nav, do: [[ setNav, catalog/fields ]] }
+
 /customfields/fieldsets/form:
     - { include: base }
     - { include: form }
