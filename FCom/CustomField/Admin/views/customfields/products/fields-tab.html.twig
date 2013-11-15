@@ -1,3 +1,5 @@
+{% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
+{% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 <div class="row">
     <div class="col-sm-10">
         <div class="pull-right">
@@ -11,42 +13,96 @@
         <table>
             <tr>
                 <td style='padding-right:20px;'>
-                    <select id="product-edit-available-sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
-                        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Set').as_values('set_name')) | raw }}
+                    <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+                        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
                     </select>
 
                 </td>
                 <td style='padding-right:70px;'>
-                    <button class="btn btn-primary" id="product-edit-add-set" type="button">Add Field Set</button>
+                    <button class="btn btn-primary" id="btn_add_set" type="button">Add a Field Set</button>
 
                 </td>
                 <td style='padding-right:20px;'>
-                    <select id="product-edit-available-fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+                    <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
                         {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
                     </select>
 
                 </td>
                 <td>
-                    <button class="btn btn-primary" type="button" id="product-edit-add-field">Add Field</button>
+                    <button class="btn btn-primary" type="button" id="btn_add_field">Add a Field</button>
                 </td>
             </tr>
         </table>
-
-        <div class="box box-bordered blue-border box-nomargin">
-            <div class="box-header box-header-small blue-background">
-                <div class="title">Small &amp; Bordered</div>
+        <hr>
+        <div id='fields_list'/>
+        <script type="template" id="fieldset-template">
+            <div class="box-header box-header-small green-background">
+                <div class="title"><%- rc.set_name %></div>
                 <div class="actions">
-                    <a href="#" class="btn box-remove btn-xs btn-link"><i class="icon-remove"></i>
+                    <a href="#" class="btn box-remove btn-xs btn-link btn-edit">Edit
                     </a>
 
-                    <a href="#" class="btn box-collapse btn-xs btn-link"><i></i>
+                    <a href="#" class="btn box-collapse btn-xs btn-link btn-remove">Remove
                     </a>
                 </div>
             </div>
             <div class="box-content">
-                Explicabo voluptate eos ipsam et recusandae quasi laudantium est velit nihil perspiciatis minima corrupti neque sint dolores lorum consequatur voluptatem
+                <!-- field template here -->
             </div>
-        </div>
-	</div>
+        </script>
 </div>
 
+<script>
+var fieldSetAry = {{ ctrl.fieldsetAry() | raw }};
+var fieldsAry = {{ ctrl.fieldAry() | raw }};
+
+require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $) {
+
+    $('#btn_add_set').click(function() {
+
+    });
+
+
+    $('#sel_sets').select2();
+    $('#sel_fields').select2();
+
+    var CustomField = {
+        Models: {},
+        Collections: {},
+        Views: {}
+    };
+
+    CustomField.Models.FieldSet = Backbone.Model.extend({
+    });
+
+    CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
+
+    });
+
+    CustomField.Views.FieldSetView = Backbone.Model.extend({
+        className: "box box-borderd green-border box-nomargin",
+        template: _.template($('#fieldset-template').html()),
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        }
+    });
+
+
+    CustomField.Views.MainView = Backbone.Model.extend({
+        el: '#fields_list',
+        _addSetView: function(set) {
+             var setView = new  CustomField.Views.FieldSetView({
+                model: set
+            });
+            this.$el.append(setView.render().el);
+        },
+        render: function() {
+            this.collection.each(this._addSetView, this);
+        }
+    });
+
+    var fieldSets = new CustomField.Collections.FieldSetCollection();
+
+});
+</script>

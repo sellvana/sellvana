@@ -24,7 +24,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
         );
         $config['actions'] = array(
-            'refresh'=>true,
             'export'=>true,
             'edit'=>true,
             'delete'=>true

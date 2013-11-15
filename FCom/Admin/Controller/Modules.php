@@ -10,6 +10,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 	protected $_recordName = 'Product';
 	protected $_mainTableAlias = 'm';
     protected $_gridViewName = 'core/backbonegrid';
+
     public function getModulesData()
     {
         $config = BConfig::i();
@@ -51,8 +52,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
-	        $r['id'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('id') : uniqid();
-            $r['editable'] = !empty($schemaVersions[$modName]) ? true : false;
+	        $r['id'] = $r['name'];
+            $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
         }
 
@@ -77,6 +78,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
 	public function gridConfig()
 	{
+        $modules = BModuleRegistry::i()->getAllModules();
+        $moduleNames = array_keys($modules);
+        $moduleNames = array_combine($moduleNames, $moduleNames);
+
 		$coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
 		$areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('area_run_level');
 		$runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
@@ -91,7 +96,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
 			array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
 			array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
- 			array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'editable' => true, 'editor' => 'select', 'cell' => new BValue("FCom.Backgrid.RunLevelSelectCell"), 'overflow' => true),
+ 			array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
 			array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
 			array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true)
 		);
@@ -99,13 +104,18 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 		$config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         $config['filters'] = array(
-                                    array('field' => 'name', 'type' => 'text'),
-                                    array('field' => 'run_level_core', 'type' => 'multiselect')
-                                 );
+            array('field' => 'name', 'type' => 'text'),
+            array('field' => 'run_status', 'type' => 'multiselect'),
+            array('field' => 'run_level', 'type' => 'multiselect'),
+            //array('field' => 'run_level_core', 'type' => 'multiselect'),
+            array('field' => 'requires', 'type' => 'multiselect', 'options' => $moduleNames),
+            array('field' => 'required_by', 'type' => 'multiselect', 'options' => $moduleNames),
+        );
         $config['actions'] = array(
-            'edit' => true
+            'edit' => array('caption'=>'Change Status')
         );
         $config['events'] = array('edit', 'mass-edit');
+        $config['callbacks'] = array('after_render'=>'afterModuleGridRowRendered');
 
         //$config['state'] =array(5,6,7,8);
 		return $config;

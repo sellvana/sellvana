@@ -28,6 +28,7 @@ class FCom_Admin_Admin extends BClass
 FCom.Admin = {};
 FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/js/codemirror').'";
 FCom.Admin.upload_href = "'.BApp::href('upload').'";
+FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";
             ');
 
             $config = BConfig::i()->get('modules/FCom_Admin');
@@ -46,6 +47,11 @@ FCom.Admin.upload_href = "'.BApp::href('upload').'";
             }
             if (!empty($config['add_css_style'])) {
                 $head->css_raw('add_css_code', $config['add_css_style']);
+            }
+
+            $pers = FCom_Admin_Model_User::i()->personalize();
+            if (!empty($pers['nav']['collapsed'])) {
+                BLayout::i()->view('root')->addBodyClass('main-nav-closed');
             }
         }
     }
