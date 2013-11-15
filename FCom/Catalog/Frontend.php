@@ -11,4 +11,14 @@ class FCom_Catalog_Frontend extends BClass
             ;
         }
     }
+
+    public function getFeaturedProducts()
+    {
+        return FCom_Catalog_Model_Product::i()->orm()->where('is_featured', 1)->limit(6)->find_many();
+    }
+
+    public function getPopularProducts()
+    {
+        return FCom_Catalog_Model_Product::i()->orm()->where('is_popular', 1)->limit(6)->find_many();
+    }
 }

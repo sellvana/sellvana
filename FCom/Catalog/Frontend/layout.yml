@@ -3,6 +3,8 @@ base:
         do:
             - [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
             - [ requireRun, fcom.catalog ]
+/:
+    - { hook: homepage-additional, views: catalog/homepage }
 
 /catalog/category:
     - { include: base }

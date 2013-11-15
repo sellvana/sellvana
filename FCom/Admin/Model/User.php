@@ -237,7 +237,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function personalize($data=null)
     {
         if (!$this->orm) {
-            return $this->sessionUser()->personalize($data);
+            $user = $this->sessionUser();
+            if (!$user) {
+                return null;
+            }
+            return $user->personalize($data);
         }
         if (!$this->_persModel) {
             $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id(), 'user_id');
