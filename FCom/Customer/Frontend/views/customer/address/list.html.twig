@@ -7,6 +7,7 @@
           <a href="{{ APP.href("customer/address/edit") }}" class="btn btn-primary">{{ "Add new address" | _ }}</a>
           <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
         </header>
+          {{ THIS.view('core/messages') | raw }}
         <div class="f-address-list">
         {% for address in THIS.get('addresses') %}
           <div class="f-address-list-item{% if address.get('id') == THIS.get('customer').get('default_shipping_id') or address.get('id') == THIS.get('customer').get('default_billing_id') %} well{% endif %}">

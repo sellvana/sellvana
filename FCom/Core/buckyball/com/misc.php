@@ -3615,7 +3615,7 @@ class Bcrypt extends BClass
         return strlen($hash) > 13 ? $hash : false;
     }
 
-    public function verify($input, $existingHash)
+    public static function verify($input, $existingHash)
     {
         // md5 for protection against timing side channel attack (needed)
         return md5(crypt($input, $existingHash)) === md5($existingHash);
