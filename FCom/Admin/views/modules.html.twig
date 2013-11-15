@@ -21,9 +21,6 @@ function afterModuleGridRowRendered(el, row)
 
     var badge = '';
     switch(row.run_level) {
-        case 'DISABLED':
-            badge = 'default';
-            break;
         case 'REQUESTED':
             badge = 'success';
             break;
@@ -31,7 +28,8 @@ function afterModuleGridRowRendered(el, row)
             badge = 'warning';
             break;
     }
-    el.find('td[data-col="run_level"]').html('<span class="badge badge-'+badge+'">'+row.run_level+'</span>');
+    if(badge != '')
+        el.find('td[data-col="run_level"]').html('<span class="badge badge-'+badge+'">'+row.run_level+'</span>');
 }
 
 /**Event Aggregator
