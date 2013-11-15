@@ -126,9 +126,14 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer->setChangePasswordRules();
 
             if ($customer->validate($r, array(), $formId)) {
-                $customer->set($r)->save();
-                BSession::i()->addMessage($this->_('Your password has been updated'), 'success', 'frontend');
-                BResponse::i()->redirect(BApp::href('customer/myaccount'));
+                if (!Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                    BSession::i()->addMessage($this->_('Current password is not correct, please try again'), 'error', 'frontend');
+                    BResponse::i()->redirect(BApp::href('customer/myaccount/editpassword'));
+                } else {
+                    $customer->set($r)->save();
+                    BSession::i()->addMessage($this->_('Your password has been updated'), 'success', 'frontend');
+                    BResponse::i()->redirect(BApp::href('customer/myaccount'));
+                }
             } else {
                 $this->formMessages($formId);
                 BResponse::i()->redirect(BApp::href('customer/myaccount/editpassword'));
