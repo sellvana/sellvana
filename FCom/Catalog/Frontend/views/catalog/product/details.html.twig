@@ -6,6 +6,9 @@
 </style>
 {% set prod = THIS.get('product') %}
 {% set cat = THIS.get('category') %}
+{% set relatedProducts = prod.getRelatedProducts() %}
+{% set upsellProducts = prod.getUpsellProducts() %}
+{% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 <div class="f-site-main" role="main">
   <div class="container">
     {{ THIS.view('breadcrumbs') | raw }}
@@ -93,25 +96,7 @@
                 </tr>
               {% endif %}
             </table>
-
-            <table class="f-tier-price-group table table-condensed">
-              <caption>Tier Pricing</caption>
-              <tr>
-                <td>Buy 2</td>
-                <td>$59.99 each</td>
-                <td>Save 5%</td>
-              </tr>
-              <tr>
-                <td>Buy 5</td>
-                <td>$49.99 each</td>
-                <td>Save 5%</td>
-              </tr>
-              <tr>
-                <td>Buy 15</td>
-                <td>$39.99 each</td>
-                <td>Save 5%</td>
-              </tr>
-            </table> <!-- /.f-tier-price-group -->
+            {{ THIS.view('customer-groups/product-tier-prices').set('product', prod) | raw }}
           </div> <!-- /.f-price-group -->
 
           <div class="f-prod-select">
@@ -262,31 +247,35 @@
           </div>
         </div><!-- /.f-prod-info -->
       <br/>
-      <!-- You may also like -->
-      <div class="f-widget f-widget-featured-prods">
-        <header class="f-widget-header">
-          <strong class="f-widget-title">Related Products</strong>
-        </header>
-        {{ THIS.view('catalog/product/grid-tiles').set('products', prod.getRelatedProducts()) | raw }}
-      </div><!-- /.f-widget -->
+      {% if relatedProducts %}
+        <!-- You may also like -->
+        <div class="f-widget f-widget-featured-prods">
+          <header class="f-widget-header">
+            <strong class="f-widget-title">Related Products</strong>
+          </header>
+          {{ THIS.view('catalog/product/grid-tiles').set('products', relatedProducts) | raw }}
+        </div><!-- /.f-widget -->
+      {% endif %}
 
-      <!-- You may also like -->
-      <div class="f-widget f-widget-featured-prods">
-        <header class="f-widget-header">
-          <strong class="f-widget-title">You may also like these items</strong>
-        </header>
-        {{ THIS.view('catalog/product/grid-tiles').set('products', prod.getUpsellProducts()) | raw }}
-      </div><!-- /.f-widget -->
+      {% if upsellProducts %}
+        <!-- You may also like -->
+        <div class="f-widget f-widget-featured-prods">
+          <header class="f-widget-header">
+            <strong class="f-widget-title">You may also like these items</strong>
+          </header>
+          {{ THIS.view('catalog/product/grid-tiles').set('products', upsellProducts) | raw }}
+        </div><!-- /.f-widget -->
+      {% endif %}
 
-
-
-      <!-- You may also like -->
-      <div class="f-widget f-widget-featured-prods">
-        <header class="f-widget-header">
-          <strong class="f-widget-title">You recently viewed these items</strong>
-        </header>
-        {{ THIS.view('catalog/product/grid-tiles').set('products', APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts()) | raw }}
-      </div>
+      {% if recentlyViewed %}
+        <!-- You may also like -->
+        <div class="f-widget f-widget-featured-prods">
+          <header class="f-widget-header">
+            <strong class="f-widget-title">You recently viewed these items</strong>
+          </header>
+          {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
