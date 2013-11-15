@@ -244,6 +244,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         case 'settings.sections.order':
             break;
 
+        case 'nav.collapse':
+            $data['nav']['collapsed'] = !empty($r['collapsed']);
+            break;
+
         case 'dashboard.widget.pos':
             if (empty($r['widgets'])) {
                 break;
@@ -267,6 +271,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('dashboard' => array('widgets' => array($r['key'] => $data)));
             break;
         }
+        BEvents::i()->fire(__METHOD__, array('request' => $r, 'data' => &$data));
+
         FCom_Admin_Model_User::i()->personalize($data);
         BResponse::i()->json(array('success'=>true, 'data' => $data, 'r' => $r));
     }
