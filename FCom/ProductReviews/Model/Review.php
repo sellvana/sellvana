@@ -44,12 +44,13 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        parent::afterSave();
+        parent::onAfterSave();
 
         //TODO: condition on relevant changes only (approved, rating)
-        $rating = static::i()->orm()->where('product_id', $this->product_id)
+        $pId = $this->get('product_id');
+        $rating = static::i()->orm()->where('product_id', $pId)
             ->where('approved', 1)
             ->select('(avg(rating))', 'avg')
             #->select('(avg(rating1))', 'avg1')
@@ -57,11 +58,10 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             #->select('(avg(rating3))', 'avg3')
             ->select('(count(1))', 'num')
             ->find_one();
-        FCom_Catalog_Model_Product::i()->load($this->product_id)
+        FCom_Catalog_Model_Product::i()->load($pId)
             ->set('avg_rating', $rating->get('avg'))
             ->set('num_reviews', $rating->get('num'))
             ->save();
-
         return $this;
     }
 
