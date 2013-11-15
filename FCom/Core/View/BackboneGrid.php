@@ -243,7 +243,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
                      case 'new':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>'btn grid-new btn-primary', 'type'=>'button'),
+                            array('class'=>'btn grid-new btn-primary', 'type'=>'button', 'data-inline'=>$action['inline']),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
                         ));
                         break;
