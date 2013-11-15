@@ -1,5 +1,22 @@
 <?php
-
+/**
+ * Model class for table 'fcom_customer'
+ * The followings are the available columns in table 'fcom_customer':
+ * @property string $id
+ * @property string $email
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $password_hash
+ * @property string $default_shipping_id
+ * @property string $default_billing_id
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $last_login
+ * @property string $token
+ * @property string $payment_method
+ * @property string $payment_details
+ * @property string $customer_group
+ */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer';
@@ -184,6 +201,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
+    /**
+     * @param bool $reset
+     * @return bool|FCom_Customer_Model_Customer
+     */
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
