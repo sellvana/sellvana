@@ -51,6 +51,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 		array('default_billing_id', '@integer'),
 		/*array('customer_group', '@integer'),*/
 	);
+    //todo: set rules password minimum length
 
     /**
      * @param bool  $new
@@ -102,6 +103,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function setChangePasswordRules()
     {
         $this->_validationRules = array(
+            array('current_password', '@required'),
             array('password', '@required'),
             array('password_confirm', '@password_confirm'),
         );
