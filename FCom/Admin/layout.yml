@@ -9,8 +9,6 @@ base:
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
   - { callback: FCom_Admin_Admin::layout }
 
-
-
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]

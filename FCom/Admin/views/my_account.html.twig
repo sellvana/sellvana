@@ -5,7 +5,7 @@
 
 <div class="row" id="content-wrapper">
 
-  <form class="form form-horizontal" method="post">
+  <form id="my_account-form" class="form form-horizontal" method="post">
 
     <div class="col-xs-12">
       <div class="row">
@@ -42,6 +42,8 @@
         </div>
       </div>
 
+      {{ THIS.view('core/messages') | raw }}
+
       <div class="box">
         <div class="box-content">
           <div class="row">
@@ -50,7 +52,7 @@
               <fieldset>
                 <div class='lead'>
                   <i class='icon-laptop text-contrast'></i>
-                  Account Information
+                  {{ 'Account Information'|_ }}
                 </div>
                 <div class="form-group">
                   <label class="col-md-3 control-label">{{ 'Username'|_ }}</label>
@@ -61,10 +63,19 @@
                 <div class="form-group">
                   <label class="col-md-3 control-label">{{ 'E-mail'|_ }}</label>
                   <div class="col-md-7">
-                    <input class="form-control" id="email" placeholder="{{ 'E-mail'|_ }}" type="text" name="model[email]" value="{{ m.get('email') }}">
+                    <input class="form-control" id="email" placeholder="{{ 'E-mail'|_ }}" type="email" name="model[email]" value="{{ m.get('email') }}">
                   </div>
                   <div class="col-md-1">
                     <img class="img-responsive" width="32" height="32" src="{{ m.thumb(32) }}" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label" for="password-current">{{ 'Current Password'|_ }}</label>
+                  <div class="col-md-7">
+                    <input class="required form-control" id="password-current" placeholder="{{ 'Current Password'|_ }}" type="password" name="model[password_current]">
+                  </div>
+                  <div class="col-md-offset-3 col-md-7">
+                    <small>{{ 'Any account updates require current password'|_ }}</small>
                   </div>
                 </div>
 
@@ -80,15 +91,15 @@
                 </div>
                 <div class="collapse" id="change-password">
                   <div class="form-group">
-                    <label class="col-md-3 control-label">{{ 'Password'|_ }}</label>
+                    <label class="col-md-3 control-label" for="password">{{ 'New Password'|_ }}</label>
                     <div class="col-md-7">
-                      <input class="form-control" id="password" placeholder="{{ 'Password'|_ }}" type="password" name="model[password]">
+                      <input class="required form-control" id="password" placeholder="{{ 'New Password'|_ }}" type="password" name="model[password]">
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-md-3 control-label">{{ 'Password confirmation'|_ }}</label>
+                    <label class="col-md-3 control-label" for="password-confirmation">{{ 'Password confirmation'|_ }}</label>
                     <div class="col-md-7">
-                      <input class="form-control" id="password-confirmation" placeholder="{{ 'Password confirmation'|_ }}" type="password" name="model[password_confirm]">
+                      <input class="required form-control" id="password-confirmation" placeholder="{{ 'Password confirmation'|_ }}" equalto="#password" type="password" name="model[password_confirm]">
                     </div>
                   </div>
                 </div>
@@ -136,3 +147,19 @@
     </div>
   </form>
 </div>
+
+<script>
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#changepasswordcheck').change(function(ev) {
+          return;
+          if (this.checked) {
+            $('#change-password input').addClass('required');
+          } else {
+            $('#change-password input').removeClass('required');
+          }
+        })
+        $('#my_account-form').validate();
+    })
+})
+</script>
