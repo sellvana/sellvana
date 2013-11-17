@@ -10,6 +10,12 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         return parent::authenticate($args);
     }
 
+    public function action_test()
+    {
+        FCom_Admin_Model_User::i()->sessionUser()->recoverPassword();
+        echo "DONE"; exit;
+    }
+
     public function action_index()
     {
         $this->layout('/');
@@ -82,17 +88,21 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_password_reset__POST()
     {
-        $token = BRequest::i()->request('token');
-        $password = BRequest::i()->post('password');
-        if ($token && $password && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
-            && ($user->get('token') === $token)
+        $r = BRequest::i();
+        $token = $r->request('token');
+        $password = $r->post('password');
+        $confirm = $r->post('password_confirm');
+        if ($token && $password && $confirm && $password === $confirm
+            && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && $user->get('token') === $token
         ) {
             $user->resetPassword($password);
             BSession::i()->addMessage('Password has been reset', 'success', 'admin');
+            BResponse::i()->redirect(BApp::href());
         } else {
             BSession::i()->addMessage('Invalid form data', 'error', 'admin');
+            BResponse::i()->redirect(BRequest::i()->currentUrl());
         }
-        BResponse::i()->redirect(BApp::href());
     }
 
     public function action_logout()
