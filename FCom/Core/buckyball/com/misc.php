@@ -2076,9 +2076,15 @@ class BDebug extends BClass
         static::$_logDir = $dir;
     }
 
-    public static function log($msg, $file='debug.log')
+    public static function log($msg, $file='debug.log', $backtrace=false)
     {
-        error_log($msg."\n", 3, static::$_logDir.'/'.$file);
+        $file = static::$_logDir.'/'.$file;
+        error_log($msg."\n", 3, $file);
+        if ($backtrace) {
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            error_log(ob_get_clean(), 3, $file);
+        }
     }
 
     public static function logException($e)

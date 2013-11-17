@@ -220,7 +220,7 @@ class BApp extends BClass
         BModuleRegistry::i()->bootstrap();
 
         // run module migration scripts if necessary
-        if (BConfig::i()->get('db/implicit_migration')) {
+        if (BConfig::i()->get('install_status')==='installed' && BConfig::i()->get('db/implicit_migration')) {
             BMigrate::i()->migrateModules(true);
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Core_View_Messages extends BView
+class FCom_Core_View_Messages extends FCom_Core_View_Abstract
 {
     protected $_classes = array(
         'error' => 'danger',
