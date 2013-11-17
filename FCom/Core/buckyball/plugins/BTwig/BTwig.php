@@ -36,7 +36,7 @@ class BTwig extends BClass
 
         $options = array(
             'cache' => static::$_cacheDir,
-            'debug' => 1,#$config->get('modules/BTwig/debug'),
+            'debug' => 0,#$config->get('modules/BTwig/debug'),
             'auto_reload' => 1,#$config->get('modules/BTwig/auto_reload'),
         );
 

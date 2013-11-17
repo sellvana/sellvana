@@ -132,11 +132,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_my_account__POST()
     {
+        $model = FCom_Admin_Model_User::i()->sessionUser();
         $r = BRequest::i();
-        $args = array();
+        $data = $r->post('model');
+        if (empty($data['password_current']) || !$model->validatePassword($data['password_current'])) {
+            BSession::i()->addMessage('Missing or invalid current password');
+            BResponse::i()->redirect('my_account');
+        }
         try {
-            $model = FCom_Admin_Model_User::i()->sessionUser();
-            $data = $r->post('model');
+            if (!empty($data['password'])) {
+                if (empty($data['password_confirm']) || $data['password'] !== $data['password_confirm']) {
+                    BSession::i()->addMessage('Missing or not matching password confirmation');
+                    BResponse::i()->redirect('my_account');
+                }
+            }
             $model->set($data)->save();
             BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
         } catch (Exception $e) {
