@@ -91,9 +91,14 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_reset__POST()
     {
-        $token = BRequest::i()->request('token');
-        $password = BRequest::i()->post('password');
-        if ($token && $password && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))) {
+        $r = BRequest::i();
+        $token = $r->request('token');
+        $password = $r->post('password');
+        $confirm = $r->post('password_confirm');
+        if ($token && $password && $password===$confirm
+            && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
+            && $user->get('token') === $token
+        ) {
             $user->resetPassword($password);
             BSession::i()->addMessage('Password has been reset', 'success', 'frontend');
             BResponse::i()->redirect(BApp::baseUrl());

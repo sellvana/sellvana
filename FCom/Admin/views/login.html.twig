@@ -1,4 +1,3 @@
-
 <div class='middle-container'>
     <div class='middle-row'>
         <div class='middle-wrapper'>
@@ -10,15 +9,15 @@
             <div class='login-container'>
                 <div class='container'>
                     {{ THIS.view('core/messages') | raw }}
-                    <form action='{{ APP.href('login') }}' class='validate-form' method='post'>
+                    <form id="login-form" action='{{ APP.href('login') }}' class='validate-form' method='post'>
                         <div class='form-group'>
                             <div class='controls with-icon-over-input'>
-                                <input value="" placeholder="{{ 'E-mail'|_ }}" class="form-control" data-rule-required="true" name="login[username]" type="text" />
+                                <input value="" placeholder="{{ 'E-mail'|_ }}" class="required form-control" data-rule-required="true" name="login[username]" type="email" />
                             </div>
                         </div>
                         <div class='form-group'>
                             <div class='controls with-icon-over-input'>
-                                <input value="" placeholder="{{ 'Password'|_ }}" class="form-control" data-rule-required="true" name="login[password]" type="password" />
+                                <input value="" placeholder="{{ 'Password'|_ }}" class="required form-control" data-rule-required="true" name="login[password]" type="password" />
                             </div>
                         </div>
                         <div class='checkbox'>
@@ -38,3 +37,11 @@
         </div>
     </div>
 </div>
+
+<script>
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#login-form').validate();
+    })
+})
+</script>
