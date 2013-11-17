@@ -36,8 +36,9 @@ function afterModuleGridRowRendered(el, row)
 This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
 
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
-    if(typeof(g_vent) === 'undefined')
+    if (typeof(g_vent) === 'undefined') {
         g_vent = _.extend({}, Backbone.Events);
+    }
 
     function RowModelEx() {
         g_vent.bind('mass-edit', this.mass_save);
@@ -45,28 +46,30 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
     }
     RowModelEx.prototype.save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Controller_Modules')
+        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
+        }
         var data = {
-                    module_name: ev.row.name,
-                    run_level_core: ev.row.run_level_core,
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                };
-        $.post("#{$this->form_url}", data, function(response, status, xhr) {
+            module_name: ev.row.name,
+            run_level_core: ev.row.run_level_core/*,
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')*/
+        };
+        $.post("{{ THIS.get('form_url') }}", data, function(response, status, xhr) {
             $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
         });
     }
 
     RowModelEx.prototype.mass_save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Controller_Modules')
+        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
+        }
         for (var i in ev.rows) {
             var data = {
-                        module_name: ev.rows[i].name,
-                        run_level_core: ev.rows[i].run_level_core,
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    };
-            $.post("#{$this->form_url}", data, function(response, status, xhr) {
+                module_name: ev.rows[i].name,
+                run_level_core: ev.rows[i].run_level_core/*,
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')*/
+            };
+            $.post("{{ THIS.get('form_url') }}", data, function(response, status, xhr) {
                 //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
             });
         }
