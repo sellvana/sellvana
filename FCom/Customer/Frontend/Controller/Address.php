@@ -152,20 +152,4 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->view('customer/address/choose')->addresses = $addresses;
         $this->layout('/customer/address/choose');
     }
-
-    /**
-     * form error message
-     */
-    public function formMessages($formId = 'frontend')
-    {
-        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-        $messages = BSession::i()->messages('validator-errors:'.$formId);
-        if (count($messages)) {
-            $msg = array();
-            foreach ($messages as $m) {
-                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-            }
-            BSession::i()->addMessage($msg, 'error', 'frontend');
-        }
-    }
 }
