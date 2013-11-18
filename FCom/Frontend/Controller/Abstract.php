@@ -28,4 +28,13 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
             BResponse::i()->status(403, 'Forbidden');
         }
     }
+
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
+
+        return true;
+    }
 }

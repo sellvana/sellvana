@@ -6,7 +6,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-username">{{ 'User Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-username" name="model[username]" class="validate[required] form-control" value="{{ validator.fieldValue('username') }}" />
+            <input type="text" id="model-username" name="model[username]" class="required form-control" value="{{ validator.fieldValue('username') }}" />
         </div>
     </div>
     <div class="form-group">
@@ -37,31 +37,31 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-email" name="model[email]" class="validate[required,custom[email]] form-control" value="{{ validator.fieldValue('email') }}" />
+            <input type="email" id="model-email" name="model[email]" class="required form-control" value="{{ validator.fieldValue('email') }}" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-password">{{ 'Password'|_ }}</label>
         <div class="col-md-5">
-            <input type="password" class="form-control" id="model-password" name="model[password]" value="" />
+            <input type="password" class="required form-control" id="model-password" name="model[password]" value="" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
         <div class="col-md-5">
-            <input type="password" id="model-password_confirm" name="model[password_confirm]" class="validate[equals[model-password]] form-control" value="" />
+            <input type="password" id="model-password_confirm" name="model[password_confirm]" class="required form-control" equalto="#model-password" value="" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-firstname" name="model[firstname]" class="validate[required] form-control" value="{{ validator.fieldValue('firstname') }}" />
+            <input type="text" id="model-firstname" name="model[firstname]" class="required form-control" value="{{ validator.fieldValue('firstname') }}" />
         </div>
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" id="model-lastname" name="model[lastname]" class="validate[required] form-control" value="{{ validator.fieldValue('lastname') }}" />
+            <input type="text" id="model-lastname" name="model[lastname]" class="required form-control" value="{{ validator.fieldValue('lastname') }}" />
         </div>
     </div>
     <div class="form-group">
@@ -77,3 +77,11 @@
         </div>
     </div>
 </fieldset>
+
+<script>
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#users-form').validate();
+    })
+})
+</script>
