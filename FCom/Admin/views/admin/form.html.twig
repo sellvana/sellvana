@@ -20,7 +20,7 @@
             });
             $("#{{ formId }}").validate();
 
-            FCom.Admin.Tabs('.fcom-admin-main-container', {
+            FCom.Admin.Tabs('.f-admin-main-container', {
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ curTab }}",
                 tab_load_callback: function(i) {
@@ -55,10 +55,10 @@
 
     {{ THIS.view('core/messages') | raw }}
 
-    <div class="row fcom-admin-main-container fcom-admin-sidebar-view col-sm-12 box">
+    <div class="row f-admin-main-container f-admin-sidebar-view col-sm-12 box">
         <div class="box-content">
             <div class="tabbable tabs-left">
-                <ul class="nav nav-tabs nav-stacked fcom-admin-nav-sidebar" id="tabs">
+                <ul class="nav nav-tabs nav-stacked f-admin-nav-sidebar" id="tabs">
                     {% if THIS.get('sidebar_img') %}
                         <li><img src="{{ THIS.get('sidebar_img') | raw }}" width="98" height="98" /></li>
                     {%  endif %}

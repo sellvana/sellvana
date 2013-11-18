@@ -441,6 +441,31 @@ class BUtil extends BClass
     }
 
     /**
+     * Find index of array item that matches filter values
+     *
+     * @param array $array
+     * @param array $filter
+     * @return boolean|int
+     */
+    static public function arrayFind(array $array, array $filter)
+    {
+        foreach ($array as $i => $item) {
+            $found = true;
+            foreach ($filter as $k=>$v) {
+                if (!(isset($item[$k]) && $item[$k]===$v)) {
+                    $found = false;
+                    break;
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+            return $i;
+        }
+        return false;
+    }
+
+    /**
     * Clean array of ints from empty and non-numeric values
     *
     * If parameter is a string, splits by comma
@@ -1564,9 +1589,13 @@ class BEmail extends BClass
         }
 
         $origBody = $body;
+
+        $this->_formatAlternative($headers, $body);
+        $body = trim(preg_replace('#<!--.*?-->#', '', $body));
+
         if ($files) {
             // $body and $headers will be updated
-            $this->_addAttachment($files, $headers, $body);
+            $this->_addAttachments($files, $headers, $body);
         }
 
         $emailData = array(
@@ -1615,6 +1644,26 @@ class BEmail extends BClass
         return $result;
     }
 
+    protected function _formatAlternative(&$headers, &$body)
+    {
+        if (!preg_match('#<!--=+-->#', $body)) {
+            return $body;
+        }
+        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
+
+        // headers for attachment
+        $headers['mime-version'] = "MIME-Version: 1.0";
+        $headers['content-type'] = "Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
+
+        $parts = preg_split('#<!--=+-->#', $body);
+        $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim($parts[0]);
+        $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim($parts[1]);
+        $message .= "\r\n--{$mimeBoundary}--";
+
+        $body = $message;
+        return true;
+    }
+
     /**
      * Add email attachment
      *
@@ -1622,39 +1671,34 @@ class BEmail extends BClass
      * @param $mailheaders
      * @param $body
      */
-    protected function _addAttachment($files, &$mailheaders, &$body)
+    protected function _addAttachments($files, &$headers, &$body)
     {
         $body = trim($body);
-        //$headers = array();
-        // boundary
-        $semi_rand     = md5(microtime());
-        $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
 
-        // headers for attachment
-        $headers   = $mailheaders;
-        $headers[] = "MIME-Version: 1.0";
-        $headers[] = "Content-Type: multipart/mixed;";
-        $headers[] = " boundary=\"{$mime_boundary}\"";
+        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
 
         //headers and message for text
-        $message = "--{$mime_boundary}\n\n" . $body . "\n\n";
+        $message = "--{$mimeBoundary}\r\n{$mailheaders['content-type']}\r\n\r\n{$body}\r\n\r\n";
+
+        // headers for attachment
+        $headers['mime-version'] = "MIME-Version: 1.0";
+        $headers['content-type'] = "Content-Type: multipart/mixed; boundary=\"{$mimeBoundary}\"";
 
         // preparing attachments
         foreach ($files as $file) {
             if (is_file($file)) {
                 $data = chunk_split(base64_encode(file_get_contents($file)));
                 $name = basename($file);
-                $message .= "--{$mime_boundary}\n" .
-                    "Content-Type: application/octet-stream; name=\"" . $name . "\"\n" .
-                    "Content-Description: " . $name . "\n" .
-                    "Content-Disposition: attachment;\n" . " filename=\"" . $name . "\"; size=" . filesize($files[$i]) . ";\n" .
-                    "Content-Transfer-Encoding: base64\n\n" . $data . "\n\n";
+                $message .= "--{$mimeBoundary}\r\n" .
+                    "Content-Type: application/octet-stream; name=\"{$name}\"\r\n" .
+                    "Content-Description: {$name}\r\n" .
+                    "Content-Disposition: attachment; filename=\"{$name}\"; size=".filesize($files[$i]).";\r\n" .
+                    "Content-Transfer-Encoding: base64\r\n\r\n{$data}\r\n\r\n";
             }
         }
-        $message .= "--{$mime_boundary}--";
+        $message .= "--{$mimeBoundary}--";
 
-        $body        = $message;
-        $mailheaders = $headers;
+        $body = $message;
         return true;
     }
 
@@ -2051,9 +2095,15 @@ class BDebug extends BClass
         static::$_logDir = $dir;
     }
 
-    public static function log($msg, $file='debug.log')
+    public static function log($msg, $file='debug.log', $backtrace=false)
     {
-        error_log($msg."\n", 3, static::$_logDir.'/'.$file);
+        $file = static::$_logDir.'/'.$file;
+        error_log($msg."\n", 3, $file);
+        if ($backtrace) {
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            error_log(ob_get_clean(), 3, $file);
+        }
     }
 
     public static function logException($e)
@@ -3297,7 +3347,7 @@ class BValidate extends BClass
             'message' => 'Invalid number: :field',
         ),
         'integer'   => array(
-            'rule'    => '/^[+-][0-9]+$/',
+            'rule'    => '/^[+-]?[0-9]+$/',
             'message' => 'Invalid integer: :field',
         ),
         'alphanum'  => array(
@@ -3370,7 +3420,7 @@ class BValidate extends BClass
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
-                $result = empty($data[$r['field']]) || preg_match($m[0], $data[$r['field']]);
+                $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
             } elseif($r['rule'] instanceof Closure){
                 $result = $r['rule']($data, $r['args']);
             } elseif (is_callable($r['rule'])) {

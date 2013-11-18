@@ -104,26 +104,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function onAfterSave()
     {
-        if($this->get('price_info')) {
-            $data = json_decode($this->get('price_info'), true);
-            $rows = $data['rows'];
-            $remove_ids = $data['remove_ids'];
-            $model = FCom_CustomerGroups_Model_TierPrice::i();
-
-            foreach($remove_ids as $id) {
-                $model->load($id)->delete();
-            }
-
-            foreach($rows as $row) {
-                if(isset($row['_new'])) {
-                    unset($row['_new']);
-                    unset($row['id']);
-                    $model->create($row)->save();
-                } else {
-                    $model->load($row['id'])->set($row)->save();
-                }
-            }
-        }
         if (!parent::onAfterSave()) return false;
 
         //todo: setup unique uniq_id
@@ -708,6 +688,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         return $rs;
+    }
+
+    public function getRelatedProducts()
+    {
+        return array();
+    }
+
+    public function getUpsellProducts()
+    {
+        return array();
     }
 }
 

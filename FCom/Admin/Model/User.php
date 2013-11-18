@@ -31,9 +31,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
 		array('email', '@email'),
 
-		array('is_superadmin', '@integer'),
+		//array('is_superadmin', '@integer'),
 		array('role_id', '@integer'),
-		array('superior_id', '@integer'),
+		//array('superior_id', '@integer'),
 	);
 
     protected $_persModel;

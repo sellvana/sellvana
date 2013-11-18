@@ -17,3 +17,4 @@ modules:
             FCom_Frontend:
                 routing:
                     - [ any, /email/pref, FCom_Email_Frontend_Controller.pref ]
+                    - [ any, /email/subscribe, FCom_Email_Frontend_Controller.subscribe ]

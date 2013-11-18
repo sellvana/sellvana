@@ -1,3 +1,4 @@
+<?php /* Leave as PHP, renderers are not available yet at this point */ ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

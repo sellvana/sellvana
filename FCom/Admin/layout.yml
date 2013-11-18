@@ -9,8 +9,6 @@ base:
   - { callback: FCom_Core_Main::defaultThemeCustomLayout }
   - { callback: FCom_Admin_Admin::layout }
 
-
-
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
@@ -151,8 +149,9 @@ lib_admin_theme1:
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/bootstrap_switch/bootstrap-switch.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/light-theme.css ]
-      - [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/bootstrap/fontawesome.css ]
+      - [ css, @FCom_Admin/theme1/assets/stylesheets/fulleron-base.css ]
+      #- [ css, @FCom_Admin/theme1/assets/stylesheets/theme-colors.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/demo.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/jquery_fileupload/jquery.fileupload-ui.css ]
       - [ css, @FCom_Admin/theme1/assets/stylesheets/plugins/select2/select2.css ]
@@ -276,8 +275,8 @@ form:
     - { view: admin/nav, do: [[ setNav, dashboard ]] }
     - view: head
       do:
-        - [ requireJs, ModalLauncher, @FCom_Admin/js/BackboneViews/ModalLauncher ]
-        - [ requireJs, FormView, @FCom_Admin/js/BackboneViews/FormView ]
+        #- [ requireJs, ModalLauncher, @FCom_Admin/js/BackboneViews/ModalLauncher ]
+        #- [ requireJs, FormView, @FCom_Admin/js/BackboneViews/FormView ]
         - [ css, @FCom_Core/js/lib/css/dragtable-akottr.css ]
 
 /denied:
