@@ -29,6 +29,15 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
+
+        return true;
+    }
+
     /**
      * convert validate error messages to frontend messages to show
      */
