@@ -145,20 +145,4 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect(BApp::href('customer/register'));
         }
     }
-
-    /**
-     * form error message
-     */
-    public function formMessages($formId = 'frontend')
-    {
-        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-        $messages = BSession::i()->messages('validator-errors:'.$formId);
-        if (count($messages)) {
-            $msg = array();
-            foreach ($messages as $m) {
-                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-            }
-            BSession::i()->addMessage($msg, 'error', 'frontend');
-        }
-    }
 }
