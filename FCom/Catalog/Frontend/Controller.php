@@ -23,6 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BApp::i()->set('current_product', $product);
 
         $layout->view('catalog/product/details')->set('product', $product);
+        $head = $layout->view('head');
 
         $categoryPath = BRequest::i()->params('category');
         if ($categoryPath) {
@@ -35,14 +36,18 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             BApp::i()->set('current_category', $category);
 
             $layout->view('catalog/product/details')->set('category', $category);
-            $layout->view('head')->canonical($product->url());
+            $head->canonical($product->url());
             foreach ($category->ascendants() as $c) {
                 if ($c->get('node_name')) {
                     $crumbs[] = array('label'=>$c->get('node_name'), 'href'=>$c->url());
+                    $head->addTitle($c->get('node_name'));
                 }
             }
+            $head->addTitle($category->get('node_name'));
             $crumbs[] = array('label'=>$category->get('node_name'), 'href'=>$category->url());
         }
+
+        $head->addTitle($product->get('product_name'));
         $crumbs[] = array('label'=>$product->get('product_name'), 'active'=>true);
 
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
