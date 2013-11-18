@@ -49,6 +49,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 } else {
                     BSession::i()->addMessage('Invalid user name or password.', 'error', 'admin');
                 }
+            } else {
+                BSession::i()->addMessage('Username and password cannot be blank.', 'error', 'admin');
             }
             $url = BSession::i()->data('admin_login_orig_url');
         } catch (Exception $e) {
