@@ -20,7 +20,7 @@
                 <div class="checkbox">
                   <label>
                       <input type="checkbox" name="model[unsub_all]" value="1"
-                      {{ pref && pref.get('unsub_all') || r.get('unsub_all') ? 'checked' }} />{{"Unsubscribe from all non-transactional emails" | _ }}
+                      {{ pref and pref.get('unsub_all') or r.get('unsub_all') ? 'checked' }} />{{"Unsubscribe from all non-transactional emails" | _ }}
                   </label>
                 </div>
                 <p><input type="submit" class="btn btn-primary" value="{{ "Save Preferences" | _ }}"/></p>
