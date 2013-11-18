@@ -10,7 +10,7 @@ class FCom_CustomField_Model_FieldOption extends FCom_Core_Model_Abstract
         $result = array();
         $options = $this->orm()->where("field_id", $fieldId)->find_many();
         foreach($options as $o) {
-            $result[$o->label] = $o;
+            $result[$o->label] = $o->label;
         }
         return $result;
     }

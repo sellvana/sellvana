@@ -105,6 +105,7 @@ require(['jquery', 'unique'], function($) {
             _setFormVal();
         }
     });
+
     $('button.btn-add.prod-attachments-modal-add').click(function() {
         var objs = _.clone(prod_img_rows);
         originFileIds = _.pluck(originRows, 'file_id');

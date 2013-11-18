@@ -6,7 +6,7 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     if (typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
 
-    g_vent.bind('async_edit', function(ev) {
+    g_vent.bind('custom_callback', function(ev) {
         console.log(ev);
         if (ev.grid === 'fieldsets') {
             selFieldSetRow = ev.row;

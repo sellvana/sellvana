@@ -97,26 +97,76 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         BResponse::i()->render();
     }
 
+    public function getInitialData($id)
+    {
+        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$id)->find_many());
+        return $res[0]['_data_serialized'];
+    }
     public function fieldsetAry()
     {
         $sets= BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')->find_many());
-        $ret = array();
-        foreach($sets as $set) {
-            $id = $set['id'];
-            $ret[] = array($id=>$set);
-        }
-        return json_encode($ret);
+
+        return json_encode($sets);
     }
 
     public function fieldAry()
     {
         $fields = BDb::many_as_array(FCom_CustomField_Model_SetField::i()->orm('s')->select('s.*')->find_many());
-        $ret = array();
-        foreach($fields as $field) {
-            $id = $field['id'];
-            $ret[] = array($id=>$field);
-        }
-        return json_encode($ret);
 
+        return json_encode($fields);
+    }
+
+    public function action_get_fieldset()
+    {
+        $r = BRequest::i();
+        $id = $r->get('id');
+        $set = FCom_CustomField_Model_Set::i()->load($id);
+        $fields = BDb::many_as_array(
+                    FCom_CustomField_Model_SetField::i()->orm('sf')
+                    ->join('FCom_CustomField_Model_Field', array('f.id','=','sf.field_id'), 'f')
+                    ->select(array('f.id', 'f.field_name', 'f.admin_input_type'))
+                    ->where('sf.set_id', $id)->find_many()
+                );
+        foreach($fields as &$field) {
+            if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
+                $field['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field['id']);
+            }
+        }
+
+        BResponse::i()->json(array('id'=>$set->id, 'set_name'=>$set->set_name, 'fields'=>($fields)));
+    }
+
+    public function action_get_field()
+    {
+        $r = BRequest::i();
+        $id = $r->get('id');
+        $field = FCom_CustomField_Model_Field::i()->load($id);
+        $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id);
+        BResponse::i()->json(array('id'=>$field->id, 'field_name'=>$field->field_name, 'admin_input_type'=>$field->admin_input_type, 'options'=>$options));
+    }
+
+    public function action_save__POST()
+    {
+         $data = BRequest::i()->post();
+         $prodId = $data['id'];
+         $json = $data['json'];
+
+         $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$prodId)->find_many());
+
+         if(empty($res)) {
+            $new = FCom_CustomField_Model_ProductField::i()->create();
+            $new->product_id = $prodId;
+            $new->_data_serialized = $json;
+            $new->save();
+            $status = 'Successfully saved.';
+         } else {
+
+            $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
+            $row->_data_serialized = $json;
+            $row->save();
+            $status = 'Successfully updated.';
+         }
+
+         BResponse::i()->json(array('status'=>$status));
     }
 }

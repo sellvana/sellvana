@@ -16,8 +16,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['columns'] = array(
             array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
-            array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250, 'editable'=>true),
-            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100, 'editable'=>true),
+            array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250),
+            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
             array('name'=>'uom', 'label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
@@ -25,7 +25,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         );
         $config['actions'] = array(
             'export'=>true,
-            'edit'=>true,
             'delete'=>true
         );
         $config['filters'] = array(
@@ -102,6 +101,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function productAttachmentsGridConfig($model)
     {
+        $download_url = BApp::href('/media/grid/download?folder=media/product/attachment&file=');
         return array(
             'config'=>array(
                 'id'=>'product_attachments',
@@ -110,16 +110,17 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data'=>BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default'=>$model->id()),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>true),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>true, 'validate'=>'number'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('/media/grid/download?folder=media/product/attachment&file='), 'col'=>'file_name'),'delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true,'delete'=>true))
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add attachments'),
@@ -159,13 +160,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
                     array('name'=>'file_name',  'hidden'=>true),
-                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'print("<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>");', 'sortable'=>false),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>true),
-                    array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>true, 'validate'=>'number'),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>true, 'validation'=>array('required'=>true)),
+                    array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>true, 'validation'=>array('required'=>true, 'number'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add images'),

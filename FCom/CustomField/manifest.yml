@@ -19,7 +19,7 @@ modules:
                     - [ get, /customfields/fields, FCom_CustomField_Admin_Controller_FieldSets.fields ]
                     - [ any, /customfields/fieldsets/.action, FCom_CustomField_Admin_Controller_FieldSets ]
                     - [ any, /customfields/fields/.action, FCom_CustomField_Admin_Controller_FieldSets ]
-                    - [ get, /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
+                    - [ any, /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
                 observe:
                     - [ FCom_Catalog_Admin_Controller_Products::gridColumns, FCom_CustomField_Admin.productGridColumns ]
                     - [ FCom_Catalog_Admin_Controller_Products::formViewBefore, FCom_CustomField_Admin_Controller_Products.formViewBefore ]

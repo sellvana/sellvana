@@ -19,7 +19,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('name'=>'title', 'label'=>'Title', 'width'=>250),
             array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'validate'=>'number'),
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'validate'=>'number'),
-            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No')),
+            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'mass-editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No')),
             array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array(
                 'edit'   => array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),
                 'delete' => true,
@@ -44,10 +44,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-
-            $config['columns'][6]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
-            $config['columns'][6]['data']['edit']['async_edit'] = true;
-
+            $config['id'] = 'products_reviews';
             $config['data_mode'] = 'local';
             $config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = array('personalize'=>true);
@@ -66,7 +63,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 }
             }*/
             //print_r($data);
-            $config['events'] = array('async_edit');
+            unset($config['columns'][6]['data']['edit']);
+            $config['columns'][6]['data']['custom']=array('caption'=>'Edit...');
             $config['data'] = $data;
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');

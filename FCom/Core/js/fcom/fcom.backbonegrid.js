@@ -1,5 +1,58 @@
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique'], function(Backbone, _, $, NProgress) {
+function validationRules(rules) {
+    var str = '';
+    for(var key in rules) {
+        switch(key) {
+            case 'required':
+                str+='data-rule-required="true" ';
+                break;
+            case 'number':
+                str+='data-rule-number="true" ';
+                break;
+            case 'ip':
+                str+='data-rule-ipv4="true" ';
+                break;
+            case 'url':
+                str+='data-rule-url="true" ';
+                break;
+            case 'phoneus':
+                str+='data-rule-phoneus="true" ';
+                break;
+            case 'minlength':
+                str+='data-rule-minlength="'+rules[key]+'" ';
+                break;
+            case 'date':
+                str+='data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
+                break;
+        }
+    }
 
+    return str;
+}
+
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate'], function(Backbone, _, $, NProgress) {
+
+var setValidateForm = function(selector) {
+    if (selector == null) {
+      selector = $(".validate-form");
+    }
+    if (jQuery().validate) {
+      return selector.each(function(i, elem) {
+        return $(elem).validate({
+          errorElement: "span",
+          errorClass: "help-block has-error",
+          errorPlacement: function(e, t) {
+            return t.parents(".controls").first().append(e);
+          },
+          highlight: function(e) {
+            return $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+          },
+          success: function(e) {
+            return e.closest(".form-group").removeClass("has-error");
+          }
+        });
+      });
+    }
+};
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
     var columnsCollection;
@@ -19,7 +72,6 @@ FCom.BackboneGrid = function(config) {
         data_mode: 'server'
 
     }
-
     BackboneGrid.Models.ColModel = Backbone.Model.extend({
         defaults: {
             style: '',
@@ -527,22 +579,28 @@ FCom.BackboneGrid = function(config) {
             'change .form-control': '_cellValChanged',
             //'keydown .form-control': '_validate',
             'click a.btn-delete': '_deleteRow',
-            'click a.btn-edit.async_edit': '_asyncEditLoad'
+            'click a.btn-edit._modal': '_editModal',
+            'click a.btn-custom': '_callbackCustom'
         },
         initialize: function() {
             this.model.on('render',this.render, this);
             this.model.on('remove', this._destorySelf, this);
             //this.model.on('change', this.render, this);
         },
-        _asyncEditLoad: function(ev) {
-            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "async_edit") !== -1) {
-                g_vent.trigger('async_edit', {grid: BackboneGrid.id, row:this.model.toJSON()});
+        _callbackCustom: function(ev) {
+            if (typeof(g_vent) !== 'undefined') {
+                g_vent.trigger('custom_callback', {grid: BackboneGrid.id, row:this.model.toJSON()});
                 ev.stopPropagation();
                 ev.preventDefault();
 
                 return false;
             }
-
+        },
+        _editModal: function(ev) {
+            modalForm.modalType = 'editable';
+            BackboneGrid.currentRow = this.model;
+            modalForm.render();
+            $(BackboneGrid.modalShowBtnId).trigger('click');
             return true;
         },
         _validate: function(ev) {
@@ -920,7 +978,9 @@ FCom.BackboneGrid = function(config) {
             BackboneGrid.modalElementVals[key] = val;
         },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.html(this.template({col:this.model.toJSON(), current:(BackboneGrid.currentRow !==false ? BackboneGrid.currentRow.toJSON() : false)}));
+
+
             return this;
         }
     });
@@ -929,6 +989,8 @@ FCom.BackboneGrid = function(config) {
             this.modalType = 'mass-editable';
         },
         _saveChanges: function(ev) {
+            if (!modalForm.formEl.valid())
+                return;
 
             for( var key in BackboneGrid.modalElementVals) {
                 if (BackboneGrid.modalElementVals[key] === '')
@@ -981,6 +1043,13 @@ FCom.BackboneGrid = function(config) {
                 }
             }
 
+            if (modalForm.modalType === 'editable') {
+                for (key in BackboneGrid.modalElementVals) {
+                    BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key]);
+                    BackboneGrid.currentRow.save();
+                }
+            }
+
             $(ev.target).prev().trigger('click');
             BackboneGrid.modalElementVals = {};
 
@@ -991,12 +1060,29 @@ FCom.BackboneGrid = function(config) {
         },
         render: function() {
             this.$el.html('');
+            var header;
+            switch(this.modalType) {
+                case 'addable':
+                    header = 'Create Form';
+                    BackboneGrid.currentRow = false;
+                    break;
+                case 'mass-editable':
+                    BackboneGrid.currentRow = false;
+                    header = 'Mass Edit Form';
+                    break;
+                case 'editable':
+                    header = 'Edit Form';
+                    break;
+            }
+            $(BackboneGrid.modalFormId).find('h4').html(header);
             BackboneGrid.modalElementVals = {};
             this.collection.each(this.addElementDiv, this);
-            this.$el.parents('div.modal-dialog:first').find('input').val('');
-            this.$el.parents('div.modal-dialog:first').find('select').val('');
 
+            if (this.modalType === 'addable' || this.modalType ==='mass-editable')
+                $(BackboneGrid.modalFormId).find('select').val('');
 
+            this.formEl = this.$el.parents('form:first');
+            setValidateForm(this.formEl);
         },
         addElementDiv: function(model) {
             console.log(model.get(this.modalType));
@@ -1234,9 +1320,9 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.RefreshButton = 'Div #'+config.id+' button.grid-refresh';
         BackboneGrid.ExportButton = 'Div #'+config.id+' button.grid-export';
 
-        if ($(BackboneGrid.AddButton).length > 0 || $(BackboneGrid.MassEditButton).length > 0) {
+        //if ($(BackboneGrid.AddButton).length > 0 || $(BackboneGrid.MassEditButton).length > 0) {
             modalForm = new BackboneGrid.Views.ModalForm({collection: columnsCollection});
-        }
+        //}
 
         if ($(BackboneGrid.ExportButton).length > 0) {
             $(BackboneGrid.ExportButton).on('click', function(ev) {
@@ -1268,7 +1354,6 @@ FCom.BackboneGrid = function(config) {
                     rowsCollection.add(newRow);
                     gridView.render();
                 }
-
             });
         }
 
@@ -1335,7 +1420,6 @@ FCom.BackboneGrid = function(config) {
 
         //quick search
         var quickInputId = '#'+config.id+'-quick-search';
-
 
         $(quickInputId).keypress(function(ev){
                 var k=ev.keyCode || ev.which;

@@ -23,9 +23,9 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'text' => 'Text Line',
             'textarea' => 'Text Area',
             'select' => 'Drop down',
-            'multiselect' => 'Multipul Select',
+            'multiselect' => 'Multiple Select',
             'boolean' => 'Yes/No',
-            'wyswyg' => 'WYSWYG editor'
+            'wysiwyg' => 'WYSIWYG editor'
         ),
         'frontend_show' => array(
             '1' => 'Yes',
