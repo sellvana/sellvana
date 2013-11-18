@@ -110,9 +110,11 @@
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
                 <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
             </div>
-            <div class='modal-body'>
+            <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
+              <div class='modal-body'>
                   <!-- mass edit form element template is here -->
-            </div>
+              </div>
+            </form>
             <div class='modal-footer'>
                 <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
                 <button class='btn btn-primary save' type='button'>Save changes</button>
@@ -126,17 +128,20 @@
 
 
 <script type="template" id="{{ config.id }}-modal-element-template">
-
-    <label for="<%- rc.name %>"><%- rc.label%></label>
-    <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-      <input type="text" id="<%- rc.name %>" class="form-control">
-    <% } else if(rc.editor === 'select') { %>
-      <select id="<%- rc.name %>" class="form-control">
-        <% for(var key in rc.options) { %>
-          <option value="<%- key %>"><%- rc.options[key] %></option>
-        <% } %>
-      </select>
-    <% } %>
+    <div class="control-label col-sm-3">
+      <label for="<%- rc.col.name %>"><%- rc.col.label%></label>
+    </div>
+    <div class="controls col-sm-8">
+      <% if (typeof(rc.col.editor) === 'undefined' || rc.col.editor ==='text') { %>
+        <input name="<%- rc.col.name %>" id="<%- rc.col.name %>" type="text" id="<%- rc.name %>" class="form-control" <%if (rc.current !== false){print(' value="'+rc.current[rc.col.name]+'"'); }%> <% print(validationRules(rc.col.validation)); %>>
+      <% } else if(rc.col.editor === 'select') { %>
+        <select name="<%- rc.col.name %>" id="<%- rc.col.name %>" class="form-control" <% print(validationRules(rc.col.validation)); %>>
+          <% for(var key in rc.col.options) { %>
+            <option value="<%- key %>" <%if (rc.current !== false && rc.current[rc.col.name] === key) print(' selected ') %>><%- rc.col.options[key] %></option>
+          <% } %>
+        </select>
+      <% } %>
+    </div>
 </script>
 <script type="template" id="{{ config.id }}-col-template">
   <div class="dd-handle dd3-handle">
@@ -169,41 +174,40 @@
         print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
-        if (typeof(col.data.edit) != 'undefined') {
-          var async_edit = '';
-          if (typeof(col.data.edit.async_edit) !== 'undefined') {
-            async_edit = ' async_edit';
-          }
-          print('<a class="btn btn-success btn-xs btn-edit'+async_edit+'" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
-            print('<i class=" icon-edit-sign"></i>');
-          print('</a>');
-        }
-        print('&nbsp;&nbsp;');
-        if (typeof(col.data.delete) !== 'undefined') {
-          print('<a class="btn btn-danger btn-xs btn-delete" >');
-            print('<i class="icon-remove"></i>');
+        if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
+          print('<a class="btn btn-info btn-xs btn-custom" href="#">');
+            print(col.data.custom.caption);
           print('</a>');
         }
 
-    } else if (typeof(col.editable) !== 'undefined' && col.editable) {
-        if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
-          print('<span style="display:none;">'+rc.row[col.name]+'</span>');
-          print('<select data-col="'+col.name +'" class="form-control">');
-            for(var val in col.options) {
-              print('<option value="'+val+'"'+ (rc.row[col.name] === val ? ' selected' : '') +'>'+col.options[val]+'</option>');
-            }
-          print('</select>');
-      } else if (typeof(col.editable) !== 'undefined') {
-          print('<span style="display:none;">'+rc.row[col.name]+'</span>');
-          print('<input data-col="'+col.name+'" value = "'+rc.row[col.name]+'" class="form-control"/>');
-      }
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.edit) != 'undefined') {
+          if (typeof(col.data.edit.href) !== 'undefined') {
+            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
+          } else {
+            print('<a class="btn btn-success btn-xs btn-edit _modal" href="#">');
+          }
+          print('<i class=" icon-edit-sign"></i>');
+          print('</a>');
+        }
+
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.delete) !== 'undefined') {
+          print('<a class="btn btn-danger btn-xs btn-delete" >');
+          print('<i class="icon-remove"></i>');
+          print('</a>');
+        }
     } else {
       if (typeof(col.print) !== 'undefined') {
-        eval(col.print);
+        eval('print('+col.print+');');
       } else {
-        if (typeof(col.display) === 'undefined')
-          print(rc.row[col.name]);
-        else if (col.display === 'file_size') {
+        if (typeof(col.display) === 'undefined') {
+          if (typeof(col.editor) && col.editor === 'select') {
+            print(col.options[rc.row[col.name]]);
+          } else {
+            print(rc.row[col.name]);
+          }
+        } else if (col.display === 'file_size') {
           var size = parseInt(rc.row[col.name]);
           if (size/(1024*1024) > 1) {
             size = size/(1024*1024);

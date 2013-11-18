@@ -4,16 +4,17 @@
     <div class="col-sm-10">
         <div class="pull-right">
             <div class="btn-group">
-                <button class="btn">Reset</button>
-                <button class="btn">Clone</button>
-                <button class="btn btn-danger">Delete</button>
-                <button class="btn btn-primary">Save</button>
+                <button class="btn" type="button" id='btn_fields_reset'>Reset</button>
+                <button class="btn" id='btn_fields_clone' type="button">Clone</button>
+                <button class="btn btn-danger" type="button" id='btn_fields_delete' >Delete</button>
+                <button class="btn btn-primary" id='btn_fields_save' type="button">Save</button>
             </div>
         </div>
         <table>
             <tr>
                 <td style='padding-right:20px;'>
                     <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+
                         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
                     </select>
 
@@ -24,6 +25,7 @@
                 </td>
                 <td style='padding-right:20px;'>
                     <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+
                         {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
                     </select>
 
@@ -50,16 +52,111 @@
                 <!-- field template here -->
             </div>
         </script>
+
+        <script type="template" id="field-template">
+            <label class="col-md-3 control-label" for="prod-review-text"><%- rc.field_name %></label>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+                <% switch(rc.admin_input_type) {
+                    case 'text':
+                        print('<input id="'+rc.field_name+'" value="TEXT" class="form-control" />');
+
+                        break;
+                    case 'textarea':
+                        print('<textarea id="'+rc.field_name+'" class="form-control" >TEXT AREAR</textarea>');
+
+                        break;
+                    case 'wysiwyg':
+                        print('<textarea id="'+rc.field_name+'" class="form-control ckeditor" >WYSIWYG</textarea>');
+
+                        break;
+                    case 'select':
+                    case 'multiselect':
+                        print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+rc.field_name+'" class="form-control" >');
+                        for(key in rc.options) {
+                            print('<option value="'+key+'">'+rc.options[key]+'</option>');
+                        }
+                        print('</select>');
+
+                        break;
+                    case 'boolean':
+                        print('<input type="hidden" id="check" name="check" value="1" /><input class="switch-cbx" id="ch" name="ch" type="checkbox" value="1" checked style="margin-top: 11px;"/>');
+
+                        break;
+                } %>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+                <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
+                    <i class="icon-remove"></i>
+                </a>
+            </div>
+        </script>
 </div>
 
 <script>
-var fieldSetAry = {{ ctrl.fieldsetAry() | raw }};
-var fieldsAry = {{ ctrl.fieldAry() | raw }};
 
-require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Backbone, _, $) {
+    var currentSet = null;
+    var initialData = {{ ctrl.getInitialData(model.id) | raw }};
+    $('#btn_fields_reset').click(function() {
+        var c = confirm('Are you sure to reset?');
+        if(c) {
+            setCollection.reset();
+            mainView.render();
+        }
+    });
+
+    $('#btn_fields.delete').click(function() {
+        var c = confirm('Are you sure to delete?');
+        /*if(c) {
+            setCollection.reset();
+            mainView.render();
+        }*/
+    });
+
+    $('#btn_fields_save').click(function() {
+        var str = JSON.stringify(setCollection.toJSON());
+        $.post('{{ APP.href('/customfields/products/save') | raw }}',
+                {
+                    id: {{ model.id }},
+                    json: str
+                },
+                function(res) {
+                    if(typeof(res.status) !== 'undefined') {
+                        $.bootstrapGrowl(res.status, { type:'success', align:'center', width:'auto' });
+                    }
+                }
+        );
+    });
 
     $('#btn_add_set').click(function() {
 
+        setCollection.each(function(set) {
+            set.set('collapsed', true);
+        });
+        var setId = $('#sel_sets').val();
+        var newSet = new CustomField.Models.FieldSet();
+        newSet.url = '{{ APP.href('/customfields/products/get_fieldset?id=') | raw }}'+setId;
+        newSet.fetch({
+            success: function() {
+                setCollection.add(newSet);
+                currentSet = newSet;
+            }
+        });
+
+
+
+    });
+
+    $('#btn_add_field').click(function() {
+        if (currentSet === null) return;
+        var fieldId = $('#sel_fields').val();
+        var newField = new CustomField.Models.Field();
+        newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
+        newField.fetch({
+            success: function() {
+                currentSet.fields.add(newField);
+            }
+        });
     });
 
 
@@ -72,37 +169,176 @@ require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $
         Views: {}
     };
 
+
+
+    CustomField.Models.Field = Backbone.Model.extend({
+        intialize: function() {
+            this.set('admin_input_type', this.get('admin_input_type').replace(' ',''));
+        }
+    });
+
+    CustomField.Collections.FieldCollection = Backbone.Collection.extend({
+        model: CustomField.Models.Field
+    });
+
     CustomField.Models.FieldSet = Backbone.Model.extend({
+        default: {
+            callapsed: false
+        },
+        initialize: function(response) {
+            this.fields = new CustomField.Collections.FieldCollection()
+        },
+        parse: function(response) {
+            this.fields.set(response.fields);
+            delete response.fields;
+            return response;
+        },
+        toJSON: function() {
+            var hash = Backbone.Model.prototype.toJSON.call(this);
+            console.log(hash);
+            if(typeof(this.fields) !== 'undefined')
+                hash.fields = this.fields.toJSON();
+
+            return hash;
+        }
     });
 
     CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
-
+        model: CustomField.Models.FieldSet
     });
 
-    CustomField.Views.FieldSetView = Backbone.Model.extend({
-        className: "box box-borderd green-border box-nomargin",
-        template: _.template($('#fieldset-template').html()),
+    CustomField.Views.FieldView = Backbone.View.extend({
+        className: 'form-group',
+        template: _.template($('#field-template').html()),
+        events: {
+            'click a.field-remove': '_remove'
+        },
+        _remove: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                currentSet.fields.remove(this.model, {silent: true});
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
+            }
+        },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
+
             return this;
         }
     });
 
+    CustomField.Views.FieldSetView = Backbone.View.extend({
+        className: function() {
+            var name = "box box-borderd green-border box-nomargin prod-fieldset ";
+            name += (this.model.get('collapsed') === true ? 'box-collapsed' : '');
 
-    CustomField.Views.MainView = Backbone.Model.extend({
-        el: '#fields_list',
-        _addSetView: function(set) {
-             var setView = new  CustomField.Views.FieldSetView({
-                model: set
+            return name;
+        },
+        attributes: function() {
+            return { id: guid()};
+        },
+        template: _.template($('#fieldset-template').html()),
+        initialize: function() {
+            this.model.on('change', this._checkCollapse, this);
+            this.model.fields.on('add', this._addField, this)
+        },
+        events: {
+            'click a.btn-edit': '_showSelf',
+            'click a.btn-remove': '_removeSelf'
+        },
+        _removeSelf: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                setCollection.remove(currentSet);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
+                currentSet = null;
+            }
+        },
+        _showSelf: function() {
+            setCollection.each(function(set) {
+                set.set('collapsed', true);
             });
-            this.$el.append(setView.render().el);
+            currentSet = this.model;
+            this.model.set('collapsed', false);
+        },
+        _checkCollapse: function() {
+            console.log('_checkCollapse');
+            if (this.model.get('collapsed')) {
+                console.log('collapsed');
+                this.$el.addClass('box-collapsed');
+            } else {
+                console.log('open');
+                this.$el.removeClass('box-collapsed');
+            }
+        },
+        _addField: function(field) {
+            var fieldView = new CustomField.Views.FieldView({model: field});
+            this.$el.find('div.box-content').append(fieldView.render().el);
+
+            switch (field.get('admin_input_type')) {
+                case 'multiselect':
+                case 'select':
+                    this.$el.find('select:last').select2();
+
+                    break;
+                case 'boolean':
+                    adminForm.createSwitchButton();
+
+                    break;
+                case 'wysiwyg':
+                    adminForm.wysiwygInit();
+                    break;
+
+            }
+
         },
         render: function() {
-            this.collection.each(this._addSetView, this);
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.fields.each(this._addField, this);
+
+            return this;
         }
     });
 
-    var fieldSets = new CustomField.Collections.FieldSetCollection();
+    CustomField.Views.MainView = Backbone.View.extend({
+        el: '#fields_list',
+        initialize: function() {
+            this.collection.on('add', this._addSetView, this);
+        },
+        _addSetView: function(set) {
+            var setView = new  CustomField.Views.FieldSetView({model: set});
+            this.$el.append(setView.render().el);
+        },
+        render: function() {
+            this.$el.html('');
+            this.collection.each(this._addSetView, this);
+            adminForm.wysiwygInit();
+            adminForm.createSwitchButton();
+        }
+    });
 
+    var setCollection = new CustomField.Collections.FieldSetCollection();
+    var setModel = null;
+    for(var i in initialData) {
+        var set = initialData[i];
+        var fields = _.clone(set.fields);
+        delete set.fields;
+        var setModel = new CustomField.Models.FieldSet(set);
+        setModel.set('collapsed', true);
+        setModel.fields.set(fields);
+        setCollection.add(setModel);
+    }
+
+    currentSet = setModel;
+    setModel.set('collapsed', false);
+
+    var mainView = new CustomField.Views.MainView({collection: setCollection});
+    mainView.render();
 });
 </script>

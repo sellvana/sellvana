@@ -6,7 +6,7 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     if (typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
 
-    g_vent.bind('async_edit', function(ev) {
+    g_vent.bind('custom_callback', function(ev) {
         console.log(ev);
         if (ev.grid === 'fields') {
             selFieldRow = ev.row;
@@ -52,10 +52,8 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
 **/
 function afterRowRenderFieldsGrid(el, row)
 {
-    if(row.admin_input_type === 'select') {
-        el.find('a.btn-edit.async_edit:first').removeClass('disabled');
-    } else {
-        el.find('a.btn-edit.async_edit:first').addClass('disabled');
+    if(row.admin_input_type !== 'select' &&  row.admin_input_type !== 'multiselect') {
+        el.find('a.btn-custom').remove();
     }
 }
 </script>

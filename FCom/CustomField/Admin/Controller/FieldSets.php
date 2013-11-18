@@ -4,9 +4,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 {
     public function fieldSetsGridConfig()
     {
-        $data = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
-            ->select('(select count(*) from '.FCom_CustomField_Model_SetField::table().' where set_id=s.id)', 'num_fields')
-            ->find_many();
+        $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
+            ->select('(select count(*) from '.FCom_CustomField_Model_SetField::table().' where set_id=s.id)', 'num_fields');
+
         ;
         $config = array(
             'config'=>array(
@@ -14,27 +14,24 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'caption'=>'Field Sets',
                 'data_url'=>BApp::href('customfields/fieldsets/grid_data'),
                 'edit_url'=>BApp::href('customfields/fieldsets/grid_data'),
-                'data_mode'=>'local',
-                'data'=>$data,
+                'orm'=>$orm,
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id','label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true, 'hidden'=>true),
-                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true),
-                    array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true),
+                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>true)),
+                    array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true, 'editable'=>true , 'validation'=>array('required'=>true)),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('async_edit'=>true),'delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'fields...'), 'edit'=>true, 'delete'=>true))
                 ),
                 'actions'=>array(
                             'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
-                            'edit'=>true,
                             'delete'=>true
                 ),
                 'filters'=>array(
                             array('field'=>'set_name', 'type'=>'text'),
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
-                ),
-                'events'=>array('async_edit')
+                )
             )
         );
 
@@ -117,23 +114,23 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>'new', 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true),
-                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true),
-                    array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true),
-                    array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true,
+                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true, 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
                         'options'=>$fld->fieldOptions('frontend_show'), 'editor'=>'select'),
-                    array('name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,/*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true, 'mass-editable'=>true/*,
+                    array('name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,/*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)/*,
                     'options'=>range(0,20)*/),
                     /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                         'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
-                    array('name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
+                    array('name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editor'=>'select', 'addable'=>true, 'validation'=>array('required'=>true),
                     'options'=>$fld->fieldOptions('table_field_type')),
-                    array('name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
+                    array('name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
                         'options'=>$fld->fieldOptions('admin_input_type')),
                     array('name'=>'num_options', 'label'=>'Options', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
+                    array('name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
                         'options'=>array('0'=>'No', '1'=>'Yes')),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('async_edit'=>true),'delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
                 ),
                 'filters'=>array(
                             array('field'=>'field_name', 'type'=>'text'),
@@ -146,7 +143,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                                     'edit'=>true,
                                     'delete'=>true
                                 ),
-                'events'=>array('async_edit'),
                 'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid')
             )
         );
@@ -339,5 +335,4 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             BResponse::i()->redirect(BApp::href('customfields/customfield/form/?id='.$id));
         }
     }
-
 }

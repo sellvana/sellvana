@@ -25,88 +25,6 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
         return parent::i($new, $args);
     }
 
-    public function gridConfig()
-    {
-	    $config = parent::gridConfig();
-        $gridId = $config['id'];
-
-	    $config['columns'] = array(
-		    'id'         => array(
-			    'label' => BLocale::_("ID"),
-			    'width' => 30, 'index' => $this->_mainTableAlias . '.id'
-		    ),
-		    'product_id'=> array(
-			    'label' => BLocale::_("Product ID"),
-			    'width' => 30,
-			    'index' => $this->_mainTableAlias . '.product_id',
-			    'hidden'=>true,
-			    'editable' => true,
-			    'edittype' => 'custom',
-			    'editoptions' => array('custom_value' => "function (elem, op, value) {
-                            if(op === 'get') {
-                                var v = $(elem).val();
-                                if(undefined == v || null == v || '' == v) {
-                                    var cols = $('#$gridId').jqGrid('getGridParam', 'colModel');
-                                    $(cols).each(function(i, c) {
-                                        if (c.name == 'product_id'){
-                                            console.log(c.editoptions.value)
-                                            return c.editoptions.value
-                                        }
-                                    });
-                                }
-                                return v;
-                            } else if(op === 'set') {
-                                $(elem).val(value);
-                            }
-                        }"
-			    ),
-		    ),
-		    'group_id'    => array(
-			    'label' => BLocale::_('Group'),
-			    'index' => $this->_mainTableAlias . '.group_id', 'width' => 200,
-			    'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(),
-			    'editable' => true,
-			    'edittype' => 'select'
-		    ),
-		    'base_price'      => array(
-			    'label' => BLocale::_('Regular Price'),
-			    'index' => $this->_mainTableAlias . '.base_price', 'width' => 200,
-			    'editable' => true,
-                'validate' =>'number'
-		    ),
-		    'sale_price' => array(
-			    'label' => BLocale::_('Sale Price'),
-			    'index' => $this->_mainTableAlias . '.sale_price', 'width' => 200,
-			    'editable' => true,
-                'validate' =>'number'
-		    ),
-		    'qty'        => array(
-			    'label' => BLocale::_('Qty'),
-			    'index' => $this->_mainTableAlias . '.qty', 'width' => 200,
-			    'editable' => true,
-                'validate' =>'number'
-		    ),
-	    );
-	    $config['multiselect'] = true;
-        /*$config  = array(
-            'grid' => array(
-                'id'      => $gridId,
-                'caption' => BLocale::_("Tier prices"),
-                'url'     => BApp::href('tier-prices/grid_data'),
-                'editurl' => BApp::href('tier-prices/grid_data/?id='),
-//                'datatype'=> 'local',
-                'columns' => array(
-
-                ),
-
-                'multiselect' => true,
-            ),
-            'navGrid' => array('add'=>true, 'addtext'=>'Add New', 'addtitle'=>'Add new price', 'edit'=>true, 'del'=>true),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
-        );*/
-        return $config;
-    }
-
     /**
      * @param FCom_Catalog_Model_Product $model
      * @return array
@@ -115,30 +33,30 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
     {
         $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id());
         $grid = array(
-            'config' => array(
-                'id' => 'tier-prices',
-                'columns' => array(
-                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-                    array('name' => 'id', 'label' => 'ID'),
-                    array('name' => 'product_id', 'default' => $model->id(), 'hidden' => true),
-                    array('name' => 'group_id', 'label' => 'Group', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'editor' => 'select', 'width' => 150),
-                    array('name' => 'qty', 'label' => 'Qty', 'editable' => true, 'width' => 150, 'validate' => 'number'),
-                    array('name' => 'base_price', 'label' => 'Base Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
-                    array('name' => 'sale_price', 'label' => 'Sale Price', 'editable' => true, 'width' => 150, 'validate' => 'number'),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+            'config'=>array(
+                'id'=>'tier-prices',
+                'columns'=>array(
+                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
+                    array('name'=>'product_id', 'default'=>$model->id(), 'hidden'=>true),
+                    array('name'=>'group_id', 'label'=>'Group', 'options'=>FCom_CustomerGroups_Model_Group::i()->groupsOptions(),'validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'editor'=>'select', 'width'=>150),
+                    array('name'=>'qty', 'label'=>'Qty','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
+                    array('name'=>'base_price', 'label'=>'Base Price','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
+                    array('name'=>'sale_price', 'label'=>'Sale Price','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('delete'=>true))
                 ),
-                'data' => BDb::many_as_array($orm->find_many()),
-                'data_mode' => 'local',
-                'filters' => array(
-                                    array('field' => 'name', 'type' => 'text'),
-                                    array('field' => 'group_id', 'type' => 'multiselect')
+                'data'=>BDb::many_as_array($orm->find_many()),
+                'data_mode'=>'local',
+                'filters'=>array(
+                                    array('field'=>'name', 'type'=>'text'),
+                                    array('field'=>'group_id', 'type'=>'multiselect')
                 ),
-                'actions' => array(
-                    'new' => true,
-                    'edit' => true,
-                    'delete' => true
+                'actions'=>array(
+                    'new'=>array('caption'=>'Add New Price', 'modal'=>true),
+                    'edit'=>true,
+                    'delete'=>true
                 ),
-                'events' => array(
+                'events'=>array(
                     'init', 'edit', 'delete', 'mass-edit', 'mass-delete'
                 )
             )

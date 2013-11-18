@@ -7,7 +7,8 @@
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
         adminForm.createSwitchButton();
         adminForm.wysiwygInit();
-        g_vent.bind('async_edit', function(ev) {
+        g_vent.bind('custom_callback', function(ev) {
+            console.log(ev);
             if(ev.grid === 'products_reviews') {
                 var review = ev.row;
                 $('#prod-review-id').val(review.id);
