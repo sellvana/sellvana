@@ -2,15 +2,15 @@
 - if (!$rowsView) $rowsView = $this->view('admin/grid/rows')
 - $rowsView->set($this->get())
 
-.fcom-datagrid
-    .fcom-datagrid__toolbar
-        .fcom-datagrid__pager
+.f-datagrid
+    .f-datagrid__toolbar
+        .f-datagrid__pager
 
-        .fcom-datagrid__options
+        .f-datagrid__options
 
-        .fcom-datagrid__actions
+        .f-datagrid__actions
 
-    %table.fcom-datagrid__grid
+    %table.f-datagrid__grid
         %thead
             %tr
                 - foreach ($this->columns as $col)

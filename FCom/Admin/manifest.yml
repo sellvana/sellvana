@@ -22,6 +22,7 @@ modules:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ get, /, FCom_Admin_Controller.index ]
                     - [ get, /*view, FCom_Admin_Controller.static ]
+                    - [ get, /test, FCom_Admin_Controller.test ]
                     - [ get, /blank, FCom_Admin_Controller.blank ]
                     - [ post, /login, FCom_Admin_Controller.login ]
                     - [ any, /password/recover, FCom_Admin_Controller.password_recover ]

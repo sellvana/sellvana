@@ -170,20 +170,4 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             BResponse::i()->set($this->view('prodreviews/product-reviews-list')->set('reviews', $reviews));
         }
     }
-
-    /**
-     * form error message
-     */
-    public function formMessages()
-    {
-        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-        $messages = BSession::i()->messages('validator-errors:'.$this->formId);
-        if (count($messages)) {
-            $msg = array();
-            foreach ($messages as $m) {
-                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-            }
-            BSession::i()->addMessage($msg, 'error', 'frontend');
-        }
-    }
 }

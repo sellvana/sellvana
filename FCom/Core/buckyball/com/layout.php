@@ -1287,14 +1287,14 @@ class BView extends BClass
         include $file;
         return ob_get_clean();
     }
-
+    /*
     public function renderEval($source)
     {
         ob_start();
         eval($source);
         return ob_get_clean();
     }
-
+    */
     /**
      * View class specific rendering
      *
@@ -1302,7 +1302,7 @@ class BView extends BClass
      */
     protected function _render()
     {
-        $renderer = $this->param('renderer');
+        $renderer = $this->getParam('renderer');
         if ($renderer) {
             return call_user_func($renderer, $this);
         }
@@ -1319,7 +1319,7 @@ class BView extends BClass
      * @param bool  $retrieveMetaData
      * @return string
      */
-    public function render(array $args = array(), $retrieveMetaData = true)
+    public function render(array $args = array(), $retrieveMetaData = false)
     {
         $debug = BDebug::is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
@@ -1353,15 +1353,10 @@ class BView extends BClass
         $viewContent = $this->_render();
 
         if ($retrieveMetaData) {
-            $metaData = array();
-            if (preg_match_all(static::$_metaDataRegex, $viewContent, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $m) {
-                    $metaData[$m[1]] = $m[2];
-                    $viewContent     = str_replace($m[0], '', $viewContent);
-                }
-            }
-            $this->setParam('meta_data', $metaData);
+            // collect meta data and remove meta tags from source
+            $viewContent = $this->collectMetaData($viewContent);
         }
+
         $result .= $viewContent;
         $result .= join('', BEvents::i()->fire('BView::render:after', array('view' => $this)));
 
@@ -1378,13 +1373,59 @@ class BView extends BClass
         return $result;
     }
 
+    public function collectMetaData($viewContent = null)
+    {
+        $t = BDebug::debug('COLLECT META DATA: '.$this->getParam('view_name'));
+        if (is_null($viewContent)) {
+            $viewContent = $this->getParam('source');
+            if (!$viewContent) {
+                // get template file name for the view
+                $viewFile = $this->getTemplateFileName();
+                if (!$viewFile) {
+                    BDebug::profile($t);
+                    return $viewContent;
+                }
+                $viewContent = file_get_contents($viewFile);
+            }
+        }
+
+        // collect template source for meta tags for further interpolation processing
+        //TODO: revisit isolating meta tags in case of dynamic generation
+        if (!preg_match_all(static::$_metaDataRegex, $viewContent, $matches, PREG_PATTERN_ORDER)) {
+            BDebug::profile($t);
+            return $viewContent;
+        }
+        $metaContent = join("\n", $matches[0]);
+        // create a view with only meta tags
+        $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
+            'renderer' => $this->getParam('renderer'),
+            'source' => $metaContent,
+        ));
+        // render the meta view for variables interpolation
+        $metaOutput = $metaView->_render();
+        // collect meta data
+        $metaData = array();
+        if (preg_match_all(static::$_metaDataRegex, $metaOutput, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $m) {
+                $metaData[$m[1]] = $m[2];
+                $viewContent     = str_replace($m[0], '', $viewContent);
+            }
+        }
+        $this->setParam('meta_data', $metaData);
+        BDebug::profile($t);
+        return $viewContent;
+    }
+
     /**
      * Use meta data declared in the view template to set head meta tags
      */
     public function useMetaData()
     {
-        $this->render();
-        $metaData = $this->param('meta_data');
+        if (!$this->getParam('meta_data')) {
+            $this->collectMetaData();
+        }
+
+        $metaData = $this->getParam('meta_data');
         if ($metaData) {
             if (!empty($metaData['layout.yml'])) {
                 $layoutData = BYAML::i()->parse(trim($metaData['layout.yml']));

@@ -91,9 +91,14 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_reset__POST()
     {
-        $token = BRequest::i()->request('token');
-        $password = BRequest::i()->post('password');
-        if ($token && $password && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))) {
+        $r = BRequest::i();
+        $token = $r->request('token');
+        $password = $r->post('password');
+        $confirm = $r->post('password_confirm');
+        if ($token && $password && $password===$confirm
+            && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
+            && $user->get('token') === $token
+        ) {
             $user->resetPassword($password);
             BSession::i()->addMessage('Password has been reset', 'success', 'frontend');
             BResponse::i()->redirect(BApp::baseUrl());
@@ -138,22 +143,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
             BResponse::i()->redirect(BApp::href('customer/register'));
-        }
-    }
-
-    /**
-     * form error message
-     */
-    public function formMessages($formId = 'frontend')
-    {
-        //prepare error message, todo: separate this code to function in FCom_Frontend_Controller_Abstract
-        $messages = BSession::i()->messages('validator-errors:'.$formId);
-        if (count($messages)) {
-            $msg = array();
-            foreach ($messages as $m) {
-                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
-            }
-            BSession::i()->addMessage($msg, 'error', 'frontend');
         }
     }
 }

@@ -1435,7 +1435,7 @@ FCom.BackboneGrid = function(config) {
                 }
                 return true;
         });
-        var restricts = ['FCom/PushServer/index.php', 'media/grid/upload'];
+        var restricts = ['FCom/PushServer/index.php', 'media/grid/upload', 'my_account/personalize'];
         //ajax loading...
         $( document ).ajaxSend(function(event, jqxhr, settings) {
             var url = settings.url;

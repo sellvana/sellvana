@@ -28,4 +28,29 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
             BResponse::i()->status(403, 'Forbidden');
         }
     }
+
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
+
+        return true;
+    }
+
+    /**
+     * convert validate error messages to frontend messages to show
+     */
+    public function formMessages($formId = 'frontend')
+    {
+        //prepare error message
+        $messages = BSession::i()->messages('validator-errors:'.$formId);
+        if (count($messages)) {
+            $msg = array();
+            foreach ($messages as $m) {
+                $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
+            }
+            BSession::i()->addMessage($msg, 'error', 'frontend');
+        }
+    }
 }

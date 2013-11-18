@@ -156,9 +156,9 @@ label { margin-bottom:2px; }
   -webkit-box-shadow:none;
   box-shadow:none;
   }
-select.form-control {
+/*select.form-control {
   height:26px;
-  }
+  }*/
 label.control-label.required:after {
   content:"*";
   padding-left:3px;
@@ -870,6 +870,12 @@ label.error {
 .f-address-list address {
   margin-bottom:0;
   }
+
+/* Page: newsletter */
+.f-newsletter-block {
+    max-width: 400px;
+    margin: 25px auto;
+}
 
 /*------------------------------------*\
    VENDOR CSS

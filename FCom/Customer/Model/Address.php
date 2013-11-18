@@ -8,9 +8,13 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 	protected $_validationRules = array(
 		/*array('customer_id', '@required'),
 		array('email', '@required'),*/
+		array('firstname', '@required'),
+		array('lastname', '@required'),
 		array('street1', '@required'),
 		array('city', '@required'),
 		array('country', '@required'),
+		array('region', '@required'),
+		array('postcode', '@required'),
 
 		array('email', '@email'),
 

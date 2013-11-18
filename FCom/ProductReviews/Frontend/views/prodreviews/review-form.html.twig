@@ -85,7 +85,6 @@
                                 $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}');
                             {% endif %}
                         } else {
-                            console.log(data);
                             alert("Invalid data, please check again");
                         }
                     },
