@@ -29,4 +29,7 @@ base:
 
 /:
     - { include: base }
+    - view: head
+        do:
+            - [ title, Home Page ]
     - { hook: main, views: static/index, use_meta: true }
