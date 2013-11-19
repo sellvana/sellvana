@@ -18,7 +18,6 @@
                 </td>
                 <td style='padding-right:20px;'>
                     <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
-
                         {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
                     </select>
 
@@ -51,20 +50,20 @@
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input id="'+rc.field_name+'" value="TEXT" class="form-control" />');
+                        print('<input id="'+guid()+'" value="TEXT" class="form-control" />');
 
                         break;
                     case 'textarea':
-                        print('<textarea id="'+rc.field_name+'" class="form-control" >TEXT AREAR</textarea>');
+                        print('<textarea id="'+guid()+'" class="form-control" >TEXT AREAR</textarea>');
 
                         break;
                     case 'wysiwyg':
-                        print('<textarea id="'+rc.field_name+'" class="form-control ckeditor" >WYSIWYG</textarea>');
+                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >WYSIWYG</textarea>');
 
                         break;
                     case 'select':
                     case 'multiselect':
-                        print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+rc.field_name+'" class="form-control" >');
+                        print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+guid()+'" class="form-control" >');
                         for(key in rc.options) {
                             print('<option value="'+key+'">'+rc.options[key]+'</option>');
                         }
@@ -121,18 +120,65 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         );
     });*/
 
+    function refresh_selects()
+    {
+        $('#sel_sets').val('');
+        $('#sel_fields').val('');
+        $('#sel_sets').select2();
+        $('#sel_fields').select2();
+    }
+
+    function remove_options(set)
+    {
+        $("#sel_sets option[value='"+set.get('id')+"']").remove();
+        var fields = set.fields;
+        fields.each(function(f) {
+            $("#sel_fields option[value='"+f.get('id')+"']").remove();
+        });
+    }
+
+    function add_options(set)
+    {
+        if ($("#sel_sets option[value='"+set.get('id')+"']").length === 0)
+            $('#sel_sets')
+             .append($("<option></option>")
+             .attr("value",set.get('id'))
+             .text(set.get('set_name'));
+
+        fields.each(function(f) {
+            if ($("#sel_fields option[value='"+f.get('id')+"']").length === 0)
+                $('#sel_fields')
+                 .append($("<option></option>")
+                 .attr("value",f.get('id'))
+                 .text(f.get('field_name'));
+        });
+
+        refresh_selects();
+    }
+
+    function remove_option(field)
+    {
+        $("#sel_fields option[value='"+field.get('id')+"']").remove();
+    }
+
+    function add_option(field)
+    {
+
+    }
     $('#btn_add_set').click(function() {
 
-        setCollection.each(function(set) {
+        /*setCollection.each(function(set) {
             set.set('collapsed', true);
-        });
+        });*/
         var setId = $('#sel_sets').val();
         var newSet = new CustomField.Models.FieldSet();
         newSet.url = '{{ APP.href('/customfields/products/get_fieldset?id=') | raw }}'+setId;
         newSet.fetch({
             success: function() {
                 setCollection.add(newSet);
-                currentSet = newSet;
+                //currentSet = newSet;
+                remove_options(newSet);
+                refresh_selects();
             }
         });
 
@@ -141,21 +187,24 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
     });
 
     $('#btn_add_field').click(function() {
-        if (currentSet === null) return;
+        //if (currentSet === null) return;
         var fieldId = $('#sel_fields').val();
         var newField = new CustomField.Models.Field();
         newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
         newField.fetch({
             success: function() {
-                currentSet.fields.add(newField);
+                //currentSet.fields.add(newField);
+                setCollection.each(function(set) {
+                    console.log(set.toJSON());
+                    console.log(set.get('collapsed'));
+                    if (set.get('collapsed') === false) {
+                        set.fields.add(newField);
+                    }
+                });
                 setCollection.trigger('change');
             }
         });
     });
-
-
-    $('#sel_sets').select2();
-    $('#sel_fields').select2();
 
     var CustomField = {
         Models: {},
@@ -176,8 +225,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
     });
 
     CustomField.Models.FieldSet = Backbone.Model.extend({
-        default: {
-            callapsed: false
+        defaults: {
+            collapsed: false
         },
         initialize: function(response) {
             this.fields = new CustomField.Collections.FieldCollection()
@@ -189,7 +238,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         },
         toJSON: function() {
             var hash = Backbone.Model.prototype.toJSON.call(this);
-            console.log(hash);
             if(typeof(this.fields) !== 'undefined')
                 hash.fields = this.fields.toJSON();
 
@@ -210,13 +258,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         _remove: function() {
             var confirm = window.confirm("Do you want to really remove?");
             if (confirm) {
-                currentSet.fields.remove(this.model, {silent: true});
+
+                this.parentSet.fields.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
-
                 setCollection.trigger('change');
+
+
             }
         },
         render: function() {
@@ -248,28 +298,34 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         _removeSelf: function() {
             var confirm = window.confirm("Do you want to really remove?");
             if (confirm) {
-                setCollection.remove(currentSet);
+                remove_options(this.model);
+                setCollection.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
+                /*if (this.model.get('id') === currentSet.get('id')) {
+                    currentSet = null;
+                }*/
+
                 delete this.model;
-                currentSet = null;
+
             }
         },
-        _showSelf: function() {
-            setCollection.each(function(set) {
+        _showSelf: function(ev) {
+            /*setCollection.each(function(set) {
                 set.set('collapsed', true);
-            });
-            currentSet = this.model;
-            this.model.set('collapsed', false);
+            });*/
+            //currentSet = this.model;
+            this.model.set('collapsed', !this.model.get('collapsed'));
+
         },
         _checkCollapse: function() {
-            console.log('_checkCollapse');
+
             if (this.model.get('collapsed')) {
-                console.log('collapsed');
+
                 this.$el.addClass('box-collapsed');
             } else {
-                console.log('open');
+
                 this.$el.removeClass('box-collapsed');
             }
         },
@@ -290,8 +346,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
                 case 'wysiwyg':
                     adminForm.wysiwygInit();
                     break;
-
             }
+
+            fieldView.parentSet = this.model;
 
         },
         render: function() {
@@ -327,17 +384,20 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
             var fields = _.clone(set.fields);
             delete set.fields;
             var setModel = new CustomField.Models.FieldSet(set);
-            setModel.set('collapsed', true);
+            //setModel.set('collapsed', true);
             setModel.fields.set(fields);
             setCollection.add(setModel);
-        }
+            remove_options(setModel);
 
+        }
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
     }
-    if (setModel !== null) {
+
+    refresh_selects();
+    /*if (setModel !== null) {
         currentSet = setModel;
         setModel.set('collapsed', false);
-    }
+    }*/
 
     var mainView = new CustomField.Views.MainView({collection: setCollection});
     mainView.render();
@@ -346,5 +406,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
         console.log($('#prod_customfield').val());
     });
+
+
 });
 </script>

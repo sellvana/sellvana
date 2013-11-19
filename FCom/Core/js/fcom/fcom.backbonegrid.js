@@ -944,7 +944,7 @@ FCom.BackboneGrid = function(config) {
             this.$el.find('#multi_hidden:first').select2({
                 multiple: this.model.get('filter_type') === 'select' ? false : true,
                 data: data,
-                placeholder: 'All',
+                placeholder: 'All'
                 //closeOnSelect: true
             });
             var self = this;
@@ -1266,7 +1266,7 @@ FCom.BackboneGrid = function(config) {
                                 c.filterOp = 'contains';
                                 c.filterLabel = 'Contains';
                             }
-                    if (filter.type === 'multiselect') {
+                    if (filter.type === 'multiselect' || filter.type === 'select') {
                         if(typeof(filter.options) !== 'undefined') {
                             c._multipulFilterOptions = filter.options;
                         } else if( typeof(c.options) !== 'undefined') {
