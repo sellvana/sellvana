@@ -99,8 +99,12 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function getInitialData($id)
     {
+
         $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$id)->find_many());
-        return $res[0]['_data_serialized'];
+        if (empty($res)) {
+            return -1;
+        }
+        return $res[0]['_data_serialized'] ? $res[0]['_data_serialized'] : -1;
     }
     public function fieldsetAry()
     {

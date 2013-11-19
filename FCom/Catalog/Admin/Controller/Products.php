@@ -316,12 +316,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function formPostAfter($args)
     {
+
         parent::formPostAfter($args);
         $model = $args['model'];
         $data = BRequest::i()->post();
         $this->processCategoriesPost($model);
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
+        $this->processCustomFieldPost($model, $data);
     }
 
     public function processCategoriesPost($model)
@@ -452,6 +454,29 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
         }
         return $this;
+    }
+
+    public function processCustomFieldPost($model, $data)
+    {
+        $prodId = $model->id;
+
+        if(!isset($model->prod_customfield))
+            return;
+
+        $json = $model->prod_customfield;
+
+        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id', $prodId)->find_many());
+        if(empty($res)) {
+            $new = FCom_CustomField_Model_ProductField::i()->create();
+            $new->product_id = $prodId;
+            $new->_data_serialized = $json;
+            $new->save();
+         } else {
+
+            $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
+            $row->_data_serialized = $json;
+            $row->save();
+         }
     }
 
     public function onMediaGridConfig($args)

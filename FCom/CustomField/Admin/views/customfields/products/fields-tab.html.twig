@@ -2,14 +2,7 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 <div class="row">
     <div class="col-sm-10">
-        <div class="pull-right">
-            <div class="btn-group">
-                <button class="btn" type="button" id='btn_fields_reset'>Reset</button>
-                <button class="btn" id='btn_fields_clone' type="button">Clone</button>
-                <button class="btn btn-danger" type="button" id='btn_fields_delete' >Delete</button>
-                <button class="btn btn-primary" id='btn_fields_save' type="button">Save</button>
-            </div>
-        </div>
+        <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
         <table>
             <tr>
                 <td style='padding-right:20px;'>
@@ -97,7 +90,7 @@
 require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Backbone, _, $) {
     var currentSet = null;
     var initialData = {{ ctrl.getInitialData(model.id) | raw }};
-    $('#btn_fields_reset').click(function() {
+    /*$('#btn_fields_reset').click(function() {
         var c = confirm('Are you sure to reset?');
         if(c) {
             setCollection.reset();
@@ -107,13 +100,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
 
     $('#btn_fields.delete').click(function() {
         var c = confirm('Are you sure to delete?');
-        /*if(c) {
+        if(c) {
             setCollection.reset();
             mainView.render();
-        }*/
-    });
+        }
+    });**/
 
-    $('#btn_fields_save').click(function() {
+    /*$('#btn_fields_save').click(function() {
         var str = JSON.stringify(setCollection.toJSON());
         $.post('{{ APP.href('/customfields/products/save') | raw }}',
                 {
@@ -126,7 +119,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
                     }
                 }
         );
-    });
+    });*/
 
     $('#btn_add_set').click(function() {
 
@@ -155,6 +148,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         newField.fetch({
             success: function() {
                 currentSet.fields.add(newField);
+                setCollection.trigger('change');
             }
         });
     });
@@ -221,6 +215,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
+
+                setCollection.trigger('change');
             }
         },
         render: function() {
@@ -325,20 +321,30 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
 
     var setCollection = new CustomField.Collections.FieldSetCollection();
     var setModel = null;
-    for(var i in initialData) {
-        var set = initialData[i];
-        var fields = _.clone(set.fields);
-        delete set.fields;
-        var setModel = new CustomField.Models.FieldSet(set);
-        setModel.set('collapsed', true);
-        setModel.fields.set(fields);
-        setCollection.add(setModel);
-    }
+    if (initialData !== -1) {
+        for(var i in initialData) {
+            var set = initialData[i];
+            var fields = _.clone(set.fields);
+            delete set.fields;
+            var setModel = new CustomField.Models.FieldSet(set);
+            setModel.set('collapsed', true);
+            setModel.fields.set(fields);
+            setCollection.add(setModel);
+        }
 
-    currentSet = setModel;
-    setModel.set('collapsed', false);
+        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+    }
+    if (setModel !== null) {
+        currentSet = setModel;
+        setModel.set('collapsed', false);
+    }
 
     var mainView = new CustomField.Views.MainView({collection: setCollection});
     mainView.render();
+
+    setCollection.on('add remove change', function() {
+        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+        console.log($('#prod_customfield').val());
+    });
 });
 </script>
