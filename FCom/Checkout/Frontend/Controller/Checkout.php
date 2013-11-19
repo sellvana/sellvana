@@ -2,6 +2,18 @@
 
 class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controller_Abstract
 {
+    public function authenticate($args = array())
+    {
+        $r = BRequest::i();
+        $isLoggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
+        if (!$isLoggedIn && $r->get('guest') != 'yes' && $r->rawPath() != '/checkout/login') {
+            BResponse::i()->redirect(BApp::href('/checkout/login'));
+        } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {
+            BResponse::i()->redirect(BApp::href('/checkout'));
+        }
+        return parent::authenticate($args);
+    }
+
     public function action_checkout_login()
     {
         $layout = BLayout::i();
