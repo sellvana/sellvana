@@ -214,6 +214,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 BSession::i()->addMessage(BLocale::_('The record has been deleted'), 'success', 'admin');
             } else {
 	            $model->set($data);
+
 	            if ($model->validate($model->as_array(), array(), $formId)) {
 		            $model->save();
 		            BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', 'admin');
@@ -221,6 +222,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 		            BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
 		            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
 	            }
+
             }
             $this->formPostAfter($args);
         } catch (Exception $e) {
