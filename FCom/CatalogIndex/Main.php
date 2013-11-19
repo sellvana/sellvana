@@ -65,7 +65,7 @@ class FCom_CatalogIndex_Main extends BClass
     static public function onProductAfterSave($args)
     {
         if (static::$_autoReindex) {
-            FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
+            //FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
         }
     }
 

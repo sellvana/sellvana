@@ -160,14 +160,14 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>true),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline'),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
                 'filters'=>array(
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new' => array('caption' => 'Insert New Option', 'modal'=>false),
+                                    'new' => array('caption' => 'Insert New Option'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
                 'events'=>array('init')

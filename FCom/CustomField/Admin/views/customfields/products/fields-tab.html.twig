@@ -34,10 +34,10 @@
             <div class="box-header box-header-small green-background">
                 <div class="title"><%- rc.set_name %></div>
                 <div class="actions">
-                    <a href="#" class="btn box-remove btn-xs btn-link btn-edit">Edit
+                    <a class="btn box-remove btn-xs btn-link btn-remove" href="#"><i class='icon-remove'></i>
                     </a>
 
-                    <a href="#" class="btn box-collapse btn-xs btn-link btn-remove">Remove
+                    <a class="btn box-collapse btn-xs btn-link btn-edit" href="#"><i></i>
                     </a>
                 </div>
             </div>
@@ -238,7 +238,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         },
         template: _.template($('#fieldset-template').html()),
         initialize: function() {
-            this.model.on('change', this._checkCollapse, this);
+            //this.model.on('change', this._checkCollapse, this);
             this.model.fields.on('add', this._addField, this)
         },
         events: {
