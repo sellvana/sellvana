@@ -60,9 +60,10 @@ var g_vent;
             }
         });
 
-
-        g_vent.bind('edit', function(ev) {
+        function _check(ev)
+        {
             if(ev.grid === 'tier-prices') {
+                alert('ffw');
                 var rows = json.rows;
                 rows = _.reject(rows, function(row) {
                     return row.id === ev.row.id;
@@ -71,7 +72,10 @@ var g_vent;
                 json.rows = rows;
                 _setFormVal();
             }
-        });
+        }
+
+        g_vent.bind('new', _check);
+        g_vent.bind('edit', _check);
 
         g_vent.bind('mass-edit', function(ev) {
             if(ev.grid === 'tier-prices') {
@@ -86,6 +90,8 @@ var g_vent;
                 _setFormVal();
             }
         });
+
+        g_vent.bind('')
     });
 </script>
 
