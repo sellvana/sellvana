@@ -202,8 +202,30 @@
         eval('print('+col.print+');');
       } else {
         if (typeof(col.display) === 'undefined') {
-          if (typeof(col.editor) && col.editor === 'select') {
-            print(col.options[rc.row[col.name]]);
+          if (typeof(col.editable) !== 'undefined') {
+
+            if (col.editor === 'select') {
+                if(col.editable === 'inline') {
+                print('<select id="'+col.name+'" class="form-control" data-col="'+col.name+'">');
+                for(var key in col.options) {
+                    print('<option value="'+key+'"' + ((rc.current !== false && rc.current[col.name] === key) ? ' selected ' : '')+'>'+col.options[key]+'</option>');
+                }
+                print('</select>');
+                print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
+              } else {
+                print(col.options[rc.row[col.name]]);
+              }
+            }
+            console.log(col.editor);
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
+              if(col.editable === 'inline') {
+                print('<input id="'+col.name+'" type="text"  class="form-control" data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
+              } else {
+                print(rc.row[col.name]);
+              }
+            }
+
           } else {
             print(rc.row[col.name]);
           }

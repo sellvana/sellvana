@@ -577,7 +577,7 @@ FCom.BackboneGrid = function(config) {
         events: {
             'change input.select-row': '_selectRow',
             'change .form-control': '_cellValChanged',
-            //'keydown .form-control': '_validate',
+            'blur .form-control': '_validate',
             'click a.btn-delete': '_deleteRow',
             'click a.btn-edit._modal': '_editModal',
             'click a.btn-custom': '_callbackCustom'
@@ -604,16 +604,32 @@ FCom.BackboneGrid = function(config) {
             return true;
         },
         _validate: function(ev) {
+
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-col');
             var col = columnsCollection.findWhere({name: name});
             if (typeof(col) != 'undefined') {
-                if (typeof(col.get('validate')) !== 'undefined') {
-                    switch(col.get('validate')) {
-                        case 'number':
-                            $(ev.target).toggleClass('unvalid', isNaN(val));
-                            return  !isNaN(val);
-                        break;
+                if (typeof(col.get('validation')) !== 'undefined') {
+                    var validation = col.get('validation');
+                    console.log(validation);
+                    if(validation.number) {
+                        if (isNaN(val))
+                            $(ev.target).addClass('unvalid');
+                        else
+                            $(ev.target).removeClass('unvalid');
+
+                        return  !isNaN(val);
+                    }
+                    console.log(validation);
+                    if(validation.required) {
+
+                        var status = (val === '' || typeof(val) === 'undefined');
+                        if (status)
+                            $(ev.target).addClass('unvalid');
+                        else
+                            $(ev.target).removeClass('unvalid');
+
+                        return  !status;
                     }
                 }
             }
@@ -640,9 +656,10 @@ FCom.BackboneGrid = function(config) {
 
         },
         _cellValChanged: function(ev) {
-
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-col');
+            console.log('val='+val);
+            console.log('name='+name);
             if(!this._validate(ev))
             {
                 //console.log('validate fail');
@@ -1047,7 +1064,6 @@ FCom.BackboneGrid = function(config) {
                 }
 
                 if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('new') !== -1) {
-                    alert('trigger');
                     if (typeof(hash.oper) !== 'undefined')
                         delete hash.oper;
                     hash._new = true;
@@ -1400,10 +1416,11 @@ FCom.BackboneGrid = function(config) {
                         var ev = {grid: BackboneGrid.id, rows: rows};
                         g_vent.trigger('mass-delete', ev);
                     }
-
+                    console.log(selectedRows.models);
                     rowsCollection.remove(selectedRows.models, {silent:true});
                     selectedRows.reset();
                     $('select.'+config.id+'.js-sel').val('');
+                    gridView.render();
 
                 }
             });

@@ -63,7 +63,6 @@ var g_vent;
         function _check(ev)
         {
             if(ev.grid === 'tier-prices') {
-                alert('ffw');
                 var rows = json.rows;
                 rows = _.reject(rows, function(row) {
                     return row.id === ev.row.id;

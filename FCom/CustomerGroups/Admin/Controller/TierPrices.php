@@ -38,11 +38,10 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('name'=>'product_id', 'default'=>$model->id(), 'hidden'=>true),
                     array('name'=>'group_id', 'label'=>'Group', 'options'=>FCom_CustomerGroups_Model_Group::i()->groupsOptions(),'validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'editor'=>'select', 'width'=>150),
                     array('name'=>'qty', 'label'=>'Qty','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
-                    array('name'=>'base_price', 'label'=>'Base Price','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
-                    array('name'=>'sale_price', 'label'=>'Sale Price','validation'=>array('required'=>true), 'editable'=>true, 'addable'=>true, 'width'=>150, 'validate'=>'number'),
+                    array('name'=>'base_price', 'label'=>'Base Price','validation'=>array('required'=>true), 'editable'=>'inline', 'width'=>150, 'validate'=>'number'),
+                    array('name'=>'sale_price', 'label'=>'Sale Price','validation'=>array('required'=>true), 'editable'=>'inline', 'width'=>150, 'validate'=>'number'),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('delete'=>true))
                 ),
                 'data'=>BDb::many_as_array($orm->find_many()),
@@ -52,7 +51,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                                     array('field'=>'group_id', 'type'=>'multiselect')
                 ),
                 'actions'=>array(
-                    'new'=>array('caption'=>'Add New Price', 'modal'=>true),
+                    'new'=>array('caption'=>'Add New Price', 'modal'=>false),
                     'edit'=>true,
                     'delete'=>true
                 ),
