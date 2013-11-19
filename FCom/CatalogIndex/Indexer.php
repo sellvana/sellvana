@@ -100,10 +100,10 @@ class FCom_CatalogIndex_Indexer extends BClass
         $sortColumn = array();
         $sortJoin = array();
         foreach ($sortFields as $fName => $field) {
-            if ($field->get('sort_method') === 'column') {
-                $sortColumn[$fName] = $field;
-            } else {
+            if ($field->get('sort_method') === 'join') {
                 $sortJoin[$fName] = $field;
+            } else {
+                $sortColumn[$fName] = $field;
             }
         }
         foreach (static::$_indexData as $pId => $pData) {
@@ -116,6 +116,9 @@ class FCom_CatalogIndex_Indexer extends BClass
             $docHlp->create($row)->save();
 
             foreach ($sortJoin as $fName => $field) {
+                if (!isset($pData[$fName])) {
+                    continue;
+                }
                 $row = array('doc_id' => $pId, 'field_id' => $field->id(), 'value' => $pData[$fName]);
                 $sortHlp->create($row)->save();
             }
