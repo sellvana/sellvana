@@ -143,14 +143,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
             $('#sel_sets')
              .append($("<option></option>")
              .attr("value",set.get('id'))
-             .text(set.get('set_name'));
-
+             .text(set.get('set_name')));
+        var fields = set.fields;
         fields.each(function(f) {
             if ($("#sel_fields option[value='"+f.get('id')+"']").length === 0)
                 $('#sel_fields')
                  .append($("<option></option>")
                  .attr("value",f.get('id'))
-                 .text(f.get('field_name'));
+                 .text(f.get('field_name')));
         });
 
         refresh_selects();
@@ -163,7 +163,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
 
     function add_option(field)
     {
-
+        if ($("#sel_fields option[value='"+field.get('id')+"']").length === 0)
+            $('#sel_fields')
+             .append($("<option></option>")
+             .attr("value",field.get('id'))
+             .text(field.get('field_name')));
     }
     $('#btn_add_set').click(function() {
 
@@ -258,7 +262,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         _remove: function() {
             var confirm = window.confirm("Do you want to really remove?");
             if (confirm) {
-
+                add_option(this.model);
                 this.parentSet.fields.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
@@ -298,7 +302,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         _removeSelf: function() {
             var confirm = window.confirm("Do you want to really remove?");
             if (confirm) {
-                remove_options(this.model);
+                add_options(this.model);
                 setCollection.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
