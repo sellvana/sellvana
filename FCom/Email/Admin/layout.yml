@@ -1,3 +1,25 @@
+base:
+	- view: admin/nav
+		do:
+		    - [ addNav, email, { label: Emails, pos: 300, icon_class:  icon-envelope-alt } ]
+			- [ addNav, email/subscriptions, { label: Subscriptions, href: /subscriptions } ]
+			- [ addNav, email/queues, { label: Queues, href: /email-queues } ]
+
+/subscriptions:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, email/subscriptions ]] }
+
+/subscriptions/form:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, email/subscriptions ]] }
+    - view: admin/form
+        set: { tab_view_prefix: emails/form/ }
+        do:
+            - [ addTab, main, { label: Email, pos: 10 } ]
+
 /settings:
     - view: settings
         do:
