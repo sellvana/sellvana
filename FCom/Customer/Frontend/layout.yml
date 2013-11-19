@@ -1,20 +1,33 @@
 /customer/login:
     - { include: base }
-    - { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
+    - view: head
+        do:
+            - [ title, Customer Login ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/login }
 
 /customer/register:
     - { include: base }
-    - { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
+    - view: head
+        do:
+            - [ title, Customer Registration ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/register }
 
 /customer/password/recover:
     - { include: base }
-    - { view: head, do: [[ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]] }
+    - view: head
+        do:
+            - [ title, Password Recovery ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/password/recover }
 
 /customer/password/reset:
     - { include: base }
+    - view: head
+        do:
+            - [ title, Password Reset ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/password/reset }
 
 customer_account_sidebar:
