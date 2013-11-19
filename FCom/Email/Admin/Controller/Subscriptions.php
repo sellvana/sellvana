@@ -11,19 +11,41 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
 
     public function gridConfig()
     {
-        $config = parent::gridConfig();
+        $config            = parent::gridConfig();
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-            array('name' => 'id', 'label' => 'ID', 'index'=>'e.id'),
-            array('name' => 'email', 'label'=>'Email', 'index'=>'e.email'),
-            array('name' => 'unsub_all', 'label'=>'Un-subscribe all', 'index'=>'e.unsub_all'),
-            array('name' => 'sub_newsletter', 'label'=>'Subscribe newsletter', 'index'=>'e.sub_newsletter'),
-            array('name' => 'create_at', 'label'=>'Created', 'index'=>'e.create_at'),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('subscriptions/form?id='), 'col'=>'id'),'delete'=>true)),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'e.id'),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'e.email'),
+            array('name'          => 'unsub_all',
+                  'label'         => 'Un-subscribe all',
+                  'index'         => 'e.unsub_all',
+                  'editable'      => true,
+                  'mass-editable' => true,
+                  'options'       => array('1' => 'Yes', '0' => 'No'),
+                  'editor'        => 'select'
+            ),
+            array('name'          => 'sub_newsletter',
+                  'label'         => 'Subscribe newsletter',
+                  'index'         => 'e.sub_newsletter',
+                  'editable'      => true,
+                  'mass-editable' => true,
+                  'options'       => array('1' => 'Yes', '0' => 'No'),
+                  'editor'        => 'select'
+            ),
+            array('name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at'),
+            array(
+                'name'     => '_actions',
+                'label'    => 'Actions',
+                'sortable' => false,
+                'data'     => array('edit' => array('href' => BApp::href('subscriptions/form?id='), 'col' => 'id'), 'delete' => true)
+            ),
         );
         $config['actions'] = array(
-            'export'=>true,
-            'delete'=>true
+            'export' => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'sub_newsletter', 'type' => 'select', 'options' => array('1' => 'yes', '2' => 'no')),
         );
         return $config;
     }
