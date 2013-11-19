@@ -45,7 +45,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
             'delete' => true
         );
         $config['filters'] = array(
-            array('field' => 'sub_newsletter', 'type' => 'select', 'options' => array('1' => 'yes', '2' => 'no')),
+            array('field' => 'sub_newsletter', 'type' => 'select'),
         );
         return $config;
     }
