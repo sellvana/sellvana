@@ -48,30 +48,33 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 break;
             }
         } else {
-            $cart->items();
-            if (!empty($post['remove'])) {
-                foreach ($post['remove'] as $id) {
-                    $cart->removeItem($id);
-                }
-
-            }
-            if (!empty($post['qty'])) {
-                foreach ($post['qty'] as $id=>$qty) {
-                    $item = $cart->childById('items', $id);
-                    if ($item) {
-                        $item->set('qty', $qty)->save();
+            $items = $cart->items();
+            if (count($items)) {
+                if (!empty($post['remove'])) {
+                    foreach ($post['remove'] as $id) {
+                        $cart->removeItem($id);
                     }
                 }
-            }
-            if (!empty($post['postcode'])) {
-                $estimate = array();
-                foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
-                    $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
+                if (!empty($post['qty'])) {
+                    foreach ($post['qty'] as $id=>$qty) {
+                        if ($qty > 0) {
+                            $item = $cart->childById('items', $id);
+                            if ($item) {
+                                $item->set('qty', $qty)->save();
+                            }
+                        } //todo: else remove item?
+                    }
                 }
-                BSession::i()->data('shipping_estimate', $estimate);
+                if (!empty($post['postcode'])) {
+                    $estimate = array();
+                    foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
+                        $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
+                    }
+                    BSession::i()->data('shipping_estimate', $estimate);
+                }
+                $cart->calculateTotals()->save();
+                BSession::i()->addMessage('Your cart has been updated', 'success', 'frontend');
             }
-            $cart->calculateTotals()->save();
-            BSession::i()->addMessage('Your cart has been updated', 'success', 'frontend');
         }
         BResponse::i()->redirect($cartHref);
     }
