@@ -173,4 +173,16 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
          BResponse::i()->json(array('status'=>$status));
     }
+
+    public function getFieldTypes()
+    {
+        $f = FCom_CustomField_Model_Field::i();
+        return $f->fieldOptions('table_field_type');
+    }
+
+    public function getAdminInputTypes()
+    {
+        $f = FCom_CustomField_Model_Field::i();
+        return $f->fieldOptions('admin_input_type');
+    }
 }

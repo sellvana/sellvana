@@ -1,5 +1,101 @@
 {% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
+<a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
+<div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title" id="myModalLabel">Create Form</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="field_code">Field Code</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="field_name">Field Name</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="frontend_label">Frontend Label</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="frontend_show">Show on frontend</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="sort_order">Sort order</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="table_field_type">DB Type</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
+                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="admin_input_type">Input Type</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
+                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="system">System field</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="system" id="system" class="form-control" data-rule-required="true">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
+                <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-sm-10">
         <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
@@ -7,7 +103,6 @@
             <tr>
                 <td style='padding-right:20px;'>
                     <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
-
                         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
                     </select>
 
@@ -24,6 +119,9 @@
                 </td>
                 <td>
                     <button class="btn btn-primary" type="button" id="btn_add_field">Add a Field</button>
+                </td>
+                <td width='100%' class='text-right'>
+                    <button class="btn" type="button" id="btn_new_field">New Field</button>
                 </td>
             </tr>
         </table>
@@ -84,9 +182,32 @@
         </script>
 </div>
 
+
 <script>
 
-require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+    var setValidateForm = function(selector) {
+        if (selector == null) {
+          selector = $(".validate-form");
+        }
+        if (jQuery().validate) {
+          return selector.each(function(i, elem) {
+            return $(elem).validate({
+              errorElement: "span",
+              errorClass: "help-block has-error",
+              errorPlacement: function(e, t) {
+                return t.parents(".controls").first().append(e);
+              },
+              highlight: function(e) {
+                return $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+              },
+              success: function(e) {
+                return e.closest(".form-group").removeClass("has-error");
+              }
+            });
+          });
+        }
+    };
     var currentSet = null;
     var initialData = {{ ctrl.getInitialData(model.id) | raw }};
     /*$('#btn_fields_reset').click(function() {
@@ -197,10 +318,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
         newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
         newField.fetch({
             success: function() {
-                //currentSet.fields.add(newField);
                 setCollection.each(function(set) {
-                    console.log(set.toJSON());
-                    console.log(set.get('collapsed'));
                     if (set.get('collapsed') === false) {
                         set.fields.add(newField);
                     }
@@ -209,7 +327,37 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
             }
         });
     });
+    var _mainForm = $('form:last');
+    $('#btn_new_field').click(function() {
+        $('div#prod-new-field-form').find('select, input').val('');
+        $('#btn_show_modal').trigger('click');
+        setValidateForm($(_mainForm));
+    });
 
+    $('#btn-newfield-save').click(function() {
+        if (!$(_mainForm).valid())
+            return;
+        var hash = {};
+        $('#prod-new-field-form .form-control').each(function(index) {
+            hash[$(this).attr('id')] = $(this).val();
+        });
+        hash.oper = 'add';
+        $.post('{{ APP.href('/customfields/fieldsets/field_grid_data') | raw }}', hash, function(res) {
+            var field = new CustomField.Models.Field(res);
+            var flag = false;
+            setCollection.each(function(set) {
+                if (set.get('collapsed') === false) {
+                    set.fields.add(field);
+                    flag = true;
+                }
+            });
+
+            if (!flag)
+                add_option(field);
+            $('#btn-newfield-close').trigger('click');
+
+        });
+    });
     var CustomField = {
         Models: {},
         Collections: {},
@@ -408,7 +556,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'unique'], function(Back
 
     setCollection.on('add remove change', function() {
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
-        console.log($('#prod_customfield').val());
     });
 
 
