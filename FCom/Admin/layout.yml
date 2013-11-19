@@ -367,7 +367,3 @@ form:
     - { include: base }
     - { hook: main, views: templates }
     - { view: admin/nav, do: [[ setNav, system/templates ]] }
-
-/test:
-    - { include: base }
-    - { hook: main, views: core/htmlgrid-wrapper }
