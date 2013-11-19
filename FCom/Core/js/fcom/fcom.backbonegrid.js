@@ -1021,25 +1021,39 @@ FCom.BackboneGrid = function(config) {
                     delete BackboneGrid.modalElementVals.oper;
                 }
 
-
-
                 selectedRows.each(function(model) {
                     for(var key in BackboneGrid.modalElementVals) {
                         model.set(key, BackboneGrid.modalElementVals[key]);
                         model.trigger('render');
                     }
                 });
+
             }
 
             if (modalForm.modalType === 'addable') {
+                var hash = BackboneGrid.modalElementVals;
                 if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
-                    hash = BackboneGrid.modalElementVals;
                     hash.oper = 'add';
                     $.post(BackboneGrid.edit_url, hash, function(data) {
                         var newRow = new BackboneGrid.Models.Row(data);
                         rowsCollection.add(newRow);
                         gridView.addRow(newRow);
                     });
+                } else {
+                    hash.id = guid();
+                    var newRow = new BackboneGrid.Models.Row(hash);
+                    rowsCollection.add(newRow);
+                    gridView.addRow(newRow);
+                }
+
+                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('new') !== -1) {
+                    alert('trigger');
+                    if (typeof(hash.oper) !== 'undefined')
+                        delete hash.oper;
+                    hash._new = true;
+                    console.log(BackboneGrid.id);
+                    console.log(hash);
+                    g_vent.trigger('new', {grid: BackboneGrid.id, row: hash});
                 }
             }
 
@@ -1370,12 +1384,7 @@ FCom.BackboneGrid = function(config) {
 
                 var confirm = window.confirm("Do you really want to delete selected rows?");
                 if (confirm) {
-                    if (BackboneGrid.data_mode === 'local' && typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('mass-delete') !== -1) {
-                        g_vent.trigger('mass-delete', {grid: BackboneGrid.id, rows: selectedRows.toJSON()});
-                        rowsCollection.remove(selectedRows.models, {silent: true});
-                        gridView.render();
-
-                    } else {
+                    if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                         var ids = selectedRows.pluck('id').join(",");
                         $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                         .done(function(data) {

@@ -57,7 +57,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     'delete'=>true
                 ),
                 'events'=>array(
-                    'init', 'edit', 'delete', 'mass-edit', 'mass-delete'
+                    'init', 'delete', 'mass-edit', 'mass-delete', 'new'
                 )
             )
         );
