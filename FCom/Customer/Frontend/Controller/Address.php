@@ -135,32 +135,39 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
+                $customer->default_shipping    = $address;
+                $cart->setAddressByType('shipping', $address);
                 //FCom_Sales_Model_Cart_Address::i()->newShipping($cart->id(), $customer->defaultShipping());
-                $cart->setAddressByType('shipping', $customer->defaultShipping());
             } else {
                 $customer->default_billing_id = $address->id();
+                $customer->default_billing    = $address;
+                $cart->setAddressByType('billing', $address);
                 //FCom_Sales_Model_Cart_Address::i()->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
-                $cart->setAddressByType('billing', $customer->defaultBilling());
             }
             $customer->save();
 
             BResponse::i()->redirect(BApp::href('checkout'));
         }
 
+        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $addresses = $customer->addresses();
         if ('s' == $type) {
             $label = "Choose shipping address";
         } else {
             $label = "Choose billing address";
         }
+
         $crumbs[] = array('label'=>'Checkout', 'href'=>Bapp::href('checkout'));
         $crumbs[] = array('label'=>$label, 'active'=>true);
-
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $this->view('customer/address/choose')->type = $type;
-        $this->view('customer/address/choose')->header = $label;
-        $this->view('customer/address/choose')->customer = $customer;
-        $this->view('customer/address/choose')->addresses = $addresses;
+        $this->view('customer/address/choose')->set(
+            array(
+                'type'      => $type,
+                'header'    => $label,
+                'customer'  => $customer,
+                'addresses' => $addresses,
+            )
+        );
         $this->layout('/customer/address/choose');
     }
 }
