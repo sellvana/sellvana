@@ -319,29 +319,51 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
         newField.fetch({
             success: function() {
-                setCollection.each(function(set) {
+                var set = setCollection.at(0);
+                set.fields.add(newField);
+                /*setCollection.each(function(set) {
                     if (set.get('collapsed') === false) {
                         set.fields.add(newField);
                     }
-                });
+                });*/
                 //setCollection.trigger('change');
             }
         });
     });
     var _mainForm = $('form:last');
 
-    $(_mainForm).submit(function() {
+    $(_mainForm).submit(function(ev) {
+
         setCollection.each(function(set) {
             set.fields.each(function(field) {
                 if (field.wysiwyg) {
-                    field.set('value', field.wysiwyg.getData());
+                    var w = field.view.getWYSIWYG();
+                    field.set('value', w.getData());
                 }
 
                 if (field.switch) {
-                    field.set('value', field.switch.hasClass('switch-on') ? '1' : '0');
+                    var s = field.view.getSwitch();
+                    field.set('value', s.hasClass('switch-on') ? '1' : '0');
+                }
+
+                var position = field.view.$el.index();
+                field.set('position', position);
+
+                var setId = field.view.$el.parents('.prod-fieldset:first').attr('id');
+                console.log(setId);
+                if (setId !== set.get('id')) {
+                    set.fields.remove(field, {silent: true});
+                    console.log(setId);
+                    var movedSet = setCollection.get(setId);
+                    movedSet.fields.add(field, {silent: true});
                 }
             });
         });
+
+        setCollection.each(function(set) {
+            set.fields.sort();
+        })
+
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
 
         return true;
@@ -409,7 +431,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     CustomField.Models.Field = Backbone.Model.extend({
         defaults: {
-            value: ''
+            value: '',
+            position: 0
         },
         intialize: function() {
             this.set('admin_input_type', this.get('admin_input_type').replace(' ',''));
@@ -417,7 +440,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     });
 
     CustomField.Collections.FieldCollection = Backbone.Collection.extend({
-        model: CustomField.Models.Field
+        model: CustomField.Models.Field,
+        comparator: function(col) {
+            return parseInt(col.get('position'));
+        }
     });
 
     CustomField.Models.FieldSet = Backbone.Model.extend({
@@ -447,6 +473,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     CustomField.Views.FieldView = Backbone.View.extend({
         className: 'form-group',
+        attributes: function() {
+            return { id: this.model.get('id')};
+        },
         template: _.template($('#field-template').html()),
         events: function (){
             var hash = {'click a.field-remove': '_remove'};
@@ -491,7 +520,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         },
         getWYSIWYG: function() {
-
             var id = this.$el.find('textarea').attr('id');
             var self = this;
             return CKEDITOR.instances[id];
@@ -503,7 +531,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
-
+            this.model.view = this;
             return this;
         }
     });
@@ -516,7 +544,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             return name;
         },
         attributes: function() {
-            return { id: guid()};
+            return { id: this.model.get('id')};
         },
         template: _.template($('#fieldset-template').html()),
         initialize: function() {
@@ -572,12 +600,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
                 case 'boolean':
                     adminForm.createSwitchButton();
-                    field.switch = fieldView.getSwitch();
+                    field.switch = true;
                     break;
                 case 'wysiwyg':
                     adminForm.wysiwygInit();
-                    field.wysiwyg = fieldView.getWYSIWYG();
-
+                    field.wysiwyg = true;
+                    console.log(field.wysiwyg);
                     break;
             }
 
@@ -587,7 +615,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.model.fields.each(this._addField, this);
-
             return this;
         }
     });
@@ -648,8 +675,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $('#td_fields').css('display', 'block');
             $('#btn_add_field').css('display', 'block');
         }
+
+        $( ".box-content" ).sortable({
+            revert: true,
+            connectWith: ".box-content"
+        });
     });
 
+    $( ".box-content" ).sortable({
+        revert: true,
+        connectWith: ".box-content"
+    });
 
 });
 </script>
