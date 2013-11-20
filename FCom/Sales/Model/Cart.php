@@ -1,15 +1,33 @@
 <?php
 
 /**
- * @property mixed shipping_service
- * @property mixed customer_id
- * @property mixed item_qty
- * @property mixed subtotal
- * @property mixed payment_method
- * @property mixed payment_details
- * @property mixed coupon_code
- * @property mixed tax
- * @property mixed grand_total
+ * model class for table "fcom_sales_cart"
+ *
+ * The followings are the available columns in table 'fcom_sales_cart':
+ * @property string $id
+ * @property string $item_qty
+ * @property integer $item_num
+ * @property string $subtotal
+ * @property string $tax_amount
+ * @property string $discount_amount
+ * @property string $grand_total
+ * @property string $session_id
+ * @property string $customer_id
+ * @property string $customer_email
+ * @property string $shipping_method
+ * @property string $shipping_price
+ * @property string $shipping_service
+ * @property string $payment_method
+ * @property string $payment_details
+ * @property string $coupon_code
+ * @property string $status
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $data_serialized
+ * @property string $last_calc_at
+ *
+ * other property
+ * @property int shipping_same flag to know shipping is same as billing
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -341,10 +359,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             return !empty($this->addresses['billing']) ? $this->addresses['billing'] : null;
 
         case 'shipping':
-            if ($this->shipping_same) {
+            if (!empty($this->addresses['shipping'])) {
+                $this->shipping_same = 0;
+                return $this->addresses['shipping'];
+            } elseif ($this->shipping_same) {
                 return $this->getAddressByType('billing');
+            } else {
+                return null;
             }
-            return !empty($this->addresses['shipping']) ? $this->addresses['shipping'] : null;
         default:
             throw new BException('Invalid cart address type: '.$atype);
         }
@@ -380,6 +402,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if ($defBilling->id == $defShipping->id) {
             $this->shipping_same = 1;
         } else {
+            $this->shipping_same = 0;
             $this->setAddressByType('shipping', $defShipping);
         }
         return true;
