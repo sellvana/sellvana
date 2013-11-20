@@ -84,7 +84,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
             //check this address is belong to this user
             if ($id && $address && $address->customer_id != $customer->id()) {
-                BSession::i()->addMessage($this->_($this->_('You don\'t have permission to update this address')), 'error', 'frontend');
+                BSession::i()->addMessage($this->_('You don\'t have permission to update this address'), 'error', 'frontend');
                 //$response->redirect('unauthorized');
             }
             if ($address->validate($post, array(), $formId)) {
@@ -124,12 +124,23 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             if (!$cart) {
                 BResponse::i()->redirect(BApp::href('cart'));
             }
+            if (!$address) {
+                BSession::i()->addMessage($this->_('Cannot find address you select, please try again'), 'error', 'frontend');
+                BResponse::i()->redirect(BApp::href('/customer/address/choose') . '?t=' . $type);
+            }
+            //you can't choose address which is not belongs to you
+            if ($customer->id() != $address->get('customer_id')) {
+                BSession::i()->addMessage($this->_('You can\'t choose address which is not belongs to you'), 'error', 'frontend');
+                BResponse::i()->redirect(BApp::href('checkout'));
+            }
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
-                FCom_Sales_Model_Cart_Address::i()->newShipping($cart->id(), $customer->defaultShipping());
+                //FCom_Sales_Model_Cart_Address::i()->newShipping($cart->id(), $customer->defaultShipping());
+                $cart->setAddressByType('shipping', $customer->defaultShipping());
             } else {
                 $customer->default_billing_id = $address->id();
-                FCom_Sales_Model_Cart_Address::i()->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
+                //FCom_Sales_Model_Cart_Address::i()->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
+                $cart->setAddressByType('billing', $customer->defaultBilling());
             }
             $customer->save();
 

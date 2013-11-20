@@ -130,10 +130,12 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $emailUniqueRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist'));
             if ($customerModel->validate($r, $emailUniqueRules, $formId)) {
                 $customer = $customerModel->register($r);
-                FCom_Customer_Model_Address::i()->import($a, $customer);
+                if ($a) {
+                    FCom_Customer_Model_Address::i()->import($a, $customer);
+                }
                 $customer->login();
                 BSession::i()->addMessage($this->_('Thank you for your registration'), 'success', 'frontend');
-                BResponse::i()->redirect(BApp::href());
+                BResponse::i()->redirect(BApp::href('customer/myaccount'));
             } else {
                 BSession::i()->addMessage($this->_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
                 $this->formMessages($formId);
