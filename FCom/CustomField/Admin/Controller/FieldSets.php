@@ -49,10 +49,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30),
-                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100),
-                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100),
-                    array('name'=>'position', 'label'=>'Position', 'width'=>100, 'editable'=>true, 'valdiate'=>'number', 'default'=>'0'),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'sortable'=>false),
+                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'sortable'=>false),
+                    array('name'=>'position', 'label'=>'Position', 'width'=>100, 'editable'=>true, 'valdiate'=>'number', 'default'=>'0', 'sortable'=>false),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
                             array('field'=>'field_code', 'type'=>'text'),
@@ -60,7 +60,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'delete' => array('caption' => 'Remove')
+                                    'delete' => array('caption' => 'Remove', 'confirm'=>false)
                                 )
             )
         );
@@ -160,15 +160,15 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline'),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
                                     'new' => array('caption' => 'Insert New Option'),
-                                    'delete' => array('caption' => 'Remove')
+                                    'delete' => array('caption' => 'Remove', 'confirm' => false)
                                 ),
                 'events'=>array('init')
             )

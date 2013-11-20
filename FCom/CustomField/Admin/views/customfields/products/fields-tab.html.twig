@@ -148,28 +148,29 @@
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input id="'+guid()+'" value="TEXT" class="form-control" />');
+                        print('<input id="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" class="form-control" >TEXT AREAR</textarea>');
+                        print('<textarea id="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
                         break;
                     case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >WYSIWYG</textarea>');
+                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
 
                         break;
                     case 'select':
                     case 'multiselect':
                         print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+guid()+'" class="form-control" >');
+                        vals = rc.value.split(',');
                         for(key in rc.options) {
-                            print('<option value="'+key+'">'+rc.options[key]+'</option>');
+                            print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
                         }
                         print('</select>');
 
                         break;
                     case 'boolean':
-                        print('<input type="hidden" id="check" name="check" value="1" /><input class="switch-cbx" id="ch" name="ch" type="checkbox" value="1" checked style="margin-top: 11px;"/>');
+                        print('<input type="hidden" id="check" name="check" value="'+rc.value+'" /><input class="switch-cbx" id="ch" name="ch" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
                         break;
                 } %>
@@ -323,11 +324,30 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                         set.fields.add(newField);
                     }
                 });
-                setCollection.trigger('change');
+                //setCollection.trigger('change');
             }
         });
     });
     var _mainForm = $('form:last');
+
+    $(_mainForm).submit(function() {
+        setCollection.each(function(set) {
+            set.fields.each(function(field) {
+                if (field.wysiwyg) {
+                    field.set('value', field.wysiwyg.getData());
+                }
+
+                if (field.switch) {
+                    field.set('value', field.switch.hasClass('switch-on') ? '1' : '0');
+                }
+            });
+        });
+        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+
+        return true;
+    });
+
+
     setValidateForm($(_mainForm));
     $('#field_code').rules("add", {
         onfocusout: false,
@@ -376,7 +396,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             if (!flag)
                 add_option(field);
             $('#btn-newfield-close').trigger('click');
-            setCollection.trigger('change');
+            //setCollection.trigger('change');
         });
     });
     var CustomField = {
@@ -388,6 +408,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
 
     CustomField.Models.Field = Backbone.Model.extend({
+        defaults: {
+            value: ''
+        },
         intialize: function() {
             this.set('admin_input_type', this.get('admin_input_type').replace(' ',''));
         }
@@ -425,8 +448,33 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Views.FieldView = Backbone.View.extend({
         className: 'form-group',
         template: _.template($('#field-template').html()),
-        events: {
-            'click a.field-remove': '_remove'
+        events: function (){
+            var hash = {'click a.field-remove': '_remove'};
+            switch (this.model.get('admin_input_type')) {
+                case 'multiselect':
+                case 'select':
+                    hash['change select'] = '_changeSelect2';
+                    break;
+                case 'textarea':
+                    hash['change textarea'] = '_changeVal';
+                case 'text':
+                    hash['change input[type="text"]'] = '_changeVal';
+            }
+            return hash;
+        },
+        _changeCheckbox: function() {
+            var val = this.$el.find('input[type="hidden"]').val();
+            console.log(val);
+        },
+        _changeSelect2: function() {
+            var val = this.$el.find('select').val();
+            if (typeof(val) === 'object')
+                val = val.join(',');
+            this.model.set('value', val);
+        },
+        _changeVal: function() {
+            var val = this.$el.find('input[type="text"],textarea').val();
+            this.model.set('value', val);
         },
         _remove: function() {
             var confirm = window.confirm("Do you want to really remove?");
@@ -437,11 +485,22 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
-                setCollection.trigger('change');
+                //setCollection.trigger('change');
 
 
             }
         },
+        getWYSIWYG: function() {
+
+            var id = this.$el.find('textarea').attr('id');
+            var self = this;
+            return CKEDITOR.instances[id];
+
+        },
+        getSwitch: function() {
+            return this.$el.find('input[type="checkbox"]').parent();
+        },
+
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
 
@@ -462,7 +521,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         template: _.template($('#fieldset-template').html()),
         initialize: function() {
             //this.model.on('change', this._checkCollapse, this);
-            this.model.fields.on('add', this._addField, this)
+            this.model.fields.on('add', this._addField, this);
         },
         events: {
             'click a.btn-edit': '_showSelf',
@@ -498,7 +557,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
                 this.$el.addClass('box-collapsed');
             } else {
-
                 this.$el.removeClass('box-collapsed');
             }
         },
@@ -514,10 +572,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
                 case 'boolean':
                     adminForm.createSwitchButton();
-
+                    field.switch = fieldView.getSwitch();
                     break;
                 case 'wysiwyg':
                     adminForm.wysiwygInit();
+                    field.wysiwyg = fieldView.getWYSIWYG();
+
                     break;
             }
 
