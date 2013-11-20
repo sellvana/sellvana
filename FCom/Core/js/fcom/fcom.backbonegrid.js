@@ -1006,8 +1006,14 @@ FCom.BackboneGrid = function(config) {
             this.modalType = 'mass-editable';
         },
         _saveChanges: function(ev) {
+            BackboneGrid.modalSaveClicked = false;
             if (!modalForm.formEl.valid())
                 return;
+            /*if ($.active > 0)
+            {
+                BackboneGrid.modalSaveClicked = true;
+                return;
+            }*/
 
             for( var key in BackboneGrid.modalElementVals) {
                 if (BackboneGrid.modalElementVals[key] === '')
@@ -1113,6 +1119,37 @@ FCom.BackboneGrid = function(config) {
 
             this.formEl = this.$el.parents('form:first');
             setValidateForm(this.formEl);
+
+            this.collection.each(function(col) {
+
+                if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
+                    var url = col.get('validation').unique;
+                    console.log(col.get('name'));
+                    modalForm.$el.find('#'+col.get('name')).rules("add", {
+                        onfocusout: false,
+                        onkeyup: false,
+                        remote: {
+                            url: url,
+                            type: 'post',
+                             data: {
+                                name: col.get('name')
+                            },
+                            dataFilter: function (responseString) {
+                                var response = jQuery.parseJSON(responseString);
+                                currentMessage = response.Message;
+                                if (modalForm.modalType === 'editable' && BackboneGrid.currentRow.get('id') === response.id)
+                                    return true;
+                                return response.unique;
+                            }
+                            //async:false
+                        },
+                        messages: {
+                            remote: "This "+col.get('label')+" is already taken place"
+                        }
+                    });
+                }
+            });
+
         },
         addElementDiv: function(model) {
             console.log(model.get(this.modalType));
