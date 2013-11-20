@@ -38,13 +38,12 @@ class FeatureContext extends MinkContext
      */
     public function iAmLoggedInAdmin()
     {
-        $session = $this->getSession();
+        $session       = $this->getSession();
         $this->baseUrl = $this->getMinkParameter('base_url');
 //        $session->visit($this->baseUrl);
         $session->visit($this->baseUrl . "/admin");
         $page    = $session->getPage();
         $content = $page->getContent();
-        $this->assertUrlRegExp("/admin/");
 
 //        echo $this->baseUrl;
         if (strpos($content, "Forgot your password?") === false) {
@@ -63,18 +62,36 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @Given /^I am not logged in$/
+     */
+    public function iAmNotLoggedIn()
+    {
+        $session       = $this->getSession();
+        $this->baseUrl = $this->getMinkParameter('base_url');
+//        $session->visit($this->baseUrl);
+        $session->visit($this->baseUrl . "/admin");
+        $page    = $session->getPage();
+        $content = $page->getContent();
+        if (strpos($content, "Forgot your password?") === false) {
+            echo "Logged in\n";
+
+            $session->visit($this->baseUrl . "/admin/logout");
+        }
+    }
+
+    /**
      * @Then /^"(?P<element>[^"]*)" should be disabled$/
      */
     public function shouldBeDisabled($element)
     {
         echo $element;
-        $page = $this->getSession()->getPage();
+        $page  = $this->getSession()->getPage();
         $field = $page->findField($element);
-        if(!$field){
+        if (!$field) {
             throw new \Behat\Mink\Exception\ElementNotFoundException($element . " not found.");
         }
         $attribute = $field->getAttribute('disabled');
-        if(!$attribute){
+        if (!$attribute) {
             throw new \Exception("Not disabled.");
         }
     }
