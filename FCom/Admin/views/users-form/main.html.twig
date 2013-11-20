@@ -82,6 +82,12 @@
 require(['jquery', 'jquery.validate'], function($) {
     $(function() {
         $('#users-form').validate();
+        $('#model-superadmin').change(function() {
+            var val = $(this).val();
+            if( val == 1) {
+                $('#model-role-id').attr("disabled", "disabled");
+            }
+        });
     })
 })
 </script>
