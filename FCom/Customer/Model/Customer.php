@@ -113,6 +113,15 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         );
     }
 
+    public function setSimpleRegisterRules()
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
+
     public function setPassword($password)
     {
         $this->password_hash = BUtil::fullSaltedHash($password);

@@ -114,15 +114,21 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         /* @var $cart FCom_Sales_Model_Cart */
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
 
-        if (!empty($post['create_account'])) {
+        if (!empty($post['create_account']) && $post['account']) {
             $r = $post['account'];
             //$billAddress = $cart->getAddressByType('billing');
             //$r['email'] = $billAddress->email;
             try {
-                $customer = FCom_Customer_Model_Customer::i()->register($r);
-                $customer->login(); // make sure customer is logged in
-                $cart->customer_id = $customer->id();
-                $cart->save();
+                $modelCustomer = FCom_Customer_Model_Customer::i();
+                $modelCustomer->setSimpleRegisterRules();
+                if ($modelCustomer->validate($r, array(), 'checkout-register')) {
+                    $customer = FCom_Customer_Model_Customer::i()->register($r);
+                    $customer->login(); // make sure customer is logged in
+                    $cart->customer_id = $customer->id();
+                    $cart->save();
+                } else {
+                    BResponse::i()->redirect(BApp::href('checkout?guest=yes'));
+                }
             } catch (Exception $e) {
                 //die($e->getMessage());
             }
