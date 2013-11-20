@@ -13,16 +13,16 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     {
         $config = parent::gridConfig();
 
-	    $config['columns'] = array(
-		    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-		    array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'),
-		    array('name' => 'username', 'label' => 'User Name', 'width' => 100, 'href' => BApp::href('users/form/?id=:id')),
-		    array('name' => 'email', 'label' => 'Email', 'width' => 150),
-		    array('name' => 'firstname', 'label' => 'First Name', 'width' => 150),
-		    array('name' => 'lastname', 'label' => 'Last Name', 'width' => 150),
-		    array('name' => 'is_superadmin', 'label' => 'Super?', 'width' => 100, 'cell' => 'integer', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
-		    array('name' => 'status', 'label' => 'Status', 'width' => 100, 'cell' => 'integer', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
-	    );
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'),
+            array('name' => 'username', 'label' => 'User Name', 'width' => 100, 'href' => BApp::href('users/form/?id=:id')),
+            array('name' => 'email', 'label' => 'Email', 'width' => 150),
+            array('name' => 'firstname', 'label' => 'First Name', 'width' => 150),
+            array('name' => 'lastname', 'label' => 'Last Name', 'width' => 150),
+            array('name' => 'is_superadmin', 'label' => 'Super?', 'width' => 100, 'cell' => 'integer', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
+            array('name' => 'status', 'label' => 'Status', 'width' => 100, 'cell' => 'integer', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
+        );
 
         return $config;
     }
@@ -35,6 +35,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             'sidebar_img' => BUtil::gravatar($m->email),
             'title' => $m->id ? 'Edit User: '.$m->username : 'Create New User',
         ));
+        $id = BRequest::i()->param('id', true);
+        if($id){
+            $args['view']->addTab("history", array('label' => BLocale::_("History")));
+        }
     }
 
     public function formPostBefore($args)
