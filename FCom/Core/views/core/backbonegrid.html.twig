@@ -193,7 +193,7 @@
 
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
-          print('<a class="btn btn-danger btn-xs btn-delete" >');
+          print('<a class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" >');
           print('<i class="icon-remove"></i>');
           print('</a>');
         }
@@ -251,9 +251,9 @@
 
 <script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
-    <% if (typeof(rc.sortable) == 'undefined') { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
+    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
       <%- rc.label %>
-    <% if (typeof(rc.sortable) == 'undefined') { %> </a> <% } %>
+    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %> </a> <% } %>
   <% } else if (rc.type === 'multiselect') { %>
    <% if (rc.selectedCount>0) { %>
       <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>

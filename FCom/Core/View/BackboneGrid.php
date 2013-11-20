@@ -231,7 +231,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
                     case 'delete':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>'btn grid-mass-delete btn-danger disabled', 'type'=>'button'),
+                            array('class'=>'btn grid-mass-delete btn-danger disabled'.((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : ''), 'type'=>'button'),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Delete')
                         ));
                         break;

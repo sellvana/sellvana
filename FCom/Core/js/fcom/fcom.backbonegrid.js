@@ -681,7 +681,12 @@ FCom.BackboneGrid = function(config) {
 
         },
         _deleteRow: function(ev) {
-            var confirm = window.confirm("Do you want to really delete?");
+            var confirm;
+            if ($(ev.target).hasClass('noconfirm'))
+                confirm = true;
+            else
+                confirm = window.confirm("Do you want to really delete?");
+
             if (confirm) {
                 rowsCollection.remove(this.model, {silent: true});
                 selectedRows.remove(this.model, {silent: true});
@@ -1434,8 +1439,12 @@ FCom.BackboneGrid = function(config) {
 
         if ($(BackboneGrid.MassDeleteButton).length > 0) {
             $(BackboneGrid.MassDeleteButton).on('click', function(){
+                var confirm;
+                if ($(this).hasClass('noconfirm'))
+                    confirm = true;
+                else
+                    confirm = window.confirm("Do you really want to delete selected rows?");
 
-                var confirm = window.confirm("Do you really want to delete selected rows?");
                 if (confirm) {
                     if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                         var ids = selectedRows.pluck('id').join(",");
