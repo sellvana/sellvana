@@ -18,7 +18,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id','label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true, 'hidden'=>true),
-                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>true)),
+                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>BApp::href('customfields/fieldsets/unique_set'))),
                     array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true, 'editable'=>true , 'validation'=>array('required'=>true)),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'fields...'), 'edit'=>true, 'delete'=>true))
@@ -114,7 +114,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true, 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true, 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true, 'unique'=>BApp::href('/customfields/fields/unique_field'))),
                     array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
                     array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
                     array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
@@ -334,5 +334,25 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         } else {
             BResponse::i()->redirect(BApp::href('customfields/customfield/form/?id='.$id));
         }
+    }
+
+    public function action_unique_field__POST()
+    {
+        $r = BRequest::i();
+        $p = $r->post();
+        $name = $p['name'];
+        $val = $p[$name];
+        $rows = BDb::many_as_array(FCom_CustomField_Model_Field::i()->orm()->where($name,$val)->find_many());
+        BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
+    }
+
+    public function action_unique_set__POST()
+    {
+        $r = BRequest::i();
+        $p = $r->post();
+        $name = $p['name'];
+        $val = $p[$name];
+        $rows = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm()->where($name,$val)->find_many());
+        BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
     }
 }

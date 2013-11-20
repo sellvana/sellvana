@@ -328,15 +328,36 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         });
     });
     var _mainForm = $('form:last');
+    setValidateForm($(_mainForm));
+    $('#field_code').rules("add", {
+        onfocusout: false,
+        onkeyup: false,
+        remote: {
+            url: '{{ APP.href('/customfields/fields/unique_field') | raw }}',
+            type: 'post',
+             data: {
+                name: 'field_code'
+            },
+            dataFilter: function (responseString) {
+                var response = jQuery.parseJSON(responseString);
+                currentMessage = response.Message;
+                return response.unique;
+            }
+        },
+        messages: {
+            remote: "This field code is already taken place"
+        }
+    });
     $('#btn_new_field').click(function() {
         $('div#prod-new-field-form').find('select, input').val('');
         $('#btn_show_modal').trigger('click');
-        setValidateForm($(_mainForm));
+
     });
 
     $('#btn-newfield-save').click(function() {
         if (!$(_mainForm).valid())
             return;
+
         var hash = {};
         $('#prod-new-field-form .form-control').each(function(index) {
             hash[$(this).attr('id')] = $(this).val();
@@ -355,7 +376,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             if (!flag)
                 add_option(field);
             $('#btn-newfield-close').trigger('click');
-
+            setCollection.trigger('change');
         });
     });
     var CustomField = {
