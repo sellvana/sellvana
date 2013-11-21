@@ -4,7 +4,7 @@ base:
             - [ requireJs, fcom.catalog, @FCom_Catalog/Frontend/js/fcom.catalog ]
             - [ requireRun, fcom.catalog ]
 /:
-    - { hook: homepage-additional, views: catalog/homepage }
+    - { hook: homepage-additional, views: [ catalog/homepage, catalog/product/quickview ] }
 
 /catalog/category:
     - { include: base }

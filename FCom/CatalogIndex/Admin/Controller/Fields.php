@@ -35,6 +35,18 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         return $config;
     }
 
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+
+        $gridView = $this->view('admin/grid');
+        $actions = $gridView->get('actions');
+        $actions += array(
+            'reindex_force' => ' <button class="btn btn-primary" onclick="location.href=\''.BApp::href('catalogindex/reindex?CLEAR=1').'\'"><span>'.BLocale::_('Force Reindex').'</span></button>',
+        );
+        $gridView->set('actions', $actions);
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);

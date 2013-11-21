@@ -13,6 +13,7 @@ modules:
                 routing:
                     - [ get, /catalogindex/fields, FCom_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ any, /catalogindex/fields/.action, FCom_CatalogIndex_Admin_Controller_Fields ]
+                    - [ any, /catalogindex/reindex, FCom_CatalogIndex_Admin_Controller.reindex ]
 
             FCom_Frontend:
                 routing:

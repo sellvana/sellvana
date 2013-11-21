@@ -171,16 +171,16 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        $this->set('status', 'new', null);
-        $this->set('type', 'workflow', null);
-        $this->set('create_at', BDb::now(), null);
+        $this->set('status', 'new', 'IFNULL');
+        $this->set('type', 'workflow', 'IFNULL');
+        $this->set('create_at', BDb::now(), 'IFNULL');
 
         if (($userId = FCom_Admin_Model_User::i()->sessionUserId())) {
-            $this->set('action_user_id', $userId, null);
+            $this->set('action_user_id', $userId, 'IFNULL');
         }
 
         if (($custId = FCom_Customer_Model_Customer::i()->sessionUserId())) {
-            $this->set('customer_id', $userId, null);
+            $this->set('customer_id', $userId, 'IFNULL');
         }
 
         return true;
