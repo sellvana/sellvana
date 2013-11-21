@@ -5,7 +5,7 @@
       <h1 class="f-page-title">{{ 'Review and Place Order'|_ }}</h1>
     </header>
     <div class="row">
-      <form action="{{ APP.href('checkout') }}" method="post">
+      <form action="{{ APP.href('checkout') }}{{ REQUEST.get('guest') == 'yes' ? '?guest=yes' : '' }}" method="post">
       <div class="f-col-main col-sm-9">
           <div class="alert alert-info"><strong>{{ 'Review the information below then click "Place your order"!' |_ }}</strong></div>
 
@@ -111,6 +111,7 @@
           <p><strong><a href="{{APP.href('cart')}}">{{ "Need to change quantities or remove items?" |_ }}</a></strong></p>
 
           {% if THIS.get('guest_checkout') %}
+          {% set validator = THIS.validator('checkout-register', THIS.get('address')) %}
           <div class="form-group">
             <label for="#" class="checkbox">
               <input type="checkbox" name="create_account" value="1" class="required form-control">
@@ -120,19 +121,23 @@
           <div class="form-group">
             <label for="#" class="control-label">{{ 'E-mail' |_ }}</label>
             <div class="controls">
-              <input type="text" name="account[email]" value="{{ THIS.billing_address.email }}" class="required form-control">
+              <input type="text" id="account-email" name="account[email]" value="{{ THIS.billing_address.email }}" class="required form-control {{ validator.fieldClass('email') }}">
+                {{ validator.errorHtml("email", "account-email") | raw }}
             </div>
           </div>
           <div class="form-group">
             <label for="#" class="control-label">{{ "Password" |_ }}</label>
             <div class="controls">
-              <input type="password" name="account[password]" class="required form-control" id="model-password"/>
+              <input type="password" id="account-password" name="account[password]" class="required form-control {{ validator.fieldClass('password') }}"/>
+                {{ validator.errorHtml("password", "account-password") | raw }}
             </div>
           </div>
           <div class="form-group">
             <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
             <div class="controls">
-              <input type="password" name="account[password_confirm]" class="required form-control" equalto="#model-password"/>
+              <input type="password" id="account-password_confirm" name="account[password_confirm]"
+                     class="required form-control {{ validator.fieldClass('password_confirm') }}" equalto="#account-password"/>
+                {{ validator.errorHtml("password_confirm", "account-password_confirm") | raw }}
             </div>
           </div>
           {% endif %}
@@ -157,7 +162,7 @@
               </table>
             {% endif %}
             <ul class="f-cart-btn-group">
-                <li><button type="submit" name="place_order" value="new_order" class="btn btn-primary btn-lg">{{ "Place your order" |_ }}</span></li>
+                <li><input type="submit" name="place_order" value="new_order" class="btn btn-primary btn-lg">{{ "Place your order" |_ }}</li>
             </ul>
         </div>
         <!-- /.f-col-sidebar -->

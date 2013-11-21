@@ -678,9 +678,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
 
         function wysiwygCreate(id) {
-            console.log('1=',!editors[id]);
-            console.log('2=',CKEDITOR !== 'undefined');
-            console.log('3=',!CKEDITOR.instances[id]);
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
                 console.log(id,'wysiwygcreate');
                 editors[id] = true; // prevent double loading

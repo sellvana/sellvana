@@ -6,8 +6,8 @@ use Behat\Behat\Context\ClosuredContextInterface,
     Behat\Behat\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
-
 use Behat\MinkExtension\Context\MinkContext;
+
 //
 // Require 3rd-party libraries here:
 //
@@ -28,15 +28,72 @@ class FeatureContext extends MinkContext
      */
     public function __construct(array $parameters)
     {
-        // Initialize your context here
+        $this->baseUrl = $this->getMinkParameter('base_url');
+    }
+
+    protected $baseUrl;
+
+    /**
+     * @Given /^I am logged in admin$/
+     */
+    public function iAmLoggedInAdmin()
+    {
+        $session       = $this->getSession();
+        $this->baseUrl = $this->getMinkParameter('base_url');
+//        $session->visit($this->baseUrl);
+        $session->visit($this->baseUrl . "/admin");
+        $page    = $session->getPage();
+        $content = $page->getContent();
+
+//        echo $this->baseUrl;
+        if (strpos($content, "Forgot your password?") === false) {
+            echo "Logged in\n";
+            return true;
+        } else {
+            echo "Have to login\n";
+        }
+
+        $userName = $page->findField('login[username]');
+        $login    = $page->findField('login[password]');
+
+        $userName->setValue('admin');
+        $login->setValue('admin123');
+        $page->findButton('Sign in')->press();
     }
 
     /**
-     * @Given /^I wait for the suggestion box to appear$/
+     * @Given /^I am not logged in$/
      */
-    public function iWaitForTheSuggestionBoxToAppear()
+    public function iAmNotLoggedIn()
     {
-        $this->getSession()->wait(5000, "$('.suggestions-results').children().length > 0" );
+        $session       = $this->getSession();
+        $this->baseUrl = $this->getMinkParameter('base_url');
+//        $session->visit($this->baseUrl);
+        $session->visit($this->baseUrl . "/admin");
+        $page    = $session->getPage();
+        $content = $page->getContent();
+        if (strpos($content, "Forgot your password?") === false) {
+            echo "Logged in\n";
+
+            $session->visit($this->baseUrl . "/admin/logout");
+        }
+    }
+
+    /**
+     * @Then /^"(?P<element>[^"]*)" should be disabled$/
+     */
+    public function shouldBeDisabled($element)
+    {
+        echo $element;
+        $page  = $this->getSession()->getPage();
+        $field = $page->findField($element);
+        if (!$field) {
+            throw new \Behat\Mink\Exception\ElementNotFoundException($element . " not found.");
+        }
+        $attribute = $field->getAttribute('disabled');
+        if (!$attribute) {
+            throw new \Exception("Not disabled.");
+        }
     }
 
 }
