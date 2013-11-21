@@ -1,5 +1,27 @@
 {% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
+<a class="btn btn-success" role="button" href="#prod-field-lang" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
+<div id="prod-field-lang" class="modal fade in" tabindex='-1'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title" id="myLangLabel"></h4>
+            </div>
+
+            <div class="modal-body">
+                <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+                        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
+                <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
 <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
     <div class="modal-dialog">
@@ -179,6 +201,12 @@
                 <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
                     <i class="icon-remove"></i>
                 </a>
+                &nbsp;&nbsp;&nbsp;
+                <% if (rc.multilang === '1') { %>
+                    <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
+                        Translate...
+                    </a>
+                <% } %>
             </div>
         </script>
 </div>
@@ -424,10 +452,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var CustomField = {
         Models: {},
         Collections: {},
-        Views: {}
+        Views: {},
+        Langs: ['en_US', 'de_DE']
     };
-
-
 
     CustomField.Models.Field = Backbone.Model.extend({
         defaults: {
@@ -478,7 +505,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         template: _.template($('#field-template').html()),
         events: function (){
-            var hash = {'click a.field-remove': '_remove'};
+            var hash = {
+                    'click a.field-remove': '_remove',
+                    'click a.multilang': '_showLangModal'
+                };
             switch (this.model.get('admin_input_type')) {
                 case 'multiselect':
                 case 'select':
@@ -490,6 +520,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     hash['change input[type="text"]'] = '_changeVal';
             }
             return hash;
+        },
+        _showLangModal: function() {
+            CustomField.currentFieldView = this;
+            $('#myLangLabel').html(this.model.get('field_name'));
+            $('#btn_show_lang').trigger('click');
+        },
+        _langAdded: function(lang) {
+            var langs = this.model.get('langs');
+
         },
         _changeCheckbox: function() {
             var val = this.$el.find('input[type="hidden"]').val();
@@ -676,15 +715,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $('#btn_add_field').css('display', 'block');
         }
 
-        $( ".box-content" ).sortable({
+        $( ".prod-fieldset .box-content" ).sortable({
             revert: true,
-            connectWith: ".box-content"
+            connectWith: ".prod-fieldset .box-content"
         });
     });
 
-    $( ".box-content" ).sortable({
+    $( ".prod-fieldset .box-content" ).sortable({
         revert: true,
-        connectWith: ".box-content"
+        connectWith: ".prod-fieldset .box-content"
     });
 
 });

@@ -1161,6 +1161,10 @@ FCom.BackboneGrid = function(config) {
             if (model.has(this.modalType) && model.get(this.modalType)) {
                 var elementView = new BackboneGrid.Views.ModalElement({model: model});
                 this.$el.append(elementView.render().el);
+
+                if(this.modalType === 'mass-editable') {
+                    elementView.$el.find('#'+model.get('name')).removeAttr('data-rule-required');
+                }
             }
         }
     });
