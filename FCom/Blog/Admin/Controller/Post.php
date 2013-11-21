@@ -16,7 +16,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID'),
-            array('name' => 'firstname', 'label'=>'Author'), //todo: add author with name join by firstname, lastname
+            array('name' => 'author', 'label'=>'Author'), //todo: add author with name join by firstname, lastname
             array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
                   'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
             array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
@@ -32,8 +32,8 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
         $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
             ->select('p.*')
-            ->join('FCom_Admin_Model_User', array('p.author_user_id','=','u.id'), 'u')
-            ->select('u.firstname');
+            ->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
+            ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
         $config['actions'] = array(
             'edit' => true,
             'delete' => true
