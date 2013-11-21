@@ -193,7 +193,7 @@
 
                         break;
                     case 'boolean':
-                        print('<input type="hidden" id="check" name="check" value="'+rc.value+'" /><input class="switch-cbx" id="ch" name="ch" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+                        print('<input type="hidden" id="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
                         break;
                 } %>
@@ -203,9 +203,9 @@
                     <i class="icon-remove"></i>
                 </a>
                 &nbsp;
-                <a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
+                <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
                     <i class="icon-refresh"></i>
-                </a>
+                </a-->
                 &nbsp;&nbsp;&nbsp;
                 <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
                     <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
@@ -352,7 +352,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var _mainForm = $('form:last');
 
     $(_mainForm).submit(function(ev) {
-
         setCollection.each(function(set) {
             set.fields.each(function(field) {
                 if (field.wysiwyg) {
@@ -386,8 +385,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
         setCollection.each(function(set) {
             set.fields.sort();
-        })
-
+        });
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
 
         return true;
@@ -477,7 +475,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             position: 0
         },
         initialize: function(config) {
-            this.langFields = new CustomField.Collections.LangFieldCollection(typeof(config.langFields) !== 'undefined' ? config.langFields : {});
+            if (typeof(config) === 'undefined') {
+                this.langFields = new CustomField.Collections.LangFieldCollection();
+                return;
+            }
+            this.langFields = new CustomField.Collections.LangFieldCollection((typeof(config.langFields) !== 'undefined') ? config.langFields : undefined);
             if (typeof(config.langFields) !== 'undefined')
                 delete this.attributes['langFields'];
         },
@@ -502,14 +504,18 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             collapsed: false
         },
         initialize: function(config) {
-            this.fields = new CustomField.Collections.FieldCollection(typeof(config.fields) !== 'undefined' ? config.fields : {})
+            if (typeof(config) === 'undefined') {
+                this.fields = new CustomField.Collections.FieldCollection();
+                return;
+            }
+            this.fields = new CustomField.Collections.FieldCollection((typeof(config.fields) !== 'undefined') ? config.fields : undefined)
             if (typeof(config.fields) !== 'undefined')
                 delete this.attributes['fields'];
         },
         parse: function(response) {
-            console.log(parse);
             this.fields.set(response.fields);
             delete response.fields;
+
             return response;
         },
         toJSON: function() {
@@ -549,8 +555,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             }
         },
+        getWYSIWYG: function() {
+            var id = this.$el.find('textarea').attr('id');
+            var self = this;
+            return CKEDITOR.instances[id];
+
+        },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
+            this.model.view = this;
 
             return this;
         }
@@ -738,13 +751,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
                     break;
                 case 'boolean':
-                    adminForm.createSwitchButton();
                     field.switch = true;
+                    fieldView.$el.find('.switch-cbx:last').wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+
                     break;
                 case 'wysiwyg':
-                    adminForm.wysiwygInit();
                     field.wysiwyg = true;
-                    console.log(field.wysiwyg);
+                    adminForm.wysiwygInit();
+
                     break;
             }
 
@@ -754,6 +768,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.model.fields.each(this._addField, this);
+
             return this;
         }
     });
