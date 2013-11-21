@@ -10,11 +10,12 @@
             </div>
 
             <div class="modal-body">
-
+                <select id="sel_locale" class="form-control select2">
+                </select>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
-                <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
+                <button class="btn btn-primary save" type="button" id="btn-add-locale">Add Locale</button>
             </div>
         </div>
     </div>
@@ -163,8 +164,10 @@
             </div>
         </script>
 
+
         <script type="template" id="field-template">
-            <label class="col-md-3 control-label" for="prod-review-text"><%- rc.field_name %></label>
+        <div class="row">
+            <label class="col-md-3 control-label" for="prod-review-text"><%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %></label>
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
@@ -199,12 +202,44 @@
                 <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
                     <i class="icon-remove"></i>
                 </a>
+                &nbsp;
+                <a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
+                    <i class="icon-refresh"></i>
+                </a>
                 &nbsp;&nbsp;&nbsp;
-                <% if (rc.multilang === '1') { %>
+                <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
                     <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
                         Translate...
                     </a>
                 <% } %>
+            </div>
+        </div>
+        </script>
+
+        <script type="template" id="lang-field-template">
+            <div class="col-md-3 control-label">
+                <span class="badge badge-default"><%- rc.lang_code %></span>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+                <% switch(rc.admin_input_type) {
+                    case 'text':
+                        print('<input id="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+
+                        break;
+                    case 'textarea':
+                        print('<textarea id="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+
+                        break;
+                    case 'wysiwyg':
+                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+
+                        break;
+                } %>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+                <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
+                    <i class="icon-remove"></i>
+                </a>
             </div>
         </script>
 </div>
@@ -237,36 +272,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     };
     var currentSet = null;
     var initialData = {{ ctrl.getInitialData(model.id) | raw }};
-    /*$('#btn_fields_reset').click(function() {
-        var c = confirm('Are you sure to reset?');
-        if(c) {
-            setCollection.reset();
-            mainView.render();
-        }
-    });
-
-    $('#btn_fields.delete').click(function() {
-        var c = confirm('Are you sure to delete?');
-        if(c) {
-            setCollection.reset();
-            mainView.render();
-        }
-    });**/
-
-    /*$('#btn_fields_save').click(function() {
-        var str = JSON.stringify(setCollection.toJSON());
-        $.post('{{ APP.href('/customfields/products/save') | raw }}',
-                {
-                    id: {{ model.id }},
-                    json: str
-                },
-                function(res) {
-                    if(typeof(res.status) !== 'undefined') {
-                        $.bootstrapGrowl(res.status, { type:'success', align:'center', width:'auto' });
-                    }
-                }
-        );
-    });*/
 
     function refresh_selects()
     {
@@ -318,17 +323,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
              .text(field.get('field_name')));
     }
     $('#btn_add_set').click(function() {
-
-        /*setCollection.each(function(set) {
-            set.set('collapsed', true);
-        });*/
         var setId = $('#sel_sets').val();
         var newSet = new CustomField.Models.FieldSet();
         newSet.url = '{{ APP.href('/customfields/products/get_fieldset?id=') | raw }}'+setId;
         newSet.fetch({
             success: function() {
                 setCollection.add(newSet);
-                //currentSet = newSet;
                 remove_options(newSet);
                 refresh_selects();
             }
@@ -339,7 +339,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     });
 
     $('#btn_add_field').click(function() {
-        //if (currentSet === null) return;
         var fieldId = $('#sel_fields').val();
         var newField = new CustomField.Models.Field();
         newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
@@ -347,12 +346,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             success: function() {
                 var set = setCollection.at(0);
                 set.fields.add(newField);
-                /*setCollection.each(function(set) {
-                    if (set.get('collapsed') === false) {
-                        set.fields.add(newField);
-                    }
-                });*/
-                //setCollection.trigger('change');
             }
         });
     });
@@ -371,7 +364,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     var s = field.view.getSwitch();
                     field.set('value', s.hasClass('switch-on') ? '1' : '0');
                 }
-
+                field.langFields.each(function(langField) {
+                    if (langField.wysiwyg) {
+                        var w = langField.view.getWYSIWYG();
+                        langField.set('value', w.getData());
+                    }
+                });
                 var position = field.view.$el.index();
                 field.set('position', position);
 
@@ -447,20 +445,48 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             //setCollection.trigger('change');
         });
     });
+
+    $('#btn-add-locale').click(function() {
+        var val = $('#sel_locale').val();
+        if (val === '')
+            return;
+
+        CustomField.currentFieldView.addLangField(val);
+    });
     var CustomField = {
         Models: {},
         Collections: {},
         Views: {},
-        Langs: ['en_US', 'de_DE']
+        Langs: ['en_US', 'de_DE', 'zh-CN', 'fr-FR', 'nl_NL']
     };
+
+    CustomField.Models.LangField = Backbone.Model.extend({
+        defaults: {
+            value: '',
+            lang_code: ''
+        }
+    });
+
+    CustomField.Collections.LangFieldCollection = Backbone.Collection.extend({
+        model: CustomField.Models.LangField
+    });
 
     CustomField.Models.Field = Backbone.Model.extend({
         defaults: {
             value: '',
             position: 0
         },
-        intialize: function() {
-            this.set('admin_input_type', this.get('admin_input_type').replace(' ',''));
+        initialize: function(config) {
+            this.langFields = new CustomField.Collections.LangFieldCollection(typeof(config.langFields) !== 'undefined' ? config.langFields : {});
+            if (typeof(config.langFields) !== 'undefined')
+                delete this.attributes['langFields'];
+        },
+        toJSON: function() {
+            var hash = Backbone.Model.prototype.toJSON.call(this);
+            if(typeof(this.langFields) !== 'undefined')
+                hash.langFields = this.langFields.toJSON();
+
+            return hash;
         }
     });
 
@@ -475,10 +501,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         defaults: {
             collapsed: false
         },
-        initialize: function(response) {
-            this.fields = new CustomField.Collections.FieldCollection()
+        initialize: function(config) {
+            this.fields = new CustomField.Collections.FieldCollection(typeof(config.fields) !== 'undefined' ? config.fields : {})
+            if (typeof(config.fields) !== 'undefined')
+                delete this.attributes['fields'];
         },
         parse: function(response) {
+            console.log(parse);
             this.fields.set(response.fields);
             delete response.fields;
             return response;
@@ -495,7 +524,37 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
         model: CustomField.Models.FieldSet
     });
+    CustomField.Views.LangFieldView = Backbone.View.extend({
+        className: 'row',
+        attributes: {
+            style: 'margin-top:3px;'
+        },
+        events: {
+            'click a.field-remove': '_remove',
+            'change input[type="text"],textarea': '_changeVal'
+        },
+        template: _.template($('#lang-field-template').html()),
+        _changeVal: function() {
+            var val = this.$el.find('input[type="text"],textarea').val();
+            this.model.set('value', val);
+        },
+        _remove: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                this.parentSet.langFields.remove(this.model);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
 
+            }
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+
+            return this;
+        }
+    });
     CustomField.Views.FieldView = Backbone.View.extend({
         className: 'form-group',
         attributes: function() {
@@ -505,6 +564,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         events: function (){
             var hash = {
                     'click a.field-remove': '_remove',
+                    'click a.field-refresh': '_refresh',
                     'click a.multilang': '_showLangModal'
                 };
             switch (this.model.get('admin_input_type')) {
@@ -519,14 +579,41 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
             return hash;
         },
+        initialize: function() {
+            this.model.langFields.on('add', this._addLangView, this);
+        },
+        _refresh: function() {
+            this.model.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+this.model.get('id');
+            var self = this;
+            this.model.fetch({
+                success: function() {
+                    self.render();
+                }
+            });
+        },
         _showLangModal: function() {
             CustomField.currentFieldView = this;
+
+            var langFields = this.model.langFields;
+            console.log(langFields);
+            var langs = _.clone(CustomField.Langs);
+            langFields.each(function(langField) {
+                langs = _.difference(langs, [langField.get('lang_code')]);
+            });
+
+            if (langs.length === 0)
+                return;
+
+            var html = '';
+            for(var i in langs) {
+                html+= '<option value="'+langs[i]+'">'+langs[i]+'</option>';
+            }
+            $('#sel_locale').html(html);
+            $('#sel_locale').select2();
+            $('#sel_locale').val('');
+
             $('#myLangLabel').html(this.model.get('field_name'));
             $('#btn_show_lang').trigger('click');
-        },
-        _langAdded: function(lang) {
-            var langs = this.model.get('langs');
-
         },
         _changeCheckbox: function() {
             var val = this.$el.find('input[type="hidden"]').val();
@@ -551,10 +638,19 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
-                //setCollection.trigger('change');
-
 
             }
+        },
+        _addLangView: function(langField) {
+            var langView = new CustomField.Views.LangFieldView({model: langField});
+            this.$el.append(langView.render().el);
+
+            if (langField.get('admin_input_type') === 'wysiwyg') {
+                    adminForm.wysiwygInit();
+                    langField.wysiwyg = true;
+            }
+
+            langView.parentSet = this.model;
         },
         getWYSIWYG: function() {
             var id = this.$el.find('textarea').attr('id');
@@ -565,9 +661,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         getSwitch: function() {
             return this.$el.find('input[type="checkbox"]').parent();
         },
+        addLangField: function(lang_code) {
+            var langField = new CustomField.Models.LangField({value: '', lang_code: lang_code, admin_input_type: this.model.get('admin_input_type')});
 
+            this.model.langFields.add(langField);
+            $('#btn-locale-close').trigger('click');
+        },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
+            this.model.langFields.each(this._addLangView, this);
             this.model.view = this;
             return this;
         }
@@ -678,11 +780,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     if (initialData !== -1) {
         for(var i in initialData) {
             var set = initialData[i];
-            var fields = _.clone(set.fields);
-            delete set.fields;
+            //var fields = _.clone(set.fields);
+            //delete set.fields;
             var setModel = new CustomField.Models.FieldSet(set);
-            //setModel.set('collapsed', true);
-            setModel.fields.set(fields);
+            //setModel.fields.set(fields);
             setCollection.add(setModel);
             remove_options(setModel);
 
@@ -691,10 +792,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     }
 
     refresh_selects();
-    /*if (setModel !== null) {
-        currentSet = setModel;
-        setModel.set('collapsed', false);
-    }*/
 
     var mainView = new CustomField.Views.MainView({collection: setCollection});
     mainView.render();
