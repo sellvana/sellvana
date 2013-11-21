@@ -1,16 +1,3 @@
-<script>
-require(['jquery', 'underscrore', 'backbone'], function($, _, Backbone) {
-    var allFields = {{ UTIL.toJson(APP.instance('FCom_CustomFields_Model_Field')) }}
-})
-</script>
-
-<div id="product-edit-variants-container">
-    <select name="variants[cur_fields]" id="variants-cur-fields">
-    </select>
-
-    <button id="variants-field-remove">Remove</button>
-    <select name="variants[avail_fields]" id="variants-avail-fields">
-
-    </select>
-    <button id="variants-field-add">Add</button>
-</div>
+<select id="sel_field">
+    {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
+</select>
