@@ -325,7 +325,7 @@ form:
       set: { tab_view_prefix: users-form/ }
       do:
         - [ addTab, main, { label: General Info } ]
-        - [ addTab, history, { label: History } ]
+#        - [ addTab, history, { label: History } ]
 
 /roles:
     - { include: base }
