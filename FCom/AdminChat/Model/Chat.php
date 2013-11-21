@@ -133,8 +133,8 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        $this->set('status', 'active', null);
-        $this->set('create_at', BDb::now(), null);
+        $this->set('status', 'active', 'IFNULL');
+        $this->set('create_at', BDb::now(), 'IFNULL');
         $this->set('update_at', BDb::now());
 
         return true;
