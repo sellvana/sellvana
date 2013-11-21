@@ -10,10 +10,8 @@
             {{ THIS.view('admin/nav') | raw }}
             <section id="content">
                 <div class="container f-admin-main" id="main-container">
-                    <div class="row" id="content-wrapper">
-                        <div class="col-xs-12">
-                            {{ THIS.hook('main')|raw }}
-                        </div>
+                    <div id="content-wrapper">
+                        {{ THIS.hook('main')|raw }}
                     </div>
                 </div>
             </section>

@@ -4,7 +4,7 @@
     require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter', 'jquery.equalHeights'], function($) {
         $(function() {
             /*
-            $('.fcom-admin-nav-sidebar').resizable({
+            $('.f-admin-nav-sidebar').resizable({
                 handles: 'e',
                 resize: function(ev, ui) {
                     $('#categories-layout').css('padding-left', ui.size.width+'px');
@@ -17,7 +17,7 @@
             categoriesLayoutEl.split({
                 orientation: 'vertical',
                 limit: 2,
-                position: '25%'
+                position: '20%'
             });
             $(window).resize(function(){
                 categoriesLayoutEl.trigger('spliter.resize');
@@ -79,30 +79,18 @@
     })
 </script>
 
-
-<div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-list-ul"></i>
-                <span>{{ "Categories" |_ }}</span>
-                {#<input class="entypo lock" id="categories-tree-lock" type="checkbox"/>#}
-            </h1>
-        </div>
-    </div>
-</div>
-
-<div class="box col-sm-12 fcom-tree-layout">
-    <div class="fcom-admin-main-container fcom-admin-sidebar-view box-content row clearfix" id="categories-layout" style="min-height: 900px;">
+<div class="f-tree-layout">
+    <div class="f-admin-main-container f-admin-sidebar-view clearfix" id="categories-layout" style="min-height: 900px;">
         <div id="categories-wrapper" class="clearfix">
-            <div class="text-center well-sm">
-                <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
-                <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
+            <div class="tree-header">{{ "Categories" |_ }}</div>
+            <div class="text-center">
+                <a class="js-expand-all btn btn-link" href="#">{{ "Expand All"|_ }}</a>
+                <a class="js-collapse-all btn btn-link" href="#">{{ "Collapse All"|_ }}</a>
             </div>
-            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-xs-12" id="categories"></div>
+            <div class="f-admin-nav-sidebar f-admin-tree-sidebar" id="categories"></div>
         </div>
         <form class="form form-horizontal clearfix" id="categories-tree-form" action="{{ formUrl }}" method="post">
-            <div id="categories-form-container" class="col-xs-12"></div>
+            <div id="categories-form-container"></div>
         </form>
     </div>
 </div>
