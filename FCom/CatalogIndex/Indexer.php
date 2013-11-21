@@ -20,7 +20,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                     //->offset($start)
                     ->find_many();
                 static::indexProducts($products);
-                echo 'DONE CHUNK '.($i++).': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).' - '.(time()-$t).'<hr>';
+                echo 'DONE CHUNK '.($i++).': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).' - '.(time()-$t)."s\n";
                 $t = time();
                 //$start += static::$_maxChunkSize;
             } while (sizeof($products)==static::$_maxChunkSize);
@@ -38,7 +38,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i=>$chunk) {
                 static::indexProducts($chunk);
-                echo 'DONE CHUNK '.$i.': '.memory_get_usage(true).' / '.memory_get_peak_usage(true).'<hr>';
+                echo 'DONE CHUNK '.$i.': '.memory_get_usage(true).' / '.memory_get_peak_usage(true)."\n";
             }
             return;
         }
