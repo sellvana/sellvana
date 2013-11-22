@@ -324,6 +324,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
         $this->processCustomFieldPost($model, $data);
+        $this->processVariantPost($model, $data);
     }
 
     public function processCategoriesPost($model)
@@ -477,6 +478,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $row->_data_serialized = $json;
             $row->save();
          }
+    }
+
+    public function processVariantPost($model, $data)
+    {
+        $arr = json_decode($model->data_serialized, true);
+        $arr['variants_fields'] = json_decode($data['vfields'], true);
+        $arr['variants'] = json_decode($data['variants'], true);
+        $model->data_serialized = json_encode($arr);
+        $model->save();
     }
 
     public function onMediaGridConfig($args)
