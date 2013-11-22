@@ -23,6 +23,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'grandtotal', 'label'=>'GT (base)', 'index'=>'o.grandtotal'),
             array('name' => 'balance', 'label'=>'GT (paid)', 'index'=>'o.balance'),
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
+            //todo: confirm with Boris about status should be stored as id_status
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
         );
         $config['filters'] = array(
@@ -32,24 +33,34 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'grandtotal', 'type' => 'text'), //todo: filter type compare, eg: > 1000
             array('field' => 'status', 'type' => 'select'),
         );
+
+        //todo: check this in FCom_Admin_Controller_Abstract_GridForm
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
         return $config;
     }
 
+    /**
+     * @param $orm BORM
+     */
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
 
         $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = ab.order_id and ab.atype="billing"', 'ab') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", ab.firstname,ab.lastname)','billing_name')
-            ->select_expr('CONCAT_WS(" \n", ab.street1,ab.city,ab.country,ab.phone)','billing_address')
-        ;
+            ->select_expr('CONCAT_WS(" \n", ab.street1,ab.city,ab.country,ab.phone)','billing_address');
+
         $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
-            ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address')
-        ;
+            ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address');
+
         $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os')
-            ->select(array('os_name' => 'os.name'))
-        ;
+            ->select(array('os_name' => 'os.name'));
     }
 
     public function gridViewBefore($args)
