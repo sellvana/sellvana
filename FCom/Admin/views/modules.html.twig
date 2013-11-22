@@ -63,6 +63,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
         }
+        console.log(ev.rows);
         for (var i in ev.rows) {
             var data = {
                 module_name: ev.rows[i].name,
