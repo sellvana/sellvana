@@ -8,6 +8,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_gridTitle = 'Customers';
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
+    protected $_formViewName = 'customer/form';
 
     public function gridConfig()
     {
@@ -25,8 +26,25 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
             array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );
-        $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
+        $config['actions'] = array(
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'email', 'type' => 'text'),
+            array('field' => 'country', 'type' => 'select'),
+        );
+        //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
+        //todo: check this in FCom_Admin_Controller_Abstract_GridForm
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
         return $config;
     }
 

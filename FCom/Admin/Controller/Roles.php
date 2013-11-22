@@ -9,11 +9,21 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Roles and Permissions';
     protected $_recordName = 'Role';
 
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            'role_name' => array('label'=>'Role Name', 'width'=>100),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'role_name', 'label'=>'Role Name', 'width'=>100, 'href' => BApp::href($this->_formHref.'?id=:id')),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+        );
+        $config['actions'] = array(
+            'delete' => true,
+        );
+        $config['filters'] = array(
+            array('field' => 'role_name', 'type' => 'text'),
         );
         return $config;
     }
