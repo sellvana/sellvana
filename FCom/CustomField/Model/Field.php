@@ -160,9 +160,8 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $fields = BDb::many_as_array($this->orm()->where('admin_input_type','select')->find_many());
         $res = array();
         foreach($fields as $field) {
-            $res[] = array($field['field_code']=>$field['field_name']);
+            $res[$field['id']] = $field['field_name'];
         }
-        print_r($res);exit;
         return $res;
     }
 }

@@ -330,7 +330,7 @@ FCom.BackboneGrid = function(config) {
         destroy: function() {
             var id = this.get('id');
             if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('delete') !== -1) {
-                var ev = {grid: BackboneGrid.id, id: id};
+                var ev = {grid: BackboneGrid.id, id: id, row: this.toJSON()};
                 g_vent.trigger('delete', ev);
             }
 
@@ -1570,6 +1570,14 @@ FCom.BackboneGrid = function(config) {
             g_vent.bind('get_rows', function (ev) {
                 if(ev.grid === config.id) {
                     ev.callback(rowsCollection.toJSON());
+                }
+            });
+        }
+
+        if (typeof(g_vent) !== 'undefined') {
+            g_vent.bind('get_collection', function (ev) {
+                if(ev.grid === config.id) {
+                    ev.callback(rowsCollection);
                 }
             });
         }
