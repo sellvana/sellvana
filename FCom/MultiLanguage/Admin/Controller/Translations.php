@@ -50,33 +50,33 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         return $config;
     }*/
 
-	public function gridConfig()
-	{
-		$config = parent::gridConfig();
-		$config['columns'] = array(
-			array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-			array('name' => 'module', 'label'=>'Module', 'width'=>250, 'editable'=>true),
-			array('name' => 'locale', 'label'=>'Locale', 'width'=>50, 'editable'=>true),
-			array('name' => 'file', 'label'=>'File', 'width'=>60, 'editable'=>true),
-			array('name' => 'id', 'label'=>'Id', 'width'=>200)
-		);
+    public function gridConfig()
+    {
+        $config = parent::gridConfig();
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'module', 'label'=>'Module', 'width'=>250, 'editable'=>true),
+            array('name' => 'locale', 'label'=>'Locale', 'width'=>50, 'editable'=>true),
+            array('name' => 'file', 'label'=>'File', 'width'=>60, 'editable'=>true),
+            array('name' => 'id', 'label'=>'Id', 'width'=>200)
+        );
 
-		$data = array();
-		$modules = BModuleRegistry::i()->getAllModules();
-		foreach($modules as $module){
-			if (!empty($module->translations)) {
-				foreach($module->translations as $trlocale => $trfile) {
-					$data[] = array(
-						'module' => $module->name,
-						'locale' => $trlocale,
-						'file' => $trfile,
-						'id'=>$module->name.'/'.$trfile);
-				}
-			}
-		}
-		$config['data'] = $data;
-		return $config;
-	}
+        $data = array();
+        $modules = BModuleRegistry::i()->getAllModules();
+        foreach($modules as $module){
+            if (!empty($module->translations)) {
+                foreach($module->translations as $trlocale => $trfile) {
+                    $data[] = array(
+                        'module' => $module->name,
+                        'locale' => $trlocale,
+                        'file' => $trfile,
+                        'id'=>$module->name.'/'.$trfile);
+                }
+            }
+        }
+        $config['data'] = $data;
+        return $config;
+    }
 
     public function action_form()
     {
