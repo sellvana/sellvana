@@ -1,25 +1,6 @@
 {% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
-<a class="btn btn-success" role="button" href="#prod-field-lang" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
-<div id="prod-field-lang" class="modal fade in" tabindex='-1'>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                <h4 class="modal-title" id="myLangLabel"></h4>
-            </div>
 
-            <div class="modal-body">
-                <select id="sel_locale" class="form-control select2">
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
-                <button class="btn btn-primary save" type="button" id="btn-add-locale">Add Locale</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
 <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
@@ -200,20 +181,60 @@
             </div>
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
                 <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
-                    <i class="icon-remove"></i>
+                    <i class="                      icon-remove"></i>
                 </a>
                 &nbsp;
                 <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
                     <i class="icon-refresh"></i>
                 </a-->
-                &nbsp;&nbsp;&nbsp;
-                <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
-                    <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
-                        Translate...
-                    </a>
-                <% } %>
             </div>
         </div>
+        <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-9">
+                <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
+                    Set Locale Field Value
+                </a>
+            </div>
+        </div>
+        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
+        <div id="<%- rc.field_code+rc.id %>" class="modal fade in" tabindex='-1'>
+            <div class="modal-dialog" style="width:900px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                        <h4 class="modal-title" id="myLangLabel"><%= rc.field_name %></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <td>
+                                    <select class="sel_locale form-control select2" style="width:150px;">
+                                    <% var langs = rc.avail_langs;
+                                    for(var i in langs) {
+                                    %>
+                                        <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                    <% } %>
+                                    </select>
+                                    &nbsp;&nbsp;
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary save" type="button" id="btn-add-locale">Add Locale</button>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="lang_fields">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
         </script>
 
         <script type="template" id="lang-field-template">
@@ -223,16 +244,11 @@
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input id="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
-
+                        print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
-
-                        break;
                     case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
-
+                        print('<textarea id="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
                         break;
                 } %>
             </div>
@@ -261,10 +277,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 return t.parents(".controls").first().append(e);
               },
               highlight: function(e) {
-                return $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                    $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                    return $(e).closest('.help-block').css('display','block');
               },
               success: function(e) {
-                return e.closest(".form-group").removeClass("has-error");
+                    console.log(success);
+                    e.closest(".form-group").removeClass("has-error");
+                    return e.closest(".help-block").css('display','none');
               }
             });
           });
@@ -449,7 +468,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         if (val === '')
             return;
 
-        CustomField.currentFieldView.addLangField(val);
+        //CustomField.currentFieldView.addLangField(val);
     });
     var CustomField = {
         Models: {},
@@ -472,9 +491,16 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Models.Field = Backbone.Model.extend({
         defaults: {
             value: '',
-            position: 0
+            position: 0,
+            avail_langs: -1
         },
         initialize: function(config) {
+
+            var avail_langs = this.get('avail_langs');
+            if (avail_langs === -1) {
+                this.set('avail_langs', CustomField.Langs);
+            }
+
             if (typeof(config) === 'undefined') {
                 this.langFields = new CustomField.Collections.LangFieldCollection();
                 return;
@@ -578,7 +604,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var hash = {
                     'click a.field-remove': '_remove',
                     'click a.field-refresh': '_refresh',
-                    'click a.multilang': '_showLangModal'
+                    'click a.multilang': '_showLangModal',
+                    'click button.btn-close': '_checkLangFieldVals',
+                    'click button.save': '_addLangField'
                 };
             switch (this.model.get('admin_input_type')) {
                 case 'multiselect':
@@ -594,6 +622,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         initialize: function() {
             this.model.langFields.on('add', this._addLangView, this);
+            this.model.langFields.on('remove', this._removeLangView, this);
         },
         _refresh: function() {
             this.model.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+this.model.get('id');
@@ -604,8 +633,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 }
             });
         },
+
         _showLangModal: function() {
-            CustomField.currentFieldView = this;
+            //CustomField.currentFieldView = this;
 
             var langFields = this.model.langFields;
             console.log(langFields);
@@ -614,19 +644,37 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 langs = _.difference(langs, [langField.get('lang_code')]);
             });
 
-            if (langs.length === 0)
-                return;
-
-            var html = '';
-            for(var i in langs) {
-                html+= '<option value="'+langs[i]+'">'+langs[i]+'</option>';
-            }
-            $('#sel_locale').html(html);
-            $('#sel_locale').select2();
-            $('#sel_locale').val('');
-
             $('#myLangLabel').html(this.model.get('field_name'));
-            $('#btn_show_lang').trigger('click');
+            this.$el.find('.btn-show').trigger('click');
+        },
+        _updateLangTag: function() {
+            var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
+            var html = 'Set Locale...'
+            if(langs.length>0) {
+                html = langs.join(',');
+            }
+            this.$el.find('.multilang').html(html);
+            this.$el.find('select.sel_locale').select2();
+        },
+        _addLangField: function() {
+            var lang_code = this.$el.find('select.sel_locale').val();
+            var langField = new CustomField.Models.LangField({value: '', lang_code: lang_code, admin_input_type: this.model.get('admin_input_type')});
+
+            this.model.langFields.add(langField);
+            this.$el.find('select.sel_locale option[value="'+lang_code+'"]').remove();
+            this.model.set('avail_langs', _.difference(this.model.get('avail_langs'),[lang_code]));
+            //this.$el.find('.select2').select2();
+            //$('#btn-locale-close').trigger('click');
+            this._updateLangTag();
+        },
+        _removeLangView: function(langField) {
+            var lang_code = langField.get('lang_code');
+            var langs= this.model.get('avail_langs');
+            langs[langs.length] = lang_code;
+            this.model.set('avail_langs', langs);
+            this.$el.find('select.sel_locale').append('<option value="'+lang_code+'">'+lang_code+'</option>');
+            //this.$el.find('.select2').select2();
+            this._updateLangTag();
         },
         _changeCheckbox: function() {
             var val = this.$el.find('input[type="hidden"]').val();
@@ -656,11 +704,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _addLangView: function(langField) {
             var langView = new CustomField.Views.LangFieldView({model: langField});
-            this.$el.append(langView.render().el);
+            this.$el.find('div.lang_fields').append(langView.render().el);
 
             if (langField.get('admin_input_type') === 'wysiwyg') {
-                    adminForm.wysiwygInit();
-                    langField.wysiwyg = true;
+                adminForm.wysiwygInit();
+                langField.wysiwyg = true;
+
             }
 
             langView.parentSet = this.model;
@@ -674,16 +723,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         getSwitch: function() {
             return this.$el.find('input[type="checkbox"]').parent();
         },
-        addLangField: function(lang_code) {
-            var langField = new CustomField.Models.LangField({value: '', lang_code: lang_code, admin_input_type: this.model.get('admin_input_type')});
 
-            this.model.langFields.add(langField);
-            $('#btn-locale-close').trigger('click');
-        },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.model.langFields.each(this._addLangView, this);
             this.model.view = this;
+
+            //this.$el.find('.select2').select2();
+            this._updateLangTag();
             return this;
         }
     });
@@ -827,13 +874,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
         $( ".prod-fieldset .box-content" ).sortable({
             revert: true,
-            connectWith: ".prod-fieldset .box-content"
+            connectWith: ".prod-fieldset .box-content",
+            handle: '.control-label'
         });
     });
 
     $( ".prod-fieldset .box-content" ).sortable({
         revert: true,
-        connectWith: ".prod-fieldset .box-content"
+        connectWith: ".prod-fieldset .box-content",
+        handle: '.control-label'
     });
 
 });
