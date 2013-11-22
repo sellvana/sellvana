@@ -133,10 +133,10 @@
             <div class="box-header box-header-small green-background">
                 <div class="title"><%- rc.set_name %></div>
                 <div class="actions">
-                    <button class="btn box-remove btn-xs btn-link btn-remove" ><i class='icon-remove'></i>
+                    <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
                     </button>
 
-                    <button class="btn box-collapse btn-xs btn-link btn-edit"><i></i>
+                    <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
                     </button>
                 </div>
             </div>
@@ -756,7 +756,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         events: {
             'click a.btn-edit': '_showSelf',
-            'click a.btn-remove': '_removeSelf'
+            'click button.btn-remove': '_removeSelf'
         },
         _removeSelf: function() {
             var confirm = window.confirm("Do you want to really remove?");
