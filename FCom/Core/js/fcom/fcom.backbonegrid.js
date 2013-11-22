@@ -29,7 +29,7 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker'], function(Backbone, _, $, NProgress) {
 
 var setValidateForm = function(selector) {
     if (selector == null) {
@@ -922,8 +922,52 @@ FCom.BackboneGrid = function(config) {
             this._filter(filterVal);
             this.model.set('filterVal',filterVal);
             this.render();
-        },
+        }
 
+    });
+
+    BackboneGrid.Views.FilterDateCell = BackboneGrid.Views.FilterCell.extend({
+        events: {
+            'click input': 'preventDefault',
+            'click span.input-group-addon': 'dateCheck',
+            'click button.update': 'filter',
+            'click button.clear': '_closeFilter',
+            'keyup input': '_checkEnter'
+        },
+        _closeFilter: function(ev) {
+            this._filter(false);
+        },
+        _checkEnter: function(ev) {
+            var evt = ev || window.event;
+            var charCode = evt.keyCode || evt.which;
+            if (charCode === 13) {
+                this.$el.find('button.update').trigger('click');
+            }
+        },
+        dateCheck: function() {
+            return false;
+        },
+        filter: function() {
+            var field = this.model.get('name');
+            var filterVal = this.$el.find('input:first').val();
+            BackboneGrid.current_filters[field] = {val: filterVal};
+            this._filter(filterVal);
+            this.model.set('filterVal',filterVal);
+            this.render();
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.initDatepicker();
+            return this;
+        },
+        initDatepicker: function() {
+            if (jQuery().datetimepicker) {
+                this.$el.find('.datepicker').datetimepicker({
+                    pickTime: false,
+                    todayHighlight: true
+                });
+            }
+        }
     });
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
@@ -980,8 +1024,11 @@ FCom.BackboneGrid = function(config) {
             if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
                 var filterCell;
                 switch (model.get('filter_type')) {
-                    case 'text':
+                    case 'text':case 'number-range':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
+                        break;
+                    case 'date':
+                        filterCell = new BackboneGrid.Views.FilterDateCell({model:model});
                         break;
                     case 'multiselect': case 'select':
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
@@ -1243,6 +1290,7 @@ FCom.BackboneGrid = function(config) {
 
         //filtering settings
         BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#'+config.id+'-text-filter-template').html());
+        BackboneGrid.Views.FilterDateCell.prototype.template = _.template($('#'+config.id+'-date-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
