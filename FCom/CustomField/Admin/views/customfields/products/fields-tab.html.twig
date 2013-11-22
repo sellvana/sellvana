@@ -133,11 +133,11 @@
             <div class="box-header box-header-small green-background">
                 <div class="title"><%- rc.set_name %></div>
                 <div class="actions">
-                    <a class="btn box-remove btn-xs btn-link btn-remove" href="#"><i class='icon-remove'></i>
-                    </a>
+                    <button class="btn box-remove btn-xs btn-link btn-remove" ><i class='icon-remove'></i>
+                    </button>
 
-                    <a class="btn box-collapse btn-xs btn-link btn-edit" href="#"><i></i>
-                    </a>
+                    <button class="btn box-collapse btn-xs btn-link btn-edit"><i></i>
+                    </button>
                 </div>
             </div>
             <div class="box-content">
@@ -180,10 +180,10 @@
                 } %>
             </div>
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
+                <button class="btn btn-danger btn-xs field-remove"  style="margin-top: 5px;" type="button">
                     <i class="                      icon-remove"></i>
-                </a>
-                &nbsp;
+                </button>
+
                 <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
                     <i class="icon-refresh"></i>
                 </a-->
@@ -193,9 +193,9 @@
         <div class="row">
             <div class="col-md-3"></div>
             <div class="col-md-9">
-                <a class="btn btn-info btn-xs multilang" href="#" style="margin-top: 5px;">
+                <button class="btn btn-info btn-xs multilang" style="margin-top: 5px;" type="button">
                     Set Locale Field Value
-                </a>
+                </button>
             </div>
         </div>
         <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
@@ -218,14 +218,13 @@
                                         <option value="<%=langs[i] %>"><%=langs[i] %></option>
                                     <% } %>
                                     </select>
-                                    &nbsp;&nbsp;
                                 </td>
                                 <td>
                                     <button class="btn btn-primary save" type="button">Add Locale</button>
                                 </td>
                             </tr>
                         </table>
-                        <div class="lang_fields" style="max-height:700px; overflow: scroll;overflow-x: hidden;">
+                        <div class="lang_fields" style="max-height:700px; overflow-y: auto;overflow-x:hidden;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -250,14 +249,14 @@
                         print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
                         break;
                     case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
                         break;
                 } %>
             </div>
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                <a class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
+                <button class="btn btn-danger btn-xs field-remove" href="#" style="margin-top: 5px;">
                     <i class="icon-remove"></i>
-                </a>
+                </button>
             </div>
         </script>
 </div>
@@ -265,7 +264,7 @@
 
 <script>
 
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique', 'ckeditor'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
         if (selector == null) {
           selector = $(".validate-form");
@@ -558,7 +557,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             style: 'margin-top:3px;'
         },
         events: {
-            'click a.field-remove': '_remove',
+            'click button.field-remove': '_remove',
             'change input[type="text"],textarea': '_changeVal'
         },
         template: _.template($('#lang-field-template').html()),
@@ -598,9 +597,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         template: _.template($('#field-template').html()),
         events: function (){
             var hash = {
-                    'click a.field-remove': '_remove',
+                    'click button.field-remove': '_remove',
                     'click a.field-refresh': '_refresh',
-                    'click a.multilang': '_showLangModal',
+                    'click button.multilang': '_showLangModal',
                     'click button.btn-close': '_checkLangFieldVals',
                     'click button.save': '_addLangField'
                 };
@@ -642,6 +641,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             $('#myLangLabel').html(this.model.get('field_name'));
             this.$el.find('.btn-show').trigger('click');
+            //adminForm.wysiwygInit();
         },
         _updateLangTag: function() {
             var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
@@ -886,5 +886,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         handle: '.control-handle'
     });
 
+});
+
+$('body').on('click', 'a', function(e){
+    if( $(this).attr('href') === '#' ) {
+        alert('fwfwf');
+        e.preventDefault();
+        e.stopPropagation();
+
+        return false;
+    }
 });
 </script>
