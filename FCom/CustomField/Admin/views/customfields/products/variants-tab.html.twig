@@ -1,61 +1,153 @@
-{% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
-{% set fieldConfig = ctrl.variableFieldGridConfig(model) %}
-
-
-<select id="sel_field" style="width: 200px;">
+{% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
+{% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
+{% set variantConfig = ctrl.variantGridConfig(model) %}
+<table>
+<tr>
+<td>
+<select id="sel_var_field" style="width: 200px;">
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
 </select>
-<button class="btn btn-primary" id="btn_add_field" type="button">Add Field</button>
-<hr>
+</td>
+<td>
+<button class="btn btn-primary" id="btn_add_var_field" type="button">Add Field</button>
+</td>
+</tr>
+</table>
+
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-3">
         {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
     </div>
+    <div class="col-sm-7">
+        {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
+    </div>
 </div>
-<input type='hidden' id='vfield_ids' name='model[vfields_ids]' />
+
+<input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants' name='variants' />
 <script>
 require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $) {
-    var fieldCollection=null;
-    g_vent.trigger('get_collection',{'grid': 'variable-field-grid', callback: function(c){ fieldCollection = c;} });
+    var fieldCollection = null;
+    var vColsCollection = null;
+    var vRowsCollection = null;
+
+    g_vent.trigger('get_rows_collection',
+                    {
+                        'grid': 'variable-field-grid',
+                        callback: vFieldGridInit
+                    }
+                   );
+    g_vent.trigger('get_cols_collection', {'grid': 'variant-grid', callback: function(c){ vColsCollection = c;} });
+    g_vent.trigger('get_rows_collection', {'grid': 'variant-grid', callback: function(r){ vRowsCollection = r;} });
+    function resetSelect()
+    {
+        $('#sel_var_field').val('');
+        $('#sel_var_field').select2();
+    }
+
+    function vFieldGridInit(c)
+    {
+
+        fieldCollection = c;
+        var ids = fieldCollection.pluck('id');
+        for(var i in ids) {
+            $("#sel_var_field option[value='"+ids[i]+"']").remove();
+        }
+
+        resetSelect();
+    }
+
+
+
     $('form').submit(function(ev) {
-        $('input[id="vfield_ids"]').val(_.pluck(fieldCollection.toJSON(),'id'));
+
+        var variant_fields = [];
+        fieldCollection.each(function (f) {
+            variant_fields.push({id:f.get('id'), name: f.get('name')});
+        });
+        $('input[id="vfield_ids"]').val(JSON.stringify(variant_fields));
+
+        var variants = [];
+        vRowsCollection.each(function (row) {
+            var variant = {};
+            variant.sku = row.get('sku');
+            variant.price = row.get('price');
+
+            var fvals = {};
+            fieldCollection.each(function (f) {
+                var key = f.get('name');
+                fvals[key] = row.get(key);
+            });
+            variant.fields = fvals;
+            variants.push(variant);
+        });
+        $('input[id="variants"]').val(JSON.stringify(variants));
 
         return true;
     });
-    function resetSelect()
-    {
-        $('#sel_field').val('');
-        $('#sel_field').select2();
-    }
 
-    resetSelect();
-
-    $('#btn_add_field').click(function() {
-        var val = $('#sel_field').val();
-        console.log(val);
-        if(val === '')
+    $('#btn_add_var_field').click(function() {
+        var val = $('#sel_var_field').val();
+        if(!val)
             return;
-        var text = $("#sel_field option:selected").text();
-        g_vent.trigger('add_row', {grid: 'variable-field-grid', row: {id: val, field_name: text }});
-        $("#sel_field option[value='"+val+"']").remove();
+        var text = $("#sel_var_field option:selected").text();
+
+        fieldCollection.add({id: val, name: text });
+        fieldCollection.trigger('render');
+
+        $("#sel_var_field option[value='"+val+"']").remove();
         resetSelect();
-    });
 
+        $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}'+val,
+                function(response) {
+                    if (response.success) {
+                        vColsCollection.each(function(col) {
+                            if (col.get('position')>0)
+                                col.set(col.get('postion')+1);
+                        });
 
-    g_vent.bind('init',function(ev) {
-        if (ev.grid === 'variable-field-grid') {
-            for (var i in ev.ids) {
-                $("#sel_field option[value='"+ev.ids[i]+"']").remove();
-            }
-            resetSelect();
-        }
+                        vColsCollection.add({
+                                                name: text,
+                                                label: text,
+                                                width: 150,
+                                                editable: true,
+                                                addable: true,
+                                                'mass-ediatable': true,
+                                                position: 1,
+                                                validation:{required:true},
+                                                editor: 'select',
+                                                options: response.options
+                                            });
+
+                        vRowsCollection.each( function(row) { row.set(text, ''); } );
+                        vColsCollection.trigger('render');
+                        vRowsCollection.trigger('render');
+                    }
+                }
+        );
+
     });
 
     g_vent.bind('delete', function(ev) {
         if (ev.grid === 'variable-field-grid') {
-            var option = '<option value="'+ev.id+'">'+ev.row.field_name+'</option>';
-            $('#sel_field').append(option);
+            var option = '<option value="'+ev.id+'">'+ev.row.name+'</option>';
+            $('#sel_var_field').append(option);
             resetSelect();
+
+            var col = vColsCollection.findWhere({name: ev.row.name});
+            var delPos = col.get('position');
+            vColsCollection.each(function(c) {
+                if (c.get('position')>delPos) {
+                    c.set(col.get('position')-1);
+                }
+            });
+            vColsCollection.remove(col);
+            vRowsCollection.each(function(r) {
+                delete r.attributes[ev.row.name];
+            });
+
+            vColsCollection.trigger('render');
+            vRowsCollection.trigger('render');
         }
     });
 

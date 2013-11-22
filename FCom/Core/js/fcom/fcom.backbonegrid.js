@@ -276,6 +276,7 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.HeaderView = Backbone.View.extend({
         initialize: function() {
             this.collection.on('sort', this.render, this);
+            this.collection.on('render', this.render, this);
         },
         render: function() {
             //console.log('headerver_render');
@@ -716,6 +717,7 @@ FCom.BackboneGrid = function(config) {
       //  el: 'table tbody',
         initialize: function () {
             this.collection.on('reset', this.render, this);
+            this.collection.on('render', this.render, this);
         },
         updateColsAndRender: function() {
             this.render();
@@ -791,6 +793,7 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
         initialize: function() {
             this.setElement('#'+BackboneGrid.id+' .dd-list');
+            this.collection.on('render', this.render, this);
         },
         orderChanged: function(ev) {
             //console.log('orderChanged');
@@ -991,17 +994,8 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.ModalElement = Backbone.View.extend({
         className: 'form-group',
-        events: {
-            'change': '_setVal'
-        },
-        _setVal: function(ev) {
-            var key = $(ev.target).attr('id');
-            var val = $(ev.target).val();
-            BackboneGrid.modalElementVals[key] = val;
-        },
         render: function() {
-            this.$el.html(this.template({col:this.model.toJSON(), current:(BackboneGrid.currentRow !==false ? BackboneGrid.currentRow.toJSON() : false)}));
-
+            this.$el.html(this.template(this.model.toJSON()));
 
             return this;
         }
@@ -1011,14 +1005,14 @@ FCom.BackboneGrid = function(config) {
             this.modalType = 'mass-editable';
         },
         _saveChanges: function(ev) {
-            BackboneGrid.modalSaveClicked = false;
+            modalForm.$el.find('input, select').each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                BackboneGrid.modalElementVals[key] = val;
+            });
+            console.log(modalForm.formEl.valid());
             if (!modalForm.formEl.valid())
                 return;
-            /*if ($.active > 0)
-            {
-                BackboneGrid.modalSaveClicked = true;
-                return;
-            }*/
 
             for( var key in BackboneGrid.modalElementVals) {
                 if (BackboneGrid.modalElementVals[key] === '')
@@ -1119,7 +1113,9 @@ FCom.BackboneGrid = function(config) {
             BackboneGrid.modalElementVals = {};
             this.collection.each(this.addElementDiv, this);
 
-            if (this.modalType === 'addable' || this.modalType ==='mass-editable')
+            /*if (this.modalType === 'addable' || this.modalType ==='mass-editable')
+                $(BackboneGrid.modalFormId).find('select').val('');*/
+            if (this.modalType ==='mass-editable')
                 $(BackboneGrid.modalFormId).find('select').val('');
 
             this.formEl = this.$el.parents('form:first');
@@ -1157,13 +1153,18 @@ FCom.BackboneGrid = function(config) {
 
         },
         addElementDiv: function(model) {
-            console.log(model.get(this.modalType));
             if (model.has(this.modalType) && model.get(this.modalType)) {
                 var elementView = new BackboneGrid.Views.ModalElement({model: model});
                 this.$el.append(elementView.render().el);
 
                 if(this.modalType === 'mass-editable') {
                     elementView.$el.find('#'+model.get('name')).removeAttr('data-rule-required');
+                }
+
+                if (BackboneGrid.currentRow) {
+                    var name = model.get('name');
+                    var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
+                    this.$el.find('input,select:last').val(val);
                 }
             }
         }
@@ -1564,18 +1565,20 @@ FCom.BackboneGrid = function(config) {
 
                 }
             });
-        }
 
-        if (typeof(g_vent) !== 'undefined') {
             g_vent.bind('get_rows', function (ev) {
                 if(ev.grid === config.id) {
                     ev.callback(rowsCollection.toJSON());
                 }
             });
-        }
 
-        if (typeof(g_vent) !== 'undefined') {
-            g_vent.bind('get_collection', function (ev) {
+            g_vent.bind('get_cols_collection', function (ev) {
+                if(ev.grid === config.id) {
+                    ev.callback(columnsCollection);
+                }
+            });
+
+            g_vent.bind('get_rows_collection', function(ev) {
                 if(ev.grid === config.id) {
                     ev.callback(rowsCollection);
                 }

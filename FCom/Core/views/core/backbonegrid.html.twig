@@ -129,15 +129,15 @@
 
 <script type="template" id="{{ config.id }}-modal-element-template">
     <div class="control-label col-sm-3">
-      <label for="<%- rc.col.name %>"><%- rc.col.label%></label>
+      <label for="<%- rc.name %>"><%- rc.label%></label>
     </div>
     <div class="controls col-sm-8">
-      <% if (typeof(rc.col.editor) === 'undefined' || rc.col.editor ==='text') { %>
-        <input name="<%- rc.col.name %>" id="<%- rc.col.name %>" type="text" id="<%- rc.name %>" class="form-control" <%if (rc.current !== false){print(' value="'+rc.current[rc.col.name]+'"'); }%> <% print(validationRules(rc.col.validation)); %>>
-      <% } else if(rc.col.editor === 'select') { %>
-        <select name="<%- rc.col.name %>" id="<%- rc.col.name %>" class="form-control" <% print(validationRules(rc.col.validation)); %>>
-          <% for(var key in rc.col.options) { %>
-            <option value="<%- key %>" <%if (rc.current !== false && rc.current[rc.col.name] === key) print(' selected ') %>><%- rc.col.options[key] %></option>
+      <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
+        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation));%> >
+      <% } else if(rc.editor === 'select') { %>
+        <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
+          <% for(var key in rc.options) { %>
+            <option value="<%- key %>"><%- rc.options[key] %></option>
           <% } %>
         </select>
       <% } %>
