@@ -308,6 +308,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         fields.each(function(f) {
             $("#sel_fields option[value='"+f.get('id')+"']").remove();
         });
+        refresh_selects();
     }
 
     function add_options(set)
@@ -332,6 +333,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     function remove_option(field)
     {
         $("#sel_fields option[value='"+field.get('id')+"']").remove();
+        refresh_selects();
     }
 
     function add_option(field)
@@ -341,6 +343,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
              .append($("<option></option>")
              .attr("value",field.get('id'))
              .text(field.get('field_name')));
+        refresh_selects();
     }
     $('#btn_add_set').click(function() {
         var setId = $('#sel_sets').val();
@@ -350,7 +353,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             success: function() {
                 setCollection.add(newSet);
                 remove_options(newSet);
-                refresh_selects();
             }
         });
 
@@ -366,6 +368,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             success: function() {
                 var set = setCollection.at(0);
                 set.fields.add(newField);
+                remove_option(newField);
             }
         });
     });
