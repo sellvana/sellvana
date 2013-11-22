@@ -148,7 +148,7 @@
 
         <script type="template" id="field-template">
         <div class="row">
-            <label class="col-md-3 control-label" for="prod-review-text"><%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %></label>
+            <label class="col-md-3 control-label control-handle" for="prod-review-text"><%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %></label>
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
@@ -221,11 +221,11 @@
                                     &nbsp;&nbsp;
                                 </td>
                                 <td>
-                                    <button class="btn btn-primary save" type="button" id="btn-add-locale">Add Locale</button>
+                                    <button class="btn btn-primary save" type="button">Add Locale</button>
                                 </td>
                             </tr>
                         </table>
-                        <div class="lang_fields">
+                        <div class="lang_fields" style="max-height:700px; overflow: scroll;overflow-x: hidden;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -247,8 +247,10 @@
                         print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
                         break;
                     case 'textarea':
+                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                        break;
                     case 'wysiwyg':
-                        print('<textarea id="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
                         break;
                 } %>
             </div>
@@ -263,7 +265,7 @@
 
 <script>
 
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique', 'ckeditor'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
         if (selector == null) {
           selector = $(".validate-form");
@@ -463,13 +465,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         });
     });
 
-    $('#btn-add-locale').click(function() {
-        var val = $('#sel_locale').val();
-        if (val === '')
-            return;
 
-        //CustomField.currentFieldView.addLangField(val);
-    });
     var CustomField = {
         Models: {},
         Collections: {},
@@ -655,6 +651,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
             this.$el.find('.multilang').html(html);
             this.$el.find('select.sel_locale').select2();
+            if(this.model.get('avail_langs').length === 0 ) {
+                this.$el.find('button.save').addClass('disabled');
+            } else {
+                this.$el.find('button.save').removeClass('disabled');
+            }
         },
         _addLangField: function() {
             var lang_code = this.$el.find('select.sel_locale').val();
@@ -711,7 +712,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 langField.wysiwyg = true;
 
             }
-
+            this.$el.find('div.lang_fields').css('max-height','500px;');
             langView.parentSet = this.model;
         },
         getWYSIWYG: function() {
@@ -875,14 +876,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $( ".prod-fieldset .box-content" ).sortable({
             revert: true,
             connectWith: ".prod-fieldset .box-content",
-            handle: '.control-label'
+            handle: '.control-handle'
         });
     });
 
     $( ".prod-fieldset .box-content" ).sortable({
         revert: true,
         connectWith: ".prod-fieldset .box-content",
-        handle: '.control-label'
+        handle: '.control-handle'
     });
 
 });

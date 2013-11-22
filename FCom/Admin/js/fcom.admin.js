@@ -1059,6 +1059,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
 
         if (typeof CKEDITOR !== 'undefined') {
             CKEDITOR.config.autoUpdateElement = true;
+            CKEDITOR.config.toolbarCanCollapse = true;
             CKEDITOR.config.toolbarStartupExpanded = false;
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
             //CKEDITOR.config.filebrowserUploadUrl = '/';
