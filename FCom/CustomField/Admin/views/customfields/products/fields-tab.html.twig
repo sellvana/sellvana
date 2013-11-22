@@ -225,7 +225,7 @@
                                 </td>
                             </tr>
                         </table>
-                        <div class="lang_fields">
+                        <div class="lang_fields" style="max-height:700px; overflow: auto;overflow-x: hidden;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -248,7 +248,7 @@
                         break;
                     case 'textarea':
                     case 'wysiwyg':
-                        print('<textarea id="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
                         break;
                 } %>
             </div>
@@ -263,7 +263,7 @@
 
 <script>
 
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique', 'ckeditor'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
         if (selector == null) {
           selector = $(".validate-form");
@@ -708,6 +708,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             if (langField.get('admin_input_type') === 'wysiwyg') {
                 adminForm.wysiwygInit();
+
                 langField.wysiwyg = true;
 
             }
