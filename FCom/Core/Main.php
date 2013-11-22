@@ -40,6 +40,15 @@ class FCom_Core_Main extends BClass
 
     public function initConfig($area)
     {
+        $req = BRequest::i();
+
+        // Chrome has a bug of not storing cookies for localhost domain
+        if ($req->httpHost(false)==='localhost' && $req->userAgent('/chrome/i')) {
+            $url = str_replace('//localhost', '//127.0.0.1', $req->currentUrl());
+            BResponse::i()->redirect($url);
+            exit;
+        }
+
         date_default_timezone_set('UTC');
 
         $config = BConfig::i();
@@ -54,13 +63,13 @@ class FCom_Core_Main extends BClass
         }
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
-            $rootDir = BRequest::i()->scriptDir();
+            $rootDir = $req->scriptDir();
         }
         $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
         BDebug::debug('ROOTDIR='.$rootDir);
 
-        $webRoot = BRequest::i()->webRoot();
+        $webRoot = $req->webRoot();
         $baseHref = $config->get('web/base_href');
         $baseSrc = $config->get('web/base_src');
         $baseStore = $config->get('web/base_store');

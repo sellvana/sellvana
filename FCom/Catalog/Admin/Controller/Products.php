@@ -329,18 +329,18 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processCategoriesPost($model)
     {
         $post = BRequest::i()->post();
-        $categoreis = array();
+        $categories = array();
         foreach($post as $key=>$value){
             $matches = array();
             if(preg_match("#check_(\d+)#", $key, $matches)){
-                $categoreis[intval($matches[1])] = $value;
+                $categories[intval($matches[1])] = $value;
             }
         }
-        if (!empty($categoreis)){
+        if (!empty($categories)){
             $cat_product = FCom_Catalog_Model_CategoryProduct::i();
             $category_model = FCom_Catalog_Model_Category::i();
 
-            foreach($categoreis as $cat_id=>$value){
+            foreach($categories as $cat_id=>$value){
                 $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
                 if(0 == $value && $product){
                     $product->delete();
