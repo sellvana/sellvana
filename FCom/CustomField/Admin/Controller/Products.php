@@ -31,14 +31,94 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
-    public function fieldsGridConfig()
+    public function variantFieldGridConfig($model)
     {
-        $config = FCom_CustomField_Admin_Controller_FieldSets::i()->fieldsGridConfig();
-        $config['grid']['id'] = __CLASS__;
-        $config['grid']['hiddengrid'] = true;
-        $config[] = array('navButtonAdd', 'caption'=>'Add', 'buttonicon'=>'ui-icon-plus', 'position'=>'first',
-            'title'=>'Add fields to product', 'onClickButton'=>'function() { return addCustomFields.call(this) }');
+        $obj = json_decode($model->data_serialized, true);
+        $data = $obj['variants_fields'];
+
+        $config = array(
+            'config'=>array(
+                'id'=>'variable-field-grid',
+                'caption'=>'Variable Field Grid',
+                'data_mode'=>'local',
+                'data'=>$data,
+                'columns'=>array(
+                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
+                    array('name'=>'name', 'label'=>'Field Name', 'width'=>300),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                ),
+                'actions'=>array(
+                                   'delete' => array('caption' => 'Remove')
+                                ),
+                'events'=>array('init', 'delete')
+            )
+        );
+
         return $config;
+    }
+
+    public function variantGridConfig($model)
+    {
+        $columns = array(
+            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30, 'position'=>0),
+            array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true, 'position'=>1)
+        );
+
+        $obj = $model->data_serialized;
+        $obj = json_decode($obj,true);
+        if (isset($obj['variants_fields'])) {
+            $vFields = $obj['variants_fields'];
+            $pos = 2;
+            foreach($vFields as $f) {
+                $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                $f['label'] = $f['name'];
+                $f['editable'] = true;
+                $f['addable'] = true;
+                $f['mass-editable'] = true;
+                $f['width'] = 150;
+                $f['position'] = $pos++;
+                $f['validation'] = array('required'=>true);
+                $f['editor'] = 'select';
+                $columns[] = $f;
+            }
+        }
+        $columns[] = array('name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>true, 'addable'=>true, 'validation'=>array('required'=>true));
+        $columns[] = array('name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>true, 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true));
+        $columns[] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete'=>true, 'edit'=>true));
+
+        $data = array();
+        if (isset($obj['variants'])) {
+            $variants = $obj['variants'];
+            $index = 0;
+            foreach($variants as $v) {
+                $v['fields']['sku'] = $v['sku'];
+                $v['fields']['price'] = $v['price'];
+                $v['fields']['id'] = $index++;
+                $data[] = $v['fields'];
+            }
+        }
+
+        $config = array(
+            'config'=>array(
+                'id'=>'variant-grid',
+                'caption'=>'Variable Field Grid',
+                'data_mode'=>'local',
+                'data'=>$data,
+                'columns'=>$columns,
+                'filters'=>array(
+                            '_quick'=>array('expr'=>'field_name like ? or id like ', 'args'=> array('%?%', '%?%'))
+                ),
+                'actions'=>array(
+                                    'new'=>array('caption'=>'New Variant', 'modal'=>true),
+                                    'edit'=>array('caption'=>'Edit Variants'),
+                                    'delete' => array('caption' => 'Remove')
+                                )
+            )
+        );
+
+        return $config;
+
     }
 
     public function formViewBefore()
