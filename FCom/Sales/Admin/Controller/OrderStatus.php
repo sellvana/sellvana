@@ -13,12 +13,19 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('name' => 'id', 'index'=>'o.id', 'label' => 'Status id', 'width' =>70),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'index'=>'o.id', 'label' => 'ID', 'width' =>70),
             array('name' => 'name', 'index'=>'name', 'label' => 'Label', 'href' => BApp::href('orderstatus/form/?id=:id')),
             array('name' => 'code', 'index'=>'code', 'label' => 'Code'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('orderstatus/form/?id='), 'col'=>'id'),'delete' => true)),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data' => array('edit' => array('href' => BApp::href('orderstatus/form/?id='), 'col'=>'id'),'delete' => true)),
         );
-
+        $config['actions'] = array(
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'code', 'type' => 'text'),
+        );
         return $config;
     }
 }

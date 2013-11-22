@@ -16,7 +16,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID'),
-            array('name' => 'author', 'label'=>'Author'), //todo: add author with name join by firstname, lastname
+            array('name' => 'author', 'label'=>'Author'),
             array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
                   'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
             array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
