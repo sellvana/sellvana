@@ -186,7 +186,7 @@ class BModuleRegistry extends BClass
     protected function _getManifestCacheFilename()
     {
         $area = BApp::i()->get('area');
-        $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';
+        $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';#.'.php';
         BUtil::ensureDir(dirname($fileName));
         return $fileName;
     }
@@ -201,6 +201,7 @@ class BModuleRegistry extends BClass
         foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
         }
+        #file_put_contents($cacheFile, '<'.'?php return '.var_export($data, 1).';');
         file_put_contents($cacheFile, serialize($data));
         BDebug::profile($t);
         return true;
@@ -212,6 +213,7 @@ class BModuleRegistry extends BClass
         if (is_readable($cacheFile)) {
             # $this->_modules = unserialize(file_get_contents($cacheFile)); return;
 
+            #$data = include($cacheFile);
             $data = unserialize(file_get_contents($cacheFile));
             foreach ($data as $modName => $params) {
                 $this->addModule($modName, $params);
@@ -647,6 +649,10 @@ class BModule extends BClass
     public $autoload;
     public $crontab;
     public $custom;
+    /**
+     * @var array
+     */
+    public $translations;
 
     const
         // run_level
@@ -676,10 +682,6 @@ class BModule extends BClass
             self::ERROR   => 'ERROR'
         ),
     );
-    /**
-     * @var array
-     */
-    protected $translations;
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -712,6 +714,14 @@ class BModule extends BClass
         #if (empty($args['area'])) {
             $args['area'] = BApp::i()->get('area');
         #}
+/*            
+if ($args['name']==="FCom_Referrals") {
+    echo "<pre>";
+    var_dump($args);
+    debug_print_backtrace();
+    exit;
+}
+*/
         $this->set($args);
 
         $args = $this->_processAreas($args);

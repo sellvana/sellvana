@@ -34,8 +34,24 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
     {
         return self::orm()->where('code', 'paid')->find_one();
     }
+    public function status($name)
+    {
+        return self::orm()->where('code', $name)->find_one();
+    }
     public function statusList()
     {
         return self::orm()->find_many();
+    }
+
+    public function statusOptions()
+    {
+        $status = $this->statusList();
+        $options = array();
+        if ($status) {
+            foreach($status as $s) {
+                $options[$s->code] = $s->name;
+            }
+        }
+        return $options;
     }
 }

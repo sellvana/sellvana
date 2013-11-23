@@ -1744,7 +1744,7 @@ class BModel extends Model
     *
     * @param string|array $key
     * @param mixed $value
-    * @param mixed $flag if true, add to existing value; if null, update only if currently not set
+    * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
     * @return BModel
     */
     public function set($key, $value=null, $flag=false)
@@ -1754,7 +1754,7 @@ class BModel extends Model
                 parent::set($k, $v);
             }
         } else {
-            if (true===$flag) {
+            if (true===$flag || 'ADD' === $flag) {
                 $oldValue = $this->get($key);
                 if (is_array($oldValue)) {
                     $oldValue[] = $value;
@@ -1763,7 +1763,7 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!is_null($flag) || is_null($this->get($key)))) {
+            if (is_scalar($key) && (!(is_null($flag) || 'IFNULL' === $flag) || is_null($this->get($key)))) {
                 parent::set($key, $value);
             }
         }
@@ -1779,7 +1779,7 @@ class BModel extends Model
     */
     public function add($key, $increment=1)
     {
-        return $this->set($key, $increment, true);
+        return $this->set($key, $increment, 'ADD');
     }
 
     /**
@@ -2241,7 +2241,7 @@ class BModel extends Model
     * @param array $params if $where string, use these params
     * @return boolean
     */
-    public static function update_many(array $data, $where, $p=array())
+    public static function update_many(array $data, $where = null, $p=array())
     {
         $update = array();
         $params = array();
@@ -2252,7 +2252,7 @@ class BModel extends Model
         if (is_array($where)) {
             list($where, $p) = BDb::where($where);
         }
-        $sql = "UPDATE ".static::table()." SET ".join(', ', $update) ." WHERE {$where}";
+        $sql = "UPDATE ".static::table()." SET ".join(', ', $update) . ($where ? " WHERE {$where}" : '');
         BDebug::debug('SQL: '.$sql);
         return static::run_sql($sql, array_merge($params, $p));
     }

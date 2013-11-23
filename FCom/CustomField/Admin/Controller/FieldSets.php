@@ -192,10 +192,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_grid_data()
     {
-        $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
-            ->select('(select count(*) from '.FCom_CustomField_Model_SetField::table().' where set_id=s.id)', 'num_fields')
-        ;
-        $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
+        $view = $this->view('core/backbonegrid');
+        $view->set('grid', $this->fieldSetsGridConfig());
+        $data = $view->outputData();
         BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
                     BDb::many_as_array($data['rows']),
@@ -218,10 +217,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_field_grid_data()
     {
-        $orm = FCom_CustomField_Model_Field::i()->orm('f')->select('f.*')
-            ->select('(select count(*) from '.FCom_CustomField_Model_FieldOption::table().' where field_id=f.id)', 'num_options')
-        ;
-        $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
+        $view = $this->view('core/backbonegrid');
+        $view->set('grid', $this->fieldsGridConfig());
+        $data = $view->outputData();
         BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
                     BDb::many_as_array($data['rows']),
@@ -237,6 +235,19 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('c' => $data['state']['c']),
                     BDb::many_as_array($data['rows']),
                 ));
+    }
+
+    public function action_options()
+    {
+        $id = BRequest::i()->get('id');
+        $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($id);
+
+        BResponse::i()->json(
+            array(
+                'success'=>true,
+                'options'=>$options
+            )
+        );
     }
 
     public function action_grid_data__POST()
@@ -358,4 +369,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $rows = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm()->where($name,$val)->find_many());
         BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
     }
+
+
 }

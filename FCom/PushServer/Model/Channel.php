@@ -52,7 +52,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        $this->set('create_at', BDb::now(), null);
+        $this->set('create_at', BDb::now(), 'IFNULL');
         $this->set('update_at', BDb::now());
 
         return true;

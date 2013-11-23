@@ -4,8 +4,7 @@
  * @project fulleron
  */
 
-class FCom_CustomerGroups_Admin_Controller_CustomerGroups
-    extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
 
@@ -14,14 +13,24 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups
     protected $_gridTitle = 'Customer Groups';
     protected $_recordName = 'Customer Group';
     protected $_mainTableAlias = 'cg';
+    protected $_formViewName = 'customer-groups/form';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] += array(
-            'id' => array('label'=>'ID', 'width'=>30, 'index' => 'cg.id'),
-            'title' => array('label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href('customer-groups/form/?id=:id')),
-            'code' => array('label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
+            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href($this->_formViewName.'?id=:id')),
+            array('name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)),
+        );
+        $config['actions'] = array(
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'code', 'type' => 'text'),
         );
         return $config;
     }
