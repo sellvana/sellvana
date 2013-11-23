@@ -1,4 +1,4 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
 {% set paymentMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getPaymentMethods(), '.getName') %}
 {% set shippingMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getShippingMethods(), '.getName') %}
 
