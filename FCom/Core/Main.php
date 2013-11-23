@@ -380,7 +380,7 @@ class FCom_Core_Main extends BClass
         }
         if (in_array('local', $files)) {
             // the rest of configuration
-            $local = BUtil::arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache', true);
+            $local = BUtil::arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core', true);
             $config->writeFile('local.php', $local);
         }
         return $this;
