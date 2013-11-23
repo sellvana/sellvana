@@ -482,11 +482,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processVariantPost($model, $data)
     {
-        $arr = json_decode($model->data_serialized, true);
-        $arr['variants_fields'] = json_decode($data['vfields'], true);
-        $arr['variants'] = json_decode($data['variants'], true);
-        $model->data_serialized = json_encode($arr);
+        $model->setData('variants_fields',json_decode($data['vfields'],true));
+        $model->setData('variants',json_decode($data['variants'],true));
         $model->save();
+
     }
 
     public function onMediaGridConfig($args)

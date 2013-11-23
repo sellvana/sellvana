@@ -279,6 +279,7 @@
             container: "body"
           });
         }
+        console.log('tooltip123');
         return el.tooltip("show");
       });
       $("body").on("mouseleave", ".has-tooltip", function() {
