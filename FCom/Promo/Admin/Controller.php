@@ -14,14 +14,33 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] += array(
-            'id'=>array('label'=>'ID', 'index'=>'id', 'width'=>55, 'sorttype'=>'number'),
-            'description'=>array('label'=>'Description', 'index'=>'description', 'width'=>250),
-            'from_date'=>array('label'=>'Start Date', 'index'=>'from_date', 'formatter'=>'date'),
-            'to_date'=>array('label'=>'End Date', 'index'=>'to_date', 'formatter'=>'date'),
-            'status'=>array('label'=>'Status', 'index'=>'p.status', 'options'=>FCom_Promo_Model_Promo::i()->fieldOptions('status')),
-            'details'=>array('label'=>'Details', 'index'=>'details', 'hidden'=>true),
-            'attachments'=>array('label'=>'Attachments', 'sortable'=>false, 'hidden'=>false),
+
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'),
+            array('name' => 'description', 'label' => 'Description', 'index' => 'description', 'width' => 250),
+            array('name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'),
+            array('name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'),
+            array('name' => 'status', 'label' => 'Status', 'index' => 'p.status',
+                  'editable' => true, 'mass-editable' => true, 'options' => FCom_Promo_Model_Promo::i()->fieldOptions('status'), 'editor' => 'select'
+            ),
+            array('name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true),
+            array('name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false),
+            array(
+                'name'     => '_actions',
+                'label'    => 'Actions',
+                'sortable' => false,
+                'data'     => array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)
+            ),
+        );
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'from_date', 'type' => 'text'), //todo: add filter type date
+            array('field' => 'to_date', 'type' => 'text'),
+            array('field' => 'status', 'type' => 'select'),
         );
         return $config;
     }

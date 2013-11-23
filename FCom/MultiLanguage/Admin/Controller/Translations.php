@@ -53,13 +53,17 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
 	public function gridConfig()
 	{
 		$config = parent::gridConfig();
-		$config['columns'] = array(
-			array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-			array('name' => 'module', 'label'=>'Module', 'width'=>250, 'editable'=>true),
-			array('name' => 'locale', 'label'=>'Locale', 'width'=>50, 'editable'=>true),
-			array('name' => 'file', 'label'=>'File', 'width'=>60, 'editable'=>true),
-			array('name' => 'id', 'label'=>'Id', 'width'=>200)
-		);
+        $localeOptions = array();
+        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
+            $localeOptions[$iso] = $iso;
+        }
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'module', 'label' => 'Module', 'width' => 250),
+            array('name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select'),
+            array('name' => 'file', 'label' => 'File', 'width' => 60),
+            array('name' => 'id', 'label' => 'Id', 'width' => 200)
+        );
 
 		$data = array();
 		$modules = BModuleRegistry::i()->getAllModules();
@@ -68,13 +72,21 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
 				foreach($module->translations as $trlocale => $trfile) {
 					$data[] = array(
 						'module' => $module->name,
-						'locale' => $trlocale,
+						'locale' => strtoupper($trlocale),
 						'file' => $trfile,
 						'id'=>$module->name.'/'.$trfile);
 				}
 			}
 		}
-		$config['data'] = $data;
+        $config['data'] = $data;
+        //todo: just show buttons, need add event and process for this controller
+        $config['actions'] = array(
+            'delete' => true,
+        );
+        $config['filters'] = array(
+            array('field' => 'module', 'type' => 'text'),
+            array('field' => 'locale', 'type' => 'select'),
+        );
 		return $config;
 	}
 

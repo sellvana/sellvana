@@ -42,9 +42,11 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
         );
         $config['actions'] = array(
             'export' => true,
+            'edit'   => true,
             'delete' => true
         );
         $config['filters'] = array(
+            array('field' => 'email', 'type' => 'text'),
             array('field' => 'sub_newsletter', 'type' => 'select'),
         );
         return $config;

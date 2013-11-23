@@ -154,4 +154,14 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         }
         return $result;
     }
+
+    public function getDropdowns()
+    {
+        $fields = BDb::many_as_array($this->orm()->where('admin_input_type','select')->find_many());
+        $res = array();
+        foreach($fields as $field) {
+            $res[$field['id']] = $field['field_name'];
+        }
+        return $res;
+    }
 }
