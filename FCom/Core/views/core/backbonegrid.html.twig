@@ -175,9 +175,9 @@
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
-          print('<a class="btn btn-info btn-xs btn-custom" href="#">');
+          print('<button class="btn btn-info btn-xs btn-custom" type="button">');
             print(col.data.custom.caption);
-          print('</a>');
+          print('</button>');
         }
 
         print('&nbsp;&nbsp;');
@@ -185,7 +185,7 @@
           if (typeof(col.data.edit.href) !== 'undefined') {
             print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
           } else {
-            print('<a class="btn btn-success btn-xs btn-edit _modal" href="#">');
+            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" >');
           }
           print('<i class=" icon-edit-sign"></i>');
           print('</a>');
@@ -193,9 +193,9 @@
 
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
-          print('<a class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" >');
+          print('<button class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
-          print('</a>');
+          print('</button>');
         }
     } else {
       if (typeof(col.print) !== 'undefined') {
@@ -206,9 +206,9 @@
 
             if (col.editor === 'select') {
                 if(col.editable === 'inline') {
-                print('<select id="'+col.name+'" class="form-control" data-col="'+col.name+'">');
+                print('<select id="'+col.name+'" class="form-control has-tooltip" '+validationRules(col.validation)+' data-col="'+col.name+'"  title="" data-placement="bottom" title="Bottom">');
                 for(var key in col.options) {
-                    print('<option value="'+key+'"' + ((rc.current !== false && rc.current[col.name] === key) ? ' selected ' : '')+'>'+col.options[key]+'</option>');
+                    print('<option value="'+key+'">'+col.options[key]+'</option>');
                 }
                 print('</select>');
                 print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
@@ -216,10 +216,10 @@
                 print(col.options[rc.row[col.name]]);
               }
             }
-            console.log(col.editor);
+
             if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
               if(col.editable === 'inline') {
-                print('<input id="'+col.name+'" type="text"  class="form-control" data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print('<input id="'+col.name+'" type="text"  class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
               } else {
                 print(rc.row[col.name]);

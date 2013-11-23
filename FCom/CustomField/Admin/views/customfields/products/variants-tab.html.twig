@@ -110,13 +110,14 @@ require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $
                                                 name: text,
                                                 label: text,
                                                 width: 150,
-                                                editable: true,
+                                                editable: 'inline',
                                                 addable: true,
                                                 'mass-ediatable': true,
                                                 position: 1,
                                                 validation:{required:true},
                                                 editor: 'select',
-                                                options: response.options
+                                                options: response.options,
+                                                'default': ''
                                             });
 
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
@@ -128,23 +129,37 @@ require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $
 
     });
 
+    function removeColumn(row)
+    {
+        var option = '<option value="'+row.id+'">'+row.name+'</option>';
+        $('#sel_var_field').append(option);
+        resetSelect();
+
+        var col = vColsCollection.findWhere({name: row.name});
+        var delPos = col.get('position');
+        vColsCollection.each(function(c) {
+            if (c.get('position')>delPos) {
+                c.set(col.get('position')-1);
+            }
+        });
+
+        vColsCollection.remove(col);
+        vRowsCollection.each(function(r) {
+            delete r.attributes[row.name];
+        });
+    }
     g_vent.bind('delete', function(ev) {
         if (ev.grid === 'variable-field-grid') {
-            var option = '<option value="'+ev.id+'">'+ev.row.name+'</option>';
-            $('#sel_var_field').append(option);
-            resetSelect();
+            removeColumn({id: ev.id, name: ev.name})
+            vColsCollection.trigger('render');
+            vRowsCollection.trigger('render');
+        }
+    });
 
-            var col = vColsCollection.findWhere({name: ev.row.name});
-            var delPos = col.get('position');
-            vColsCollection.each(function(c) {
-                if (c.get('position')>delPos) {
-                    c.set(col.get('position')-1);
-                }
-            });
-            vColsCollection.remove(col);
-            vRowsCollection.each(function(r) {
-                delete r.attributes[ev.row.name];
-            });
+    g_vent.bind('mass-delete', function(ev) {
+        if (ev.grid === 'variable-field-grid') {
+            for(var i in ev.rows)
+                removeColumn(ev.rows[i]);
 
             vColsCollection.trigger('render');
             vRowsCollection.trigger('render');
