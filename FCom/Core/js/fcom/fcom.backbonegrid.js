@@ -100,6 +100,18 @@ FCom.BackboneGrid = function(config) {
         append: 1,
         comparator: function(col) {
             return parseInt(col.get('position'));
+        },
+        initialize: function() {
+            this.on('add', this._addDefault, this);
+            this.on('remove', this._removeDefault, this);
+        },
+        _addDefault: function(c) {
+            if (typeof(c.get('default'))!=='undefined')
+                BackboneGrid.Models.Row.prototype.defaults[c.get('name')] = c.get('default');
+        },
+        _removeDefault: function(c) {
+            if (typeof(BackboneGrid.Models.Row.prototype.defaults[c.get('name')]) !== 'undefined')
+                delete BackboneGrid.Models.Row.prototype.defaults[c.get('name')];
         }
     });
 
@@ -344,7 +356,7 @@ FCom.BackboneGrid = function(config) {
 
             return false;
         },
-        save: function() {
+        save: function(not_render) {
             var self = this;
             var id = this.get('id');
             var hash = this.changedAttributes();
@@ -368,8 +380,9 @@ FCom.BackboneGrid = function(config) {
                 }
 
             }
+            if(not_render)
+                this.trigger('render');
 
-            this.trigger('render');
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
         }
     });
@@ -578,14 +591,15 @@ FCom.BackboneGrid = function(config) {
         events: {
             'change input.select-row': '_selectRow',
             'change .form-control': '_cellValChanged',
-            'blur .form-control': '_validate',
-            'click a.btn-delete': '_deleteRow',
-            'click a.btn-edit._modal': '_editModal',
-            'click a.btn-custom': '_callbackCustom'
+            //'blur .form-control': '_validate',
+            'click button.btn-delete': '_deleteRow',
+            'click button.btn-edit._modal': '_editModal',
+            'click button.btn-custom': '_callbackCustom'
         },
         initialize: function() {
             this.model.on('render',this.render, this);
             this.model.on('remove', this._destorySelf, this);
+
             //this.model.on('change', this.render, this);
         },
         _callbackCustom: function(ev) {
@@ -661,8 +675,8 @@ FCom.BackboneGrid = function(config) {
             var name = $(ev.target).attr('data-col');
             console.log('val='+val);
             console.log('name='+name);
-            if(!this._validate(ev))
-            {
+            //if(!this._validate(ev))
+            //{
                 //console.log('validate fail');
                 /*if(typeof(g_vent) != 'undefined') {
                     g_vent.trigger('validate_fail',{
@@ -675,10 +689,10 @@ FCom.BackboneGrid = function(config) {
                                                     }
                                   );
                 }*/
-                return;
-            }
+            //    return;
+            //}
             this.model.set(name, val);
-            this.model.save();
+            this.model.save(true);
 
         },
         _deleteRow: function(ev) {
@@ -704,12 +718,22 @@ FCom.BackboneGrid = function(config) {
 
             var colsInfo = columnsCollection.toJSON();
             this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
+
             if (typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                 var func = BackboneGrid.callbacks['after_render'];
                 var script = func+'(this.$el,this.model.toJSON());';
                 eval(script);
             }
             return this;
+        },
+        setSelectVals: function() {
+            var self = this;
+            columnsCollection.each(function(col) {
+                if(col.get('editor') === 'select' && col.get('editable') === 'inline') {
+                    var name = col.get('name');
+                    self.$el.find('select#'+name).val(self.model.get(name));
+                }
+            });
         }
     });
 
@@ -718,6 +742,7 @@ FCom.BackboneGrid = function(config) {
         initialize: function () {
             this.collection.on('reset', this.render, this);
             this.collection.on('render', this.render, this);
+            this.collection.on('add', this.addRow, this);
         },
         updateColsAndRender: function() {
             this.render();
@@ -745,6 +770,7 @@ FCom.BackboneGrid = function(config) {
                 model: row
             });
             this.$el.append(rowView.render().el);
+            rowView.setSelectVals();
         }
     });
     BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -1369,7 +1395,8 @@ FCom.BackboneGrid = function(config) {
                         }
                     }
                 }
-
+                if (BackboneGrid.validation !== true && typeof(c.validation) !== 'undefined')
+                    BackboneGrid.validation = true;
                 if (typeof(c.default) !== 'undefined') {
                     BackboneGrid.Models.Row.prototype.defaults[c.name] = c.default;
                 } else {
@@ -1477,7 +1504,7 @@ FCom.BackboneGrid = function(config) {
                 } else {
                     var newRow = new BackboneGrid.Models.Row({id: guid(), _new: true});
                     rowsCollection.add(newRow);
-                    gridView.render();
+                    //gridView.render();
                 }
             });
         }
@@ -1542,6 +1569,25 @@ FCom.BackboneGrid = function(config) {
                 return false;
             });
         }
+
+        //validation
+        /*if (BackboneGrid.validation === true) {
+            gridView.form = gridView.$el.parents('form:first');
+
+            gridView.form.submit(function(ev) {
+                alert('fwfwfw');
+                if(!gridView.form.valid()) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+
+                    return false;
+                }
+
+                return true;
+            });
+            console.log(gridView.form.html());
+        }*/
+
 
         //quick search
         var quickInputId = '#'+config.id+'-quick-search';

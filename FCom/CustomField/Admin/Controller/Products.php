@@ -33,15 +33,14 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function variantFieldGridConfig($model)
     {
-        $obj = json_decode($model->data_serialized, true);
-        $data = $obj['variants_fields'];
+        $data = $model->getData('variants_fields');
 
         $config = array(
             'config'=>array(
                 'id'=>'variable-field-grid',
                 'caption'=>'Variable Field Grid',
                 'data_mode'=>'local',
-                'data'=>$data,
+                'data'=>($data === null ? array() : $data),
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
@@ -51,7 +50,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'actions'=>array(
                                    'delete' => array('caption' => 'Remove')
                                 ),
-                'events'=>array('init', 'delete')
+                'events'=>array('init', 'delete', 'mass-delete')
             )
         );
 
@@ -65,31 +64,32 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true, 'position'=>1)
         );
 
-        $obj = $model->data_serialized;
-        $obj = json_decode($obj,true);
-        if (isset($obj['variants_fields'])) {
-            $vFields = $obj['variants_fields'];
+        $vFields = $model->getData('variants_fields');
+        if ($vFields !== null) {
             $pos = 2;
             foreach($vFields as $f) {
                 $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
-                $f['editable'] = true;
+                $f['editable'] = 'inline';
                 $f['addable'] = true;
                 $f['mass-editable'] = true;
                 $f['width'] = 150;
                 $f['position'] = $pos++;
                 $f['validation'] = array('required'=>true);
                 $f['editor'] = 'select';
+                $f['default'] = '';
                 $columns[] = $f;
             }
         }
-        $columns[] = array('name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>true, 'addable'=>true, 'validation'=>array('required'=>true));
-        $columns[] = array('name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>true, 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true));
-        $columns[] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete'=>true, 'edit'=>true));
+        $columns[] = array('name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
+        $columns[] = array('name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete'=>true));
 
         $data = array();
-        if (isset($obj['variants'])) {
-            $variants = $obj['variants'];
+
+        $variants = $model->getData('variants');
+
+        if ($variants !== null) {
             $index = 0;
             foreach($variants as $v) {
                 $v['fields']['sku'] = $v['sku'];
@@ -110,7 +110,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                             '_quick'=>array('expr'=>'field_name like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new'=>array('caption'=>'New Variant', 'modal'=>true),
+                                    'new'=>array('caption'=>'New Variant'),
                                     'edit'=>array('caption'=>'Edit Variants'),
                                     'delete' => array('caption' => 'Remove')
                                 )
