@@ -140,6 +140,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_Customer' => 'REQUESTED',
                         'FCom_CustomerGroups' => 'REQUESTED',
                         'FCom_CustomField' => 'REQUESTED',
+                        'FCom_CustomModule' => 'REQUESTED',
                         'FCom_Disqus' => 'REQUESTED',
                         'FCom_EasyPost' => 'REQUESTED',
                         'FCom_Email' => 'REQUESTED',

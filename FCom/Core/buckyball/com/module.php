@@ -495,7 +495,7 @@ class BModuleRegistry extends BClass
         // take care of 'load_after' option
         foreach ($modules as $modName=>$mod) {
             $mod->children_copy = $mod->children;
-            if ($mod->load_after) {
+            if ($mod->load_after && is_array($mod->load_after)) {
                 foreach ($mod->load_after as $n) {
                     if (empty($modules[$n])) {
                         BDebug::notice('Invalid module name specified: '.$n);
@@ -539,6 +539,13 @@ class BModuleRegistry extends BClass
             }
             // remove processed module from list
             unset($modules[$n->name]);
+        }
+        // move modules that have load_after=='ALL' to the end of list
+        foreach ($sorted as $modName => $mod) {
+            if ($mod->load_after==='ALL') {
+                unset($sorted[$modName]);
+                $sorted[$modName] = $mod;
+            }
         }
         $this->_modules = $sorted;
         return $this;
@@ -643,6 +650,7 @@ class BModule extends BClass
     public $routing;
     public $observe;
     public $provides;
+    public $areas;
     public $area;
     public $override;
     public $default_config;
@@ -714,7 +722,7 @@ class BModule extends BClass
         #if (empty($args['area'])) {
             $args['area'] = BApp::i()->get('area');
         #}
-/*            
+/*
 if ($args['name']==="FCom_Referrals") {
     echo "<pre>";
     var_dump($args);
