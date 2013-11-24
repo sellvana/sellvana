@@ -11,7 +11,7 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
     <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-9">
+          <div class="col-sm-8">
           {% if filterData[0] %}
             <span><label>Filters:&nbsp;</label></span>
             <span>
@@ -19,7 +19,7 @@
             </span>
           {% endif %}
           </div>
-          <div class="col-sm-3 text-right">
+          <div class="col-sm-4 text-right">
 
               <div class="dataTables_filter">
                   <label>
@@ -33,14 +33,14 @@
     </div>
   {% endif %}
 
-  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
+  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row">
       <div class="col-sm-7">
         <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
                 Columns
                 <b class="caret"></b>
             </a>
-                <ol class="dd-list dropdown-menu" style="margin-left:20px;min-width:200px;">
+                <ol class="dd-list dropdown-menu" style="min-width:200px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
@@ -77,7 +77,7 @@
       </div>
   </div>
   <div class='row'>
-    <div class="text-center {{ config.id }}-pagination"></div>
+    <div class="text-center {{ config.id }}-pagination f-grid-pagination"></div>
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
@@ -85,7 +85,7 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }} style='width:auto;'>
+    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -144,9 +144,7 @@
     </div>
 </script>
 <script type="template" id="{{ config.id }}-col-template">
-  <div class="dd-handle dd3-handle">
-    &nbsp;
-  </div>
+  <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
   <div class="dd3-content">
     <label>
         <input class="showhide_column" type="checkbox" datid=<%- rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
@@ -175,7 +173,7 @@
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
-          print('<button class="btn btn-info btn-xs btn-custom" type="button">');
+          print('<button class="btn btn-link btn-custom" type="button">');
             print(col.data.custom.caption);
           print('</button>');
         }
@@ -183,9 +181,9 @@
         print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
           if (typeof(col.data.edit.href) !== 'undefined') {
-            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
+            print('<a class="btn btn-link btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
           } else {
-            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" >');
+            print('<button type="button" class="btn btn-link btn-edit _modal" >');
           }
           print('<i class=" icon-edit-sign"></i>');
           print('</a>');
@@ -193,7 +191,7 @@
 
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
-          print('<button class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" type="button">');
+          print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
           print('</button>');
         }
