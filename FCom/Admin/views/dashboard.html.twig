@@ -1,9 +1,5 @@
 {% set widgets = THIS.getWidgets() %}
 {% set asyncWidgets = [] %}
-<style>
-.js-sortable-container { list-style-type: none; }
-.js-sortable-handle { cursor: move; }
-</style>
 <div id='content-wrapper'>
 
     <div class='page-header page-header-with-buttons'>
@@ -27,10 +23,10 @@
       </div>
       <div class='pull-right'>
         <div class='btn-group'>
-          <a class="btn btn-white hidden-xs" href="#">Last month</a>
-          <a class="btn btn-white" href="#">Last week</a>
-          <a class="btn btn-white " href="#">Today</a>
-          <a class="btn btn-white" id="daterange" href="#"><i class='icon-calendar'></i><span>Custom</span><b class='caret'></b></a>
+          <a class="btn btn-link hidden-xs" href="#">Last month</a>
+          <a class="btn btn-link" href="#">Last week</a>
+          <a class="btn btn-link " href="#">Today</a>
+          <a class="btn btn-link" id="daterange" href="#"><i class='icon-calendar'></i><span>Custom</span><b class='caret'></b></a>
         </div>
       </div>
     </div>

@@ -22,9 +22,7 @@
   right: 0px;
   width: 200px;
   height: 100%;
-  box-shadow: 0 0 10px #00ffff, 0 0 5px #00ffff;
   opacity: 1.0;
-
   -webkit-transform: rotate(3deg) translate(0px, -4px);
       -ms-transform: rotate(3deg) translate(0px, -4px);
           transform: rotate(3deg) translate(0px, -4px);
