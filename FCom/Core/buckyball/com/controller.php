@@ -207,6 +207,19 @@ class BRequest extends BClass
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest';
     }
 
+    public static function userAgent($pattern=null)
+    {
+        if (empty($_SERVER['HTTP_USER_AGENT'])) {
+            return null;
+        }
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        if (is_null($pattern)) {
+            return $userAgent;
+        }
+        preg_match($pattern, $userAgent, $match);
+        return $match;
+    }
+
     /**
     * Request method:
     *
@@ -961,6 +974,22 @@ class BResponse extends BClass
         return $this;
     }
 
+    public function header($header, $replace = true)
+    {
+        if (headers_sent($file, $line)) {
+            BDebug::notice("Can't send header: '{$header}', output started in {$file}:{$line}");
+            return $this;
+        }
+        if (is_string($header)) {
+            header($header, $replace);
+        } elseif (is_array($header)) {
+            foreach ($header as $h) {
+                header($h, $replace);
+            }
+        }
+        return $this;
+    }
+
     /**
     * Set or retrieve response content MIME type
     *
@@ -1087,12 +1116,15 @@ class BResponse extends BClass
             $fileName = basename($source);
         }
 
-        header('Pragma: public');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Length: ' . filesize($source));
-        header('Last-Modified: ' . date('r'));
-        header('Content-Type: '. $this->fileContentType($fileName));
-        header('Content-Disposition: '.$disposition.'; filename=' . $fileName);
+        static::header(array(
+            'Pragma: public',
+            'Cache-Control: must-revalidate, post-check=0, pre-check=0',
+            'Content-Length: ' . filesize($source),
+            'Last-Modified: ' . date('r'),
+            'Content-Type: '. $this->fileContentType($fileName),
+            'Content-Disposition: '.$disposition.'; filename=' . $fileName,
+        ));
+
         //echo file_get_contents($source);
         $fs = fopen($source, 'rb');
         $fd = fopen('php://output', 'wb');
@@ -1114,12 +1146,15 @@ class BResponse extends BClass
     public function sendContent($content, $fileName='download.txt', $disposition='attachment')
     {
         BSession::i()->close();
-        header('Pragma: public');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: '.$this->fileContentType($fileName));
-        header('Content-Length: ' . strlen($content));
-        header('Last-Modified: ' . date('r'));
-        header('Content-Disposition: '.$disposition.'; filename=' . $fileName);
+
+        static::header(array(
+            'Pragma: public',
+            'Cache-Control: must-revalidate, post-check=0, pre-check=0',
+            'Content-Type: '.$this->fileContentType($fileName),
+            'Content-Length: ' . strlen($content),
+            'Last-Modified: ' . date('r'),
+            'Content-Disposition: '.$disposition.'; filename=' . $fileName,
+        ));
         echo $content;
         $this->shutdown(__METHOD__);
     }
@@ -1142,8 +1177,12 @@ class BResponse extends BClass
             }
         }
         $protocol = BRequest::i()->serverProtocol();
-        header("{$protocol} {$status} {$message}");
-        header("Status: {$status} {$message}");
+
+        static::header(array(
+            "{$protocol} {$status} {$message}",
+            "Status: {$status} {$message}",
+        ));
+
         if (is_string($output)) {
             echo $output;
             exit;
@@ -1165,13 +1204,14 @@ class BResponse extends BClass
             $this->setContentType($type);
         }
         //BSession::i()->close();
-        header('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
+        $headers = array('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
 
         foreach ((array)BConfig::i()->get('web/headers') as $header => $content) {
-            header($header.': '.$content);
+            $headers[] = $header.': '.$content;
             //header('X-Frame-Options: SAMEORIGIN');
             //header('X-UA-Compatible: IE=edge');
         }
+        static::header($headers);
 
         if ($this->_contentType=='application/json') {
             if (!empty($this->_content)) {
@@ -1235,7 +1275,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        static::header('Strict-Transport-Security: max-age=500; includeSubDomains');
         return $this;
     }
 
@@ -1250,31 +1290,34 @@ class BResponse extends BClass
         if (empty($options['origin'])) {
             $options['origin'] = BRequest::i()->httpOrigin();
         }
-        header('Access-Control-Allow-Origin: '.$options['origin']);
+        $headers = array('Access-Control-Allow-Origin: '.$options['origin']);
         if (!empty($options['methods'])) {
-            header('Access-Control-Allow-Methods: '.$options['methods']);
+            $headers[] = 'Access-Control-Allow-Methods: '.$options['methods'];
         }
         if (!empty($options['credentials'])) {
-            header('Access-Control-Allow-Credentials: true');
+            $headers[] = 'Access-Control-Allow-Credentials: true';
         }
         if (!empty($options['headers'])) {
-            header('Access-Control-Allow-Headers: '.$options['headers']);
+            $headers[] = 'Access-Control-Allow-Headers: '.$options['headers'];
         }
         if (!empty($options['expose-headers'])) {
-            header('Access-Control-Expose-Headers: '.$options['expose-headers']);
+            $headers[] = 'Access-Control-Expose-Headers: '.$options['expose-headers'];
         }
         if (!empty($options['age'])) {
-            header('Access-Control-Max-Age: '.$options['age']);
+            $headers[] = 'Access-Control-Max-Age: '.$options['age'];
         }
+        static::header($headers);
         return $this;
     }
 
     public function nocache()
     {
-        header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); // Current time
-        header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-        header("Pragma: no-cache");
+        static::header(array(
+            "Expires: Sat, 26 Jul 1997 05:00:00 GMT", // Date in the past
+            "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT", // Current time
+            "Cache-Control: no-cache, must-revalidate", // HTTP/1.1
+            "Pragma: no-cache",
+        ));
         return $this;
     }
 

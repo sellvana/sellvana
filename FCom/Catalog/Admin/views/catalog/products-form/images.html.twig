@@ -1,4 +1,4 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 {% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images'}) %}
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />

@@ -365,5 +365,5 @@ form:
 
 /templates:
     - { include: base }
-    - { hook: main, views: templates }
+    - { hook: main, views: admin/grid }
     - { view: admin/nav, do: [[ setNav, system/templates ]] }
