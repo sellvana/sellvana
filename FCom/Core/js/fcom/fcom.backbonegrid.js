@@ -823,7 +823,7 @@ FCom.BackboneGrid = function(config) {
         },
         orderChanged: function(ev) {
             //console.log('orderChanged');
-            var orderJson = $('.dd').nestable('serialize');
+            var orderJson = $('.'+BackboneGrid.id+'.dd').nestable('serialize');
             var changedFlag = false;
             for(var i in orderJson) {
                 var key = orderJson[i].id;
@@ -858,7 +858,8 @@ FCom.BackboneGrid = function(config) {
             });*/
 
             // working
-            $('.dd').nestable().on('change',this.orderChanged);
+            console.log($('.'+BackboneGrid.id+'.dd').html());
+            $('.'+BackboneGrid.id+'.dd').nestable().on('change',this.orderChanged);
         },
         addLiTag: function(model) {
             console.log(model.toJSON());
