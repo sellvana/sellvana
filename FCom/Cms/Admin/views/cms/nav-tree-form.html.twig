@@ -1,5 +1,5 @@
 {% set tabs = THIS.sortedTabs() %}
-{% set m =THIS.model %}
+{% set m =THIS.get('model') %}
 {% set formUrl = APP.href('cms/nav/tree_form/' ~ m.get('id')) %}
 
 <script>
