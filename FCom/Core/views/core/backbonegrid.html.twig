@@ -14,7 +14,7 @@
           <div class="col-sm-9">
           {% if filterData[0] %}
             <span><label>Filters:&nbsp;</label></span>
-            <span class="fcom-filter-buttons-container">
+            <span>
               <!-- filter buttons here -->
             </span>
           {% endif %}
@@ -35,8 +35,8 @@
 
   <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
       <div class="col-sm-7">
-        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+        <span class="{{ config.id }} dropdown dd dd-nestable filter-span" style="display:inline;">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="javascript:void()" style="margin-left: 20px;">
                 Columns
                 <b class="caret"></b>
             </a>
