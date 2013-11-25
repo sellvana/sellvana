@@ -228,6 +228,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         } catch (Exception $e) {
             $this->formPostError($args);
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
         }
 
         if ($r->xhr()) {

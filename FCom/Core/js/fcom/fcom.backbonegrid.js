@@ -29,7 +29,7 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui'], function(Backbone, _, $, NProgress) {
 
 var setValidateForm = function(selector) {
     if (selector == null) {
@@ -100,6 +100,18 @@ FCom.BackboneGrid = function(config) {
         append: 1,
         comparator: function(col) {
             return parseInt(col.get('position'));
+        },
+        initialize: function() {
+            this.on('add', this._addDefault, this);
+            this.on('remove', this._removeDefault, this);
+        },
+        _addDefault: function(c) {
+            if (typeof(c.get('default'))!=='undefined')
+                BackboneGrid.Models.Row.prototype.defaults[c.get('name')] = c.get('default');
+        },
+        _removeDefault: function(c) {
+            if (typeof(BackboneGrid.Models.Row.prototype.defaults[c.get('name')]) !== 'undefined')
+                delete BackboneGrid.Models.Row.prototype.defaults[c.get('name')];
         }
     });
 
@@ -138,18 +150,19 @@ FCom.BackboneGrid = function(config) {
            this.model.on('render', this.render, this);
         },
         _selectPageAction: function(flag) {
+            console.log('_selectPageAction');
+            var temp = [];
             rowsCollection.each(function(model) {
-                if (model.get('editable')) {
+                if (model.get('_selectable')) {
                     if (flag) {
-                        selectedRows.add(model);
-                    } else {
-                            selectedRows.remove(model,{silent: true});
-                            selectedRows.trigger('remove');
+                        temp.push(model.toJSON());
                     }
                     model.set('selected', flag);
-                    model.trigger('render');
+                    //model.trigger('render');
                 }
             });
+            selectedRows.reset(temp);
+            gridView.$el.find('input.select-row:not([disabled])').prop('checked', flag);
         },
         _checkAction: function(ev) {
 
@@ -157,13 +170,18 @@ FCom.BackboneGrid = function(config) {
                 this._selectAction();
             else
                 this._showAction();
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return false;
         },
         //function to show All,Selected or Unselelected rows
         _showAction: function() {
             var key = this.$el.find('select.js-sel').val();
             switch (key) {
                 case 'show_all':
-                    //console.log('show_all!!!');
+                    console.log('show_all!!!');
                     if(BackboneGrid.showingSelected) {
                         BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                         rowsCollection.originalRows = BackboneGrid.prev_originalRows;
@@ -200,16 +218,15 @@ FCom.BackboneGrid = function(config) {
             rowsCollection.each(function(model) {
                 if(model.get('selected'))
                     model.set('selected', false);
-                model.trigger('render');
+                //model.trigger('render');
             });
-
+            gridView.$el.find('input.select-row:not([disabled])').prop('checked', false);
             $(BackboneGrid.MassDeleteButton).addClass('disabled');
             $(BackboneGrid.MassEditButton).addClass('disabled');
         },
         //function to select or unselect all rows of page and empty selected rows
         _selectAction: function() {
             var key = this.$el.find('select.js-sel').val();
-            console.log(key);
             switch (key) {
                 case 'upd_sel': //select all rows of a page
                     this._selectPageAction(true);
@@ -276,6 +293,7 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.HeaderView = Backbone.View.extend({
         initialize: function() {
             this.collection.on('sort', this.render, this);
+            this.collection.on('render', this.render, this);
         },
         render: function() {
             //console.log('headerver_render');
@@ -343,7 +361,7 @@ FCom.BackboneGrid = function(config) {
 
             return false;
         },
-        save: function() {
+        save: function(not_render) {
             var self = this;
             var id = this.get('id');
             var hash = this.changedAttributes();
@@ -367,8 +385,9 @@ FCom.BackboneGrid = function(config) {
                 }
 
             }
+            if(not_render)
+                this.trigger('render');
 
-            this.trigger('render');
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
         }
     });
@@ -577,14 +596,15 @@ FCom.BackboneGrid = function(config) {
         events: {
             'change input.select-row': '_selectRow',
             'change .form-control': '_cellValChanged',
-            'blur .form-control': '_validate',
-            'click a.btn-delete': '_deleteRow',
-            'click a.btn-edit._modal': '_editModal',
-            'click a.btn-custom': '_callbackCustom'
+            //'blur .form-control': '_validate',
+            'click button.btn-delete': '_deleteRow',
+            'click button.btn-edit._modal': '_editModal',
+            'click button.btn-custom': '_callbackCustom'
         },
         initialize: function() {
             this.model.on('render',this.render, this);
             this.model.on('remove', this._destorySelf, this);
+
             //this.model.on('change', this.render, this);
         },
         _callbackCustom: function(ev) {
@@ -611,7 +631,6 @@ FCom.BackboneGrid = function(config) {
             if (typeof(col) != 'undefined') {
                 if (typeof(col.get('validation')) !== 'undefined') {
                     var validation = col.get('validation');
-                    console.log(validation);
                     if(validation.number) {
                         if (isNaN(val))
                             $(ev.target).addClass('unvalid');
@@ -620,7 +639,6 @@ FCom.BackboneGrid = function(config) {
 
                         return  !isNaN(val);
                     }
-                    console.log(validation);
                     if(validation.required) {
 
                         var status = (val === '' || typeof(val) === 'undefined');
@@ -649,19 +667,21 @@ FCom.BackboneGrid = function(config) {
 
                 if (BackboneGrid.showingSelected) {
                     rowsCollection.remove(this.model,{silent:true});
-                    gridView.render();
+                    //gridView.render();
                 }
             }
+            ev.stopPropagation();
+            ev.preventDefault();
 
+            return;
 
         },
         _cellValChanged: function(ev) {
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-col');
-            console.log('val='+val);
-            console.log('name='+name);
-            if(!this._validate(ev))
-            {
+
+            //if(!this._validate(ev))
+            //{
                 //console.log('validate fail');
                 /*if(typeof(g_vent) != 'undefined') {
                     g_vent.trigger('validate_fail',{
@@ -674,10 +694,10 @@ FCom.BackboneGrid = function(config) {
                                                     }
                                   );
                 }*/
-                return;
-            }
+            //    return;
+            //}
             this.model.set(name, val);
-            this.model.save();
+            this.model.save(true);
 
         },
         _deleteRow: function(ev) {
@@ -703,12 +723,37 @@ FCom.BackboneGrid = function(config) {
 
             var colsInfo = columnsCollection.toJSON();
             this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
+
             if (typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                 var func = BackboneGrid.callbacks['after_render'];
                 var script = func+'(this.$el,this.model.toJSON());';
                 eval(script);
             }
             return this;
+        },
+        setValidation: function() {
+            var self = this;
+            columnsCollection.each(function(col) {
+                if (col.get('editor') === 'select' && col.get('editable') === 'inline') {
+                    var name = col.get('name');
+                    self.$el.find('select#'+name).val(self.model.get(name));
+                }
+
+                if (col.get('editable') === 'inline') {
+                    var name = col.get('name');
+                    var editor = col.get('editor') === 'select' ? 'select' : 'input';
+                    console.log(self.$el.find(editor+'#'+name).length);
+                    self.$el.find(editor+'#'+name).validate({
+
+                              errorPlacement: function(e, t) {
+                                alert('fff');
+                                return false;
+                              }
+                            });
+                }
+            });
+
+
         }
     });
 
@@ -716,6 +761,8 @@ FCom.BackboneGrid = function(config) {
       //  el: 'table tbody',
         initialize: function () {
             this.collection.on('reset', this.render, this);
+            this.collection.on('render', this.render, this);
+            this.collection.on('add', this.addRow, this);
         },
         updateColsAndRender: function() {
             this.render();
@@ -743,6 +790,7 @@ FCom.BackboneGrid = function(config) {
                 model: row
             });
             this.$el.append(rowView.render().el);
+            rowView.setValidation();
         }
     });
     BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -791,10 +839,11 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
         initialize: function() {
             this.setElement('#'+BackboneGrid.id+' .dd-list');
+            this.collection.on('render', this.render, this);
         },
         orderChanged: function(ev) {
             //console.log('orderChanged');
-            var orderJson = $('.dd').nestable('serialize');
+            var orderJson = $('.'+BackboneGrid.id+'.dd').nestable('serialize');
             var changedFlag = false;
             for(var i in orderJson) {
                 var key = orderJson[i].id;
@@ -829,10 +878,9 @@ FCom.BackboneGrid = function(config) {
             });*/
 
             // working
-            $('.dd').nestable().on('change',this.orderChanged);
+            $('.'+BackboneGrid.id+'.dd').nestable().on('change',this.orderChanged);
         },
         addLiTag: function(model) {
-            console.log(model.toJSON());
             if(model.get('label') !== '') {
                 var checkView = new BackboneGrid.Views.ColCheckView({model:model});
                 this.$el.append(checkView.render().el);
@@ -923,15 +971,16 @@ FCom.BackboneGrid = function(config) {
 
     });
 
-    BackboneGrid.Views.FilterDateCell = BackboneGrid.Views.FilterCell.extend({
+    BackboneGrid.Views.FilterDateRangeCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click input': 'preventDefault',
-            'click span.input-group-addon': 'dateCheck',
+            'click span.input-group-addon': 'preventDefault',
             'click button.update': 'filter',
             'click button.clear': '_closeFilter',
             'keyup input': '_checkEnter'
         },
         _closeFilter: function(ev) {
+            this.removeOldDatepicker();
             this._filter(false);
         },
         _checkEnter: function(ev) {
@@ -941,15 +990,15 @@ FCom.BackboneGrid = function(config) {
                 this.$el.find('button.update').trigger('click');
             }
         },
-        dateCheck: function() {
-            return false;
-        },
         filter: function() {
             var field = this.model.get('name');
-            var filterVal = this.$el.find('input:first').val();
-            BackboneGrid.current_filters[field] = {val: filterVal};
+            var dateFrom = this.$el.find('.date-from input[type=text]').val();
+            var dateTo = this.$el.find('.date-to input[type=text]').val();
+            var filterVal = {from: dateFrom, to: dateTo};
+            BackboneGrid.current_filters[field] = filterVal;
             this._filter(filterVal);
-            this.model.set('filterVal',filterVal);
+            this.model.set('filterVal', filterVal);
+            this.removeOldDatepicker(); //remove old datetimepicker widget
             this.render();
         },
         render: function() {
@@ -963,7 +1012,11 @@ FCom.BackboneGrid = function(config) {
                     pickTime: false,
                     todayHighlight: true
                 });
+                //todo: fix when click next, prev or choose month, year in datetimepicker
             }
+        },
+        removeOldDatepicker: function() {
+            $('div.bootstrap-datetimepicker-widget').remove();
         }
     });
 
@@ -1008,7 +1061,7 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterView = Backbone.View.extend({
         initialize: function() {
-            var div = 'div.row.datatables-top.'+BackboneGrid.id+' div.col-sm-9 span:nth-child(2)';
+            var div = 'div.row.datatables-top.'+BackboneGrid.id+' .fcom-filter-buttons-container';
             this.setElement(div);
             this.collection.on('sort', this.render, this);
         },
@@ -1024,8 +1077,8 @@ FCom.BackboneGrid = function(config) {
                     case 'text':case 'number-range':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                         break;
-                    case 'date':
-                        filterCell = new BackboneGrid.Views.FilterDateCell({model:model});
+                    case 'date-range':
+                        filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
                         break;
                     case 'multiselect': case 'select':
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
@@ -1038,17 +1091,8 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.ModalElement = Backbone.View.extend({
         className: 'form-group',
-        events: {
-            'change': '_setVal'
-        },
-        _setVal: function(ev) {
-            var key = $(ev.target).attr('id');
-            var val = $(ev.target).val();
-            BackboneGrid.modalElementVals[key] = val;
-        },
         render: function() {
-            this.$el.html(this.template({col:this.model.toJSON(), current:(BackboneGrid.currentRow !==false ? BackboneGrid.currentRow.toJSON() : false)}));
-
+            this.$el.html(this.template(this.model.toJSON()));
 
             return this;
         }
@@ -1058,14 +1102,14 @@ FCom.BackboneGrid = function(config) {
             this.modalType = 'mass-editable';
         },
         _saveChanges: function(ev) {
-            BackboneGrid.modalSaveClicked = false;
+            modalForm.$el.find('input, select').each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                BackboneGrid.modalElementVals[key] = val;
+            });
+
             if (!modalForm.formEl.valid())
                 return;
-            /*if ($.active > 0)
-            {
-                BackboneGrid.modalSaveClicked = true;
-                return;
-            }*/
 
             for( var key in BackboneGrid.modalElementVals) {
                 if (BackboneGrid.modalElementVals[key] === '')
@@ -1125,8 +1169,6 @@ FCom.BackboneGrid = function(config) {
                     if (typeof(hash.oper) !== 'undefined')
                         delete hash.oper;
                     hash._new = true;
-                    console.log(BackboneGrid.id);
-                    console.log(hash);
                     g_vent.trigger('new', {grid: BackboneGrid.id, row: hash});
                 }
             }
@@ -1166,7 +1208,9 @@ FCom.BackboneGrid = function(config) {
             BackboneGrid.modalElementVals = {};
             this.collection.each(this.addElementDiv, this);
 
-            if (this.modalType === 'addable' || this.modalType ==='mass-editable')
+            /*if (this.modalType === 'addable' || this.modalType ==='mass-editable')
+                $(BackboneGrid.modalFormId).find('select').val('');*/
+            if (this.modalType ==='mass-editable')
                 $(BackboneGrid.modalFormId).find('select').val('');
 
             this.formEl = this.$el.parents('form:first');
@@ -1176,7 +1220,6 @@ FCom.BackboneGrid = function(config) {
 
                 if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
                     var url = col.get('validation').unique;
-                    console.log(col.get('name'));
                     modalForm.$el.find('#'+col.get('name')).rules("add", {
                         onfocusout: false,
                         onkeyup: false,
@@ -1204,13 +1247,18 @@ FCom.BackboneGrid = function(config) {
 
         },
         addElementDiv: function(model) {
-            console.log(model.get(this.modalType));
             if (model.has(this.modalType) && model.get(this.modalType)) {
                 var elementView = new BackboneGrid.Views.ModalElement({model: model});
                 this.$el.append(elementView.render().el);
 
                 if(this.modalType === 'mass-editable') {
                     elementView.$el.find('#'+model.get('name')).removeAttr('data-rule-required');
+                }
+
+                if (BackboneGrid.currentRow) {
+                    var name = model.get('name');
+                    var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
+                    this.$el.find('input,select:last').val(val);
                 }
             }
         }
@@ -1289,7 +1337,7 @@ FCom.BackboneGrid = function(config) {
 
         //filtering settings
         BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#'+config.id+'-text-filter-template').html());
-        BackboneGrid.Views.FilterDateCell.prototype.template = _.template($('#'+config.id+'-date-filter-template').html());
+        BackboneGrid.Views.FilterDateRangeCell.prototype.template = _.template($('#'+config.id+'-date-range-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
@@ -1368,7 +1416,8 @@ FCom.BackboneGrid = function(config) {
                         }
                     }
                 }
-
+                if (BackboneGrid.validation !== true && typeof(c.validation) !== 'undefined')
+                    BackboneGrid.validation = true;
                 if (typeof(c.default) !== 'undefined') {
                     BackboneGrid.Models.Row.prototype.defaults[c.name] = c.default;
                 } else {
@@ -1476,7 +1525,7 @@ FCom.BackboneGrid = function(config) {
                 } else {
                     var newRow = new BackboneGrid.Models.Row({id: guid(), _new: true});
                     rowsCollection.add(newRow);
-                    gridView.render();
+                    //gridView.render();
                 }
             });
         }
@@ -1514,7 +1563,6 @@ FCom.BackboneGrid = function(config) {
                         var ev = {grid: BackboneGrid.id, rows: rows};
                         g_vent.trigger('mass-delete', ev);
                     }
-                    console.log(selectedRows.models);
                     rowsCollection.remove(selectedRows.models, {silent:true});
                     selectedRows.reset();
                     $('select.'+config.id+'.js-sel').val('');
@@ -1541,6 +1589,24 @@ FCom.BackboneGrid = function(config) {
                 return false;
             });
         }
+
+        //validation
+        /*if (BackboneGrid.validation === true) {
+            gridView.form = gridView.$el.parents('form:first');
+
+            gridView.form.submit(function(ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                if(!gridView.form.valid()) {
+
+
+                    return false;
+                }
+
+                return true;
+            });
+        }*/
+
 
         //quick search
         var quickInputId = '#'+config.id+'-quick-search';
@@ -1612,18 +1678,20 @@ FCom.BackboneGrid = function(config) {
 
                 }
             });
-        }
 
-        if (typeof(g_vent) !== 'undefined') {
             g_vent.bind('get_rows', function (ev) {
                 if(ev.grid === config.id) {
                     ev.callback(rowsCollection.toJSON());
                 }
             });
-        }
 
-        if (typeof(g_vent) !== 'undefined') {
-            g_vent.bind('get_collection', function (ev) {
+            g_vent.bind('get_cols_collection', function (ev) {
+                if(ev.grid === config.id) {
+                    ev.callback(columnsCollection);
+                }
+            });
+
+            g_vent.bind('get_rows_collection', function(ev) {
                 if(ev.grid === config.id) {
                     ev.callback(rowsCollection);
                 }

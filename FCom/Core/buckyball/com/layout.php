@@ -236,12 +236,14 @@ class BLayout extends BClass
      * @param string $prefix Optional: add prefix to view names
      * @return BLayout
      */
-    public function addAllViews($rootDir = null, $prefix = '')
+    public function addAllViews($rootDir = null, $prefix = '', $curModule = null)
     {
         if (is_null($rootDir)) {
             return $this->_views;
         }
-        $curModule = BModuleRegistry::i()->currentModule();
+        if (is_null($curModule)) {
+            $curModule = BModuleRegistry::i()->currentModule();
+        }
         if ($curModule && !BUtil::isPathAbsolute($rootDir)) {
             $rootDir = $curModule->root_dir . '/' . $rootDir;
         }
@@ -269,8 +271,12 @@ class BLayout extends BClass
             }
             if (preg_match($re, $file, $m)) {
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
-                $viewParams = array('template' => $file, 'file_ext' => $m[3]);
-                $viewParams['renderer'] = static::$_extRenderers[$m[3]]['callback'];
+                $viewParams = array(
+                    'template' => $file,
+                    'file_ext' => $m[3],
+                    'module_name' => $curModule->name,
+                    'renderer' => static::$_extRenderers[$m[3]]['callback'],
+                );
                 $this->addView($prefix . $m[2], $viewParams);
             }
         }
@@ -278,6 +284,16 @@ class BLayout extends BClass
         BEvents::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
 
         return $this;
+    }
+
+    /**
+    * Get all views in this layout
+    *
+    * @return array
+    */
+    public function getAllViews()
+    {
+        return $this->_views;
     }
 
     /**

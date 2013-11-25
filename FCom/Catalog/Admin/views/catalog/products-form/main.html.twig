@@ -1,16 +1,16 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 
 <fieldset name="main-product">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-product-name" name="model[product_name]" value="{{ validator.fieldValue('product_name') }}" />
+            <input class="form-control required" type="text" id="model-product-name" name="model[product_name]" value="{{ validator.fieldValue('product_name') }}" />
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }} {{ 'optional'|_ }}</label>
+        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }} ({{ 'optional'|_ }})</label>
         <div class="col-md-5">
             <input class="form-control" type="text" id="model-url-key" name="model[url_key]" value="{{ validator.fieldValue('url_key') }}" />
         </div>
@@ -65,7 +65,7 @@
 <script>
     require(['jquery', 'fcom.admin.form'], function($) {
         $(function() {
-            //adminForm.wysiwygCreate('general-info-description');
+
         });
     })
 </script>
