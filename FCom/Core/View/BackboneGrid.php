@@ -945,7 +945,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $data = array();
         foreach ($filters as $filter) {
             foreach ($columns as $column) {
-                if (isset($column['name']) && ($column['name'] == $filter['field'])) {
+                if (isset($column['name']) && isset($filter['field']) && ($column['name'] == $filter['field'])) {
                     $data[$filter['field']] = $column;
                 }
             }
