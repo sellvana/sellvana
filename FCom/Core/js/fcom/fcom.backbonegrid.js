@@ -725,6 +725,7 @@ FCom.BackboneGrid = function(config) {
             this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
 
             if (typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
+                console.log('after_render');
                 var func = BackboneGrid.callbacks['after_render'];
                 var script = func+'(this.$el,this.model.toJSON());';
                 eval(script);
