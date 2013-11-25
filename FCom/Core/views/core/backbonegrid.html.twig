@@ -333,19 +333,19 @@
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu filter-box">
-        <li>
+        <li role="presentation">
             <div class="form-group">
                 <label>From</label>
                 <div class="date-from datepicker input-group">
-                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
                     <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.from %>">
+                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
                 </div>
             </div>
             <div class="form-group">
                 <label>To</label>
                 <div class="date-to datepicker input-group">
-                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
                     <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.to %>">
+                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
                 </div>
             </div>
             <div class="input-group-btn">
@@ -374,8 +374,6 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             events: {{ THIS.getEventData() | raw }},
             callbacks: {{ THIS.getCallbacks() | raw }}
         });
-    console.log('debug');
-    console.log({{ THIS.getFilterData()  | raw }});
     //});
 });
 </script>

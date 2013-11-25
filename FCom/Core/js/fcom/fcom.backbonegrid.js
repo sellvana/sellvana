@@ -974,12 +974,13 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.FilterDateRangeCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click input': 'preventDefault',
-            'click span.input-group-addon': 'dateCheck',
+            'click span.input-group-addon': 'preventDefault',
             'click button.update': 'filter',
             'click button.clear': '_closeFilter',
             'keyup input': '_checkEnter'
         },
         _closeFilter: function(ev) {
+            this.removeOldDatepicker();
             this._filter(false);
         },
         _checkEnter: function(ev) {
@@ -989,9 +990,6 @@ FCom.BackboneGrid = function(config) {
                 this.$el.find('button.update').trigger('click');
             }
         },
-        dateCheck: function() {
-            return false;
-        },
         filter: function() {
             var field = this.model.get('name');
             var dateFrom = this.$el.find('.date-from input[type=text]').val();
@@ -1000,6 +998,7 @@ FCom.BackboneGrid = function(config) {
             BackboneGrid.current_filters[field] = filterVal;
             this._filter(filterVal);
             this.model.set('filterVal', filterVal);
+            this.removeOldDatepicker(); //remove old datetimepicker widget
             this.render();
         },
         render: function() {
@@ -1013,7 +1012,11 @@ FCom.BackboneGrid = function(config) {
                     pickTime: false,
                     todayHighlight: true
                 });
+                //todo: fix when click next, prev or choose month, year in datetimepicker
             }
+        },
+        removeOldDatepicker: function() {
+            $('div.bootstrap-datetimepicker-widget').remove();
         }
     });
 
