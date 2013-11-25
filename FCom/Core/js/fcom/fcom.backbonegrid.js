@@ -218,9 +218,9 @@ FCom.BackboneGrid = function(config) {
             rowsCollection.each(function(model) {
                 if(model.get('selected'))
                     model.set('selected', false);
-                model.trigger('render');
+                //model.trigger('render');
             });
-
+            gridView.$el.find('input.select-row:not([disabled])').prop('checked', false);
             $(BackboneGrid.MassDeleteButton).addClass('disabled');
             $(BackboneGrid.MassEditButton).addClass('disabled');
         },
