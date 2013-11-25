@@ -150,18 +150,19 @@ FCom.BackboneGrid = function(config) {
            this.model.on('render', this.render, this);
         },
         _selectPageAction: function(flag) {
+            console.log('_selectPageAction');
+            var temp = [];
             rowsCollection.each(function(model) {
-                if (model.get('editable')) {
+                if (model.get('_selectable')) {
                     if (flag) {
-                        selectedRows.add(model);
-                    } else {
-                            selectedRows.remove(model,{silent: true});
-                            selectedRows.trigger('remove');
+                        temp.push(model.toJSON());
                     }
                     model.set('selected', flag);
-                    model.trigger('render');
+                    //model.trigger('render');
                 }
             });
+            selectedRows.reset(temp);
+            gridView.$el.find('input.select-row:not([disabled])').prop('checked', flag);
         },
         _checkAction: function(ev) {
 
@@ -169,13 +170,18 @@ FCom.BackboneGrid = function(config) {
                 this._selectAction();
             else
                 this._showAction();
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return false;
         },
         //function to show All,Selected or Unselelected rows
         _showAction: function() {
             var key = this.$el.find('select.js-sel').val();
             switch (key) {
                 case 'show_all':
-                    //console.log('show_all!!!');
+                    console.log('show_all!!!');
                     if(BackboneGrid.showingSelected) {
                         BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                         rowsCollection.originalRows = BackboneGrid.prev_originalRows;
@@ -212,16 +218,15 @@ FCom.BackboneGrid = function(config) {
             rowsCollection.each(function(model) {
                 if(model.get('selected'))
                     model.set('selected', false);
-                model.trigger('render');
+                //model.trigger('render');
             });
-
+            gridView.$el.find('input.select-row:not([disabled])').prop('checked', false);
             $(BackboneGrid.MassDeleteButton).addClass('disabled');
             $(BackboneGrid.MassEditButton).addClass('disabled');
         },
         //function to select or unselect all rows of page and empty selected rows
         _selectAction: function() {
             var key = this.$el.find('select.js-sel').val();
-            console.log(key);
             switch (key) {
                 case 'upd_sel': //select all rows of a page
                     this._selectPageAction(true);
@@ -626,7 +631,6 @@ FCom.BackboneGrid = function(config) {
             if (typeof(col) != 'undefined') {
                 if (typeof(col.get('validation')) !== 'undefined') {
                     var validation = col.get('validation');
-                    console.log(validation);
                     if(validation.number) {
                         if (isNaN(val))
                             $(ev.target).addClass('unvalid');
@@ -635,7 +639,6 @@ FCom.BackboneGrid = function(config) {
 
                         return  !isNaN(val);
                     }
-                    console.log(validation);
                     if(validation.required) {
 
                         var status = (val === '' || typeof(val) === 'undefined');
@@ -664,17 +667,19 @@ FCom.BackboneGrid = function(config) {
 
                 if (BackboneGrid.showingSelected) {
                     rowsCollection.remove(this.model,{silent:true});
-                    gridView.render();
+                    //gridView.render();
                 }
             }
+            ev.stopPropagation();
+            ev.preventDefault();
 
+            return;
 
         },
         _cellValChanged: function(ev) {
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-col');
-            console.log('val='+val);
-            console.log('name='+name);
+
             //if(!this._validate(ev))
             //{
                 //console.log('validate fail');
@@ -726,14 +731,29 @@ FCom.BackboneGrid = function(config) {
             }
             return this;
         },
-        setSelectVals: function() {
+        setValidation: function() {
             var self = this;
             columnsCollection.each(function(col) {
-                if(col.get('editor') === 'select' && col.get('editable') === 'inline') {
+                if (col.get('editor') === 'select' && col.get('editable') === 'inline') {
                     var name = col.get('name');
                     self.$el.find('select#'+name).val(self.model.get(name));
                 }
+
+                if (col.get('editable') === 'inline') {
+                    var name = col.get('name');
+                    var editor = col.get('editor') === 'select' ? 'select' : 'input';
+                    console.log(self.$el.find(editor+'#'+name).length);
+                    self.$el.find(editor+'#'+name).validate({
+
+                              errorPlacement: function(e, t) {
+                                alert('fff');
+                                return false;
+                              }
+                            });
+                }
             });
+
+
         }
     });
 
@@ -770,7 +790,7 @@ FCom.BackboneGrid = function(config) {
                 model: row
             });
             this.$el.append(rowView.render().el);
-            rowView.setSelectVals();
+            rowView.setValidation();
         }
     });
     BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -858,11 +878,9 @@ FCom.BackboneGrid = function(config) {
             });*/
 
             // working
-            console.log($('.'+BackboneGrid.id+'.dd').html());
             $('.'+BackboneGrid.id+'.dd').nestable().on('change',this.orderChanged);
         },
         addLiTag: function(model) {
-            console.log(model.toJSON());
             if(model.get('label') !== '') {
                 var checkView = new BackboneGrid.Views.ColCheckView({model:model});
                 this.$el.append(checkView.render().el);
@@ -1086,7 +1104,7 @@ FCom.BackboneGrid = function(config) {
                 var val = $(this).val();
                 BackboneGrid.modalElementVals[key] = val;
             });
-            console.log(modalForm.formEl.valid());
+
             if (!modalForm.formEl.valid())
                 return;
 
@@ -1148,8 +1166,6 @@ FCom.BackboneGrid = function(config) {
                     if (typeof(hash.oper) !== 'undefined')
                         delete hash.oper;
                     hash._new = true;
-                    console.log(BackboneGrid.id);
-                    console.log(hash);
                     g_vent.trigger('new', {grid: BackboneGrid.id, row: hash});
                 }
             }
@@ -1201,7 +1217,6 @@ FCom.BackboneGrid = function(config) {
 
                 if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
                     var url = col.get('validation').unique;
-                    console.log(col.get('name'));
                     modalForm.$el.find('#'+col.get('name')).rules("add", {
                         onfocusout: false,
                         onkeyup: false,
@@ -1545,7 +1560,6 @@ FCom.BackboneGrid = function(config) {
                         var ev = {grid: BackboneGrid.id, rows: rows};
                         g_vent.trigger('mass-delete', ev);
                     }
-                    console.log(selectedRows.models);
                     rowsCollection.remove(selectedRows.models, {silent:true});
                     selectedRows.reset();
                     $('select.'+config.id+'.js-sel').val('');
@@ -1578,17 +1592,16 @@ FCom.BackboneGrid = function(config) {
             gridView.form = gridView.$el.parents('form:first');
 
             gridView.form.submit(function(ev) {
-                alert('fwfwfw');
+                ev.preventDefault();
+                ev.stopPropagation();
                 if(!gridView.form.valid()) {
-                    ev.preventDefault();
-                    ev.stopPropagation();
+
 
                     return false;
                 }
 
                 return true;
             });
-            console.log(gridView.form.html());
         }*/
 
 
