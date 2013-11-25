@@ -180,6 +180,46 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         return $config;
     }
 
+    public function variableFieldGridConfig($model)
+    {
+        $data = array();
+
+        $f = FCom_CustomField_Model_ProductVariant::i()->orm()
+            ->where('product_id',$model->id)
+            ->select(array('field_values'))
+            ->find_one();
+
+        if($f) {
+            $data = FCom_CustomField_Model_Field::i()->orm()
+                    ->where_in('id',explode(",",$f->field_values))
+                    ->find_many();
+        }
+
+
+        $config = array(
+            'config'=>array(
+                'id'=>'variable-field-grid',
+                'caption'=>'Variable Field Grid',
+                'data_mode'=>'local',
+                'data'=>$data,
+                'columns'=>array(
+                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
+                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>300),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
+                ),
+                'filters'=>array(
+                            '_quick'=>array('expr'=>'field_name like ? or id like ', 'args'=> array('%?%', '%?%'))
+                ),
+                'actions'=>array(
+                                   'delete' => array('caption' => 'Remove', 'confirm' => false)
+                                ),
+                'events'=>array('init','delete')
+            )
+        );
+
+        return $config;
+    }
     public function action_fieldsets()
     {
         $this->layout('/customfields/fieldsets');

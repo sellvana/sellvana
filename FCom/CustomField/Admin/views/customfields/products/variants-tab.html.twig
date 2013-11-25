@@ -1,3 +1,63 @@
-<select id="sel_field">
+{% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
+{% set fieldConfig = ctrl.variableFieldGridConfig(model) %}
+
+
+<select id="sel_field" style="width: 200px;">
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
 </select>
+<button class="btn btn-primary" id="btn_add_field" type="button">Add Field</button>
+<hr>
+<div class="row">
+    <div class="col-sm-12">
+        {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
+    </div>
+</div>
+<input type='hidden' id='vfield_ids' name='model[vfields_ids]' />
+<script>
+require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $) {
+    var fieldCollection=null;
+    g_vent.trigger('get_collection',{'grid': 'variable-field-grid', callback: function(c){ fieldCollection = c;} });
+    $('form').submit(function(ev) {
+        $('input[id="vfield_ids"]').val(_.pluck(fieldCollection.toJSON(),'id'));
+
+        return true;
+    });
+    function resetSelect()
+    {
+        $('#sel_field').val('');
+        $('#sel_field').select2();
+    }
+
+    resetSelect();
+
+    $('#btn_add_field').click(function() {
+        var val = $('#sel_field').val();
+        console.log(val);
+        if(val === '')
+            return;
+        var text = $("#sel_field option:selected").text();
+        g_vent.trigger('add_row', {grid: 'variable-field-grid', row: {id: val, field_name: text }});
+        $("#sel_field option[value='"+val+"']").remove();
+        resetSelect();
+    });
+
+
+    g_vent.bind('init',function(ev) {
+        if (ev.grid === 'variable-field-grid') {
+            for (var i in ev.ids) {
+                $("#sel_field option[value='"+ev.ids[i]+"']").remove();
+            }
+            resetSelect();
+        }
+    });
+
+    g_vent.bind('delete', function(ev) {
+        if (ev.grid === 'variable-field-grid') {
+            var option = '<option value="'+ev.id+'">'+ev.row.field_name+'</option>';
+            $('#sel_field').append(option);
+            resetSelect();
+        }
+    });
+
+});
+</script>
