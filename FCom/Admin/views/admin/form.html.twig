@@ -55,6 +55,8 @@
                                 $(this).append('<span class="badge badge-important"></span>');
                             }
                             $(this).find('span.badge').html(val>0 ? val : '');
+                        } else {
+                            $(this).find('span.badge').remove();
                         }
                     });
 
