@@ -31,7 +31,7 @@ function validationRules(rules) {
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui'], function(Backbone, _, $, NProgress) {
 
-/*var setValidateForm = function(selector) {
+var setValidateForm = function(selector) {
     if (selector == null) {
       selector = $(".validate-form");
     }
@@ -52,7 +52,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2',
         });
       });
     }
-};*/
+};
 FCom.BackboneGrid = function(config) {
     var rowsCollection;
     var columnsCollection;
