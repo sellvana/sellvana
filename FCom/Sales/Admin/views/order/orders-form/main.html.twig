@@ -1,4 +1,4 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 
 {% if m.get('act') == 'edit' %}
     {% set countries = APP.instance('FCom_Geo_Model_Country').options() %}

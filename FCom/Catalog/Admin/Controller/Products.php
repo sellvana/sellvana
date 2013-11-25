@@ -324,23 +324,24 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->processLinkedProductsPost($model, $data);
         $this->processMediaPost($model, $data);
         $this->processCustomFieldPost($model, $data);
+        $this->processVariantPost($model, $data);
     }
 
     public function processCategoriesPost($model)
     {
         $post = BRequest::i()->post();
-        $categoreis = array();
+        $categories = array();
         foreach($post as $key=>$value){
             $matches = array();
             if(preg_match("#check_(\d+)#", $key, $matches)){
-                $categoreis[intval($matches[1])] = $value;
+                $categories[intval($matches[1])] = $value;
             }
         }
-        if (!empty($categoreis)){
+        if (!empty($categories)){
             $cat_product = FCom_Catalog_Model_CategoryProduct::i();
             $category_model = FCom_Catalog_Model_Category::i();
 
-            foreach($categoreis as $cat_id=>$value){
+            foreach($categories as $cat_id=>$value){
                 $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
                 if(0 == $value && $product){
                     $product->delete();
@@ -460,23 +461,32 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $prodId = $model->id;
 
-        if(!isset($model->prod_customfield))
-            return;
+        $json = $model->get('prod_customfield');
 
-        $json = $model->prod_customfield;
+        if (!$json) {
+            return;
+        }
 
         $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id', $prodId)->find_many());
-        if(empty($res)) {
+        if (empty($res)) {
             $new = FCom_CustomField_Model_ProductField::i()->create();
-            $new->product_id = $prodId;
-            $new->_data_serialized = $json;
-            $new->save();
+            $new->set(array('product_id' => $prodId, '_data_serialized' => $json))->save();
          } else {
-
             $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
-            $row->_data_serialized = $json;
-            $row->save();
+            $row->set('_data_serialized',  $json)->save();
          }
+    }
+
+    public function processVariantPost($model, $data)
+    {
+        if (!empty($data['vfields'])) {
+            $model->setData('variants_fields', json_decode($data['vfields'], true));
+        }
+        if (!empty($data['variants'])) {
+            $model->setData('variants', json_decode($data['variants'], true));
+        }
+        $model->save();
+
     }
 
     public function onMediaGridConfig($args)

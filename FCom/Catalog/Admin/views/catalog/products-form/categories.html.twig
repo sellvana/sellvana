@@ -7,24 +7,24 @@
     require(['jquery', 'fcom.admin', 'jstree'], function($) {
         $(function() {
             FCom.Admin.tree('#categories', {
-                url: '{{ baseUrl | raw }}{{ THIS.model.id }}',
+                url: '{{ baseUrl | raw }}{{ THIS.get('model').id }}',
                 checkbox: {
                     override_ui:true,
                     checked_parent_open:true,
                     real_checkboxes:true,
                     two_state: true
                 },
-                initially_open: {{ prodCtrl.linkedCategoriesData(THIS.model) | raw }}
+                initially_open: {{ prodCtrl.linkedCategoriesData(THIS.get('model')) | raw }}
             });
             $('#categories').bind('loaded.jstree', function(event, data) {
                 $('#categories').css({height:'auto'});
-                var checked = {{ prodCtrl.linkedCategoriesData(THIS.model) | raw }};
+                var checked = {{ prodCtrl.linkedCategoriesData(THIS.get('model')) | raw }};
                 for (var id in checked) {
                     jQuery("<input>").attr("type", "hidden").attr("name", checked[id]).val(0).appendTo('#categories_unset');
                     data.inst.check_node('#'+checked[id]);
                 }
             }).bind('after_open.jstree', function(event, data) {
-                var checked = {{ prodCtrl.linkedCategoriesData(THIS.model) | raw }};
+                var checked = {{ prodCtrl.linkedCategoriesData(THIS.get('model')) | raw }};
                 for (var id in checked) {
                     data.inst.check_node('#'+checked[id]);
                 }
