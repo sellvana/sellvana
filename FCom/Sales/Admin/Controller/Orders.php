@@ -27,7 +27,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
         );
         $config['filters'] = array(
-            array('field' => 'create_at', 'type' => 'date'), //todo: filter type date
+            array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text'),
             array('field' => 'shipping_name', 'type' => 'text'),
             array('field' => 'grandtotal', 'type' => 'text'), //todo: filter type compare, eg: > 1000
@@ -184,5 +184,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
         }
+    }
+
+    public function action_view()
+    {
+        //todo: view order detail
     }
 }

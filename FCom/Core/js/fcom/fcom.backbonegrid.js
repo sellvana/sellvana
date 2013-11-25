@@ -972,7 +972,7 @@ FCom.BackboneGrid = function(config) {
 
     });
 
-    BackboneGrid.Views.FilterDateCell = BackboneGrid.Views.FilterCell.extend({
+    BackboneGrid.Views.FilterDateRangeCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click input': 'preventDefault',
             'click span.input-group-addon': 'dateCheck',
@@ -995,10 +995,12 @@ FCom.BackboneGrid = function(config) {
         },
         filter: function() {
             var field = this.model.get('name');
-            var filterVal = this.$el.find('input:first').val();
-            BackboneGrid.current_filters[field] = {val: filterVal};
+            var dateFrom = this.$el.find('.date-from input[type=text]').val();
+            var dateTo = this.$el.find('.date-to input[type=text]').val();
+            var filterVal = {from: dateFrom, to: dateTo};
+            BackboneGrid.current_filters[field] = filterVal;
             this._filter(filterVal);
-            this.model.set('filterVal',filterVal);
+            this.model.set('filterVal', filterVal);
             this.render();
         },
         render: function() {
@@ -1073,8 +1075,8 @@ FCom.BackboneGrid = function(config) {
                     case 'text':case 'number-range':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                         break;
-                    case 'date':
-                        filterCell = new BackboneGrid.Views.FilterDateCell({model:model});
+                    case 'date-range':
+                        filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
                         break;
                     case 'multiselect': case 'select':
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
@@ -1333,7 +1335,7 @@ FCom.BackboneGrid = function(config) {
 
         //filtering settings
         BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#'+config.id+'-text-filter-template').html());
-        BackboneGrid.Views.FilterDateCell.prototype.template = _.template($('#'+config.id+'-date-filter-template').html());
+        BackboneGrid.Views.FilterDateRangeCell.prototype.template = _.template($('#'+config.id+'-date-range-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
