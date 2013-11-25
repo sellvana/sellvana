@@ -72,6 +72,8 @@ FCom.BackboneGrid = function(config) {
         data_mode: 'server'
 
     }
+
+
     BackboneGrid.Models.ColModel = Backbone.Model.extend({
         defaults: {
             style: '',
@@ -138,7 +140,7 @@ FCom.BackboneGrid = function(config) {
             'change select.js-sel': '_checkAction'
         },
         initialize: function() {
-           // this.model.on('change', this.render, this);
+           // this.model.on('change', this, this);
            if (typeof(g_vent)!== 'undefined') {
                 var self = this;
                 g_vent.bind('clear_selection', function(ev) {
@@ -362,6 +364,7 @@ FCom.BackboneGrid = function(config) {
             return false;
         },
         save: function(not_render) {
+            console.log('save');
             var self = this;
             var id = this.get('id');
             var hash = this.changedAttributes();
@@ -385,7 +388,7 @@ FCom.BackboneGrid = function(config) {
                 }
 
             }
-            if(not_render)
+            if(!not_render)
                 this.trigger('render');
 
             $(BackboneGrid.quickInputId).quicksearch('table#'+BackboneGrid.id+' tbody tr');
@@ -720,7 +723,7 @@ FCom.BackboneGrid = function(config) {
             this.model.destroy();
         },
         render: function() {
-
+            console.log('row-render');
             var colsInfo = columnsCollection.toJSON();
             this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
 
@@ -743,14 +746,34 @@ FCom.BackboneGrid = function(config) {
                 if (col.get('editable') === 'inline') {
                     var name = col.get('name');
                     var editor = col.get('editor') === 'select' ? 'select' : 'input';
-                    console.log(self.$el.find(editor+'#'+name).length);
-                    self.$el.find(editor+'#'+name).validate({
 
-                              errorPlacement: function(e, t) {
-                                alert('fff');
-                                return false;
-                              }
-                            });
+                    if (jQuery().validate) {
+                        /*self.validator = self.$el.find(editor+'#'+name).validate({
+                        });*/
+                        /*self.$el.find(editor+'#'+name).rules('add',{
+                                required: true,
+                                errorPlacement: function(e, t) {
+                                    console.log('error');
+                                    //$(e).addClass('unvalid');
+                                    //$(e).attr('title', 'This field is required.');
+
+
+                                },
+                                highlight: function(e) {
+                                    console.log('highlight');
+
+                                },
+                                success: function(e, t) {
+                                    console.log('success');
+                                    //$(e).removeClass('unvalid');
+                                    //$(e).attr('title','');
+                                },
+                                errorElement: "",
+                                errorClass: ""
+
+                        });*/
+                        //self.$el.find(editor+'#'+name).removeAttr('novalidate');
+                    }
                 }
             });
 
