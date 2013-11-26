@@ -96,4 +96,18 @@ class FeatureContext extends MinkContext
         }
     }
 
+    /**
+     * @Given /^I click "(?P<element>[^"]*)"$/
+     */
+    public function iClick($element)
+    {
+
+        echo $element;
+        $page  = $this->getSession()->getPage();
+        $field = $page->find('xpath',$element);
+        if(!$field){
+            throw new \Behat\Mink\Exception\ElementNotFoundException($this->getSession(), null, null, $element);
+        }
+        $field->click();
+    }
 }
