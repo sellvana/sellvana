@@ -177,14 +177,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         BResponse::i()->render();
     }
 
-    public function getInitialData($id)
+    public function getInitialData($model)
     {
-
-        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$id)->find_many());
-        if (empty($res)) {
-            return -1;
-        }
-        return $res[0]['_data_serialized'] ? $res[0]['_data_serialized'] : -1;
+        $customFields = $model->getData('custom_fields');
+        return !isset($customFields) ? -1 : $customFields;
     }
     public function fieldsetAry()
     {

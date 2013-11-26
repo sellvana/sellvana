@@ -129,4 +129,10 @@ class FCom_CustomField_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $tProdField = FCom_CustomField_Model_Field::table();
+        BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('validation' => "varchar(100) null")));
+    }
 }
