@@ -18,15 +18,53 @@
                 url_get:  '{{ formUrl }}',
                 url_post: '{{ formUrl }}'
             });
-            $("#{{ formId }}").validate({
+            /*$("#{{ formId }}").validate({
                 debug: true,
                 ignore: ".ignore-validation input, .ignore-validation select, .ignore-validation textarea",
                 submitHandler: function(form) {
                     console.log('submitHandler', form);
                 }
+            });*/
+            //$("#{{ formId }}").removeAttr("novalidate");
+            $("#{{ formId }}").validate({
+                ignore: [],//for invisible elements
+                invalidHandler: function(event, validator) {
+                    var info = {};
+
+                    for(key in validator.invalid) {
+                        var input = jQuery('input[name="'+key+'"]');
+                        if (input.length>0) {
+                            var tab = input.parents('div.main-form-tab:first');
+                            var key = '#'+tab.attr('id');
+                            if (typeof(info[key]) === 'undefined')
+                                info[key] = 1;
+                            else
+                                info[key]++;
+
+
+
+                        }
+                    }
+
+                    console.log(info);
+                    $('ul#tabs').find('li a').each(function(index) {
+                        var val = info[$(this).attr('href')];
+                        if (typeof(val) !== 'undefined')
+                         {
+                            if ($(this).find('span.badge').length === 0) {
+                                $(this).append('<span class="badge badge-important"></span>');
+                            }
+                            $(this).find('span.badge').html(val>0 ? val : '');
+                        } else {
+                            $(this).find('span.badge').remove();
+                        }
+                    });
+
+                    return false;
+                }
             });
 
-            console.log(123);
+
             FCom.Admin.Tabs('.f-admin-main-container', {
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ curTab }}",
@@ -43,7 +81,7 @@
     });
 </script>
 
-<form id="{{ formId }}" class="form form-horizontal validate-form" action="{{ formUrl }}" method="post">
+<form id="{{ formId }}" class="form form-horizontal" action="{{ formUrl }}" method="post">
     <div class="row fcom-admin-main-title">
         <div class="col-sm-12">
             <div class="page-header">
@@ -82,7 +120,7 @@
                 </ul>
                 <div class="tab-content">
                     {% for k, tab in tabs %}
-                        <div class="tab-pane" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
+                        <div class="tab-pane main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
                             {% if not tab.async %}
                                 {{ THIS.view(tab.view).set('validator', validator) | raw }}
                             {% endif %}
@@ -93,3 +131,6 @@
         </div>
     </div>
 </form>
+
+<div id="fcom_append_form">
+</div>

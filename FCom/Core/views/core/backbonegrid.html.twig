@@ -102,28 +102,31 @@
       </tbody>
     </table>
   </div>
-  <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
-  <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
-    <div class='modal-dialog'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
-            </div>
-            <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
-              <div class='modal-body'>
-                  <!-- mass edit form element template is here -->
-              </div>
-            </form>
-            <div class='modal-footer'>
-                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
-                <button class='btn btn-primary save' type='button'>Save changes</button>
+</div>
+ <div id="{{ config.id }}-modal">
+      <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
+      <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                    <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+                </div>
+                <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
+                  <div class='modal-body'>
+                      <!-- mass edit form element template is here -->
+                  </div>
+                </form>
+                <div class='modal-footer'>
+                    <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
+                    <button class='btn btn-primary save' type='button'>Save changes</button>
+                </div>
             </div>
         </div>
-    </div>
+      </div>
   </div>
 
-</div>
+
 
 
 
@@ -206,7 +209,7 @@
 
             if (col.editor === 'select') {
                 if(col.editable === 'inline') {
-                print('<select id="'+col.name+'" class="form-control has-tooltip" '+validationRules(col.validation)+' data-col="'+col.name+'"  title="" data-placement="bottom" title="Bottom">');
+                print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
                 for(var key in col.options) {
                     print('<option value="'+key+'">'+col.options[key]+'</option>');
                 }
@@ -219,7 +222,7 @@
 
             if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
               if(col.editable === 'inline') {
-                print('<input id="'+col.name+'" type="text"  class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
               } else {
                 print(rc.row[col.name]);
@@ -361,6 +364,15 @@
 </script>
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
+
+    if ($('#fcom_append_form').length > 0) {
+      $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');
+      var html = $("#{{ config.id }}-modal").html();
+
+      $("#{{ config.id }}-modal").remove();
+      $('form#{{ config.id }}-new-form').append(html);
+
+    }
     //$(function() {
         var grid = new FCom.BackboneGrid({
             id: "{{ config.id }}",

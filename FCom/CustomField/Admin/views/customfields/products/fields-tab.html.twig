@@ -1,99 +1,100 @@
 {% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 
+<div id="prod-new-field-modal">
+    <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
+    <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-<a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
-<div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                <h4 class="modal-title" id="myModalLabel">Create Form</h4>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="field_code">Field Code</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="field_name">Field Name</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="frontend_label">Frontend Label</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="frontend_show">Show on frontend</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="sort_order">Sort order</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="table_field_type">DB Type</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
-                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="admin_input_type">Input Type</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
-                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="system">System field</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="system" id="system" class="form-control" data-rule-required="true">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </div>
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Create Form</h4>
                 </div>
 
-            </div>
+                <div class="modal-body">
 
-            <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
-                <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_code">Field Code</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_name">Field Name</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_label">Frontend Label</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_show">Show on frontend</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="sort_order">Sort order</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="table_field_type">DB Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="admin_input_type">Input Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="system">System field</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="system" id="system" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
+                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                </div>
             </div>
         </div>
     </div>
@@ -263,6 +264,10 @@
 
 
 <script>
+$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
+var html = $("#prod-new-field-modal").html();
+$("#prod-new-field-modal").remove();
+$('form#prod-new-field-form1').append(html);
 
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
