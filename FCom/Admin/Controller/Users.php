@@ -94,7 +94,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         );
         $config['actions'] = array(
             'add'=>array('caption'=>'Add user'),
-            'delete'=>array('caption'=>'Remove')
         );
         $config['filters'] = array(
             array('field'=>'username', 'type'=>'text'),
@@ -109,10 +108,11 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
 
     /**
      * get config for grid: all users
-     * @param $model
+     * @param $model FCom_Admin_Model_Role
+     * @param $filterAdmin bool
      * @return array
      */
-    public function getAllUsersConfig($model)
+    public function getAllUsersConfig($model, $filterAdmin = true)
     {
         $config            = parent::gridConfig();
         $config['id']      = 'role_all_users_grid_' . $model->id;
@@ -133,6 +133,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('field'=>'status', 'type'=>'select'),
             '_quick' => array('expr' => 'username like ? or email like ? or au.id=?', 'args' => array('?%', '%?%', '?'))
         );
+        if ($filterAdmin) {
+            $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
+        }
 
         $config['events'] = array('add');
 
