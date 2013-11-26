@@ -101,7 +101,7 @@
 </div>
 <div class="row">
     <div class="col-sm-10">
-        <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
+        <input type="hidden" id="prod_customfield" name="custom_fields"/>
         <table>
             <tr>
                 <td style='padding-right:20px;'>
@@ -153,20 +153,20 @@
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input id="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                        print('<input data-rule-required="true" name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea data-rule-required="true" name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
                         break;
                     case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
 
                         break;
                     case 'select':
                     case 'multiselect':
-                        print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+guid()+'" class="form-control" >');
+                        print('<select data-rule-required="true" '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
                         vals = rc.value.split(',');
                         for(key in rc.options) {
                             print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
@@ -175,7 +175,7 @@
 
                         break;
                     case 'boolean':
-                        print('<input type="hidden" id="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+                        print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
                         break;
                 } %>
@@ -287,7 +287,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     return $(e).closest('.help-block').css('display','block');
               },
               success: function(e) {
-                    console.log(success);
+
                     e.closest(".form-group").removeClass("has-error");
                     return e.closest(".help-block").css('display','none');
               }
@@ -296,7 +296,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     };
     var currentSet = null;
-    var initialData = {{ ctrl.getInitialData(model.id) | raw }};
+    var initialData = {{ ctrl.getInitialData(model) | raw }};
 
     function refresh_selects()
     {
@@ -377,7 +377,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         });
     });
-    var _mainForm = $('form:last');
+    var _mainForm = $('form#catalog-products-form');
 
     $(_mainForm).submit(function(ev) {
         setCollection.each(function(set) {
@@ -385,6 +385,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 if (field.wysiwyg) {
                     var w = field.view.getWYSIWYG();
                     field.set('value', w.getData());
+                    field.view.$el.find('textarea').eq(1).val(w.getData());//for validation show only
                 }
 
                 if (field.switch) {
@@ -399,12 +400,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 });
                 var position = field.view.$el.index();
                 field.set('position', position);
-
+                //console.log('ffff');
                 var setId = field.view.$el.parents('.prod-fieldset:first').attr('id');
-                console.log(setId);
                 if (setId !== set.get('id')) {
                     set.fields.remove(field, {silent: true});
-                    console.log(setId);
                     var movedSet = setCollection.get(setId);
                     movedSet.fields.add(field, {silent: true});
                 }
@@ -415,12 +414,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             set.fields.sort();
         });
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
-
-        return true;
+        console.log($('#prod_customfield').val());
+        //$(this).valid();
+        //return false;
     });
 
-
-    setValidateForm($(_mainForm));
+    var _appendForm = $('form#prod-new-field-form1');
+    setValidateForm($(_appendForm));
     $('#field_code').rules("add", {
         onfocusout: false,
         onkeyup: false,
@@ -441,13 +441,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
     $('#btn_new_field').click(function() {
-        $('div#prod-new-field-form').find('select, input').val('');
+        $('div#prod-new-field-form').find('input').val('');
+        $('div#prod-new-field-form').find('select').each(function(index) {
+            $(this).find('option').removeAttr('selected');
+            $(this).find('option:first').attr('selected','selected');
+        })
         $('#btn_show_modal').trigger('click');
 
     });
 
     $('#btn-newfield-save').click(function() {
-        if (!$(_mainForm).valid())
+        if (!$(_appendForm).valid())
             return;
 
         var hash = {};
@@ -641,7 +645,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             //CustomField.currentFieldView = this;
 
             var langFields = this.model.langFields;
-            console.log(langFields);
             var langs = _.clone(CustomField.Langs);
             langFields.each(function(langField) {
                 langs = _.difference(langs, [langField.get('lang_code')]);
@@ -687,12 +690,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _changeCheckbox: function() {
             var val = this.$el.find('input[type="hidden"]').val();
-            console.log(val);
         },
         _changeSelect2: function() {
             var val = this.$el.find('select').val();
             if (typeof(val) === 'object')
                 val = val.join(',');
+            console.log(val);
             this.model.set('value', val);
         },
         _changeVal: function() {
@@ -740,6 +743,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             //this.$el.find('.select2').select2();
             this._updateLangTag();
+            this.$el.find('.lang_fields').css('max-height', $(window).height()-300);
             return this;
         }
     });
@@ -814,7 +818,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 case 'wysiwyg':
                     field.wysiwyg = true;
                     adminForm.wysiwygInit();
-
+                    var p = fieldView.$el.find('textarea:first').parent();
+                    p.append('<textarea name="'+guid()+'" data-rule-required="true" style="display:none;">'+fieldView.$el.find('textarea:first').val()+'</textarea>');
                     break;
             }
 
@@ -904,4 +909,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         return false;
     }
 });*/
+
+
+
+
+$(window).resize(function() {
+    var h = $(window).height()-300;
+    $('.lang_fields').css('max-height', h);
+})
 </script>

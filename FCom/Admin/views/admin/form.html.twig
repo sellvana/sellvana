@@ -30,23 +30,20 @@
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
                     var info = {};
-
+                    console.log(validator.invalid);
                     for(key in validator.invalid) {
-                        var input = jQuery('input[name="'+key+'"]');
-                        if (input.length>0) {
-                            var tab = input.parents('div.main-form-tab:first');
+                        var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                        if (element.length>0) {
+                            var tab = element.parents('div.main-form-tab:first');
                             var key = '#'+tab.attr('id');
                             if (typeof(info[key]) === 'undefined')
                                 info[key] = 1;
                             else
                                 info[key]++;
-
-
-
                         }
                     }
 
-                    console.log(info);
+
                     $('ul#tabs').find('li a').each(function(index) {
                         var val = info[$(this).attr('href')];
                         if (typeof(val) !== 'undefined')
@@ -60,6 +57,10 @@
                         }
                     });
 
+                    for(key in info) {
+                        $('a[href="'+key+'"]').trigger('click');
+                        break;
+                    }
                     return false;
                 }
             });
