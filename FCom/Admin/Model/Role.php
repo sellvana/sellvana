@@ -7,7 +7,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
 
 	protected $_validationRules = array(
 		array('role_name', '@required'),
-		array('permissions_data', '@required'),
+		//array('permissions_data', '@required'),
 	);
 
     protected static $_allPermissions = array(
