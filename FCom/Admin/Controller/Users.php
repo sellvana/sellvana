@@ -8,7 +8,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridHref = 'users';
     protected $_gridTitle = 'Admin Users';
     protected $_recordName = 'User';
-    protected $_formViewName = 'users/form';
 
     public function gridConfig()
     {
@@ -51,7 +50,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         ));
         $id = BRequest::i()->param('id', true);
         if($id){
-            $args['view']->addTab("history", array('label' => BLocale::_("History")));
+            $args['view']->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
         }
     }
 
