@@ -459,22 +459,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processCustomFieldPost($model, $data)
     {
-        $prodId = $model->id;
 
-        $json = $model->get('prod_customfield');
-
-        if (!$json) {
-            return;
+        if (!empty($data['custom_fields'])) {
+            $model->setData('custom_fields', $data['custom_fields']);
         }
 
-        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id', $prodId)->find_many());
-        if (empty($res)) {
-            $new = FCom_CustomField_Model_ProductField::i()->create();
-            $new->set(array('product_id' => $prodId, '_data_serialized' => $json))->save();
-         } else {
-            $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
-            $row->set('_data_serialized',  $json)->save();
-         }
+        $model->save();
     }
 
     public function processVariantPost($model, $data)
