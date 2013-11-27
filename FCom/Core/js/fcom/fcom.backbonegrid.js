@@ -156,14 +156,29 @@ FCom.BackboneGrid = function(config) {
             var temp = [];
             rowsCollection.each(function(model) {
                 if (model.get('_selectable')) {
-                    if (flag) {
-                        temp.push(model.toJSON());
-                    }
-                    model.set('selected', flag);
-                    //model.trigger('render');
+                    temp.push(model.toJSON());
                 }
             });
-            selectedRows.reset(temp);
+
+            if (flag) {
+                selectedRows.reset(_.union(selectedRows.toJSON(),temp));
+            } else {
+                var ids = _.pluck(temp,'id');
+                var newRows = [];
+                console.log(temp);
+                selectedRows.each(function (row) {
+                    if (_.indexOf(ids, row.get('id')) === -1)
+                        newRows.push(row.toJSON());
+                });
+                selectedRows.reset(newRows);
+            }
+
+            rowsCollection.each(function(model) {
+                if (model.get('_selectable')) {
+                    model.set('selected', flag);
+                }
+            });
+
             gridView.$el.find('input.select-row:not([disabled])').prop('checked', flag);
         },
         _checkAction: function(ev) {
