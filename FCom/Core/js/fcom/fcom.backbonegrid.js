@@ -1739,6 +1739,12 @@ FCom.BackboneGrid = function(config) {
                     ev.callback(rowsCollection);
                 }
             });
+
+            g_vent.bind('get_selected_rows_collection', function(ev) {
+                if(ev.grid === config.id) {
+                    ev.callback(selectedRows);
+                }
+            });
         }
     }
 });
