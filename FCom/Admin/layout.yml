@@ -322,7 +322,7 @@ form:
     - view: admin/form
       set: { tab_view_prefix: users-form/ }
       do:
-        - [ addTab, main, { label: General Info } ]
+        - [ addTab, main, { label: General Info, pos: 10 } ]
 #        - [ addTab, history, { label: History } ]
 
 /roles:

@@ -10,7 +10,6 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'product' => 'Products',
         ),
         'table_field_type' => array(
-            '_serialized' => 'Serialized',
             'varchar(255)' => 'Short Text',
             'text' => 'Long Text',
             'int(11)' => 'Integer',
@@ -18,6 +17,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'decimal(12,2)' => 'Decimal',
             'date' => 'Date',
             'datetime' => 'Date/Time',
+            '_serialized' => 'Serialized',
         ),
         'admin_input_type' => array(
             'text' => 'Text Line',

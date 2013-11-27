@@ -1,5 +1,7 @@
 {% set m = THIS.get('model') %}
-
+<div class="form-group">
+    <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
+</div>
 <div class="form-group">
     <label class="col-md-2 control-label" for="main-node_name">{{ 'Node Name'|_ }}</label>
     <div class="col-md-5">

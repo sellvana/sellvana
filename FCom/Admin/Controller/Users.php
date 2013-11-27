@@ -8,7 +8,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridHref = 'users';
     protected $_gridTitle = 'Admin Users';
     protected $_recordName = 'User';
-    protected $_formViewName = 'users/form';
+    protected $_mainTableAlias = 'au';
 
     public function gridConfig()
     {
@@ -51,7 +51,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         ));
         $id = BRequest::i()->param('id', true);
         if($id){
-            $args['view']->addTab("history", array('label' => BLocale::_("History")));
+            $args['view']->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
         }
     }
 
@@ -63,5 +63,82 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         if (!empty($args['data']['model']['password'])) {
             $args['model']->setPassword($args['data']['model']['password']);
         }
+    }
+
+    /**
+     * get config for grid: users of role
+     * @param $model FCom_Admin_Model_Role
+     * @return array
+     */
+    public function getRoleUsersConfig($model)
+    {
+        $class = $this->_modelClass;
+        $orm = $class::i()->orm()->table_alias('au')
+            ->select(array('au.id', 'au.username', 'au.email', 'au.status'))
+            ->join('FCom_Admin_Model_Role', array('au.role_id','=','ar.id'), 'ar')
+            ->where('au.role_id', $model ? $model->id : 0);
+
+        $config = parent::gridConfig();
+
+        // TODO for empty local grid, it throws exception
+        unset($config['orm']);
+        $config['data'] = $orm->find_many();
+        $config['id'] = 'role_users_grid_'.$model->id;
+        $config['columns'] = array(
+            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('name'=>'id', 'label'=>'ID', 'index'=>'au.id', 'width'=>80, 'hidden'=>true),
+            array('name'=>'username', 'label'=>'Username', 'index'=>'au.username', 'width'=>200),
+            array('name'=>'email', 'label'=>'Email', 'index'=>'au.email', 'width'=>200),
+            array('name'=>'status', 'label'=>'Status', 'index'=>'au.status', 'width'=>200,
+                  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status'))
+        );
+        $config['actions'] = array(
+            'add'=>array('caption'=>'Add user'),
+        );
+        $config['filters'] = array(
+            array('field'=>'username', 'type'=>'text'),
+            array('field'=>'email', 'type'=>'text'),
+            array('field'=>'status', 'type'=>'select')
+        );
+        $config['data_mode'] = 'local';
+        $config['events'] = array('init', 'add','mass-delete');
+
+        return array('config'=>$config);
+    }
+
+    /**
+     * get config for grid: all users
+     * @param $model FCom_Admin_Model_Role
+     * @param $filterAdmin bool
+     * @return array
+     */
+    public function getAllUsersConfig($model, $filterAdmin = true)
+    {
+        $config            = parent::gridConfig();
+        $config['id']      = 'role_all_users_grid_' . $model->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true),
+            array('name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250),
+            array('name' => 'email', 'label' => 'Local SKU', 'index' => 'au.email', 'width' => 100),
+            array('name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100,
+                  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status'))
+        );
+        $config['actions'] = array(
+            'add' => array('caption' => 'Add selected users')
+        );
+        $config['filters'] = array(
+            array('field' => 'username', 'type' => 'text'),
+            array('field' => 'email', 'type' => 'text'),
+            array('field'=>'status', 'type'=>'select'),
+            '_quick' => array('expr' => 'username like ? or email like ? or au.id=?', 'args' => array('?%', '%?%', '?'))
+        );
+        if ($filterAdmin) {
+            $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
+        }
+
+        $config['events'] = array('add');
+
+        return array('config' => $config);
     }
 }
