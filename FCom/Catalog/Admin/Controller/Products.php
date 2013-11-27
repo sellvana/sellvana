@@ -326,6 +326,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->processCustomFieldPost($model, $data);
         $this->processVariantPost($model, $data);
         $this->processSystemLangFieldsPost($model, $data);
+        $this->processFrontendPost($model, $data);
     }
 
     public function processCategoriesPost($model)
@@ -489,6 +490,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     }
 
+    public function processFrontendPost($model, $data)
+    {
+        $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
+        $model->save();
+    }
     public function onMediaGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, array(
