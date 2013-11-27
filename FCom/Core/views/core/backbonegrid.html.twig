@@ -11,10 +11,10 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
     <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-8">
+          <div class="col-sm-8 f-grid-top-filters">
           {% if filterData[0] %}
             <span><label>Filters:&nbsp;</label></span>
-            <span class="fcom-filter-buttons-container">
+            <span class="f-filter-btns">
               <!-- filter buttons here -->
             </span>
           {% endif %}
@@ -33,7 +33,7 @@
     </div>
   {% endif %}
 
-  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row">
+  <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
       <div class="col-sm-7">
         <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
             <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
@@ -308,11 +308,10 @@
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-default clear">
-                  <i class=" icon-remove"></i>
+                <i class=" icon-remove"></i>
               </button>
               <button type="submit" class="btn btn-primary update">
-                  <i class=" icon-check-sign"></i>
-                  Update
+                 Update
               </button>
             </div>
           </div>
