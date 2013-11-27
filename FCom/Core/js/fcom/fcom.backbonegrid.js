@@ -622,6 +622,7 @@ FCom.BackboneGrid = function(config) {
         _editModal: function(ev) {
             modalForm.modalType = 'editable';
             BackboneGrid.currentRow = this.model;
+            console.log(BackboneGrid.currentRow.toJSON());
             modalForm.render();
             $(BackboneGrid.modalShowBtnId).trigger('click');
             return true;
@@ -1283,7 +1284,8 @@ FCom.BackboneGrid = function(config) {
                 if (BackboneGrid.currentRow) {
                     var name = model.get('name');
                     var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                    this.$el.find('input,select:last').val(val);
+                    console.log(val);
+                    elementView.$el.find('input,select:last').val(val);
                 }
             }
         }
