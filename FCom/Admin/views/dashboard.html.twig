@@ -1,71 +1,54 @@
 {% set widgets = THIS.getWidgets() %}
 {% set asyncWidgets = [] %}
-<div id='content-wrapper'>
-
-    <div class='page-header page-header-with-buttons'>
-      <h1 class='pull-left'>
-        <i class='icon-dashboard'></i>
-        <span>Dashboard</span>
-      </h1>
-      <div class="pull-left">
-        <div class="btn-group">
-        <!--
-          <select id="dashboard-add-widget" class="select2">
-            <option value="">{{ 'Select to add...'|_ }}</option>
+<div id="content-wrapper">
+  <div class="page-header f-page-header-has-btns">
+    <h1 class="f-page-title"">
+      <i class="icon-dashboard"></i>
+      <span>Dashboard</span>
+    </h1>
+    <div class="btn-group">
+      <a class="btn btn-link hidden-xs" href="#">Last month</a>
+      <a class="btn btn-link" href="#">Last week</a>
+      <a class="btn btn-link " href="#">Today</a>
+      <a class="btn btn-link" id="daterange" href="#"><i class="icon-calendar"></i><span>Custom</span><b class="caret"></b></a>
+    </div>
+  </div>
+  <div class="row f-content-dashboard">
+    <ul class="js-sortable-container">
 {% for widget in widgets %}
-  {% if widget.state.closed %}
-            <option value="{{ widget.key }}">{{ widget.title|_ }}</option>
+  {% if not widget.state.closed %}
+      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
+        <div class="box {{ widget.state.collapsed ? 'box-collapsed' }}">
+          <div class="box-header js-sortable-handle {{ widget.header_class }}">
+            <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
+            <div class="actions">
+              <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+              <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
+            </div>
+          </div>
+
+          {% if widget.async %}
+            {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
+          {% elseif widget.view %}
+            {{ THIS.view(widget.view) | raw }}
+          {% else %}
+            {{ widget.content | raw }}
+          {% endif %}
+        </div>
+      </li>
   {% endif %}
 {% endfor %}
-          </select>
-          -->
-        </div>
-      </div>
-      <div class='pull-right'>
-        <div class='btn-group'>
-          <a class="btn btn-link hidden-xs" href="#">Last month</a>
-          <a class="btn btn-link" href="#">Last week</a>
-          <a class="btn btn-link " href="#">Today</a>
-          <a class="btn btn-link" id="daterange" href="#"><i class='icon-calendar'></i><span>Custom</span><b class='caret'></b></a>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <ul class='js-sortable-container'>
-  {% for widget in widgets %}
-    {% if not widget.state.closed %}
-        <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
-          <div class='box {{ widget.state.collapsed ? 'box-collapsed' }}'>
-            <div class='box-header js-sortable-handle {{ widget.header_class }}'>
-              <div class='title'><i class='icon-{{ widget.icon }}'></i>{{ widget.title }}</div>
-              <div class='actions'>
-                <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class='icon-remove'></i></a>
-                <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
-              </div>
-            </div>
-  
-            {% if widget.async %}
-              {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
-            {% elseif widget.view %}
-              {{ THIS.view(widget.view) | raw }}
-            {% else %}
-              {{ widget.content | raw }}
-            {% endif %}
-          </div>
-        </li>
-    {% endif %}
-  {% endfor %}
-      </ul>
+    </ul>
   </div>
 </div>
 
 <script type="text/template" id="dashboard-widget-template">
   <li class="col-sm-<%- widget.cols %>" id="dashboard-widget__<%- widget.key %>" data-id="<%- widget.key %>">
-    <div class='box'>
-      <div class='box-header js-sortable-handle <%- widget.header_class %>'>
-        <div class='title'><i class='icon-<%- widget.icon %>'></i><%- widget.title %></div>
-        <div class='actions'>
-          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class='icon-remove'></i></a>
+    <div class="box">
+      <div class="box-header js-sortable-handle <%- widget.header_class %>">
+        <div class="title"><i class="icon-<%- widget.icon %>"></i><%- widget.title %></div>
+        <div class="actions">
+          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
           <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
         </div>
       </div>

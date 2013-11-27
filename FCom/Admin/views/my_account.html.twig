@@ -3,55 +3,39 @@
 {% set m = THIS.get('model') %}
 {% set userHlp = APP.instance('FCom_Admin_Model_User') %}
 
-<div class="row" id="content-wrapper">
+<div id="content-wrapper">
 
   <form id="my_account-form" class="form form-horizontal" method="post">
-
-    <div class="col-xs-12">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="page-header with-breadcrumbs" data-spy="affix">
-            <div class="pull-left">
-              <h1>
-                <i class="icon-user"></i>
-                <span>{{ m.fullname() }}</span>
-              </h1>
-
-              <ul class="breadcrumb">
-                <li>
-                  <a href="{{ APP.href() }}">
-                    <i class="icon-home"></i>
-                  </a>
-                </li>
-                <li class="separator">
-                  <i class="icon-angle-right"></i>
-                </li>
-                <li class="active">{{ 'User profile' |_ }}</li>
-              </ul>
-            </div>
-            <div class="pull-right">
-              <div class="btn-toolbar">
-                <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
-                <button type="submit" class="btn btn-primary">
-                  <i class="icon-save"></i>
-                  {{ 'Save' |_ }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="page-header with-breadcrumbs">
+      <h1 class="f-page-title">
+        <span>{{ m.fullname() }}</span>
+      </h1>
+      <div class="btn-group">
+        <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
+        <button type="submit" class="btn btn-primary">
+          {{ 'Save' |_ }}
+        </button>
       </div>
+    </div>
 
+      <ul class="breadcrumb">
+        <li>
+          <a href="{{ APP.href() }}">
+            <i class="icon-home"></i>
+          </a>
+        </li>
+        <li class="separator">
+          <i class="icon-angle-right"></i>
+        </li>
+        <li class="active">{{ 'User profile' |_ }}</li>
+      </ul>
       {{ THIS.view('core/messages') | raw }}
 
-      <div class="box">
-        <div class="box-content">
           <div class="row">
 
             <div class="col-lg-6">
-              <fieldset>
+              <fieldset class="f-fieldset-group">
                 <div class='lead'>
-                  <i class='icon-laptop text-contrast'></i>
                   {{ 'Account Information'|_ }}
                 </div>
                 <div class="form-group">
@@ -107,9 +91,8 @@
 
               <hr class="hr-normal">
 
-              <fieldset>
+              <fieldset class="f-fieldset-group">
                 <div class="lead">
-                  <i class="icon-user text-contrast"></i>
                   {{ 'Personal info'|_ }}
                 </div>
                 <div class="form-group">
@@ -133,18 +116,12 @@
                 </div>
               </fieldset>
             </div>
-
             <div class="col-lg-6">
-
-                <div class="lead">
-                  <i class="icon-bell text-contrast"></i>
-                  {{ 'Notifications Subscriptions'|_ }}
-                </div>
-            </div>
+              <div class="lead">
+                {{ 'Notifications Subscriptions'|_ }}
+              </div>
           </div>
-
-      </div>
-    </div>
+        </div>
   </form>
 </div>
 
