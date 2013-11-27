@@ -1178,15 +1178,16 @@ FCom.BackboneGrid = function(config) {
                 if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
                     hash.oper = 'add';
                     $.post(BackboneGrid.edit_url, hash, function(data) {
+                        alert('fff');
                         var newRow = new BackboneGrid.Models.Row(data);
                         rowsCollection.add(newRow);
-                        gridView.addRow(newRow);
+                        //gridView.addRow(newRow);
                     });
                 } else {
                     hash.id = guid();
                     var newRow = new BackboneGrid.Models.Row(hash);
                     rowsCollection.add(newRow);
-                    gridView.addRow(newRow);
+                    //gridView.addRow(newRow);
                 }
 
                 if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('new') !== -1) {

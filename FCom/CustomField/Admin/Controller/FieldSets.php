@@ -132,7 +132,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'options'=>array('0'=>'No', '1'=>'Yes')),
                     array('name'=>'multilanguage', 'label'=>'Multi Language', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
                         'options'=>array('0'=>'No', '1'=>'Yes')),
-
+                    array('name'=>'required', 'label'=>'Required', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
+                        'options'=>array('1'=>'Yes', '0'=>'No')),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
                 ),
                 'filters'=>array(
