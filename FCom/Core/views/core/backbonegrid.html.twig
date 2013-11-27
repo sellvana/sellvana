@@ -186,14 +186,11 @@
         print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
           if (typeof(col.data.edit.href) !== 'undefined') {
-            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
+            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
           } else {
-            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" >');
+            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
           }
-          print('<i class=" icon-edit-sign"></i>');
-          print('</a>');
         }
-
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
           print('<button class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" type="button">');
