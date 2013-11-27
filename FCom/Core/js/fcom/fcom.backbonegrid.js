@@ -156,6 +156,7 @@ FCom.BackboneGrid = function(config) {
             var temp = [];
             rowsCollection.each(function(model) {
                 if (model.get('_selectable')) {
+                    model.set('selected', flag);
                     temp.push(model.toJSON());
                 }
             });
