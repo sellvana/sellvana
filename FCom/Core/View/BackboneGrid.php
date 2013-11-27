@@ -777,6 +777,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (empty($config['filters'])) {
             return;
         }
+        $columnData = $this->findColumnDataForFilters($config);
         foreach ($config['filters'] as $fId=>$f) {
             $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
@@ -790,59 +791,63 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 continue;
             }
             $fId = $f['field'];
-            if (isset($filters[$fId]) && !empty($f['type']))
-                switch ($f['type']) {
-                case 'text':
-                    $val = $filters[$fId];
-                    if (!empty($filters[$fId])) {
-                        $val = $filters[$fId]['val'];
-                        switch ($filters[$fId]['op']) {
-                            case 'start'://start with
-                                $val = $val.'%';
-                                $op = 'like';
-                                break;
-                            case 'end'://end with
-                                $val = '%'.$val;
-                                $op = 'like';
-                                break;
-                            case 'contains'://contain
-                                $val = '%'.$val.'%';
-                                $op = 'like';
-                                break;
-                            case 'equal'://equal to
-                                $op = 'like';
-                                break;
-                            case 'not'://does not contain
-                                $val = '%'.$val.'%';
-                                $op = 'not_like';
-                                break;
-                        }
-                        $this->_processGridFiltersOne($f, $op, $val, $orm);
-                    }
-                    break;
-
-                case 'text-range': case 'number-range': case 'date-range':
-                    if (!empty($filters[$fId]['from'])) {
-                        $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
-                    }
-                    if (!empty($filters[$fId]['to'])) {
-                        $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['to'], $orm);
-                    }
-                    break;
-
-                case 'select':
-                    if (!empty($filters[$fId])) {
-                        $this->_processGridFiltersOne($f, 'equal', $filters[$fId], $orm);
-                    }
-                    break;
-
-                case 'multiselect':
-                    if (!empty($filters[$fId])) {
-                        $filters[$fId] = explode(',', $filters[$fId]);
-                        $this->_processGridFiltersOne($f, 'in', $filters[$fId], $orm);
-                    }
-                    break;
+            if (isset($filters[$fId]) && !empty($f['type'])) {
+                if (isset($columnData[$f['field']]['index'])) {
+                    $f['field'] = $columnData[$f['field']]['index']; //set field as index when select
                 }
+                switch ($f['type']) {
+                    case 'text':
+                        $val = $filters[$fId];
+                        if (!empty($filters[$fId])) {
+                            $val = $filters[$fId]['val'];
+                            switch ($filters[$fId]['op']) {
+                                case 'start'://start with
+                                    $val = $val.'%';
+                                    $op = 'like';
+                                    break;
+                                case 'end'://end with
+                                    $val = '%'.$val;
+                                    $op = 'like';
+                                    break;
+                                case 'contains'://contain
+                                    $val = '%'.$val.'%';
+                                    $op = 'like';
+                                    break;
+                                case 'equal'://equal to
+                                    $op = 'like';
+                                    break;
+                                case 'not'://does not contain
+                                    $val = '%'.$val.'%';
+                                    $op = 'not_like';
+                                    break;
+                            }
+                            $this->_processGridFiltersOne($f, $op, $val, $orm);
+                        }
+                        break;
+
+                    case 'text-range': case 'number-range': case 'date-range':
+                        if (!empty($filters[$fId]['from'])) {
+                            $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
+                        }
+                        if (!empty($filters[$fId]['to'])) {
+                            $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['to'], $orm);
+                        }
+                        break;
+
+                    case 'select':
+                        if (!empty($filters[$fId])) {
+                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId], $orm);
+                        }
+                        break;
+
+                    case 'multiselect':
+                        if (!empty($filters[$fId])) {
+                            $filters[$fId] = explode(',', $filters[$fId]);
+                            $this->_processGridFiltersOne($f, 'in', $filters[$fId], $orm);
+                        }
+                        break;
+                    }
+            }
         }
     }
 
@@ -931,6 +936,21 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }/*);*/
         fclose($fp);
         BResponse::i()->sendFile($filename);
+    }
+
+    public function findColumnDataForFilters($config)
+    {
+        $filters = $config['filters'];
+        $columns = $config['columns'];
+        $data = array();
+        foreach ($filters as $filter) {
+            foreach ($columns as $column) {
+                if (isset($column['name']) && isset($filter['field']) && ($column['name'] == $filter['field'])) {
+                    $data[$filter['field']] = $column;
+                }
+            }
+        }
+        return $data;
     }
 
 }
