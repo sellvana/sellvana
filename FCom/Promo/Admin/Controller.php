@@ -7,7 +7,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridLayoutName = '/promo';
     protected $_gridHref = 'promo';
     protected $_gridTitle = 'Promotions';
-    protected $_formViewName = 'promo/form';
     protected $_recordName = 'Promotion';
     protected $_mainTableAlias = 'p';
 
@@ -30,7 +29,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'name'     => '_actions',
                 'label'    => 'Actions',
                 'sortable' => false,
-                'data'     => array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)
+                'data'     => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)
             ),
         );
         $config['actions'] = array(
