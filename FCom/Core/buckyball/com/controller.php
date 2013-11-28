@@ -272,6 +272,8 @@ class BRequest extends BClass
         return ($script = static::scriptFilename()) ? dirname($script) : null;
     }
 
+    protected static $_webRootCache = array();
+
     /**
     * Web root path for current application
     *
@@ -280,8 +282,11 @@ class BRequest extends BClass
     * @param $parent if required a parent of current web root, specify depth
     * @return string
     */
-    public static function webRoot($parentDepth=null)
+    public static function webRoot($parentDepth=0)
     {
+        if (isset(static::$_webRootCache[$parentDepth])) {
+            return static::$_webRootCache[$parentDepth];
+        }
         $scriptName = static::scriptName();
         if (empty($scriptName)) {
             return null;
@@ -292,7 +297,12 @@ class BRequest extends BClass
             $len = sizeof($arr)-$parentDepth;
             $root = $len>1 ? join('/', array_slice($arr, 0, $len)) : '/';
         }
-        return $root ? $root : '/';
+        if (!$root) {
+            $root = '/';
+        }
+        static::$_webRootCache[$parentDepth] = $root;
+
+        return $root;
     }
 
     /**
@@ -977,7 +987,7 @@ class BResponse extends BClass
     public function header($header, $replace = true)
     {
         if (headers_sent($file, $line)) {
-            BDebug::notice("Can't send header: '{$header}', output started in {$file}:{$line}");
+            BDebug::notice("Can't send header: '".print_r($header,1)."', output started in {$file}:{$line}");
             return $this;
         }
         if (is_string($header)) {

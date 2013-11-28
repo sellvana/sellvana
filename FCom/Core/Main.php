@@ -294,7 +294,11 @@ class FCom_Core_Main extends BClass
         $dirConf = $config->get('fs');
         $modReg = BModuleRegistry::i();
 
-        $useProductionCache = 'STAGING' === $mode || 'PRODUCTION' === $mode;
+        if (file_exists($configDir.'/db.php')) {
+            $config->addFile('db.php', true);
+        }
+
+        $useProductionCache = ('STAGING' === $mode || 'PRODUCTION' === $mode) && !$config->get('db/implicit_migration');
         if ($useProductionCache) {
             $manifestsLoaded = $modReg->loadManifestCache();
         } else {
@@ -324,9 +328,6 @@ class FCom_Core_Main extends BClass
             $modReg->saveManifestCache(); //TODO: call explicitly
         }
 
-        if (file_exists($configDir.'/db.php')) {
-            $config->addFile('db.php', true);
-        }
         if (file_exists($configDir.'/local.php')) {
             $config->addFile('local.php', true);
         }
