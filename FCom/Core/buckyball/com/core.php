@@ -335,10 +335,13 @@ class BApp extends BClass
     * @param string $method
     * @return string
     */
-    public static function src($modName, $url='', $method='baseSrc')
+    public static function src($url='', $method='baseSrc')
     {
-        if ($modName[0]==='@' && !$url) {
+        if ($url[0]==='@') {
             list($modName, $url) = explode('/', substr($modName, 1), 2);
+        }
+        if (empty($modName)) {
+            return BRequest::i()->webRoot() . '/' . $url;
         }
         $m = BApp::m($modName);
         if (!$m) {
