@@ -121,6 +121,37 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     }
 
+    public function frontendFieldGrid($model)
+    {
+        $data = $model->getData('frontend_fields');
+        if (!isset($data))
+            $data = array();
+        $config = array(
+            'config'=>array(
+                'id'=>'frontend-field-grid',
+                'caption'=>'Frontend Field Grid',
+                'data_mode'=>'local',
+                'data'=>$data,
+                'columns'=>array(
+                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
+                    array('name'=>'name', 'label'=>'Field Name', 'width'=>200),
+                    array('name'=>'label', 'label'=>'Field Label', 'width'=>200),
+                    array('name'=>'input_type', 'label'=>'Input Type', 'width'=>200),
+                    array('name'=>'options', 'label'=>'Options', 'width'=>200),
+                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                ),
+                'actions'=>array(
+                                    'add' => array('caption' => 'Select a Field'),
+                                    'delete' => array('caption' => 'Remove')
+                                ),
+                'events'=>array('add')
+            )
+        );
+
+        return $config;
+    }
+
     public function formViewBefore()
     {
         $id = BRequest::i()->params('id', true);
@@ -177,14 +208,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         BResponse::i()->render();
     }
 
-    public function getInitialData($id)
+    public function getInitialData($model)
     {
-
-        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$id)->find_many());
-        if (empty($res)) {
-            return -1;
-        }
-        return $res[0]['_data_serialized'] ? $res[0]['_data_serialized'] : -1;
+        $customFields = $model->getData('custom_fields');
+        return !isset($customFields) ? -1 : $customFields;
     }
     public function fieldsetAry()
     {
@@ -226,7 +253,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $id = $r->get('id');
         $field = FCom_CustomField_Model_Field::i()->load($id);
         $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id);
-        BResponse::i()->json(array('id'=>$field->id, 'field_name'=>$field->field_name, 'admin_input_type'=>$field->admin_input_type, 'multilang'=>$field->multilanguage, 'options'=>$options));
+        BResponse::i()->json(array('id'=>$field->id, 'field_name'=>$field->field_name, 'admin_input_type'=>$field->admin_input_type, 'multilang'=>$field->multilanguage, 'options'=>$options, 'required'=>$field->required));
     }
 
     public function action_save__POST()
@@ -252,6 +279,22 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
          }
 
          BResponse::i()->json(array('status'=>$status));
+    }
+
+    public function action_get_fields__POST()
+    {
+        $res = array();
+        $data = BRequest::i()->post();
+        $ids = explode(',',$data['ids']);
+        $optionsModel = FCom_CustomField_Model_FieldOption::i();
+        $fieldModel = FCom_CustomField_Model_Field::i();
+        foreach($ids as $id) {
+            $field = $fieldModel->load($id);
+            $options = join(',', array_keys($optionsModel->getListAssocById($id)));
+            $res[] = array('id'=>$id, 'name'=>$field->field_name, 'label'=>$field->frontend_label, 'input_type'=>$field->admin_input_type, 'options'=>$options);
+        }
+
+        BResponse::i()->json($res);
     }
 
     public function getFieldTypes()

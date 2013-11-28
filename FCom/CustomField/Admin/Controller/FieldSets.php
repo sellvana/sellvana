@@ -132,7 +132,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'options'=>array('0'=>'No', '1'=>'Yes')),
                     array('name'=>'multilanguage', 'label'=>'Multi Language', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
                         'options'=>array('0'=>'No', '1'=>'Yes')),
-
+                    array('name'=>'required', 'label'=>'Required', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
+                        'options'=>array('1'=>'Yes', '0'=>'No')),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
                 ),
                 'filters'=>array(
@@ -369,6 +370,4 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $rows = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm()->where($name,$val)->find_many());
         BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
     }
-
-
 }

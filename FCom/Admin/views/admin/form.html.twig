@@ -18,15 +18,55 @@
                 url_get:  '{{ formUrl }}',
                 url_post: '{{ formUrl }}'
             });
-            $("#{{ formId }}").validate({
+            /*$("#{{ formId }}").validate({
                 debug: true,
                 ignore: ".ignore-validation input, .ignore-validation select, .ignore-validation textarea",
                 submitHandler: function(form) {
                     console.log('submitHandler', form);
                 }
+            });*/
+            //$("#{{ formId }}").removeAttr("novalidate");
+            $("#{{ formId }}").validate({
+                ignore: [],//for invisible elements
+                invalidHandler: function(event, validator) {
+                    console.log('invalidHandler');
+                    var info = {};
+                    console.log(validator.invalid);
+                    for(key in validator.invalid) {
+                        var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                        if (element.length>0) {
+                            var tab = element.parents('div.main-form-tab:first');
+                            var key = '#'+tab.attr('id');
+                            if (typeof(info[key]) === 'undefined')
+                                info[key] = 1;
+                            else
+                                info[key]++;
+                        }
+                    }
+
+
+                    $('ul#tabs').find('li a').each(function(index) {
+                        var val = info[$(this).attr('href')];
+                        if (typeof(val) !== 'undefined')
+                         {
+                            if ($(this).find('span.badge').length === 0) {
+                                $(this).append('<span class="badge badge-important"></span>');
+                            }
+                            $(this).find('span.badge').html(val>0 ? val : '');
+                        } else {
+                            $(this).find('span.badge').remove();
+                        }
+                    });
+
+                    for(key in info) {
+                        $('a[href="'+key+'"]').trigger('click');
+                        break;
+                    }
+
+                }
             });
 
-            console.log(123);
+
             FCom.Admin.Tabs('.f-admin-main-container', {
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ curTab }}",
@@ -44,52 +84,47 @@
 </script>
 
 <form id="{{ formId }}" class="form form-horizontal validate-form" action="{{ formUrl }}" method="post">
-    <div class="row fcom-admin-main-title">
-        <div class="col-sm-12">
-            <div class="page-header">
-                <h1 class="pull-left">
-                    <i class="icon-table"></i>
-                    {{ THIS.get('title') }}
-                </h1>
-                <div class="pull-right">
-                    <div class="btn-group">
-                        {{ THIS.get('actions') | join(' ') | raw }}
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="row page-header">
+      <h1 class="f-page-title">
+          <i class="icon-table"></i>
+          {{ THIS.get('title') }}
+      </h1>
+      <div class="btn-group">
+          {{ THIS.get('actions') | join(' ') | raw }}
+      </div>
     </div>
 
     {{ THIS.view('core/messages') | raw }}
 
-    <div class="row f-admin-main-container f-admin-sidebar-view col-sm-12 box">
-        <div class="box-content">
-            <div class="tabbable tabs-left">
-                <ul class="nav nav-tabs nav-stacked f-admin-nav-sidebar" id="tabs">
-                    {% if THIS.get('sidebar_img') %}
-                        <li><img src="{{ THIS.get('sidebar_img') | raw }}" width="98" height="98" /></li>
-                    {%  endif %}
-                    {% for k, tab in tabs %}
-                        {% if tab.disabled is empty %}
-                            <li>
-                                <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
-                                    <span class="icon"></span>
-                                    {{ tab.label }}
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                <div class="tab-content">
-                    {% for k, tab in tabs %}
-                        <div class="tab-pane" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
-                            {% if not tab.async %}
-                                {{ THIS.view(tab.view).set('validator', validator) | raw }}
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+    <div class="row f-admin-main-container f-admin-sidebar-view col-sm-12">
+      <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs nav-stacked f-admin-nav-sidebar" id="tabs">
+            {% if THIS.get('sidebar_img') %}
+                <li><img src="{{ THIS.get('sidebar_img') | raw }}" width="98" height="98" /></li>
+            {%  endif %}
+            {% for k, tab in tabs %}
+                {% if tab.disabled is empty %}
+                    <li>
+                        <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                            <span class="icon"></span>
+                            {{ tab.label }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for k, tab in tabs %}
+                <div class="tab-pane" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
+                    {% if not tab.async %}
+                        {{ THIS.view(tab.view).set('validator', validator) | raw }}
+                    {% endif %}
                 </div>
-            </div>
+            {% endfor %}
         </div>
+      </div>
     </div>
 </form>
+
+<div id="fcom_append_form">
+</div>

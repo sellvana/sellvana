@@ -11,15 +11,15 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
     <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-9">
+          <div class="col-sm-8 f-grid-top-filters">
           {% if filterData[0] %}
             <span><label>Filters:&nbsp;</label></span>
-            <span class="fcom-filter-buttons-container">
+            <span class="f-filter-btns">
               <!-- filter buttons here -->
             </span>
           {% endif %}
           </div>
-          <div class="col-sm-3 text-right">
+          <div class="col-sm-4 text-right">
 
               <div class="dataTables_filter">
                   <label>
@@ -33,14 +33,14 @@
     </div>
   {% endif %}
 
-  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
+  <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
       <div class="col-sm-7">
-        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+        <span class="{{ config.id }} dropdown dd dd-nestable filter-span" style="display:inline;">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 Columns
                 <b class="caret"></b>
             </a>
-                <ol class="dd-list dropdown-menu" style="margin-left:20px;min-width:200px;">
+                <ol class="dd-list dropdown-menu" style="min-width:200px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
@@ -77,7 +77,7 @@
       </div>
   </div>
   <div class='row'>
-    <div class="text-center {{ config.id }}-pagination"></div>
+    <div class="text-center {{ config.id }}-pagination f-grid-pagination"></div>
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
@@ -85,7 +85,7 @@
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }} style='width:auto;'>
+    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -102,28 +102,31 @@
       </tbody>
     </table>
   </div>
-  <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
-  <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
-    <div class='modal-dialog'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
-            </div>
-            <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
-              <div class='modal-body'>
-                  <!-- mass edit form element template is here -->
-              </div>
-            </form>
-            <div class='modal-footer'>
-                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
-                <button class='btn btn-primary save' type='button'>Save changes</button>
+</div>
+ <div id="{{ config.id }}-modal">
+      <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
+      <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                    <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+                </div>
+                <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
+                  <div class='modal-body'>
+                      <!-- mass edit form element template is here -->
+                  </div>
+                </form>
+                <div class='modal-footer'>
+                    <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
+                    <button class='btn btn-primary save' type='button'>Save changes</button>
+                </div>
             </div>
         </div>
-    </div>
+      </div>
   </div>
 
-</div>
+
 
 
 
@@ -144,9 +147,7 @@
     </div>
 </script>
 <script type="template" id="{{ config.id }}-col-template">
-  <div class="dd-handle dd3-handle">
-    &nbsp;
-  </div>
+  <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
   <div class="dd3-content">
     <label>
         <input class="showhide_column" type="checkbox" datid=<%- rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
@@ -175,7 +176,7 @@
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
-          print('<button class="btn btn-info btn-xs btn-custom" type="button">');
+          print('<button class="btn btn-link btn-custom" type="button">');
             print(col.data.custom.caption);
           print('</button>');
         }
@@ -183,17 +184,20 @@
         print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
           if (typeof(col.data.edit.href) !== 'undefined') {
-            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
+/* START CONFLICT *
+            print('<a class="btn btn-link btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'">');
           } else {
-            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" >');
+            print('<button type="button" class="btn btn-link btn-edit _modal" >');
+/* MIDDLE CONFLICT */
+            print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
+          } else {
+            print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
+/* END CONFLICT */
           }
-          print('<i class=" icon-edit-sign"></i>');
-          print('</a>');
         }
-
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
-          print('<button class="btn btn-danger btn-xs btn-delete '+col.data.delete+'" type="button">');
+          print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
           print('</button>');
         }
@@ -206,7 +210,7 @@
 
             if (col.editor === 'select') {
                 if(col.editable === 'inline') {
-                print('<select id="'+col.name+'" class="form-control has-tooltip" '+validationRules(col.validation)+' data-col="'+col.name+'"  title="" data-placement="bottom" title="Bottom">');
+                print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
                 for(var key in col.options) {
                     print('<option value="'+key+'">'+col.options[key]+'</option>');
                 }
@@ -219,7 +223,7 @@
 
             if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
               if(col.editable === 'inline') {
-                print('<input id="'+col.name+'" type="text"  class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
               } else {
                 print(rc.row[col.name]);
@@ -310,11 +314,10 @@
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-default clear">
-                  <i class=" icon-remove"></i>
+                <i class=" icon-remove"></i>
               </button>
               <button type="submit" class="btn btn-primary update">
-                  <i class=" icon-check-sign"></i>
-                  Update
+                 Update
               </button>
             </div>
           </div>
@@ -322,35 +325,54 @@
     </ul>
  </script>
 
-<script type='template' id="{{ config.id }}-date-filter-template">
+<script type='template' id="{{ config.id }}-date-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <%- rc.label %>:
         <% if(rc.filterVal ==='') { %>
         All
         <%} else { %>
-        <%- rc.filterLabel %> "<%- rc.filterVal %>"
+        <%- rc.filterVal.from %> - <%- rc.filterVal.to %>
         <% } %>
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu filter-box">
-        <li>
-            <div class="input-group datepicker">
-                <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
-                <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal  %>">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-default clear">
-                        <i class=" icon-remove"></i>
-                    </button>
-                    <button type="submit" class="btn btn-primary update">
-                        <i class=" icon-check-sign"></i> Update
-                    </button>
+        <li role="presentation">
+            <div class="form-group">
+                <label>From</label>
+                <div class="date-from datepicker input-group">
+                    <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.from %>">
+                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
                 </div>
+            </div>
+            <div class="form-group">
+                <label>To</label>
+                <div class="date-to datepicker input-group">
+                    <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.to %>">
+                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
+                </div>
+            </div>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default clear">
+                    <i class=" icon-remove"></i>
+                </button>
+                <button type="submit" class="btn btn-primary update">
+                    <i class=" icon-check-sign"></i> Update
+                </button>
             </div>
         </li>
     </ul>
 </script>
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
+
+    if ($('#fcom_append_form').length > 0) {
+      $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');
+      var html = $("#{{ config.id }}-modal").html();
+
+      $("#{{ config.id }}-modal").remove();
+      $('form#{{ config.id }}-new-form').append(html);
+
+    }
     //$(function() {
         var grid = new FCom.BackboneGrid({
             id: "{{ config.id }}",

@@ -1,34 +1,21 @@
 {% set formUrl = APP.href('cms/nav/tree_form/') %}
 
 <div class="row">
-    <div class="col-sm-12">
+  <div class="col-sm-12">
+    <div class="f-admin-main-title">
         <div class="page-header">
             <h1 class="pull-left">
                 <i class="icon-file"></i>
                 <span>{{ "CMS Navigation" |_ }}</span>
             </h1>
         </div>
+      </div>
     </div>
 </div>
 
-{#<div class="box col-sm-12" id="cms-nav-layout">#}
-    {#<div class="box-header blue-background">#}
-        {#<div class="title">{{ "Pages"|_ }}</div>#}
-        {#<div class="actions">#}
-            {#<input id="nav-tree-lock" type="checkbox" />#}
-            {#<input id="nav-expand-collapse" type="checkbox" />#}
-        {#</div>#}
-    {#</div>#}
-    {#<div class="box-content" id="cms_nav"></div>#}
 
-    {#<form id="nav-tree-form" method="post" action="{{ formUrl }}">#}
-        {#<div class="ui-layout-center adm-main" id="nav-form-container"></div>#}
-    {#</form>#}
-
-{#</div>#}
-
-<div class="box col-sm-12 fcom-tree-layout">
-    <div class="box-content row" id="cms-nav-layout">
+<div class="col-sm-12 fcom-tree-layout">
+    <div class="row" id="cms-nav-layout">
         <div id="cms-nav-wrapper">
             <div class="text-center well-sm">
                 <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>

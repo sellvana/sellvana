@@ -84,53 +84,45 @@
 {{ THIS.view('core/messages') | raw }}
 
 <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
-    <div class="row f-admin-main-title">
-        <div class="col-sm-12">
-            <div class="page-header">
-                <h1 class="pull-left">
-                    <i class="icon-cog"></i>
-                    <span>{{ "Settings" |_ }}</span>
-                </h1>
-                <div class="pull-right">
-                    <div class="btn-group">
-                        <button class="btn" type="submit" onclick="return adminForm.saveAll(this)">{{ "Save All" |_ }}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="page-header">
+      <h1 class="f-page-title">
+          <i class="icon-cog"></i>
+          <span>{{ "Settings" |_ }}</span>
+      </h1>
+      <div class="btn-group">
+          <button class="btn btn-primary" type="submit" onclick="return adminForm.saveAll(this)">{{ "Save All" |_ }}</button>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12 f-admin-main-container">
-            <div class="f-admin-main-content">
-                <ul class="nav nav-tabs">
-                    {% for group in THIS.tab_groups %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }}</a>
-                            <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
-                                {% for k, tab in group.tabs %}
-                                    {% if tab.disabled is empty %}
-                                        <li id="settings-tab-{{ k }}">
-                                            <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
-                                                <span class="icon"></span>
-                                                {{ tab.label }}
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
+    <div class="f-admin-main-container">
+        <div class="f-admin-main-content">
+            <ul class="f-horiz-nav-tabs nav nav-tabs">
+                {% for group in THIS.tab_groups %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }}</a>
+                        <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
+                            {% for k, tab in group.tabs %}
+                                {% if tab.disabled is empty %}
+                                    <li id="settings-tab-{{ k }}">
+                                        <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                                            <span class="icon"></span>
+                                            {{ tab.label }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
 
-                <div class="tab-content">
-                    {% for k, tab in THIS.tabs %}
-                        <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
-                            {% if tab.async is empty  %}
-                                {{ THIS.view(tab.view)|raw }}
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="tab-content">
+                {% for k, tab in THIS.tabs %}
+                    <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
+                        {% if tab.async is empty  %}
+                            {{ THIS.view(tab.view)|raw }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

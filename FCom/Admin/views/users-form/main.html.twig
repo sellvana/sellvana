@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% set validator = THIS.get('validator') %}
+{% set validator = THIS.get('validator', m) %}
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
 
 <fieldset class="form-horizontal">
@@ -12,9 +12,9 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-superadmin">{{ 'Super Admin'|_ }}</label>
         <div class="col-md-5">
-            <select id="model-superadmin" name="model[is_superadmin]" class="form-control">
-                {{ UTIL.optionsHtml(hlp.fieldOptions('is_superadmin'), validator.fieldValue('is_superadmin'))|raw }}
-            </select>
+            <input type="hidden" name="model[is_superadmin]" value="0" />
+            <input type="checkbox" id="model-superadmin" class="switch-cbx" name="model[is_superadmin]"
+                   value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
         </div>
     </div>
     <div class="form-group">
