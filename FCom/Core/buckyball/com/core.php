@@ -338,7 +338,7 @@ class BApp extends BClass
     public static function src($url='', $method='baseSrc')
     {
         if ($url[0]==='@') {
-            list($modName, $url) = explode('/', substr($modName, 1), 2);
+            list($modName, $url) = explode('/', substr($url, 1), 2);
         }
         if (empty($modName)) {
             return BRequest::i()->webRoot() . '/' . $url;
