@@ -289,19 +289,19 @@
 
               <ul class='dropdown-menu filter-sub'>
                 <li>
-                    <a class='filter_op' data-id='contains' href='#'>contains</a>
+                    <a class='filter_op' data-id='contains' href='javascript:void()'>contains</a>
                 </li>
                 <li>
-                   <a class='filter_op' data-id='not' href='#'>does not contain</a>
+                   <a class='filter_op' data-id='not' href='javascript:void()'>does not contain</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='equal' href='#'>is equal to</a>
+                    <a class='filter_op' data-id='equal' href='javascript:void()'>is equal to</a>
                 </li>
                 <li>
-                    <a  class='filter_op' data-id='start' href='#'>start with</a>
+                    <a  class='filter_op' data-id='start' href='javascript:void()'>start with</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='end' href='#'>end with</a>
+                    <a class='filter_op' data-id='end' href='javascript:void()'>end with</a>
                 </li>
               </ul>
             </div>
@@ -324,39 +324,61 @@
 
 <script type='template' id="{{ config.id }}-date-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%- rc.label %>:
-        <% if(rc.filterVal ==='') { %>
-        All
-        <%} else { %>
-        <%- rc.filterVal.from %> - <%- rc.filterVal.to %>
-        <% } %>
+        <%- rc.label %>: All
         <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu filter-box">
-        <li role="presentation">
-            <div class="form-group">
-                <label>From</label>
-                <div class="date-from datepicker input-group">
-                    <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.from %>">
-                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
-                </div>
+
+    <ul class="dropdown-menu filter-box" style="width:570px;">
+      <li>
+          <div class="input-group">
+            <div class="input-group-btn dropdown" style="width:100px;padding-right:15px;">
+              <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
+                  <%- rc.filterLabel%>
+                  <span class='caret'></span>
+              </button>
+
+              <ul class='dropdown-menu filter-sub'>
+                <li>
+                    <a class='filter_op range' data-id='between' href='javascript:void()'>between</a>
+                </li>
+                <li>
+                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>from</a>
+                </li>
+                <li>
+                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>to</a>
+                </li>
+                <li>
+                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>is equal to</a>
+                </li>
+                <li>
+                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>not in</a>
+                </li>
+              </ul>
             </div>
-            <div class="form-group">
-                <label>To</label>
-                <div class="date-to datepicker input-group">
-                    <input type="text" class="form-control" data-format="yyyy-MM-dd" value="<%- rc.filterVal.to %>">
-                    <span class="input-group-addon"> <span data-date-icon="icon-calendar" data-time-icon="icon-time" class="icon-calendar"></span> </span>
-                </div>
+
+            <div class="input-group range" style="width:260px;height:38px;display:table;">
+                <input type="text" placeholder="Select daterange" class="form-control daterange" style="height:38px;">
+                <span id="daterange2" class="input-group-addon">
+                  <i class="icon-calendar"></i>
+                </span>
+            </div>
+            <div class="datepicker input-group not_range"  style="width:260px;display:none;">
+                          <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" style="height:38px;">
+                          <span class="input-group-addon">
+                            <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
+                          </span>
             </div>
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default clear">
-                    <i class=" icon-remove"></i>
-                </button>
-                <button type="submit" class="btn btn-primary update">
-                    <i class=" icon-check-sign"></i> Update
-                </button>
+              <button type="button" class="btn btn-default clear">
+                  <i class=" icon-remove"></i>
+              </button>
+              <button type="submit" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  Update
+              </button>
             </div>
-        </li>
+          </div>
+      </li>
     </ul>
 </script>
 <script>
