@@ -933,7 +933,7 @@ FCom.BackboneGrid = function(config) {
                 if(typeof(BackboneGrid.current_filters[this.model.get('name')]) === 'undefined')
                     return;
                 delete BackboneGrid.current_filters[this.model.get('name')];
-
+                this.render();
             } else {
 
                 if (val.length === 0)
@@ -1091,6 +1091,14 @@ FCom.BackboneGrid = function(config) {
             this.$el.find(".datepicker").datetimepicker({
                 pickTime: false
             });
+
+            $('div.daterangepicker').on('click', function(ev) {
+                                                            ev.stopPropagation();
+                                                            ev.preventDefault();
+
+                                                            return false;
+                                                        }
+                                    );
 
             var filterVal = this.model.get('filterVal');
             if (this.range)
@@ -1522,13 +1530,6 @@ FCom.BackboneGrid = function(config) {
         colsVisibiltyView.render();
         filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
         filterView.render();
-        $('div.daterangepicker').on('click', function(ev) {
-                                                            ev.stopPropagation();
-                                                            ev.preventDefault();
-
-                                                            return false;
-                                                        }
-                                    );
 
         //body view
         var rows = config.data.data;
