@@ -88,7 +88,28 @@
                             </select>
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Multi Language</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Required</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="required" id="required" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -240,7 +261,7 @@ CONFLICT END #}
                 </button>
             </div>
         </div>
-        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
+        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">show</a>
         <div id="<%- rc.field_code+rc.id %>" class="modal fade in" tabindex='-1'>
             <div class="modal-dialog" style="width:900px;">
                 <div class="modal-content">
@@ -419,10 +440,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         });
     });
     var _mainForm = $('form#catalog-products-form');
-    var _submitted = false; //flag for prevent infitive loop
-    $(_mainForm).submit(function(ev) {
 
-
+    function checkFieldSet()
+    {
         setCollection.each(function(set) {
             set.fields.each(function(field) {
                 if (field.wysiwyg) {
@@ -444,7 +464,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                         langField.set('value', val);
                         langField.view.$el.find('textarea').eq(1).val(val);//for validation show only
                     }
-
                     if (field.get('required') === '1' && langField.get('value') === '')
                             invalid++;
                 });
@@ -467,20 +486,31 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 }
             });
         });
+    }
 
+    function sortFieldSet()
+    {
         setCollection.each(function(set) {
             set.fields.sort();
         });
+    }
+
+    $(_mainForm).submit(function(ev) {
+
+        checkFieldSet();
+        sortFieldSet();
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
-        if (!$(this).valid()) {
-            _submitted = false;
+        if(!$(this).valid()) {
+            CustomField.checkingForm = true;
             return false;
         } else {
-            if (!_submitted) {
-                _submitted = true;
+            if (CustomField.checkingForm) {
+                CustomField.checkingForm = false;
                 $(this).submit();
             }
+
         }
+
     });
 
     var _appendForm = $('form#prod-new-field-form1');
@@ -630,7 +660,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Views.LangFieldView = Backbone.View.extend({
         className: 'row',
         attributes: {
-            style: 'margin-top:3px;'
+            style: 'margin-top:3px; margin-bottom: 30px;'
         },
         events: {
             'click button.field-remove': '_remove',
@@ -810,7 +840,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             //this.$el.find('.select2').select2();
             this._updateLangTag();
-            this.$el.find('.lang_fields').css('max-height', $(window).height()-300);
+            if ($(window).height()-250 > 100)
+                this.$el.find('.lang_fields').css('max-height', $(window).height()-250);
             return this;
         }
     });
@@ -981,7 +1012,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
 
 $(window).resize(function() {
-    var h = $(window).height()-300;
-    $('.lang_fields').css('max-height', h);
+    var h = $(window).height()-250;
+    if (h > 100)
+        $('.lang_fields').css('max-height', h);
 })
 </script>
