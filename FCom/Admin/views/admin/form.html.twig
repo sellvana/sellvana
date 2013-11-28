@@ -29,6 +29,7 @@
             $("#{{ formId }}").validate({
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
+                    console.log('invalidHandler');
                     var info = {};
                     console.log(validator.invalid);
                     for(key in validator.invalid) {
@@ -61,7 +62,7 @@
                         $('a[href="'+key+'"]').trigger('click');
                         break;
                     }
-                    return false;
+
                 }
             });
 

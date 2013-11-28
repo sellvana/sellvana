@@ -222,7 +222,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $id = $r->get('id');
         $field = FCom_CustomField_Model_Field::i()->load($id);
         $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id);
-        BResponse::i()->json(array('id'=>$field->id, 'field_name'=>$field->field_name, 'admin_input_type'=>$field->admin_input_type, 'multilang'=>$field->multilanguage, 'options'=>$options));
+        BResponse::i()->json(array('id'=>$field->id, 'field_name'=>$field->field_name, 'admin_input_type'=>$field->admin_input_type, 'multilang'=>$field->multilanguage, 'options'=>$options, 'required'=>$field->required));
     }
 
     public function action_save__POST()

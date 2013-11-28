@@ -622,6 +622,7 @@ FCom.BackboneGrid = function(config) {
         _editModal: function(ev) {
             modalForm.modalType = 'editable';
             BackboneGrid.currentRow = this.model;
+            console.log(BackboneGrid.currentRow.toJSON());
             modalForm.render();
             $(BackboneGrid.modalShowBtnId).trigger('click');
             return true;
@@ -1175,15 +1176,16 @@ FCom.BackboneGrid = function(config) {
                 if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
                     hash.oper = 'add';
                     $.post(BackboneGrid.edit_url, hash, function(data) {
+                        alert('fff');
                         var newRow = new BackboneGrid.Models.Row(data);
                         rowsCollection.add(newRow);
-                        gridView.addRow(newRow);
+                        //gridView.addRow(newRow);
                     });
                 } else {
                     hash.id = guid();
                     var newRow = new BackboneGrid.Models.Row(hash);
                     rowsCollection.add(newRow);
-                    gridView.addRow(newRow);
+                    //gridView.addRow(newRow);
                 }
 
                 if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('new') !== -1) {
@@ -1279,7 +1281,8 @@ FCom.BackboneGrid = function(config) {
                 if (BackboneGrid.currentRow) {
                     var name = model.get('name');
                     var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                    this.$el.find('input,select:last').val(val);
+                    console.log(val);
+                    elementView.$el.find('input,select:last').val(val);
                 }
             }
         }
