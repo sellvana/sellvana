@@ -194,11 +194,11 @@ CONFLICT END #}
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input data-rule-required="true" name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                        print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
                         break;
                     case 'textarea':
-                        print('<textarea data-rule-required="true" name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
                         break;
                     case 'wysiwyg':
@@ -207,7 +207,7 @@ CONFLICT END #}
                         break;
                     case 'select':
                     case 'multiselect':
-                        print('<select data-rule-required="true" '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
+                        print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
                         vals = rc.value.split(',');
                         for(key in rc.options) {
                             print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
@@ -288,7 +288,7 @@ CONFLICT END #}
                         print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
                         break;
                     case 'wysiwyg':
                         print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
@@ -419,29 +419,46 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         });
     });
     var _mainForm = $('form#catalog-products-form');
-
+    var _submitted = false; //flag for prevent infitive loop
     $(_mainForm).submit(function(ev) {
+
+
         setCollection.each(function(set) {
             set.fields.each(function(field) {
                 if (field.wysiwyg) {
                     var w = field.view.getWYSIWYG();
-                    field.set('value', w.getData());
-                    field.view.$el.find('textarea').eq(1).val(w.getData());//for validation show only
+                    var val = w.getData();
+                    field.set('value', val);
+                    field.view.$el.find('textarea').eq(1).val(val);//for validation show only
                 }
 
                 if (field.switch) {
                     var s = field.view.getSwitch();
                     field.set('value', s.hasClass('switch-on') ? '1' : '0');
                 }
+                var invalid = 0;
                 field.langFields.each(function(langField) {
                     if (langField.wysiwyg) {
                         var w = langField.view.getWYSIWYG();
-                        langField.set('value', w.getData());
+                        var val = w.getData();
+                        langField.set('value', val);
+                        langField.view.$el.find('textarea').eq(1).val(val);//for validation show only
                     }
+
+                    if (field.get('required') === '1' && langField.get('value') === '')
+                            invalid++;
                 });
+
+                if (field.get('required') === '1') {
+                    field.view.$el.find('div.col-md-9:last').find('span').remove();
+                    if (invalid > 0 ) {
+                        field.view.$el.find('div.col-md-9:last').append('<span class="badge badge-important">'+invalid+'</span>');
+                        flag = true;
+                    }
+                }
+
                 var position = field.view.$el.index();
                 field.set('position', position);
-                //console.log('ffff');
                 var setId = field.view.$el.parents('.prod-fieldset:first').attr('id');
                 if (setId !== set.get('id')) {
                     set.fields.remove(field, {silent: true});
@@ -455,9 +472,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             set.fields.sort();
         });
         $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
-        console.log($('#prod_customfield').val());
-        //$(this).valid();
-        //return false;
+        if (!$(this).valid()) {
+            _submitted = false;
+            return false;
+        } else {
+            if (!_submitted) {
+                _submitted = true;
+                $(this).submit();
+            }
+        }
     });
 
     var _appendForm = $('form#prod-new-field-form1');
@@ -736,7 +759,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var val = this.$el.find('select').val();
             if (typeof(val) === 'object')
                 val = val.join(',');
-            console.log(val);
             this.model.set('value', val);
         },
         _changeVal: function() {
@@ -762,7 +784,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             if (langField.get('admin_input_type') === 'wysiwyg') {
                 adminForm.wysiwygInit();
                 langField.wysiwyg = true;
+                var p = langView.$el.find('textarea:first').parent();
+                p.append('<textarea name="'+guid()+'"' +(this.model.get('required') === '1' ? 'data-rule-required="true"' : '')+ ' style="display:none;">'+langView.$el.find('textarea:first').val()+'</textarea>');
 
+            } else if (this.model.get('required') === '1') {
+                langView.$el.find('input,textarea').attr('data-rule-required','true');
             }
             this.$el.find('div.lang_fields').css('max-height','500px;');
             langView.parentSet = this.model;
@@ -860,7 +886,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     field.wysiwyg = true;
                     adminForm.wysiwygInit();
                     var p = fieldView.$el.find('textarea:first').parent();
-                    p.append('<textarea name="'+guid()+'" data-rule-required="true" style="display:none;">'+fieldView.$el.find('textarea:first').val()+'</textarea>');
+                    p.append('<textarea name="'+guid()+'" '+(field.get('required') === '1' ? 'data-rule-required="true"' : '')+' style="display:none;">'+fieldView.$el.find('textarea:first').val()+'</textarea>');
                     break;
             }
 
