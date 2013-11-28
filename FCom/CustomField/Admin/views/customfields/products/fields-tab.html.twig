@@ -1,106 +1,168 @@
 {% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 
+<div id="prod-new-field-modal">
+    <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
+    <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-<a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
-<div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                <h4 class="modal-title" id="myModalLabel">Create Form</h4>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="field_code">Field Code</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="field_name">Field Name</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="frontend_label">Frontend Label</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="frontend_show">Show on frontend</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="sort_order">Sort order</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="table_field_type">DB Type</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
-                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="admin_input_type">Input Type</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
-                            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label col-sm-3">
-                        <label for="system">System field</label>
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select name="system" id="system" class="form-control" data-rule-required="true">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </div>
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Create Form</h4>
                 </div>
 
-            </div>
+                <div class="modal-body">
 
-            <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
-                <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_code">Field Code</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_name">Field Name</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_label">Frontend Label</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_show">Show on frontend</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="sort_order">Sort order</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="table_field_type">DB Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="admin_input_type">Input Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="system">System field</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="system" id="system" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Multi Language</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Required</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="required" id="required" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
+                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+{# CONFLICT START #}
+
+<div class="well">
+  <div class="row">
+    <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
+    <div class="col-sm-6">
+      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">Add a Field Set</button>
+    </div>
+    <div class="col-sm-6">
+      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">Add a Field</button>
+      <button class="btn btn-sm" type="button" id="btn_new_field">New Field</button>
+    </div>
+  </div>
+</div>
+<hr/>
+<div id='fields_list'/>
+<script type="template" id="fieldset-template">
+    <div class="box-header box-header-small green-background">
+        <div class="title"><%- rc.set_name %></div>
+        <div class="actions">
+            <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
+            </button>
+
+            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-content">
+        <!-- field template here -->
+    </div>
+</script>
+
+{# CONFLICT MIDDLE
 <div class="row">
     <div class="col-sm-10">
-        <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
+        <input type="hidden" id="prod_customfield" name="custom_fields"/>
         <table>
             <tr>
                 <td style='padding-right:20px;'>
@@ -144,6 +206,7 @@
                 <!-- field template here -->
             </div>
         </script>
+CONFLICT END #}
 
 
         <script type="template" id="field-template">
@@ -152,20 +215,20 @@
             <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                 <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input id="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                        print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
                         break;
                     case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
 
                         break;
                     case 'select':
                     case 'multiselect':
-                        print('<select '+(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' id="'+guid()+'" class="form-control" >');
+                        print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
                         vals = rc.value.split(',');
                         for(key in rc.options) {
                             print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
@@ -174,7 +237,7 @@
 
                         break;
                     case 'boolean':
-                        print('<input type="hidden" id="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+                        print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
                         break;
                 } %>
@@ -198,7 +261,7 @@
                 </button>
             </div>
         </div>
-        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">fwfwf</a>
+        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">show</a>
         <div id="<%- rc.field_code+rc.id %>" class="modal fade in" tabindex='-1'>
             <div class="modal-dialog" style="width:900px;">
                 <div class="modal-content">
@@ -246,7 +309,7 @@
                         print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
                         break;
                     case 'textarea':
-                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
                         break;
                     case 'wysiwyg':
                         print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
@@ -263,6 +326,10 @@
 
 
 <script>
+$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
+var html = $("#prod-new-field-modal").html();
+$("#prod-new-field-modal").remove();
+$('form#prod-new-field-form1').append(html);
 
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
@@ -282,7 +349,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     return $(e).closest('.help-block').css('display','block');
               },
               success: function(e) {
-                    console.log(success);
+
                     e.closest(".form-group").removeClass("has-error");
                     return e.closest(".help-block").css('display','none');
               }
@@ -291,7 +358,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     };
     var currentSet = null;
-    var initialData = {{ ctrl.getInitialData(model.id) | raw }};
+    var initialData = {{ ctrl.getInitialData(model) | raw }};
 
     function refresh_selects()
     {
@@ -372,50 +439,82 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         });
     });
-    var _mainForm = $('form:last');
+    var _mainForm = $('form#catalog-products-form');
 
-    $(_mainForm).submit(function(ev) {
+    function checkFieldSet()
+    {
         setCollection.each(function(set) {
             set.fields.each(function(field) {
                 if (field.wysiwyg) {
                     var w = field.view.getWYSIWYG();
-                    field.set('value', w.getData());
+                    var val = w.getData();
+                    field.set('value', val);
+                    field.view.$el.find('textarea').eq(1).val(val);//for validation show only
                 }
 
                 if (field.switch) {
                     var s = field.view.getSwitch();
                     field.set('value', s.hasClass('switch-on') ? '1' : '0');
                 }
+                var invalid = 0;
                 field.langFields.each(function(langField) {
                     if (langField.wysiwyg) {
                         var w = langField.view.getWYSIWYG();
-                        langField.set('value', w.getData());
+                        var val = w.getData();
+                        langField.set('value', val);
+                        langField.view.$el.find('textarea').eq(1).val(val);//for validation show only
                     }
+                    if (field.get('required') === '1' && langField.get('value') === '')
+                            invalid++;
                 });
+
+                if (field.get('required') === '1') {
+                    field.view.$el.find('div.col-md-9:last').find('span').remove();
+                    if (invalid > 0 ) {
+                        field.view.$el.find('div.col-md-9:last').append('<span class="badge badge-important">'+invalid+'</span>');
+                        flag = true;
+                    }
+                }
+
                 var position = field.view.$el.index();
                 field.set('position', position);
-
                 var setId = field.view.$el.parents('.prod-fieldset:first').attr('id');
-                console.log(setId);
                 if (setId !== set.get('id')) {
                     set.fields.remove(field, {silent: true});
-                    console.log(setId);
                     var movedSet = setCollection.get(setId);
                     movedSet.fields.add(field, {silent: true});
                 }
             });
         });
+    }
 
+    function sortFieldSet()
+    {
         setCollection.each(function(set) {
             set.fields.sort();
         });
-        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+    }
 
-        return true;
+    $(_mainForm).submit(function(ev) {
+
+        checkFieldSet();
+        sortFieldSet();
+        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+        if(!$(this).valid()) {
+            CustomField.checkingForm = true;
+            return false;
+        } else {
+            if (CustomField.checkingForm) {
+                CustomField.checkingForm = false;
+                $(this).submit();
+            }
+
+        }
+
     });
 
-
-    setValidateForm($(_mainForm));
+    var _appendForm = $('form#prod-new-field-form1');
+    setValidateForm($(_appendForm));
     $('#field_code').rules("add", {
         onfocusout: false,
         onkeyup: false,
@@ -436,13 +535,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
     $('#btn_new_field').click(function() {
-        $('div#prod-new-field-form').find('select, input').val('');
+        $('div#prod-new-field-form').find('input').val('');
+        $('div#prod-new-field-form').find('select').each(function(index) {
+            $(this).find('option').removeAttr('selected');
+            $(this).find('option:first').attr('selected','selected');
+        })
         $('#btn_show_modal').trigger('click');
 
     });
 
     $('#btn-newfield-save').click(function() {
-        if (!$(_mainForm).valid())
+        if (!$(_appendForm).valid())
             return;
 
         var hash = {};
@@ -557,7 +660,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Views.LangFieldView = Backbone.View.extend({
         className: 'row',
         attributes: {
-            style: 'margin-top:3px;'
+            style: 'margin-top:3px; margin-bottom: 30px;'
         },
         events: {
             'click button.field-remove': '_remove',
@@ -636,7 +739,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             //CustomField.currentFieldView = this;
 
             var langFields = this.model.langFields;
-            console.log(langFields);
             var langs = _.clone(CustomField.Langs);
             langFields.each(function(langField) {
                 langs = _.difference(langs, [langField.get('lang_code')]);
@@ -682,7 +784,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _changeCheckbox: function() {
             var val = this.$el.find('input[type="hidden"]').val();
-            console.log(val);
         },
         _changeSelect2: function() {
             var val = this.$el.find('select').val();
@@ -713,7 +814,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             if (langField.get('admin_input_type') === 'wysiwyg') {
                 adminForm.wysiwygInit();
                 langField.wysiwyg = true;
+                var p = langView.$el.find('textarea:first').parent();
+                p.append('<textarea name="'+guid()+'"' +(this.model.get('required') === '1' ? 'data-rule-required="true"' : '')+ ' style="display:none;">'+langView.$el.find('textarea:first').val()+'</textarea>');
 
+            } else if (this.model.get('required') === '1') {
+                langView.$el.find('input,textarea').attr('data-rule-required','true');
             }
             this.$el.find('div.lang_fields').css('max-height','500px;');
             langView.parentSet = this.model;
@@ -735,6 +840,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             //this.$el.find('.select2').select2();
             this._updateLangTag();
+            if ($(window).height()-250 > 100)
+                this.$el.find('.lang_fields').css('max-height', $(window).height()-250);
             return this;
         }
     });
@@ -809,7 +916,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 case 'wysiwyg':
                     field.wysiwyg = true;
                     adminForm.wysiwygInit();
-
+                    var p = fieldView.$el.find('textarea:first').parent();
+                    p.append('<textarea name="'+guid()+'" '+(field.get('required') === '1' ? 'data-rule-required="true"' : '')+' style="display:none;">'+fieldView.$el.find('textarea:first').val()+'</textarea>');
                     break;
             }
 
@@ -899,4 +1007,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         return false;
     }
 });*/
+
+
+
+
+$(window).resize(function() {
+    var h = $(window).height()-250;
+    if (h > 100)
+        $('.lang_fields').css('max-height', h);
+})
 </script>

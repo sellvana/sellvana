@@ -62,7 +62,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
             $tagNames = preg_split('#[ ,;]+#', $this->tags);
             $exists = FCom_Blog_Model_Tag::i()->orm()->where_in('tag_name', $tagNames)->find_many_assoc('tag_name');
             foreach ($tagNames as $t) {
-                if ($exists[$t]) {
+                if (isset($exists[$t])) {
                     $tagId = $exists[$t]->id;
                 } else {
                     $tag = FCom_Blog_Model_Tag::i()->create(array('tag_key' => $t, 'tag_name' => $t))->save();
@@ -98,7 +98,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
             $this->tag_models = FCom_Blog_Model_Tag::i()->orm('t')
                 ->join('FCom_Blog_Model_PostTag', array('pt.tag_id','=','t.id'), 'pt')
                 ->where('pt.post_id', $this->id)
-                ->find_many_assoc('t.id');
+                ->find_many('t.id');
         }
         return $this->tag_models;
     }

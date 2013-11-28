@@ -37,7 +37,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             array('name' => 'source_type', 'label' => 'Source', 'index' => 'idxf.source_type', 'options'=>$fieldHlp->fieldOptions('source_type'), 'width'=>80),
             array('name' => 'source_callback', 'label' => 'Source Callback', 'index' => 'idxf.source_callback', 'width'=>80, 'hidden'=>true),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)
+                  'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)
             ),
         );
         $config['actions'] = array(

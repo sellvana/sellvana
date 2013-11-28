@@ -2,10 +2,10 @@
 
 class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
 {
-	protected static $_origClass = __CLASS__;
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'translations';
-	protected $_gridTitle = 'All translations';
-	protected $_recordName = 'Translation';
+    protected $_gridTitle = 'All translations';
+    protected $_recordName = 'Translation';
 
     /*public function gridConfig()
     {
@@ -50,9 +50,9 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         return $config;
     }*/
 
-	public function gridConfig()
-	{
-		$config = parent::gridConfig();
+    public function gridConfig()
+    {
+        $config = parent::gridConfig();
         $localeOptions = array();
         foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
             $localeOptions[$iso] = $iso;
@@ -65,19 +65,19 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             array('name' => 'id', 'label' => 'Id', 'width' => 200)
         );
 
-		$data = array();
-		$modules = BModuleRegistry::i()->getAllModules();
-		foreach($modules as $module){
-			if (!empty($module->translations)) {
-				foreach($module->translations as $trlocale => $trfile) {
-					$data[] = array(
-						'module' => $module->name,
-						'locale' => strtoupper($trlocale),
-						'file' => $trfile,
-						'id'=>$module->name.'/'.$trfile);
-				}
-			}
-		}
+        $data = array();
+        $modules = BModuleRegistry::i()->getAllModules();
+        foreach($modules as $module){
+            if (!empty($module->translations)) {
+                foreach($module->translations as $trlocale => $trfile) {
+                    $data[] = array(
+                        'module' => $module->name,
+                        'locale' => strtoupper($trlocale),
+                        'file' => $trfile,
+                        'id'=>$module->name.'/'.$trfile);
+                }
+            }
+        }
         $config['data'] = $data;
         //todo: just show buttons, need add event and process for this controller
         $config['actions'] = array(
@@ -87,8 +87,8 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             array('field' => 'module', 'type' => 'text'),
             array('field' => 'locale', 'type' => 'select'),
         );
-		return $config;
-	}
+        return $config;
+    }
 
     public function action_form()
     {

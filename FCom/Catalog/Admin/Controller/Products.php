@@ -326,6 +326,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->processMediaPost($model, $data);
         $this->processCustomFieldPost($model, $data);
         $this->processVariantPost($model, $data);
+        $this->processSystemLangFieldsPost($model, $data);
+        $this->processFrontendPost($model, $data);
     }
 
     public function processCategoriesPost($model)
@@ -464,22 +466,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processCustomFieldPost($model, $data)
     {
-        $prodId = $model->id;
 
-        $json = $model->get('prod_customfield');
-
-        if (!$json) {
-            return;
+        if (!empty($data['custom_fields'])) {
+            $model->setData('custom_fields', $data['custom_fields']);
         }
 
-        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id', $prodId)->find_many());
-        if (empty($res)) {
-            $new = FCom_CustomField_Model_ProductField::i()->create();
-            $new->set(array('product_id' => $prodId, '_data_serialized' => $json))->save();
-         } else {
-            $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
-            $row->set('_data_serialized',  $json)->save();
-         }
+        $model->save();
     }
 
     public function processVariantPost($model, $data)
@@ -494,6 +486,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     }
 
+    public function processSystemLangFieldsPost($model, $data)
+    {
+        $model->setData('name_lang_fields', $data['name_lang_fields']);
+        $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
+        $model->setData('desc_lang_fields', $data['desc_lang_fields']);
+        $model->save();
+
+    }
+
+    public function processFrontendPost($model, $data)
+    {
+        $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
+        $model->save();
+    }
     public function onMediaGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, array(
