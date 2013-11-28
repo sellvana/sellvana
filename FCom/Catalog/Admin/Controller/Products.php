@@ -166,6 +166,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('required'=>true, 'number'=>true)),
+                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'editable'=>'inline', 'validation'=>array('required'=>true, 'number'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
@@ -418,8 +419,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             if (!empty($data['grid'][$typeName]['rows'])) {
                 $rows = json_decode($data['grid'][$typeName]['rows'], true);
                 foreach($rows as $row) {
-                    if(isset($row['_new'])) {
-                        $hlp->create(array(
+                    if (isset($row['_new'])) {
+                        $mediaModel = $hlp->create(array(
                             'product_id'=>$model->id,
                             'media_type'=>$type,
                             'file_id'=>$row['file_id'],
@@ -430,7 +431,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
                         ))->save();
                     } else {
-                        $hlp->load($row['id'])->set($row)->save();
+                        $mediaModel = $hlp->load($row['id'])->set($row)->save();
+                    }
+                    if ($mediaModel->get('main_thumb')) {
+                        $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
+                        $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
                     }
                 }
 /*

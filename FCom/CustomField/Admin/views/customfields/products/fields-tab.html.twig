@@ -120,6 +120,46 @@
         </div>
     </div>
 </div>
+
+{# CONFLICT START #}
+
+<div class="well">
+  <div class="row">
+    <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
+    <div class="col-sm-6">
+      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">Add a Field Set</button>
+    </div>
+    <div class="col-sm-6">
+      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">Add a Field</button>
+      <button class="btn btn-sm" type="button" id="btn_new_field">New Field</button>
+    </div>
+  </div>
+</div>
+<hr/>
+<div id='fields_list'/>
+<script type="template" id="fieldset-template">
+    <div class="box-header box-header-small green-background">
+        <div class="title"><%- rc.set_name %></div>
+        <div class="actions">
+            <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
+            </button>
+
+            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-content">
+        <!-- field template here -->
+    </div>
+</script>
+
+{# CONFLICT MIDDLE
 <div class="row">
     <div class="col-sm-10">
         <input type="hidden" id="prod_customfield" name="custom_fields"/>
@@ -166,6 +206,7 @@
                 <!-- field template here -->
             </div>
         </script>
+CONFLICT END #}
 
 
         <script type="template" id="field-template">

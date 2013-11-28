@@ -1,10 +1,12 @@
 <style>
 .zoom:after { content:''; display:block; width:33px; height:33px; position:absolute; top:0; right:0;
-  background:url("{{ APP.src('@FCom_Core/img/icon.png') }}"); }
+  background:url("{{ APP.src('@FCom_Core/img/zoom-corner.png') }}"); }
 .zoom img { display: block; }
 .zoom img::selection { background-color: transparent; }
 </style>
+
 {% set prod = THIS.get('product') %}
+{% set images = prod.media('I') %}
 {% set cat = THIS.get('category') %}
 {% set relatedProducts = prod.getRelatedProducts() %}
 {% set upsellProducts = prod.getUpsellProducts() %}
@@ -17,18 +19,16 @@
       <div class="col-md-5 f-col-prod-img">
         <div class="f-rslides-container">
           <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
-            <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
+{% for img in images %}
+            <li><img class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
+{% endfor %}
           </ul>
         </div>
-        <p class="text-center"><small>Mouse move on Image to zoom</small></p>
+        <p class="text-center"><small>{{ 'Mouse move on Image to zoom'|_ }}</small></p>
         <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
-          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
-          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
-          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
-          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+{% for img in images %}
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
+{% endfor %}
         </ul>
       </div>
       <script>
@@ -53,7 +53,7 @@
           <input type="hidden" name="action" value="add">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
 
-{% if MODULES.isLoaded('FCom_ProductReviews') %}
+{% if prod.getAverageStars() %}
           <div class="f-prod-avg-rating">
             <div class="glyphicon f-rating-stars f-sm-stars">
               <span class="f-filled-stars" style="width:{{ prod.getAverageStars() }}%;"></span>
@@ -251,7 +251,7 @@
         <!-- You may also like -->
         <div class="f-widget f-widget-featured-prods">
           <header class="f-widget-header">
-            <strong class="f-widget-title">Related Products</strong>
+            <strong class="f-widget-title">{{ 'Related Products'|_ }}</strong>
           </header>
           {{ THIS.view('catalog/product/grid-tiles').set('products', relatedProducts) | raw }}
         </div><!-- /.f-widget -->
@@ -261,7 +261,7 @@
         <!-- You may also like -->
         <div class="f-widget f-widget-featured-prods">
           <header class="f-widget-header">
-            <strong class="f-widget-title">You may also like these items</strong>
+            <strong class="f-widget-title">{{ 'You may also like these items'|_ }}</strong>
           </header>
           {{ THIS.view('catalog/product/grid-tiles').set('products', upsellProducts) | raw }}
         </div><!-- /.f-widget -->

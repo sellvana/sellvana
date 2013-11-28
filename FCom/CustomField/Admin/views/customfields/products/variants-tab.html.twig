@@ -1,26 +1,19 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
-<table>
-<tr>
-<td>
-<select id="sel_var_field" style="width: 200px;">
+<div class="well">
+  <select id="sel_var_field" style="width:150px;">
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
-</select>
-</td>
-<td>
-<button class="btn btn-primary" id="btn_add_var_field" type="button">Add Field</button>
-</td>
-</tr>
-</table>
-
-<div class="row">
-    <div class="col-sm-3">
-        {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
-    </div>
-    <div class="col-sm-7">
-        {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
-    </div>
+  </select>
+  <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+</div>
+<div class="f-variants-col row">
+  <div class="col-sm-3">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
+  </div>
+  <div class="col-sm-8">
+    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
+  </div>
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />

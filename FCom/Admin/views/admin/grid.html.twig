@@ -1,14 +1,10 @@
-<div class="f-admin-main-title">
-  <div class="page-header">
-      <h1 class="pull-left">
-          <i class="icon-table"></i>
-          {{ THIS.get('title') }}
-      </h1>
-      <div class="pull-right">
-          <div class="btn-group">
-              {{ THIS.get('actions') | join(' ') | raw }}
-          </div>
-      </div>
+<div class="page-header f-page-header-has-btns">
+  <h1 class="f-page-title">
+      <i class="icon-table"></i>
+      {{ THIS.get('title') }}
+  </h1>
+  <div class="btn-group">
+      {{ THIS.get('actions') | join(' ') | raw }}
   </div>
 </div>
 

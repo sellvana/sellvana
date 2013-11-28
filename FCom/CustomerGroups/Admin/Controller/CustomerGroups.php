@@ -53,4 +53,30 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
             $v->addTitle($title);
         }
     }
+
+    public function formPostAfter($args)
+    {
+        $data = $args['data'];
+        $model = $args['model'];
+        if (!empty($data['customer_ids_remove'])) {
+            $customer_ids = explode(",", $data['customer_ids_remove']);
+            foreach ($customer_ids as $id) {
+                $customer = FCom_Customer_Model_Customer::i()->load($id);
+                if ($customer) {
+                    $customer->customer_group = null;
+                    $customer->save();
+                }
+            }
+        }
+        if (!empty($data['customer_ids_add'])) {
+            $customer_ids = explode(",", $data['customer_ids_add']);
+            foreach ($customer_ids as $id) {
+                $customer = FCom_Customer_Model_Customer::i()->load($id);
+                if ($customer) {
+                    $customer->customer_group = $model->id;
+                    $customer->save();
+                }
+            }
+        }
+    }
 }

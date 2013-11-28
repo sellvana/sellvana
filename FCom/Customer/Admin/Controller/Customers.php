@@ -92,4 +92,75 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             }
         }
     }
+
+    /**
+     * get config for grid: customers of group
+     * @param $group FCom_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getGroupCustomersConfig($group)
+    {
+        $class = $this->_modelClass;
+        $orm = $class::i()->orm()->table_alias('c')
+            ->select(array('c.id', 'c.firstname', 'c.lastname', 'c.email'))
+            ->join('FCom_CustomerGroups_Model_Group', array('c.customer_group','=','cg.id'), 'cg')
+            ->where('c.customer_group', $group ? $group->id : 0);
+
+        $config = parent::gridConfig();
+
+        // TODO for empty local grid, it throws exception
+        unset($config['orm']);
+        $config['data'] = $orm->find_many();
+        $config['id'] = 'group_customers_grid_'.$group->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
+            array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200),
+        );
+        $config['actions'] = array(
+            'add'=>array('caption'=>'Add customer'),
+        );
+        $config['filters'] = array(
+            array('field'=>'firstname', 'type'=>'text'),
+            array('field'=>'lastname', 'type'=>'text'),
+            array('field'=>'email', 'type'=>'text'),
+        );
+        $config['data_mode'] = 'local';
+        $config['events'] = array('init', 'add','mass-delete');
+
+        return array('config'=>$config);
+    }
+
+    /**
+     * get config for grid: all customer
+     * @param $group FCom_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getAllCustomersConfig($group)
+    {
+        $config            = parent::gridConfig();
+        $config['id']      = 'group_all_customers_grid_' . $group->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
+            array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200),
+        );
+        $config['actions'] = array(
+            'add' => array('caption' => 'Add selected customers')
+        );
+        $config['filters'] = array(
+            array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'lastname', 'type' => 'text'),
+            array('field' => 'email', 'type' => 'text'),
+            '_quick' => array('expr' => 'firstname like ? or lastname like ? or email like ? or c.id=?', 'args' => array('?%', '%?%', '?'))
+        );
+
+        $config['events'] = array('add');
+
+        return array('config' => $config);
+    }
 }

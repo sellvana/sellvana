@@ -205,7 +205,7 @@ FCom.BackboneGrid = function(config) {
                         rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                         BackboneGrid.showingSelected = false;
                         if(BackboneGrid.data_mode !== 'local') {
-                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','block');
+                            $('.f-htmlgrid-toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','block');
                             rowsCollection.fetch({reset:true});
                         } else {
                             rowsCollection.filter();
@@ -220,7 +220,7 @@ FCom.BackboneGrid = function(config) {
                         BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                         BackboneGrid.showingSelected = true;
                         if(BackboneGrid.data_mode !== 'local')
-                            $('.fcom-htmlgrid__toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','none');
+                            $('.f-htmlgrid-toolbar.'+BackboneGrid.id+' div.pagination ul').css('display','none');
 
                         BackboneGrid.data_mode = 'local';
                         rowsCollection.originalRows = selectedRows;
@@ -926,9 +926,6 @@ FCom.BackboneGrid = function(config) {
     });
     BackboneGrid.Views.FilterCell = Backbone.View.extend({
         className: 'btn-group dropdown',
-        attributes: {
-            style: 'margin-right:20px;'
-        },
 
         _filter: function(val) {
             if (val === false) {
@@ -1146,7 +1143,7 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterView = Backbone.View.extend({
         initialize: function() {
-            var div = 'div.row.datatables-top.'+BackboneGrid.id+' .fcom-filter-buttons-container';
+            var div = 'div.row.datatables-top.'+BackboneGrid.id+' .f-filter-btns';
             this.setElement(div);
             this.collection.on('sort', this.render, this);
         },

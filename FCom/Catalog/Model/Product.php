@@ -267,7 +267,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
             //->select(array('pa.manuf_vendor_id'))
             ->join('FCom_Core_Model_MediaLibrary', array('a.id','=','pa.file_id'), 'a')
-            ->select(array('a.id', 'a.file_name', 'a.file_size'));
+            ->select(array('a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'))
+            ->order_by_asc('position');
     }
 
     public function media($type)
