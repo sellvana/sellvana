@@ -13,7 +13,6 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     protected $_gridTitle = 'Customer Groups';
     protected $_recordName = 'Customer Group';
     protected $_mainTableAlias = 'cg';
-    protected $_formViewName = 'customer-groups/form';
 
     public function gridConfig()
     {
@@ -21,10 +20,10 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
-            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href($this->_formViewName.'?id=:id')),
+            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href($this->_formHref.'?id=:id')),
             array('name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)),
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );
         $config['actions'] = array(
             'delete' => true
@@ -52,6 +51,32 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         $v = $this->view('head');
         if ($v) {
             $v->addTitle($title);
+        }
+    }
+
+    public function formPostAfter($args)
+    {
+        $data = $args['data'];
+        $model = $args['model'];
+        if (!empty($data['customer_ids_remove'])) {
+            $customer_ids = explode(",", $data['customer_ids_remove']);
+            foreach ($customer_ids as $id) {
+                $customer = FCom_Customer_Model_Customer::i()->load($id);
+                if ($customer) {
+                    $customer->customer_group = null;
+                    $customer->save();
+                }
+            }
+        }
+        if (!empty($data['customer_ids_add'])) {
+            $customer_ids = explode(",", $data['customer_ids_add']);
+            foreach ($customer_ids as $id) {
+                $customer = FCom_Customer_Model_Customer::i()->load($id);
+                if ($customer) {
+                    $customer->customer_group = $model->id;
+                    $customer->save();
+                }
+            }
         }
     }
 }

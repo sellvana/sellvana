@@ -7,14 +7,13 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     protected $_modelClass = 'FCom_Cms_Model_Block';
     protected $_gridTitle = 'CMS Block';
     protected $_recordName = 'CMS Block';
-    protected $_formViewName = 'cms/blocks/form';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-            array('name' => 'handle', 'label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=:id')),
+            array('name' => 'handle', 'label'=>'Handle', 'href' => BApp::href($this->_formHref . '?id=:id')),
             array('name' => 'description', 'label'=>'Description', 'editable'=>true),
             array('name' => 'renderer', 'label'=>'Renderer',
                   'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
@@ -28,7 +27,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
             array('name' => 'modified_time', 'label'=>'Modified Time', 'hidden' => true),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formViewName.'?id='), 'col' => 'id'), 'delete' => true)),
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );
         $config['actions'] = array(
             'edit' => true,
