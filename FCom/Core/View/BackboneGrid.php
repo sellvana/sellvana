@@ -824,13 +824,38 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             $this->_processGridFiltersOne($f, $op, $val, $orm);
                         }
                         break;
+                    case 'date-range':
+                        $val = $filters[$fId]['val'];
+                        $temp = explode('~', $val);
+                        if (!empty($filters[$fId])) {
+                            switch ($filters[$fId]['op']) {
+                                case 'between':
+                                    $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
+                                    $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                                    break;
+                                case 'from':
+                                    $this->_processGridFiltersOne($f, 'gte', $val, $orm);
+                                    break;
+                                case 'to':
+                                    $this->_processGridFiltersOne($f, 'lte', $val, $orm);
+                                    $op = 'like';
+                                    break;
+                                case 'equal':
+                                    $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
+                                    break;
+                                case 'not_in':
+                                    $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
+                                    break;
+                            }
+                        }
+                        break;
+                    case 'number-range':
 
-                    case 'text-range': case 'number-range': case 'date-range':
                         if (!empty($filters[$fId]['from'])) {
                             $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
                         }
-                        if (!empty($filters[$fId]['to'])) {
-                            $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['to'], $orm);
+                        if (!empty($filters[$fId]['val'])) {
+                            $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
                         }
                         break;
 

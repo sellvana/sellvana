@@ -29,7 +29,7 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'], function(Backbone, _, $, NProgress) {
 
 var setValidateForm = function(selector) {
     if (selector == null) {
@@ -577,12 +577,8 @@ FCom.BackboneGrid = function(config) {
         },
         parse: function(response) {
             if (response[0].c) {
-                var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
-                /*console.log('c=', response[0].c);
-                console.log('ps=', BackboneGrid.currentState.ps);
-                console.log('mp=', mp);
-                console.log('bb.mp=', BackboneGrid.currentState.mp);*/
-                if (mp !== BackboneGrid.currentState.mp) {
+                if (response[0].c !== BackboneGrid.currentState.c) {
+                    var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
                     BackboneGrid.currentState.mp = mp;
                     BackboneGrid.currentState.c = response[0].c;
                     if (BackboneGrid.data_mode !== 'local')
@@ -937,7 +933,6 @@ FCom.BackboneGrid = function(config) {
         _filter: function(val) {
             if (val === false) {
                 this.model.set('filterVal','');
-                this.render();
                 if(typeof(BackboneGrid.current_filters[this.model.get('name')]) === 'undefined')
                     return;
                 delete BackboneGrid.current_filters[this.model.get('name')];
@@ -953,6 +948,8 @@ FCom.BackboneGrid = function(config) {
             } else {
                 rowsCollection.fetch({reset:true});
             }
+
+            this.updateMainText();
         },
         preventDefault: function(ev) {
                 ev.stopPropagation();
@@ -961,20 +958,32 @@ FCom.BackboneGrid = function(config) {
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             return this;
+        },
+        updateMainText: function() {
+            var html = this.model.get('label')+': ';
+            if (this.model.get('filterVal') ==='') {
+                html += 'All';
+            } else {
+                html += (this.model.get('filterLabel') +' "'+this.model.get('filterVal')+'"');
+            }
+            html += '<span class="caret"></span>';
+            this.$el.find('button.filter-text-main').html(html);
         }
     });
     BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click input': 'preventDefault',
             'click button.update': 'filter',
-            //'click .filter-box': 'preventDefault',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-            'keyup': 'filterValChanged',
             'click button.clear': '_closeFilter',
             'keyup input': '_checkEnter'
         },
+        initialize: function() {
+            this.model.set('filterOp', 'contains');
+        },
         _closeFilter: function(ev) {
+            this.$el.find('input').val('');
             this._filter(false);
         },
         _checkEnter: function(ev) {
@@ -984,20 +993,20 @@ FCom.BackboneGrid = function(config) {
                 this.$el.find('button.update').trigger('click');
             }
         },
-        filterValChanged: function(ev) {
-            this.model.set('filterVal', this.$el.find('input:first').val());
-        },
+
         filterOperatorSelected: function(ev) {
-            this.filterValChanged();
+            //this.filterValChanged();
             var operator = $(ev.target);
             this.model.set('filterOp',operator.attr('data-id'));
             this.model.set('filterLabel', operator.html());
-            this.$el.find('ul.filter-sub').css('display','none');
-            this.render();
+            this.$el.find('button.filter-text-sub').html(operator.html()+"<span class='caret'></span>");
+            this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
             return false;
         },
         subButtonClicked: function(ev) {
             this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
             return false;
         },
         filter: function() {
@@ -1005,9 +1014,9 @@ FCom.BackboneGrid = function(config) {
             var filterVal = this.$el.find('input:first').val();
             var op = this.model.get('filterOp');
             BackboneGrid.current_filters[field] = {val: filterVal, op: op};
-            this._filter(filterVal);
             this.model.set('filterVal',filterVal);
-            this.render();
+            this._filter(filterVal);
+
         }
 
     });
@@ -1015,49 +1024,84 @@ FCom.BackboneGrid = function(config) {
     BackboneGrid.Views.FilterDateRangeCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click input': 'preventDefault',
-            'click span.input-group-addon': 'preventDefault',
             'click button.update': 'filter',
+            //'click .filter-box': 'preventDefault',
+            'click .filter-text-sub': 'subButtonClicked',
+            'click a.filter_op': 'filterOperatorSelected',
+
             'click button.clear': '_closeFilter',
-            'keyup input': '_checkEnter'
+
+        },
+        initialize: function() {
+            this.range = true;
+            this.model.set('filterOp', 'between');
         },
         _closeFilter: function(ev) {
-            this.removeOldDatepicker();
+            this.$el.find('input').val('');
             this._filter(false);
+
         },
-        _checkEnter: function(ev) {
-            var evt = ev || window.event;
-            var charCode = evt.keyCode || evt.which;
-            if (charCode === 13) {
-                this.$el.find('button.update').trigger('click');
+        filterValChanged: function(ev) {
+            this.model.set('filterVal', this.$el.find('input:first').val());
+        },
+        filterOperatorSelected: function(ev) {
+
+            //this.filterValChanged();
+            this.range = $(ev.target).hasClass('range');
+            if (this.range) {
+                this.$el.find('div.range').css('display','table');
+                this.$el.find('div.not_range').css('display','none');
+            } else {
+                this.$el.find('div.range').css('display','none');
+                this.$el.find('div.not_range').css('display','table');
             }
+
+            var operator = $(ev.target);
+            this.model.set('filterOp',operator.attr('data-id'));
+            this.model.set('filterLabel', operator.html());
+            this.$el.find('button.filter-text-sub').html(operator.html()+"<span class='caret'></span>");
+            this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+            return false;
+        },
+        subButtonClicked: function(ev) {
+            this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+            return false;
         },
         filter: function() {
             var field = this.model.get('name');
-            var dateFrom = this.$el.find('.date-from input[type=text]').val();
-            var dateTo = this.$el.find('.date-to input[type=text]').val();
-            var filterVal = {from: dateFrom, to: dateTo};
-            BackboneGrid.current_filters[field] = filterVal;
+            var filterVal;
+            if (this.range)
+                filterVal = this.$el.find('input:first').val();
+            else
+                filterVal = this.$el.find('input:last').val();
+
+            var op = this.model.get('filterOp');
+            BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+            this.model.set('filterVal',filterVal);
             this._filter(filterVal);
-            this.model.set('filterVal', filterVal);
-            this.removeOldDatepicker(); //remove old datetimepicker widget
-            this.render();
+
         },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.initDatepicker();
+            BackboneGrid.Views.FilterCell.prototype.render.call(this);
+            var self = this.$el;
+            this.$el.find('#daterange2').daterangepicker({
+                                            format: "YYYY-MM-DD"
+                                          }, function(start, end) {
+                                            return self.find("#daterange2").parent().find("input").first().val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+                                          });
+            this.$el.find(".datepicker").datetimepicker({
+                pickTime: false
+            });
+
+            var filterVal = this.model.get('filterVal');
+            if (this.range)
+                filterVal = this.$el.find('input:first').val(filterVal);
+            else
+                filterVal = this.$el.find('input:last').val(filterVal);
+
             return this;
-        },
-        initDatepicker: function() {
-            if (jQuery().datetimepicker) {
-                this.$el.find('.datepicker').datetimepicker({
-                    pickTime: false,
-                    todayHighlight: true
-                });
-                //todo: fix when click next, prev or choose month, year in datetimepicker
-            }
-        },
-        removeOldDatepicker: function() {
-            $('div.bootstrap-datetimepicker-widget').remove();
         }
     });
 
@@ -1195,7 +1239,6 @@ FCom.BackboneGrid = function(config) {
                 if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length>0) {
                     hash.oper = 'add';
                     $.post(BackboneGrid.edit_url, hash, function(data) {
-                        alert('fff');
                         var newRow = new BackboneGrid.Models.Row(data);
                         rowsCollection.add(newRow);
                         //gridView.addRow(newRow);
@@ -1446,11 +1489,16 @@ FCom.BackboneGrid = function(config) {
                     c.filtering = true;
                     c.filter_type = filter['type'];
 
-                    if (filter.type === 'text')
-                            {
-                                c.filterOp = 'contains';
-                                c.filterLabel = 'Contains';
-                            }
+                    if (filter.type === 'text') {
+                        c.filterOp = 'contains';
+                        c.filterLabel = 'Contains';
+                    }
+
+                    if (filter.type === 'date-range') {
+                        c.filterOp = 'Between';
+                        c.filterLabel = 'Between';
+                    }
+
                     if (filter.type === 'multiselect' || filter.type === 'select') {
                         if(typeof(filter.options) !== 'undefined') {
                             c._multipulFilterOptions = filter.options;
@@ -1477,6 +1525,14 @@ FCom.BackboneGrid = function(config) {
         colsVisibiltyView.render();
         filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
         filterView.render();
+        $('div.daterangepicker').on('click', function(ev) {
+                                                            ev.stopPropagation();
+                                                            ev.preventDefault();
+
+                                                            return false;
+                                                        }
+                                    );
+
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
