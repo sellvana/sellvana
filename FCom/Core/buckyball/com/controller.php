@@ -977,7 +977,7 @@ class BResponse extends BClass
     public function header($header, $replace = true)
     {
         if (headers_sent($file, $line)) {
-            BDebug::notice("Can't send header: '{$header}', output started in {$file}:{$line}");
+            BDebug::notice("Can't send header: '".print_r($header,1)."', output started in {$file}:{$line}");
             return $this;
         }
         if (is_string($header)) {
