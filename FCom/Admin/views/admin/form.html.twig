@@ -27,7 +27,7 @@
                     for(key in validator.invalid) {
                         var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
                         if (element.length>0) {
-                            var tab = element.parents('div.main-form-tab:first');
+                            var tab = element.parents('div.js-main-form-tab:first');
                             var key = '#'+tab.attr('id');
                             if (typeof(info[key]) === 'undefined')
                                 info[key] = 1;
@@ -107,7 +107,7 @@
         </ul>
         <div class="tab-content">
             {% for k, tab in tabs %}
-                <div class="tab-pane main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
+                <div class="tab-pane js-main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
                     {% if not tab.async %}
                         {{ THIS.view(tab.view).set('validator', validator) | raw }}
                     {% endif %}
