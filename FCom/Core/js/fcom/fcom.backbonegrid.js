@@ -1133,8 +1133,12 @@ FCom.BackboneGrid = function(config) {
             this.$el.find('div.select2-container').css('font-weight', 600);
             this.$el.find('div.select2-container').css('color', '#44444');
             this.$el.find('div.select2-container').css('padding', 0);
-            this.$el.find('div.select2-container').css('padding', 0);
+            this.$el.find('div.select2-container').css('margin', 0);
             this.$el.find('div.select2-container a').removeClass('select2-default');
+            this.$el.find('div.select2-container span.select2-chosen').css('margin-right', 10);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('right', 3);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('top', 15);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('z-index', 300);
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
