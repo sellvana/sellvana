@@ -1080,7 +1080,26 @@ FCom.BackboneGrid = function(config) {
             return this;
         }
     });
+    BackboneGrid.Views.FilterNumberRangeCell = BackboneGrid.Views.FilterDateRangeCell.extend({
+        render: function() {
+            BackboneGrid.Views.FilterCell.prototype.render.call(this);
 
+            return this;
+        },
+        filter: function() {
+            var field = this.model.get('name');
+            var filterVal;
+            if (this.range)
+                filterVal = this.$el.find('input.js-number1').val()+'~'+this.$el.find('input.js-number2').val();
+            else
+                filterVal = this.$el.find('input.js-number').val();
+
+            var op = this.model.get('filterOp');
+            BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+            this.model.set('filterVal',filterVal);
+            this._filter(filterVal);
+        }
+    });
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
         events: {
             'click button.update': 'filter',
@@ -1189,11 +1208,14 @@ FCom.BackboneGrid = function(config) {
             if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
                 var filterCell;
                 switch (model.get('filter_type')) {
-                    case 'text':case 'number-range':
+                    case 'text':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                         break;
                     case 'date-range':
                         filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
+                        break;
+                    case 'number-range':
+                        filterCell = new BackboneGrid.Views.FilterNumberRangeCell({model:model});
                         break;
                     case 'multiselect':
                         BackboneGrid.multiselect_filter = true;
@@ -1464,6 +1486,7 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.Views.FilterDateRangeCell.prototype.template = _.template($('#'+config.id+'-date-range-filter-template').html());
         BackboneGrid.Views.FilterSelectCell.prototype.template = _.template($('#'+config.id+'-select-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
+        BackboneGrid.Views.FilterNumberRangeCell.prototype.template =_.template($('#'+config.id+'-number-range-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
 
@@ -1533,7 +1556,7 @@ FCom.BackboneGrid = function(config) {
                         c.filterLabel = 'Contains';
                     }
 
-                    if (filter.type === 'date-range') {
+                    if (filter.type === 'date-range' || filter.type === 'number-range') {
                         c.filterOp = 'Between';
                         c.filterLabel = 'Between';
                     }
