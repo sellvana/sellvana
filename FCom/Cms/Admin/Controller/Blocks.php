@@ -46,7 +46,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         $m = $args['model'];
         $args['view']->set(array(
             'title' => $m->id ? 'Edit CMS Block: '.$m->handle : 'Create New CMS Block',
-        ));//todo: set default tab is CMS Block
+        ));
     }
 
     public function historyGridConfig($m)
