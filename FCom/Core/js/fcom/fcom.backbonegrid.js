@@ -578,7 +578,7 @@ FCom.BackboneGrid = function(config) {
             return this.data_url+c+append+'&gridId='+BackboneGrid.id;
         },
         parse: function(response) {
-            if (response[0].c) {
+            if (typeof(response[0].c) !== 'undefined') {
                 if (response[0].c !== BackboneGrid.currentState.c) {
                     var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
                     BackboneGrid.currentState.mp = mp;
@@ -1425,8 +1425,12 @@ FCom.BackboneGrid = function(config) {
 
             $('ul.'+BackboneGrid.id+'.pagination.page').html(html);
 
-            var caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
-            $('div.'+BackboneGrid.id+'-pagination').html(caption);
+            var caption = '';
+            if (BackboneGrid.currentState.c > 0)
+                caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
+            else
+                caption = 'No data';
+            $('span.'+BackboneGrid.id+'-pagination').html(caption);
     }
 
         NProgress.start();
