@@ -1,15 +1,32 @@
 <?php
+
+if(empty($argv[1])){
+    echo "Provide a php file for formatting\n";
+    exit(0);
+}
+
 class Token {
     public $type;
+    public $typeString;
     public $contents;
+    protected static $constants;
 
     public function __construct( $rawToken ) {
+        $this->loadTokenConstants();
         if ( is_array( $rawToken ) ) {
             $this->type = $rawToken[ 0 ];
             $this->contents = $rawToken[ 1 ];
+            $this->typeString = self::$constants[$this->type];
         } else {
             $this->type = -1;
             $this->contents = $rawToken;
+        }
+    }
+
+    protected function loadTokenConstants() {
+        if(null == self::$constants){
+            self::$constants = array_flip(get_defined_constants(true)['tokenizer']);
+//            var_dump($this->constants);die;
         }
     }
 }
@@ -22,6 +39,7 @@ $tokens = array();
 foreach ( $rawTokens as $rawToken ) {
     $tokens[] = new Token( $rawToken );
 }
+echo count($tokens) . " tokens found\n";
 
 function skipWhitespace( &$tokens, &$i ) {
     global $lineNo;
@@ -34,6 +52,10 @@ function skipWhitespace( &$tokens, &$i ) {
     }
 }
 
+/**
+ * @param $j
+ * @return Token
+ */
 function nextToken( &$j ) {
     global $tokens, $i;
     $j = $i;
@@ -58,10 +80,14 @@ foreach ( $OPERATORS as $op ) {
 }
 
 $matchingTernary = false;
+$matchingControlOneLine = false;
+$inControlStatement = false;
+$controlNesting = 0;
 
 // First pass - filter out unwanted tokens
 $filteredTokens = array();
 for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
+    /* @var $token Token */
     $token = $tokens[ $i ];
     if ( $token->contents == '?' ) {
         $matchingTernary = true;
@@ -82,6 +108,28 @@ for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
     } elseif ( $token->type == T_ELSE && nextToken( $j )->type == T_IF ) {
         $i = $j;
         $filteredTokens[] = new Token( array( T_ELSEIF, 'elseif' ) );
+    } elseif ( in_array( $token->type, $CONTROL_STRUCTURES ) ){
+        $inControlStatement = true;
+        $filteredTokens[] = $token;
+    } elseif ( $token->contents == '(' && $inControlStatement ) {
+        $controlNesting++;
+        $filteredTokens[] = $token;
+    } elseif ( $token->contents == ')' && $inControlStatement ) {
+        $controlNesting--;
+        $filteredTokens[] = $token;
+        $inControlStatement = $controlNesting != 0;
+        $nextToken = nextToken( $j );
+        if($controlNesting == 0 && $nextToken->contents != '{' && $nextToken->contents != ';'){
+            $matchingControlOneLine = true;
+            $filteredTokens[] = new Token('{');
+            $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
+        }
+    } elseif ( $token->contents == ";" && $matchingControlOneLine) {
+        $matchingControlOneLine = false;
+        $filteredTokens[] = $token;
+        $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
+        $filteredTokens[] = new Token('}');
+        $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
     } elseif ( $token->contents == ':' ) {
         if ( $matchingTernary ) {
             $matchingTernary = false;
@@ -110,6 +158,8 @@ $output = '';
 $matchingTernary = false;
 $doubleQuote = false;
 for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
+    $first = $i == 0;
+    $last = ($i + 1 == $n);
     $token = $tokens[ $i ];
     if ( $token->contents == '?' ) {
         $matchingTernary = true;
@@ -135,7 +185,7 @@ for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
     if ( $doubleQuote && $token->contents == '"' && isAssocArrayVariable( 1 ) ) {
         // don't $output .= "
     } elseif ( $doubleQuote && isAssocArrayVariable() ) {
-        if ( $tokens[ $i - 1 ]->contents != '"' ) {
+        if ( !$first && $tokens[ $i - 1 ]->contents != '"' ) {
             $output .= '" . ';
         }
         $var = $token->contents;
@@ -143,13 +193,14 @@ for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
         $str = $tokens[ ++$i ]->contents;
         $closeSquareBracket = $tokens[ ++$i ]->contents;
         $output .= $var . "['" . $str . "']";
-        if ( $tokens[ $i + 1 ]->contents != '"' ) {
+        if ( !$last && $tokens[ $i + 1 ]->contents != '"' ) {
             $output .= ' . "';
         } else {
             $i++; // process "
             $doubleQuote = false;
         }
-    } elseif ( $token->type == T_STRING && $tokens[ $i - 1 ]->contents == '[' && $tokens[ $i + 1 ]->contents == ']' ) {
+    } elseif ( $token->type == T_STRING && ( $first || $tokens[ $i - 1 ]->contents == '[')
+               && ( $last || $tokens[ $i + 1 ]->contents == ']' ) ) {
         if ( preg_match( '/[a-z_]+/', $token->contents ) ) {
             $output .= "'" . $token->contents . "'";
         } else {
@@ -157,45 +208,45 @@ for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
         }
     } elseif ( $token->type == T_ENCAPSED_AND_WHITESPACE || $token->type == T_STRING ) {
         $output .= $token->contents;
-    } elseif ( $token->contents == '-' && in_array( $tokens[ $i + 1 ]->type, array( T_LNUMBER, T_DNUMBER ) ) ) {
+    } elseif ( $token->contents == '-' && ( $last || in_array( $tokens[ $i + 1 ]->type, array( T_LNUMBER, T_DNUMBER ) ) ) ) {
         $output .= '-';
     } elseif ( in_array( $token->type, $CONTROL_STRUCTURES ) ) {
         $output .= $token->contents;
         if ( $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
             $output .= ' ';
         }
-    } elseif ( $token->contents == '}' && in_array( $tokens[ $i + 1 ]->type, $CONTROL_STRUCTURES ) ) {
+    } elseif ( $token->contents == '}' && ( !$last && in_array( $tokens[ $i + 1 ]->type, $CONTROL_STRUCTURES ) ) ) {
         $output .= '} ';
-    } elseif ( $token->contents == '=' && $tokens[ $i + 1 ]->contents == '&' ) {
-        if ( $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
+    } elseif ( $token->contents == '=' && ( !$last && $tokens[ $i + 1 ]->contents == '&' ) ) {
+        if ( !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
             $output .= ' ';
         }
         $i++; // match &
         $output .= '=&';
-        if ( $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
+        if ( !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
             $output .= ' ';
         }
     } elseif ( $token->contents == ':' && $matchingTernary ) {
         $matchingTernary = false;
-        if ( $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
+        if ( !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
             $output .= ' ';
         }
         $output .= ':';
-        if ( $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
+        if ( !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
             $output .= ' ';
         }
-    } elseif ( in_array( $token->contents, $WHITESPACE_BEFORE ) && $tokens[ $i - 1 ]->type != T_WHITESPACE &&
-        in_array( $token->contents, $WHITESPACE_AFTER ) && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
+    } elseif ( in_array( $token->contents, $WHITESPACE_BEFORE ) && !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE &&
+        in_array( $token->contents, $WHITESPACE_AFTER ) && !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
         $output .= ' ' . $token->contents . ' ';
-    } elseif ( in_array( $token->contents, $WHITESPACE_BEFORE ) && $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
+    } elseif ( in_array( $token->contents, $WHITESPACE_BEFORE ) && !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
         $output .= ' ' . $token->contents;
-    } elseif ( in_array( $token->contents, $WHITESPACE_AFTER ) && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
+    } elseif ( in_array( $token->contents, $WHITESPACE_AFTER ) && !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
         $output .= $token->contents . ' ';
     } else {
         $output .= $token->contents;
     }
 }
 
-$output = str_replace( array( '()', '[]' ), array( '()', '[]' ), $output );
+$output = str_replace( array( '( )', '[ ]' ), array( '()', '[]' ), $output );
 
 echo $output;
