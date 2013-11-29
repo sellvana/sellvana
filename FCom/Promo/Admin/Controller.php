@@ -37,8 +37,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             'delete' => true
         );
         $config['filters'] = array(
-            array('field' => 'from_date', 'type' => 'text'), //todo: add filter type date
-            array('field' => 'to_date', 'type' => 'text'),
+            array('field' => 'from_date', 'type' => 'date-range'),
+            array('field' => 'to_date', 'type' => 'date-range'),
             array('field' => 'status', 'type' => 'select'),
         );
         return $config;
@@ -68,6 +68,14 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
         $args['view']->title = $m->id ? 'Edit Promo: '.$m->description: 'Create New Promo';
         $args['view']->actions = BUtil::arrayMerge($args['view']->actions, $actions);
+    }
+
+    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
+    {
+        if ($model && $model->id) {
+            $view->addTab("history", array('label' => BLocale::_("History"), 'pos' => 40, 'async' => true));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostBefore($args)

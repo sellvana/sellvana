@@ -11,9 +11,9 @@
                     {{ THIS.view('core/messages') | raw }}
                     <form id="login-form" action='{{ APP.href('login') }}' class='validate-form' method='post'>
                         <div class='form-group'>
-                            <label for="login-username" class="control-label">{{ "User Name" | _ }}</label>
+                            <label for="login-username" class="control-label">{{ "User Name or Email" | _ }}</label>
                             <div class='controls with-icon-over-input'>
-                                <input id="login-username" value="" placeholder="{{ 'E-mail'|_ }}" class="required form-control"
+                                <input id="login-username" value="" placeholder="{{ 'User Name or Email'|_ }}" class="required form-control"
                                         data-rule-required="true" name="login[username]" type="text" />
                             </div>
                         </div>
