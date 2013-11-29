@@ -499,8 +499,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processFrontendPost($model, $data)
     {
-        $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
-        $model->save();
+        if (!empty($data['prod_frontend_data'])) {
+            $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
+            $model->save();
+        }
+
     }
     public function onMediaGridConfig($args)
     {
