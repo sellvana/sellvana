@@ -1610,7 +1610,24 @@ FCom.BackboneGrid = function(config) {
         }
 
         gridView.render();
-
+        //local rows count info
+        if (BackboneGrid.data_mode === 'local') {
+            var pageSpan = $('span.'+BackboneGrid.id+'-pagination.f-grid-pagination');
+            pageSpan.css('top', 10);
+            function setLocalPageInfo()
+            {
+                if (rowsCollection.length === 0) {
+                    pageSpan.html('No data.');
+                } else {
+                    pageSpan.html(rowsCollection.length+' rows');
+                }
+            }
+            setLocalPageInfo();
+            rowsCollection.on('add remove reset filter', function() {
+                console.log('change');
+                setLocalPageInfo();
+            });
+        }
         if(config.dataMode != 'local') {
             $('ul.pagination.pagesize a').click(function(ev){
                 $('ul.pagination.pagesize li').removeClass('active');
