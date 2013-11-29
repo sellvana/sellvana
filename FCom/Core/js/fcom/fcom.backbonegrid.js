@@ -759,34 +759,6 @@ FCom.BackboneGrid = function(config) {
                 if (col.get('editable') === 'inline') {
                     var name = col.get('name');
                     var editor = col.get('editor') === 'select' ? 'select' : 'input';
-
-                    if (jQuery().validate) {
-                        /*self.validator = self.$el.find(editor+'#'+name).validate({
-                        });*/
-                        /*self.$el.find(editor+'#'+name).rules('add',{
-                                required: true,
-                                errorPlacement: function(e, t) {
-                                    console.log('error');
-                                    //$(e).addClass('unvalid');
-                                    //$(e).attr('title', 'This field is required.');
-
-
-                                },
-                                highlight: function(e) {
-                                    console.log('highlight');
-
-                                },
-                                success: function(e, t) {
-                                    console.log('success');
-                                    //$(e).removeClass('unvalid');
-                                    //$(e).attr('title','');
-                                },
-                                errorElement: "",
-                                errorClass: ""
-
-                        });*/
-                        //self.$el.find(editor+'#'+name).removeAttr('novalidate');
-                    }
                 }
             });
 
