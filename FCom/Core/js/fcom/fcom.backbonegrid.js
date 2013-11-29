@@ -1082,15 +1082,16 @@ FCom.BackboneGrid = function(config) {
     });
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
-        className: 'btn-group dropdown f-grid-filter js-multiselect-filter',
         events: {
             'click button.update': 'filter',
-            'focusin div.select2-container': '_preventDefault'
+            'focusin div.select2-container': '_preventClose'
         },
-        _preventDefault: function() {
+        _preventClose: function() {
+            this.$el.addClass('js-prevent-close');
             this.$el.find('ul.filter-box').css('display','block');
         },
         filter: function(val) {
+            this.$el.removeClass('js-prevent-close');
             this.$el.find('ul.filter-box').css('display','');
             val = this.$el.find('#multi_hidden:first').val();
             BackboneGrid.current_filters[this.model.get('name')] = val;
@@ -1118,7 +1119,7 @@ FCom.BackboneGrid = function(config) {
 
             var self = this;
             this.$el.find('#multi_hidden:first').change(function(ev) {
-                self.$el.find('ul.filter-box').css('display','block');
+                self._preventClose();
             })
             return this;
         }
@@ -1565,10 +1566,11 @@ FCom.BackboneGrid = function(config) {
         filterView.render();
         if (BackboneGrid.multiselect_filter) {
             $('body').click(function(ev) {
-                // if opened multiselect filter is exist
-                if ($('div.js-multiselect-filter.open').length > 0 && $(ev.target).parents('div.js-multiselect-filter.open').length === 0) {
-                    $('div.js-multiselect-filter.open ul.filter-box').css('display', '');
-                    $('div.js-multiselect-filter.open').removeClass('open');
+                var _cache = filterView.$el.find('div.js-prevent-close');
+                // checking whether opened multiselect filter is exist and clicked element is not opend multilselect filter div
+                if (_cache.length > 0 && $(ev.target).parents('div.js-prevent-close').length === 0) {
+                    _cache.find('ul.filter-box').css('display', '');
+                    _cache.removeClass('js-prevent-close');
                 }
             });
         }
