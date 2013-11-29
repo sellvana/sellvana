@@ -184,8 +184,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     $(_mainForm).submit(function(ev) {
         var descWysiwyg = CKEDITOR.instances['model-description'];
-        console.log(descWysiwyg.getData());
-
         $('textarea.js-desc-wysiwyg').val(descWysiwyg.getData());
 
         checkLangField(nameModel);
