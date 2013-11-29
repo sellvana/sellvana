@@ -248,8 +248,28 @@
   <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
-      <span><%- rc.label %>:</span>
-      <input type="hidden" id="multi_hidden" style="width:auto;min-width:120px;"/>
+      <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+        <%- rc.label %>:
+        <% if(rc.filterVal ==='') { %>
+            All
+        <%} else { %>
+            <%- rc.filterLabel %> "<%- rc.filterVal %>"
+        <% } %>
+        <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;"/>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-primary update">
+                 Update
+              </button>
+            </div>
+          </div>
+      </li>
+    </ul>
 </script>
 
 <script type='template' id="{{ config.id }}-select-filter-template">
@@ -313,7 +333,7 @@
         <span class="caret"></span>
     </button>
 
-    <ul class="dropdown-menu filter-box" style="width:570px;">
+    <ul class="dropdown-menu filter-box">
       <li>
           <div class="input-group">
             <div class="input-group-btn dropdown" >
@@ -341,13 +361,13 @@
               </ul>
             </div>
 
-            <div class="input-group range" style="width:260px;display:table;">
+            <div class="input-group range">
                 <input type="text" placeholder="Select daterange" class="form-control daterange" >
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>
             </div>
-            <div class="datepicker input-group not_range"  style="width:260px;display:none;">
+            <div class="datepicker input-group not_range">
                           <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control">
                           <span class="input-group-addon">
                             <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>

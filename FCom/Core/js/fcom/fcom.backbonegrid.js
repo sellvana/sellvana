@@ -71,7 +71,8 @@ FCom.BackboneGrid = function(config) {
         Views: {},
         currentState: {},
         colsInfo: {},
-        data_mode: 'server'
+        data_mode: 'server',
+        multiselect_filter: false
 
     }
 
@@ -921,15 +922,24 @@ FCom.BackboneGrid = function(config) {
                 rowsCollection.fetch({reset:true});
             }
 
-            this.updateMainText();
+            if (typeof(this.updateMainText) !== 'undefined')
+                this.updateMainText();
         },
         preventDefault: function(ev) {
+                ev.preventDefault();
                 ev.stopPropagation();
+
                 return false;
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.append('<abbr class="select2-search-choice-close"></abbr>');
+
+            var self = this;
+            this.$el.find('abbr').click(function(ev) {
+                self._filter(false);
+            });
+
             return this;
         },
         updateMainText: function() {
@@ -949,14 +959,12 @@ FCom.BackboneGrid = function(config) {
             'click button.update': 'filter',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-            'keyup input': '_checkEnter',
-            'click abbr': '_closeFilter'
+            'keyup input': '_checkEnter'
         },
         initialize: function() {
             this.model.set('filterOp', 'contains');
         },
         _closeFilter: function(ev) {
-            this.$el.find('input').val('');
             this._filter(false);
         },
         _checkEnter: function(ev) {
@@ -1000,25 +1008,13 @@ FCom.BackboneGrid = function(config) {
             'click button.update': 'filter',
             //'click .filter-box': 'preventDefault',
             'click .filter-text-sub': 'subButtonClicked',
-            'click a.filter_op': 'filterOperatorSelected',
-            'click abbr': '_closeFilter'
-
+            'click a.filter_op': 'filterOperatorSelected'
         },
         initialize: function() {
             this.range = true;
             this.model.set('filterOp', 'between');
         },
-        _closeFilter: function(ev) {
-            this.$el.find('input').val('');
-            this._filter(false);
-
-        },
-        filterValChanged: function(ev) {
-            this.model.set('filterVal', this.$el.find('input:first').val());
-        },
         filterOperatorSelected: function(ev) {
-
-            //this.filterValChanged();
             this.range = $(ev.target).hasClass('range');
             if (this.range) {
                 this.$el.find('div.range').css('display','table');
@@ -1086,22 +1082,27 @@ FCom.BackboneGrid = function(config) {
     });
 
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
+        className: 'btn-group dropdown f-grid-filter js-multiselect-filter',
         events: {
-        'click button.clear': '_closeFilter',
-        'blur input[type="text"]': '_onBlur'
+            'click button.update': 'filter',
+            'focusin div.select2-container': '_preventDefault'
         },
-        _onBlur: function(ev) {
-            //$('div.select2-drop.select2-drop-multi').css('display','none');
-        },
-        checkEnter: function(ev) {
-
+        _preventDefault: function() {
+            this.$el.find('ul.filter-box').css('display','block');
         },
         filter: function(val) {
+            this.$el.find('ul.filter-box').css('display','');
+            val = this.$el.find('#multi_hidden:first').val();
             BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
+
+            var html = this.model.get('label')+': '+val;
+            html += '<span class="caret"></span>';
+            this.$el.find('button.filter-text-main').html(html);
         },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
+            BackboneGrid.Views.FilterCell.prototype.render.call(this);
+
             var options = this.model.get('_multipulFilterOptions');
             var data = [];
             for(var key in options) {
@@ -1114,24 +1115,25 @@ FCom.BackboneGrid = function(config) {
                 placeholder: 'All'
                 //closeOnSelect: true
             });
-            var self = this;
-            this.$el.find('#multi_hidden:first').on('change', function() {
-                self.filter($(this).val());
-            });
 
+            var self = this;
+            this.$el.find('#multi_hidden:first').change(function(ev) {
+                self.$el.find('ul.filter-box').css('display','block');
+            })
             return this;
         }
 
     });
 
-    BackboneGrid.Views.FilterSelectCell = BackboneGrid.Views.FilterCell.extend({
+    BackboneGrid.Views.FilterSelectCell = Backbone.View.extend({
+        className: 'btn-group dropdown f-grid-filter',
         _changeCss: function() {
             this.$el.find('div.select2-container').addClass('btn-group');
             this.$el.find('div.select2-container a').removeClass('select2-default');
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
-            this._filter(val);
+            BackboneGrid.Views.FilterCell.prototype._filter.call(this, val);
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -1193,6 +1195,7 @@ FCom.BackboneGrid = function(config) {
                         filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
                         break;
                     case 'multiselect':
+                        BackboneGrid.multiselect_filter = true;
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
                         break;
                     case 'select':
@@ -1560,7 +1563,15 @@ FCom.BackboneGrid = function(config) {
         colsVisibiltyView.render();
         filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
         filterView.render();
-
+        if (BackboneGrid.multiselect_filter) {
+            $('body').click(function(ev) {
+                // if opened multiselect filter is exist
+                if ($('div.js-multiselect-filter.open').length > 0 && $(ev.target).parents('div.js-multiselect-filter.open').length === 0) {
+                    $('div.js-multiselect-filter.open ul.filter-box').css('display', '');
+                    $('div.js-multiselect-filter.open').removeClass('open');
+                }
+            });
+        }
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
