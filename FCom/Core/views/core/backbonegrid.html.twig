@@ -265,6 +265,11 @@
       <span><%- rc.label %>:</span>
       <input type="hidden" id="multi_hidden" style="width:auto;min-width:120px;"/>
 </script>
+
+<script type='template' id="{{ config.id }}-select-filter-template">
+      <input type="hidden" id="select_hidden" style="width:auto;"/>
+</script>
+
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <%- rc.label %>:

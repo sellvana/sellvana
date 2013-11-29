@@ -1106,7 +1106,7 @@ FCom.BackboneGrid = function(config) {
             }
 
             this.$el.find('#multi_hidden:first').select2({
-                multiple: this.model.get('filter_type') === 'select' ? false : true,
+                multiple: true,
                 data: data,
                 placeholder: 'All'
                 //closeOnSelect: true
@@ -1115,6 +1115,67 @@ FCom.BackboneGrid = function(config) {
             this.$el.find('#multi_hidden:first').on('change', function() {
                 self.filter($(this).val());
             });
+
+            return this;
+        }
+
+    });
+
+    BackboneGrid.Views.FilterSelectCell = BackboneGrid.Views.FilterCell.extend({
+        events: {
+            'click a.select2-choice': '_insertClearBtn'
+        },
+        _insertClearBtn: function() {
+            console.log('fff');
+        },
+        _changeCss: function() {
+            this.$el.find('div.select2-container').addClass('btn-group');
+            this.$el.find('div.select2-container').css('font-weight', 600);
+            this.$el.find('div.select2-container').css('color', '#44444');
+            this.$el.find('div.select2-container').css('padding', 0);
+            this.$el.find('div.select2-container').css('margin', 0);
+            this.$el.find('div.select2-container a').removeClass('select2-default');
+            this.$el.find('div.select2-container span.select2-chosen').css('margin-right', 10);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('right', 3);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('top', 15);
+            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('z-index', 300);
+        },
+        filter: function(val) {
+            BackboneGrid.current_filters[this.model.get('name')] = val;
+            this._filter(val);
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            var fieldLabel = this.model.get('label');
+            var options = this.model.get('_multipulFilterOptions');
+            var data = [];
+            for(var key in options) {
+                data[data.length] = {id: key, text: options[key]};
+            }
+            this.$el.find('#select_hidden:first').select2({
+                //multiple: this.model.get('filter_type') === 'select' ? false : true,
+                data: data,
+                placeholder: fieldLabel +': All',
+                allowClear: true
+                //closeOnSelect: true
+            });
+
+            var self = this;
+            this.$el.find('#select_hidden:first').on('change', function() {
+                var val = $(this).val();
+
+                if (val !== '') {
+                    var temp = self.$el.find('div.select2-container span.select2-chosen');
+                    temp.html(fieldLabel+': '+temp.html());
+
+                } else {
+                    self.$el.find('div.select2-container a').removeClass('select2-default');
+                }
+
+                self.filter(val);
+            });
+
+            this._changeCss();
 
             return this;
         }
@@ -1142,8 +1203,11 @@ FCom.BackboneGrid = function(config) {
                     case 'date-range':
                         filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
                         break;
-                    case 'multiselect': case 'select':
+                    case 'multiselect':
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
+                        break;
+                    case 'select':
+                        filterCell = new BackboneGrid.Views.FilterSelectCell({model:model});
                         break;
                 }
                 this.$el.append(filterCell.render().el);
@@ -1401,6 +1465,7 @@ FCom.BackboneGrid = function(config) {
         //filtering settings
         BackboneGrid.Views.FilterTextCell.prototype.template = _.template($('#'+config.id+'-text-filter-template').html());
         BackboneGrid.Views.FilterDateRangeCell.prototype.template = _.template($('#'+config.id+'-date-range-filter-template').html());
+        BackboneGrid.Views.FilterSelectCell.prototype.template = _.template($('#'+config.id+'-select-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
