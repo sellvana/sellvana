@@ -1,30 +1,17 @@
 {% set formUrl = APP.href('cms/nav/tree_form/') %}
 
-<div class="row">
-  <div class="col-sm-12">
-    <div class="f-admin-main-title">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-file"></i>
-                <span>{{ "CMS Navigation" |_ }}</span>
-            </h1>
-        </div>
-      </div>
-    </div>
-</div>
-
-
-<div class="col-sm-12 fcom-tree-layout">
-    <div class="row" id="cms-nav-layout">
-        <div id="cms-nav-wrapper">
-            <div class="text-center well-sm">
-                <a class="js-expand-all btn" href="#">{{ "Expand All"|_ }}</a>
-                <a class="js-collapse-all btn" href="#">{{ "Collapse All"|_ }}</a>
+<div class="f-tree-layout">
+    <div class="f-admin-main-container f-admin-sidebar-view clearfix" id="cms-nav-layout" style="min-height: 900px;">
+        <div id="categories-wrapper" class="clearfix">
+            <div class="tree-header">{{ "CMS Navigation" |_ }}</div>
+            <div class="text-center">
+                <a class="js-expand-all btn btn-link" href="#">{{ "Expand All"|_ }}</a>
+                <a class="js-collapse-all btn btn-link" href="#">{{ "Collapse All"|_ }}</a>
             </div>
-            <div class="fcom-admin-nav-sidebar fcom-admin-tree-sidebar col-xs-12" id="cms_nav"></div>
+            <div class="f-admin-nav-sidebar f-admin-tree-sidebar" id="cms_nav"></div>
         </div>
-        <form class="form form-horizontal" id="cms-tree-form" action="{{ formUrl }}" method="post">
-            <div id="nav-form-container" class="col-xs-12"></div>
+        <form class="form form-horizontal clearfix" id="cms-tree-form" action="{{ formUrl }}" method="post">
+            <div id="nav-form-container"></div>
         </form>
     </div>
 </div>

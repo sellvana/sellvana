@@ -3154,6 +3154,24 @@ label[for="nav-tree-lock"] {
 #categories-form-container .nav-tabs  > li.active > a:focus {
   border-top:none;
   }
+#categories-form-container .nav-tabs > li:first-child > a {
+    border-left: none;
+}
+
+#nav-form-container .nav-tabs > li > a {
+    margin-right:0;
+    border-radius:0;
+}
+#nav-form-container .nav-tabs  > li > a,
+#nav-form-container .nav-tabs  > li.active > a,
+#nav-form-container .nav-tabs  > li.active,
+#nav-form-container .nav-tabs  > li.active > a:hover,
+#nav-form-container .nav-tabs  > li.active > a:focus {
+    border-top:none;
+}
+#nav-form-container .nav-tabs > li:first-child > a {
+    border-left: none;
+}
 
 /* Catalog > Product Edit */
 #catalog-products-form .tabbable.tabs-left { 
