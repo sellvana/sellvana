@@ -10,26 +10,13 @@
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
-    <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-8 f-grid-top-filters">
-          {% if filterData[0] %}
-            <span><label>Filters:&nbsp;</label></span>
-            <span class="f-filter-btns">
-              <!-- filter buttons here -->
-            </span>
-          {% endif %}
-          </div>
-          <div class="col-sm-4 text-right">
-
-              <div class="dataTables_filter">
-                  <label>
-                    Search:
-                  </label>
-                  <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
-
-              </div>
-
-          </div>
+    <div class="row datatables-top f-grid-top-filters {{ config.id | raw }}">
+        <input type="text" style="width:150px; margin-right:5px; display:inline;" class="form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+      {% if filterData[0] %}
+        <span class="f-filter-btns">
+          <!-- filter buttons here -->
+        </span>
+      {% endif %}
     </div>
   {% endif %}
 
