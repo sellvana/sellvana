@@ -42,6 +42,7 @@
         {% endfor %}
       </div>
       <div class="col-sm-5 text-right pagination" style='margin:0px;'>
+        <span class="{{ config.id }}-pagination f-grid-pagination" href="javascript:void()"> </span>
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
             {% for ps in THIS.pageSizeOptions() %}
@@ -63,9 +64,7 @@
         {% endif %}
       </div>
   </div>
-  <div class='row'>
-    <div class="text-center {{ config.id }}-pagination f-grid-pagination"></div>
-  </div>
+
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
       {{ s.description|raw }}
