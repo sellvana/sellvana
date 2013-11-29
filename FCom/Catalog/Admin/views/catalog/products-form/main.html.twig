@@ -190,6 +190,16 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $('input[id="short_desc_lang_fields"]').val(JSON.stringify(shortDescModel.langFields.toJSON()));
         $('input[id="desc_lang_fields"]').val(JSON.stringify(descModel.langFields.toJSON()));
 
+        if (!$(this).valid()) {
+            SystemFields.checkingForm = true;
+            return false;
+        } else {
+            if (SystemField.checkingForm) {
+                SystemFields.checkingForm = false;
+                $(this).submit();
+            }
+        }
+
     });
     _.templateSettings.variable = 'rc';
 

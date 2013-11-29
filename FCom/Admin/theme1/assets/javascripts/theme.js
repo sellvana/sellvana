@@ -206,7 +206,7 @@
     setAutoSize();
     setCharCounter();
     setMaxLength();
-    setValidateForm();
+    //setValidateForm();
     $(".box .box-remove").live("click", function(e) {
       $(this).parents("li").first().remove();
       e.preventDefault();
