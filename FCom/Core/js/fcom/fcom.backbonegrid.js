@@ -29,7 +29,9 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2', 'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'], function(Backbone, _, $, NProgress) {
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2',
+    'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
+function(Backbone, _, $, NProgress) {
 
 var setValidateForm = function(selector) {
     if (selector == null) {
