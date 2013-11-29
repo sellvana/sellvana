@@ -1652,6 +1652,15 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
   padding: 15px;
   width: 450px;
   }
+.f-filter-btns .filter-box div.range {
+  width: 100%;
+}
+
+.f-filter-btns .filter-box div.not_range {
+  width: 100%;
+  display:none;
+}
+
 .f-filter-btns .btn-group {
   margin-right:10px;
   }
