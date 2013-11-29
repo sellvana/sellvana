@@ -1687,7 +1687,42 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
   margin-right: 15px;
 }
 .f-grid-top-filters { margin:7px 0; }
+.f-grid-filter div.select2-container {
+  font-weight: 600;
+  color: #444444;
+  padding: 0px;
+  margin: 0px;
+}
+.f-grid-filter div.select2-container span.select2-chosen {
+  margin-right: 10px;
+}
+.f-grid-filter .select2-container .select2-choice abbr {
+  left: 7px;
+  top: 8px;
+  z-index: 300;
+}
+.f-grid-filter abbr {
+  left: 7px;
+  top: 9px;
+  z-index: 300;
+  margin-right: 10px;
+  display: none;
+  cursor: pointer;
+}
+.f-grid-filter-val abbr {
+  display: inline;
+}
+.f-grid-filter abbr:hover {
+  background-position: right -11px;
+}
+.f-filter-btns .f-grid-filter-val .dropdown-toggle {
+  padding-left: 20px;
+}
 
+.f-grid-filter .select2-container.select2-allowclear .select2-choice .select2-chosen {
+  margin-right: 10px;
+  margin-left: 10px;
+}
 .dataTable thead tr th:first-of-type select { width:70px; }
 .todo-list .new-todo {
   margin-bottom: 0;

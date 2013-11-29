@@ -899,17 +899,18 @@ FCom.BackboneGrid = function(config) {
         }
     });
     BackboneGrid.Views.FilterCell = Backbone.View.extend({
-        className: 'btn-group dropdown',
+        className: 'btn-group dropdown f-grid-filter',
 
         _filter: function(val) {
             if (val === false) {
+                this.$el.removeClass('f-grid-filter-val');
                 this.model.set('filterVal','');
                 if(typeof(BackboneGrid.current_filters[this.model.get('name')]) === 'undefined')
                     return;
                 delete BackboneGrid.current_filters[this.model.get('name')];
                 this.render();
             } else {
-
+                this.$el.addClass('f-grid-filter-val');
                 if (val.length === 0)
                     delete BackboneGrid.current_filters[this.model.get('name')];
             }
@@ -928,6 +929,7 @@ FCom.BackboneGrid = function(config) {
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
+            this.$el.append('<abbr class="select2-search-choice-close"></abbr>');
             return this;
         },
         updateMainText: function() {
@@ -947,8 +949,8 @@ FCom.BackboneGrid = function(config) {
             'click button.update': 'filter',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-            'click button.clear': '_closeFilter',
-            'keyup input': '_checkEnter'
+            'keyup input': '_checkEnter',
+            'click abbr': '_closeFilter'
         },
         initialize: function() {
             this.model.set('filterOp', 'contains');
@@ -999,8 +1001,7 @@ FCom.BackboneGrid = function(config) {
             //'click .filter-box': 'preventDefault',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-
-            'click button.clear': '_closeFilter',
+            'click abbr': '_closeFilter'
 
         },
         initialize: function() {
@@ -1124,23 +1125,9 @@ FCom.BackboneGrid = function(config) {
     });
 
     BackboneGrid.Views.FilterSelectCell = BackboneGrid.Views.FilterCell.extend({
-        events: {
-            'click a.select2-choice': '_insertClearBtn'
-        },
-        _insertClearBtn: function() {
-            console.log('fff');
-        },
         _changeCss: function() {
             this.$el.find('div.select2-container').addClass('btn-group');
-            this.$el.find('div.select2-container').css('font-weight', 600);
-            this.$el.find('div.select2-container').css('color', '#44444');
-            this.$el.find('div.select2-container').css('padding', 0);
-            this.$el.find('div.select2-container').css('margin', 0);
             this.$el.find('div.select2-container a').removeClass('select2-default');
-            this.$el.find('div.select2-container span.select2-chosen').css('margin-right', 10);
-            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('right', 3);
-            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('top', 15);
-            this.$el.find('div.select2-container abbr.select2-search-choice-close').css('z-index', 300);
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
