@@ -462,7 +462,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                         var w = langField.view.getWYSIWYG();
                         var val = w.getData();
                         langField.set('value', val);
-                        langField.view.$el.find('textarea').eq(1).val(val);//for validation show only
+                        langField.view.$el.find('textarea').val(val);//for validation show only
                     }
                     if (field.get('required') === '1' && langField.get('value') === '')
                             invalid++;

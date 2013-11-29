@@ -40,7 +40,8 @@
     <div class="form-group has-multilang">
         <label class="col-md-2 control-label" for="model-description">{{ 'Long Description'|_ }}</label>
         <div class="col-md-10">
-            <textarea class="form-control ckeditor" id="model-description" name="model[description]" rows="5" data-rule-required="true">{{ validator.fieldValue('description') }}</textarea>
+            <textarea class="form-control ckeditor js-desc-wysiwyg" id="model-description" name="model[description]" rows="5" >{{ validator.fieldValue('description') }}</textarea>
+            <textarea class="form-control js-desc-wysiwyg" id="model-description-validation" name="js-desc-wysiwyg" rows="5" style="display:none;" data-rule-required="true">{{ validator.fieldValue('description') }}</textarea>
         </div>
     </div>
     <div id="main-product-desc-lang">
@@ -167,7 +168,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 var w = langField.view.getWYSIWYG();
                 var val = w.getData();
                 langField.set('value', val);
-                langField.view.$el.find('textarea').eq(1).val(val);//for validation show only
+                langField.view.$el.find('textarea').val(val);//for validation show only
             }
 
             if (langField.get('value') === '')
@@ -182,6 +183,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     }
 
     $(_mainForm).submit(function(ev) {
+        var descWysiwyg = CKEDITOR.instances['model-description'];
+        console.log(descWysiwyg.getData());
+
+        $('textarea.js-desc-wysiwyg').val(descWysiwyg.getData());
+
         checkLangField(nameModel);
         checkLangField(shortDescModel);
         checkLangField(descModel);
