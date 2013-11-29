@@ -71,7 +71,8 @@ FCom.BackboneGrid = function(config) {
         Views: {},
         currentState: {},
         colsInfo: {},
-        data_mode: 'server'
+        data_mode: 'server',
+        multiselect_filter: false
 
     }
 
@@ -921,15 +922,24 @@ FCom.BackboneGrid = function(config) {
                 rowsCollection.fetch({reset:true});
             }
 
-            this.updateMainText();
+            if (typeof(this.updateMainText) !== 'undefined')
+                this.updateMainText();
         },
         preventDefault: function(ev) {
+                ev.preventDefault();
                 ev.stopPropagation();
+
                 return false;
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.append('<abbr class="select2-search-choice-close"></abbr>');
+
+            var self = this;
+            this.$el.find('abbr').click(function(ev) {
+                self._filter(false);
+            });
+
             return this;
         },
         updateMainText: function() {
@@ -949,14 +959,12 @@ FCom.BackboneGrid = function(config) {
             'click button.update': 'filter',
             'click .filter-text-sub': 'subButtonClicked',
             'click a.filter_op': 'filterOperatorSelected',
-            'keyup input': '_checkEnter',
-            'click abbr': '_closeFilter'
+            'keyup input': '_checkEnter'
         },
         initialize: function() {
             this.model.set('filterOp', 'contains');
         },
         _closeFilter: function(ev) {
-            this.$el.find('input').val('');
             this._filter(false);
         },
         _checkEnter: function(ev) {
@@ -1000,25 +1008,13 @@ FCom.BackboneGrid = function(config) {
             'click button.update': 'filter',
             //'click .filter-box': 'preventDefault',
             'click .filter-text-sub': 'subButtonClicked',
-            'click a.filter_op': 'filterOperatorSelected',
-            'click abbr': '_closeFilter'
-
+            'click a.filter_op': 'filterOperatorSelected'
         },
         initialize: function() {
             this.range = true;
             this.model.set('filterOp', 'between');
         },
-        _closeFilter: function(ev) {
-            this.$el.find('input').val('');
-            this._filter(false);
-
-        },
-        filterValChanged: function(ev) {
-            this.model.set('filterVal', this.$el.find('input:first').val());
-        },
         filterOperatorSelected: function(ev) {
-
-            //this.filterValChanged();
             this.range = $(ev.target).hasClass('range');
             if (this.range) {
                 this.$el.find('div.range').css('display','table');
@@ -1084,24 +1080,49 @@ FCom.BackboneGrid = function(config) {
             return this;
         }
     });
+    BackboneGrid.Views.FilterNumberRangeCell = BackboneGrid.Views.FilterDateRangeCell.extend({
+        render: function() {
+            BackboneGrid.Views.FilterCell.prototype.render.call(this);
 
+            return this;
+        },
+        filter: function() {
+            var field = this.model.get('name');
+            var filterVal;
+            if (this.range)
+                filterVal = this.$el.find('input.js-number1').val()+'~'+this.$el.find('input.js-number2').val();
+            else
+                filterVal = this.$el.find('input.js-number').val();
+
+            var op = this.model.get('filterOp');
+            BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+            this.model.set('filterVal',filterVal);
+            this._filter(filterVal);
+        }
+    });
     BackboneGrid.Views.FilterMultiselectCell = BackboneGrid.Views.FilterCell.extend({
         events: {
-        'click button.clear': '_closeFilter',
-        'blur input[type="text"]': '_onBlur'
+            'click button.update': 'filter',
+            'focusin div.select2-container': '_preventClose'
         },
-        _onBlur: function(ev) {
-            //$('div.select2-drop.select2-drop-multi').css('display','none');
-        },
-        checkEnter: function(ev) {
-
+        _preventClose: function() {
+            this.$el.addClass('js-prevent-close');
+            this.$el.find('ul.filter-box').css('display','block');
         },
         filter: function(val) {
+            this.$el.removeClass('js-prevent-close');
+            this.$el.find('ul.filter-box').css('display','');
+            val = this.$el.find('#multi_hidden:first').val();
             BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
+
+            var html = this.model.get('label')+': '+val;
+            html += '<span class="caret"></span>';
+            this.$el.find('button.filter-text-main').html(html);
         },
         render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
+            BackboneGrid.Views.FilterCell.prototype.render.call(this);
+
             var options = this.model.get('_multipulFilterOptions');
             var data = [];
             for(var key in options) {
@@ -1114,24 +1135,25 @@ FCom.BackboneGrid = function(config) {
                 placeholder: 'All'
                 //closeOnSelect: true
             });
-            var self = this;
-            this.$el.find('#multi_hidden:first').on('change', function() {
-                self.filter($(this).val());
-            });
 
+            var self = this;
+            this.$el.find('#multi_hidden:first').change(function(ev) {
+                self._preventClose();
+            })
             return this;
         }
 
     });
 
-    BackboneGrid.Views.FilterSelectCell = BackboneGrid.Views.FilterCell.extend({
+    BackboneGrid.Views.FilterSelectCell = Backbone.View.extend({
+        className: 'btn-group dropdown f-grid-filter',
         _changeCss: function() {
             this.$el.find('div.select2-container').addClass('btn-group');
             this.$el.find('div.select2-container a').removeClass('select2-default');
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
-            this._filter(val);
+            BackboneGrid.Views.FilterCell.prototype._filter.call(this, val);
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -1186,13 +1208,17 @@ FCom.BackboneGrid = function(config) {
             if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
                 var filterCell;
                 switch (model.get('filter_type')) {
-                    case 'text':case 'number-range':
+                    case 'text':
                         filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                         break;
                     case 'date-range':
                         filterCell = new BackboneGrid.Views.FilterDateRangeCell({model:model});
                         break;
+                    case 'number-range':
+                        filterCell = new BackboneGrid.Views.FilterNumberRangeCell({model:model});
+                        break;
                     case 'multiselect':
+                        BackboneGrid.multiselect_filter = true;
                         filterCell = new BackboneGrid.Views.FilterMultiselectCell({model:model});
                         break;
                     case 'select':
@@ -1460,6 +1486,7 @@ FCom.BackboneGrid = function(config) {
         BackboneGrid.Views.FilterDateRangeCell.prototype.template = _.template($('#'+config.id+'-date-range-filter-template').html());
         BackboneGrid.Views.FilterSelectCell.prototype.template = _.template($('#'+config.id+'-select-filter-template').html());
         BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#'+config.id+'-multiselect-filter-template').html());
+        BackboneGrid.Views.FilterNumberRangeCell.prototype.template =_.template($('#'+config.id+'-number-range-filter-template').html());
         //column visiblity checkbox view
         BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
 
@@ -1529,7 +1556,7 @@ FCom.BackboneGrid = function(config) {
                         c.filterLabel = 'Contains';
                     }
 
-                    if (filter.type === 'date-range') {
+                    if (filter.type === 'date-range' || filter.type === 'number-range') {
                         c.filterOp = 'Between';
                         c.filterLabel = 'Between';
                     }
@@ -1560,7 +1587,16 @@ FCom.BackboneGrid = function(config) {
         colsVisibiltyView.render();
         filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
         filterView.render();
-
+        if (BackboneGrid.multiselect_filter) {
+            $('body').click(function(ev) {
+                var _cache = filterView.$el.find('div.js-prevent-close');
+                // checking whether opened multiselect filter is exist and clicked element is not opend multilselect filter div
+                if (_cache.length > 0 && $(ev.target).parents('div.js-prevent-close').length === 0) {
+                    _cache.find('ul.filter-box').css('display', '');
+                    _cache.removeClass('js-prevent-close');
+                }
+            });
+        }
         //body view
         var rows = config.data.data;
         rowsCollection = new BackboneGrid.Collections.Rows;
@@ -1597,7 +1633,24 @@ FCom.BackboneGrid = function(config) {
         }
 
         gridView.render();
-
+        //local rows count info
+        if (BackboneGrid.data_mode === 'local') {
+            var pageSpan = $('span.'+BackboneGrid.id+'-pagination.f-grid-pagination');
+            pageSpan.css('top', 10);
+            function setLocalPageInfo()
+            {
+                if (rowsCollection.length === 0) {
+                    pageSpan.html('No data.');
+                } else {
+                    pageSpan.html(rowsCollection.length+' rows');
+                }
+            }
+            setLocalPageInfo();
+            rowsCollection.on('add remove reset filter', function() {
+                console.log('change');
+                setLocalPageInfo();
+            });
+        }
         if(config.dataMode != 'local') {
             $('ul.pagination.pagesize a').click(function(ev){
                 $('ul.pagination.pagesize li').removeClass('active');
