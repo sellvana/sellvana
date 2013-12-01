@@ -910,10 +910,14 @@ FCom.BackboneGrid = function(config) {
                     return;
                 delete BackboneGrid.current_filters[this.model.get('name')];
                 this.render();
+
             } else {
                 this.$el.addClass('f-grid-filter-val');
                 if (val.length === 0)
                     delete BackboneGrid.current_filters[this.model.get('name')];
+
+                if (typeof(this.updateMainText) !== 'undefined')
+                    this.updateMainText();
             }
 
             if (BackboneGrid.data_mode === 'local') {
@@ -922,8 +926,7 @@ FCom.BackboneGrid = function(config) {
                 rowsCollection.fetch({reset:true});
             }
 
-            if (typeof(this.updateMainText) !== 'undefined')
-                this.updateMainText();
+
         },
         preventDefault: function(ev) {
                 ev.preventDefault();
@@ -943,14 +946,15 @@ FCom.BackboneGrid = function(config) {
             return this;
         },
         updateMainText: function() {
-            var html = this.model.get('label')+': ';
-            if (this.model.get('filterVal') ==='') {
-                html += 'All';
+            var html = '';
+            if (typeof(this.model.get('filterLabel')) !== 'undefined') {
+                html = this.model.get('filterLabel') + ' ';
+                html += ('"'+this.model.get('filterVal')+'"');
             } else {
-                html += (this.model.get('filterLabel') +' "'+this.model.get('filterVal')+'"');
+                html = this.model.get('filterVal');
             }
-            html += '<span class="caret"></span>';
-            this.$el.find('button.filter-text-main').html(html);
+
+            this.$el.find('span.f-grid-filter-value').html(html);
         }
     });
     BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
@@ -1128,9 +1132,9 @@ FCom.BackboneGrid = function(config) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
 
-            var html = this.model.get('label')+': '+val;
+            /*var html = this.model.get('label')+': '+val;
             html += '<span class="caret"></span>';
-            this.$el.find('button.filter-text-main').html(html);
+            this.$el.find('button.filter-text-main').html(html);*/
         },
         render: function() {
             BackboneGrid.Views.FilterCell.prototype.render.call(this);
@@ -1161,7 +1165,6 @@ FCom.BackboneGrid = function(config) {
         className: 'btn-group dropdown f-grid-filter',
         _changeCss: function() {
             this.$el.find('div.select2-container').addClass('btn-group');
-            this.$el.find('div.select2-container a').removeClass('select2-default');
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
@@ -1186,13 +1189,11 @@ FCom.BackboneGrid = function(config) {
             var self = this;
             this.$el.find('#select_hidden:first').on('change', function() {
                 var val = $(this).val();
-
+                var temp = self.$el.find('div.select2-container span.select2-chosen');
                 if (val !== '') {
-                    var temp = self.$el.find('div.select2-container span.select2-chosen');
-                    temp.html(fieldLabel+': '+temp.html());
-
+                    temp.html('<span class="f-grid-filter-field">'+fieldLabel+'</span>: <span class="f-grid-filter-value">'+val+'</span>');
                 } else {
-                    self.$el.find('div.select2-container a').removeClass('select2-default');
+                    temp.html('<span class="f-grid-filter-field">'+fieldLabel+'</span>: <span class="f-grid-filter-value">All</span>');
                 }
 
                 self.filter(val);
