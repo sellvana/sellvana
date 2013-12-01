@@ -580,13 +580,13 @@ FCom.BackboneGrid = function(config) {
         },
         parse: function(response) {
             if (typeof(response[0].c) !== 'undefined') {
-                if (response[0].c !== BackboneGrid.currentState.c) {
+              //  if (response[0].c !== BackboneGrid.currentState.c) {
                     var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
                     BackboneGrid.currentState.mp = mp;
                     BackboneGrid.currentState.c = response[0].c;
                     if (BackboneGrid.data_mode !== 'local')
                         updatePageHtml();
-                }
+               // }
             }
             return response[1];
         },
@@ -1421,7 +1421,7 @@ FCom.BackboneGrid = function(config) {
 
             p = BackboneGrid.currentState.p;
             mp = BackboneGrid.currentState.mp;
-            //console.log(BackboneGrid.currentState.mp);
+            console.log(BackboneGrid.currentState.mp);
             var html = '';
 
             html += '<li class="first'+ (p<=1 ? ' disabled' : '')+'">';
