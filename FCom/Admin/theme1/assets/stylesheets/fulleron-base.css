@@ -1724,8 +1724,12 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
 .f-grid-filter abbr:hover {
   background-position: right -11px;
 }
+.f-filter-btns .f-grid-filter .dropdown-toggle {
+  color: #999;
+}
 .f-filter-btns .f-grid-filter-val .dropdown-toggle {
   padding-left: 20px;
+  color: #444444;
 }
 
 .f-grid-filter .select2-container.select2-allowclear .select2-choice .select2-chosen {
