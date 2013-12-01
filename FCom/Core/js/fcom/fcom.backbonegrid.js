@@ -964,9 +964,6 @@ FCom.BackboneGrid = function(config) {
         initialize: function() {
             this.model.set('filterOp', 'contains');
         },
-        _closeFilter: function(ev) {
-            this._filter(false);
-        },
         _checkEnter: function(ev) {
             var evt = ev || window.event;
             var charCode = evt.keyCode || evt.which;
@@ -1113,6 +1110,21 @@ FCom.BackboneGrid = function(config) {
             this.$el.removeClass('js-prevent-close');
             this.$el.find('ul.filter-box').css('display','');
             val = this.$el.find('#multi_hidden:first').val();
+            if (val === '') {
+                if (this.model.get('filterVal') !== '') {
+
+                    this.model.set('filterVal', '');
+                    this._filter(false);
+                } else {
+                    this.model.set('filterVal', '');
+                    this.render();
+
+                }
+
+                return;
+
+            }
+
             BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
 
