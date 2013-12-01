@@ -144,13 +144,13 @@
 <hr/>
 <div id='fields_list'/>
 <script type="template" id="fieldset-template">
-    <div class="box-header box-header-small green-background">
+    <div class="box-header box-header-small">
         <div class="title"><%- rc.set_name %></div>
         <div class="actions">
             <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
             </button>
 
-            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
+            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i class="icon-chevron-down"></i>
             </button>
         </div>
     </div>
@@ -981,7 +981,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $('#btn_add_field').css('display', 'none');
         } else {
             $('#td_fields').css('display', 'block');
-            $('#btn_add_field').css('display', 'block');
+            $('#btn_add_field').css('display', 'inline-block');
         }
 
         $( ".prod-fieldset .box-content" ).sortable({
