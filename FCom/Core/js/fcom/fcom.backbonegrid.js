@@ -1432,18 +1432,18 @@ FCom.BackboneGrid = function(config) {
             html += '</li>';
 
             html += '<li class="last'+ (p>=mp ? ' disabled' : '')+'">';
-            html += '<a class="js-change-url" href="#">&raquo;</a>';
+            html += '<a class="js-change-url" href="#">'+mp+' &raquo;</a>';
             html += '</li>';
 
 
-            $('ul.'+BackboneGrid.id+'.pagination.page').html(html);
+            $('.'+BackboneGrid.id+'.pagination.page').html(html);
 
             var caption = '';
             if (BackboneGrid.currentState.c > 0)
-                caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
+                caption = BackboneGrid.currentState.c+' record(s)';
             else
-                caption = 'No data';
-            $('span.'+BackboneGrid.id+'-pagination').html(caption);
+                caption = 'No data found';
+            $('.'+BackboneGrid.id+'-pagination').html(caption);
     }
 
         NProgress.start();
