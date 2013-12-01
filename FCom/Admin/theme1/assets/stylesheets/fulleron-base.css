@@ -1614,6 +1614,7 @@ body.without-footer #footer {
   }
 .f-filter-btns .f-grid-filter-val .dropdown-toggle {
   padding-left: 20px;
+  color: #444444;
 }
 
 .f-grid-filter .select2-container.select2-allowclear .select2-choice .select2-chosen {

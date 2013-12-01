@@ -249,12 +249,16 @@
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%- rc.label %>:
-        <% if(rc.filterVal ==='') { %>
-            All
-        <%} else { %>
-            <%- rc.filterLabel %> "<%- rc.filterVal %>"
-        <% } %>
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.filterVal ==='') { %>
+              All
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.filterVal %>"
+          <% } %>
+        </span>
         <span class="caret"></span>
     </button>
 
@@ -278,12 +282,14 @@
 
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%- rc.label %>:
-        <% if(rc.filterVal ==='') { %>
-            All
-        <%} else { %>
-            <%- rc.filterLabel %> "<%- rc.filterVal %>"
-        <% } %>
+        <span class='f-grid-filter-field'><%- rc.label %></span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.filterVal ==='') { %>
+              All
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.filterVal %>"
+          <% } %>
+        </span>
         <span class="caret"></span>
     </button>
 
@@ -329,7 +335,12 @@
 
 <script type='template' id="{{ config.id }}-date-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%- rc.label %>: All
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          All
+        </span>
         <span class="caret"></span>
     </button>
 
@@ -386,7 +397,12 @@
 
 <script type='template' id="{{ config.id }}-number-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%- rc.label %>: All
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          All
+        </span>
         <span class="caret"></span>
     </button>
 
