@@ -580,13 +580,13 @@ FCom.BackboneGrid = function(config) {
         },
         parse: function(response) {
             if (typeof(response[0].c) !== 'undefined') {
-                if (response[0].c !== BackboneGrid.currentState.c) {
+              //  if (response[0].c !== BackboneGrid.currentState.c) {
                     var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps) ;
                     BackboneGrid.currentState.mp = mp;
                     BackboneGrid.currentState.c = response[0].c;
                     if (BackboneGrid.data_mode !== 'local')
                         updatePageHtml();
-                }
+               // }
             }
             return response[1];
         },
@@ -910,10 +910,14 @@ FCom.BackboneGrid = function(config) {
                     return;
                 delete BackboneGrid.current_filters[this.model.get('name')];
                 this.render();
+
             } else {
                 this.$el.addClass('f-grid-filter-val');
                 if (val.length === 0)
                     delete BackboneGrid.current_filters[this.model.get('name')];
+
+                if (typeof(this.updateMainText) !== 'undefined')
+                    this.updateMainText();
             }
 
             if (BackboneGrid.data_mode === 'local') {
@@ -922,8 +926,7 @@ FCom.BackboneGrid = function(config) {
                 rowsCollection.fetch({reset:true});
             }
 
-            if (typeof(this.updateMainText) !== 'undefined')
-                this.updateMainText();
+
         },
         preventDefault: function(ev) {
                 ev.preventDefault();
@@ -943,14 +946,15 @@ FCom.BackboneGrid = function(config) {
             return this;
         },
         updateMainText: function() {
-            var html = this.model.get('label')+': ';
-            if (this.model.get('filterVal') ==='') {
-                html += 'All';
+            var html = '';
+            if (typeof(this.model.get('filterLabel')) !== 'undefined') {
+                html = this.model.get('filterLabel') + ' ';
+                html += ('"'+this.model.get('filterVal')+'"');
             } else {
-                html += (this.model.get('filterLabel') +' "'+this.model.get('filterVal')+'"');
+                html = this.model.get('filterVal');
             }
-            html += '<span class="caret"></span>';
-            this.$el.find('button.filter-text-main').html(html);
+
+            this.$el.find('span.f-grid-filter-value').html(html);
         }
     });
     BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
@@ -963,9 +967,6 @@ FCom.BackboneGrid = function(config) {
         },
         initialize: function() {
             this.model.set('filterOp', 'contains');
-        },
-        _closeFilter: function(ev) {
-            this._filter(false);
         },
         _checkEnter: function(ev) {
             var evt = ev || window.event;
@@ -1113,12 +1114,27 @@ FCom.BackboneGrid = function(config) {
             this.$el.removeClass('js-prevent-close');
             this.$el.find('ul.filter-box').css('display','');
             val = this.$el.find('#multi_hidden:first').val();
+            if (val === '') {
+                if (this.model.get('filterVal') !== '') {
+
+                    this.model.set('filterVal', '');
+                    this._filter(false);
+                } else {
+                    this.model.set('filterVal', '');
+                    this.render();
+
+                }
+
+                return;
+
+            }
+
             BackboneGrid.current_filters[this.model.get('name')] = val;
             this._filter(val);
 
-            var html = this.model.get('label')+': '+val;
+            /*var html = this.model.get('label')+': '+val;
             html += '<span class="caret"></span>';
-            this.$el.find('button.filter-text-main').html(html);
+            this.$el.find('button.filter-text-main').html(html);*/
         },
         render: function() {
             BackboneGrid.Views.FilterCell.prototype.render.call(this);
@@ -1149,7 +1165,6 @@ FCom.BackboneGrid = function(config) {
         className: 'btn-group dropdown f-grid-filter',
         _changeCss: function() {
             this.$el.find('div.select2-container').addClass('btn-group');
-            this.$el.find('div.select2-container a').removeClass('select2-default');
         },
         filter: function(val) {
             BackboneGrid.current_filters[this.model.get('name')] = val;
@@ -1174,13 +1189,11 @@ FCom.BackboneGrid = function(config) {
             var self = this;
             this.$el.find('#select_hidden:first').on('change', function() {
                 var val = $(this).val();
-
+                var temp = self.$el.find('div.select2-container span.select2-chosen');
                 if (val !== '') {
-                    var temp = self.$el.find('div.select2-container span.select2-chosen');
-                    temp.html(fieldLabel+': '+temp.html());
-
+                    temp.html('<span class="f-grid-filter-field">'+fieldLabel+'</span>: <span class="f-grid-filter-value">'+val+'</span>');
                 } else {
-                    self.$el.find('div.select2-container a').removeClass('select2-default');
+                    temp.html('<span class="f-grid-filter-field">'+fieldLabel+'</span>: <span class="f-grid-filter-value">All</span>');
                 }
 
                 self.filter(val);
@@ -1409,7 +1422,7 @@ FCom.BackboneGrid = function(config) {
 
             p = BackboneGrid.currentState.p;
             mp = BackboneGrid.currentState.mp;
-            //console.log(BackboneGrid.currentState.mp);
+            console.log(BackboneGrid.currentState.mp);
             var html = '';
 
             html += '<li class="first'+ (p<=1 ? ' disabled' : '')+'">';
@@ -1432,18 +1445,18 @@ FCom.BackboneGrid = function(config) {
             html += '</li>';
 
             html += '<li class="last'+ (p>=mp ? ' disabled' : '')+'">';
-            html += '<a class="js-change-url" href="#">&raquo;</a>';
+            html += '<a class="js-change-url" href="#">'+mp+' &raquo;</a>';
             html += '</li>';
 
 
-            $('ul.'+BackboneGrid.id+'.pagination.page').html(html);
+            $('.'+BackboneGrid.id+'.pagination.page').html(html);
 
             var caption = '';
             if (BackboneGrid.currentState.c > 0)
-                caption = 'Page: '+p+' of '+mp+' | '+BackboneGrid.currentState.c+' records';
+                caption = BackboneGrid.currentState.c+' record(s)';
             else
-                caption = 'No data';
-            $('span.'+BackboneGrid.id+'-pagination').html(caption);
+                caption = 'No data found';
+            $('.'+BackboneGrid.id+'-pagination').html(caption);
     }
 
         NProgress.start();
