@@ -11,7 +11,7 @@
 <div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
     <div class="row datatables-top f-grid-top-filters {{ config.id | raw }}">
-        <input type="text" style="width:150px; margin-right:5px; display:inline;" class="form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
       {% if filterData[0] %}
         <span class="f-filter-btns">
           <!-- filter buttons here -->
