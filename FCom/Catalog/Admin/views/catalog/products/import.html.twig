@@ -21,7 +21,7 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_ProductsImport').getImportFilesGridConfig()) | raw }}
+                                    {{ THIS.hook('mediaLibrary') | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
@@ -75,7 +75,7 @@
 <script>
     require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
         $(function() {
-            FCom.Admin.Accordion('import-accordion');
+            /*FCom.Admin.Accordion('import-accordion');
 
             importsGrid = new FCom.Admin.MediaLibrary({
                 grid:'#import_files',
@@ -117,7 +117,7 @@
                 $.post('{{APP.href('catalog/products/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                     importStatusEle.html(data);
                 });
-            });
+            });*/
         });
     })
 </script>
