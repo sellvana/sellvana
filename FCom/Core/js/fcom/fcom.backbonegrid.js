@@ -1208,7 +1208,7 @@ FCom.BackboneGrid = function(config) {
 
     BackboneGrid.Views.FilterView = Backbone.View.extend({
         initialize: function() {
-            var div = 'div.row.datatables-top.'+BackboneGrid.id+' .f-filter-btns';
+            var div = 'div.row.f-grid-top.'+BackboneGrid.id+' .f-filter-btns';
             this.setElement(div);
             this.collection.on('sort', this.render, this);
         },
