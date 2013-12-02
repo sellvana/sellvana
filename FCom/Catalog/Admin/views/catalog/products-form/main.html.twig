@@ -23,7 +23,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-local-sku">{{ 'Local SKU'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" value="{{ validator.fieldValue('local_sku') }}" />
+            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" data-rule-required="true" value="{{ validator.fieldValue('local_sku') }}" />
         </div>
     </div>
 

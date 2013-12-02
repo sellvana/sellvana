@@ -1,7 +1,7 @@
 base:
   - view: admin/nav
     do:
-      - [ addNav, catalog, { label: Catalog, pos: 100, icon_class: icon-barcode } ]
+      - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
       - [ addNav, catalog/categories, { label: Categories, href: /catalog/categories } ]
       - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
       - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
