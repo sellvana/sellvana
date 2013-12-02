@@ -8,9 +8,9 @@
 {% set filterData = config.filters %}
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
-<div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}" style="min-height:500px;">
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
-    <div class="row datatables-top f-grid-top-filters {{ config.id | raw }}">
+    <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
         <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
       {% if filterData[0] %}
         <span class="f-filter-btns">
@@ -21,9 +21,9 @@
   {% endif %}
 
   <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
-      <div class="col-sm-7">
+      <div class="col-sm-6">
         <span class="{{ config.id }} dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+            <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 Columns
                 <b class="caret"></b>
             </a>
@@ -41,7 +41,7 @@
           {% endif %}
         {% endfor %}
       </div>
-      <div class="col-sm-5 text-right pagination" style='margin:0px;'>
+      <div class="col-sm-6 text-right pagination" style='margin:0px;'>
         <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
@@ -373,7 +373,7 @@
             </div>
 
             <div class="input-group range">
-                <input type="text" placeholder="Select daterange" class="form-control daterange" >
+                <input type="text" placeholder="Select date range" class="form-control daterange" >
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>
@@ -385,10 +385,7 @@
                           </span>
             </div>
             <div class="input-group-btn">
-              <button type="buttton" class="btn btn-primary update">
-                  <i class=" icon-check-sign"></i>
-                  Update
-              </button>
+              <button type="buttton" class="btn btn-primary update">Update</button>
             </div>
           </div>
       </li>
