@@ -25,7 +25,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-base-price">{{ 'Default Base Price'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-base-price" name="model[base_price]" value="{{ validator.fieldValue('base_price') }}" />
+            <input class="form-control" type="text" id="model-base-price" name="model[base_price]" data-rule-required="true" value="{{ validator.fieldValue('base_price') }}" />
         </div>
     </div>
 
