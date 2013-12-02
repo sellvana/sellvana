@@ -7,6 +7,9 @@
 {% set pageUrl = THIS.pageChangeHref() %}
 {% set filterData = config.filters %}
 
+
+
+
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:500px;">
   {% if filterData %}
@@ -372,13 +375,13 @@
               </ul>
             </div>
 
-            <div class="input-group range">
+            <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
                 <input type="text" placeholder="Select date range" class="form-control daterange" >
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>
             </div>
-            <div class="datepicker input-group not_range">
+            <div class="datepicker input-group not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
                           <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control">
                           <span class="input-group-addon">
                             <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
@@ -434,7 +437,7 @@
               </ul>
             </div>
 
-            <div class="input-group-btn range">
+            <div class="input-group-btn range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
 
                 <input type="text" placeholder="Input number1" class="form-control js-number1" style="width:45%;" >
                 &nbsp;<i class="icon-resize-horizontal"></i>&nbsp;
@@ -442,7 +445,7 @@
 
             </div>
 
-            <div class="input-group-btn not_range" style='display:none;'>
+            <div class="input-group-btn not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
               <input type="text" placeholder="Input number" class="form-control js-number" >
             </div>
 
@@ -473,12 +476,12 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             personalize_url: "{{ APP.href('my_account/personalize') }}",
             data_url: "{{ config.data_url }}",
             edit_url: "{{ config.edit_url }}",
-            data: {{ THIS.getPageRowsData() | raw }},
-            columns: {{ THIS.getColumnsData() | raw }},
+            data: {{ THIS.getPageRowsData() | json_encode() | raw }},
+            columns: {{ config.columns | json_encode() | raw }},
             data_mode: "{{ config.data_mode }}",
-            filters: {{ THIS.getFilterData()  | raw }},
-            events: {{ THIS.getEventData() | raw }},
-            callbacks: {{ THIS.getCallbacks() | raw }}
+            filters: {{ config.filters | json_encode() | raw}},
+            events: {{ config.events | json_encode() | raw}},
+            callbacks: {{ config.callbacks | json_encode() | raw }},
         });
     //});
 });

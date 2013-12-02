@@ -58,7 +58,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-shipping-weight">{{ 'Shipping Weight'|_ }}</label>
         <div class="col-md-5">
-            <input type="text" class="form-control" id="model-shipping-weight" name="model[net_weight]" value="{{ validator.fieldValue('ship_weight') }}" />
+            <input type="text" class="form-control" id="model-shipping-weight" name="model[ship_weight]" value="{{ validator.fieldValue('ship_weight') }}" />
         </div>
     </div>
 
@@ -190,12 +190,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             SystemFields.checkingForm = true;
             return false;
         } else {
-            if (SystemField.checkingForm) {
+            if (SystemFields.checkingForm) {
                 SystemFields.checkingForm = false;
                 $(this).submit();
             }
         }
-
     });
     _.templateSettings.variable = 'rc';
 

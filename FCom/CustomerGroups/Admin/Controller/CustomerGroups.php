@@ -58,8 +58,8 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     {
         $data = $args['data'];
         $model = $args['model'];
-        if (!empty($data['customer_ids_remove'])) {
-            $customer_ids = explode(",", $data['customer_ids_remove']);
+        if (!empty($data['removed_ids'])) {
+            $customer_ids = explode(",", $data['removed_ids']);
             foreach ($customer_ids as $id) {
                 $customer = FCom_Customer_Model_Customer::i()->load($id);
                 if ($customer) {
@@ -68,8 +68,8 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
                 }
             }
         }
-        if (!empty($data['customer_ids_add'])) {
-            $customer_ids = explode(",", $data['customer_ids_add']);
+        if (!empty($data['rows'])) {
+            $customer_ids = explode(",", $data['rows']);
             foreach ($customer_ids as $id) {
                 $customer = FCom_Customer_Model_Customer::i()->load($id);
                 if ($customer) {

@@ -1,3 +1,5 @@
+
+
 <div class="page-header">
     <h1 class="f-page-title">
         <i class="icon-file"></i>
@@ -17,7 +19,7 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.hook('mediaLibrary') | raw }}
+                                    {{ THIS.view('core/medialib').set('config', {id: 'import_products', folder: 'storage/import/products'}) | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
