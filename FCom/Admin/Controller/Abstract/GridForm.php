@@ -132,7 +132,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
                 //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
                 $data = $view->outputData();
-                //$data = $this->gridDataAfter($data);
+                $data = $this->gridDataAfter($data);
                 BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
                     BDb::many_as_array($data['rows']),

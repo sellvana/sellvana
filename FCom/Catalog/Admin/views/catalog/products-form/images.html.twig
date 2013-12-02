@@ -5,8 +5,7 @@
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
 <script>
 
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
+
 
 require(['jquery', 'unique'], function($) {
     var prod_image_rows = [], editedRows = [], removedIds = [], originRows = [];

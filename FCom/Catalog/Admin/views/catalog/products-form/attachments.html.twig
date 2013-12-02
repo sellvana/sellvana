@@ -3,10 +3,9 @@
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
+{{ m | debug }}
 <script>
 
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
 
 require(['jquery', 'unique'], function($) {
     var prod_img_rows = [], editedRows = [], removedIds = [], originRows = [];

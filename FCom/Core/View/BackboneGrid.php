@@ -385,6 +385,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         //$mapColumns = array();
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
+
         $this->grid = $grid;
         return $grid;
     }
@@ -414,45 +415,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         foreach ($rows as $rowId=>$row) {
             $data[] = is_array($row) ? $row : $row->as_array();
         }
-        return json_encode(array('state'=>$state, 'data'=>$data));
-    }
 
-    public function getColumnsData()
-    {
-        $grid = $this->get('grid');
-        return json_encode($grid['config']['columns']);
-    }
-
-    public function getFilterData()
-    {
-        $grid = $this->get('grid');
-        if (isset($grid['config']['filters'])) {
-            return json_encode($grid['config']['filters']);
-        } else {
-            return '[]';
+        if (class_exists($gridId) && method_exists($gridId, 'afterInitialData')) {
+            $data = $gridId::afterInitialData($data);
         }
 
+        return array('state'=>$state, 'data'=>$data);
     }
 
-    public function getEventData()
-    {
-        $grid = $this->get('grid');
-        if (isset($grid['config']['events'])) {
-            return json_encode($grid['config']['events']);
-        } else {
-            return '[]';
-        }
-    }
-
-    public function getCallbacks()
-    {
-        $grid = $this->get('grid');
-        if (isset($grid['config']['callbacks'])) {
-            return json_encode($grid['config']['callbacks']);
-        } else {
-            return '[]';
-        }
-    }
 
     public function getPageHtmlData($rows = null)
     {
@@ -663,10 +633,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
-        if (!is_null($method)) {
+        /*if (!is_null($method)) {
             BEvents::i()->fire($method.'.data', array('data'=>&$data));
-        }
-
+        }*/
+        BEvents::i()->fire(__METHOD__.'.data', array('data'=>&$data));
         return $data;
     }
 

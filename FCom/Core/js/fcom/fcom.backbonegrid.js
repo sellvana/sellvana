@@ -742,7 +742,7 @@ function(Backbone, _, $, NProgress) {
                 var colsInfo = columnsCollection.toJSON();
                 this.$el.html(this.template({row:this.model.toJSON(), colsInfo: colsInfo}));
 
-                if (typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
+                if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                     console.log('after_render');
                     var func = BackboneGrid.callbacks['after_render'];
                     var script = func+'(this.$el,this.model.toJSON());';
@@ -754,13 +754,9 @@ function(Backbone, _, $, NProgress) {
                 var self = this;
                 columnsCollection.each(function(col) {
                     if (col.get('editor') === 'select' && col.get('editable') === 'inline') {
-                        var name = col.get('name');
-                        self.$el.find('select#'+name).val(self.model.get(name));
-                    }
 
-                    if (col.get('editable') === 'inline') {
                         var name = col.get('name');
-                        var editor = col.get('editor') === 'select' ? 'select' : 'input';
+                        self.$el.find('td[data-col="'+name+'"] select').val(self.model.get(name));
                     }
                 });
 
@@ -1011,12 +1007,12 @@ function(Backbone, _, $, NProgress) {
                 'click a.filter_op': 'filterOperatorSelected'
             },
             initialize: function() {
-                this.range = true;
+                this.model.set('range', true);
                 this.model.set('filterOp', 'between');
             },
             filterOperatorSelected: function(ev) {
-                this.range = $(ev.target).hasClass('range');
-                if (this.range) {
+                this.model.set('range', $(ev.target).hasClass('range'));
+                if (this.model.get('range')) {
                     this.$el.find('div.range').css('display','table');
                     this.$el.find('div.not_range').css('display','none');
                 } else {
@@ -1040,7 +1036,7 @@ function(Backbone, _, $, NProgress) {
             filter: function() {
                 var field = this.model.get('name');
                 var filterVal;
-                if (this.range)
+                if (this.model.get('range'))
                     filterVal = this.$el.find('input:first').val();
                 else
                     filterVal = this.$el.find('input:last').val();
@@ -1072,7 +1068,7 @@ function(Backbone, _, $, NProgress) {
                                         );
 
                 var filterVal = this.model.get('filterVal');
-                if (this.range)
+                if (this.model.get('range'))
                     filterVal = this.$el.find('input:first').val(filterVal);
                 else
                     filterVal = this.$el.find('input:last').val(filterVal);
@@ -1089,7 +1085,7 @@ function(Backbone, _, $, NProgress) {
             filter: function() {
                 var field = this.model.get('name');
                 var filterVal;
-                if (this.range)
+                if (this.model.get('range'))
                     filterVal = this.$el.find('input.js-number1').val()+'~'+this.$el.find('input.js-number2').val();
                 else
                     filterVal = this.$el.find('input.js-number').val();
@@ -1843,7 +1839,7 @@ function(Backbone, _, $, NProgress) {
             }
             //console.log(BackboneGrid.events);
             if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
-                var ev= {grid: config.id, rows: rowsCollection.toJSON()};
+                var ev= {grid: config.id, rows: rowsCollection.toJSON(), collection: rowsCollection };
                 g_vent.trigger('init-detail', ev);
             }
 
@@ -1884,6 +1880,8 @@ function(Backbone, _, $, NProgress) {
                 });
 
                 g_vent.bind('get_rows_collection', function(ev) {
+
+                    console.log(ev);
                     if(ev.grid === config.id) {
                         ev.callback(rowsCollection);
                     }
