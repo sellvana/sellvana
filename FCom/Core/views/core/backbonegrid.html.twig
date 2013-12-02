@@ -104,8 +104,8 @@
                   </div>
                 </form>
                 <div class='modal-footer'>
-                    <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
-                    <button class='btn btn-primary save' type='button'>Save changes</button>
+                    <button class='btn btn-default' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
+                    <button class='btn btn-primary save' type='button'>{{ 'Save changes' |_ }}</button>
                 </div>
             </div>
         </div>
@@ -254,7 +254,7 @@
         </span>:
         <span class='f-grid-filter-value'>
           <% if(rc.filterVal ==='') { %>
-              All
+              {{ 'All'|_ }}
           <%} else { %>
               <%- rc.filterLabel %> "<%- rc.filterVal %>"
           <% } %>
@@ -268,7 +268,7 @@
             <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;"/>
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
-                 Update
+                 {{ 'Update'|_ }}
               </button>
             </div>
           </div>
@@ -285,7 +285,7 @@
         <span class='f-grid-filter-field'><%- rc.label %></span>:
         <span class='f-grid-filter-value'>
           <% if(rc.filterVal ==='') { %>
-              All
+              {{ 'All'|_ }}
           <%} else { %>
               <%- rc.filterLabel %> "<%- rc.filterVal %>"
           <% } %>
@@ -304,19 +304,19 @@
 
               <ul class='dropdown-menu filter-sub'>
                 <li>
-                    <a class='filter_op' data-id='contains' href='javascript:void()'>contains</a>
+                    <a class='filter_op' data-id='contains' href='javascript:void()'>{{ 'contains'|_ }}</a>
                 </li>
                 <li>
-                   <a class='filter_op' data-id='not' href='javascript:void()'>does not contain</a>
+                   <a class='filter_op' data-id='not' href='javascript:void()'>{{ 'does not contain'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='equal' href='javascript:void()'>is equal to</a>
+                    <a class='filter_op' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
                 </li>
                 <li>
-                    <a  class='filter_op' data-id='start' href='javascript:void()'>start with</a>
+                    <a  class='filter_op' data-id='start' href='javascript:void()'>{{ 'start with'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='end' href='javascript:void()'>end with</a>
+                    <a class='filter_op' data-id='end' href='javascript:void()'>{{ 'end with'|_ }}</a>
                 </li>
               </ul>
             </div>
@@ -325,7 +325,7 @@
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
-                 Update
+                 {{ 'Update'|_ }}
               </button>
             </div>
           </div>
@@ -339,7 +339,7 @@
           <%- rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
-          All
+          {{ 'All'|_ }}
         </span>
         <span class="caret"></span>
     </button>
@@ -355,19 +355,19 @@
 
               <ul class='dropdown-menu filter-sub'>
                 <li>
-                    <a class='filter_op range' data-id='between' href='javascript:void()'>between</a>
+                    <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
                 </li>
                 <li>
-                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>from</a>
+                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>to</a>
+                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
                 </li>
                 <li>
-                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>is equal to</a>
+                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>not in</a>
+                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
                 </li>
               </ul>
             </div>
@@ -385,7 +385,10 @@
                           </span>
             </div>
             <div class="input-group-btn">
-              <button type="buttton" class="btn btn-primary update">Update</button>
+              <button type="button" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  {{ 'Update'|_ }}
+              </button>
             </div>
           </div>
       </li>
@@ -398,7 +401,7 @@
           <%- rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
-          All
+          {{ 'All'|_ }}
         </span>
         <span class="caret"></span>
     </button>
@@ -414,19 +417,19 @@
 
               <ul class='dropdown-menu filter-sub'>
                 <li>
-                    <a class='filter_op range' data-id='between' href='javascript:void()'>between</a>
+                    <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
                 </li>
                 <li>
-                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>is equal to</a>
+                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
                 </li>
                 <li>
-                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>greater than</a>
+                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'greater than'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>less than</a>
+                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'less than'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>not between</a>
+                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not between'|_ }}</a>
                 </li>
               </ul>
             </div>
@@ -446,7 +449,7 @@
             <div class="input-group-btn">
               <button type="buttton" class="btn btn-primary update">
                   <i class=" icon-check-sign"></i>
-                  Update
+                  {{ 'Update'|_ }}
               </button>
             </div>
           </div>

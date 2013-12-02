@@ -1300,6 +1300,9 @@ body.without-footer .f-admin-footer {
 .f-admin-sidebar-view .tabbable.tabs-left > .nav-tabs > li.active > a {
   border-left:none;
   }
+.f-admin-sidebar-view .tabbable.tabs-left > .nav-tabs > li:first-child > a {
+    border-top:none;
+}
 .f-admin-sidebar-view .tabbable.tabs-left .tab-content {
   display:table-cell;
   width:100%;
@@ -1590,6 +1593,8 @@ body.without-footer .f-admin-footer {
   margin-right:5px; 
   display:inline;
   }
+
+
 .f-filter-btns .f-grid-filter-val .dropdown-toggle {
   padding-left:20px;
   color:#444444;
@@ -1599,6 +1604,11 @@ body.without-footer .f-admin-footer {
   margin-right:10px;
   margin-left:10px;
 }
+.modal-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .dataTable thead tr th:first-of-type select { width:70px; }
 .todo-list .new-todo {
   margin-bottom:0;
@@ -3409,3 +3419,4 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
   display:table;
 }
 .page-header:after { clear:both; }
+

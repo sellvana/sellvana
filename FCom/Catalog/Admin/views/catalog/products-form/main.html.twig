@@ -23,7 +23,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-local-sku">{{ 'Local SKU'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" value="{{ validator.fieldValue('local_sku') }}" />
+            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" data-rule-required="true" value="{{ validator.fieldValue('local_sku') }}" />
         </div>
     </div>
 
@@ -78,19 +78,11 @@
 
 {{ THIS.hook('catalog/products/tab/main', {'model' : m}) | raw }}
 
-<script>
-    require(['jquery', 'fcom.admin.form'], function($) {
-        $(function() {
-
-        });
-    })
-</script>
-
 <script type="template" id="main-lang-view-template">
     <div class="row multilang-field">
         <div class="col-md-2" />
         <div class="col-md-5">
-            <button type="button" style="margin-top: 5px;" class="btn btn-info btn-xs multilang">Set Locale</button>
+            <button type="button" style="margin-top: 5px;" class="btn btn-info btn-xs multilang">{{ 'Set Locale'|_ }}</button>
         </div>
     </div>
 
@@ -116,15 +108,15 @@
                                 </select>
                             </td>
                             <td>
-                                <button class="btn btn-primary save" type="button">Add Locale</button>
+                                <button class="btn btn-primary save" type="button">{{ 'Add Locale' |_ }}</button>
                             </td>
                         </tr>
                     </table>
-                    <div class="system_lang_fields" style="max-height:700px; overflow-y: auto;overflow-x:hidden;">
+                    <div class="system_lang_fields">
                     </div>
                 </div>
                 <div class="modal-footer">
-                   <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
+                   <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">{{ 'Close'|_ }}</button>
                 </div>
             </div>
         </div>
@@ -358,8 +350,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.langFields.each(this._addLangView, this);
             this.model.view = this;
             this._updateLangTag();
-            if ($(window).height()-250 > 100)
-                this.$el.find('.system_lang_fields').css('max-height', $(window).height()-250);
+
 
             if (typeof(adminForm) !== 'undefined')
                     adminForm.wysiwygInit();
@@ -397,10 +388,4 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var descView = new SystemFields.Views.LangView({model: descModel, el: '#main-product-desc-lang'});
     descView.render();
 });
-
-$(window).resize(function() {
-    var h = $(window).height()-250;
-    if(h>100)
-        $('div.system_lang_fields').css('max-height', h);
-})
 </script>
