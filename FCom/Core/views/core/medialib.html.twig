@@ -127,8 +127,8 @@
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var prod_img_rows = [];
-        console.log('fwfwfw');
-        $('#{{config.id}}-media-upload').fileupload({
+
+        $('div#{{config.id}}-media-upload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=") | raw}}{{ config.folder | raw }}',
             multiple:true
         })
