@@ -59,8 +59,12 @@ function skipWhitespace( &$tokens, &$i ) {
 function nextToken( &$j ) {
     global $tokens, $i;
     $j = $i;
+    $token = new Token('');
     do {
         $j++;
+        if(!isset($tokens[ $j ])){
+            break;
+        }
         $token = $tokens[ $j ];
     } while ( $token->type == T_WHITESPACE );
     return $token;
@@ -84,11 +88,44 @@ $matchingControlOneLine = false;
 $inControlStatement = false;
 $controlNesting = 0;
 
+$level = 0; // level of indentation
+$sep = "    "; // 4 spaces
+
 // First pass - filter out unwanted tokens
 $filteredTokens = array();
 for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
     /* @var $token Token */
     $token = $tokens[ $i ];
+    if($token->type == T_OPEN_TAG){
+//        $level++; // all code after open tag should be indented
+    } elseif ($token->type == T_WHITESPACE) {
+        if (strpos($token->contents, "\n") === 0) {
+            // new line indentation, adding it to each new line
+            $l = $level;
+            if(nextToken( $j )->contents == "}"){
+                $l--;
+            }
+            $token->contents = "\n" . str_repeat($sep, $l);
+        } elseif (strpos($token->contents, "\t")) {
+            // replace tab with spaces
+            $count           = 0;
+            $token->contents = str_replace("\t", $sep, $token->contents, $count);
+            if ($count) {
+                echo $count, " tabs converted to spaces";
+            }
+        }
+    } elseif ($token->contents == "{") {
+        $level++;
+        if( nextToken($j)->type != T_WHITESPACE  && $level){
+            $token->contents .= "\n" . str_repeat($sep, $level);
+        }
+    } elseif ($token->contents == "}") {
+        $level--;
+        if( nextToken($j)->type != T_WHITESPACE && $level){
+            $token->contents .= "\n" . str_repeat($sep, $level);
+        }
+    }
+
     if ( $token->contents == '?' ) {
         $matchingTernary = true;
     }
@@ -120,14 +157,20 @@ for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
         $inControlStatement = $controlNesting != 0;
         $nextToken = nextToken( $j );
         if($controlNesting == 0 && $nextToken->contents != '{' && $nextToken->contents != ';'){
+            // single line control to be wrapped between
             $matchingControlOneLine = true;
             $filteredTokens[] = new Token('{');
-            $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
+            $level++;
+            $filteredTokens[] = new Token(array(T_WHITESPACE, "\n" . str_repeat($sep, $level)));
+            if(isset($tokens[$i + 1]) ){
+                $tokens[$i + 1]->contents = trim($tokens[$i + 1]->contents);
+            }
         }
     } elseif ( $token->contents == ";" && $matchingControlOneLine) {
         $matchingControlOneLine = false;
         $filteredTokens[] = $token;
-        $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
+
+        $filteredTokens[] = new Token(array(T_WHITESPACE, "\n" . str_repeat($sep, --$level)));
         $filteredTokens[] = new Token('}');
         $filteredTokens[] = new Token(array(T_WHITESPACE, "\n"));
     } elseif ( $token->contents == ':' ) {
