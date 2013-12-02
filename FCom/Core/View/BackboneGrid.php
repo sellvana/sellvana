@@ -889,11 +889,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $cfg = $this->_processConfig($cfg);
         print_r($cfg);
         exit;*/
-        $columns = $this->grid['config']['columns'];
+        $grid = $this->getGrid();
+        $columns =$grid['config']['columns'];
         $headers = array();
         foreach ($columns as $i=>$col) {
-            if (!empty($col['hidden'])) continue;
-            if (!empty($col['cell'])) continue;
+            if (!empty($col['hidden']) && $col['hidden'] !== 'false') continue;
+            if (!empty($col['cell']) || $col['name'] === 'thumb_path') continue;
             if ($col['name'] === '_actions') continue;
             $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
             /*if (!empty($col['editoptions']['value']) && is_string($col['editoptions']['value'])) {
@@ -920,8 +921,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $data = array();
 
             foreach ($columns as $col) {
-                if (!empty($col['hidden'])) continue;
-                if (!empty($col['cell'])) continue;
+                if (!empty($col['hidden']) && $col['hidden'] !== 'false') continue;
+                if (!empty($col['cell']) || $col['name'] === 'thumb_path') continue;
                 if ($col['name'] === '_actions') continue;
                 $k = $col['name'];
 
