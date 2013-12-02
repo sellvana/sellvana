@@ -1,11 +1,13 @@
 {% set c = THIS.get('model') %}
 
+<h2>{{ "Email Settings"|_}}</h2>
+
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Email">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'Email Sending'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_Email-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Email-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'SMTP Host'|_ }}</label>
