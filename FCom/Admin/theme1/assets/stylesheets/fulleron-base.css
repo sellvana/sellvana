@@ -1651,7 +1651,7 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
   text-align: left;
   padding: 15px;
   width: 450px;
-  }
+}
 .f-filter-btns .filter-box div.range {
   width: 100%;
 }
@@ -1727,6 +1727,8 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
 .f-filter-btns .f-grid-filter .dropdown-toggle {
   color: #999;
 }
+
+
 .f-filter-btns .f-grid-filter-val .dropdown-toggle {
   padding-left: 20px;
   color: #444444;
@@ -1736,6 +1738,11 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055); }
   margin-right: 10px;
   margin-left: 10px;
 }
+.modal-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .dataTable thead tr th:first-of-type select { width:70px; }
 .todo-list .new-todo {
   margin-bottom: 0;
@@ -3839,3 +3846,4 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
   display:table;
 }
 .page-header:after { clear:both; }
+

@@ -215,3 +215,16 @@ ul#adminUserList li
     </form>
   </nav>
 </header>
+
+<script>
+  function setModalHeight() {
+    var h = $(window).height()-200;
+    if (h>0) {
+      $('.modal-body').css('max-height', h);
+    }
+  }
+
+  $(window).resize(function(ev) {
+    setModalHeight();
+  });
+</script>
