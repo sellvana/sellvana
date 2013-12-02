@@ -1623,7 +1623,7 @@ function(Backbone, _, $, NProgress) {
                     $(BackboneGrid.MassEditButton).addClass('disabled');
                 }
 
-                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('select-rows') !== -1) {
+                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && BackboneGrid.events.indexOf('select-rows') !== -1) {
                     g_vent.trigger('select-rows', {grid: config.id, rows: selectedRows.toJSON()});
                 }
             });
