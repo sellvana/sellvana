@@ -19,13 +19,15 @@ class FCom_CustomerGroups_Admin extends BClass
 
         if ($prod->get('price_info')) {
             $data = BUtil::fromJson($prod->get('price_info'));
-
             $rows = $data['rows'];
             $remove_ids = $data['remove_ids'];
+
             $model = FCom_CustomerGroups_Model_TierPrice::i();
 
             foreach($remove_ids as $id) {
-                $model->load($id)->delete();
+                $r = $model->load($id);
+                if(!empty($r))
+                    $r->delete();
             }
 
             foreach($rows as $row) {
@@ -34,8 +36,6 @@ class FCom_CustomerGroups_Admin extends BClass
                     unset($row['id']);
                     $row['product_id'] = $prod->id;
                     $model->create($row)->save();
-
-
                 } else {
                     $model->load($row['id'])->set($row)->save();
                 }

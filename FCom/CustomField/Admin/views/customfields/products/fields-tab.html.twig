@@ -125,7 +125,7 @@
 
 <div class="well">
   <div class="row">
-    <input type="hidden" id="prod_customfield" name="model[prod_customfield]"/>
+    <input type="hidden" id="custom_fields" name="custom_fields"/>
     <div class="col-sm-6">
       <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
@@ -144,13 +144,13 @@
 <hr/>
 <div id='fields_list'/>
 <script type="template" id="fieldset-template">
-    <div class="box-header box-header-small green-background">
+    <div class="box-header box-header-small">
         <div class="title"><%- rc.set_name %></div>
         <div class="actions">
             <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
             </button>
 
-            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
+            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i class="icon-chevron-down"></i>
             </button>
         </div>
     </div>
@@ -162,7 +162,7 @@
 {# CONFLICT MIDDLE
 <div class="row">
     <div class="col-sm-10">
-        <input type="hidden" id="prod_customfield" name="custom_fields"/>
+        <input type="hidden" id="custom_fields" name="custom_fields"/>
         <table>
             <tr>
                 <td style='padding-right:20px;'>
@@ -287,7 +287,7 @@ CONFLICT END #}
                                 </td>
                             </tr>
                         </table>
-                        <div class="lang_fields" style="max-height:700px; overflow-y: auto;overflow-x:hidden;">
+                        <div class="lang_fields">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -499,7 +499,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
         checkFieldSet();
         sortFieldSet();
-        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+
         if(!$(this).valid()) {
             CustomField.checkingForm = true;
             return false;
@@ -510,7 +511,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
 
         }
-
     });
 
     var _appendForm = $('form#prod-new-field-form1');
@@ -789,6 +789,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var val = this.$el.find('select').val();
             if (typeof(val) === 'object')
                 val = val.join(',');
+
             this.model.set('value', val);
         },
         _changeVal: function() {
@@ -820,8 +821,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             } else if (this.model.get('required') === '1') {
                 langView.$el.find('input,textarea').attr('data-rule-required','true');
             }
-            this.$el.find('div.lang_fields').css('max-height','500px;');
+
             langView.parentSet = this.model;
+            setModalHeight();
         },
         getWYSIWYG: function() {
             var id = this.$el.find('textarea').attr('id');
@@ -840,8 +842,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             //this.$el.find('.select2').select2();
             this._updateLangTag();
-            if ($(window).height()-250 > 100)
-                this.$el.find('.lang_fields').css('max-height', $(window).height()-250);
             return this;
         }
     });
@@ -905,8 +905,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             switch (field.get('admin_input_type')) {
                 case 'multiselect':
                 case 'select':
+                    this.$el.find('select:last').val(field.get('value'));
                     this.$el.find('select:last').select2();
-
                     break;
                 case 'boolean':
                     field.switch = true;
@@ -962,7 +962,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             remove_options(setModel);
 
         }
-        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
     }
 
     refresh_selects();
@@ -974,14 +974,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $('#btn_add_field').css('display', 'none');
     }
     setCollection.on('add remove change', function() {
-        $('#prod_customfield').val(JSON.stringify(setCollection.toJSON()));
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
 
         if (setCollection.length === 0) {
             $('#td_fields').css('display', 'none');
             $('#btn_add_field').css('display', 'none');
         } else {
             $('#td_fields').css('display', 'block');
-            $('#btn_add_field').css('display', 'block');
+            $('#btn_add_field').css('display', 'inline-block');
         }
 
         $( ".prod-fieldset .box-content" ).sortable({
@@ -1009,11 +1009,4 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 });*/
 
 
-
-
-$(window).resize(function() {
-    var h = $(window).height()-250;
-    if (h > 100)
-        $('.lang_fields').css('max-height', h);
-})
 </script>

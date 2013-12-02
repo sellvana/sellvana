@@ -1,12 +1,10 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-file"></i>
-                <span>{{ "Upload and Import Products" |_ }}</span>
-            </h1>
-        </div>
-    </div>
+
+
+<div class="page-header">
+    <h1 class="f-page-title">
+        <i class="icon-file"></i>
+        <span>{{ "Upload and Import Products" |_ }}</span>
+    </h1>
 </div>
 
 <div class="box col-sm-12">
@@ -21,7 +19,7 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_ProductsImport').getImportFilesGridConfig()) | raw }}
+                                    {{ THIS.view('core/medialib').set('config', {id: 'import_products', folder: 'storage/import/products'}) | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
@@ -75,7 +73,7 @@
 <script>
     require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
         $(function() {
-            FCom.Admin.Accordion('import-accordion');
+            /*FCom.Admin.Accordion('import-accordion');
 
             importsGrid = new FCom.Admin.MediaLibrary({
                 grid:'#import_files',
@@ -117,7 +115,7 @@
                 $.post('{{APP.href('catalog/products/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                     importStatusEle.html(data);
                 });
-            });
+            });*/
         });
     })
 </script>

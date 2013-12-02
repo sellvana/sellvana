@@ -1,11 +1,13 @@
 {% set c = THIS.get('model') %}
 
+<h2>{{ "Crontab Settings"|_}}</h2>
+
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Cron">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Cron-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Cron-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
@@ -21,7 +23,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Cron Dispatch"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_Cron-group1">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Cron-group1">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Leeway Minutes"|_ }}</label>

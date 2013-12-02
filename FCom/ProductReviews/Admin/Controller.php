@@ -16,15 +16,18 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $columns = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
-            array('name'=>'title', 'label'=>'Title', 'width'=>250),
-            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'validate'=>'number'),
-            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'validate'=>'number'),
-            array('name'=>'approved', 'label'=>'Approved', 'editable'=>true, 'mass-editable'=>true, 'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array(
-                'edit'   => array('href'=>BApp::href('/prodreviews/form?id='), 'col'=>'id'),
-                'delete' => true,
-            )),
-        );
+            array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
+            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true, 'number' => true)),
+            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
+            array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
+                  'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                'data'     => array(
+                    'edit'   => true,
+                    'delete' => true,
+                )
+            ),
+        );//todo: missing author name
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
@@ -34,7 +37,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['actions'] = array(
             'export' => true,
             'edit' => true,
-            'delete' => true
+            'delete' => true,
+            'new' => array('caption' => 'New Product Review', 'modal' => true)
         );
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
@@ -93,5 +97,11 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ),
         ));
 
+    }
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->view('admin/grid')->set(array('actions' => array('new' => '')));
     }
 }

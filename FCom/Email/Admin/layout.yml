@@ -1,7 +1,7 @@
 base:
 	- view: admin/nav
 		do:
-		    - [ addNav, email, { label: Emails, pos: 300, icon_class:  icon-envelope-alt } ]
+		    - [ addNav, email, { label: Emails, pos: 400, icon_class:  icon-envelope-alt } ]
 			- [ addNav, email/subscriptions, { label: Subscriptions, href: /subscriptions } ]
 			- [ addNav, email/queues, { label: Queues, href: /email-queues } ]
 
