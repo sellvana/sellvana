@@ -16,11 +16,11 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'index' => 'o.id', 'label' => 'ID', 'width' => 70),
             array('name' => 'code', 'index' => 'code', 'label' => 'Code',
-                  'addable' => true, 'validation' => array('required' => true, 'unique' => BApp::href('orderstatus/unique'))),
+                  'addable' => true, 'editable' => true, 'validation' => array('required' => true, 'unique' => BApp::href('orderstatus/unique'))),
             array('name' => 'name', 'index' => 'name', 'label' => 'Label',
-                  'addable' => true, 'validation' => array('required' => true, /*'unique' => BApp::href('orderstatus/unique')*/)),
+                  'addable' => true, 'editable' => true, 'validation' => array('required' => true, /*'unique' => BApp::href('orderstatus/unique')*/)),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href('orderstatus/form/?id='), 'col'=>'id'),'delete' => true)),
+                  'data' => array('edit' => true,'delete' => true)),
         );
         $config['actions'] = array(
             'new'    => array('caption' => 'Add New Order Status', 'modal' => true),
