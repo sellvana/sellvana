@@ -1336,6 +1336,9 @@ body.without-footer #footer {
 .f-admin-sidebar-view .tabbable.tabs-left > .nav-tabs > li.active > a {
   border-left:none;
   }
+.f-admin-sidebar-view .tabbable.tabs-left > .nav-tabs > li:first-child > a {
+    border-top:none;
+}
 .f-admin-sidebar-view .tabbable.tabs-left .tab-content {
   display:table-cell;
   width:100%;
