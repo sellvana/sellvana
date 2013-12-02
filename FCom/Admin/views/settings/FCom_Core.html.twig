@@ -1,11 +1,13 @@
 {% set c = THIS.get('model') %}
 
+<h2>{{ "Core Settings"|_}}</h2>
+
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Core">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "DB Settings"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_Core-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Core-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Host"|_ }}</label>
@@ -53,7 +55,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Website"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Core-group1">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group1">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Company Name"|_ }}</label>
@@ -111,7 +113,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Session"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Core-group2">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group2">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Session Handler"|_ }}</label>
@@ -160,7 +162,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "System"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Core-group3">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group3">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Hide script file name in URL"|_ }}</label>
@@ -177,7 +179,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "CSRF Protection"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Core-group4">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group4">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Check Method"|_ }}</label>

@@ -57,22 +57,14 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
 **/
 </script>
 
-<div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-file"></i>
-                <span>{{ "Field Sets" |_ }}</span>
-            </h1>
-        </div>
-    </div>
+<div class="page-header">
+  <h1 class="f-page-title">
+      <i class="icon-file"></i>
+      {{ "Field Sets" |_ }}
+  </h1>
 </div>
 
-<div class="row">
-    <div class="col-sm-12">
-        {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
-    </div>
-</div>
+{{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
 
 <a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
 

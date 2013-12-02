@@ -1657,7 +1657,7 @@ class BSession extends BClass
     public function getHandlers()
     {
         $handlers = array_keys($this->_availableHandlers);
-        return array_combine($handlers, $handlers);
+        return $handlers ? array_combine($handlers, $handlers) : array();
     }
 
     /**

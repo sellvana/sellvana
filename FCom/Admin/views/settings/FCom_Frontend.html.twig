@@ -1,11 +1,13 @@
 {% set c = THIS.get('model') %}
 
+<h2>{{ "FrontEnd Settings"|_}}</h2>
+
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Frontend">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "HTML"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_Frontend-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Frontend-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Theme"|_ }}</label>
@@ -47,7 +49,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Frontend-group1">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group1">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
@@ -69,7 +71,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "Navigation"|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Frontend-group2">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group2">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Select top menu"|_ }}</label>

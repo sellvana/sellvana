@@ -1,21 +1,28 @@
 {% set widgets = THIS.getWidgets() %}
 {% set asyncWidgets = [] %}
-<div id="content-wrapper">
-  <div class="page-header f-page-header-has-btns">
-    <h1 class="f-page-title"">
-      <i class="icon-dashboard"></i>
-      <span>Dashboard</span>
-    </h1>
-    <div class="btn-group">
-      <a class="btn btn-link hidden-xs" href="#">Last month</a>
-      <a class="btn btn-link" href="#">Last week</a>
-      <a class="btn btn-link " href="#">Today</a>
-      <a class="btn btn-link" id="daterange" href="#"><i class="icon-calendar"></i><span>Custom</span><b class="caret"></b></a>
-    </div>
+<div class="page-header f-page-header-has-btns">
+  <h1 class="f-page-title">
+    <i class="icon-dashboard"></i>
+    Dashboard
+  </h1>
+  <div class="btn-group">
+    <button class="btn">+ Add Widget</button>
   </div>
-  <div class="row f-content-dashboard">
+  <div class="pull-right btn-group">
+    <a class="btn btn-link hidden-xs" href="#">Last month</a>
+    <a class="btn btn-link" href="#">Last week</a>
+    <a class="btn btn-link" href="#">Today</a>
+    <a class="btn btn-link" id="daterange" href="#">
+      <i class="icon-calendar"></i>
+      <span>Custom</span>
+      <b class="caret"></b>
+    </a>
+  </div>
+</div>
+<div class="f-content-dashboard">
+  <div class="row">
     <ul class="js-sortable-container">
-{% for widget in widgets %}
+  {% for widget in widgets %}
   {% if not widget.state.closed %}
       <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
         <div class="box {{ widget.state.collapsed ? 'box-collapsed' }}">
@@ -26,7 +33,7 @@
               <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
             </div>
           </div>
-
+  
           {% if widget.async %}
             {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
           {% elseif widget.view %}
@@ -37,7 +44,7 @@
         </div>
       </li>
   {% endif %}
-{% endfor %}
+  {% endfor %}
     </ul>
   </div>
 </div>

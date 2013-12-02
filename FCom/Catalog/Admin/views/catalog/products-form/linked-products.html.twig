@@ -2,8 +2,7 @@
 {% set prodCtrl =  APP.instance('FCom_Catalog_Admin_Controller_Products') %}
 
 <script>
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
+
 require(['jquery'], function($) {
     var related = 'linked_products_related', similar = 'linked_products_similar';
     var modalGrid = 'category_all_prods_grid_{{ m.id }}';

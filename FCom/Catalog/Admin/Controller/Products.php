@@ -16,7 +16,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['columns'] = array(
             array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
-            array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250),
+            array('name'=>'thumb_path', 'label'=>'', 'width'=>48, 'print'=>'"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable'=>false),
+            array('name'=>'product_name', 'label'=>'Name', 'width'=>250),
+            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
+            array('name'=>'short_description', 'label'=>'Description',  'width'=>200),
+            array('name'=>'base_price', 'label'=>'Base Price',  'width'=>100,'hidden'=>true),
+            array('name'=>'sale_price', 'label'=>'Sale Price',  'width'=>100,'hidden'=>true),
+            array('name'=>'net_weight', 'label'=>'New Weight',  'width'=>100,'hidden'=>true),
+            array('name'=>'ship_weight', 'label'=>'Ship Weight',  'width'=>100,'hidden'=>true),
             array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
@@ -30,6 +37,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['filters'] = array(
             array('field'=>'product_name', 'type'=>'text'),
             array('field'=>'local_sku', 'type'=>'text'),
+            array('field'=>'short_description', 'type'=>'text'),
+            array('field'=>'base_price', 'type'=>'number-range'),
+            array('field'=>'sale_price', 'type'=>'number-range'),
+            array('field'=>'net_weight', 'type'=>'number-range'),
+            array('field'=>'ship_weight', 'type'=>'number-range'),
             array('field'=>'uom', 'type'=>'text'),
             array('field'=>'create_at', 'type'=>'date-range'),
             array('field'=>'update_at', 'type'=>'date-range'),
@@ -43,8 +55,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
+    public static function afterInitialData($rows)
+    {
+
+        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
+        $resize_url = FCom_Core_Main::i()->resizeUrl();
+        foreach($rows as & $row) {
+            $thumbUrl = $row['thumb_url'];
+            $url = $media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
+            $row['thumb_path'] = $resize_url.'?f='.urlencode(trim($url, '/')).'&s=68x68';
+        }
+
+        return $rows;
+    }
+
     public function gridDataAfter($data)
     {
+        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
+        $resize_url = FCom_Core_Main::i()->resizeUrl();
+
         $data = parent::gridDataAfter($data);
         foreach ($data['rows'] as $row) {
             $customRowData = $row->getData();
@@ -52,6 +81,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $row->set($customRowData);
                 $row->set('data', null);
             }
+
+            $thumbUrl = $row->thumb_url;
+            $url = $media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
+            $row->set('thumb_path', $resize_url.'?f='.urlencode(trim($url, '/')).'&s=68x68');
         }
         unset($row);
         return $data;

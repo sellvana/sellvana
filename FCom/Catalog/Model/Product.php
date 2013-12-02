@@ -102,6 +102,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onAfterLoad()
+    {
+        parent::onAfterLoad();
+        $thumbPath = FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl(), '/')).'&s=48x48';
+        $this->set('thumb_path', $thumbPath);
+
+    }
+
     public function onAfterSave()
     {
         if (!parent::onAfterSave()) return false;
