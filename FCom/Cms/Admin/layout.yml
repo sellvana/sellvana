@@ -5,6 +5,7 @@ base:
             - [ addNav, cms/blocks, { label: Blocks, href: /cms/blocks } ]
             - [ addNav, cms/nav, { label: Navigation, href: /cms/nav } ]
             #- [ addNav, cms/pages, { label: Pages, href: /cms/pages } ]
+            - [ addNav, cms/templates, { label: Templates, href: /templates  } ]
 
 /cms/nav:
     - { include: base }

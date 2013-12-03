@@ -837,7 +837,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
 
                     case 'select':
-                        if (!empty($filters[$fId])) {
+                        if ((isset($filters[$fId]) && $filters[$fId] === '0') || !empty($filters[$fId])) {
                             $this->_processGridFiltersOne($f, 'equal', $filters[$fId], $orm);
                         }
                         break;

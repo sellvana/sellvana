@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago', 'autosize'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago, autosize) {
+define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago', 'autosize', 'jquery-ui'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago, autosize) {
     _.templateSettings.variable = 'rc';
     var dingPath, username = '', initializing, avatars={};
 
