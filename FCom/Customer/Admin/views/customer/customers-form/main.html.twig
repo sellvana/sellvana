@@ -9,10 +9,11 @@
     //var custModule = angular.module('custModule', []);
 
     var regions={};
+    var countries= {};
     require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
     var addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
-    console.log(addresses);
     regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
+    countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
       _.templateSettings.variable = 'rc';
       var Customer = {
             Models: {},
@@ -24,7 +25,7 @@
         defaults: {
                     edit_mode: false,
                     country: ''
-                    }
+                }
       });
 
       Customer.Collections.Addresses = Backbone.Collection.extend({
@@ -39,11 +40,12 @@
           'change select.country': '_changeCountry',
           'change select.region': '_changeRegion',
           'click a.icon-remove': '_removeSelf',
-          'change input': '_changeVal'
+          'change input.form-control': '_changeVal'
         },
         _changeVal: function(ev) {
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-name');
+            console.log('fw');
             this.model.set(name, val);
         },
         _removeSelf: function(ev) {
@@ -74,6 +76,7 @@
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.find('select.country').val(this.model.get('country'));
             this.$el.find('select.region').val(this.model.get('region'));
+
             return this;
         }
       });
@@ -193,16 +196,16 @@
                   <input type="checkbox" <%= rc.edit_mode ? 'checked' : '' %> /> {{ 'Edit'|_ }}
                   <div class="adr">
                       <div class="form-group street-address">
-                          <input data-name="stree1" type="text" class="form-control" value="<%= rc.street1 %>" placeholder="{{ 'Street 1'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
-                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street1 %></span>
+                          <input data-name="street1" type="text" class="form-control" value="<%= rc.street1 %>" placeholder="{{ 'Street 1'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street1 %></span>
                       </div>
                       <div class="form-group extended-address" style='display:<%= (rc.street2 || rc.edit_mode) ? 'block' : 'none'%>'>
-                          <input data-name="stree2" type="text" class="form-control" value="<%= rc.street2 %>" placeholder="{{ 'Street 2'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
-                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street2 %></span>
+                          <input data-name="street2" type="text" class="form-control" value="<%= rc.street2 %>" placeholder="{{ 'Street 2'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street2 %></span>
                       </div>
                       <div class="form-group extended-address" style='display:<%= (rc.street3 || rc.edit_mode) ? 'block' : 'none'%>'>
-                          <input data-name="stree3" type="text" class="form-control" value="<%= rc.street3 %>" placeholder="{{ 'Street 3'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
-                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street3 %></span>
+                          <input data-name="street3" type="text" class="form-control" value="<%= rc.street3 %>" placeholder="{{ 'Street 3'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street3 %></span>
                       </div>
 
                       <div class="form-group locality">
@@ -210,7 +213,7 @@
                           <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%= rc.city %></span>
                       </div>
                       <div class="form-group region">
-                          <select class="form-control region"  value="<%=rc.region %>" fcom-select2 style="display:<%= rc.edit_mode && regions[rc.country] ? 'block' : 'none' %>;">
+                          <select class="form-control region"  style="display:<%= rc.edit_mode && regions[rc.country] ? 'block' : 'none' %>;">
                               <option></option>
                               <%
                                 if (typeof(regions[rc.country]) !== 'undefined')
@@ -233,7 +236,7 @@
                             <option></option>
                             {{ UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Country').options()) | raw }}
                           </select>
-                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ></span>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ><%= countries[rc.country] %></span>
                       </div>
                       <div class="form-group phone">
                           <input data-name="phone" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.phone%>" placeholder="{{ 'Phone'|_ }}" />

@@ -124,6 +124,7 @@ require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $
 
     function removeColumn(row)
     {
+
         var option = '<option value="'+row.id+'">'+row.name+'</option>';
         $('#sel_var_field').append(option);
         resetSelect();
@@ -143,7 +144,7 @@ require(['backbone', 'underscore', 'jquery', 'select2'], function(Backbone, _, $
     }
     g_vent.bind('delete', function(ev) {
         if (ev.grid === 'variable-field-grid') {
-            removeColumn({id: ev.id, name: ev.name})
+            removeColumn(ev.row);
             vColsCollection.trigger('render');
             vRowsCollection.trigger('render');
         }
