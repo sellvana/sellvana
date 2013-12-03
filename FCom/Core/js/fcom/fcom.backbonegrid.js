@@ -1397,6 +1397,10 @@ function(Backbone, _, $, NProgress) {
                     }
                 });
 
+                $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
+                    $('input:text:visible:first', this).focus();
+                });
+
             },
             addElementDiv: function(model) {
                 if (model.has(this.modalType) && model.get(this.modalType)) {
