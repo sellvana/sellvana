@@ -2,6 +2,24 @@
 
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public function action_reindex()
+    {
+        BResponse::i()->startLongResponse();
+        BDebug::mode('PRODUCTION');
+        BORM::configure('logging', 0);
+        BConfig::i()->set('db/logging', 0);
+
+        echo "<pre>Starting...\n";
+        if (BRequest::i()->request('CLEAR')) {
+            //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
+            FCom_CatalogIndex_Model_Doc::i()->update_many(array('flag_reindex'=>1));
+        }
+        FCom_CatalogIndex_Indexer::i()->indexProducts(true);
+        FCom_CatalogIndex_Indexer::i()->indexGC();
+        echo 'DONE';
+        exit;
+    }
+
     public function action_test()
     {
         BResponse::i()->startLongResponse();
@@ -11,7 +29,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         if (true) {
             echo '<p>Creating categories...</p>';
             $root = FCom_Catalog_Model_Category::i()->load(1);
-            for ($i=1; $i<=10; $i++) {
+            for ($i=1; $i<=9; $i++) {
                 $root->createChild('Category '.$i);
             }
         }
