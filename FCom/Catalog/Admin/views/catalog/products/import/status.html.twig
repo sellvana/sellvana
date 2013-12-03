@@ -1,5 +1,5 @@
 {% set c = APP.instance('FCom_Catalog_ProductsImport').config() %}
-{% set start = REQEUST.get('start') %}
+{% set start = THIS.get('start') %}
 
 <div class="panel-body">
 {% if start or c.status == 'running' %}
@@ -13,7 +13,7 @@
     {% if start %}
         <script>
             require(['jquery'], function ($) {
-                $.post({{ APP.href('catalog/products/import/start') }})
+                $.post('{{ APP.href('catalog/products/import/start') }}')
             })
         </script>
     {% else %}
