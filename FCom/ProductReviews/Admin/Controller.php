@@ -25,7 +25,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                   'validation' => array('number' => true)),
             array('name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
                   'validation' => array('number' => true)),
-            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
+            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true,
+                  'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select', 'validation' => array('number' => true)),
             array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
             /*array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),*/
@@ -59,7 +60,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-                ->join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
                 ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
 
             $data = BDb::many_as_array($orm->find_many());
@@ -82,14 +83,22 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250);
             $config['columns'][] = array('name'=>'author', 'label'=>'Author', 'width'=>250);
             $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
-                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-                ->join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+                ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
         }
 
         $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true));
 
         return $config;
+    }
+
+    public function gridOrmConfig($orm)
+    {
+        parent::gridOrmConfig($orm);
+        $orm->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+            ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+            ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
     }
 
     public function formViewBefore($args)
