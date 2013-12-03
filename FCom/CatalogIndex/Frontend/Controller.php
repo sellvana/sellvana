@@ -163,6 +163,15 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
         $this->layout('/catalog/category');
+
+        if ($category->layout_update) {
+            $layoutUpdate = BYAML::parse($category->layout_update);
+            if (!is_null($layoutUpdate)) {
+                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
+            } else {
+                BDebug::warning('Invalid layout update for CMS page');
+            }
+        }
     }
 
     public function action_search()
