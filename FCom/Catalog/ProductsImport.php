@@ -19,6 +19,9 @@ class FCom_Catalog_ProductsImport extends BImport
         'product.is_hidden' => array('pattern'=>'hidden|disable'),
         'product.categories' => array('pattern'=>'categories|category'),
         'product.images' => array('pattern'=>'images|image'),
+        'product.uom' => array('pattern'=>'uom'),
+        'product.create_at' => array('created'),
+        'product.update_at' => array('updated')
     );
 
     protected $dir = 'products';
