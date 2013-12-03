@@ -3,40 +3,118 @@
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
 {% set validator = THIS.get('validator') %}
-
+{# APP.instance('FCom_Geo_Model_Country').options() | debug #}
+{# APP.instance('FCom_Geo_Model_Region').allOptions() | debug #}
 <script>
     //var custModule = angular.module('custModule', []);
 
-    function CustomerAddressesCtrl($scope) {
-        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
-        $scope.countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
-        $scope.regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
+    var regions={};
+    require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+    var addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
+    console.log(addresses);
+    regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
+      _.templateSettings.variable = 'rc';
+      var Customer = {
+            Models: {},
+            Collections: {},
+            Views: {}
+      };
 
-        $scope.del_ids = [];
-        $scope.newId = 0;
+      Customer.Models.Address = Backbone.Model.extend({
+        defaults: {
+                    edit_mode: false,
+                    country: ''
+                    }
+      });
 
-        $scope.addAddress = function() {
-            $scope.addresses.push({edit_mode:true, id:--$scope.newId});
+      Customer.Collections.Addresses = Backbone.Collection.extend({
+        model: Customer.Models.Address
+      });
+
+      Customer.Views.AddrView = Backbone.View.extend({
+        className: 'col-sm-6',
+        template: _.template($('#address-template').html()),
+        events: {
+          'click input[type="checkbox"]': '_changeEditingMode',
+          'change select.country': '_changeCountry',
+          'change select.region': '_changeRegion',
+          'click a.icon-remove': '_removeSelf',
+          'change input': '_changeVal'
+        },
+        _changeVal: function(ev) {
+            var val = $(ev.target).val();
+            var name = $(ev.target).attr('data-name');
+            this.model.set(name, val);
+        },
+        _removeSelf: function(ev) {
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+            this.remove();
+            addrs.remove(this.model);
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return false;
+
+
+        },
+        _changeEditingMode: function(ev) {
+          this.model.set('edit_mode', !this.model.get('edit_mode'));
+          this.render();
+        },
+        _changeCountry: function(ev) {
+            this.model.set('country', this.$el.find('select.country').val());
+            this.render();
+        },
+        _changeRegion: function(ev) {
+            this.model.set('region', this.$el.find('select.region').val())
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.find('select.country').val(this.model.get('country'));
+            this.$el.find('select.region').val(this.model.get('region'));
+            return this;
         }
+      });
 
-        $scope.delAddress = function(addr) {
-            for (var i = 0, ii = $scope.addresses.length; i<ii; i++) {
-                if (addr === $scope.addresses[i]) {
-                    $scope.addresses.splice(i, 1);
-                }
-            }
-            if (addr.id>0) {
-                $scope.del_ids.push(addr.id);
-            }
+      Customer.Views.MainView = Backbone.View.extend({
+        el: 'div.col-customer-address div.row',
+        initialize: function() {
+            this.collection.on('add', this.addAddrView, this);
+        },
+        addAddrView: function(model) {
+          addrView = new Customer.Views.AddrView({model:model});
+          this.$el.append(addrView.render().el);
+        },
+        render: function() {
+          this.$el.html('');
+          this.collection.each(this.addAddrView, this);
         }
-    }
+      });
+      var newId = 0;
+      var addrs = new Customer.Collections.Addresses(addresses);
+      var mainView = new Customer.Views.MainView({collection: addrs});
+      mainView.render();
+      var originIds = addrs.pluck('id');
+      $('a.add-link').click(function(ev) {
+            var addr = new Customer.Models.Address({edit_mode:true, id: --newId });
+            addrs.add(addr);
 
-    function CustomerAddressCtrl($scope) {
+            ev.stopPropagation();
+            ev.preventDefault();
 
-    }
+            return false;
+      });
+
+      $('form:last').submit(function(ev) {
+            $('input[name="address[data_json]"]').val(addrs.toJSON());
+            $('input[name="address[del_json]"]').val(_.difference(orginIds, addrs.pluck('id')));
+      });
+    });
 </script>
 
-<div ng-app ng-controller="CustomerAddressesCtrl" class="col-md-12">
+<div class="col-md-12">
     <fieldset class="f-fieldset-group">
         <h3 class="f-fieldset-group-title">{{ "Personal Information"|_ }}</h3>
         <div class="form-group">
@@ -104,63 +182,75 @@
         </div>
     </fieldset>
 
-    <div class="col-customer-address" ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none">
+    <div class="col-customer-address">
         <fieldset class="f-fieldset-group">
             <h3 class="f-fieldset-group-title">{{ 'Addresses'|_ }}</h3>
             <div class="row">
-              <div ng-repeat="a in addresses" class="col-sm-6">
+              <!--div ng-repeat="a in addresses" class="col-sm-6" -->
+              <script id="address-template" type="template">
                 <div class="f-address-card-listing">
-                  <a class="icon-remove" href="#" ng-click="delAddress(a)"></a>
-                  <input type="checkbox" ng-model="a.edit_mode" /> {{ 'Edit'|_ }}
+                  <a class="icon-remove" href="#" ></a>
+                  <input type="checkbox" <%= rc.edit_mode ? 'checked' : '' %> /> {{ 'Edit'|_ }}
                   <div class="adr">
                       <div class="form-group street-address">
-                          <input type="text" class="form-control" ng-show="a.edit_mode" ng-model="a.street1" placeholder="{{ 'Street 1'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.street1"></span>
+                          <input data-name="stree1" type="text" class="form-control" value="<%= rc.street1 %>" placeholder="{{ 'Street 1'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street1 %></span>
                       </div>
-                      <div class="form-group extended-address" ng-show="a.street2 || a.edit_mode">
-                          <input type="text" class="form-control" ng-show="a.edit_mode" ng-model="a.street2" placeholder="{{ 'Street 2'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.street2"></span>
+                      <div class="form-group extended-address" style='display:<%= (rc.street2 || rc.edit_mode) ? 'block' : 'none'%>'>
+                          <input data-name="stree2" type="text" class="form-control" value="<%= rc.street2 %>" placeholder="{{ 'Street 2'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street2 %></span>
                       </div>
-                      <div class="form-group extended-address" ng-show="a.street3 || a.edit_mode">
-                          <input type="text" class="form-control" ng-show="a.edit_mode" ng-model="a.street3" placeholder="{{ 'Street 3'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.street3"></span>
+                      <div class="form-group extended-address" style='display:<%= (rc.street3 || rc.edit_mode) ? 'block' : 'none'%>'>
+                          <input data-name="stree3" type="text" class="form-control" value="<%= rc.street3 %>" placeholder="{{ 'Street 3'|_ }}" style="display:<%=rc.edit_mode ? 'display' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'display' %>;"><%= rc.street3 %></span>
                       </div>
-      
+
                       <div class="form-group locality">
-                          <input type="text" class="form-control" ng-show="a.edit_mode" ng-model="a.city" placeholder="{{ 'City'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.city"></span>
+                          <input type="text" data-name="city" class="form-control" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.city%>" placeholder="{{ 'City'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%= rc.city %></span>
                       </div>
                       <div class="form-group region">
-                          <select ng-show="a.edit_mode && regions[a.country]" class="form-control" ng-options="name for (key,name) in regions[a.country]" ng-model="a.region" fcom-select2>
+                          <select class="form-control region"  value="<%=rc.region %>" fcom-select2 style="display:<%= rc.edit_mode && regions[rc.country] ? 'block' : 'none' %>;">
                               <option></option>
+                              <%
+                                if (typeof(regions[rc.country]) !== 'undefined')
+                                for(var key in regions[rc.country]) {
+                                    var val = regions[rc.country][key];
+                                    print('<option value="'+key+'">'+val+'</option>');
+                              } %>
+                              {# UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Region').allOptions()['US']) | raw #}
                           </select>
-                          <input type="text" class="form-control" ng-show="a.edit_mode && !regions[a.country]" ng-model="a.region" placeholder="{{ 'Region/State'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.region"></span>
+                          <input data-name="region" type="text" class="form-control" style="display:<%= rc.edit_mode && !regions[rc.country] ? 'block' : 'none' %>;" value="<%=rc.region%>" placeholder="{{ 'Region/State'|_ }}"/>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.region %></span>
                       </div>
                       <div class="form-group postal-code">
-                          <input type="text" class="form-control" ng-show="a.edit_mode" ng-model="a.postcode" size="6" placeholder="{{ 'Zip/Postal Code'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.postcode"></span>
+                          <input data-name="postcode" type="text" class="form-control" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.postcode%>" size="6" placeholder="{{ 'Zip/Postal Code'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.postcode%></span>
                       </div>
-      
+
                       <div class="form-group country-name">
-                          <select class="form-control" ng-show="a.edit_mode" ng-options="key as name for (key,name) in countries" ng-model="a.country" fcom-select2> </select>
-                          <span ng-hide="a.edit_mode" ng-bind="countries[a.country]"></span>
+                          <select class="form-control country" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;">
+                            <option></option>
+                            {{ UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Country').options()) | raw }}
+                          </select>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ></span>
                       </div>
                       <div class="form-group phone">
-                          <input class="form-control" type="text" ng-show="a.edit_mode" ng-model="a.phone" placeholder="{{ 'Phone'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.phone"></span>
+                          <input data-name="phone" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.phone%>" placeholder="{{ 'Phone'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ng-bind="rc.phone"><%=rc.phone%></span>
                       </div>
                       <div class="form-group fax">
-                          <input class="form-control" type="text" ng-show="a.edit_mode" ng-model="a.fax" placeholder="{{ 'Fax'|_ }}" />
-                          <span ng-hide="a.edit_mode" ng-bind="a.fax"></span>
+                          <input data-name="fax" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.fax %>" placeholder="{{ 'Fax'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.fax %></span>
                       </div>
                     </div>
                   </div>
-              </div>
+              </script>
+              <!--/div-->
             </div><br/>
-            <a href ng-click="addAddress()" class="add-link">{{ '+ Add Another'|_ }}</a>
-            <input type="hidden" name="address[data_json]" value="{% verbatim %}{{addresses}}{% endverbatim %}" />
-            <input type="hidden" name="address[del_json]" value="{% verbatim %}{{del_ids}}{% endverbatim %}" />
+            <a class="add-link" href="#">{{ '+ Add Another'|_ }}</a>
+            <input type="hidden" name="address[data_json]" value="" />
+            <input type="hidden" name="address[del_json]" value="" />
         </fieldset>
     </div>
 </div>
