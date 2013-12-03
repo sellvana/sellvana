@@ -20,6 +20,9 @@ function validationRules(rules) {
             case 'minlength':
                 str+='data-rule-minlength="'+rules[key]+'" ';
                 break;
+            case 'maxlength':
+                str+='data-rule-maxlength="'+rules[key]+'" ';
+                break;
             case 'date':
                 str+='data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
                 break;
