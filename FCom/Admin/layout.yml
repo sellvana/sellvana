@@ -211,10 +211,6 @@ lib_admin_theme1:
 
       - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
 
-htmlgrid:
-  - { hook: main, view: core/htmlgrid-wrapper }
-
-
 
 jstree:
   - view: head

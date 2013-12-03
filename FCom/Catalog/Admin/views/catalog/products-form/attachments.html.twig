@@ -274,12 +274,13 @@ require(['jquery', 'unique'], function($) {
 </div>
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        console.log('all_attachments');
+
 
         var prod_img_rows = [];
         $('#prod-attach-checkbox').change(function() {
             prod_img_rows = [];
         });
+        alert('fff');
         $('#prod-attach-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
             multiple:true
