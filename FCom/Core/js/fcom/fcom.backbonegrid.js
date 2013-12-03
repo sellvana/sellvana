@@ -20,6 +20,9 @@ function validationRules(rules) {
             case 'minlength':
                 str+='data-rule-minlength="'+rules[key]+'" ';
                 break;
+            case 'maxlength':
+                str+='data-rule-maxlength="'+rules[key]+'" ';
+                break;
             case 'date':
                 str+='data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
                 break;
@@ -367,7 +370,7 @@ function(Backbone, _, $, NProgress) {
             },
             destroy: function() {
                 var id = this.get('id');
-                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('delete') !== -1) {
+                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && BackboneGrid.events.indexOf('delete') !== -1) {
                     var ev = {grid: BackboneGrid.id, id: id, row: this.toJSON()};
                     g_vent.trigger('delete', ev);
                 }
@@ -388,7 +391,7 @@ function(Backbone, _, $, NProgress) {
                 var hash = this.changedAttributes();
                 hash.id = id;
                 hash.oper = 'edit';
-                if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "edit") !== -1) {
+                if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "edit") !== -1) {
                     var row = this.toJSON();
                     var ev = {grid: BackboneGrid.id, row: row};
                     g_vent.trigger('edit', ev);
@@ -1267,7 +1270,7 @@ function(Backbone, _, $, NProgress) {
                 if (modalForm.modalType === 'mass-editable') {
                     var ids = selectedRows.pluck('id').join(",");
 
-                    if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-edit") !== -1) {
+                    if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "mass-edit") !== -1) {
                         var rows = selectedRows.toJSON();
                         for  (var i in rows) {
                             for(var key in BackboneGrid.modalElementVals)
@@ -1314,7 +1317,7 @@ function(Backbone, _, $, NProgress) {
                         //gridView.addRow(newRow);
                     }
 
-                    if (typeof(g_vent) !== 'undefined' && BackboneGrid.events.indexOf('new') !== -1) {
+                    if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && BackboneGrid.events.indexOf('new') !== -1) {
                         if (typeof(hash.oper) !== 'undefined')
                             delete hash.oper;
                         hash._new = true;
@@ -1376,7 +1379,7 @@ function(Backbone, _, $, NProgress) {
                                 url: url,
                                 type: 'post',
                                  data: {
-                                    name: col.get('name')
+                                    _name: col.get('name')
                                 },
                                 dataFilter: function (responseString) {
                                     var response = jQuery.parseJSON(responseString);
@@ -1392,6 +1395,10 @@ function(Backbone, _, $, NProgress) {
                             }
                         });
                     }
+                });
+
+                $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
+                    $('input:text:visible:first', this).focus();
                 });
 
             },
@@ -1746,7 +1753,7 @@ function(Backbone, _, $, NProgress) {
                             });
                         }
 
-                        if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "mass-delete") !== -1) {
+                        if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "mass-delete") !== -1) {
                             var rows = selectedRows.toJSON();
                             var ev = {grid: BackboneGrid.id, rows: rows};
                             g_vent.trigger('mass-delete', ev);
@@ -1763,7 +1770,7 @@ function(Backbone, _, $, NProgress) {
             if ($(BackboneGrid.AddButton).length > 0) {
                 $(BackboneGrid.AddButton).on('click', function(ev){
 
-                    if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "add") !== -1) {
+                    if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "add") !== -1) {
                         var rows = selectedRows.toJSON();
                         var evt = {grid: BackboneGrid.id, rows: rows};
                         g_vent.trigger('add', evt);
@@ -1833,12 +1840,12 @@ function(Backbone, _, $, NProgress) {
             });
             NProgress.done();
 
-            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init") !== -1) {
+            if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "init") !== -1) {
                 var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
                 g_vent.trigger('init', ev);
             }
             //console.log(BackboneGrid.events);
-            if (typeof(g_vent) !== 'undefined' && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
+            if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "init-detail") !== -1) {
                 var ev= {grid: config.id, rows: rowsCollection.toJSON(), collection: rowsCollection };
                 g_vent.trigger('init-detail', ev);
             }

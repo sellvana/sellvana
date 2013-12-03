@@ -355,7 +355,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $r = BRequest::i();
         $p = $r->post();
-        $name = $p['name'];
+        $name = $p['_name'];
         $val = $p[$name];
         $rows = BDb::many_as_array(FCom_CustomField_Model_Field::i()->orm()->where($name,$val)->find_many());
         BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
@@ -365,7 +365,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $r = BRequest::i();
         $p = $r->post();
-        $name = $p['name'];
+        $name = $p['_name'];
         $val = $p[$name];
         $rows = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm()->where($name,$val)->find_many());
         BResponse::i()->json(array('unique'=>empty($rows), 'id'=>(empty($rows) ? -1 : $rows[0]['id']) ));
