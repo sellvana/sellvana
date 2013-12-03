@@ -44,6 +44,7 @@ class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Controller
     public function action_start()
     {
         FCom_Catalog_ProductsImport::i()->run();
+        BResponse::i()->redirect(BApp::href('catalog/products/import/status'));
         exit;
     }
 
