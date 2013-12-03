@@ -50,7 +50,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
                 ),
-                'events' => array('add','select-rows')
+                'events' => array('add','select-rows','init')
             )
         );
         if (!empty($options['config'])) {
