@@ -28,8 +28,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
             array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),
-        );//todo: missing author name
+            /*array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),*/
+        );
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
@@ -59,7 +59,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-                ->select('pr.*')->select('p.product_name');
+                ->join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
 
             $data = BDb::many_as_array($orm->find_many());
             unset($config['orm']);
@@ -79,9 +80,14 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
             $config['id'] = 'products_reviews';
             $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250);
+            $config['columns'][] = array('name'=>'author', 'label'=>'Author', 'width'=>250);
             $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
-                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')->select('p.product_name');
+                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
+                ->join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
         }
+
+        $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true));
 
         return $config;
     }
