@@ -17,16 +17,18 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
-            array('name'=>'rating', 'label'=>'Rating', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true, 'number' => true)),
+            array('name'=>'rating', 'label'=>'Total Rating', 'width'=>60, 'addable' => true, 'editable'=>true,
+                  'validation' => array('required' => true, 'number' => true)),
+            array('name'=>'rating1', 'label'=>'Value Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
+                  'validation' => array('number' => true)),
+            array('name'=>'rating2', 'label'=>'Features Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
+                  'validation' => array('number' => true)),
+            array('name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
+                  'validation' => array('number' => true)),
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
             array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                'data'     => array(
-                    'edit'   => true,
-                    'delete' => true,
-                )
-            ),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),
         );//todo: missing author name
 
         $config['filters'] = array(
@@ -35,10 +37,10 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
         $config['actions'] = array(
+            'new'    => array('caption' => 'New Product Review', 'modal' => true),
             'export' => true,
-            'edit' => true,
+            'edit'   => true,
             'delete' => true,
-            'new' => array('caption' => 'New Product Review', 'modal' => true)
         );
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
