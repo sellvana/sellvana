@@ -1376,7 +1376,7 @@ function(Backbone, _, $, NProgress) {
                                 url: url,
                                 type: 'post',
                                  data: {
-                                    name: col.get('name')
+                                    _name: col.get('name')
                                 },
                                 dataFilter: function (responseString) {
                                     var response = jQuery.parseJSON(responseString);
