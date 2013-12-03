@@ -1461,7 +1461,7 @@ function(Backbone, _, $, NProgress) {
                 $('.'+BackboneGrid.id+'-pagination').html(caption);
         }
 
-            NProgress.start();
+            //NProgress.start();
             //general settings
             _.templateSettings.variable = 'rc';
             BackboneGrid.id = config.id;
@@ -1828,7 +1828,7 @@ function(Backbone, _, $, NProgress) {
                     if (url.indexOf(restricts[i]) !== -1)
                         return;
                 }
-                NProgress.start();
+                //NProgress.start();
             });
             $( document ).ajaxComplete(function(event, jqxhr, settings) {
                 var url = settings.url;
@@ -1836,9 +1836,9 @@ function(Backbone, _, $, NProgress) {
                     if (url.indexOf(restricts[i]) !== -1)
                         return;
                 }
-                NProgress.done();
+                //NProgress.done();
             });
-            NProgress.done();
+            //NProgress.done();
 
             if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "init") !== -1) {
                 var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
