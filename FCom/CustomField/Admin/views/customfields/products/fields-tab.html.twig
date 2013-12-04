@@ -229,6 +229,7 @@ CONFLICT END #}
                     case 'select':
                     case 'multiselect':
                         print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
+                        print("<option value=''>&nbsp;</option>");
                         vals = rc.value.split(',');
                         for(key in rc.options) {
                             print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');

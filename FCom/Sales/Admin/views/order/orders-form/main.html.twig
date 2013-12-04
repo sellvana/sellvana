@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-
+<div class="col-md-12" xmlns="http://www.w3.org/1999/html">
 {% if m.get('act') == 'edit' %}
     {% set countries = APP.instance('FCom_Geo_Model_Country').options() %}
 
@@ -39,19 +39,19 @@
 
     <div ng-app ng-controller="CustomerAddressesCtrl" class="col-md-10">
         <div class="col-customer-info">
-            <fieldset class="adm-section-group">
+            <fieldset class="f-fieldset-group">
                 <h3 class="form-group-title">{{ "Order Information"|_ }}</h3>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Order"|_ }}: {{ m.get('id') }}</label>
+                    <label class="col-md-2 control-label">{{ "Order"|_ }}: {{ m.get('id') }}</label>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Order Date"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Order Date"|_ }}</label>
                     <div class="col-md-5">
                         <input type="text" name="model[create_at]" value="{{ m.get('create_at') }}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Order Status"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
                     <div class="col-md-5">
                         <select name="model[status_id]">
                             {% set status = m.status() ? m.status().get('code') : m.get('status')  %}
@@ -65,9 +65,9 @@
                 </div>
             </fieldset>
 
-            <fieldset class="adm-section-group">
+            <fieldset class="f-fieldset-group">
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Account information"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Account information"|_ }}</label>
                 </div>
 
                 {% set customer = m.get('customer') %}
@@ -75,15 +75,15 @@
                     <div class="form-group">
                         {{ "Purchased by guest"|_ }}
                     </div>
-                {% esle %}
+                {% else %}
                     <div class="form-group">
-                        <label class="col-md-2 label-control">{{ "Customer name"|_ }}</label>
+                        <label class="col-md-2 control-label">{{ "Customer name"|_ }}</label>
                         <div class="col-md-5">
                             {{ customer.get('firstname') }} {{ customer.get('lastname') }}
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 label-control">{{ "Email"|_ }}</label>
+                        <label class="col-md-2 control-label">{{ "Email"|_ }}</label>
                         <div class="col-md-5">
                             {{ customer.get('email') }}
                         </div>
@@ -94,10 +94,10 @@
                 {% endif %}
             </fieldset>
 
-            <fieldset class="adm-section-group">
+            <fieldset class="f-fieldset-group">
                 <h3 class="form-group-title">{{ "Payment info"|_ }}</h3>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Payment method"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Payment method"|_ }}</label>
                     <div class="col-md-5">
                         <input type="text" class="form-control" name="model[payment_method]" value="{{ m.get('payment_method') }}" />
                     </div>
@@ -113,23 +113,23 @@
                 {% endif %}
             </fieldset>
 
-            <fieldset class="adm-section-group">
-                <h3 class="form-group-title">{{ "Shipping &amp; Handling information"|_ }}</h3>
+            <fieldset class="f-fieldset-group">
+                <h3 class="form-group-title">{{ "Shipping & Handling information"|_ }}</h3>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Shipping method"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Shipping method"|_ }}</label>
                     <div class="col-md-5">
-                        <input type="text" name="model[shipping_method]" value="{{ m.get('shipping_method') }}" />
+                        <input type="text" class="form-control" name="model[shipping_method]" value="{{ m.get('shipping_method') }}" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Shipping service"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Shipping service"|_ }}</label>
                     <div class="col-md-5">
-                        <input type="text" name="model[shipping_service_title]" value="{{ m.get('shipping_service_title') }}" />
+                        <input type="text" class="form-control" name="model[shipping_service_title]" value="{{ m.get('shipping_service_title') }}" />
                     </div>
                 </div>
             </fieldset>
 
-            <fieldset class="adm-section-group">
+            <fieldset class="f-fieldset-group">
                 <h3 class="form-group-title">{{ "Items ordered"|_ }}</h3>
 
                 {% if m.get('items') %}
@@ -137,31 +137,31 @@
                         {% set product = UTIL.fromJson(item.get('product_info')) %}
                         {% set itemId = item.get('id') %}
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "Product"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "Product"|_ }}</label>
                             <div class="col-md-5"> {{ product.product_name }} </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "SKU"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "SKU"|_ }}</label>
                             <div class="col-md-5"> {{ product.local_sku }} </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "Price"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "Price"|_ }}</label>
                             <div class="col-md-5"> {{ product.base_price }} </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "Qty"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "Qty"|_ }}</label>
                             <div class="col-md-5">
                                 <input type="text" name="model[items][{{ itemId }}][qty]" value="{{ item.get('qty') }}" onkeyup="$('#total_{{ itemId }}').val({{ product.base_price }}*this.value)">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "Total"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "Total"|_ }}</label>
                             <div class="col-md-5">
                                 <input type="text" name="model[items][{{ itemId }}][total]" value="{{ item.get('total') }}" id="total_{{ itemId }}" />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-2 label-control">{{ "Delete"|_ }}</label>
+                            <label class="col-md-2 control-label">{{ "Delete"|_ }}</label>
                             <div class="col-md-5">
                                 <input type="checkbox" name="model[items][{{ itemId }}][delete]" value="1" />
                             </div>
@@ -223,37 +223,43 @@
     </div>
 
 {% else %}
-    <fieldset class="adm-section-group">
+    <fieldset class="f-fieldset-group">
         <div class="form-group">
-            <label class="col-md-2 label-control">{{ "Order"|_ }}</label>
-            <div class="col-md-5">{{ m.get('id') }}</div>
+            <label class="col-md-2 control-label">{{ "Order"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ m.get('id') }}</label>
+            </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 label-control">{{ "Order Date"|_ }}</label>
-            <div class="col-md-5">{{ m.get('create_at') }}</div>
+            <label class="col-md-2 control-label">{{ "Order Date"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ m.get('create_at') }}</label>
+            </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 label-control">{{ "Order Status"|_ }}</label>
-            <div class="col-md-5">{{ m.status() ? m.status().name : m.get('status') }}</div>
+            <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ m.status() ? m.status().name : m.get('status') }}</label>
+            </div>
         </div>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h4 class="label">{{ "Account information"|_ }} </h4>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Account information"|_ }}</h3>
         {% set customer = m.get('customer') %}
-        {% if customer.get('guest') %}
+        {% if customer.guest %}
             <div class="form-group">
                 {{ "Purchased by guest"|_ }}
             </div>
-            {% esle %}
+        {% else %}
             <div class="form-group">
-                <label class="col-md-2 label-control">{{ "Customer name"|_ }}</label>
+                <label class="col-md-2 control-label">{{ "Customer name"|_ }}</label>
                 <div class="col-md-5">
                     {{ customer.get('firstname') }} {{ customer.get('lastname') }}
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 label-control">{{ "Email"|_ }}</label>
+                <label class="col-md-2 control-label">{{ "Email"|_ }}</label>
                 <div class="col-md-5">
                     {{ customer.get('email') }}
                 </div>
@@ -264,24 +270,24 @@
         {% endif %}
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h4 class="label">{{ "Billing info"|_ }} </h4>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Billing info"|_ }}</h3>
         <ul>
             <li>{{ m.get('billing_name') }}</li>
-            <li>{{ m.get('billing_address') }}</li>
+            <li>{{ m.get('billing_address')|raw }}</li>
         </ul>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h4 class="label">{{ "Shipping info"|_ }} </h4>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Shipping info"|_ }}</h3>
         <ul>
             <li>{{ m.get('shipping_name') }}</li>
-            <li>{{ m.get('shipping_address') }}</li>
+            <li>{{ m.get('shipping_address')|raw }}</li>
         </ul>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h4 class="label">{{ "Payment info"|_ }} </h4>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Payment info"|_ }}</h3>
         <ul>
             <li>{{ "Payment method"|_ }}: {{ m.get('payment_method') }}</li>
             {% if UTIL.fromJson(m.get('payment_details')) %}
@@ -292,52 +298,54 @@
         </ul>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h4 class="label">{{ "Shipping &amp; Handling information"|_ }} </h4>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Shipping & Handling information"|_ }}</h3>
         <div class="form-group">
-            <label class="col-md-2 label-control">{{ "Shipping method"|_ }}</label>
+            <label class="col-md-2 control-label">{{ "Shipping method"|_ }}</label>
             <div class="col-md-5">
-                <input type="text" name="model[shipping_method]" value="{{ m.get('shipping_method') }}" />
+                <label class="form-control">{{ m.get('shipping_method') }}</label>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 label-control">{{ "Shipping service"|_ }}</label>
+            <label class="col-md-2 control-label">{{ "Shipping service"|_ }}</label>
             <div class="col-md-5">
-                <input type="text" name="model[shipping_service_title]" value="{{ m.get('shipping_service_title') }}" />
+                <label class="form-control">{{ m.get('shipping_service_title') }}</label>
             </div>
         </div>
     </fieldset>
 
-    <fieldset class="adm-section-group">
-        <h3 class="form-group-title">{{ "Items ordered"|_ }}</h3>
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Items ordered"|_ }}</h3>
 
         {% if m.get('items') %}
+            <div class="row">
             {% for item in m.get('items') %}
                 {% set product = UTIL.fromJson(item.get('product_info')) %}
                 {% set itemId = item.get('id') %}
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Product"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Product"|_ }}</label>
                     <div class="col-md-5"> {{ product.product_name }} </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "SKU"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "SKU"|_ }}</label>
                     <div class="col-md-5"> {{ product.local_sku }} </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Price"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Price"|_ }}</label>
                     <div class="col-md-5"> {{ product.base_price }} </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Qty"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Qty"|_ }}</label>
                     <div class="col-md-5">{{ item.get('qty') }}</div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 label-control">{{ "Total"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Total"|_ }}</label>
                     <div class="col-md-5">{{ item.get('total') }}</div>
                 </div>
-                ------------------------------
             {% endfor %}
+            </div>
         {% endif %}
     </fieldset>
 
 {% endif %}
+</div>

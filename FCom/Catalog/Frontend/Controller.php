@@ -59,6 +59,15 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('catalog/product/details')->set('user', $user);
 
         $this->layout('/catalog/product');
+
+        if ($product->layout_update) {
+            $layoutUpdate = BYAML::parse($product->layout_update);
+            if (!is_null($layoutUpdate)) {
+                BLayout::i()->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
+            } else {
+                BDebug::warning('Invalid layout update for CMS page');
+            }
+        }
     }
 
     public function action_product__POST()

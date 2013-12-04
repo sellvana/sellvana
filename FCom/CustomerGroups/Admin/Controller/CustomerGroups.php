@@ -20,12 +20,16 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
-            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'href' => BApp::href($this->_formHref.'?id=:id')),
-            array('name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true),
+            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'addable' => true,
+                  'validation' => array('required' => true)),
+            array('name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true, 'addable' => true,
+                  'validation' => array('required' => true, 'unique' => BApp::href('customer-groups/unique'))),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+                  'data'=> array('edit' => true, 'delete' => true)),
         );
         $config['actions'] = array(
+            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
+            'edit' => true,
             'delete' => true
         );
         $config['filters'] = array(
@@ -34,15 +38,19 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         return $config;
     }
 
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '')));
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
         $m = $args['model'];
         $title = $m->id ? 'Edit Customer Group: '.$m->title : 'Create New Customer Group';
         $this->addTitle($title);
-        $args['view']->set(array(
-                                'title' => $title,
-                           ));
+        $args['view']->set(array('title' => $title));
     }
 
     public function addTitle($title = '')
@@ -78,5 +86,13 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
                 }
             }
         }
+    }
+
+    public function action_unique__POST()
+    {
+        $post = BRequest::i()->post();
+        $data = each($post);
+        $rows = BDb::many_as_array(FCom_CustomerGroups_Model_Group::i()->orm()->where($data['key'], $data['value'])->find_many());
+        BResponse::i()->json(array( 'unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])));
     }
 }
