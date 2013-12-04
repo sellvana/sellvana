@@ -44,6 +44,7 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
     public function action_start()
     {
         FCom_Customer_Import::i()->run();
+        BResponse::i()->redirect(BApp::href('customers/import/status'));
         exit;
     }
 
@@ -55,6 +56,8 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function action_status()
     {
-        BResponse::i()->set(BLayout::i()->view('customer/import/status')->render());
+        $s = BRequest::i()->request('start');
+        $view = BLayout::i()->view('customer/import/status')->set(array('start'=>$s));
+        BResponse::i()->set($view->render());
     }
 }

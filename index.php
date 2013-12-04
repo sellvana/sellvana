@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__.'/FCom/Core/Main.php';
 
 if (file_exists(__DIR__.'/index.local.php')) {

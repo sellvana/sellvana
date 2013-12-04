@@ -837,7 +837,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
 
                     case 'select':
-                        if (!empty($filters[$fId])) {
+                        if ((isset($filters[$fId]) && $filters[$fId] === '0') || !empty($filters[$fId])) {
                             $this->_processGridFiltersOne($f, 'equal', $filters[$fId], $orm);
                         }
                         break;
@@ -896,7 +896,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if (!empty($col['hidden']) && $col['hidden'] !== 'false') continue;
             if (!empty($col['cell']) || $col['name'] === 'thumb_path') continue;
             if ($col['name'] === '_actions') continue;
-            $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
+            $headers[] = !empty($col['label']) ? strtolower($col['label']) : strtolower($col['name']);
             /*if (!empty($col['editoptions']['value']) && is_string($col['editoptions']['value'])) {
                 $options = explode(';', $col['editoptions']['value']);
                 $col['editoptions']['value'] = array();

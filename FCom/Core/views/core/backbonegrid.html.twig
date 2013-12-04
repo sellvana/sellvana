@@ -125,13 +125,15 @@
     </div>
     <div class="controls col-sm-8">
       <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation));%> >
+        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" class="form-control" <% print(validationRules(rc.validation));%> >
       <% } else if(rc.editor === 'select') { %>
         <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
           <% for(var key in rc.options) { %>
             <option value="<%- key %>"><%- rc.options[key] %></option>
           <% } %>
         </select>
+      <% } else if (rc.editor === 'textarea') { %>
+        <textarea name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" rows="5" <% print(validationRules(rc.validation));%>></textarea>
       <% } %>
     </div>
 </script>
@@ -204,7 +206,7 @@
               }
             }
 
-            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text' || col.editor === 'textarea') {
               if(col.editable === 'inline') {
                 print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
