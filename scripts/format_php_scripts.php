@@ -15,10 +15,10 @@ foreach ( $modules as $modName => $mod ) {
         echo $modName . " has no files." . PHP_EOL;
         continue;
     }
-    $targetFile = '/../storage/formatted/';
+    $targetFile = __DIR__ . '/../storage/formatted/';
     BUtil::ensureDir( $targetFile );
 
-    echo $targetFile . "\n";
+    echo realpath($targetFile) . "\n";
     chmod( $targetFile, 0777 );
     formatModulePhpFiles( $dir, $targetFile );
 }
@@ -34,11 +34,19 @@ function formatModulePhpFiles( $dir, $target = null )
     if(null == $target){
         $target = $dir; //overwrite files !!!
     }
-    foreach ( $files as $file ) {
-        $source = formatFile($file);
+    $base = realpath(__DIR__ . '/../');
 
-        if(@file_put_contents($target . "/" . $file, $source)){
-            echo "$target/$file formatted\n";
+    foreach ( $files as $file ) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if($ext != "php"){
+            continue;
+        }
+        $source = formatFile($file);
+        $fileName = str_replace($base, '', $file);
+        $dirName = pathinfo($fileName, PATHINFO_DIRNAME);
+        mkdir($target . '/' . $dirName, 0775, true);
+        if(@file_put_contents($target . "/" . $fileName, $source)){
+            echo "$target/$file formatted\n\n";
         }
     }
 }
