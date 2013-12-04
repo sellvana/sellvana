@@ -11,7 +11,7 @@
 
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
-<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:500px;">
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if filterData %}
     <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
         <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
@@ -25,17 +25,31 @@
 
   <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
       <div class="col-sm-6">
-        <span class="{{ config.id }} dropdown dd dd-nestable filter-span" style="display:inline;">
+        <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 Columns
                 <b class="caret"></b>
             </a>
-                <ol class="dd-list dropdown-menu" style="min-width:200px;">
+                <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
                 </ol>
         </span>
+        {% if config.filters %}
+          <span class="dropdown dd dd-nestable" style="display:inline;">
+              <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+                  Filters
+                  <b class="caret"></b>
+              </a>
+                  <ol class="dd-list dropdown-menu filters" style="min-width:200px;">
+                      <!--li calss="ui-state-default"-->
+                      <!-- visibiility template -->
+                      <!--/li -->
+                  </ol>
+          </span>
+        {% endif %}
+
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
             {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
