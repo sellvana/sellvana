@@ -6,11 +6,11 @@
 {# APP.instance('FCom_Geo_Model_Country').options() | debug #}
 {# APP.instance('FCom_Geo_Model_Region').allOptions() | debug #}
 <script>
-    //var custModule = angular.module('custModule', []);
+
 
     var regions={};
     var countries= {};
-    require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+    require(['backbone', 'underscore', 'jquery', 'jquery.validate'], function(Backbone, _, $) {
     var addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
     regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
     countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
@@ -36,7 +36,7 @@
         className: 'col-sm-6',
         template: _.template($('#address-template').html()),
         events: {
-          'click input[type="checkbox"]': '_changeEditingMode',
+          'change input[type="checkbox"]': '_changeEditingMode',
           'change select.country': '_changeCountry',
           'change select.region': '_changeRegion',
           'click a.icon-remove': '_removeSelf',
@@ -45,7 +45,7 @@
         _changeVal: function(ev) {
             var val = $(ev.target).val();
             var name = $(ev.target).attr('data-name');
-            console.log('fw');
+
             this.model.set(name, val);
         },
         _removeSelf: function(ev) {
@@ -64,6 +64,7 @@
         _changeEditingMode: function(ev) {
           this.model.set('edit_mode', !this.model.get('edit_mode'));
           this.render();
+
         },
         _changeCountry: function(ev) {
             this.model.set('country', this.$el.find('select.country').val());
@@ -73,6 +74,7 @@
             this.model.set('region', this.$el.find('select.region').val())
         },
         render: function() {
+
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.find('select.country').val(this.model.get('country'));
             this.$el.find('select.region').val(this.model.get('region'));
@@ -87,7 +89,7 @@
             this.collection.on('add', this.addAddrView, this);
         },
         addAddrView: function(model) {
-          addrView = new Customer.Views.AddrView({model:model});
+          var addrView = new Customer.Views.AddrView({model:model});
           this.$el.append(addrView.render().el);
         },
         render: function() {
@@ -111,8 +113,11 @@
       });
 
       $('form:last').submit(function(ev) {
-            $('input[name="address[data_json]"]').val(addrs.toJSON());
-            $('input[name="address[del_json]"]').val(_.difference(orginIds, addrs.pluck('id')));
+            $('input[name="address[data_json]"]').val(JSON.stringify(addrs.toJSON()));
+            $('input[name="address[del_json]"]').val(JSON.stringify(_.difference(originIds, addrs.pluck('id'))));
+            console.log($('input[name="address[data_json]"]').val());
+            console.log($('input[name="address[del_json]"]').val());
+
       });
     });
 </script>
@@ -189,7 +194,6 @@
         <fieldset class="f-fieldset-group">
             <h3 class="f-fieldset-group-title">{{ 'Addresses'|_ }}</h3>
             <div class="row">
-              <!--div ng-repeat="a in addresses" class="col-sm-6" -->
               <script id="address-template" type="template">
                 <div class="f-address-card-listing">
                   <a class="icon-remove" href="#" ></a>
@@ -240,7 +244,7 @@
                       </div>
                       <div class="form-group phone">
                           <input data-name="phone" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.phone%>" placeholder="{{ 'Phone'|_ }}" />
-                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ng-bind="rc.phone"><%=rc.phone%></span>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.phone%></span>
                       </div>
                       <div class="form-group fax">
                           <input data-name="fax" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.fax %>" placeholder="{{ 'Fax'|_ }}" />
@@ -249,7 +253,6 @@
                     </div>
                   </div>
               </script>
-              <!--/div-->
             </div><br/>
             <a class="add-link" href="#">{{ '+ Add Another'|_ }}</a>
             <input type="hidden" name="address[data_json]" value="" />

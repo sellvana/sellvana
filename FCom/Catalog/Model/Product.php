@@ -29,14 +29,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 		array('num_reviews', '@integer'),
 
         array('local_sku', '@string', null, array('max' => 100)),
-        array('cost', '@string', null, array('max' => 12)),
-        array('msrp', '@string', null, array('max' => 12)),
-        array('map', '@string', null, array('max' => 12)),
-        array('markup', '@string', null, array('max' => 12)),
-        array('base_price', '@string', null, array('max' => 12)),
-        array('sale_price', '@string', null, array('max' => 12)),
-        array('net_weight', '@string', null, array('max' => 12)),
-        array('ship_weight', '@string', null, array('max' => 12)),
 
 		array('cost', '@numeric'),
 		array('msrp', '@numeric'),
@@ -707,6 +699,24 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function getUpsellProducts()
     {
         return array();
+    }
+
+    /**
+     * get options data to create options html in select
+     * @param bool $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $r->product_name : $r->product_name;
+            }
+        }
+
+        return $data;
     }
 }
 
