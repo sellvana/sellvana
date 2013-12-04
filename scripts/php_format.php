@@ -129,7 +129,7 @@ function formatFile( $file, $j = 0 )
             }
         } elseif ( $token->contents == "{" ) {
             $level++;
-            if ( nextToken( $j, $i, $tokens )->type != T_WHITESPACE && $level ) {
+            if ( strpos($tokens[ $i + 1 ]->contents, "\n") === false && $level ) {
                 $token->contents .= "\n" . str_repeat( $sep, $level );
             }
         } elseif ( $token->contents == "}" ) {
