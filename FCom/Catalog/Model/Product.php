@@ -708,5 +708,23 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return array();
     }
+
+    /**
+     * get options data to create options html in select
+     * @param bool $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $r->product_name : $r->product_name;
+            }
+        }
+
+        return $data;
+    }
 }
 
