@@ -8,6 +8,9 @@ function validationRules(rules) {
             case 'number':
                 str+='data-rule-number="true" ';
                 break;
+            case 'digits':
+                str+='data-rule-digits="true" ';
+                break;
             case 'ip':
                 str+='data-rule-ipv4="true" ';
                 break;
@@ -22,6 +25,15 @@ function validationRules(rules) {
                 break;
             case 'maxlength':
                 str+='data-rule-maxlength="'+rules[key]+'" ';
+                break;
+            case 'max':
+                str+='data-rule-max="'+rules[key]+'" ';
+                break;
+            case 'min':
+                str+='data-rule-min="'+rules[key]+'" ';
+                break;
+            case 'range':
+                str+='data-rule-range="['+rules[key][0]+','+rules[key][1]+']" ';
                 break;
             case 'date':
                 str+='data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
