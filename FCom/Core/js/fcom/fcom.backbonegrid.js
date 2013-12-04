@@ -994,6 +994,7 @@ function(Backbone, _, $, NProgress) {
                 var filterVal = this.$el.find('input:first').val();
                 var op = this.model.get('filterOp');
                 BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+                BackboneGrid.currentState.p = 1; //reset paging
                 this.model.set('filterVal',filterVal);
                 this._filter(filterVal);
 
@@ -1046,6 +1047,7 @@ function(Backbone, _, $, NProgress) {
 
                 var op = this.model.get('filterOp');
                 BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+                BackboneGrid.currentState.p = 1; //reset paging
                 this.model.set('filterVal',filterVal);
                 this._filter(filterVal);
 
@@ -1095,6 +1097,7 @@ function(Backbone, _, $, NProgress) {
 
                 var op = this.model.get('filterOp');
                 BackboneGrid.current_filters[field] = {val: filterVal, op: op};
+                BackboneGrid.currentState.p = 1; //reset paging
                 this.model.set('filterVal',filterVal);
                 this._filter(filterVal);
             }
@@ -1128,6 +1131,7 @@ function(Backbone, _, $, NProgress) {
                 }
 
                 BackboneGrid.current_filters[this.model.get('name')] = val;
+                BackboneGrid.currentState.p = 1; //reset paging
                 this._filter(val);
 
                 /*var html = this.model.get('label')+': '+val;
@@ -1166,6 +1170,7 @@ function(Backbone, _, $, NProgress) {
             },
             filter: function(val) {
                 BackboneGrid.current_filters[this.model.get('name')] = val;
+                BackboneGrid.currentState.p = 1; //reset paging
                 BackboneGrid.Views.FilterCell.prototype._filter.call(this, val);
             },
             render: function() {
