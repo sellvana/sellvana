@@ -392,6 +392,24 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     }
 
     /**
+     * get options data to create options html in select
+     * @param $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $fullname = $r->firstname . ' ' . $r->lastname;
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $fullname : $fullname;
+            }
+        }
+        return $data;
+    }
+
+    /**
      * rule email unique
      * @param $data
      * @param $args

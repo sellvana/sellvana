@@ -12,23 +12,31 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function gridConfig($productModel = false)
     {
         $formUrl = BApp::href("prodreviews/form");
+        $reviewConfigs = FCom_ProductReviews_Model_Review::i()->config();
         $config = parent::gridConfig();
         $columns = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
+            array('name'=>'text', 'label'=>'Text', 'width'=>250, 'hidden' => true, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
             array('name'=>'rating', 'label'=>'Total Rating', 'width'=>60, 'addable' => true, 'editable'=>true,
-                  'validation' => array('required' => true, 'number' => true)),
+                  'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))),
             array('name'=>'rating1', 'label'=>'Value Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
-                  'validation' => array('number' => true)),
+                  'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
             array('name'=>'rating2', 'label'=>'Features Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
-                  'validation' => array('number' => true)),
+                  'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
             array('name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
-                  'validation' => array('number' => true)),
+                  'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
             array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select', 'validation' => array('number' => true)),
             array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
+            array('name'=>'product_id', 'label'=>'Product', 'addable' => true, 'hidden' => true,
+                  'options'=>FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
+                  'validation' => array('required' => true)),
+            array('name'=>'customer_id', 'label'=>'Customer', 'addable' => true, 'hidden' => true,
+                  'options'=>FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
+                  'validation' => array('required' => true)),
             /*array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),*/
         );
 

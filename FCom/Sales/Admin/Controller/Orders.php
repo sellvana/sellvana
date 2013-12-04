@@ -30,7 +30,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text'),
             array('field' => 'shipping_name', 'type' => 'text'),
-            array('field' => 'grandtotal', 'type' => 'text'), //todo: filter type compare, eg: > 1000
+            array('field' => 'grandtotal', 'type' => 'number-range'),
             array('field' => 'status', 'type' => 'select'),
         );
 
@@ -136,6 +136,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'form_id' => BLocale::transliterate($this->_formLayoutName),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
+            'title' => $m->id ? 'Edit Order' : 'Create New Order',
         ));
         BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
@@ -184,10 +185,5 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
         }
-    }
-
-    public function action_view()
-    {
-        //todo: view order detail
     }
 }
