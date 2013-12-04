@@ -35,7 +35,7 @@ function validationRules(rules) {
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
 function(Backbone, _, $, NProgress) {
-    var setValidateForm = function(selector) {
+    /*var setValidateForm = function(selector) {
         if (selector == null) {
           selector = $(".validate-form");
         }
@@ -56,7 +56,7 @@ function(Backbone, _, $, NProgress) {
             });
           });
         }
-    };
+    };*/
     FCom.BackboneGrid = function(config) {
         var rowsCollection;
         var columnsCollection;
@@ -848,12 +848,12 @@ function(Backbone, _, $, NProgress) {
         });
         BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
             initialize: function() {
-                this.setElement('#'+BackboneGrid.id+' .dd-list');
+                this.setElement('.'+BackboneGrid.id+'.dd-list.columns');
                 this.collection.on('render', this.render, this);
             },
             orderChanged: function(ev) {
                 //console.log('orderChanged');
-                var orderJson = $('.'+BackboneGrid.id+'.dd').nestable('serialize');
+                var orderJson = $('.'+BackboneGrid.id+'.columns-span').nestable('serialize');
                 var changedFlag = false;
                 for(var i in orderJson) {
                     var key = orderJson[i].id;
@@ -888,7 +888,58 @@ function(Backbone, _, $, NProgress) {
                 });*/
 
                 // working
-                $('.'+BackboneGrid.id+'.dd').nestable().on('change',this.orderChanged);
+                $('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
+            },
+            addLiTag: function(model) {
+                if(model.get('label') !== '') {
+                    var checkView = new BackboneGrid.Views.ColCheckView({model:model});
+                    this.$el.append(checkView.render().el);
+                }
+            }
+        });
+        BackboneGrid.Views.FiltersVisibiltyView = Backbone.View.extend({
+            initialize: function() {
+                this.setElement('.'+BackboneGrid.id+'.dd-list.filters');
+                this.collection.on('render', this.render, this);
+            },
+            orderChanged: function(ev) {
+                //console.log('orderChanged');
+                var orderJson = $('.'+BackboneGrid.id+'.filters-span').nestable('serialize');
+                var changedFlag = false;
+                for(var i in orderJson) {
+                    var key = orderJson[i].id;
+                    colModel = columnsCollection.findWhere({name: key});
+                    if (parseInt(colModel.get('position')) !== parseInt(i)+columnsCollection.append) {
+                        colModel.set('position', parseInt(i)+columnsCollection.append);
+                        changedFlag = true;
+                    }
+
+                }
+
+                if (!changedFlag)
+                    return;
+
+                columnsCollection.sort();
+                gridView.render();
+
+                 $.post(BackboneGrid.personalize_url,{
+                    'do': 'grid.col.orders',
+                    'cols': columnsCollection.toJSON(),
+                    'grid': columnsCollection.grid
+                });
+
+
+            },
+            render: function() {
+                this.$el.html('');
+                this.collection.each(this.addLiTag, this);
+
+                // not working
+                /*this.$el.find('.dd:first').nestable().on('change',function(){
+                });*/
+
+                // working
+                $('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
             },
             addLiTag: function(model) {
                 if(model.get('label') !== '') {
@@ -1371,7 +1422,8 @@ function(Backbone, _, $, NProgress) {
                     $(BackboneGrid.modalFormId).find('select').val('');
 
                 this.formEl = this.$el.parents('form:first');
-                setValidateForm(this.formEl);
+                this.formEl.validate({});
+                //setValidateForm(this.formEl);
 
                 this.collection.each(function(col) {
 
