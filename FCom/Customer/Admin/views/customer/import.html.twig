@@ -21,7 +21,7 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Customer_Admin_Controller_CustomersImport').customerFilesGridConfig()) | raw }}
+                                    {{ THIS.view('core/medialib').set('config', {id: 'import_files', folder: 'storage/import/customers'}) | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
@@ -76,45 +76,46 @@
     require(['jquery', 'fcom.admin'], function($) {
         $(function() {
             FCom.Admin.Accordion('import-accordion');
-
-            importsGrid = new FCom.Admin.MediaLibrary({
-                grid:'#import_files',
-                url:'{{ APP.href('media/grid') }}',
-                folder:'storage/import/customers'
-            });
+            var selectedRows;
+            g_vent.trigger('get_selected_rows_collection', {
+                                                                grid: 'import_files',
+                                                                callback: function(rows) {
+                                                                    selectedRows = rows;
+                                                                }
+                                                            }
+            );
 
             var importAccordionEle = $('#import-accordion');
             var importConfigEle = $('#import-accordion-group1');
             var importStatusEle = $('#import-accordion-group2');
 
             $('#step1-next').click(function(ev) {
-                var sel = importsGrid.getSelectedRows();
-                if (!sel.length) {
-                    //alert('Please select one file');
-                    //return;
+                if (!selectedRows || !selectedRows.length) {
+                    alert('Please select one file');
+                    return;
                 }
-                var row = $('#import_files').jqGrid('getRowData', sel[0]);
-                importConfigEle.collapse('show');
+                var filename = selectedRows.at(0).get('file_name');
+                importConfigEle.prev().find('a').trigger('click');
                 importConfigEle.html('Please wait loading file configuration...');
-                $.getJSON('{{ APP.href('customers/import/config') }}?file='+encodeURIComponent(row.file_name), function(data, status, xhr) {
+                $.getJSON('{{APP.href('customers/import/config')}}?file='+encodeURIComponent(filename), function(data, status, xhr) {
                     importConfigEle.html(data.html);
                 });
             });
 
-            $(document).on('click', '#step2-next', function(ev) {
-                importStatusEle.collapse('show');
+            importAccordionEle.on('click', '#step2-next', function(ev) {
+                importStatusEle.prev().find('a').trigger('click');
                 importStatusEle.html('Please wait starting import...');
-                $.post('{{ APP.href('customers/import/config') }}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                $.post('{{APP.href('customers/import/config')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                     importStatusEle.html(data);
                 });
             });
 
-            $(document).on('click', '#step3-start', function(ev) {
-                importStatusEle.load('{{ APP.href('customers/import/status') }}?start=true');
+            importAccordionEle.on('click', '#step3-start', function(ev) {
+                importStatusEle.load('{{APP.href('customers/import/status')}}?start=true');
             });
 
-            $(document).on('click', '#step3-stop', function(ev) {
-                $.post('{{ APP.href('customers/import/stop') }}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+            importAccordionEle.on('click', '#step3-stop', function(ev) {
+                $.post('{{APP.href('customers/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                     importStatusEle.html(data);
                 });
             });
