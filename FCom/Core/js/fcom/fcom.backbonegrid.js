@@ -1402,9 +1402,10 @@ function(Backbone, _, $, NProgress) {
                     }
                 });
 
+                /*//focus to first input when modal shown
                 $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
                     $('input:text:visible:first', this).focus();
-                });
+                });*/
 
             },
             addElementDiv: function(model) {
@@ -1420,7 +1421,7 @@ function(Backbone, _, $, NProgress) {
                         var name = model.get('name');
                         var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
                         console.log(val);
-                        elementView.$el.find('input,select:last').val(val);
+                        elementView.$el.find('#'+name).val(val);
                     }
                 }
             }

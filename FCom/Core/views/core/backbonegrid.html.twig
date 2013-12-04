@@ -206,7 +206,7 @@
               }
             }
 
-            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text' || col.editor === 'textarea') {
               if(col.editable === 'inline') {
                 print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
