@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR_.'/../tests/index.php';
+require_once __DIR__.'/../tests/index.php';
 
 $content = file_get_contents("/tmp/latest.json");
 $data = json_decode($content);

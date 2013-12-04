@@ -8,6 +8,9 @@ function validationRules(rules) {
             case 'number':
                 str+='data-rule-number="true" ';
                 break;
+            case 'digits':
+                str+='data-rule-digits="true" ';
+                break;
             case 'ip':
                 str+='data-rule-ipv4="true" ';
                 break;
@@ -22,6 +25,15 @@ function validationRules(rules) {
                 break;
             case 'maxlength':
                 str+='data-rule-maxlength="'+rules[key]+'" ';
+                break;
+            case 'max':
+                str+='data-rule-max="'+rules[key]+'" ';
+                break;
+            case 'min':
+                str+='data-rule-min="'+rules[key]+'" ';
+                break;
+            case 'range':
+                str+='data-rule-range="['+rules[key][0]+','+rules[key][1]+']" ';
                 break;
             case 'date':
                 str+='data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
@@ -1454,9 +1466,10 @@ function(Backbone, _, $, NProgress) {
                     }
                 });
 
+                /*//focus to first input when modal shown
                 $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
                     $('input:text:visible:first', this).focus();
-                });
+                });*/
 
             },
             addElementDiv: function(model) {
@@ -1472,7 +1485,7 @@ function(Backbone, _, $, NProgress) {
                         var name = model.get('name');
                         var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
                         console.log(val);
-                        elementView.$el.find('input,select:last').val(val);
+                        elementView.$el.find('#'+name).val(val);
                     }
                 }
             }
@@ -1518,7 +1531,7 @@ function(Backbone, _, $, NProgress) {
                 $('.'+BackboneGrid.id+'-pagination').html(caption);
         }
 
-            NProgress.start();
+            //NProgress.start();
             //general settings
             _.templateSettings.variable = 'rc';
             BackboneGrid.id = config.id;
@@ -1885,7 +1898,7 @@ function(Backbone, _, $, NProgress) {
                     if (url.indexOf(restricts[i]) !== -1)
                         return;
                 }
-                NProgress.start();
+                //NProgress.start();
             });
             $( document ).ajaxComplete(function(event, jqxhr, settings) {
                 var url = settings.url;
@@ -1893,9 +1906,9 @@ function(Backbone, _, $, NProgress) {
                     if (url.indexOf(restricts[i]) !== -1)
                         return;
                 }
-                NProgress.done();
+                //NProgress.done();
             });
-            NProgress.done();
+            //NProgress.done();
 
             if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "init") !== -1) {
                 var ev= {grid: config.id, ids: rowsCollection.pluck('id')};
