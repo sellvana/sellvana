@@ -29,6 +29,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                   'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );
         $config['actions'] = array(
+            'export' => true,
             'delete' => true
         );
         $config['filters'] = array(

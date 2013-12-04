@@ -125,13 +125,15 @@
     </div>
     <div class="controls col-sm-8">
       <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation));%> >
+        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" class="form-control" <% print(validationRules(rc.validation));%> >
       <% } else if(rc.editor === 'select') { %>
         <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
           <% for(var key in rc.options) { %>
             <option value="<%- key %>"><%- rc.options[key] %></option>
           <% } %>
         </select>
+      <% } else if (rc.editor === 'textarea') { %>
+        <textarea name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" rows="5" <% print(validationRules(rc.validation));%>></textarea>
       <% } %>
     </div>
 </script>
