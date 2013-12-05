@@ -24,9 +24,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name'=>'sale_price', 'label'=>'Sale Price',  'width'=>100,'hidden'=>true),
             array('name'=>'net_weight', 'label'=>'Net Weight',  'width'=>100,'hidden'=>true),
             array('name'=>'ship_weight', 'label'=>'Ship Weight',  'width'=>100,'hidden'=>true),
-            array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
-            array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
-            array('name'=>'uom', 'label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
+            array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
+            array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
             array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
         );
         $config['actions'] = array(
@@ -41,7 +40,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field'=>'sale_price', 'type'=>'number-range'),
             array('field'=>'net_weight', 'type'=>'number-range'),
             array('field'=>'ship_weight', 'type'=>'number-range'),
-            array('field'=>'uom', 'type'=>'text'),
             array('field'=>'create_at', 'type'=>'date-range'),
             array('field'=>'update_at', 'type'=>'date-range'),
             '_quick'=>array('expr'=>'product_name like ? or local_sku like ? or p.id=?', 'args'=> array('?%', '%?%', '?'))
