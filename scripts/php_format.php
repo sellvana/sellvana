@@ -85,6 +85,8 @@ function formatFile( $file, $j = 0 )
     $IMPORT_STATEMENTS = array( T_REQUIRE, T_REQUIRE_ONCE, T_INCLUDE, T_INCLUDE_ONCE );
 
     $CONTROL_STRUCTURES = array( T_IF, T_ELSEIF, T_FOREACH, T_FOR, T_WHILE, T_SWITCH, T_ELSE );
+    $DECLARATION_STRUCTURES = array( T_ARRAY, T_FUNCTION, T_DECLARE );
+
     $WHITESPACE_BEFORE  = array( '?', '{', '=>', ']', ')' );
     $WHITESPACE_AFTER   = array( ',', '?', '=>', '[', '(' );
 
@@ -96,10 +98,13 @@ function formatFile( $file, $j = 0 )
     $matchingTernary        = false;
     $matchingControlOneLine = false;
     $inControlStatement     = false;
+    $inHereDoc = false;
+    $inDeclarationStatement = false;
     $controlNesting         = 0;
 
     $level = 0; // level of indentation
     $sep   = "    "; // 4 spaces
+    $interpolation = false;
 
 // First pass - filter out unwanted tokens
     $filteredTokens = array();
@@ -128,17 +133,25 @@ function formatFile( $file, $j = 0 )
                 }
             }
         } elseif ( $token->contents == "{" ) {
-            $level++;
-            if ( strpos($tokens[ $i + 1 ]->contents, "\n") === false && $level ) {
-                $token->contents .= "\n" . str_repeat( $sep, $level );
+            if ( $token->type != T_CURLY_OPEN && $token->type != T_DOLLAR_OPEN_CURLY_BRACES ) { // variable interpolation in string {
+                $level++;
+                if ( strpos( $tokens[ $i + 1 ]->contents, "\n" ) === false && $level ) {
+                    $token->contents .= "\n" . str_repeat( $sep, $level );
+                }
+            } else {
+                $interpolation = true;
             }
         } elseif ( $token->contents == "}" ) {
-            $level--;
-            if ( $filteredTokens[count($filteredTokens) - 1]->type != T_WHITESPACE) {
-                $filteredTokens[] = new Token( array( T_WHITESPACE, "\n" . str_repeat( $sep, $level ) ) );
-                if($level){
-                    $token->contents .= str_repeat( $sep, $level );
+            if ( !$interpolation ) {
+                $level--;
+                if ( $filteredTokens[ count( $filteredTokens ) - 1 ]->type != T_WHITESPACE ) {
+                    $filteredTokens[ ] = new Token( array( T_WHITESPACE, "\n" . str_repeat( $sep, $level ) ) );
+                    if ( $level ) {
+                        $token->contents .= str_repeat( $sep, $level );
+                    }
                 }
+            } else {
+                $interpolation = false;
             }
         }
 
@@ -163,6 +176,15 @@ function formatFile( $file, $j = 0 )
             $filteredTokens[ ] = new Token( array( T_ELSEIF, 'elseif' ) );
         } elseif ( in_array( $token->type, $CONTROL_STRUCTURES ) ) {
             $inControlStatement = true;
+            $filteredTokens[ ]  = $token;
+        } elseif ( in_array( $token->type, $DECLARATION_STRUCTURES ) ) {
+            $inDeclarationStatement = true;
+            $filteredTokens[ ]  = $token;
+        } elseif ( $token->type == T_START_HEREDOC ) {
+            $inHereDoc = true;
+            $filteredTokens[ ]  = $token;
+        } elseif ( $token->type == T_END_HEREDOC ) {
+            $inHereDoc = false;
             $filteredTokens[ ]  = $token;
         } elseif ( $token->contents == '(' && $inControlStatement ) {
             $controlNesting++;
@@ -314,7 +336,7 @@ function formatFile( $file, $j = 0 )
         }
     }
 
-    $output = str_replace( array( '( )', '[ ]' ), array( '()', '[]' ), $output );
+    $output = str_replace( array( '( )', '(  )', '[ ]', '[  ]' ), array( '()', '()', '[]', '[]' ), $output );
 
     return $output;
 }
