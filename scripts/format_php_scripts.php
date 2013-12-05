@@ -18,9 +18,8 @@ foreach ( $modules as $modName => $mod ) {
     $targetFile = __DIR__ . '/../storage/formatted/';
     BUtil::ensureDir( $targetFile );
 
-    echo realpath($targetFile) . "\n";
     chmod( $targetFile, 0777 );
-    formatModulePhpFiles( $dir, $targetFile );
+    formatModulePhpFiles( $dir, realpath($targetFile) );
 }
 
 function formatModulePhpFiles( $dir, $target = null )
@@ -44,9 +43,9 @@ function formatModulePhpFiles( $dir, $target = null )
         $source = formatFile($file);
         $fileName = str_replace($base, '', $file);
         $dirName = pathinfo($fileName, PATHINFO_DIRNAME);
-        mkdir($target . '/' . $dirName, 0775, true);
+        mkdir(rtrim($target, '/') . '/' . trim($dirName, '/'), 0775, true);
         if(@file_put_contents($target . "/" . $fileName, $source)){
-            echo "$target/$file formatted\n\n";
+            echo "$target/$fileName formatted\n\n";
         }
     }
 }
