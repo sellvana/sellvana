@@ -4,7 +4,7 @@
     <label class="col-md-2 control-label" for="model-show_content">{{ 'Show Content'|_ }}</label>
     <div class="col-md-5">
         <input type="hidden" name="model[show_content]" value="0" />
-        <input id="model-is-top-menu" class="switch-cbx" name="model[show_content]" {% if m.get('show_content') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <input id="model-show_content" class="switch-cbx" name="model[show_content]" {% if m.get('show_content') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
 <div class="form-group">
@@ -17,14 +17,14 @@
     <label class="col-md-2 control-label" for="model-show_products">{{ 'Show Products'|_ }}</label>
     <div class="col-md-5">
         <input type="hidden" name="model[show_products]" value="0" />
-        <input id="model-is-top-menu" class="switch-cbx" name="model[show_products]" {% if m.get('show_products') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <input id="model-show_products" class="switch-cbx" name="model[show_products]" {% if m.get('show_products') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
 <div class="form-group">
     <label class="col-md-2 control-label" for="model-show_sub_cat">{{ 'Show Subcategories'|_ }}</label>
     <div class="col-md-5">
         <input type="hidden" name="model[show_sub_cat]" value="0" />
-        <input id="model-is-top-menu" class="switch-cbx" name="model[show_sub_cat]" {% if m.get('show_sub_cat') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <input id="model-show_sub_cat" class="switch-cbx" name="model[show_sub_cat]" {% if m.get('show_sub_cat') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
 <div class="form-group">
