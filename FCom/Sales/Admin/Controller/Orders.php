@@ -196,4 +196,48 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             }
         }
     }
+
+    public function itemsOrderGridConfig($order)
+    {
+        $data = array();
+        $items = $order->items();
+        if ($items) {
+            foreach($items as $item) {
+                $product_info = BUtil::fromJson($item->product_info);
+                $product = array(
+                    'id'           => $item->id,
+                    'product_name' => $product_info['product_name'],
+                    'local_sku'    => $product_info['local_sku'],
+                    'price'        => $product_info['base_price'],
+                    'qty'          => $item->qty,
+                    'total'        => $item->total,
+                );
+                $data[] = $product;
+            }
+        }
+        $config = array_merge(
+            parent::gridConfig(),
+            array(
+                'id'        => 'orders_item',
+                'data'      => $data,
+                'data_mode' => 'local',
+                'orm'       => 'FCom_Sales_Model_Order_Item',
+                'columns'   => array(
+                    //todo: add row for image
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true),
+                    array('name' => 'product_name', 'label' => 'Name', 'width' => 400),
+                    array('name' => 'local_sku', 'label' => 'Local SKU', 'width' => 200),
+                    array('name' => 'price', 'label' => 'Price', 'width' => 100),
+                    array('name' => 'qty', 'label' => 'Qty', 'width' => 100),
+                    array('name' => 'total', 'label' => 'Total', 'width' => 150),
+                ),
+                'actions'   => array(
+                    'add'    => array('caption' => 'Add products'),
+                    'delete' => array('caption' => 'Remove') //todo: fix remove is not delete in some grid
+                ),
+            )
+        );
+        return array('config' => $config);
+    }
 }
