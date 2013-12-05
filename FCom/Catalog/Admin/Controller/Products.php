@@ -97,6 +97,26 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ));
     }
 
+    public function openCategoriesData($model)
+    {
+        $cp = FCom_Catalog_Model_CategoryProduct::i();
+        $categories = $cp->orm('cp')->where('product_id', $model->id())
+            ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+            ->select('c.id_path')
+            ->find_many();
+        if(!$categories){
+            return BUtil::toJson(array());
+        }
+        $result = array();
+        foreach($categories as $c){
+            $idPathArr = explode('/', $c->id_path);
+            foreach ($idPathArr as $id) {
+                $result[] = 'check_'.$id;
+            }
+        }
+        return BUtil::toJson($result);
+    }
+
     public function linkedCategoriesData($model)
     {
         $cp = FCom_Catalog_Model_CategoryProduct::i();
