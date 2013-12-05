@@ -2730,6 +2730,11 @@ label[for="categories-tree-lock"],
 label[for="nav-tree-lock"] {
   color:#d40000;
   }
+label[for="categories-tree-lock"].icon-unlock,
+label[for="nav-tree-lock"].icon-unlock {
+  color:#00d400;
+  }
+
 #categories-form-container .nav-tabs > li > a {
   margin-right:0;
   border-radius:0;
