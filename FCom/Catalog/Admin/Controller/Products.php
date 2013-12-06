@@ -8,7 +8,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_gridTitle = 'Products';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
-    protected $_gridViewName = 'core/backbonegrid';
 
     public function gridConfig()
     {
@@ -95,6 +94,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'sidebar_img'=>$m->thumbUrl(98),
             'title'=>$m->id ? 'Edit Product: '.$m->product_name : 'Create New Product',
         ));
+        $this->_formTitle = $m->id ? 'Edit Product: '.$m->product_name : 'Create New Product';
     }
 
     public function openCategoriesData($model)
