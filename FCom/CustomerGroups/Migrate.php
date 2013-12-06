@@ -27,8 +27,8 @@ class FCom_CustomerGroups_Migrate
         );
 
         BDb::run("
-        replace INTO `{$tableCustomerGroup}` (`title`, `code`)
-        VALUES('General', 'general'), ('NOT LOGGED IN', 'guest'), ('Retailer', 'retailer')
+        replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
+        VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retailer', 'retailer')
         ");
 
         BDb::ddlTableDef(FCom_Customer_Model_Customer::table(),
@@ -90,5 +90,14 @@ class FCom_CustomerGroups_Migrate
 //            $ins->execute($data);
 //        }
 //        $conn->commit();
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
+        BDb::run("
+        replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
+        VALUES (0, 'ALL', 'all')
+        ");
     }
 }

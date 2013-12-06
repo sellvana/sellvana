@@ -31,6 +31,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      */
     public function getTierPricesGrid($model)
     {
+        $cgOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
         $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id());
         $grid = array(
             'config'=>array(
@@ -38,10 +39,10 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('name'=>'group_id', 'label'=>'Group', 'options'=>FCom_CustomerGroups_Model_Group::i()->groupsOptions(),'validation'=>array('required'=>true), 'addable'=>true,'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
-                    array('name'=>'qty', 'label'=>'Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150, 'validation'=>array('required'=>true, 'number'=>true)),
-                    array('name'=>'base_price', 'label'=>'Base Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
-                    array('name'=>'sale_price', 'label'=>'Sale Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
+                    array('name'=>'group_id', 'label'=>'Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'addable'=>true,'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
+                    array('name'=>'qty', 'label'=>'Min.Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150, 'validation'=>array('required'=>true, 'number'=>true)),
+                    array('name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
+                    array('name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('delete'=>true))
                 ),
                 'data'=>BDb::many_as_array($orm->find_many()),
