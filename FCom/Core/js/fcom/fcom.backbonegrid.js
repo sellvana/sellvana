@@ -1658,29 +1658,30 @@ function(Backbone, _, $, NProgress) {
                         BackboneGrid.current_filters[field] = temp;
                     }
                     var c = columnsCollection.findWhere({name: filter.field});
-
-                    c.filter_type= filter.type;
-                    if (filter.type === 'text') {
-                        if (typeof(filter.op) === 'undefined')
-                            filter.op = 'contains';
-                        if (typeof(filter.filterLabel) === 'undefined')
-                            filter.filterLabel = 'Contains';
-                    }
-
-                    if (filter.type === 'date-range' || filter.type === 'number-range') {
-                        if (typeof(filter.op) === 'undefined')
-                            filter.op = 'between';
-                        if (typeof(filter.filterLabel) === 'undefined')
-                            filter.filterLabel = 'Between';
-                    }
-
-                    if (filter.type === 'multiselect' || filter.type === 'select') {
-                        if(typeof(filter.options) === 'undefined') {
-                             filter.options = c.get('options');
+                    if (c) {
+                        c.filter_type= filter.type;
+                        if (filter.type === 'text') {
+                            if (typeof(filter.op) === 'undefined')
+                                filter.op = 'contains';
+                            if (typeof(filter.filterLabel) === 'undefined')
+                                filter.filterLabel = 'Contains';
                         }
+
+                        if (filter.type === 'date-range' || filter.type === 'number-range') {
+                            if (typeof(filter.op) === 'undefined')
+                                filter.op = 'between';
+                            if (typeof(filter.filterLabel) === 'undefined')
+                                filter.filterLabel = 'Between';
+                        }
+
+                        if (filter.type === 'multiselect' || filter.type === 'select') {
+                            if(typeof(filter.options) === 'undefined') {
+                                 filter.options = c.get('options');
+                            }
+                        }
+                        filter.label = c.get('label');
+                        fCollection.push(filter);
                     }
-                    filter.label = c.get('label');
-                    fCollection.push(filter);
                 }
             }
             console.log(fCollection);
