@@ -1,8 +1,8 @@
 base:
-	- view: head
-		do:
-			- [ requireJs, fcom.productreviews, @FCom_ProductReviews/Frontend/js/fcom.productreviews ]
+    - view: head
+        do:
+            - [ requireJs, fcom.productreviews, @FCom_ProductReviews/Frontend/js/fcom.productreviews ]
 
 /prodreview/add:
-	- { include: base }
-	- { hook: main, views: prodreviews/add }
+    - { include: base }
+    - { hook: main, views: prodreviews/add }
