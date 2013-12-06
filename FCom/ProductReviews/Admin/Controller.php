@@ -49,10 +49,12 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
         }
         $config['actions'] += array(
-            'export' => true,
-            'edit'   => true,
-            'delete' => true,
+            'export'  => true,
+            'delete'  => true,
+            'approve' => array('html' => '<button type="button" class="btn btn-primary disabled" id="prod-reviews-approve"><span>Approve</span></button>'),
+            'deny'    => array('html' => '<button type="button" class="btn btn-warning disabled" id="prod-reviews-deny"><span>Deny</span></button>'),
         );
+        $config['events'] = array('select-rows');
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
         //$config['multiselect'] = false;
@@ -61,7 +63,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-            $config['id'] = 'products_reviews_grid_in_form';
+            $config['id'] = 'products_reviews';
             $i = BUtil::arrayFind($config['columns'], array('name' => '_actions'));
             $config['columns'][$i]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
@@ -132,5 +134,20 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     {
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(array('actions' => array('new' => '')));
+    }
+
+    public function action_status__POST()
+    {
+        $post = BRequest::i()->post();
+        $approve = (int)$post['approve'];
+        $ids = $post['ids'];
+        foreach ($ids as $id) {
+            $review = FCom_ProductReviews_Model_Review::i()->load($id);
+            if ($review) {
+                $review->approved = $approve;
+                $review->save();
+            }
+        }
+        BResponse::i()->json(array('status' => 'success', 'message' => 'Update status successful'));
     }
 }
