@@ -1,13 +1,13 @@
-define(['jquery', 'underscore', 'backbone', 'marionette'], function($, _, Backbone, Marionette) {
+define(['jquery', 'underscore', 'backbone', 'marionette'], function ($, _, Backbone, Marionette) {
 
     var config = {};
 
     function CustomFields(options) {
         _.extend(config, options);
-console.log('test');
+        console.log('test');
 
         var fieldsCollection = new CustomFields.Collections.Fields([
-            {field_name:'TEST', value:'VALUE'}
+            {field_name: 'TEST', value: 'VALUE'}
         ]);
 
         var fieldsView = new CustomFields.Views.Fields({
@@ -19,13 +19,13 @@ console.log('test');
         Models: {},
         Collections: {},
         Views: {}
-    })
+    });
 
     CustomFields.Models.Field = Backbone.Model.extend({
-        initialize: function() {
+        initialize: function () {
 
         }
-    })
+    });
 
     CustomFields.Collections.Fields = Backbone.Collection.extend({
         model: CustomFields.Models.Field
@@ -43,10 +43,10 @@ console.log('test');
         modelEvents: {
             'change': 'render'
         },
-        onRender: function() {
+        onRender: function () {
 
         },
-        destroy: function() {
+        destroy: function () {
             this.model.destroy();
         }
     });
@@ -68,20 +68,20 @@ console.log('test');
         collectionEvents: {
             'all': 'update'
         },
-        onRender: function() {
+        onRender: function () {
             console.log('onRender');
             this.update();
         },
-        update: function() {
+        update: function () {
             console.log('update');
         },
-        onSetAdd: function() {
+        onSetAdd: function () {
             console.log(this.availSets.val())
         },
-        onFieldAdd: function() {
+        onFieldAdd: function () {
             console.log(this.availFields.val())
         }
     });
 
     return CustomFields;
-})
+});

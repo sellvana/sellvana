@@ -1,10 +1,10 @@
-define(['backbone','marionette','backbone.bootstrap-modal'],
-    function(Backbone,Marionette){
+define(['backbone', 'marionette', 'backbone.bootstrap-modal'],
+    function (Backbone, Marionette) {
         var ModalLauncher = Backbone.Marionette.ItemView.extend({
-            getTemplate: function(){
-                    return this.templateHelper;
+            getTemplate: function () {
+                return this.templateHelper;
             },
-            initialize : function(options){
+            initialize: function (options) {
                 this.templateHelper = options.templateHelper;
                 this.eventHelper = options.eventHelper;
                 this.passedView = options.passedView;
@@ -17,10 +17,10 @@ define(['backbone','marionette','backbone.bootstrap-modal'],
                 this.events[eventKey] = 'openModal';
                 this.delegateEvents();
             },
-            events : {
-                'click #open' : 'openModal'
+            events: {
+                'click #open': 'openModal'
             },
-            openModal: function() {
+            openModal: function () {
                 _this = this;
                 var modal = new Backbone.BootstrapModal({
                     content: _this.passedView,
@@ -29,7 +29,8 @@ define(['backbone','marionette','backbone.bootstrap-modal'],
                 });
                 modal.open();
             },
-    });
-    return ModalLauncher;
-});
+        });
+        return ModalLauncher;
+    }
+);
 

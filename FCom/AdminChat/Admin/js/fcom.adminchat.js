@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slimscroll', 'timeago', 'autosize', 'jquery-ui'], function ($, _, Backbone, PushClient, exports, slimscroll, timeago, autosize) {
     _.templateSettings.variable = 'rc';
-    var dingPath, username = '', initializing, avatars={};
+    var dingPath, username = '', initializing, avatars = {};
 
     function playDing() {
         document.getElementById("sound").innerHTML = '<audio autoplay="autoplay">'
@@ -9,7 +9,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             + '</audio>';
     }
 
-    var setScrollable = function(selector) {
+    var setScrollable = function (selector) {
         if (selector == null) {
             selector = $(".scrollable");
         }
@@ -21,18 +21,18 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
                 });
             });
         }
-    }
+    };
 
-    var setTimeAgo = function(selector) {
+    var setTimeAgo = function (selector) {
         if (selector == null) {
-          selector = $(".timeago");
+            selector = $(".timeago");
         }
         if (jQuery().timeago) {
-          jQuery.timeago.settings.allowFuture = true;
-          jQuery.timeago.settings.refreshMillis = 60000;
-          selector.timeago();
+            jQuery.timeago.settings.allowFuture = true;
+            jQuery.timeago.settings.refreshMillis = 60000;
+            selector.timeago();
 
-          return selector.addClass("in");
+            return selector.addClass("in");
         }
     };
 
@@ -40,7 +40,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         Models: {},
         Collections: {},
         Views: {}
-    }
+    };
 
     //User Model
     ChatUserList.Models.User = Backbone.Model.extend({
@@ -49,10 +49,10 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             avatar: ''
         },
         incUnread: function () {
-            this.set('unreadCount', this.get('unreadCount')+1);
+            this.set('unreadCount', this.get('unreadCount') + 1);
         },
         decUnread: function () {
-            this.set('unreadCount', this.get('unreadCount')-1);
+            this.set('unreadCount', this.get('unreadCount') - 1);
         }
 
     });
@@ -61,7 +61,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     ChatUserList.Collections.Users = Backbone.Collection.extend({
         model: ChatUserList.Models.User,
         findModelByName: function (username) {
-            for (var i=0;i<this.models.length;i++) {
+            for (var i = 0; i < this.models.length; i++) {
                 if (this.models[i].get('username') === username) {
                     return this.models[i];
                 }
@@ -79,22 +79,22 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             'change .js-adminuser-status': 'changeStatus',
             'click .js-adminuser-status': 'preventDefault'
         },
-        initialize: function() {
-            this.model.on('change', this.render,this);
+        initialize: function () {
+            this.model.on('change', this.render, this);
         },
-        render: function() {
+        render: function () {
             var status = $.trim(this.model.get('status'));
             this.$el.html(this.template(this.model.toJSON()));
-            $('select.js-adminuser-status option[value="' + status + '"]').prop('selected',true);
+            $('select.js-adminuser-status option[value="' + status + '"]').prop('selected', true);
             return this;
         },
-        changeStatus: function(ev) {
+        changeStatus: function (ev) {
             var status = this.$el.find('.js-adminuser-status').val();
             sendStatus({status: status});
 
             return true;
         },
-        preventDefault: function(ev){
+        preventDefault: function (ev) {
 
             ev.stopPropagation();
         }
@@ -102,11 +102,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     //View for all user list
     ChatUserList.Views.Users = Backbone.View.extend({
         el: '#adminUserList',
-        initialize: function() {
+        initialize: function () {
             this.collection.on('add', this.addOne, this);
             this.collection.on('change', this.updateUnread, this);
         },
-        render: function() {
+        render: function () {
             this.collection.each(this.addOne, this);
 
             return this;
@@ -117,19 +117,18 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             });
             this.$el.append(userView.render().el);
         },
-        updateUnread: function() {
+        updateUnread: function () {
             var total = 0;
 
-            this.collection.each(function(userModel){
+            this.collection.each(function (userModel) {
                 total += userModel.get('unreadCount');
             });
 
-            if (total>0) {
-                $('span#totalUnreads').css('display', 'inline');
-                $('span#totalUnreads').html(total);
+            if (total > 0) {
+                $('span#totalUnreads').css('display', 'inline').html(total);
             } else {
                 $('span#totalUnreads').css('display', 'none');
-        }
+            }
         }
     });
 
@@ -137,21 +136,20 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     ChatUserList.Views.User = Backbone.View.extend({
         tagName: 'li',
         template: _.template($('#userTemplate').html()),
-        initialize: function(){
+        initialize: function () {
             this.model.on('change', this.render, this);
         },
         events: {
-            'click' :'initChat'
+            'click': 'initChat'
         },
-        initChat: function(){
+        initChat: function () {
             sendOpen({user: this.model.get('username')});
         },
-        render: function(){
+        render: function () {
             this.$el.html(this.template(this.model.toJSON()));
-            if (this.model.get('unreadCount')>0)
-            {
+            if (this.model.get('unreadCount') > 0) {
                 var html = this.model.get('unreadCount') + ' unread';
-                if (this.model.get('unreadCount')>1)
+                if (this.model.get('unreadCount') > 1)
                     html += 's';
 
                 this.$el.find('span.badge').css('display', 'inline');
@@ -165,12 +163,11 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     });
 
 
-
     var ChatWindows = {
         Models: {},
         Collections: {},
         Views: {}
-    }
+    };
 
     //Chat item model
     ChatWindows.Models.Item = Backbone.Model.extend({
@@ -179,8 +176,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             joinMsg: false,
             avatar: ''
         },
-        initialize: function(config)
-        {
+        initialize: function (config) {
             this.set('avatar', avatars[this.get('username')]);
         }
     });
@@ -207,21 +203,21 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     });
 
 
-    //view for multipul chat windows(when user create several chat sessions)
+    //view for multiple chat windows(when user create several chat sessions)
     ChatWindows.Views.Main = Backbone.View.extend({
         el: '#adminChatMain',
-        initialize: function(){
+        initialize: function () {
             this.collection.on('add', this.addOne, this);
             this.collection.on('remove', this.updatePosition, this)
         },
-        updatePosition: function(){
-            var index=0;
-            _.each(this.collection.models, function(model) {
-                model.set('index',index);
+        updatePosition: function () {
+            var index = 0;
+            _.each(this.collection.models, function (model) {
+                model.set('index', index);
                 index++;
             });
         },
-        render: function(){
+        render: function () {
             this.collection.each(this.addOne, this);
 
             return this;
@@ -238,25 +234,23 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             };
             this.$el.append(chatWin.render().el);
         }
-    })
+    });
 
     //view for chat window
     ChatWindows.Views.Window = Backbone.View.extend({
 
         template: _.template($('#chatWinTemplate').html()),
         events: {
-            'click .btn.box-collapse' :'toggleChatWin',
-            'click .btn.box-remove' :'closeChatWin',
-            'submit' :'say',
-            'keydown textarea' :'checkEnter'
+            'click .btn.box-collapse': 'toggleChatWin',
+            'click .btn.box-remove': 'closeChatWin',
+            'submit': 'say',
+            'keydown textarea': 'checkEnter'
         },
-        initialize: function()
-        {
+        initialize: function () {
             this.collection.on('add', this.addOne, this);
             this.model.on('change', this.updateHeader, this);
         },
-        toggleChatWin: function(e)
-        {
+        toggleChatWin: function (e) {
             var box = this.$el.find(".box");
 
             box.toggleClass("box-collapsed");
@@ -270,25 +264,24 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
                         var userModel = userView.collection.findModelByName(item.get('username'));
                         console.log(userModel);
-                        if (userModel!==false) {
+                        if (userModel !== false) {
                             userModel.decUnread();
                         }
                     }
-                },this);
+                }, this);
                 this.model.set('unreadCount', 0);
                 this.model.set('badgeDisplay', 'none');
 
-                PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'open'});
+                PushClient.send({channel: this.model.get('channel'), signal: 'window_status', status: 'open'});
             } else {
-                PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'collapsed'});
+                PushClient.send({channel: this.model.get('channel'), signal: 'window_status', status: 'collapsed'});
             }
             e.preventDefault();
 
             return false;
         },
-        updateHeader: function()
-        {
-            this.$el.find("div.chat.chat-fixed").css('margin-right', (this.model.get('index')*300)+'px');
+        updateHeader: function () {
+            this.$el.find("div.chat.chat-fixed").css('margin-right', (this.model.get('index') * 300) + 'px');
 
             this.$el.find("span.badge").css('display', this.model.get('badgeDisplay'));
             if (this.model.get('collapsed')) {
@@ -300,13 +293,12 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             }
 
         },
-        closeChatWin: function()
-        {
-            PushClient.send({channel:this.model.get('channel'), signal:'window_status', status:'closed'});
+        closeChatWin: function () {
+            PushClient.send({channel: this.model.get('channel'), signal: 'window_status', status: 'closed'});
 
             loadedWins = _.reject(loadedWins, function (obj) {
                 return obj.channel === this.model.get('channel');
-            },this);
+            }, this);
 
 
             this.undelegateEvents();
@@ -334,14 +326,13 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             });
             this.$el.find('textarea').val('').trigger('resize');
         },
-        checkEnter: function(ev) {
+        checkEnter: function (ev) {
             if (ev.keyCode == 13) {
                 this.$el.find('form').submit();
                 return false;
-             }
+            }
         },
-        render: function()
-        {
+        render: function () {
             this.$el.html(this.template(this.model.toJSON()));
             this.collection.each(this.addOne, this);
 
@@ -372,7 +363,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             var itemModel = this.collection.findWhere({msg_id: msg.msg_id});
             playDing();
             if (itemModel) {
-                itemModel.set('time',msg.time);
+                itemModel.set('time', msg.time);
 
                 return true;
             } else
@@ -387,20 +378,18 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         template: _.template($('#chatItemTempate').html()),
         tagName: 'li',
         className: 'message',
-        initialize: function()
-        {
-            this.model.on('change',this.render,this);
+        initialize: function () {
+            this.model.on('change', this.render, this);
         },
-        render: function()
-        {
+        render: function () {
             this.$el.html(this.template(this.model.toJSON()));
             if (this.model.get('joinMsg') || (this.model.get('time') !== 'undefined' && this.model.get('time') !== -1)) {
                 var date = new Date();
                 timeago = this.$el.find(".timeago");
-                if(this.model.get('joinMsg')) {
+                if (this.model.get('joinMsg')) {
                     var month = (date.getMonth() + 1);
                     var date_day = (date.getDate());
-                    timeago.attr('title', date.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (date_day<10 ? '0' : '' ) + date_day + " " + (date.getHours()) + ":" + (date.getMinutes()) + ":" + (date.getSeconds()));
+                    timeago.attr('title', date.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (date_day < 10 ? '0' : '' ) + date_day + " " + (date.getHours()) + ":" + (date.getMinutes()) + ":" + (date.getSeconds()));
                 } else {
                     timeago.attr('title', this.model.get('time'));
                 }
@@ -412,7 +401,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             }
 
             if (this.model.get('time') === -1) {
-                this.$el.find('i').attr('class','icon-spinner');
+                this.$el.find('i').attr('class', 'icon-spinner');
             }
 
             return this;
@@ -421,10 +410,10 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     var chatWins = new ChatWindows.Collections.Wins([]);
     var chatMainWin = new ChatWindows.Views.Main({collection: chatWins});
-    var loadedWins=[];
+    var loadedWins = [];
 
     //TODO: refactor for AdminChat to be main class
-    var AdminChat = function(options) {
+    var AdminChat = function (options) {
 
         initializing = true;
         username = options.username;
@@ -440,7 +429,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
         initializing = false;
 
-    }
+    };
 
     // send to server
     function sendStatus(options) {
@@ -477,16 +466,16 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         chat.index = loadedWins.length;
         var chatModel = new ChatWindows.Models.Win(chat);
 
-        if(chat.status && chat.status === 'collapsed') {
-            chatModel.set('collapsed',true);
+        if (chat.status && chat.status === 'collapsed') {
+            chatModel.set('collapsed', true);
         }
 
         chatWins.add(chatModel);
 
         if (chat.history) {
             _.each(chat.history, function (history) {
-                    history.channel = chat.channel;
-                    add_history(history, false);
+                history.channel = chat.channel;
+                add_history(history, false);
             });
         }
 
@@ -505,18 +494,18 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         });
         if (json[0]) {
             if (!(msg.msg_id && json[0].win.messageSent(msg))) {
-                var winView=json[0].win;
-                var chatItem= new ChatWindows.Models.Item(msg);
+                var winView = json[0].win;
+                var chatItem = new ChatWindows.Models.Item(msg);
 
                 if (checkUnread && winView.model.get('collapsed')) {
-                    winView.model.set('unreadCount',winView.model.get('unreadCount')+1);
-                    winView.model.set('badgeDisplay','inline');
-                    chatItem.set('unread',true);
-                    if(!initializing)
+                    winView.model.set('unreadCount', winView.model.get('unreadCount') + 1);
+                    winView.model.set('badgeDisplay', 'inline');
+                    chatItem.set('unread', true);
+                    if (!initializing)
                         playDing();
 
                     var userModel = userView.collection.findModelByName(msg.username);
-                    if (userModel!==false) {
+                    if (userModel !== false) {
                         userModel.incUnread();
                     }
                 }
@@ -528,7 +517,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     function user_status(user) {
         //alert('fff');
         var avatarSet = false;
-        if(user.avatar) {
+        if (user.avatar) {
             avatars[user.username] = user.avatar;
             avatarSet = true;
         }
@@ -562,6 +551,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             channel_adminuser.signals[msg.signal](msg);
         }
     }
+
     var users = new ChatUserList.Collections.Users([]);
     var userView = new ChatUserList.Views.Users({collection: users});
 
@@ -570,10 +560,10 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
     statusView.render();
 
     channel_adminuser.signals = {
-        status: function(msg) {
+        status: function (msg) {
             _.each(msg.users, user_status);
         }
-    }
+    };
 
     function channel_adminchat(msg) {
 
@@ -581,31 +571,32 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
             channel_adminchat.signals[msg.signal](msg);
         }
     }
+
     channel_adminchat.signals = {
-        chats: function(msg) {
-            _.each(msg.chats, function(chat) {
+        chats: function (msg) {
+            _.each(msg.chats, function (chat) {
                 show_window(chat);
             })
         },
-        open: function(msg) {
+        open: function (msg) {
             show_window(msg);
         },
-        say: function(msg) {
+        say: function (msg) {
             show_window({channel: msg.channel});
             add_history(msg);
         },
-        join: function(msg) {
+        join: function (msg) {
             show_window({channel: msg.channel});
             add_history({channel: msg.channel, text: 'joined', username: msg.username, joinMsg: true});
         },
-        leave: function(msg) {
+        leave: function (msg) {
             show_window({channel: msg.channel});
             add_history({channel: msg.channel, text: ' left', username: msg.username});
         },
-        close: function(msg) {
+        close: function (msg) {
             //close_window(msg.channel);
         }
-    }
+    };
 
     return AdminChat;
 });

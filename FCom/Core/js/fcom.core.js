@@ -52,30 +52,30 @@ function($, Backbone) {
         }
     })
 
-    FCom._ = function(str) {
+    FCom._ = function (str) {
         return FCom.i18n[str] || str;
-    }
+    };
 
     FCom.TransparencyView = Backbone.View.extend({
-        constructor: function(options) {
+        constructor: function (options) {
             Backbone.View.prototype.constructor.apply(this, arguments);
             this.setElement($(this.options.baseEl).clone());
             this.model.on("change", this.render, this);
         },
 
-        render: function() {
+        render: function () {
             Transparency.render(this.el, this.model.toJSON());
         }
     });
 
-    $(function() {
+    $(function () {
         $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
         if ($.fn.select2) {
-            $('.select2').select2({width:'other values', minimumResultsForSearch:20, dropdownAutoWidth:true});
+            $('.select2').select2({width: 'other values', minimumResultsForSearch: 20, dropdownAutoWidth: true});
         }
     })
 
-})
+});
 
 function partial(el, options) {
     el = $(el);
@@ -92,13 +92,13 @@ function partial(el, options) {
         el.data('params', params);
     }
     for (i in params) {
-        req.push(encodeURIComponent(i)+'='+encodeURIComponent(params[i]));
+        req.push(encodeURIComponent(i) + '=' + encodeURIComponent(params[i]));
     }
-    el.css({opacity:.5});
-    el.load(options.src+(options.src&&options.src.match(/\?/)?'&':'?')+req.join('&'), function(data) {
+    el.css({opacity: .5});
+    el.load(options.src + (options.src && options.src.match(/\?/) ? '&' : '?') + req.join('&'), function (data) {
         $('.scrollable', el).scrollTop(scroll);
-        el.css({opacity:1});
-        if (typeof options.complete!=='undefined') options.complete();
+        el.css({opacity: 1});
+        if (typeof options.complete !== 'undefined') options.complete();
     });
 }
 

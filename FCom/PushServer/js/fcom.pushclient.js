@@ -1,14 +1,13 @@
-define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
-{
+define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports) {
     if (!window.name) { // unique name for the browser window or tab
-        window.name = (Math.random()+'').replace(/^0\./, 'f-');
+        window.name = (Math.random() + '').replace(/^0\./, 'f-');
     }
     var state = { sub_id: 0, window_name: window.name, conn_id: 0, msg_id: 0, conn_cnt: 0 },
         channels = {},
         subscribers = {},
         messages = [];
 
-    send({channel:'client', signal:'ready'});
+    send({channel: 'client', signal: 'ready'});
 
     scheduler();
 
@@ -16,8 +15,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
     listen({ channel: 'client', callback: channel_client });
     listen({ regexp: /^client:(.*)$/, callback: channel_client });
 
-    function scheduler()
-    {
+    function scheduler() {
         if (!FCom.pushserver_url) {
             return;
         }
@@ -27,8 +25,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
         setTimeout(scheduler, 300);
     }
 
-    function connect()
-    {
+    function connect() {
         var data = JSON.stringify({ window_name: state.window_name, conn_id: state.conn_id++, messages: messages });
 
         $.post(FCom.pushserver_url, data, receive);
@@ -37,22 +34,21 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function($, _, exports)
         //messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });
 
         state.conn_cnt++;
-console.log('send', data);
+        console.log('send', data);
     }
 
-    function receive(response, status, xhr)
-    {
-console.log('receive', JSON.stringify(response.messages));
+    function receive(response, status, xhr) {
+        console.log('receive', JSON.stringify(response.messages));
 
-        _.each(response.messages, function(msg) {
+        _.each(response.messages, function (msg) {
             if (channels[msg.channel]) {
-                _.each(channels[msg.channel].subscribers, function(sub) {
+                _.each(channels[msg.channel].subscribers, function (sub) {
                     sub.callback(msg);
                 });
             }
-            _.each(subscribers, function(sub) {
+            _.each(subscribers, function (sub) {
                 if (sub.regexp && sub.regexp.test(msg.channel)) {
-console.log('regexp subscriber', sub);
+                    console.log('regexp subscriber', sub);
                     sub.callback(msg);
                 }
             });
@@ -63,14 +59,12 @@ console.log('regexp subscriber', sub);
         }
     }
 
-    function send(msg)
-    {
+    function send(msg) {
         if (!msg.seq) msg.seq = ++state.msg_id;
         messages.push(msg);
     }
 
-    function listen(options)
-    {
+    function listen(options) {
         if (!options.alias) {
             options.alias = ++state.sub_id;
         }
@@ -84,8 +78,7 @@ console.log('regexp subscriber', sub);
         }
     }
 
-    function forget(alias, channel)
-    {
+    function forget(alias, channel) {
         if (channel) {
             if (true === alias) {
                 delete channels[channel];
@@ -97,20 +90,20 @@ console.log('regexp subscriber', sub);
         }
     }
 
-    function catchAll(msg)
-    {
+    function catchAll(msg) {
 
     }
 
-    function channel_client(msg)
-    {
+    function channel_client(msg) {
         switch (msg.signal) {
             case 'received':
-                messages = _.filter(messages, function(qmsg) { return qmsg.seq != msg.ref_seq; });
+                messages = _.filter(messages, function (qmsg) {
+                    return qmsg.seq != msg.ref_seq;
+                });
                 break;
 
             case 'error':
-                $.bootstrapGrowl(msg.description, { type:'error', align:'center', width:'auto' });
+                $.bootstrapGrowl(msg.description, { type: 'error', align: 'center', width: 'auto' });
 
             case 'stop':
                 state.conn_cnt = false;

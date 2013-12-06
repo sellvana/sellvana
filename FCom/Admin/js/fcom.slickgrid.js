@@ -248,9 +248,8 @@ console.log(w, h);
 
     Admin.save('grids', el, grid);
     return grid;
-}
-
-,RemoteModel: function(opt) {
+},
+    RemoteModel: function(opt) {
     // private
     var PAGESIZE = 50;
     var data = {length:0};

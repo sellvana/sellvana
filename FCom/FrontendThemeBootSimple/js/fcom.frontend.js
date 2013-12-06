@@ -1,3 +1,2 @@
-define(['jquery', 'bootstrap', 'typeahead', 'responsiveslides'], function($) {
-
+define(['jquery', 'bootstrap', 'typeahead', 'responsiveslides'], function ($) {
 });

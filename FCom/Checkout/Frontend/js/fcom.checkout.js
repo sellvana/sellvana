@@ -1,11 +1,12 @@
-define(["jquery", "fcom.frontend"], function($) {
+define(["jquery", "fcom.frontend"], function ($) {
 
-    FCom.CartWidget = function(opt) {
+    FCom.CartWidget = function (opt) {
         opt = opt || {};
         var cartActiveTimeout;
+
         function add(id, qty) {
             if (!opt.apiUrl) opt.apiUrl = FCom.base_href + "cart/addxhr";
-            $.post(opt.apiUrl, {action:'add', id:id, qty:qty||1}, function(data) {
+            $.post(opt.apiUrl, {action: 'add', id: id, qty: qty || 1}, function (data) {
                 //console.log(data);
                 /*
                 $.pnotify({pnotify_title:data.title,
@@ -17,14 +18,15 @@ define(["jquery", "fcom.frontend"], function($) {
                 $('#minicart-container').html(data.minicart_html);
                 $('.mini-cart').addClass('active');
                 clearTimeout(cartActiveTimeout);
-                cartActiveTimeout = setTimeout(function() {
+                cartActiveTimeout = setTimeout(function () {
                     $('.mini-cart').removeClass('active');
                 }, 3000);
             });
         }
-        return {add:add};
-    }
+
+        return {add: add};
+    };
 
     FCom.cart = new FCom.CartWidget();
 
-})
+});
