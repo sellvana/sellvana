@@ -208,6 +208,14 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
             break;
+        case 'grid.filter.hidden':
+            if (empty($r['grid']) || empty($r['col']) || empty($r['hidden'])) {
+                break;
+            }
+            $filters = array($r['col'] =>array('hidden'=>$r['hidden']));
+            $data = array('grid'=>array($r['grid']=>array('filters'=>$filters)));
+
+            break;
         case 'grid.col.order':
             if (is_array($r['cols'])) {
                 $cols = $r['cols'];
@@ -223,6 +231,22 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 $columns[$col['name']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
             }
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
+
+            break;
+        case 'grid.filter.orders':
+            if (is_array($r['cols'])) {
+                $cols = $r['cols'];
+            } else {
+                $cols = BUtil::fromJson($r['cols']);
+            }
+            $filters = array();
+            foreach ($cols as $i=>$col) {
+                if (empty($col['field'])) {
+                    continue;
+                }
+                $filters[$col['field']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
+            }
+            $data = array('grid'=>array($r['grid']=>array('filters'=>$filters)));
 
             break;
         case 'grid.col.orders':
