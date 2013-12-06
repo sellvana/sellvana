@@ -1505,6 +1505,7 @@ body.without-footer .f-admin-footer {
 .tab-pane .f-htmlgrid-toolbar .btn { font-size:12px; padding:5px 10px; }
 .f-htmlgrid-toolbar .dd-nestable { margin-right:15px; }
 .f-htmlgrid-toolbar .btn { padding:7px 15px; }
+.f-grid-top-filters .btn { padding:8px 15px; }
 .f-filter-btns .filter-span { margin-right:20px; }
 .f-filter-btns .dropdown { margin-bottom:5px; }
 .f-filter-btns .filter-box {
@@ -2814,6 +2815,9 @@ label[for="nav-tree-lock"].icon-unlock {
   padding:0;
   list-style:none;
   text-align:left;
+  max-height: 300px;
+  overflow: auto;
+  min-width: 200px;
   }
 .dd-list .dd-list { padding-left:30px; }
 .open .dd-list {
@@ -2838,12 +2842,13 @@ label[for="nav-tree-lock"].icon-unlock {
 .dd-placeholder {
   position:relative;
   display:block;
-  min-height:16px;
+  vertical-align: top;
+  /*min-height:16px;*/
   margin:0;
   padding:0;
   font-size:13px;
   line-height:16px;
-  border-bottom:1px solid #eee;
+  border:1px solid #eee;
   }
 .dd-item > button {
   display:block;
@@ -2895,7 +2900,7 @@ label[for="nav-tree-lock"].icon-unlock {
   left:0;
   margin:0;
   width:16px;
-  height:32px;
+  height:34px;
   white-space:nowrap;
   overflow:hidden;
   line-height:22px;
