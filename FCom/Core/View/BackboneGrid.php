@@ -54,7 +54,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         return array(
             ''=>'',
-            '@Show'=>array(
+            'show_all' => 'Show All',
+            'show_sel' => 'Show Selected',
+            'upd_sel' => 'Select Visible',
+            'upd_unsel' => 'Unselect Visible',
+            'upd_clear' => 'Unselect All',
+            /*'@Show'=>array(
                 'show_all'=>'All',
                 'show_sel'=>'Sel'
             ),
@@ -62,7 +67,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 'upd_sel'=>'Sel',
                 'upd_unsel'=>'Unsel',
                 'upd_clear'=>'Clear'
-            ),
+            ),*/
         );
     }
 

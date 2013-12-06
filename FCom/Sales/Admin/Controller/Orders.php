@@ -25,7 +25,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             //todo: confirm with Boris about status should be stored as id_status
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
-        );
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text'),
@@ -122,21 +123,30 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $act = $m->act;
         if ('edit' == $act) {
             $actions =array(
-                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
-                'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Delete') . '</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>',
+                'back' => '<a class="btn btn-link" href=\''.BApp::href($this->_gridHref).'\'><span>' .  BLocale::_('Back to list') . '</span></a>',
+                'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Delete') . '</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>',
             );
         } else {
             $actions =array(
-                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href($this->_gridHref).'\'"><span>Back to list</span></button>',
-                'edit' => '<button type="button" class="st1 sz2 btn" onclick="location.href=\''.BApp::href('orders/form').'?id='.$m->id.'&act=edit'.'\'"><span>Edit</span></button>',
+                'back' => '<a class="btn btn-link" href=\''.BApp::href($this->_gridHref).'\'><span>Back to list</span></a>',
+                'edit' => '<a class="btn btn-primary" href=\''.BApp::href('orders/form').'?id='.$m->id.'&act=edit'.'\'><span>Edit</span></a>',
             );
+        }
+        if ($m->id) {
+            if ($m->act == 'edit') {
+                $title = 'Edit Order #'.$m->id;
+            } else {
+                $title = 'View Order #'.$m->id;
+            }
+        } else {
+            $title = 'Create New Order';
         }
         $args['view']->set(array(
             'form_id' => BLocale::transliterate($this->_formLayoutName),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
             'actions' => $actions,
-            'title' => $m->id ? 'Edit Order' : 'Create New Order',
+            'title' => $title,
         ));
         BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
     }
@@ -185,5 +195,49 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
         }
+    }
+
+    public function itemsOrderGridConfig($order)
+    {
+        $data = array();
+        $items = $order->items();
+        if ($items) {
+            foreach($items as $item) {
+                $product_info = BUtil::fromJson($item->product_info);
+                $product = array(
+                    'id'           => $item->id,
+                    'product_name' => $product_info['product_name'],
+                    'local_sku'    => $product_info['local_sku'],
+                    'price'        => $product_info['base_price'],
+                    'qty'          => $item->qty,
+                    'total'        => $item->total,
+                );
+                $data[] = $product;
+            }
+        }
+        $config = array_merge(
+            parent::gridConfig(),
+            array(
+                'id'        => 'orders_item',
+                'data'      => $data,
+                'data_mode' => 'local',
+                'orm'       => 'FCom_Sales_Model_Order_Item',
+                'columns'   => array(
+                    //todo: add row for image
+                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true),
+                    array('name' => 'product_name', 'label' => 'Name', 'width' => 400),
+                    array('name' => 'local_sku', 'label' => 'Local SKU', 'width' => 200),
+                    array('name' => 'price', 'label' => 'Price', 'width' => 100),
+                    array('name' => 'qty', 'label' => 'Qty', 'width' => 100),
+                    array('name' => 'total', 'label' => 'Total', 'width' => 150),
+                ),
+                'actions'   => array(
+                    'add'    => array('caption' => 'Add products'),
+                    'delete' => array('caption' => 'Remove') //todo: fix remove is not delete in some grid
+                ),
+            )
+        );
+        return array('config' => $config);
     }
 }

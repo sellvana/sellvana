@@ -24,9 +24,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name'=>'sale_price', 'label'=>'Sale Price',  'width'=>100,'hidden'=>true),
             array('name'=>'net_weight', 'label'=>'Net Weight',  'width'=>100,'hidden'=>true),
             array('name'=>'ship_weight', 'label'=>'Ship Weight',  'width'=>100,'hidden'=>true),
-            array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
-            array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100/*, 'filtering'=>true, 'filter_type'=>'date-range'*/),
-            array('name'=>'uom', 'label'=>'UOM', 'index'=>'p.uom', 'width'=>60),
+            array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
+            array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
             array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
         );
         $config['actions'] = array(
@@ -41,7 +40,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field'=>'sale_price', 'type'=>'number-range'),
             array('field'=>'net_weight', 'type'=>'number-range'),
             array('field'=>'ship_weight', 'type'=>'number-range'),
-            array('field'=>'uom', 'type'=>'text'),
             array('field'=>'create_at', 'type'=>'date-range'),
             array('field'=>'update_at', 'type'=>'date-range'),
             '_quick'=>array('expr'=>'product_name like ? or local_sku like ? or p.id=?', 'args'=> array('?%', '%?%', '?'))
@@ -97,6 +95,26 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'sidebar_img'=>$m->thumbUrl(98),
             'title'=>$m->id ? 'Edit Product: '.$m->product_name : 'Create New Product',
         ));
+    }
+
+    public function openCategoriesData($model)
+    {
+        $cp = FCom_Catalog_Model_CategoryProduct::i();
+        $categories = $cp->orm('cp')->where('product_id', $model->id())
+            ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+            ->select('c.id_path')
+            ->find_many();
+        if(!$categories){
+            return BUtil::toJson(array());
+        }
+        $result = array();
+        foreach($categories as $c){
+            $idPathArr = explode('/', $c->id_path);
+            foreach ($idPathArr as $id) {
+                $result[] = 'check_'.$id;
+            }
+        }
+        return BUtil::toJson($result);
     }
 
     public function linkedCategoriesData($model)
