@@ -18,7 +18,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
-            array('name'=>'text', 'label'=>'Text', 'width'=>250, 'hidden' => true, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
+            array('name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
             array('name'=>'rating', 'label'=>'Total Rating', 'width'=>60, 'addable' => true, 'editable'=>true,
                   'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))),
             array('name'=>'rating1', 'label'=>'Value Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
@@ -27,8 +27,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                   'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
             array('name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
                   'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
-            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true,
-                  'options'=>array('1'=>'Yes','0'=>'No'), 'editor' => 'select', 'validation' => array('number' => true)),
+            array('name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
             array('name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
                   'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
             array('name'=>'product_id', 'label'=>'Product', 'addable' => true, 'hidden' => true,
@@ -45,8 +44,11 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('field'=>'approved', 'type'=>'select'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
-        $config['actions'] = array(
-            'new'    => array('caption' => 'New Product Review', 'modal' => true),
+        $config['actions'] = array();
+        if (!$productModel) {
+            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
+        }
+        $config['actions'] += array(
             'export' => true,
             'edit'   => true,
             'delete' => true,
@@ -59,17 +61,18 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>true);
 
         if ($productModel) {
-            $config['id'] = 'products_reviews';
+            $config['id'] = 'products_reviews_grid_in_form';
             $i = BUtil::arrayFind($config['columns'], array('name' => '_actions'));
             $config['columns'][$i]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
+            $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
             $config['data_mode'] = 'local';
-            $config['filters'][] = array('field'=>'product_name', 'type'=>'text');
+            //$config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
                 ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
-                ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
+                ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
 
             $data = BDb::many_as_array($orm->find_many());
             unset($config['orm']);
@@ -87,16 +90,17 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['data'] = $data;
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
-            $config['id'] = 'products_reviews';
+            $config['id'] = 'products_reviews_grid';
             $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250);
-            $config['columns'][] = array('name'=>'author', 'label'=>'Author', 'width'=>250);
+            $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
             $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
                 ->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
                 ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
-                ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
+                ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
         }
 
-        $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true));
+        $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+                                     'data' => array('edit' => true, 'delete' => true));
 
         return $config;
     }
