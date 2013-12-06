@@ -2,6 +2,10 @@
 {% set ctrl = APP.instance('FCom_ProductReviews_Admin_Controller') %}
 
 <script>
+    var btnApprove = $('#prod-reviews-approve');
+    var btnDeny = $('#prod-reviews-deny');
+    var selected_row_ids = [];
+
     if(typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
@@ -24,6 +28,16 @@
 
                 $('a#btn_prod-review-modal').trigger('click');
             }
+        }).bind('select-rows', function(ev) {
+            if (ev.rows.length > 0) {
+                btnApprove.removeClass('disabled');
+                btnDeny.removeClass('disabled');
+                selected_row_ids = _.pluck(ev.rows,'id');
+            } else {
+                btnApprove.addClass('disabled');
+                btnDeny.addClass('disabled');
+                selected_row_ids = [];
+            }
         });
 
         $('button.btn-prod-review-save').click(function(){
@@ -37,6 +51,39 @@
             console.log(row.approved);
             g_vent.trigger('update_row', {grid: 'products_reviews', row: row});
         });
+
+        btnApprove.on('click', function() {
+            updateStatus(1, selected_row_ids);
+        });
+
+        btnDeny.on('click', function() {
+            updateStatus(0, selected_row_ids);
+        });
+
+        function updateStatus(approve, ids)
+        {
+            var url = '{{ APP.href('/prodreviews/status') }}';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {approve: approve, ids: ids},
+                success: function (data)
+                {
+                    if (data.status == 'success') {
+                        $.bootstrapGrowl(data.message, { type: 'success', align: 'center', width: 'auto' });
+                        //todo: trigger event g_vent update_row
+                    } else if (data.status == 'error') {
+                        $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    } else {
+                        $.bootstrapGrowl('Dont know data status type', { type: 'warning', align: 'center', width: 'auto' });
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown)
+                {
+                    alert("[ERROR]<br>" + textStatus);
+                }
+            });
+        }
 
     });
 </script>
