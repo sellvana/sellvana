@@ -11,11 +11,11 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'step' => 1,
     );
 
-	protected $_validationRules = array(
-		array('product_id', '@required'),
-		array('customer_id', '@required'),
-		array('rating', '@required'),
-		array('title', '@required'),
+    protected $_validationRules = array(
+        array('product_id', '@required'),
+        array('customer_id', '@required'),
+        array('rating', '@required'),
+        array('title', '@required'),
 
         array('title', '@string', null, array('max' => 255)),
 
@@ -24,11 +24,11 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         array('rating1', '@integer'),
         array('rating2', '@integer'),
         array('rating3', '@integer'),
-		array('approved', '@integer'),
-		array('helpful', '@integer'),
+        array('approved', '@integer'),
+        array('helpful', '@integer'),
         array('offensive', '@integer'),
-		array('offensive', '@integer'),*/
-	);
+        array('offensive', '@integer'),*/
+    );
 
     public function notify()
     {

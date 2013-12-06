@@ -3796,13 +3796,13 @@ class BRSA extends BClass
         return $this->_privateKey;
     }
 
-    public function setPublicKey()
+    public function setPublicKey($key)
     {
         $this->_publicKey = $key;
         return $this;
     }
 
-    public function setPrivateKey()
+    public function setPrivateKey($key)
     {
         $this->_privateKey = $key;
         return $this;
@@ -3895,8 +3895,9 @@ if (!function_exists('hash_hmac')) {
      *
      * @see http://www.php.net/manual/en/function.hash-hmac.php#93440
      *
-     * @param string  $data       Data to be hashed.
-     * @param string  $key        Hash key.
+     * @param         $algo
+     * @param string  $data Data to be hashed.
+     * @param string  $key Hash key.
      * @param boolean $raw_output Return raw or hex
      *
      * @access public
@@ -3988,8 +3989,8 @@ if (!function_exists('oath_hotp')) {
      *
      * @see http://www.php.net/manual/en/function.hash-hmac.php#108978
      *
-     * @param string $secret Shared secret
-     * @param string $crt Counter
+     * @param string  $secret Shared secret
+     * @param         $counter
      * @param integer $len OTP length
      * @return string
      */

@@ -57,6 +57,6 @@ class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
 
     public function sortClass($col)
     {
-    	return '';
+        return '';
     }
 }

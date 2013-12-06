@@ -13,7 +13,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-	        array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index'=>'c.id'),
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),

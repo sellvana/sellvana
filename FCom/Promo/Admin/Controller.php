@@ -312,26 +312,26 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ->save();
     }
 
-	public function attachmentGridConfig($model)
-	{
-		return array(
-			'grid' => array(
-				'id' => 'promo_attachments',
-				'caption' => 'Promotion Attachments',
-				'datatype' => 'local',
-				'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
-				'colModel' => array(
-					array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-					array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
-				),
-				'multiselect' => true,
-				'multiselectWidth' => 30,
-				'shrinkToFit' => true,
-				'forceFit' => true,
-			),
-			'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-			array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor'=>'pointer'),
-			array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor'=>'pointer'),
-		);
-	}
+    public function attachmentGridConfig($model)
+    {
+        return array(
+            'grid' => array(
+                'id' => 'promo_attachments',
+                'caption' => 'Promotion Attachments',
+                'datatype' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+                'colModel' => array(
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                ),
+                'multiselect' => true,
+                'multiselectWidth' => 30,
+                'shrinkToFit' => true,
+                'forceFit' => true,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor'=>'pointer'),
+            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor'=>'pointer'),
+        );
+    }
 }

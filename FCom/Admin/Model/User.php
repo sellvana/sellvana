@@ -24,17 +24,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ),
     );
 
-	protected $_validationRules = array(
-		array('username', '@required'),
-		array('email', '@required'),
-		array('password', '@required'),
+    protected $_validationRules = array(
+        array('username', '@required'),
+        array('email', '@required'),
+        array('password', '@required'),
 
-		array('email', '@email'),
+        array('email', '@email'),
 
-		//array('is_superadmin', '@integer'),
-		array('role_id', '@integer'),
-		//array('superior_id', '@integer'),
-	);
+        //array('is_superadmin', '@integer'),
+        array('role_id', '@integer'),
+        //array('superior_id', '@integer'),
+    );
 
     protected $_persModel;
     protected $_persData;
