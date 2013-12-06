@@ -14,12 +14,29 @@
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if filterData %}
     <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
-        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+      <div class="col-sm-2">
+
+      <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+
+      <span class="{{ config.id }} dropdown">
+        <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+          Filters
+          <b class="caret"></b>
+        </a>
+        <ul class="{{ config.id }} dd-list dropdown-menu filters">
+          <!--li calss="ui-state-default"-->
+          <!-- visibiility template -->
+          <!--/li -->
+        </ul>
+      </span>
+      </div>
+      <div class="col-sm-10">
       {% if filterData[0] %}
-        <span class="f-filter-btns">
+        <span class="{{ config.id }} f-filter-btns">
           <!-- filter buttons here -->
         </span>
       {% endif %}
+      </div>
     </div>
   {% endif %}
 
@@ -36,20 +53,6 @@
                     <!--/li -->
                 </ol>
         </span>
-        {% if config.filters %}
-          <span class="{{ config.id }} dropdown dd dd-nestable filters-span" style="display:inline;">
-              <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-                  Filters
-                  <b class="caret"></b>
-              </a>
-                  <ol class="{{ config.id }} dd-list dropdown-menu filters" style="min-width:200px;">
-                      <!--li calss="ui-state-default"-->
-                      <!-- visibiility template -->
-                      <!--/li -->
-                  </ol>
-          </span>
-        {% endif %}
-
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
             {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
@@ -128,10 +131,6 @@
         </div>
       </div>
   </div>
-
-
-
-
 
 <script type="template" id="{{ config.id }}-modal-element-template">
     <div class="control-label col-sm-3">

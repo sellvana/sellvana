@@ -321,12 +321,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
                 $filter = BUtil::arrayMerge($filter, $persGrid['filters'][$filter['field']]);
             }
-            if (empty($filter['position'])) {
+            if (!isset($filter['position'])) {
                 $filter['position'] = $defPos;
             }
             $defPos++;
             $persFilters[] = $filter;
         }
+
         usort($persFilters, function($a, $b) { return $a['position'] - $b['position']; });
         $grid['config']['filters'] = $persFilters;
 
@@ -384,9 +385,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
 
-            $persFilters = !empty($pers['grid'][$gridId]['filters']) ? $pers['grid'][$gridId]['filters'] : array();
-            $filters = BUtil::arrayMerge($config['filters'], $persFilters);
+            $filters = array();
+            foreach ($config['filters'] as $k => $v) {
+                if (isset($v['field'])) {
+                    $filters[$v['field']] = $v;
 
+                }
+            }
             $this->_processGridFilters($config, $filters, $orm);
 
             $config['state'] = $persState;
