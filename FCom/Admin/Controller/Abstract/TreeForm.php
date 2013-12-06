@@ -152,19 +152,19 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
 
             //TODO figure out why validation always return false
-	        //if ($model->validate()) {
+            //if ($model->validate()) {
             //always return false -> update rules in FCom_Core_Model_Abstract
             /** @see FCom_Core_Model_Abstract */
             $formId = $this->formId;
-	        if ($model->validate($model->as_array(), array(), $formId)) {
+            if ($model->validate($model->as_array(), array(), $formId)) {
 
-		        $model->save();
-		        $model->refreshDescendants(true, true);
-		        $result = array('status'=>'success', 'message'=>'Node updated');
-	        } else {
+                $model->save();
+                $model->refreshDescendants(true, true);
+                $result = array('status'=>'success', 'message'=>'Node updated');
+            } else {
                 BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
-		        $result = array('status'=>'error', 'message'=> $this->getErrorMessages());
-	        }
+                $result = array('status'=>'error', 'message'=> $this->getErrorMessages());
+            }
         } catch (Exception $e) {
             $result = array('status'=>'error', 'message'=>$e->getMessage());
         }

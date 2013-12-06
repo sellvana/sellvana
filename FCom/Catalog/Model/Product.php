@@ -17,28 +17,28 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ),
     );
 
-	protected $_validationRules = array(
-		array('product_name', '@required'),
-		array('base_price', '@required'),
-		array('local_sku', '@required'),
+    protected $_validationRules = array(
+        array('product_name', '@required'),
+        array('base_price', '@required'),
+        array('local_sku', '@required'),
         //TODO validation fails on is_hidden field
-		/*array('is_hidden', '@required'),*/
-		/*array('uom', '@required'),*/
+        /*array('is_hidden', '@required'),*/
+        /*array('uom', '@required'),*/
 
-		/*array('is_hidden', '@integer'),*/
-		array('num_reviews', '@integer'),
+        /*array('is_hidden', '@integer'),*/
+        array('num_reviews', '@integer'),
 
         array('local_sku', '@string', null, array('max' => 100)),
 
-		array('cost', '@numeric'),
-		array('msrp', '@numeric'),
-		array('map', '@numeric'),
-		array('markup', '@numeric'),
-		array('sale_price', '@numeric'),
-		array('net_weight', '@numeric'),
-		array('ship_weight', '@numeric'),
-		array('avg_rating', '@numeric'),
-	);
+        array('cost', '@numeric'),
+        array('msrp', '@numeric'),
+        array('map', '@numeric'),
+        array('markup', '@numeric'),
+        array('sale_price', '@numeric'),
+        array('net_weight', '@numeric'),
+        array('ship_weight', '@numeric'),
+        array('avg_rating', '@numeric'),
+    );
 
     private $_importErrors = null;
     private $_dataImport = array();

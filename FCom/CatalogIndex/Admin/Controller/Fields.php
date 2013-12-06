@@ -11,7 +11,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
 
     public function gridConfig()
     {
-	    $fieldHlp = FCom_CatalogIndex_Model_Field::i();
+        $fieldHlp = FCom_CatalogIndex_Model_Field::i();
         $config = parent::gridConfig();
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),

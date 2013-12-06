@@ -384,9 +384,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             throw new BException('Either ORM or data is required');
         }
         if (isset($config['data']) && !empty($config['data'])) {
-		    $grid['result']['state'] = array(); //todo: add pagination for reserved data
-		    $grid['result']['rows'] = $config['data'];
-	    } elseif (!empty($config['orm'])) {
+            $grid['result']['state'] = array(); //todo: add pagination for reserved data
+            $grid['result']['rows'] = $config['data'];
+        } elseif (!empty($config['orm'])) {
             $orm = $config['orm'];
             if (is_string($orm)) {
                 $orm = $orm::i()->orm();
@@ -411,21 +411,21 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $config['state'] = $persState;
 
             try {
-    			$grid['result'] = $orm->paginate($grid['request'], array(
-    			    's' =>!empty($config['state']['s'])  ? $config['state']['s']  : null,
-    			    'sd'=>!empty($config['state']['sd']) ? $config['state']['sd'] : null,
-    			    'p' =>!empty($config['state']['p'])  ? $config['state']['p']  : null,
-    			    'ps'=>!empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
-    			));
-    		} catch (Exception $e) {
-    		    $this->_resetPersonalization();
-    		    throw $e;
-    		}
+                $grid['result'] = $orm->paginate($grid['request'], array(
+                    's' =>!empty($config['state']['s'])  ? $config['state']['s']  : null,
+                    'sd'=>!empty($config['state']['sd']) ? $config['state']['sd'] : null,
+                    'p' =>!empty($config['state']['p'])  ? $config['state']['p']  : null,
+                    'ps'=>!empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
+                ));
+            } catch (Exception $e) {
+                $this->_resetPersonalization();
+                throw $e;
+            }
 
-		    //var_dump($grid['result']);exit;
-		    $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
+            //var_dump($grid['result']);exit;
+            $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
-		    BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
+            BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
         }
 
         //$mapColumns = array();

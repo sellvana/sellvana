@@ -5,10 +5,10 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_multisite_site';
     static protected $_mapCacheKey = 'FCom_MultiSite.domain_map';
 
-	protected $_validationRules = array(
-		array('name', '@required'),
-		array('root_category_id', '@integer'),
-	);
+    protected $_validationRules = array(
+        array('name', '@required'),
+        array('root_category_id', '@integer'),
+    );
 
     public function onAfterSave()
     {

@@ -3,12 +3,12 @@
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';
-	protected static $_origClass = __CLASS__;
-	protected $_modelClass = 'FCom_Core_Model_Module';
-	protected $_gridHref = 'modules';
-	protected $_gridTitle = 'Modules';
-	protected $_recordName = 'Product';
-	protected $_mainTableAlias = 'm';
+    protected static $_origClass = __CLASS__;
+    protected $_modelClass = 'FCom_Core_Model_Module';
+    protected $_gridHref = 'modules';
+    protected $_gridTitle = 'Modules';
+    protected $_recordName = 'Product';
+    protected $_mainTableAlias = 'm';
     protected $_gridViewName = 'core/backbonegrid';
 
     public function getModulesData()
@@ -52,7 +52,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
-	        $r['id'] = $r['name'];
+            $r['id'] = $r['name'];
             $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
         }
@@ -76,32 +76,32 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         return $data;
     }
 
-	public function gridConfig()
-	{
+    public function gridConfig()
+    {
         $modules = BModuleRegistry::i()->getAllModules();
         $moduleNames = array_keys($modules);
         $moduleNames = array_combine($moduleNames, $moduleNames);
 
-		$coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
-		$areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
-		$runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
-		$config = parent::gridConfig();
+        $coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
+        $areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
+        $runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
+        $config = parent::gridConfig();
 
-		$config['columns'] = array(
-			array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40, 'overflow' => true),
-			//array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
-			array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
-			array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
-			array('name' => 'version', 'label' => 'Code', 'width' => 80, 'overflow' => true),
-			array('name' => 'schema_version', 'label' => 'Schema', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
-			array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
-			array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
- 			array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
-			array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
-			array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true)
-		);
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40, 'overflow' => true),
+            //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
+            array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
+            array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
+            array('name' => 'version', 'label' => 'Code', 'width' => 80, 'overflow' => true),
+            array('name' => 'schema_version', 'label' => 'Schema', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
+            array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
+            array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
+             array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
+            array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
+            array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true)
+        );
 
-		$config['data'] = $this->getModulesData();
+        $config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         $config['filters'] = array(
             array('field' => 'name', 'type' => 'text'),
@@ -118,10 +118,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $config['callbacks'] = array('after_render'=>'afterModuleGridRowRendered');
 
         //$config['state'] =array(5,6,7,8);
-		return $config;
-	}
+        return $config;
+    }
 
-	/*
+    /*
     public function action_index()
     {
         BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
