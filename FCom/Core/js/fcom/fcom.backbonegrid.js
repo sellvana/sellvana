@@ -44,7 +44,7 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2',
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
 function(Backbone, _, $, NProgress) {
     /*var setValidateForm = function(selector) {
@@ -861,20 +861,11 @@ function(Backbone, _, $, NProgress) {
                 this.collection.on('render', this.render, this);
             },
             orderChanged: function(ev) {
-                //console.log('orderChanged');
-                var orderJson = $('.'+BackboneGrid.id+'.columns-span').nestable('serialize');
-                var changedFlag = false;
-                for(var i in orderJson) {
-                    var key = orderJson[i].id;
-                    colModel = columnsCollection.findWhere({name: key});
-                    if (parseInt(colModel.get('position')) !== parseInt(i)+columnsCollection.append) {
-                        colModel.set('position', parseInt(i)+columnsCollection.append);
-                        changedFlag = true;
-                    }
-                }
 
-                if (!changedFlag)
-                    return;
+                this.$el.find('li').each(function(index) {
+                    var c = columnsCollection.findWhere({name: $(this).data('id')});
+                    c.set('position', index);
+                });
 
                 columnsCollection.sort();
                 gridView.render();
@@ -884,7 +875,6 @@ function(Backbone, _, $, NProgress) {
                     'cols': columnsCollection.toJSON(),
                     'grid': columnsCollection.grid
                 });
-
 
             },
             render: function() {
@@ -896,7 +886,7 @@ function(Backbone, _, $, NProgress) {
                 });*/
 
                 // working
-                $('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
+                //$('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
             },
             addLiTag: function(model) {
                 if(model.get('label') !== '') {
@@ -946,24 +936,16 @@ function(Backbone, _, $, NProgress) {
                 this.collection.on('render', this.render, this);
             },
             orderChanged: function(ev) {
-                //console.log('orderChanged');
-                var orderJson = $('.'+BackboneGrid.id+'.filters-span').nestable('serialize');
-                var changedFlag = false;
-                for(var i in orderJson) {
-                    var key = orderJson[i].id;
-                    filterModel = filtersCollection.findWhere({field: key});
-                    if (parseInt(filterModel.get('position')) !== parseInt(i)+filtersCollection.append) {
-                        filterModel.set('position', parseInt(i)+filtersCollection.append);
-                        changedFlag = true;
-                    }
 
-                }
-
-                if (!changedFlag)
-                    return;
+                this.$el.find('li').each(function(index) {
+                    var filter = filtersCollection.findWhere({field: $(this).data('id')});
+                    filter.set('position', index);
+                });
 
                 filtersCollection.sort();
                 filterView.render();
+
+
 
                  $.post(BackboneGrid.personalize_url,{
                     'do': 'grid.filter.orders',
@@ -976,13 +958,6 @@ function(Backbone, _, $, NProgress) {
             render: function() {
                 this.$el.html('');
                 this.collection.each(this.addLiTag, this);
-
-                // not working
-                /*this.$el.find('.dd:first').nestable().on('change',function(){
-                });*/
-
-                // working
-                $('.'+BackboneGrid.id+'.filters-span').nestable().on('change',this.orderChanged);
             },
             addLiTag: function(model) {
                 if(model.get('label') !== '') {
@@ -997,6 +972,12 @@ function(Backbone, _, $, NProgress) {
                 val: '',
                 position: 0,
                 range: true
+            },
+            initialize: function() {
+                var val = this.get('hidden');
+                if (val !== true && val !== false)
+                    val = val === 'true' ? true : false;
+                this.set('hidden', val);
             }
         });
         BackboneGrid.Collections.FilterCollection = Backbone.Collection.extend({
@@ -1297,7 +1278,7 @@ function(Backbone, _, $, NProgress) {
 
         BackboneGrid.Views.FilterView = Backbone.View.extend({
             initialize: function() {
-                var div = '.f-grid-top.'+BackboneGrid.id+' .f-filter-btns';
+                var div = 'span.'+BackboneGrid.id+'.f-filter-btns';
                 this.setElement(div);
                 this.collection.on('sort', this.render, this);
             },
@@ -1714,6 +1695,21 @@ function(Backbone, _, $, NProgress) {
             var filtersVisiblityView = new BackboneGrid.Views.FiltersVisibiltyView({collection: filtersCollection});
             filtersVisiblityView.render();
 
+            $( "ul.filters."+BackboneGrid.id).sortable({
+                handle: '.dd-handle',
+                revert: true,
+                update: function( event, ui ) {
+                            filtersVisiblityView.orderChanged();
+                        }
+            });
+
+            $( "ol.columns."+BackboneGrid.id).sortable({
+                handle: '.dd-handle',
+                revert: true,
+                update: function( event, ui ) {
+                            colsVisibiltyView.orderChanged();
+                        }
+            });
             if (BackboneGrid.multiselect_filter) {
                 $('body').click(function(ev) {
                     var _cache = filterView.$el.find('div.js-prevent-close');

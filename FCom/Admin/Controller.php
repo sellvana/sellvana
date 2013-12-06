@@ -234,20 +234,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
             break;
         case 'grid.filter.orders':
-            if (is_array($r['cols'])) {
+           if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
                 $cols = BUtil::fromJson($r['cols']);
             }
+
             $filters = array();
             foreach ($cols as $i=>$col) {
                 if (empty($col['field'])) {
                     continue;
                 }
-                $filters[$col['field']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
+                $filters[$col['field']] = array('position'=>$col['position'], 'hidden'=>$col['hidden']);
             }
             $data = array('grid'=>array($r['grid']=>array('filters'=>$filters)));
-
             break;
         case 'grid.col.orders':
             if (is_array($r['cols'])) {
