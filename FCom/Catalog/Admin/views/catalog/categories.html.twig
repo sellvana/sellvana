@@ -70,6 +70,10 @@
                         url_get:  url,
                         url_post: url
                     });
+                    //clear instances CKEDITOR
+                    if (CKEDITOR !== 'undefined') {
+                        CKEDITOR.instances = {};
+                    }
                     adminForm.createSwitchButton();
                     adminForm.wysiwygInit();
                 });

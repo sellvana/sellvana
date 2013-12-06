@@ -13,6 +13,12 @@
 
     $('button#category_save').click(function (ev)
     {
+        //get value in ckeditor when submit ajax
+        if (CKEDITOR !== 'undefined') {
+            for (key in CKEDITOR.instances) {
+                $('#' + key).val(CKEDITOR.instances[key].getData());
+            }
+        }
         $.ajax({
             type: "POST",
             url: mainForm.attr('action'),
