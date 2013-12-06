@@ -1,12 +1,12 @@
-define(['backbone','marionette','memento'],
-    function(Bakcbone,Marionnete,Memento){
-         var DummyModel = Backbone.Model.extend({
+define(['backbone', 'marionette', 'memento'],
+    function (Bakcbone, Marionnete, Memento) {
+        var DummyModel = Backbone.Model.extend({
             //url: "yourbackend",
-            initialize: function(){
+            initialize: function () {
                 var memento = new Backbone.Memento(this);
                 _.extend(this, memento);
             },
-            defaults : {
+            defaults: {
                 title: "Mrs",
                 name: "",
                 email: "",
@@ -14,12 +14,13 @@ define(['backbone','marionette','memento'],
                 password: "",
             },
             schema: {
-                title:      { type: 'Select', options: ['Mr', 'Mrs', 'Ms'] },
-                name:       'Text',
-                email:      { validators: ['required', 'email'] },
-                birthday:   'Date',
-                password:   'Password'
+                title: { type: 'Select', options: ['Mr', 'Mrs', 'Ms'] },
+                name: 'Text',
+                email: { validators: ['required', 'email'] },
+                birthday: 'Date',
+                password: 'Password'
             }
         });
-         return DummyModel;
-});
+        return DummyModel;
+    }
+);

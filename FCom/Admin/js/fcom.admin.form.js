@@ -1,3 +1,3 @@
-define(['fcom.admin'], function() {
-    
-})
+define(['fcom.admin'], function () {
+
+});

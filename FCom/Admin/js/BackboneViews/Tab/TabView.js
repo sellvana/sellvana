@@ -1,24 +1,25 @@
-define(['backbone','marionette','formGenerator'],
-    function(Backbone,Marionette,FormGenerator){
+define(['backbone', 'marionette', 'formGenerator'],
+    function (Backbone, Marionette, FormGenerator) {
         var TabView = Backbone.Marionette.ItemView.extend({
-            region : {},
+            region: {},
             className: "tab-pane",
             template: "#tab-content-template",
-            id : function (){
+            id: function () {
                 return "tabs" + this.model.id;
             },
-            initialize : function() {
+            initialize: function () {
                 _this = this;
                 this.region = new Backbone.Marionette.Region({
-                    el : _this.el
+                    el: _this.el
                 });
             },
-            onRender : function() {
+            onRender: function () {
                 // TODO here we check if is form, grid, or graph....what do you neeeeed?
-                formview = new FormGenerator({modelToUse:this.model.get('modelToUse')});
+                formview = new FormGenerator({modelToUse: this.model.get('modelToUse')});
                 this.region.show(formview);
             }
 
         });
-    return TabView;
-});
+        return TabView;
+    }
+);
