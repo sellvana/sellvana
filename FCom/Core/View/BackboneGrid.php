@@ -29,6 +29,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function pageSizeOptions()
     {
         $pageSizes = $this->grid['config']['page_size_options'];
+        $resultState = isset($this->grid['result']['state']) ? $this->grid['result']['state'] : false;
+        if ($resultState) {
+            foreach ($pageSizes as $key => $opt) {
+                if ($resultState['c'] <= $opt) {
+                    $pageSizes = array_slice($pageSizes, 0, $key + 1);
+                    //fix page size
+                    if ($resultState['ps'] > $opt) {
+                        $resultState['ps'] = $pageSizes[count($pageSizes) - 1];
+                        $this->grid['result']['state'] = $resultState;
+                    }
+                    break;
+                }
+            }
+        }
         return array_combine($pageSizes, $pageSizes);
     }
 
@@ -314,6 +328,23 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         usort($persCols, function($a, $b) { return $a['position'] - $b['position']; });
         $grid['config']['columns'] = $persCols;
 
+        //get filters personalization
+        $persFilters = array();
+        $defPos = 0;
+        foreach ($grid['config']['filters'] as $filter) {
+            if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
+                $filter = BUtil::arrayMerge($filter, $persGrid['filters'][$filter['field']]);
+            }
+            if (!isset($filter['position'])) {
+                $filter['position'] = $defPos;
+            }
+            $defPos++;
+            $persFilters[] = $filter;
+        }
+
+        usort($persFilters, function($a, $b) { return $a['position'] - $b['position']; });
+        $grid['config']['filters'] = $persFilters;
+
         $this->grid = $grid;
     }
 
@@ -361,12 +392,21 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $orm = $orm::i()->orm();
             }
             BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
-		    $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
+
 
             $gridId = $config['id'];
             $pers = FCom_Admin_Model_User::i()->personalize();
             $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+
+            $filters = array();
+            foreach ($config['filters'] as $k => $v) {
+                if (isset($v['field'])) {
+                    $filters[$v['field']] = $v;
+
+                }
+            }
+            $this->_processGridFilters($config, $filters, $orm);
 
             $config['state'] = $persState;
 
@@ -606,7 +646,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
 
+        $persFilters = !empty($pers['grid'][$gridId]['filters']) ? $pers['grid'][$gridId]['filters'] : array();
+        $filters = $r['filters'];
         FCom_Admin_Model_User::i()->personalize(array('grid'=>array($gridId=>array('state'=>$r))));
+        FCom_Admin_Model_User::i()->personalize(array('grid'=>array($gridId=>array('filters'=>$filters))));
 
         if ($stateKey) {
             $sess =& BSession::i()->dataToUpdate();
@@ -618,8 +661,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
 
-        if (!empty($r['filters'])) {
-            $this->_processGridFilters($config, $r['filters'], $orm);
+        if (!empty($filters)) {
+            $this->_processGridFilters($config, $filters, $orm);
         }
         if (!is_null($method)) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
@@ -635,7 +678,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $data = $orm->paginate($r);
 
 
-        $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
+        $data['filters'] = !empty($filters) ? $filters : null;
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         /*if (!is_null($method)) {
@@ -749,10 +792,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     protected function _processGridFilters(&$config, $filters, $orm)
     {
 
+
         if (empty($config['filters'])) {
             return;
         }
-        $columnData = $this->findColumnDataForFilters($config);
+
         foreach ($config['filters'] as $fId=>$f) {
             $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
@@ -766,10 +810,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 continue;
             }
             $fId = $f['field'];
-            if (isset($filters[$fId]) && !empty($f['type'])) {
-                if (isset($columnData[$f['field']]['index'])) {
-                    $f['field'] = $columnData[$f['field']]['index']; //set field as index when select
-                }
+
+            if (isset($filters[$fId]) && !empty($f['type']) && !empty($filters[$fId]['val']) && $filters[$fId]['val'] !== '') {
+
                 switch ($f['type']) {
                     case 'text':
                         $val = $filters[$fId];
@@ -842,20 +885,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
 
                     case 'select':
-                        if ((isset($filters[$fId]) && $filters[$fId] === '0') || !empty($filters[$fId])) {
-                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId], $orm);
-                        }
-                        break;
-
+                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                            break;
                     case 'multiselect':
-                        if (!empty($filters[$fId])) {
-                            $filters[$fId] = explode(',', $filters[$fId]);
-                            $this->_processGridFiltersOne($f, 'in', $filters[$fId], $orm);
-                        }
+                            $vals = explode(',', $filters[$fId]['val']);
+                            $this->_processGridFiltersOne($f, 'in', $vals, $orm);
+
                         break;
                     }
             }
         }
+
     }
 
     protected function _processGridFiltersOne($filter, $op, $value, $orm)

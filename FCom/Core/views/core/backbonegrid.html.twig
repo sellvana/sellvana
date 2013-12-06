@@ -7,19 +7,33 @@
 {% set pageUrl = THIS.pageChangeHref() %}
 {% set filterData = config.filters %}
 
-
-
-
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if filterData %}
     <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
-        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+      <div class="col-sm-2">
+
+      <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+
+      <span class="{{ config.id }} dropdown">
+        <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+          Filters
+          <b class="caret"></b>
+        </a>
+        <ul class="{{ config.id }} dd-list dropdown-menu filters">
+          <!--li calss="ui-state-default"-->
+          <!-- visibiility template -->
+          <!--/li -->
+        </ul>
+      </span>
+      </div>
+      <div class="col-sm-10">
       {% if filterData[0] %}
-        <span class="f-filter-btns">
+        <span class="{{ config.id }} f-filter-btns">
           <!-- filter buttons here -->
         </span>
       {% endif %}
+      </div>
     </div>
   {% endif %}
 
@@ -36,20 +50,6 @@
                     <!--/li -->
                 </ol>
         </span>
-        {% if config.filters %}
-          <span class="dropdown dd dd-nestable" style="display:inline;">
-              <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-                  Filters
-                  <b class="caret"></b>
-              </a>
-                  <ol class="dd-list dropdown-menu filters" style="min-width:200px;">
-                      <!--li calss="ui-state-default"-->
-                      <!-- visibiility template -->
-                      <!--/li -->
-                  </ol>
-          </span>
-        {% endif %}
-
         {% for action in THIS.gridActions() %}
           {% if action.renderer %}
             {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
@@ -129,10 +129,6 @@
       </div>
   </div>
 
-
-
-
-
 <script type="template" id="{{ config.id }}-modal-element-template">
     <div class="control-label col-sm-3">
       <label for="<%- rc.name %>"><%- rc.label%></label>
@@ -160,6 +156,17 @@
     </label>
   </div>
 </script>
+
+<script type="template" id="{{ config.id }}-filter-check-template">
+  <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+  <div class="dd3-content">
+    <label>
+        <input class="showhide_column" type="checkbox" datid=<%- rc.field %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%- rc.label %>
+    </label>
+  </div>
+</script>
+
 <script type="template" id="{{ config.id }}-row-template">
   <% for (var index in rc.colsInfo) {
     var col = rc.colsInfo[index];
@@ -272,10 +279,10 @@
           <%- rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
-          <% if(rc.filterVal ==='') { %>
+          <% if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.filterVal %>"
+              <%- rc.filterLabel %> "<%- rc.val %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -296,17 +303,17 @@
 </script>
 
 <script type='template' id="{{ config.id }}-select-filter-template">
-      <input type="hidden" id="select_hidden" style="width:auto;"/>
+      <input type="hidden" id="select_hidden" style="width:auto;" value="<%= rc.val%>"/>
 </script>
 
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <span class='f-grid-filter-field'><%- rc.label %></span>:
         <span class='f-grid-filter-value'>
-          <% if(rc.filterVal ==='') { %>
+          <% if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.filterVal %>"
+              <%- rc.filterLabel %> "<%- rc.val %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -340,7 +347,7 @@
               </ul>
             </div>
 
-            <input type="text" class="form-control" value="<%- rc.filterVal  %>">
+            <input type="text" class="form-control" value="<%- rc.val  %>">
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
@@ -358,7 +365,11 @@
           <%- rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
-          {{ 'All'|_ }}
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
         </span>
         <span class="caret"></span>
     </button>
@@ -392,13 +403,13 @@
             </div>
 
             <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                <input type="text" placeholder="Select date range" class="form-control daterange" >
+                <input type="text" placeholder="Select date range" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>
             </div>
             <div class="datepicker input-group not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                          <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control">
+                          <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" value="<%= !rc.range ? rc.val : '' %>">
                           <span class="input-group-addon">
                             <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
                           </span>
@@ -420,7 +431,11 @@
           <%- rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
-          {{ 'All'|_ }}
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
         </span>
         <span class="caret"></span>
     </button>
@@ -454,15 +469,15 @@
             </div>
 
             <div class="input-group-btn range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
-
-                <input type="text" placeholder="Input number1" class="form-control js-number1" style="width:45%;" >
+                <% var vals = rc.val.split('~'); %>
+                <input type="text" placeholder="Input number1" class="form-control js-number1" style="width:45%;" value="<%= rc.range ? vals[0] : '' %>">
                 &nbsp;<i class="icon-resize-horizontal"></i>&nbsp;
-                <input type="text" placeholder="Input number2" class="form-control js-number2" style="width:45%;" >
+                <input type="text" placeholder="Input number2" class="form-control js-number2" style="width:45%;" value="<%= rc.range ? vals[1] : '' %>">
 
             </div>
 
             <div class="input-group-btn not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
-              <input type="text" placeholder="Input number" class="form-control js-number" >
+              <input type="text" placeholder="Input number" class="form-control js-number" value="<%= !rc.range ? rc.val : '' %>">
             </div>
 
             <div class="input-group-btn">

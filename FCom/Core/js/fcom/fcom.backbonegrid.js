@@ -44,7 +44,7 @@ function validationRules(rules) {
     return str;
 }
 
-define(['backbone', 'underscore', 'jquery', 'ngprogress', 'nestable', 'select2',
+define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
 function(Backbone, _, $, NProgress) {
     /*var setValidateForm = function(selector) {
@@ -102,10 +102,7 @@ function(Backbone, _, $, NProgress) {
                 label: '',
                 href: '',
                 cell: '',
-                filtering: false,
-                filterVal: '',
-                selectedCount: 0,
-                filterShow: true
+                selectedCount: 0
             },
             initialize: function() {
                 if (this.type === 'multiselect') {
@@ -480,9 +477,9 @@ function(Backbone, _, $, NProgress) {
                     var temp = this.originalRows.clone();
                     for(var filter_key in BackboneGrid.current_filters) {
 
-                        var filter_val = BackboneGrid.current_filters[filter_key];
-                        var type = columnsCollection.findWhere({name: filter_key}).get('filter_type');
-
+                        var filter_val = BackboneGrid.current_filters[filter_key].val;
+                        var type = filtersCollection.findWhere({field: filter_key}).get('type');
+                        console.log(type);
                         switch(type) {
                             case 'text':
                                 var filterVal = filter_val.val+'';
@@ -864,21 +861,11 @@ function(Backbone, _, $, NProgress) {
                 this.collection.on('render', this.render, this);
             },
             orderChanged: function(ev) {
-                //console.log('orderChanged');
-                var orderJson = $('.'+BackboneGrid.id+'.columns-span').nestable('serialize');
-                var changedFlag = false;
-                for(var i in orderJson) {
-                    var key = orderJson[i].id;
-                    colModel = columnsCollection.findWhere({name: key});
-                    if (parseInt(colModel.get('position')) !== parseInt(i)+columnsCollection.append) {
-                        colModel.set('position', parseInt(i)+columnsCollection.append);
-                        changedFlag = true;
-                    }
 
-                }
-
-                if (!changedFlag)
-                    return;
+                this.$el.find('li').each(function(index) {
+                    var c = columnsCollection.findWhere({name: $(this).data('id')});
+                    c.set('position', index);
+                });
 
                 columnsCollection.sort();
                 gridView.render();
@@ -888,7 +875,6 @@ function(Backbone, _, $, NProgress) {
                     'cols': columnsCollection.toJSON(),
                     'grid': columnsCollection.grid
                 });
-
 
             },
             render: function() {
@@ -900,13 +886,48 @@ function(Backbone, _, $, NProgress) {
                 });*/
 
                 // working
-                $('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
+                //$('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
             },
             addLiTag: function(model) {
                 if(model.get('label') !== '') {
                     var checkView = new BackboneGrid.Views.ColCheckView({model:model});
                     this.$el.append(checkView.render().el);
                 }
+            }
+        });
+        BackboneGrid.Views.FilterCheckView = Backbone.View.extend({
+            tagName: 'li',
+            className: 'dd-item dd3-item',
+            attributes: function () {
+                return {'data-id': this.model.get('field')};
+            },
+            events: {
+                'change input.showhide_column': 'changeState',
+                'click input.showhide_column': 'preventDefault',
+                'click .dd3-content': 'preventDefault'
+            },
+            preventDefault: function(ev){
+
+                ev.stopPropagation();
+            },
+            changeState: function(ev) {
+
+                this.model.set('hidden',!this.model.get('hidden'));
+                filterView.render();
+
+                $.post(BackboneGrid.personalize_url,{
+                    'do': 'grid.filter.hidden',
+                    'col': this.model.get('field'),
+                    'hidden': this.model.get('hidden'),
+                    'grid': BackboneGrid.id
+                });
+
+                ev.stopPropagation();
+                return false;
+            },
+            render: function() {
+                this.$el.html(this.template(this.model.toJSON()));
+                return this;
             }
         });
         BackboneGrid.Views.FiltersVisibiltyView = Backbone.View.extend({
@@ -915,29 +936,21 @@ function(Backbone, _, $, NProgress) {
                 this.collection.on('render', this.render, this);
             },
             orderChanged: function(ev) {
-                //console.log('orderChanged');
-                var orderJson = $('.'+BackboneGrid.id+'.filters-span').nestable('serialize');
-                var changedFlag = false;
-                for(var i in orderJson) {
-                    var key = orderJson[i].id;
-                    colModel = columnsCollection.findWhere({name: key});
-                    if (parseInt(colModel.get('position')) !== parseInt(i)+columnsCollection.append) {
-                        colModel.set('position', parseInt(i)+columnsCollection.append);
-                        changedFlag = true;
-                    }
 
-                }
+                this.$el.find('li').each(function(index) {
+                    var filter = filtersCollection.findWhere({field: $(this).data('id')});
+                    filter.set('position', index);
+                });
 
-                if (!changedFlag)
-                    return;
+                filtersCollection.sort();
+                filterView.render();
 
-                columnsCollection.sort();
-                gridView.render();
+
 
                  $.post(BackboneGrid.personalize_url,{
-                    'do': 'grid.col.orders',
-                    'cols': columnsCollection.toJSON(),
-                    'grid': columnsCollection.grid
+                    'do': 'grid.filter.orders',
+                    'cols': filtersCollection.toJSON(),
+                    'grid': BackboneGrid.id
                 });
 
 
@@ -945,41 +958,57 @@ function(Backbone, _, $, NProgress) {
             render: function() {
                 this.$el.html('');
                 this.collection.each(this.addLiTag, this);
-
-                // not working
-                /*this.$el.find('.dd:first').nestable().on('change',function(){
-                });*/
-
-                // working
-                $('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
             },
             addLiTag: function(model) {
                 if(model.get('label') !== '') {
-                    var checkView = new BackboneGrid.Views.ColCheckView({model:model});
+                    var checkView = new BackboneGrid.Views.FilterCheckView({model:model});
                     this.$el.append(checkView.render().el);
                 }
+            }
+        });
+        BackboneGrid.Models.FilterModel = Backbone.Model.extend({
+            defaults: {
+                hidden: false,
+                val: '',
+                position: 0,
+                range: true
+            },
+            initialize: function() {
+                var val = this.get('hidden');
+                if (val !== true && val !== false)
+                    val = val === 'true' ? true : false;
+                this.set('hidden', val);
+            }
+        });
+        BackboneGrid.Collections.FilterCollection = Backbone.Collection.extend({
+            model: BackboneGrid.Models.FilterModel,
+            append: 1,
+            comparator: function(col) {
+                return parseInt(col.get('position'));
             }
         });
         BackboneGrid.Views.FilterCell = Backbone.View.extend({
             className: 'btn-group dropdown f-grid-filter',
 
             _filter: function(val) {
-                if (val === false) {
+                BackboneGrid.currentState.p = 1; //reset paging
+                if (val === false || val === '') {
                     this.$el.removeClass('f-grid-filter-val');
-                    this.model.set('filterVal','');
-                    if(typeof(BackboneGrid.current_filters[this.model.get('name')]) === 'undefined')
+                    this.model.set('val','');
+                    if(typeof(BackboneGrid.current_filters[this.model.get('field')]) === 'undefined')
                         return;
-                    delete BackboneGrid.current_filters[this.model.get('name')];
                     this.render();
 
                 } else {
                     this.$el.addClass('f-grid-filter-val');
-                    if (val.length === 0)
-                        delete BackboneGrid.current_filters[this.model.get('name')];
 
                     if (typeof(this.updateMainText) !== 'undefined')
                         this.updateMainText();
                 }
+
+                var filterJSON = this.model.toJSON();
+                delete filterJSON['field'];
+                BackboneGrid.current_filters[this.model.get('field')] = filterJSON;
 
                 if (BackboneGrid.data_mode === 'local') {
                     rowsCollection.filter();
@@ -997,6 +1026,9 @@ function(Backbone, _, $, NProgress) {
             },
             render: function() {
                 this.$el.html(this.template(this.model.toJSON()));
+                if (this.model.get('val') !== '') {
+                    this.$el.addClass('f-grid-filter-val');
+                }
                 this.$el.append('<abbr class="select2-search-choice-close"></abbr>');
 
                 var self = this;
@@ -1010,9 +1042,9 @@ function(Backbone, _, $, NProgress) {
                 var html = '';
                 if (typeof(this.model.get('filterLabel')) !== 'undefined') {
                     html = this.model.get('filterLabel') + ' ';
-                    html += ('"'+this.model.get('filterVal')+'"');
+                    html += ('"'+this.model.get('val')+'"');
                 } else {
-                    html = this.model.get('filterVal');
+                    html = this.model.get('val');
                 }
 
                 this.$el.find('span.f-grid-filter-value').html(html);
@@ -1027,7 +1059,7 @@ function(Backbone, _, $, NProgress) {
                 'keyup input': '_checkEnter'
             },
             initialize: function() {
-                this.model.set('filterOp', 'contains');
+                this.model.set('op', 'contains');
             },
             _checkEnter: function(ev) {
                 var evt = ev || window.event;
@@ -1036,11 +1068,15 @@ function(Backbone, _, $, NProgress) {
                     this.$el.find('button.update').trigger('click');
                 }
             },
-
+            filter: function() {
+                var val = this.$el.find('input:first').val();
+                this.model.set('val', val);
+                this._filter(val);
+            },
             filterOperatorSelected: function(ev) {
                 //this.filterValChanged();
                 var operator = $(ev.target);
-                this.model.set('filterOp',operator.attr('data-id'));
+                this.model.set('op',operator.attr('data-id'));
                 this.model.set('filterLabel', operator.html());
                 this.$el.find('button.filter-text-sub').html(operator.html()+"<span class='caret'></span>");
                 this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
@@ -1051,18 +1087,7 @@ function(Backbone, _, $, NProgress) {
                 this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                 return false;
-            },
-            filter: function() {
-                var field = this.model.get('name');
-                var filterVal = this.$el.find('input:first').val();
-                var op = this.model.get('filterOp');
-                BackboneGrid.current_filters[field] = {val: filterVal, op: op};
-                BackboneGrid.currentState.p = 1; //reset paging
-                this.model.set('filterVal',filterVal);
-                this._filter(filterVal);
-
             }
-
         });
 
         BackboneGrid.Views.FilterDateRangeCell = BackboneGrid.Views.FilterCell.extend({
@@ -1074,8 +1099,8 @@ function(Backbone, _, $, NProgress) {
                 'click a.filter_op': 'filterOperatorSelected'
             },
             initialize: function() {
-                this.model.set('range', true);
-                this.model.set('filterOp', 'between');
+                //this.model.set('range', true);
+                this.model.set('op', 'between');
             },
             filterOperatorSelected: function(ev) {
                 this.model.set('range', $(ev.target).hasClass('range'));
@@ -1088,7 +1113,7 @@ function(Backbone, _, $, NProgress) {
                 }
 
                 var operator = $(ev.target);
-                this.model.set('filterOp',operator.attr('data-id'));
+                this.model.set('op',operator.attr('data-id'));
                 this.model.set('filterLabel', operator.html());
                 this.$el.find('button.filter-text-sub').html(operator.html()+"<span class='caret'></span>");
                 this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
@@ -1101,17 +1126,13 @@ function(Backbone, _, $, NProgress) {
                 return false;
             },
             filter: function() {
-                var field = this.model.get('name');
+
                 var filterVal;
                 if (this.model.get('range'))
                     filterVal = this.$el.find('input:first').val();
                 else
                     filterVal = this.$el.find('input:last').val();
-
-                var op = this.model.get('filterOp');
-                BackboneGrid.current_filters[field] = {val: filterVal, op: op};
-                BackboneGrid.currentState.p = 1; //reset paging
-                this.model.set('filterVal',filterVal);
+                this.model.set('val',filterVal);
                 this._filter(filterVal);
 
             },
@@ -1135,7 +1156,7 @@ function(Backbone, _, $, NProgress) {
                                                             }
                                         );
 
-                var filterVal = this.model.get('filterVal');
+                var filterVal = this.model.get('val');
                 if (this.model.get('range'))
                     filterVal = this.$el.find('input:first').val(filterVal);
                 else
@@ -1151,17 +1172,13 @@ function(Backbone, _, $, NProgress) {
                 return this;
             },
             filter: function() {
-                var field = this.model.get('name');
                 var filterVal;
                 if (this.model.get('range'))
                     filterVal = this.$el.find('input.js-number1').val()+'~'+this.$el.find('input.js-number2').val();
                 else
                     filterVal = this.$el.find('input.js-number').val();
 
-                var op = this.model.get('filterOp');
-                BackboneGrid.current_filters[field] = {val: filterVal, op: op};
-                BackboneGrid.currentState.p = 1; //reset paging
-                this.model.set('filterVal',filterVal);
+                this.model.set('val',filterVal);
                 this._filter(filterVal);
             }
         });
@@ -1178,25 +1195,8 @@ function(Backbone, _, $, NProgress) {
                 this.$el.removeClass('js-prevent-close');
                 this.$el.find('ul.filter-box').css('display','');
                 val = this.$el.find('#multi_hidden:first').val();
-                if (val === '') {
-                    if (this.model.get('filterVal') !== '') {
-
-                        this.model.set('filterVal', '');
-                        this._filter(false);
-                    } else {
-                        this.model.set('filterVal', '');
-                        this.render();
-
-                    }
-
-                    return;
-
-                }
-
-                BackboneGrid.current_filters[this.model.get('name')] = val;
-                BackboneGrid.currentState.p = 1; //reset paging
+                this.model.set('val', val);
                 this._filter(val);
-
                 /*var html = this.model.get('label')+': '+val;
                 html += '<span class="caret"></span>';
                 this.$el.find('button.filter-text-main').html(html);*/
@@ -1204,7 +1204,7 @@ function(Backbone, _, $, NProgress) {
             render: function() {
                 BackboneGrid.Views.FilterCell.prototype.render.call(this);
 
-                var options = this.model.get('_multipulFilterOptions');
+                var options = this.model.get('options');
                 var data = [];
                 for(var key in options) {
                     data[data.length] = {id: key, text: options[key]};
@@ -1232,14 +1232,13 @@ function(Backbone, _, $, NProgress) {
                 this.$el.find('div.select2-container').addClass('btn-group');
             },
             filter: function(val) {
-                BackboneGrid.current_filters[this.model.get('name')] = val;
-                BackboneGrid.currentState.p = 1; //reset paging
+                this.model.set('val', val);
                 BackboneGrid.Views.FilterCell.prototype._filter.call(this, val);
             },
             render: function() {
                 this.$el.html(this.template(this.model.toJSON()));
                 var fieldLabel = this.model.get('label');
-                var options = this.model.get('_multipulFilterOptions');
+                var options = this.model.get('options');
                 var data = [];
                 for(var key in options) {
                     data[data.length] = {id: key, text: options[key]};
@@ -1267,6 +1266,11 @@ function(Backbone, _, $, NProgress) {
 
                 this._changeCss();
 
+                var temp = this.$el.find('div.select2-container span.select2-chosen');
+                if (this.model.get('val') !== '') {
+                    temp.html('<span class="f-grid-filter-field">'+fieldLabel+'</span>: <span class="f-grid-filter-value">'+this.model.get('val')+'</span>');
+                }
+
                 return this;
             }
 
@@ -1274,7 +1278,7 @@ function(Backbone, _, $, NProgress) {
 
         BackboneGrid.Views.FilterView = Backbone.View.extend({
             initialize: function() {
-                var div = '.f-grid-top.'+BackboneGrid.id+' .f-filter-btns';
+                var div = 'span.'+BackboneGrid.id+'.f-filter-btns';
                 this.setElement(div);
                 this.collection.on('sort', this.render, this);
             },
@@ -1283,10 +1287,10 @@ function(Backbone, _, $, NProgress) {
                 this.collection.each(this.addFilterCol, this);
             },
             addFilterCol: function(model) {
-
-                if(model.get('hidden') !== true && model.get('filtering') && model.get('filterShow')) {
+                console.log(model.get('hidden'));
+                if(model.get('hidden') === false ) {
                     var filterCell;
-                    switch (model.get('filter_type')) {
+                    switch (model.get('type')) {
                         case 'text':
                             filterCell = new BackboneGrid.Views.FilterTextCell({model:model});
                             break;
@@ -1574,7 +1578,7 @@ function(Backbone, _, $, NProgress) {
             BackboneGrid.Views.FilterNumberRangeCell.prototype.template =_.template($('#'+config.id+'-number-range-filter-template').html());
             //column visiblity checkbox view
             BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#'+config.id+'-col-template').html());
-
+            BackboneGrid.Views.FilterCheckView.prototype.template = _.template($('#'+config.id +'-filter-check-template').html());
             //mass edit modal view
             BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId+" div.modal-body";
             BackboneGrid.Views.ModalElement.prototype.template = _.template($('#'+config.id+'-modal-element-template').html());
@@ -1631,29 +1635,7 @@ function(Backbone, _, $, NProgress) {
                         //c.cssClass += 'sort';
                         c.sortState = "";
                     }
-                    var filter = _.findWhere(filters, {field: c.name});
-                    if (typeof(filter) !== 'undefined') {
-                        c.filtering = true;
-                        c.filter_type = filter['type'];
 
-                        if (filter.type === 'text') {
-                            c.filterOp = 'contains';
-                            c.filterLabel = 'Contains';
-                        }
-
-                        if (filter.type === 'date-range' || filter.type === 'number-range') {
-                            c.filterOp = 'Between';
-                            c.filterLabel = 'Between';
-                        }
-
-                        if (filter.type === 'multiselect' || filter.type === 'select') {
-                            if(typeof(filter.options) !== 'undefined') {
-                                c._multipulFilterOptions = filter.options;
-                            } else if( typeof(c.options) !== 'undefined') {
-                                c._multipulFilterOptions = c.options;
-                            }
-                        }
-                    }
                     if (BackboneGrid.validation !== true && typeof(c.validation) !== 'undefined')
                         BackboneGrid.validation = true;
                     if (typeof(c.default) !== 'undefined') {
@@ -1665,13 +1647,70 @@ function(Backbone, _, $, NProgress) {
                     columnsCollection.add(ColModel);
                // }
             }
+            var fCollection = [];
+            for(var i in filters) {
+                var filter = filters[i];
+                if (typeof(filter.type) !== 'undefined') {
+                    if (typeof(filters[i].val) !== 'undefined' && filters[i].val !== '') {
+                        var temp = _.clone(filters[i]);
+                        var field = temp.field;
+                        delete temp.field;
+                        BackboneGrid.current_filters[field] = temp;
+                    }
+                    var c = columnsCollection.findWhere({name: filter.field});
+                    if (c) {
+                        c.filter_type= filter.type;
+                        if (filter.type === 'text') {
+                            if (typeof(filter.op) === 'undefined')
+                                filter.op = 'contains';
+                            if (typeof(filter.filterLabel) === 'undefined')
+                                filter.filterLabel = 'Contains';
+                        }
 
+                        if (filter.type === 'date-range' || filter.type === 'number-range') {
+                            if (typeof(filter.op) === 'undefined')
+                                filter.op = 'between';
+                            if (typeof(filter.filterLabel) === 'undefined')
+                                filter.filterLabel = 'Between';
+                        }
+
+                        if (filter.type === 'multiselect' || filter.type === 'select') {
+                            if(typeof(filter.options) === 'undefined') {
+                                 filter.options = c.get('options');
+                            }
+                        }
+                        filter.label = c.get('label');
+                        fCollection.push(filter);
+                    }
+                }
+            }
+            console.log(fCollection);
             headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
             headerView.render();
             var colsVisibiltyView = new BackboneGrid.Views.ColsVisibiltyView({collection: columnsCollection});
             colsVisibiltyView.render();
-            filterView = new BackboneGrid.Views.FilterView({collection: columnsCollection});
+
+            filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
+            filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
             filterView.render();
+            var filtersVisiblityView = new BackboneGrid.Views.FiltersVisibiltyView({collection: filtersCollection});
+            filtersVisiblityView.render();
+
+            $( "ul.filters."+BackboneGrid.id).sortable({
+                handle: '.dd-handle',
+                revert: true,
+                update: function( event, ui ) {
+                            filtersVisiblityView.orderChanged();
+                        }
+            });
+
+            $( "ol.columns."+BackboneGrid.id).sortable({
+                handle: '.dd-handle',
+                revert: true,
+                update: function( event, ui ) {
+                            colsVisibiltyView.orderChanged();
+                        }
+            });
             if (BackboneGrid.multiselect_filter) {
                 $('body').click(function(ev) {
                     var _cache = filterView.$el.find('div.js-prevent-close');
