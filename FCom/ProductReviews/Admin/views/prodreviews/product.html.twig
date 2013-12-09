@@ -65,7 +65,13 @@
 
         function updateStatus(approve, ids)
         {
-            var url = '{{ APP.href('/prodreviews/approve') }}';
+            for (var index = 0; index < selectedRows.length; index++) {
+                selectedRows[index].approved = approve;
+                g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
+                //todo: implement update multi rows
+            }
+            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+            /*var url = '{{ APP.href('/prodreviews/approve') }}';
             $.ajax({
                 type: "POST",
                 url: url,
@@ -74,7 +80,6 @@
                 {
                     if (data.status == 'success') {
                         $.bootstrapGrowl(data.message, { type: 'success', align: 'center', width: 'auto' });
-                        console.log('update successful. begin update row');
                         for (var index = 0; index < selectedRows.length; index++) {
                             selectedRows[index].approved = approve;
                             g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
@@ -89,7 +94,7 @@
                 {
                     alert("[ERROR]<br>" + textStatus);
                 }
-            });
+            });*/
         }
 
     });

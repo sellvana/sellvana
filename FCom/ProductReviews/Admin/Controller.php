@@ -9,6 +9,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_gridTitle = 'Product Reviews';
     protected $_recordName = 'Product Review';
 
+    const ABC = 1;
+
     public function gridConfig($productModel = false)
     {
         $formUrl = BApp::href("prodreviews/form");
@@ -136,7 +138,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $this->view('admin/grid')->set(array('actions' => array('new' => '')));
     }
 
-    public function action_approve__POST()
+    /*public function action_approve__POST()
     {
         $post = BRequest::i()->post();
         $approve = (int)$post['approve'];
@@ -149,5 +151,5 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             }
         }
         BResponse::i()->json(array('status' => 'success', 'message' => 'Update status successful'));
-    }
+    }*/
 }

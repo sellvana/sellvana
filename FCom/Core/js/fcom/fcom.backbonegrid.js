@@ -460,6 +460,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 },
                 _updateRows: function(ev) {
+                    //todo: need change way to update multi row, because model.save() call ajax post to edit_url
                     if (ev.grid === BackboneGrid.id) {
                         var rows = ev.rows;
                         for(var i in rows) {
