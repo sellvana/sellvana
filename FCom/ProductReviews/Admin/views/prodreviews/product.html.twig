@@ -5,6 +5,7 @@
     var btnApprove = $('#prod-reviews-approve');
     var btnDeny = $('#prod-reviews-deny');
     var selected_row_ids = [];
+    var selectedRows = [];
 
     if(typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
@@ -33,10 +34,12 @@
                 btnApprove.removeClass('disabled');
                 btnDeny.removeClass('disabled');
                 selected_row_ids = _.pluck(ev.rows,'id');
+                selectedRows = ev.rows;
             } else {
                 btnApprove.addClass('disabled');
                 btnDeny.addClass('disabled');
                 selected_row_ids = [];
+                selectedRows = [];
             }
         });
 
@@ -62,7 +65,7 @@
 
         function updateStatus(approve, ids)
         {
-            var url = '{{ APP.href('/prodreviews/status') }}';
+            var url = '{{ APP.href('/prodreviews/approve') }}';
             $.ajax({
                 type: "POST",
                 url: url,
@@ -71,7 +74,11 @@
                 {
                     if (data.status == 'success') {
                         $.bootstrapGrowl(data.message, { type: 'success', align: 'center', width: 'auto' });
-                        //todo: trigger event g_vent update_row
+                        console.log('update successful. begin update row');
+                        for (var index = 0; index < selectedRows.length; index++) {
+                            selectedRows[index].approved = approve;
+                            g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
+                        }
                     } else if (data.status == 'error') {
                         $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                     } else {
