@@ -455,7 +455,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (ev.grid === BackboneGrid.id) {
                         var rowModel = rowsCollection.get(ev.row.id);
                         rowModel.set(ev.row);
-                        rowModel.save();
+                        rowModel.save({silent: true});
+                        rowModel.trigger('render');
                     }
                 },
                 _updateRows: function(ev) {
@@ -465,7 +466,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             var row = rows[i];
                             var rowModel = rowsCollection.get(row.id);
                             rowModel.set(row);
-                            rowModel.save();
+                            rowModel.save({silent: true});
+                            rowModel.trigger('render');
                         }
                     }
                 },
