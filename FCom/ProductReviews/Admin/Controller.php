@@ -136,7 +136,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $this->view('admin/grid')->set(array('actions' => array('new' => '')));
     }
 
-    public function action_status__POST()
+    public function action_approve__POST()
     {
         $post = BRequest::i()->post();
         $approve = (int)$post['approve'];
