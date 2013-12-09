@@ -512,7 +512,7 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
             data_mode: "{{ config.data_mode }}",
             filters: {{ config.filters | json_encode() | raw}},
             events: {{ config.events | json_encode() | raw}},
-            callbacks: {{ config.callbacks | json_encode() | raw }},
+            callbacks: {{ config.callbacks | json_encode() | raw }}
         });
     //});
 });
