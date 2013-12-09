@@ -441,6 +441,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         g_vent.bind('silent_inject', this._silentInjectRows);
                         g_vent.bind('add_row', this._addRow);
                         g_vent.bind('update_row', this._updateRow);
+                        g_vent.bind('update_rows', this._updateRows);
                     }
                 },
                 _addRow: function (ev) {
@@ -455,6 +456,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var rowModel = rowsCollection.get(ev.row.id);
                         rowModel.set(ev.row);
                         rowModel.save();
+                    }
+                },
+                _updateRows: function(ev) {
+                    if (ev.grid === BackboneGrid.id) {
+                        var rows = ev.rows;
+                        for(var i in rows) {
+                            var row = rows[i];
+                            var rowModel = rowsCollection.get(row.id);
+                            rowModel.set(row);
+                            rowModel.save();
+                        }
                     }
                 },
                 _silentInjectRows: function (ev) {
