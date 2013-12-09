@@ -179,7 +179,9 @@
     }
     print('<td data-col="'+col.name+'" '+overflow +'>');
 
-    if (col.cell === 'select-row') {
+    if (col.cell === 'custom-template' && col.template !== 'undefined') {
+          print(col.template.replace(':value', rc.row[col.name]));
+    } else if (col.cell === 'select-row') {
         var isSelected = '';
         var isSelectable = rc.row._selectable ? '' : 'DISABLED';
         if (rc.row._selectable && rc.row.selected)
