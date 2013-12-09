@@ -9,11 +9,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_gridTitle = 'Product Reviews';
     protected $_recordName = 'Product Review';
 
-    const ABC = 1;
-
     public function gridConfig($productModel = false)
     {
-        $formUrl = BApp::href("prodreviews/form");
+        //$formUrl = BApp::href("prodreviews/form");
         $reviewConfigs = FCom_ProductReviews_Model_Review::i()->config();
         $config = parent::gridConfig();
         $columns = array(
@@ -21,7 +19,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
             array('name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
-            array('name'=>'rating', 'label'=>'Total Rating', 'width'=>60, 'addable' => true, 'editable'=>true,
+            array('name'=>'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true, 'editable' => true, 'cell' => 'custom-template',
+                  'template' => '<div class="rateit" data-rateit-ispreset="true" data-rateit-readonly="true" data-rateit-value=":value"></div>',
                   'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))),
             array('name'=>'rating1', 'label'=>'Value Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
                   'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
@@ -105,6 +104,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
                                      'data' => array('edit' => true, 'delete' => true));
+
+        $config['callbacks'] = array('after_render'=>'$(".rateit").rateit();');
 
         return $config;
     }
