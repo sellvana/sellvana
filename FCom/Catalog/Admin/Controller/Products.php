@@ -90,9 +90,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        $actions = array_merge($args['view']->actions, array(
+                'duplicate' => '<button type="button" class="btn btn-primary" ><span>' .  BLocale::_('Duplicate') . '</span></button>',
+                'saveAndContinue' => '<button type="submit" class="btn btn-primary" name="saveAndContinue" ><span>' .  BLocale::_('Save And Continue') . '</span></button>'
+            ));
         $args['view']->set(array(
             'sidebar_img'=>$m->thumbUrl(98),
             'title'=>$m->id ? 'Edit Product: '.$m->product_name : 'Create New Product',
+            'actions' => $actions
         ));
         $this->_formTitle = $m->id ? 'Edit Product: '.$m->product_name : 'Create New Product';
     }
@@ -592,4 +597,5 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ))
             ->save();
     }
+
 }
