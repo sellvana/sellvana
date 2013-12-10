@@ -179,8 +179,8 @@
     }
     print('<td data-col="'+col.name+'" '+overflow +'>');
 
-    if (col.cell === 'custom-template' && col.template !== 'undefined') {
-          print(col.template.replace(':value', rc.row[col.name]));
+    if (col.cell === 'custom-template' && col.cell_template !== 'undefined') {
+          print(col.cell_template.replace(':value', rc.row[col.name]));
     } else if (col.cell === 'select-row') {
         var isSelected = '';
         var isSelectable = rc.row._selectable ? '' : 'DISABLED';
