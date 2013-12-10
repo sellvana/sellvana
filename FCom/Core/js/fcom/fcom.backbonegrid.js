@@ -814,11 +814,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return $('#' + BackboneGrid.id);
                 },
                 render: function () {
-                    //console.log('gridview-render');
+                    console.log('gridview-render');
                     this.setCss();
                     this.$el.html('');
                     this.collection.each(this.addRow, this);
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
+                    if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_gridview_render']) !== 'undefined') {
+                        console.log('after_gridview_render');
+                        var func = BackboneGrid.callbacks['after_gridview_render'];
+                        var script = func + '(this.$el,rowsCollection.toJSON());';
+                        eval(script);
+                    }
                     return this;
                 },
                 addRow: function (row) {
@@ -1429,6 +1435,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 render: function () {
+                    console.log('render modal form');
                     this.$el.html('');
                     var header;
                     switch (this.modalType) {

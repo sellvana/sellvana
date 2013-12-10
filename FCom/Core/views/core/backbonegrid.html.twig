@@ -134,7 +134,9 @@
       <label for="<%- rc.name %>"><%- rc.label%></label>
     </div>
     <div class="controls col-sm-8">
-      <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
+      <% if (rc.form_row === 'custom-template' && rc.form_row_template !=='undefined') {
+        print(rc.form_row_template);
+      } else if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
         <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" class="form-control" <% print(validationRules(rc.validation));%> >
       <% } else if(rc.editor === 'select') { %>
         <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
