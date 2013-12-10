@@ -8,6 +8,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_mainTableAlias = 'pr';
     protected $_gridTitle = 'Product Reviews';
     protected $_recordName = 'Product Review';
+    //custom view
+    //protected $_gridViewName = 'grid';
 
     public function gridConfig($productModel = false)
     {
@@ -19,8 +21,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
             array('name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
-            array('name'=>'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true, 'editable' => true, 'cell' => 'custom-template',
-                  'template' => '<div class="rateit" data-rateit-ispreset="true" data-rateit-readonly="true" data-rateit-value=":value"></div>',
+            array('name'=>'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true, 'editable' => true,
+                  'cell' => 'custom-template', 'cell_template' => '<div class="rateit" data-rateit-ispreset="true" data-rateit-readonly="true" data-rateit-value=":value"></div>',
+                  //'form_row' => 'custom-template', 'form_row_template' => '<input name="" type="text" />',
                   'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))),
             array('name'=>'rating1', 'label'=>'Value Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
                   'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])),
@@ -105,7 +108,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
                                      'data' => array('edit' => true, 'delete' => true));
 
-        $config['callbacks'] = array('after_render'=>'$(".rateit").rateit();');
+        $config['callbacks'] = array('after_gridview_render' => '$(".rateit").rateit();');
 
         return $config;
     }
