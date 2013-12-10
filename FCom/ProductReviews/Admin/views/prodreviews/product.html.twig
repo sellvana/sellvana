@@ -4,11 +4,11 @@
 <script>
     var btnApprove = $('#prod-reviews-approve');
     var btnDeny = $('#prod-reviews-deny');
-    var selected_row_ids = [];
     var selectedRows = [];
 
-    if(typeof(g_vent) === 'undefined')
+    if(typeof(g_vent) === 'undefined') {
         g_vent = _.extend({}, Backbone.Events);
+    }
     require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
         adminForm.createSwitchButton();
         adminForm.wysiwygInit();
@@ -56,14 +56,14 @@
         });
 
         btnApprove.on('click', function() {
-            updateStatus(1, selected_row_ids);
+            updateStatus(1);
         });
 
         btnDeny.on('click', function() {
-            updateStatus(0, selected_row_ids);
+            updateStatus(0);
         });
 
-        function updateStatus(approve, ids)
+        function updateStatus(approve)
         {
             for (var index = 0; index < selectedRows.length; index++) {
                 selectedRows[index].approved = approve;
