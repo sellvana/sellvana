@@ -113,6 +113,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['id'] = 'products_reviews_grid';
             $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250);
             $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
+            $config['columns'][] = array('name'=>'create_at', 'label'=>'Created');
             $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
                 ->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
                 ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
@@ -122,7 +123,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
                                      'data' => array('edit' => true, 'delete' => true));
 
-        $config['callbacks'] = array('after_gridview_render' => '$(".rateit").rateit();');
+        $callbacks = '$(".rateit").rateit();
+                      $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
+        $config['callbacks'] = array('after_gridview_render' => $callbacks);
 
         return $config;
     }
