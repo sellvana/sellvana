@@ -15,13 +15,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=:id')),
-            array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Purchased on'),
+            array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
             array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'ab.billing_name'),
             array('name' => 'billing_address', 'label'=>'Bill to Address', 'index'=>'ab.billing_address'),
             array('name' => 'shipping_name', 'label'=>'Ship to Name', 'index'=>'as.shipping_name'),
             array('name' => 'shipping_address', 'label'=>'Ship to Address', 'index'=>'as.shipping_address'),
-            array('name' => 'grandtotal', 'label'=>'GT (base)', 'index'=>'o.grandtotal'),
-            array('name' => 'balance', 'label'=>'GT (paid)', 'index'=>'o.balance'),
+            array('name' => 'grandtotal', 'label'=>'Order Total', 'index'=>'o.grandtotal'),
+            array('name' => 'balance', 'label'=>'Paid', 'index'=>'o.balance'),
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             //todo: confirm with Boris about status should be stored as id_status
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
