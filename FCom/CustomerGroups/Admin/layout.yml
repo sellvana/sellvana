@@ -1,7 +1,7 @@
 base:
     - view: admin/nav
         do:
-            - [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups } ]
+            - [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups, pos: 20 } ]
 
 /customer-groups:
     - { include: base }

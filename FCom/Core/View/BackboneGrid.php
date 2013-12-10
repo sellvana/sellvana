@@ -30,6 +30,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $pageSizes = $this->grid['config']['page_size_options'];
         $resultState = isset($this->grid['result']['state']) ? $this->grid['result']['state'] : false;
+	$grid = $this->grid;
         if ($resultState) {
             foreach ($pageSizes as $key => $opt) {
                 if ($resultState['c'] <= $opt) {
@@ -37,12 +38,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     //fix page size
                     if ($resultState['ps'] > $opt) {
                         $resultState['ps'] = $pageSizes[count($pageSizes) - 1];
-                        $this->grid['result']['state'] = $resultState;
+                        $grid['result']['state'] = $resultState;
                     }
                     break;
                 }
             }
         }
+        $this->grid = $grid;
         return array_combine($pageSizes, $pageSizes);
     }
 
