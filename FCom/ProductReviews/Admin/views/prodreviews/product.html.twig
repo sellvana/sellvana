@@ -33,12 +33,10 @@
             if (ev.rows.length > 0) {
                 btnApprove.removeClass('disabled');
                 btnDeny.removeClass('disabled');
-                selected_row_ids = _.pluck(ev.rows,'id');
                 selectedRows = ev.rows;
             } else {
                 btnApprove.addClass('disabled');
                 btnDeny.addClass('disabled');
-                selected_row_ids = [];
                 selectedRows = [];
             }
         });

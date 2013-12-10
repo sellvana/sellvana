@@ -7,6 +7,8 @@ modules:
         description: "Product reviews by customers"
 
         auto_use: [ layout, views ]
+        views:
+            - [ grid, { view_class: FCom_Core_View_BackboneGrid } ]
 
         areas:
             FCom_Admin:
