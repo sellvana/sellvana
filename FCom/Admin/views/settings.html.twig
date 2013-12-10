@@ -98,7 +98,7 @@
             <ul class="f-horiz-nav-tabs nav nav-tabs">
                 {% for group in THIS.tab_groups %}
                     <li class="dropdown">
-                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }}</a>
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }} <b class="caret"></b></a>
                         <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
                             {% for k, tab in group.tabs %}
                                 {% if tab.disabled is empty %}

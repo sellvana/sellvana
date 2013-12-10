@@ -1,8 +1,8 @@
 base:
     - view: admin/nav
         do:
-            - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 20 } ]
-            - [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 30 } ]
+            - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 100 } ]
+            #- [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 110 } ]
 
 /subscriptions:
     - { include: base }

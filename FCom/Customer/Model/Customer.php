@@ -44,7 +44,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         array('email', '@required'),
         array('firstname', '@required'),
         array('lastname', '@required'),
-        array('password', '@required'),
+        //array('password', '@required'),
         array('password_confirm', '@password_confirm'),
         /*array('payment_method', '@required'),
         array('payment_details', '@required'),*/
