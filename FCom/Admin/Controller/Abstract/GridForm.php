@@ -198,7 +198,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_form__POST()
     {
+
         $r = BRequest::i();
+
+
         $args = array();
         $formId = $this->formId();
         $redirectUrl = BApp::href($this->_gridHref);
@@ -230,7 +233,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
         }
-
+        if (isset($_POST['saveAndContinue'])) {
+            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
+        }
         if ($r->xhr()) {
             $this->forward('form', null, array('id'=>$id));
         } else {
