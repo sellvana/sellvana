@@ -1422,8 +1422,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (modalForm.modalType === 'editable') {
                         for (key in BackboneGrid.modalElementVals) {
                             BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key]);
-                            BackboneGrid.currentRow.save();
                         }
+                        BackboneGrid.currentRow.save();
                     }
 
                     $(ev.target).prev().trigger('click');
