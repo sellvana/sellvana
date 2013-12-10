@@ -615,7 +615,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             $value1 = intval($value);
                             break;
                     }
-                    if ($value !== $value1) {
+                    if (isset($value1) && $value !== $value1) {
                         $row->set($field, $value1);
                     }
                 }
