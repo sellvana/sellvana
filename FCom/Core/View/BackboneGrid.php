@@ -333,19 +333,21 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //get filters personalization
         $persFilters = array();
         $defPos = 0;
-        foreach ($grid['config']['filters'] as $filter) {
-            if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
-                $filter = BUtil::arrayMerge($filter, $persGrid['filters'][$filter['field']]);
+        if (isset($grid['config']['filters'])) {
+            foreach ($grid['config']['filters'] as $filter) {
+                if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
+                    $filter = BUtil::arrayMerge($filter, $persGrid['filters'][$filter['field']]);
+                }
+                if (!isset($filter['position'])) {
+                    $filter['position'] = $defPos;
+                }
+                $defPos++;
+                $persFilters[] = $filter;
             }
-            if (!isset($filter['position'])) {
-                $filter['position'] = $defPos;
-            }
-            $defPos++;
-            $persFilters[] = $filter;
-        }
 
-        usort($persFilters, function($a, $b) { return $a['position'] - $b['position']; });
-        $grid['config']['filters'] = $persFilters;
+            usort($persFilters, function($a, $b) { return $a['position'] - $b['position']; });
+            $grid['config']['filters'] = $persFilters;
+        }
 
         $this->grid = $grid;
     }
