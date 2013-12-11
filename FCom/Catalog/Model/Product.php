@@ -1,5 +1,32 @@
 <?php
-
+/**
+ * Model class for table "fcom_product".
+ *
+ * The followings are the available columns in table 'fcom_product':
+ * @property string  $id
+ * @property string  $local_sku
+ * @property string  $product_name
+ * @property string  $short_description
+ * @property string  $description
+ * @property string  $url_key
+ * @property string  $cost
+ * @property string  $msrp
+ * @property string  $map
+ * @property string  $markup
+ * @property string  $base_price
+ * @property string  $sale_price
+ * @property string  $net_weight
+ * @property string  $ship_weight
+ * @property integer $is_hidden
+ * @property string  $notes
+ * @property string  $uom
+ * @property string  $thumb_url
+ * @property string  $create_at
+ * @property string  $update_at
+ * @property string  $data_serialized
+ * @property string  $avg_rating
+ * @property integer $num_reviews
+ */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -185,7 +212,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * Find all categories which belong to product
-     * @return type
+     * @param bool $includeAscendants
+     * @return mixed
      */
     public function categories($includeAscendants=false)
     {

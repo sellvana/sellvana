@@ -90,10 +90,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         parent::formViewBefore($args);
         $m = $args['model'];
-        $actions = array_merge($args['view']->actions, array(
-                'duplicate' => '<button type="button" class="btn btn-primary" ><span>' .  BLocale::_('Duplicate') . '</span></button>',
-                'saveAndContinue' => '<button type="submit" class="btn btn-primary" name="saveAndContinue" ><span>' .  BLocale::_('Save And Continue') . '</span></button>'
-            ));
+        $newAction = array();
+        if ($m->id) {
+            $newAction['duplicate'] = '<a href="'.BApp::href($this->_gridHref.'/duplicate?id='.$m->id).'" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_('Duplicate') . '</span></a>';
+        }
+        $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="saveAndContinue" ><span>' .  BLocale::_('Save And Continue') . '</span></button>';
+        $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set(array(
             'sidebar_img'=>$m->thumbUrl(98),
             'title'=>$m->id ? 'Edit Product: '.$m->product_name : 'Create New Product',
@@ -598,4 +600,76 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ->save();
     }
 
+    public function action_duplicate()
+    {
+        $id = BRequest::i()->param('id', true);
+        $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
+        try {
+            $oldModel = FCom_Catalog_Model_Product::i()->load($id);
+            /** @var $oldModel FCom_Catalog_Model_Product */
+            if ($oldModel) {
+                $data = $oldModel->as_array();
+                unset($data['id']);
+                $newModel = FCom_Catalog_Model_Product::i()->create($data);
+                /** @var $newModel FCom_Catalog_Model_Product */
+                $newModel->product_name = $newModel->product_name.' duplicated';
+                $newModel->url_key = $newModel->url_key.'-duplicated';
+                $newModel->local_sku = $newModel->local_sku .' duplicated';
+                $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
+                if ($newModel->save()
+                        && $this->duplicateProductCategories($oldModel, $newModel)
+                        && $this->duplicateProductCustom($oldModel, $newModel)
+                        && $this->duplicateProductLink($oldModel, $newModel)
+                        && $this->duplicateProductMedia($oldModel, $newModel)
+                        && $this->duplicateProductReview($oldModel, $newModel)
+                        && $this->duplicateProductVariant($oldModel, $newModel)
+                ) {
+                    BSession::i()->addMessage($this->_('Duplicate successful'), 'success', 'admin');
+                } else {
+                    BSession::i()->addMessage($this->_('This task have not done, please check later. An error occurred while creating model.'), 'error', 'admin');
+                }
+            } else {
+                BSession::i()->addMessage($this->_('Cannot load model with id ' . $id), 'error', 'admin');
+            }
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+        }
+
+        BResponse::i()->redirect($redirectUrl);
+    }
+
+    /**
+     * @param $old FCom_Catalog_Model_Product
+     * @param $new FCom_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductCategories($old, $new)
+    {
+        return false;
+    }
+
+    public function duplicateProductCustom()
+    {
+        return false;
+    }
+
+    public function duplicateProductLink()
+    {
+        return false;
+    }
+
+    public function duplicateProductMedia()
+    {
+        return false;
+    }
+
+    public function duplicateProductReview()
+    {
+        return false;
+    }
+
+    public function duplicateProductVariant()
+    {
+        return false;
+    }
 }
