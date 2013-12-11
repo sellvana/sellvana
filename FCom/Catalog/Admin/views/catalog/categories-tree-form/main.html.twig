@@ -3,9 +3,33 @@
     <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
 </div>
 <div class="form-group">
+    <label class="col-md-2 control-label" for="main-page_title">{{ 'Page Title'|_ }}</label>
+    <div class="col-md-5">
+        <input class="form-control" id="main-page_title" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
+    </div>
+</div>
+<div class="form-group">
     <label class="col-md-2 control-label" for="main-node_name">{{ 'Category Name'|_ }}</label>
     <div class="col-md-5">
         <input class="form-control" id="main-node_name" type="text" name="model[node_name]" value="{{ m.get('node_name') }}" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-description">{{ 'Description'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-description" class="form-control" rows="5" name="model[description]">{{ m.get('description') }}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-meta_description">{{ 'Meta Description'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-meta_description" class="form-control" rows="5" name="model[meta_description]">{{ m.get('meta_description') }}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-meta_keywords">{{ 'Meta Keywords'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-meta_keywords" class="form-control" rows="5" name="model[meta_keywords]">{{ m.get('meta_keywords') }}</textarea>
     </div>
 </div>
 <div class="form-group">
@@ -14,6 +38,7 @@
         <input class="form-control" id="main-url_key" type="text" name="model[url_key]" value="{{ m.get('url_key') }}" />
     </div>
 </div>
+
 <div class="form-group">
     <label class="col-md-2 control-label" for="model-is-top-menu">{{ 'Display'|_ }}</label>
     <div class="col-md-5">
@@ -21,3 +46,4 @@
         <input id="model-is-top-menu" class="switch-cbx" name="model[is_top_menu]" {% if m.get('is_top_menu') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
+

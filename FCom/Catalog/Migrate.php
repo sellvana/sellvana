@@ -282,4 +282,16 @@ class FCom_Catalog_Migrate extends BClass
                 'layout_update' => 'TEXT',
         )));
     }
+
+    public function upgrade__0_2_11__0_2_12()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'page_title' => 'VARCHAR(255) DEFAULT NULL',
+                    'description'  => 'TEXT DEFAULT NULL',
+                    'meta_description' => 'TEXT DEFAULT NULL',
+                    'meta_keywords' => 'TEXT DEFAULT NULL',
+                )));
+    }
 }
