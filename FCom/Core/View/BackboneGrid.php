@@ -333,6 +333,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //get filters personalization
         $persFilters = array();
         $defPos = 0;
+        if (!isset($grid['config']['filters']) && !empty($persGrid['filters'])) {
+            $grid['config']['filters'] = array();
+        }
         if (isset($grid['config']['filters'])) {
             foreach ($grid['config']['filters'] as $filter) {
                 if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
