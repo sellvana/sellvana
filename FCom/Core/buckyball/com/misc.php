@@ -1510,6 +1510,92 @@ class BUtil extends BClass
         $mult = array('G' => 1073741824, 'M' => 1048576, 'K' => 1024);
         return $val[1]*(!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
     }
+
+    /**
+     * convert image to jpeg, also resize if have width or height destination image
+     * @param string  $srcFile
+     * @param string  $dstFile
+     * @param integer $dw width destination image
+     * @param integer $dh height destination image
+     * @param string  $fileType
+     * @return boolean
+     */
+    static public function convertImage($srcFile, $dstFile, $dw = null, $dh = null, $fileType = 'jpg')
+    {
+        clearstatcache(true, $srcFile);
+
+        if (!file_exists($srcFile) || !filesize($srcFile)) {
+            return false;
+        }
+
+        list($sw, $sh, $type) = getimagesize($srcFile);
+        if (!$sw) {
+            return false;
+        }
+
+        if (!$dw) {
+            $dw = $sw;
+        }
+        if (!$dh) {
+            $dh = $sh;
+        }
+
+        //get image
+        switch ($type) {
+            case IMAGETYPE_GIF :
+                $srcImage = imagecreatefromgif($srcFile);
+                break;
+            case IMAGETYPE_BMP:
+                $srcImage = imagecreatefromwbmp($srcFile);
+                break;
+            case IMAGETYPE_PNG:
+                $srcImage = imagecreatefrompng($srcFile);
+                break;
+            case IMAGETYPE_JPEG:
+            default:
+                $srcImage = imagecreatefromjpeg($srcFile);
+                break;
+        }
+
+        if ($srcImage) {
+            $dstImage = imagecreatetruecolor($dw, $dh);
+            $color = imagecolorallocate($dstImage,
+                base_convert(substr('FFFFFF', 0, 2), 16, 10),
+                base_convert(substr('FFFFFF', 2, 2), 16, 10),
+                base_convert(substr('FFFFFF', 4, 2), 16, 10)
+            );
+            imagefill($dstImage, 0, 0, $color);
+            $scale = $sw > $sh ? $dw / $sw : $dh / $sh;
+            $dfw = $sw * $scale; //diff width
+            $dfh = $sh * $scale; //diff height
+            if ($sh < $dh) {
+                $dfh = $sh;
+            }
+            if ($sw < $dw) {
+                $dfw = $sw;
+            }
+            imagecopyresampled($dstImage, $srcImage, ($dw - $dfw) / 2, ($dh - $dfh) / 2, 0, 0, $dfw, $dfh, $sw, $sh);
+
+            //write image base on file_type
+            switch ($fileType) {
+                case 'gif':
+                    $success = imagegif($dstImage, $dstFile);
+                    break;
+                case 'png':
+                    $success = imagepng($dstImage, $dstFile, 7);
+                    break;
+                case 'jpg':
+                case 'jpeg':
+                default:
+                    $success = imagejpeg($dstImage, $dstFile, 90);
+                    break;
+            }
+            imagedestroy($dstImage);
+            @chmod($dstFile, 0664);
+            return $success;
+        }
+        return false;
+    }
 }
 
 class BHTML extends BClass
