@@ -620,11 +620,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
                         && $this->duplicateProductCategories($oldModel, $newModel)
-                        //&& $this->duplicateProductCustom($oldModel, $newModel)
                         && $this->duplicateProductLink($oldModel, $newModel)
                         && $this->duplicateProductMedia($oldModel, $newModel)
-                        //&& $this->duplicateProductVariant($oldModel, $newModel)
-                        //todo: confirm need duplicate product review or not
+                        && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
                     $redirectUrl = BApp::href($this->_formHref).'?id='.$newModel->id;
                     BSession::i()->addMessage($this->_('Duplicate successful'), 'success', 'admin');
@@ -668,7 +666,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $categories = $old->categories(true);
         if ($categories) {
             $categoryIds = array();
-            //todo: request Boris for same function in BUtil
+            //todo: request Boris for same function _.pluck in BUtil
             foreach ($categories as $category) {
                 $categoryIds[] = $category->id;
             }
@@ -682,22 +680,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      * @param $new FCom_Catalog_Model_Product
      * @return bool
      */
-    public function duplicateProductCustom($old, $new)
-    {
-        return false;
-    }
-
-    /**
-     * @param $old FCom_Catalog_Model_Product
-     * @param $new FCom_Catalog_Model_Product
-     * @return bool
-     */
     public function duplicateProductLink($old, $new)
     {
         //todo: does we need add product link similar between old and new product
-        $links = FCom_Catalog_Model_ProductLink::i()->orm('pl')->where('product_id', $old->id)->find_many();
+        $hlp = FCom_Catalog_Model_ProductLink::i();
+        $links = $hlp->orm('pl')->where('product_id', $old->id)->find_many();
         if ($links) {
-            $hlp = FCom_Catalog_Model_ProductLink::i();
             foreach ($links as $link) {
                 $data = array(
                     'product_id'        => $new->id,
@@ -720,10 +708,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function duplicateProductMedia($old, $new)
     {
-        $orm = FCom_Catalog_Model_ProductMedia::i()->orm('pa')->where('pa.product_id', $old->id)->select('pa.*');
-        $medias = $orm->find_many();
+        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $medias = $hlp->orm('pa')->where('pa.product_id', $old->id)->select('pa.*')->find_many();
         if ($medias) {
-            $hlp = FCom_Catalog_Model_ProductMedia::i();
             foreach ($medias as $media) {
                 $data = $media->as_array();
                 unset($data['id']);
@@ -743,8 +730,22 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      * @param $new FCom_Catalog_Model_Product
      * @return bool
      */
-    public function duplicateProductVariant($old, $new)
+    public function duplicateProductReviews($old, $new)
     {
-        return false;
+        //todo: confirm need duplicate product review or not
+        $hlp = FCom_ProductReviews_Model_Review::i();
+        $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+        if ($reviews) {
+            foreach($reviews as $r) {
+                $data = $r->as_array();
+                unset($data['id']);
+                $data['product_id'] = $new->id;
+                if (!$hlp->create($data)->save()) {
+                    BSession::i()->addMessage($this->_('An error occurred while duplicate product reviews.'), 'error', 'admin');
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
