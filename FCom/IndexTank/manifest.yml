@@ -24,7 +24,7 @@ modules:
                     - [ route, DELETE /indextank/products/index, FCom_IndexTank_Admin::productsDeleteAll ]
                 observe:
                     # on update settings create new index if index was changed
-                    - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_IndexTank_Admin::onSaveAdminSettings ]
+                    - [ FCom_Admin_Admin_Controller_Settings::action_index__POST, FCom_IndexTank_Admin::onSaveAdminSettings ]
 
             FCom_Frontend:
                 auto_use: [ views, layout ]

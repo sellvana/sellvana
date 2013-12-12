@@ -1,12 +1,12 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Controller_Abstract
+class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Admin_Controller_Abstract
 {
     //protected $_permission = 'catalog/products/import';
 
     public function getImportFilesGridConfig()
     {
-        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array(
+        return FCom_Admin_Admin_Controller_MediaLibrary::i()->gridConfig(array(
             'id' => 'import_files',
             'folder' => 'storage/import/products',
             'config' => array(

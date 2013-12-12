@@ -1,12 +1,12 @@
 <?php
 
-class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controller_Abstract
+class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Admin_Controller_Abstract
 {
     protected $_permission = 'customers/import';
 
     public function customerFilesGridConfig()
     {
-        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig(array(
+        return FCom_Admin_Admin_Controller_MediaLibrary::i()->gridConfig(array(
             'id' => 'import_files',
             'folder' => 'storage/import/customers',
             'config' => array(

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract_TreeForm
+class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Admin_Controller_Abstract_TreeForm
 {
     protected static $_origClass = __CLASS__;
     protected $_permission = 'catalog/categories';
@@ -12,7 +12,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     public $formId = 'category_tree_form';
 
     public function categoryProductGridConfig($model)
-    {        
+    {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
             ->select(array('p.id', 'p.product_name', 'p.local_sku'))
             ->join('FCom_Catalog_Model_CategoryProduct', array('cp.product_id','=','p.id'), 'cp')

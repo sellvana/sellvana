@@ -1,6 +1,6 @@
 <?php
 
-class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'FCom_CatalogIndex_Model_Field';

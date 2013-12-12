@@ -1,5 +1,5 @@
 <?php
-class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
+class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Admin_Controller_Abstract
 {
     public function action_index()
     {
