@@ -612,12 +612,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $newModel = FCom_Catalog_Model_Product::i()->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
-                $strTime = strtotime("now");
-                //todo: confirm Boris about new name for duplicated item
-                $newModel->product_name = $newModel->product_name . ' duplicated ' . $strTime;
-                $newModel->url_key = $newModel->url_key . '-duplicated-' . $strTime;
-                $newModel->local_sku = $newModel->local_sku . ' duplicated ' . $strTime;
+                $number = $this->getDuplicatePrefixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
+                $newModel->product_name = $newModel->product_name . '-' . $number;
+                $newModel->url_key = $newModel->url_key . '-' . $number;
+                $newModel->local_sku = $newModel->local_sku . '-' . $number;
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
+                $newModel->is_hidden = 1;
                 if ($newModel->save()
                         && $this->duplicateProductCategories($oldModel, $newModel)
                         //&& $this->duplicateProductCustom($oldModel, $newModel)
@@ -639,6 +639,23 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
         BResponse::i()->redirect($redirectUrl);
+    }
+
+    public function getDuplicatePrefixNumber($oldName, $oldSku, $oldUrlKey)
+    {
+        $i = 1;
+        while($i <= 9) {
+            $sql = 'SELECT * FROM `fcom_product`
+                WHERE `product_name` = "'.$oldName.'-'.$i.'"
+                OR `local_sku` = "'.$oldSku.'-'.$i.'"
+                OR `url_key` = "'.$oldUrlKey.'-'.$i.'"';
+            $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+            if (!$result) {
+                return $i;
+            }
+            $i++;
+        }
+        return 10;
     }
 
     /**
