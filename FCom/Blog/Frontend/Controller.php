@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
+class FCom_Blog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
 {
     public function action_index()
     {

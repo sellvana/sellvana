@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'orderstatus';

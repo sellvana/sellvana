@@ -1,6 +1,6 @@
 <?php
 
-class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
+class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Admin_Controller_Abstract
 {
     public function fieldsetsGridConfig()
     {

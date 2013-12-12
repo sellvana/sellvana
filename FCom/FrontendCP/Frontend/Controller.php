@@ -1,6 +1,6 @@
 <?php
 
-class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
+class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Admin_Controller_Abstract
 {
     public function action_upload()
     {
@@ -42,7 +42,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
             $result['error'] = true;
             $result['message'] = $e->getMessage();
         }
-        
+
         BEvents::i()->fire(__METHOD__.'.after', array('request' => $request, 'result' => $result));
 
         BResponse::i()->json($result);

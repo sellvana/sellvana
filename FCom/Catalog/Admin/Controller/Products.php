@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'FCom_Catalog_Model_Product';
