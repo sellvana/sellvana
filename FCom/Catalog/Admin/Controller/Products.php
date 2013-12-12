@@ -612,21 +612,22 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $newModel = FCom_Catalog_Model_Product::i()->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
-                $newModel->product_name = $newModel->product_name.' duplicated';
-                $newModel->url_key = $newModel->url_key.'-duplicated';
-                $newModel->local_sku = $newModel->local_sku .' duplicated';
+                $number = $this->getDuplicatePrefixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
+                $newModel->product_name = $newModel->product_name . '-' . $number;
+                $newModel->url_key = $newModel->url_key . '-' . $number;
+                $newModel->local_sku = $newModel->local_sku . '-' . $number;
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
+                $newModel->is_hidden = 1;
                 if ($newModel->save()
                         && $this->duplicateProductCategories($oldModel, $newModel)
-                        && $this->duplicateProductCustom($oldModel, $newModel)
                         && $this->duplicateProductLink($oldModel, $newModel)
                         && $this->duplicateProductMedia($oldModel, $newModel)
-                        && $this->duplicateProductReview($oldModel, $newModel)
-                        && $this->duplicateProductVariant($oldModel, $newModel)
+                        && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
+                    $redirectUrl = BApp::href($this->_formHref).'?id='.$newModel->id;
                     BSession::i()->addMessage($this->_('Duplicate successful'), 'success', 'admin');
                 } else {
-                    BSession::i()->addMessage($this->_('This task have not done, please check later. An error occurred while creating model.'), 'error', 'admin');
+                    BSession::i()->addMessage($this->_('An error occurred while creating model.'), 'error', 'admin');
                 }
             } else {
                 BSession::i()->addMessage($this->_('Cannot load model with id ' . $id), 'error', 'admin');
@@ -638,6 +639,23 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         BResponse::i()->redirect($redirectUrl);
     }
 
+    public function getDuplicatePrefixNumber($oldName, $oldSku, $oldUrlKey)
+    {
+        $i = 1;
+        while($i <= 9) {
+            $sql = 'SELECT * FROM `fcom_product`
+                WHERE `product_name` = "'.$oldName.'-'.$i.'"
+                OR `local_sku` = "'.$oldSku.'-'.$i.'"
+                OR `url_key` = "'.$oldUrlKey.'-'.$i.'"';
+            $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+            if (!$result) {
+                return $i;
+            }
+            $i++;
+        }
+        return 10;
+    }
+
     /**
      * @param $old FCom_Catalog_Model_Product
      * @param $new FCom_Catalog_Model_Product
@@ -645,31 +663,89 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function duplicateProductCategories($old, $new)
     {
-        return false;
+        $categories = $old->categories(true);
+        if ($categories) {
+            $categoryIds = array();
+            //todo: request Boris for same function _.pluck in BUtil
+            foreach ($categories as $category) {
+                $categoryIds[] = $category->id;
+            }
+            $new->addToCategories($categoryIds);
+        }
+        return true;
     }
 
-    public function duplicateProductCustom()
+    /**
+     * @param $old FCom_Catalog_Model_Product
+     * @param $new FCom_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductLink($old, $new)
     {
-        return false;
+        //todo: does we need add product link similar between old and new product
+        $hlp = FCom_Catalog_Model_ProductLink::i();
+        $links = $hlp->orm('pl')->where('product_id', $old->id)->find_many();
+        if ($links) {
+            foreach ($links as $link) {
+                $data = array(
+                    'product_id'        => $new->id,
+                    'link_type'         => $link->link_type,
+                    'linked_product_id' => $link->linked_product_id,
+                );
+                if (!$hlp->create($data)->save()) {
+                    BSession::i()->addMessage($this->_('An error occurred while duplicate product links.'), 'error', 'admin');
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    public function duplicateProductLink()
+    /**
+     * @param $old FCom_Catalog_Model_Product
+     * @param $new FCom_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductMedia($old, $new)
     {
-        return false;
+        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $medias = $hlp->orm('pa')->where('pa.product_id', $old->id)->select('pa.*')->find_many();
+        if ($medias) {
+            foreach ($medias as $media) {
+                $data = $media->as_array();
+                unset($data['id']);
+                $data['product_id'] = $new->id;
+                $data['create_at'] = $data['update_at'] = date('Y-m-d H:i:s');
+                if (!$hlp->create($data)->save()) {
+                    BSession::i()->addMessage($this->_('An error occurred while duplicate product medias.'), 'error', 'admin');
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    public function duplicateProductMedia()
+    /**
+     * @param $old FCom_Catalog_Model_Product
+     * @param $new FCom_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductReviews($old, $new)
     {
-        return false;
-    }
-
-    public function duplicateProductReview()
-    {
-        return false;
-    }
-
-    public function duplicateProductVariant()
-    {
-        return false;
+        //todo: confirm need duplicate product review or not
+        $hlp = FCom_ProductReviews_Model_Review::i();
+        $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+        if ($reviews) {
+            foreach($reviews as $r) {
+                $data = $r->as_array();
+                unset($data['id']);
+                $data['product_id'] = $new->id;
+                if (!$hlp->create($data)->save()) {
+                    BSession::i()->addMessage($this->_('An error occurred while duplicate product reviews.'), 'error', 'admin');
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
