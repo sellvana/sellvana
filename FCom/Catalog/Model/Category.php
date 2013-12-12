@@ -124,4 +124,13 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $remove_ids));
         }
     }
+
+    public function image()
+    {
+        $dir = FCom_Core_Main::i()->dir('media/category/images');
+        if (is_file($dir.'/'.$this->id.'.jpg')) {
+            return '/media/category/images/'.$this->id.'.jpg';
+        }
+        return false;
+    }
 }
