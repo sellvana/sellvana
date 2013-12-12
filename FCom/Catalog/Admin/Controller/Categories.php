@@ -50,4 +50,70 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
         return $config;
     }
 
+    public function action_upload__POST()
+    {
+        $dir = FCom_Core_Main::i()->dir('media/category/images');
+        if (isset($_FILES["upload"])) {
+            $id = BRequest::i()->param('id', true);
+            $newJpg = $id.'.jpg';
+            $tmp = $_FILES['upload']['tmp_name'];
+
+            switch (exif_imagetype($tmp)) {
+                case IMAGETYPE_GIF :
+                    $img = imagecreatefromgif($tmp);
+                    break;
+                case IMAGETYPE_JPEG || IMAGETYPE_TIFF_II:
+                    $img = imagecreatefromjpeg($tmp);
+                    break;
+                case IMAGETYPE_BMP:
+                    $img = imagecreatefromwbmp($tmp);
+                    break;
+                case IMAGETYPE_PNG:
+                    $img = imagecreatefrompng($tmp);
+                    break;
+                default : break;
+            }
+            $jpg = imagejpeg($img, $newJpg);
+            if ($jpg) {
+                $path = $dir .'/'.$newJpg;
+                if (@move_uploaded_file($tmp, $path) ) {
+                    $this->resizeImage(300, 300, $path, $dir .'/'.$id.'_large.jpg');
+                    $file = array('file_name' => $newJpg, 'large_image' => $id.'_large.jpg');
+                    BResponse::i()->json($file);
+                }
+            } else {
+                BResponse::i()->json('{"error": "true"}');
+            }
+
+        }
+    }
+
+    public function resizeImage($width, $height, $src, $des)
+    {
+        //todo: put this function into BUtil or Util class
+        $dst_image = imagecreatetruecolor($width,$height);
+        $color = imagecolorallocate($dst_image,
+            base_convert(substr('FFFFFF', 0, 2), 16, 10),
+            base_convert(substr('FFFFFF', 2, 2), 16, 10),
+            base_convert(substr('FFFFFF', 4, 2), 16, 10)
+        );
+        imagefill($dst_image, 0, 0, $color);
+        $src_image = imagecreatefromjpeg($src);
+        if ($src_image) {
+            $sw = imagesx($src_image);
+            $sh = imagesy($src_image);
+            $scale = $sw > $sh ? $width/$sw : $height/$sh;
+            $dw1 = $sw*$scale;
+            $dh1 = $sh*$scale;
+            if ( $sh <$height) {
+                $dh1 = $sh;
+            }
+            if (  $sw < $width) {
+                $dw1 = $sw;
+            }
+            imagecopyresampled($dst_image, $src_image, ($width-$dw1)/2, ($height-$dh1)/2, 0, 0, $dw1, $dh1, $sw, $sh);
+            imagejpeg($dst_image, $des);
+        }
+
+    }
 }
