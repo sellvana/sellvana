@@ -83,6 +83,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Admin_Contro
         }
         $columns[] = array('name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
         $columns[] = array('name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
         $columns[] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete'=>true));
 
         $data = array();
