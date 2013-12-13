@@ -1,5 +1,7 @@
 {% set m = THIS.get('model') %}
-{% set image = m.image() %}
+{% set image = m.image('dir') %}
+{% set imageDir = '/' ~ APP.instance('FCom_Catalog_Admin_Controller_Categories').imgDir ~ '/' %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
 <div class="form-group">
     <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
 </div>
@@ -52,12 +54,11 @@
             </div>
             <div class='fileupload-loading'></div>
             <br>
-            {% if image %}
-                <a href="#image-modal" data-toggle="modal" id="current-image">
-                    <img src={{ "/resize.php?s=150x150&f=%s"|_(image) }}>
-                </a>
-
-            {% endif %}
+            <div id="current-image">
+                {% if image %}
+                    <img src={{ resizeUrl }}?s=150x150&f={{ image }} />
+                {% endif %}
+            </div>
             <table class='table table-striped' role='presentation' id="table-image">
                 <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
             </table>
@@ -159,16 +160,15 @@
         })
 
         $('#cat-image-fileupload').fileupload({
-            url: '{{ APP.href("catalog/categories/upload?id=%s" |_(m.id() )) | raw}}',
+            url: '{{ APP.href("catalog/categories/upload?id=" ~ m.id()) }}',
             acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
         }).bind('fileuploadalways', function(e, data) {
-            var index = '<a href="#image-modal" data-toggle="modal"><img src="/resize.php?s=150x150&amp;f=/media/category/images/'+ data.result.file_name +'"></a>';
-//                var large = '<img src="/resize.php?s=500x300&amp;f=/media/category/images/'+ data.result.file_name +'">';
-            var large = '<img src="/media/category/images/'+ data.result.large_image +'">';
-            $('#image-popup').html(large);
-            $('#table-image').children('tbody').html(index);
-            $('#current-image').remove();
+            if (data.result.type == 'success') {
+                var imageTag = '<img src="{{ resizeUrl }}?s=150x150&f={{ imageDir }}'+ data.result.filename +'" />';
+                $('#current-image').html(imageTag);
+            } else {
+                $('#current-image').append('<label class="error">'+ data.result.msg + '</label>');
+            }
         });
     });
-
 </script>

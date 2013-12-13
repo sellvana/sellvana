@@ -26,6 +26,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         foreach ($sites as $site) {
             $domains = explode("\n", $site->match_domains);
             foreach ($domains as $pattern) {
+                if(empty($pattern)){
+                    continue;
+                }
                 if ($pattern[0]==='^') {
                     $regex = $pattern;
                 } else {
@@ -62,5 +65,17 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
             }
         }
         return $site;
+    }
+
+    public function siteOptions()
+    {
+        $sites = (array)static::i()->orm()->find_many();
+        $groups = array();
+        foreach ( $sites as $model ) {
+            $key            = $model->id;
+            $groups[ $key ] = $model->name;
+        }
+
+        return $groups;
     }
 }
