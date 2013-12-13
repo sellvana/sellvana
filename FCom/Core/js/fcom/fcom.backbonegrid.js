@@ -225,7 +225,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     rowsCollection.filter();
                                 }
 
-                            }
+                            }Filter
                             break;
                         case 'show_sel':
                             if (!BackboneGrid.showingSelected) {
@@ -1748,6 +1748,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
             filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
             filterView.render();
+            var windowWidth = $(window).width();
+            ////fix when dropdown menu be hidden when reach right side windows
+            $(filterView.el).find('div.dropdown.f-grid-filter').on('show.bs.dropdown', function() {
+                var ulEle = $(this).find('ul.dropdown-menu:first');
+                if ($(this).offset().left + ulEle.width() > windowWidth) {
+                    ulEle.css({'right' : 0, 'left' : 'auto'});
+                }
+            });
+
+
             var filtersVisiblityView = new BackboneGrid.Views.FiltersVisibiltyView({collection: filtersCollection});
             filtersVisiblityView.render();
 
