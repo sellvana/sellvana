@@ -2,6 +2,12 @@
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set locale = APP.instance('BLocale') %}
 {% set validator = THIS.get('validator') %}
+{% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+{% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
+    {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
 
 <fieldset class="adm-section-group">
     <div class="form-group">
@@ -45,9 +51,16 @@
             {{ 'FROM'|_ }}
             <select class="form-control" name="model[buy_group]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_group'), validator.fieldValue('buy_group'))|raw }}</select>
             <br />
+            {% if customerGroups is defined %}
             {{ 'CUSTOMER GROUPS'|_ }}
-            <select class="form-control" name="model[customer_groups]" multiple size="4">{{ UTIL.optionsHtml(APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions(), validator.fieldValue('customer_groups'))|raw }}</select>
+            <select class="form-control" name="model[customer_groups]" multiple size="4">{{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_groups'))|raw }}</select>
             <br />
+            {% endif %}
+            {% if sites is defined %}
+            {{ 'Sites'|_ }}
+            <select class="form-control" name="model[sites]" multiple size="4">{{ UTIL.optionsHtml( sites, validator.fieldValue('sites') )|raw }}</select>
+            <br />
+            {% endif %}
             {{ 'GET'|_ }}
             <select class="form-control" name="model[get_type]">{{ UTIL.optionsHtml(promo.fieldOptions('get_type'), validator.fieldValue('get_type'))|raw }}</select>
             <br />
