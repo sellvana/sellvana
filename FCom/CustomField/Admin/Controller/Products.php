@@ -142,7 +142,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Admin_Contro
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
                 'actions'=>array(
-                                    'add' => array('caption' => 'Select a Field'),
+                                    'add' => array('caption' => 'Add Fields'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
                 'events'=>array('add')
