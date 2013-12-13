@@ -62,11 +62,11 @@
             </div>
             <div class='fileupload-loading'></div>
             <br>
-            {% if image %}
-                <div id="current-image">
+            <div id="current-image">
+                {% if image %}
                     <img src={{ resizeUrl }}?s=150x150&f={{ image }} />
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
             <table class='table table-striped' role='presentation' id="table-image">
                 <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
             </table>
