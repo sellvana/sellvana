@@ -219,13 +219,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                                 BackboneGrid.showingSelected = false;
                                 if (BackboneGrid.data_mode !== 'local') {
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination ul').css('display', 'block');
+                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'block');
                                     rowsCollection.fetch({reset: true});
                                 } else {
                                     rowsCollection.filter();
                                 }
 
-                            }
+                            }Filter
                             break;
                         case 'show_sel':
                             if (!BackboneGrid.showingSelected) {
@@ -233,8 +233,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
                                 BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                                 BackboneGrid.showingSelected = true;
-                                if (BackboneGrid.data_mode !== 'local')
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination ul').css('display', 'none');
+                                if (BackboneGrid.data_mode !== 'local') {
+                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                                }
 
                                 BackboneGrid.data_mode = 'local';
                                 rowsCollection.originalRows = selectedRows;
@@ -1520,6 +1521,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             function updatePageHtml(p, mp) {
 
+                console.log(BackboneGrid.currentState);
                 p = BackboneGrid.currentState.p;
                 mp = BackboneGrid.currentState.mp;
                 console.log(BackboneGrid.currentState.mp);
@@ -1551,6 +1553,33 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 $('.' + BackboneGrid.id + '.pagination.page').html(html);
 
+                //update page size options
+                console.log('debug pagesize');
+                console.log(BackboneGrid.currentState.ps);
+                var pageSizeOpts = BackboneGrid.pageSizeOptions;
+                var pageSizeOptsRender = [];
+                for (var j = 0; j < pageSizeOpts.length; j++) {
+                    var value = pageSizeOpts[j];
+                    pageSizeOptsRender.push(value);
+                    if (BackboneGrid.currentState.c <= value) {
+                        if (BackboneGrid.currentState.ps > value) { //fix current page size
+                            BackboneGrid.currentState.ps = _.last[pageSizeOptsRender];
+                        }
+                        break;
+                    }
+                }
+                console.log(pageSizeOptsRender);
+                console.log(BackboneGrid.currentState.ps);
+                //render page size options html
+                var pageSizeHtml = '';
+                for (j = 0; j < pageSizeOptsRender.length; j++) {
+                    pageSizeHtml += '<li' + (pageSizeOptsRender[j] == BackboneGrid.currentState.ps ? ' class="active"' : '') + '>';
+                    pageSizeHtml += '<a class="js-change-url page-size" href="#">' + pageSizeOptsRender[j] + '</a>';
+                    pageSizeHtml += '</li>';
+                }
+                $('.pagination.pagesize').html(pageSizeHtml);
+                console.log('end debug pagesize');
+
                 var caption = '';
                 if (BackboneGrid.currentState.c > 0)
                     caption = BackboneGrid.currentState.c + ' record(s)';
@@ -1577,6 +1606,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             state.p = parseInt(state.p);
             state.mp = parseInt(state.mp);
             BackboneGrid.currentState = state;
+
+            BackboneGrid.pageSizeOptions = config.pageSizeOptions;
 
             //check data mode
             if (config.data_mode) {
@@ -1717,6 +1748,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
             filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
             filterView.render();
+            var windowWidth = $(window).width();
+            ////fix when dropdown menu be hidden when reach right side windows
+            $(filterView.el).find('div.dropdown.f-grid-filter').on('show.bs.dropdown', function() {
+                var ulEle = $(this).find('ul.dropdown-menu:first');
+                if ($(this).offset().left + ulEle.width() > windowWidth) {
+                    ulEle.css({'right' : 0, 'left' : 'auto'});
+                }
+            });
+
+
             var filtersVisiblityView = new BackboneGrid.Views.FiltersVisibiltyView({collection: filtersCollection});
             filtersVisiblityView.render();
 
@@ -1800,7 +1841,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 });
             }
             if (config.dataMode != 'local') {
-                $('ul.pagination.pagesize a').click(function (ev) {
+                $('ul.pagination.pagesize').on('click', 'a', function (ev) {
                     $('ul.pagination.pagesize li').removeClass('active');
                     BackboneGrid.currentState.ps = parseInt($(this).html());
                     BackboneGrid.currentState.p = 1;

@@ -13,6 +13,7 @@ class FCom_Promo_Model_Promo extends BModel
             'one' => 'Single Group',
             'any' => 'ANY Group',
             'all' => 'ALL Groups',
+            'cat' => 'Categories',
         ),
         'get_type' => array(
             'qty' => 'Quantity',
