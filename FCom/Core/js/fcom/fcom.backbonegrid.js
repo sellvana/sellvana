@@ -219,7 +219,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                                 BackboneGrid.showingSelected = false;
                                 if (BackboneGrid.data_mode !== 'local') {
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination ul').css('display', 'block');
+                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'block');
                                     rowsCollection.fetch({reset: true});
                                 } else {
                                     rowsCollection.filter();
@@ -233,8 +233,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
                                 BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                                 BackboneGrid.showingSelected = true;
-                                if (BackboneGrid.data_mode !== 'local')
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination ul').css('display', 'none');
+                                if (BackboneGrid.data_mode !== 'local') {
+                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                                }
 
                                 BackboneGrid.data_mode = 'local';
                                 rowsCollection.originalRows = selectedRows;
