@@ -1520,6 +1520,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             function updatePageHtml(p, mp) {
 
+                console.log(BackboneGrid.currentState);
                 p = BackboneGrid.currentState.p;
                 mp = BackboneGrid.currentState.mp;
                 console.log(BackboneGrid.currentState.mp);
@@ -1551,6 +1552,33 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 $('.' + BackboneGrid.id + '.pagination.page').html(html);
 
+                //update page size options
+                console.log('debug pagesize');
+                console.log(BackboneGrid.currentState.ps);
+                var pageSizeOpts = BackboneGrid.pageSizeOptions;
+                var pageSizeOptsRender = [];
+                for (var j = 0; j < pageSizeOpts.length; j++) {
+                    var value = pageSizeOpts[j];
+                    pageSizeOptsRender.push(value);
+                    if (BackboneGrid.currentState.c <= value) {
+                        if (BackboneGrid.currentState.ps > value) { //fix current page size
+                            BackboneGrid.currentState.ps = _.last[pageSizeOptsRender];
+                        }
+                        break;
+                    }
+                }
+                console.log(pageSizeOptsRender);
+                console.log(BackboneGrid.currentState.ps);
+                //render page size options html
+                var pageSizeHtml = '';
+                for (j = 0; j < pageSizeOptsRender.length; j++) {
+                    pageSizeHtml += '<li' + (pageSizeOptsRender[j] == BackboneGrid.currentState.ps ? ' class="active"' : '') + '>';
+                    pageSizeHtml += '<a class="js-change-url page-size" href="#">' + pageSizeOptsRender[j] + '</a>';
+                    pageSizeHtml += '</li>';
+                }
+                $('.pagination.pagesize').html(pageSizeHtml);
+                console.log('end debug pagesize');
+
                 var caption = '';
                 if (BackboneGrid.currentState.c > 0)
                     caption = BackboneGrid.currentState.c + ' record(s)';
@@ -1577,6 +1605,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             state.p = parseInt(state.p);
             state.mp = parseInt(state.mp);
             BackboneGrid.currentState = state;
+
+            BackboneGrid.pageSizeOptions = config.pageSizeOptions;
 
             //check data mode
             if (config.data_mode) {
@@ -1800,7 +1830,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 });
             }
             if (config.dataMode != 'local') {
-                $('ul.pagination.pagesize a').click(function (ev) {
+                $('ul.pagination.pagesize').on('click', 'a', function (ev) {
                     $('ul.pagination.pagesize li').removeClass('active');
                     BackboneGrid.currentState.ps = parseInt($(this).html());
                     BackboneGrid.currentState.p = 1;
