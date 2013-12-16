@@ -24,17 +24,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ),
     );
 
-	protected $_validationRules = array(
-		array('username', '@required'),
-		array('email', '@required'),
-		array('password', '@required'),
+    protected $_validationRules = array(
+        array('username', '@required'),
+        array('email', '@required'),
+        array('password', '@required'),
 
-		array('email', '@email'),
+        array('email', '@email'),
 
-		array('is_superadmin', '@integer'),
-		array('role_id', '@integer'),
-		array('superior_id', '@integer'),
-	);
+        //array('is_superadmin', '@integer'),
+        array('role_id', '@integer'),
+        //array('superior_id', '@integer'),
+    );
 
     protected $_persModel;
     protected $_persData;
@@ -237,7 +237,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function personalize($data=null)
     {
         if (!$this->orm) {
-            return $this->sessionUser()->personalize($data);
+            $user = $this->sessionUser();
+            if (!$user) {
+                return null;
+            }
+            return $user->personalize($data);
         }
         if (!$this->_persModel) {
             $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id(), 'user_id');

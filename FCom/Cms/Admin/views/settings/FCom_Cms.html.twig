@@ -1,11 +1,13 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
+
+<h2>{{ "CMS Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Cms">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'CMS Frontend Configuration'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_Cms-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Cms-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Enable CMS Pages'|_ }}</label>

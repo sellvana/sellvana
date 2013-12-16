@@ -9,5 +9,5 @@ modules:
             themes:
                 FCom_FrontendThemeBlue:
                     area: FCom_Frontend
-                    layout: layout.yml
+                    layout: Frontend/layout.yml
                     parent: FCom_Frontend_DefaultTheme

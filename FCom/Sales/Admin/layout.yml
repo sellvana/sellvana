@@ -1,9 +1,10 @@
 base:
     - view: admin/nav
         do:
-            - [ addNav, sales, { label: Sales, pos: 300, icon_class: icon-shopping-cart } ]
+            - [ addNav, sales, { label: Sales, pos: 100, icon_class: icon-shopping-cart } ]
             - [ addNav, sales/orders, { label: Orders, href: /orders } ]
-            - [ addNav, sales/orderstatus, { label: Order Status, href: /orderstatus } ]
+            - [ addNav, sales/orderstatus, { label: Order Statuses, href: /orderstatus } ]
+            - [ addNav, sales/reports, { label: Reports, href: /sales/reports } ]
 
 /orders:
     - { include: base }
@@ -49,8 +50,10 @@ base:
     - view: settings
         do:
             - [ addTabGroup, sales, { label: Sales, pos: 100 } ]
-            - [ addTabGroup, shipping_methods, { label: Shipping Methods, pos: 110 } ]
-            - [ addTabGroup, payment_methods, { label: Payment Methods, pos: 120 } ]
-            - [ addTabGroup, checkout_methods, { label: Checkout Methods, pos: 130 } ]
+            - [ addTabGroup, shipping_methods, { label: Shipping, pos: 110 } ]
+            - [ addTabGroup, payment_methods, { label: Payment, pos: 120 } ]
+            - [ addTabGroup, checkout_methods, { label: Checkout, pos: 130 } ]
             - [ addTab, FCom_Sales, { label: Sales, group: sales, pos: 10 } ]
+            - [ addTab, FCom_SalesShipping, { label: General, group: shipping_methods, pos: 10 } ]
+            - [ addTab, FCom_SalesPayment, { label: General, group: payment_methods, pos: 10 } ]
 

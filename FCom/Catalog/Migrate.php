@@ -254,4 +254,44 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_9__0_2_10()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tProduct, array(
+            'COLUMNS' => array(
+                'is_featured' => 'tinyint',
+                'is_popular' => 'tinyint',
+            ),
+            'KEYS' => array(
+                'IDX_featured' => '(is_featured)',
+                'IDX_popular' => '(is_popular)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_10__0_2_11()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'show_content'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'content'       => 'TEXT',
+                'show_products' => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'show_sub_cat'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'layout_update' => 'TEXT',
+        )));
+    }
+
+    public function upgrade__0_2_11__0_2_12()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'page_title' => 'VARCHAR(255) DEFAULT NULL',
+                    'description'  => 'TEXT DEFAULT NULL',
+                    'meta_description' => 'TEXT DEFAULT NULL',
+                    'meta_keywords' => 'TEXT DEFAULT NULL',
+                )));
+    }
 }

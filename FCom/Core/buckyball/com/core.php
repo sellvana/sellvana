@@ -220,7 +220,7 @@ class BApp extends BClass
         BModuleRegistry::i()->bootstrap();
 
         // run module migration scripts if necessary
-        if (BConfig::i()->get('db/implicit_migration')) {
+        if (BConfig::i()->get('install_status')==='installed' && BConfig::i()->get('db/implicit_migration')) {
             BMigrate::i()->migrateModules(true);
         }
 
@@ -335,10 +335,13 @@ class BApp extends BClass
     * @param string $method
     * @return string
     */
-    public static function src($modName, $url='', $method='baseSrc')
+    public static function src($url='', $method='baseSrc')
     {
-        if ($modName[0]==='@' && !$url) {
-            list($modName, $url) = explode('/', substr($modName, 1), 2);
+        if ($url[0]==='@') {
+            list($modName, $url) = explode('/', substr($url, 1), 2);
+        }
+        if (empty($modName)) {
+            return BRequest::i()->webRoot() . '/' . $url;
         }
         $m = BApp::m($modName);
         if (!$m) {
@@ -1654,7 +1657,7 @@ class BSession extends BClass
     public function getHandlers()
     {
         $handlers = array_keys($this->_availableHandlers);
-        return array_combine($handlers, $handlers);
+        return $handlers ? array_combine($handlers, $handlers) : array();
     }
 
     /**

@@ -1,4 +1,4 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
 {% set mname = APP.instance('BModuleRegistry').currentModuleName() %}
 {% set baseHtmlName = "config[modules][" ~ mname ~ "][" %}
 {% set baseConfigPath = "modules/"~ mname ~"/" %}
@@ -13,12 +13,14 @@
 {% set baseDpmHtmlName = baseHtmlName ~ dpm ~ "]" %}
 {% set baseDpmConfigPath = baseConfigPath ~ dpm %}
 
+<h2>{{ "Authorize.net Settings"|_}}</h2>
+
 <div class="accordion accordion-blue panel-group" id="settings-FCom_AuthorizeNet">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'Authorize.net API'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_AuthorizeNet-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_AuthorizeNet-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ aimPrefix }}active">{{ 'Enabled'|_ }}</label>
@@ -146,7 +148,7 @@
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'Authorize.net Direct Post Method API'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_AuthorizeNet-group1">
+        <div class="panel-collapse accordion-body" id="settings-FCom_AuthorizeNet-group1">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="{{ dpmPrefix }}active">{{ 'Enabled'|_ }}</label>

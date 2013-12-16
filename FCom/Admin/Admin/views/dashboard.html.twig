@@ -1,0 +1,120 @@
+{% set widgets = THIS.getWidgets() %}
+{% set asyncWidgets = [] %}
+<div class="page-header f-page-header-has-btns">
+  <h1 class="f-page-title">
+    <i class="icon-dashboard"></i>
+    Dashboard
+  </h1>
+  <div class="btn-group">
+    <button class="btn">+ Add Widget</button>
+  </div>
+  <div class="pull-right btn-group">
+    <a class="btn btn-link hidden-xs" href="#">Last month</a>
+    <a class="btn btn-link" href="#">Last week</a>
+    <a class="btn btn-link" href="#">Today</a>
+    <a class="btn btn-link" id="daterange" href="#">
+      <i class="icon-calendar"></i>
+      <span>Custom</span>
+      <b class="caret"></b>
+    </a>
+  </div>
+</div>
+<div class="f-content-dashboard">
+  <div class="row">
+    <ul class="js-sortable-container">
+  {% for widget in widgets %}
+  {% if not widget.state.closed %}
+      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
+        <div class="box {{ widget.state.collapsed ? 'box-collapsed' }}">
+          <div class="box-header js-sortable-handle {{ widget.header_class }}">
+            <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
+            <div class="actions">
+              <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+              <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
+            </div>
+          </div>
+  
+          {% if widget.async %}
+            {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
+          {% elseif widget.view %}
+            {{ THIS.view(widget.view) | raw }}
+          {% else %}
+            {{ widget.content | raw }}
+          {% endif %}
+        </div>
+      </li>
+  {% endif %}
+  {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<script type="text/template" id="dashboard-widget-template">
+  <li class="col-sm-<%- widget.cols %>" id="dashboard-widget__<%- widget.key %>" data-id="<%- widget.key %>">
+    <div class="box">
+      <div class="box-header js-sortable-handle <%- widget.header_class %>">
+        <div class="title"><i class="icon-<%- widget.icon %>"></i><%- widget.title %></div>
+        <div class="actions">
+          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+          <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
+        </div>
+      </div>
+      <%= widget.content %>
+    </div>
+  </li>
+</script>
+
+<script>
+require(['jquery', 'jquery-ui'], function($) {
+  var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+
+  function load(widgets, wrapped) {
+    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped }, function(response, status, xhr) {
+      $.each(response.widgets, function(key, widget) {
+        _.template($('dashboard-widget-template').html(), widget)
+        //$('dashboard-widget__'+widget.key+' > .box').append(widget.content);
+      });
+    });
+  }
+{% if asyncWidgets %}
+  load({{ UTIL.toJson(asyncWidgets) }}.join(','));
+{% endif %}
+
+  $('#dashboard-add-widget').change(function(ev) {
+    load($(this).val(), true);
+  });
+
+  $('.js-sortable-container').sortable({
+    connectWith: '.js-sortable-container',
+    handle: '.js-sortable-handle',
+    update: function(ev, ui) {
+      //console.log(this, ev, ui);
+      var widgetIds = [];
+      $(this).children().each(function(idx, el) {
+        widgetIds.push($(el).data('id'));
+      });
+      var postData = { do:'dashboard.widget.pos', widgets:widgetIds };
+      $.post(personalizeUrl, postData, function(response, status, xhr) {
+        console.log(response);
+      })
+    }
+    //delay: 100,
+  })
+
+  $('.js-sortable-container').on('click', '.js-remove', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+      console.log(response);
+    });
+  })
+
+  $('.js-sortable-container').on('click', '.js-collapse', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+      console.log(response);
+    });
+  })
+})
+</script>

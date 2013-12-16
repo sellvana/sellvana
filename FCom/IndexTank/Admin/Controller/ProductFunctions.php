@@ -1,6 +1,6 @@
 <?php
 
-class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'indextank/product_functions';

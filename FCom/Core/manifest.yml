@@ -19,6 +19,7 @@ modules:
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
+            - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
             - [ BTwig::init, FCom_Core_Main::onTwigInit ]
@@ -28,8 +29,12 @@ modules:
                 dbname: fulleron
                 username: root
                 logging: false
+                implicit_migration: true
             web:
                 csrf_check_method: referrer
+                headers:
+                    X-UA-Compatible: IE=edge
+                    X-Frame-Options: SAMEORIGIN
             modules:
                 FCom_Core:
                     company_name: Fulleron

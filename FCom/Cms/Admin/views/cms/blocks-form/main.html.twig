@@ -1,5 +1,5 @@
-{% set m = THIS.model %}
-{% set validator = THIS.get('validator') %}
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
 
 <fieldset class="adm-section-group">
     <div class="form-group">
@@ -29,11 +29,3 @@
         </div>
     </div>
 </fieldset>
-
-<script>
-    require(['jquery', 'fcom.admin.form'], function($) {
-        $(function() {
-            //adminForm.wysiwygCreate('main-content');
-        });
-    })
-</script>

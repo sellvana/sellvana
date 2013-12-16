@@ -1,5 +1,5 @@
-define(['jquery'], function($) {
-    $.fn.geoCountryRegion = function(opt) {
+define(['jquery'], function ($) {
+    $.fn.geoCountryRegion = function (opt) {
         opt = opt || {};
         var $country = this;
         var $regionSelect = $(opt.regionSelectEl || 'select.geo-region');
@@ -13,7 +13,7 @@ define(['jquery'], function($) {
         }
         $country.val(country);
 
-        $country.change(function(ev) {
+        $country.change(function (ev) {
             country = $country.val();
             var regions = country ? geoRegions[country] : null;
             if (regions) {
@@ -31,8 +31,12 @@ define(['jquery'], function($) {
         });
         $country.trigger('change');
 
-        $regionSelect.change(function(ev) { region = $regionSelect.val(); });
-        $regionInput.change(function(ev) { region = $regionInput.val(); });
+        $regionSelect.change(function (ev) {
+            region = $regionSelect.val();
+        });
+        $regionInput.change(function (ev) {
+            region = $regionInput.val();
+        });
         return this;
     }
-})
+});

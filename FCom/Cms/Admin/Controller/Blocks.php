@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'cms/blocks';
@@ -11,13 +11,31 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] += array(
-            'handle' => array('label'=>'Handle', 'href' => BApp::href('cms/blocks/form/?id=:id')),
-            'description' => array('label'=>'Description', 'editable'=>true),
-            'version' => array('label'=>'Version'),
-            'create_at' => array('label'=>'Created', 'cell'=>'date'),
-            'update_at' => array('label'=>'Updated', 'cell'=>'date'),
-            '_actions' => array('label' => 'Actions', 'sortable' => false),
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'handle', 'label'=>'Handle', 'href' => BApp::href($this->_formHref . '?id=:id')),
+            array('name' => 'description', 'label'=>'Description', 'editable'=>true),
+            array('name' => 'renderer', 'label'=>'Renderer',
+                  'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
+            array('name' => 'version', 'label'=>'Version'),
+            array('name' => 'page_enabled', 'label'=>'Page Enable',
+                  'options' => array('1' => 'Yes', '0' => 'No'), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
+            array('name' => 'page_url', 'label'=>'Page Url'),
+            array('name' => 'page_title', 'label'=>'Page Title'),
+            array('name' => 'meta_title', 'label'=>'Meta Title', 'hidden' => true),
+            array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
+            array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
+            array('name' => 'modified_time', 'label'=>'Modified Time', 'hidden' => true),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+        );
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'handle', 'type' => 'text'),
+            array('field' => 'page_enabled', 'type' => 'select'),
         );
         return $config;
     }
@@ -60,7 +78,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         } else {
             $orm = FCom_Cms_Model_BlockHistory::i()->orm('bh')->select('bh.*')
                 ->where('block_id', $id);
-            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+            $data = FCom_Admin_Admin_View_Grid::i()->processORM($orm, __METHOD__);
         }
         BResponse::i()->json($data);
     }

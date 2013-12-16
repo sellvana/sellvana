@@ -1,12 +1,14 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
 {% set services = APP.instance('FCom_ShippingUps_ShippingMethod').getServices() %}
+
+<h2>{{ "ShippingUPS Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_ShippingUps">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'UPS API'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_ShippingUps-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_ShippingUps-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Access Key'|_ }}</label>

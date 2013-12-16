@@ -5,10 +5,10 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_admin_role';
 
-	protected $_validationRules = array(
-		array('role_name', '@required'),
-		array('permissions_data', '@required'),
-	);
+    protected $_validationRules = array(
+        array('role_name', '@required'),
+        //array('permissions_data', '@required'),
+    );
 
     protected static $_allPermissions = array(
         '/' => array('title'=>'All Permissions', 'level'=>0),

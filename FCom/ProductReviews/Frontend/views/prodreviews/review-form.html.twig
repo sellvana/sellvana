@@ -1,4 +1,13 @@
 {% set prod = THIS.get('prod') %}
+{% set needApprove = CONFIG.get('modules/FCom_ProductReviews/need_approve') %}
+{% set config = APP.instance('FCom_ProductReviews_Model_Review').config() %}
+{% set max = config.max %}
+{% set min = config.min %}
+{% set step = config.step %}
+{% if (THIS.get('isModalBox') != 1) %}
+    {% set validator = THIS.validator(THIS.get('formId')) %}
+{% endif %}
+
 <form action="{{ APP.href('prodreviews/add') }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
     <input type="hidden" name="pid" value="{{ prod.id() }}">
 
@@ -8,22 +17,26 @@
         <dl class="dl-horizontal">
             <dt><strong>{{ 'Overall'|_ }}</strong></dt>
             <dd>
-                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating" name="review[rating]">
+                <input type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
+                       value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}" step="{{ step }}" />
                 <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
             </dd>
             <dt>{{ 'Value'|_ }}</dt>
             <dd>
-                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating1" name="review[rating1]">
+                <input type="range" id="prodreview-rating1" name="review[rating1]" min="{{ min }}" max="{{ max }}"
+                       value="{{ validator is defined and validator.fieldValue('rating1') ? validator.fieldValue('rating1') : min }}" step="{{ step }}" />
                 <div class="rateit" data-rateit-backingfld="#prodreview-rating1"></div>
             </dd>
             <dt>{{ 'Features'|_ }}</dt>
             <dd>
-                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating2" name="review[rating2]">
+                <input type="range" id="prodreview-rating2" name="review[rating2]" min="{{ min }}" max="{{ max }}"
+                       value="{{ validator is defined and validator.fieldValue('rating2') ? validator.fieldValue('rating2') : min }}" step="{{ step }}" />
                 <div class="rateit" data-rateit-backingfld="#prodreview-rating2"></div>
             </dd>
             <dt>{{ 'Quality'|_ }}</dt>
             <dd>
-                <input type="range" min="0" max="5" value="0" step="1" id="prodreview-rating3" name="review[rating3]">
+                <input type="range" id="prodreview-rating3" name="review[rating3]" min="{{ min }}" max="{{ max }}"
+                       value="{{ validator is defined and validator.fieldValue('rating3') ? validator.fieldValue('rating3') : min }}" step="{{ step }}" />
                 <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
             </dd>
         </dl>
@@ -31,54 +44,61 @@
     <div class="form-group">
         <label for="review-title">{{ 'Review Title'|_ }}</label>
         <div class="controls">
-            <input type="text" name="review[title]" placeholder="{{"Title" | _ }}" class="form-control"/>
+            <input type="text" name="review[title]" placeholder="{{"Title" | _ }}" class="form-control" value="{{ validator is defined ? validator.fieldValue('title') : '' }}" />
         </div>
     </div>
     <div class="form-group">
         <label for="review-text">{{ 'Review Text'|_ }}</label>
         <div class="controls">
-            <textarea name="review[text]" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical"></textarea><br/>
+            <textarea name="review[text]" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{{ validator is defined ? validator.fieldValue('text') : '' }}</textarea><br/>
         </div>
     </div>
-    <input type="submit" class="btn" id="review_save">
+    <input type="submit" class="btn btn-primary" id="review_save">
+    {% if (THIS.get('isModalBox') != 1) %}
+        <a href="{{ prod.url() }}" class="btn">{{ "Return product"|_ }}</a>
+    {% endif %}
 </form>
 
 <script>
     require(['jquery', 'jquery.rateit', 'jquery.bootstrap-growl'], function($) {
         {% if (THIS.get('isModalBox') == 1) %}
-        var mainForm = $('form#f-prod-reviews-main-form');
+            var mainForm = $('form#f-prod-reviews-main-form');
 
-        $('input#review_save').click(function (ev) //todo: write function for same feature in fcom
-        {
-            $.ajax({
-                type: "POST",
-                url: mainForm.attr('action'),
-                data: mainForm.serialize(),
-                success: function (data)
-                {
-                    if (data.status == 'error') {
-                        $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                    } else if (data.status == 'success'){
-                        $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
-                        $('#f-prod-review-form').modal('hide');
-                        mainForm[0].reset();
-                        mainForm.find('.rateit-reset').click();
-                        //todo: add code to update list product review
-                    } else {
-
+            $('input#review_save').click(function (ev) //todo: write function for same feature in fcom
+            {
+                $.ajax({
+                    type: "POST",
+                    url: mainForm.attr('action'),
+                    data: mainForm.serialize(),
+                    success: function (data)
+                    {
+                        if (data.status == 'error') {
+                            $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        } else if (data.status == 'success'){
+                            var message = data.message || "Saved";
+                            $.bootstrapGrowl(message, { type: 'success', align: 'center', width: 'auto' });
+                            $('#f-prod-review-form').modal('hide');
+                            mainForm[0].reset();
+                            mainForm.find('.rateit-reset').click();
+                            {% if needApprove == 0 %}
+                                //update list previews
+                                $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}');
+                            {% endif %}
+                        } else {
+                            alert("Invalid data, please check again");
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown)
+                    {
+                        alert("[ERROR]<br>" + textStatus);
                     }
-                },
-                error: function (xhr, textStatus, errorThrown)
-                {
-                    alert("[ERROR]<br>" + textStatus);
-                }
+                });
+
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                return false;
             });
-
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            return false;
-        });
         {% endif %}
     });
 </script>

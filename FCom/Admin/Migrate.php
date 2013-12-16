@@ -184,4 +184,24 @@ class FCom_Admin_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $tAggregate = FCom_Admin_Model_Aggregate::table();
+        BDb::ddlTableDef($tAggregate, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'data_type' => 'varchar(20) not null',
+                'data_args' => 'varchar(50) not null',
+                'data_day' => 'date not null',
+                //'range_type' => "enum('day') default 'day' not null",
+                //'range_start' => 'date not null',
+                'amount' => 'decimal(12,2) not null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
+            ),
+        ));
+    }
 }

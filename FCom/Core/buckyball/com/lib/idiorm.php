@@ -66,7 +66,10 @@
             'caching' => false,
         );
 
-        // Database connection, instance of the PDO class
+        /**
+         * Database connection, instance of the PDO class
+         * @var PDO
+         */
         protected static $_db;
 
         // Last query run, only populated if logging is enabled
@@ -235,6 +238,7 @@
          * Returns the PDO instance used by the the ORM to communicate with
          * the database. This can be called if any low-level DB access is
          * required outside the class.
+         * @return PDO
          */
         public static function get_db() {
             static::_setup_db(); // required in case this is called before Idiorm is instantiated
@@ -580,7 +584,7 @@
          * of the call to _quote_identifier
          */
         protected function _add_simple_where($column_name, $separator, $value) {
-            $column_name = $this->_quote_identifier($column_name);            
+            $column_name = $this->_quote_identifier($column_name);
             return $this->_add_where("{$column_name} {$separator} ?", $value);
         }
 
@@ -627,7 +631,7 @@
         /**
          * Add a WHERE ... LIKE clause to your query.
          */
-        public function where_like($column_name, $value) {                        
+        public function where_like($column_name, $value) {
             return $this->_add_simple_where($column_name, 'LIKE', $value);
         }
 

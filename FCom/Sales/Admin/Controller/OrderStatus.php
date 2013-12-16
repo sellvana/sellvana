@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'orderstatus';
@@ -13,12 +13,39 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('name' => 'id', 'index'=>'o.id', 'label' => 'Status id', 'width' =>70),
-            array('name' => 'name', 'index'=>'name', 'label' => 'Label', 'href' => BApp::href('orderstatus/form/?id=:id')),
-            array('name' => 'code', 'index'=>'code', 'label' => 'Code'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => BApp::href('orderstatus/form/?id='), 'col'=>'id'),'delete' => true)),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'index' => 'o.id', 'label' => 'ID', 'width' => 70),
+            array('name' => 'code', 'index' => 'code', 'label' => 'Code',
+                  'addable' => true, 'editable' => true, 'validation' => array('required' => true, 'unique' => BApp::href('orderstatus/unique'))),
+            array('name' => 'name', 'index' => 'name', 'label' => 'Label',
+                  'addable' => true, 'editable' => true, 'validation' => array('required' => true, /*'unique' => BApp::href('orderstatus/unique')*/)),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data' => array('edit' => true,'delete' => true)),
         );
-
+        $config['actions'] = array(
+            'new'    => array('caption' => 'Add New Order Status', 'modal' => true),
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'code', 'type' => 'text'),
+        );
         return $config;
+    }
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '')));
+    }
+
+    /**
+     * ajax check code is unique
+     */
+    public function action_unique__POST()
+    {
+        $post = BRequest::i()->post();
+        $data = each($post);
+        $rows = BDb::many_as_array(FCom_Sales_Model_Order_Status::i()->orm()->where($data['key'], $data['value'])->find_many());
+        BResponse::i()->json(array( 'unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])));
     }
 }

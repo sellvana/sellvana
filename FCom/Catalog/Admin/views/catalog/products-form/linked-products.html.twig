@@ -1,9 +1,8 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set prodCtrl =  APP.instance('FCom_Catalog_Admin_Controller_Products') %}
 
 <script>
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
+
 require(['jquery'], function($) {
     var related = 'linked_products_related', similar = 'linked_products_similar';
     var modalGrid = 'category_all_prods_grid_{{ m.id }}';
@@ -95,12 +94,17 @@ require(['jquery'], function($) {
         <ul class='nav nav-tabs prod-type'>
             <li class='active'>
                 <a data-toggle='tab' href='#related'>
-                    Related
+                    {{ "Related"|_ }}
                 </a>
             </li>
             <li>
                 <a data-toggle='tab' href='#similar'>
-                    Similar
+                    {{ "Upsells"|_ }}
+                </a>
+            </li>
+            <li>
+                <a data-toggle='tab' href='#cross-sell'>
+                    {{ " Cross-Sell"|_ }}
                 </a>
             </li>
         </ul>
@@ -110,6 +114,9 @@ require(['jquery'], function($) {
             </div>
             <div class='tab-pane' id='similar'>
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
+            </div>
+            <div class='tab-pane' id='cross-sell'>
+                NEED ADD DATA IN HERE
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
-{% set m = THIS.model %}
-{% set validator = THIS.get('validator') %}
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
 
 <fieldset class="form-horizontal">
     <div class="form-group">
@@ -19,7 +19,8 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-tags">{{ 'Tags'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control" id="model-tags" type="text" name="model[tags]" value="{{ validator.fieldValueTagsString() }}" />
+            <textarea class="form-control" id="model-tags" name="model[tags">{{ validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString() }}</textarea>
+            {#//todo: need update this textarea to suggest availble tags#}
         </div>
     </div>
     <div class="form-group">

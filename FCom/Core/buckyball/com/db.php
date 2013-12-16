@@ -82,33 +82,34 @@ class BDb
     }
 
     /**
-    * Connect to DB using default or a named connection from global configuration
-    *
-    * Connections are cached for reuse when switching.
-    *
-    * Structure in configuration:
-    *
-    * {
-    *   db: {
-    *     dsn: 'mysql:host=127.0.0.1;dbname=buckyball',  - optional: replaces engine, host, dbname
-    *     engine: 'mysql',                               - optional if dsn exists, default: mysql
-    *     host: '127.0.0.1',                             - optional if dsn exists, default: 127.0.0.1
-    *     dbname: 'buckyball',                           - optional if dsn exists, required otherwise
-    *     username: 'dbuser',                            - default: root
-    *     password: 'password',                          - default: (empty)
-    *     logging: false,                                - default: false
-    *     named: {
-    *       read: {<db-connection-structure>},           - same structure as default connection
-    *       write: {
-    *         use: 'read'                                - optional, reuse another connection
-    *       }
-    *     }
-    *  }
-    *
-    * @param string $name
-    * @throws BException
-    * @return PDO
-    */
+     * Connect to DB using default or a named connection from global configuration
+     *
+     * Connections are cached for reuse when switching.
+     *
+     * Structure in configuration:
+     *
+     * {
+     *   db: {
+     *     dsn: 'mysql:host=127.0.0.1;dbname=buckyball',  - optional: replaces engine, host, dbname
+     *     engine: 'mysql',                               - optional if dsn exists, default: mysql
+     *     host: '127.0.0.1',                             - optional if dsn exists, default: 127.0.0.1
+     *     dbname: 'buckyball',                           - optional if dsn exists, required otherwise
+     *     username: 'dbuser',                            - default: root
+     *     password: 'password',                          - default: (empty)
+     *     logging: false,                                - default: false
+     *     named: {
+     *       read: {<db-connection-structure>},           - same structure as default connection
+     *       write: {
+     *         use: 'read'                                - optional, reuse another connection
+     *       }
+     *     }
+     *  }
+     *
+     * @param string $name
+     * @param bool   $force
+     * @throws BException
+     * @return PDO
+     */
     public static function connect($name = null, $force = false)
     {
         if (!$force && !$name && static::$_currentConnectionName) { // continue connection to current db, if no value
@@ -188,7 +189,7 @@ class BDb
     /**
     * Shortcut to run multiple queries from migrate scripts
     *
-    * It doesn't make sense to run multiple queries in the same call and use $params
+    * It does not make sense to run multiple queries in the same call and use $params
     *
     * @param string $sql
     * @param array $params
@@ -858,8 +859,9 @@ class BPDO extends PDO
 }
 
 /**
-* Enhanced ORMWrapper to support multiple database connections and many other goodies
-*/
+ * Enhanced ORMWrapper to support multiple database connections and many other goodies
+ * @property mixed id
+ */
 class BORM extends ORMWrapper
 {
     /**
@@ -1034,9 +1036,9 @@ class BORM extends ORMWrapper
     protected function _run()
     {
         BDb::connect($this->_readConnectionName);
-        #$timer = microtime(true); // file log
+//        $timer = microtime(true); // file log
         $result = parent::_run();
-        #BDebug::log((microtime(true)-$timer).' '.static::$_last_query); // file log
+//        BDebug::log((microtime(true)-$timer).' '.static::$_last_query); // file log
         BDebug::profile(static::$_last_profile);
         static::$_last_profile = null;
         return $result;
@@ -1144,17 +1146,17 @@ class BORM extends ORMWrapper
     */
     public function execute()
     {
-        BDb::connect($this->_readConnectionName);
+        BDb::connect( $this->_readConnectionName );
         $query = $this->_build_select();
-        static::_log_query($query, $this->_values);
-        $statement = static::$_db->prepare($query);
-try {
-        $statement->execute($this->_values);
-} catch (Exception $e) {
-echo $query;
-print_r($e);
-exit;
-}
+        static::_log_query( $query, $this->_values );
+        $statement = static::$_db->prepare( $query );
+        try {
+            $statement->execute( $this->_values );
+        } catch ( Exception $e ) {
+            echo $query;
+            print_r( $e );
+            exit;
+        }
         return $statement;
     }
 
@@ -1184,11 +1186,12 @@ exit;
     }
 
     /**
-    * Extended where condition
-    *
-    * @param string|array $column_name if array - use where_complex() syntax
-    * @param mixed $value
-    */
+     * Extended where condition
+     *
+     * @param string|array $column_name if array - use where_complex() syntax
+     * @param mixed        $value
+     * @return $this|\BORM
+     */
     public function where($column_name, $value=null)
     {
         if (is_array($column_name)) {
@@ -1223,7 +1226,7 @@ exit;
     public function find_one($id=null)
     {
         $class = $this->_class_name;
-        if ($class::origClass()) {
+        if (method_exists($class, 'origClass') && $class::origClass()) {
             $class = $class::origClass();
         }
         BEvents::i()->fire($class.'::find_one:orm', array('orm'=>$this, 'class'=>$class, 'id'=>$id));
@@ -1240,7 +1243,7 @@ exit;
     public function find_many()
     {
         $class = $this->_class_name;
-        if ($class::origClass()) {
+        if (method_exists($class, 'origClass') && $class::origClass()) {
             $class = $class::origClass();
         }
         BEvents::i()->fire($class.'::find_many:orm', array('orm'=>$this, 'class'=>$class));
@@ -1552,8 +1555,10 @@ exit;
 }
 
 /**
-* ORM model base class
-*/
+ * ORM model base class
+ * @property static string $_table
+ * @property static array $_fieldOptions
+ */
 class BModel extends Model
 {
     /**
@@ -1744,7 +1749,7 @@ class BModel extends Model
     *
     * @param string|array $key
     * @param mixed $value
-    * @param mixed $flag if true, add to existing value; if null, update only if currently not set
+    * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
     * @return BModel
     */
     public function set($key, $value=null, $flag=false)
@@ -1754,7 +1759,7 @@ class BModel extends Model
                 parent::set($k, $v);
             }
         } else {
-            if (true===$flag) {
+            if (true===$flag || 'ADD' === $flag) {
                 $oldValue = $this->get($key);
                 if (is_array($oldValue)) {
                     $oldValue[] = $value;
@@ -1763,7 +1768,7 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!is_null($flag) || is_null($this->get($key)))) {
+            if (is_scalar($key) && (!(is_null($flag) || 'IFNULL' === $flag) || is_null($this->get($key)))) {
                 parent::set($key, $value);
             }
         }
@@ -1771,21 +1776,22 @@ class BModel extends Model
     }
 
     /**
-    * Add a value to field
-    *
-    * @param string $key
-    * @param mixed $value
-    * @return BModel
-    */
+     * Add a value to field
+     *
+     * @param string $key
+     * @param int    $increment
+     * @return BModel
+     */
     public function add($key, $increment=1)
     {
-        return $this->set($key, $increment, true);
+        return $this->set($key, $increment, 'ADD');
     }
 
     /**
     * Create a new instance of the model
     *
     * @param null|array $data
+    * @return BModel
     */
     public static function create($data=null)
     {
@@ -1795,7 +1801,7 @@ class BModel extends Model
     }
 
     /**
-    * Placeholder for after creae callback
+    * Placeholder for after create callback
     *
     * Called not after new object save, but after creation of the object in memory
     */
@@ -1916,7 +1922,7 @@ class BModel extends Model
     }
 
     /**
-    * Preload models into cache
+    * Pre load models into cache
     *
     * @param mixed $where complex where @see BORM::where_complex()
     * @param mixed $field cache key
@@ -1991,10 +1997,11 @@ class BModel extends Model
     }
 
     /**
-    * Save all dirty models in cache
-    *
-    * @return BModel
-    */
+     * Save all dirty models in cache
+     *
+     * @param string $field
+     * @return BModel
+     */
     public function cacheSaveDirty($field='id')
     {
         $class = $this->_origClass();
@@ -2009,12 +2016,12 @@ class BModel extends Model
     }
 
     /**
-    * Fetch all cached models by field
-    *
-    * @param string $field
-    * @param string $key
-    * @return array|BModel
-    */
+     * Fetch all cached models by field
+     *
+     * @param string $field
+     * @param mixed  $keyValue
+     * @return array|BModel
+     */
     public function cacheFetch($field='id', $keyValue=null)
     {
         $class = $this->_origClass();
@@ -2094,7 +2101,7 @@ class BModel extends Model
 
     /**
      * Return old value(s) of modified field
-     * @param type $property
+     * @param string|\type $property
      * @return type
      */
     public function old_values($property='')
@@ -2234,14 +2241,14 @@ class BModel extends Model
     }
 
     /**
-    * Update one or many records of the class
-    *
-    * @param array $data
-    * @param string|array $where where conditions (@see BDb::where)
-    * @param array $params if $where string, use these params
-    * @return boolean
-    */
-    public static function update_many(array $data, $where, $p=array())
+     * Update one or many records of the class
+     *
+     * @param array        $data
+     * @param string|array $where where conditions (@see BDb::where)
+     * @param array        $p params if $where string, use these params
+     * @return boolean
+     */
+    public static function update_many(array $data, $where = null, $p=array())
     {
         $update = array();
         $params = array();
@@ -2252,7 +2259,7 @@ class BModel extends Model
         if (is_array($where)) {
             list($where, $p) = BDb::where($where);
         }
-        $sql = "UPDATE ".static::table()." SET ".join(', ', $update) ." WHERE {$where}";
+        $sql = "UPDATE ".static::table()." SET ".join(', ', $update) . ($where ? " WHERE {$where}" : '');
         BDebug::debug('SQL: '.$sql);
         return static::run_sql($sql, array_merge($params, $p));
     }
@@ -2333,13 +2340,15 @@ class BModel extends Model
     }
 
     /**
-    * Retrieve persistent related model object
-    *
-    * @param string $modelClass
-    * @param mixed $idValue related object id value or complex where expression
-    * @param boolean $autoCreate if record doesn't exist yet, create a new object
-    * @result BModel
-    */
+     * Retrieve persistent related model object
+     *
+     * @param string  $modelClass
+     * @param mixed   $idValue related object id value or complex where expression
+     * @param boolean $autoCreate if record doesn't exist yet, create a new object
+     * @param null    $cacheKey
+     * @param string  $foreignIdField
+     * @return BModel
+     */
     public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null, $foreignIdField='id')
     {
         $cacheKey = $cacheKey ? $cacheKey : $modelClass;
@@ -2365,12 +2374,12 @@ class BModel extends Model
     }
 
     /**
-    * Retrieve persistent related model objects collection
-    *
-    * @param string $modelClass
-    * @param mixed $idValue complex where expression
-    * @result array
-    */
+     * Retrieve persistent related model objects collection
+     *
+     * @param string $modelClass
+     * @param        $where
+     * @return array
+     */
     public function relatedCollection($modelClass, $where)
     {
 
@@ -2452,34 +2461,34 @@ class BModel extends Model
         return $values;
     }
 
-	/**
-	 * Model validation
-	 *
-	 * Validate provided data using model rules and parameter rules.
-	 * Parameter rules will be merged with model rules and can override them.
-	 * Event will be fired prior validation which will enable adding of rules or editing data
-	 * Event will be fired if validation fails.
-	 *
-	 * @see BValidate::validateInput()
-	 * @param array $data
-	 * @param array $rules
-	 * @param string $formName
-	 * @return bool
-	 */
-	public function validate($data = array(), $rules = array(), $formName = 'admin')
-	{
-		if (!$data) {
-			$data = $this->as_array();
+    /**
+     * Model validation
+     *
+     * Validate provided data using model rules and parameter rules.
+     * Parameter rules will be merged with model rules and can override them.
+     * Event will be fired prior validation which will enable adding of rules or editing data
+     * Event will be fired if validation fails.
+     *
+     * @see BValidate::validateInput()
+     * @param array $data
+     * @param array $rules
+     * @param string $formName
+     * @return bool
+     */
+    public function validate($data = array(), $rules = array(), $formName = 'admin')
+    {
+        if (!$data) {
+            $data = $this->as_array();
         }
-		$rules = array_merge($this->_validationRules, $rules);
-		BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
-		$valid = BValidate::i()->validateInput($data, $rules, $formName);
-		if (!$valid) {
-			BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
-		}
+        $rules = array_merge($this->_validationRules, $rules);
+        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
+        $valid = BValidate::i()->validateInput($data, $rules, $formName);
+        if (!$valid) {
+            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
+        }
 
-		return $valid;
-	}
+        return $valid;
+    }
 
     public function __call($name, $args)
     {
@@ -2521,8 +2530,15 @@ class BCollection extends BData
 }
 
 /**
-* Basic user authentication and authorization class
-*/
+ * Basic user authentication and authorization class
+ * @property mixed password_hash
+ * @property mixed create_at
+ * @property mixed update_at
+ * @property mixed password
+ * @property mixed locale
+ * @property mixed timezone
+ * @property mixed id
+ */
 class BModelUser extends BModel
 {
     protected static $_sessionUser;
@@ -2539,7 +2555,7 @@ class BModelUser extends BModel
         if (!static::isLoggedIn()) {
             return false;
         }
-        $session = BSession::i();
+        BSession::i();
         if ($reset || !static::$_sessionUser) {
             static::$_sessionUser = static::load(static::sessionUserId());
         }
@@ -2616,8 +2632,8 @@ class BModelUser extends BModel
     public static function logout()
     {
         BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
+        BEvents::i()->fire(__METHOD__.':after', array('user' => static::$_sessionUser));
         static::$_sessionUser = null;
-        BEvents::i()->fire(__METHOD__.':after', array('user' => $this));
     }
 
     public function recoverPassword($emailView='email/user-password-recover')

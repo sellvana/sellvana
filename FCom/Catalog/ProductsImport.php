@@ -9,14 +9,19 @@ class FCom_Catalog_ProductsImport extends BImport
         'product.description' => array('pattern'=>'description'),
         'product.url_key' => array('pattern'=>'url.*key'),
         'product.base_price' => array('pattern'=>'base.*price|price'),
+        'product.sale_price' => array('pattern'=>'sale.*price|price'),
         'product.notes' => array('pattern'=>'notes'),
-        'product.weight' => array('pattern'=>'weight'),
+        'product.ship_weight' => array('pattern'=>'ship.*weight'),
+        'product.net_weight' => array('pattern'=>'net.*weight'),
         'product.image_url' => array('pattern'=>'image*url|thumbnail'),
         'product.avg_rating' => array('pattern'=>'avg*rating'),
         'product.num_reviews' => array('pattern'=>'num*reviews'),
         'product.is_hidden' => array('pattern'=>'hidden|disable'),
         'product.categories' => array('pattern'=>'categories|category'),
         'product.images' => array('pattern'=>'images|image'),
+        'product.uom' => array('pattern'=>'uom'),
+        'product.create_at' => array('created'),
+        'product.update_at' => array('updated')
     );
 
     protected $dir = 'products';

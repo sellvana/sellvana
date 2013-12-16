@@ -1,6 +1,6 @@
 <?php
 
-class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
+class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
 {
     public function action_reindex()
     {
@@ -9,12 +9,15 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         BORM::configure('logging', 0);
         BConfig::i()->set('db/logging', 0);
 
-        if (BRequest::i()->get('CLEAR')) {
+        echo "<pre>Starting...\n";
+        if (BRequest::i()->request('CLEAR')) {
             //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
-            FCom_CatalogIndex_Model_Doc::i()->update_many(array('reindex'=>1));
+            FCom_CatalogIndex_Model_Doc::i()->update_many(array('flag_reindex'=>1));
         }
         FCom_CatalogIndex_Indexer::i()->indexProducts(true);
         FCom_CatalogIndex_Indexer::i()->indexGC();
+        echo 'DONE';
+        exit;
     }
 
     public function action_test()
@@ -23,17 +26,19 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         FCom_CatalogIndex_Main::i()->autoReindex(false);
 
         // create categories / subcategories
-        if (false) {
+        if (true) {
+            echo '<p>Creating categories...</p>';
             $root = FCom_Catalog_Model_Category::i()->load(1);
-            for ($i=1; $i<=20; $i++) {
+            for ($i=1; $i<=9; $i++) {
                 $root->createChild('Category '.$i);
             }
         }
-        if (false) {
+        if (true) {
+            echo '<p>Creating subcategories...</p>';
             //$root = FCom_Catalog_Model_Category::i()->load(1);
             $cats = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
             foreach ($cats as $c) {
-                for ($i=1; $i<=5; $i++) {
+                for ($i=1; $i<=10; $i++) {
                     $c->createChild('Subcategory '.$c->id.'-'.$i);
                 }
             }
@@ -42,6 +47,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         // create products
         $products = true;
         if (true) {
+            echo '<p>Creating products...</p>';
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
@@ -75,7 +81,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         // assign products to categories
-        if (false) {
+        if (true) {
+            echo '<p>Assigning products to categories...</p>';
+
             BDb::run("TRUNCATE fcom_category_product");
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
@@ -98,8 +106,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         // reindex products
         if (true) {
-            FCom_CatalogIndex_Indexer::i()->indexProducts($products);//FCom_Catalog_Model_Product::i()->orm()->find_many());
-            FCom_CatalogIndex_Indexer::i()->indexGC();
+            echo '<p>Reindexing...</p>';
+
+            $this->forward('reindex');
         }
 
         // show sample search result
@@ -172,6 +181,15 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
         $this->layout('/catalog/category');
+
+        if ($category->layout_update) {
+            $layoutUpdate = BYAML::parse($category->layout_update);
+            if (!is_null($layoutUpdate)) {
+                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
+            } else {
+                BDebug::warning('Invalid layout update for CMS page');
+            }
+        }
     }
 
     public function action_search()

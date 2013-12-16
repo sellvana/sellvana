@@ -13,6 +13,6 @@ class FCom_Customer_Admin extends BClass
             'customers/import' => 'Import',
         ));
 
-        FCom_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
+        FCom_Admin_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
     }
 }

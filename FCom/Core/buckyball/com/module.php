@@ -186,7 +186,7 @@ class BModuleRegistry extends BClass
     protected function _getManifestCacheFilename()
     {
         $area = BApp::i()->get('area');
-        $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';
+        $fileName = BConfig::i()->get('fs/cache_dir').'/manifests'.($area ? '_'.$area : '').'.data';#.'.php';
         BUtil::ensureDir(dirname($fileName));
         return $fileName;
     }
@@ -201,6 +201,7 @@ class BModuleRegistry extends BClass
         foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
         }
+        #file_put_contents($cacheFile, '<'.'?php return '.var_export($data, 1).';');
         file_put_contents($cacheFile, serialize($data));
         BDebug::profile($t);
         return true;
@@ -212,6 +213,7 @@ class BModuleRegistry extends BClass
         if (is_readable($cacheFile)) {
             # $this->_modules = unserialize(file_get_contents($cacheFile)); return;
 
+            #$data = include($cacheFile);
             $data = unserialize(file_get_contents($cacheFile));
             foreach ($data as $modName => $params) {
                 $this->addModule($modName, $params);
@@ -493,7 +495,7 @@ class BModuleRegistry extends BClass
         // take care of 'load_after' option
         foreach ($modules as $modName=>$mod) {
             $mod->children_copy = $mod->children;
-            if ($mod->load_after) {
+            if ($mod->load_after && is_array($mod->load_after)) {
                 foreach ($mod->load_after as $n) {
                     if (empty($modules[$n])) {
                         BDebug::notice('Invalid module name specified: '.$n);
@@ -537,6 +539,13 @@ class BModuleRegistry extends BClass
             }
             // remove processed module from list
             unset($modules[$n->name]);
+        }
+        // move modules that have load_after=='ALL' to the end of list
+        foreach ($sorted as $modName => $mod) {
+            if ($mod->load_after==='ALL') {
+                unset($sorted[$modName]);
+                $sorted[$modName] = $mod;
+            }
         }
         $this->_modules = $sorted;
         return $this;
@@ -641,12 +650,17 @@ class BModule extends BClass
     public $routing;
     public $observe;
     public $provides;
+    public $areas;
     public $area;
     public $override;
     public $default_config;
     public $autoload;
     public $crontab;
     public $custom;
+    /**
+     * @var array
+     */
+    public $translations;
 
     const
         // run_level
@@ -708,6 +722,14 @@ class BModule extends BClass
         #if (empty($args['area'])) {
             $args['area'] = BApp::i()->get('area');
         #}
+/*
+if ($args['name']==="FCom_Referrals") {
+    echo "<pre>";
+    var_dump($args);
+    debug_print_backtrace();
+    exit;
+}
+*/
         $this->set($args);
 
         $args = $this->_processAreas($args);
@@ -1017,7 +1039,7 @@ class BModule extends BClass
     protected function _processTranslations()
     {
         //load translations
-        $language = BSession::i()->data('_language');
+        $language = BSession::i()->get('_language');
         if (!empty($language) && !empty($this->translations[$language])) {
             if (!is_array($this->translations[$language])) {
                 $this->translations[$language] = array($this->translations[$language]);

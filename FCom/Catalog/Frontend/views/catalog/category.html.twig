@@ -16,6 +16,9 @@
         <header class="f-page-header hidden-xs">
           <h1 class="f-page-title">{{ category.get('node_name') }}</h1>
         </header>
+        {% if category.get('show_sub_cat') %}
+            <div>SUBCATEGORIES HERE</div>
+        {% endif %}
         {{ THIS.hook('main_products') | raw }}
       </div>
       <!-- Sidebar Start -->

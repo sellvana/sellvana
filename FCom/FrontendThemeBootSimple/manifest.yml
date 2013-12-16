@@ -14,5 +14,5 @@ modules:
                 FCom_FrontendThemeBootSimple:
                     name: Simple Bootstrap Theme
                     area: FCom_Frontend
-                    layout: layout.yml
+                    layout: Frontend/layout.yml
                     parent: FCom_Frontend_DefaultTheme

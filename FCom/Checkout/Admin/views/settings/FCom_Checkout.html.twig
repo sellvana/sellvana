@@ -1,11 +1,13 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
+
+<h2>{{ "Checkout Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Checkout">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'Store Origin'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse in" id="settings-FCom_Checkout-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Checkout-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Store City'|_ }}</label>

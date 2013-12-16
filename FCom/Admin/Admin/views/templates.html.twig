@@ -1,0 +1,9 @@
+<form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
+    <header class="f-admin-main-title">
+        <span class="title">{{ 'Modules'|_ }}</span>
+        <div class="btn-group">
+        </div>
+    </header>
+    {{ THIS.view('core/messages') | raw }}
+    {{ THIS.view('core/backbonegrid') | raw }}
+</form>

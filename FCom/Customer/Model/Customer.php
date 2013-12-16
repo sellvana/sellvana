@@ -1,5 +1,27 @@
 <?php
-
+/**
+ * Model class for table 'fcom_customer'
+ * The followings are the available columns in table 'fcom_customer':
+ * @property string $id
+ * @property string $email
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $password_hash
+ * @property string $default_shipping_id
+ * @property string $default_billing_id
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $last_login
+ * @property string $token
+ * @property string $payment_method
+ * @property string $payment_details
+ * @property string $customer_group
+ * @property string $status
+ *
+ * relations
+ * @property FCom_Customer_Model_Address $default_billing
+ * @property FCom_Customer_Model_Address $default_shipping
+ */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer';
@@ -7,7 +29,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = array(
         'status' => array(
-            'new'      => 'New',
+            'review'   => 'Review',
             'active'   => 'Active',
             'disabled' => 'Disabled',
         ),
@@ -19,21 +41,87 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     private static $lastImportedCustomer = 0;
 
-	protected $_validationRules = array(
-		array('email', '@required'),
-		array('firstname', '@required'),
-		array('lastname', '@required'),
-		array('password', '@required'),
-		array('password_confirm', '@password_confirm'),
-		/*array('payment_method', '@required'),
-		array('payment_details', '@required'),*/
+    protected $_validationRules = array(
+        array('email', '@required'),
+        array('firstname', '@required'),
+        array('lastname', '@required'),
+        //array('password', '@required'),
+        array('password_confirm', '@password_confirm'),
+        /*array('payment_method', '@required'),
+        array('payment_details', '@required'),*/
 
-		array('email', '@email'),
+        array('email', '@email'),
 
-		array('default_shipping_id', '@integer'),
-		array('default_billing_id', '@integer'),
-		/*array('customer_group', '@integer'),*/
-	);
+        array('default_shipping_id', '@integer'),
+        array('default_billing_id', '@integer'),
+        /*array('customer_group', '@integer'),*/
+    );
+    //todo: set rules password minimum length
+
+    /**
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_Customer_Model_Customer
+     */
+    public static function i($new=false, array $args=array())
+    {
+        return parent::i($new, $args);
+    }
+
+    /**
+     * override default rules for login form
+     */
+    public function setLoginRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('email', '@email'),
+        );
+    }
+
+    /**
+     * override default rules for password recover form
+     */
+    public function setPasswordRecoverRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('email', '@email'),
+        );
+    }
+
+    public function setAccountEditRules($incChangePassword = false)
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('firstname', '@required'),
+            array('lastname', '@required'),
+        );
+
+        if ($incChangePassword) {
+            $this->_validationRules[] = array('password', '@required');
+            $this->_validationRules[] = array('password_confirm', '@password_confirm');
+        }
+    }
+
+    public function setChangePasswordRules()
+    {
+        $this->_validationRules = array(
+            array('current_password', '@required'),
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
+
+    public function setSimpleRegisterRules()
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
 
     public function setPassword($password)
     {
@@ -129,6 +217,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
+    /**
+     * @param bool $reset
+     * @return bool|FCom_Customer_Model_Customer
+     */
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
@@ -298,5 +390,40 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $user->session_cart_id = $cart->id();
             $user->save();
         }
+    }
+
+    /**
+     * get options data to create options html in select
+     * @param $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $fullname = $r->firstname . ' ' . $r->lastname;
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $fullname : $fullname;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * rule email unique
+     * @param $data
+     * @param $args
+     * @return bool
+     */
+    public static function ruleEmailUnique($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return false;
+        }
+        $model = self::i()->orm()->where('email', $data[$args['field']])->find_one();
+        if ($model)
+            return false;
+        return true;
     }
 }

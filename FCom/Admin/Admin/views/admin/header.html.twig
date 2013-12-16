@@ -1,0 +1,236 @@
+<style>
+.online
+{
+  color: #49bf67 !important;
+}
+
+.offline
+{
+  color: #C3C3C3 !important;
+}
+
+ul#adminUserList li
+{
+  cursor: pointer !important;
+}
+</style>
+{% set user = APP.instance("FCom_Admin_Model_User").sessionUser() %}
+{% set notifications = THIS.getNotifications() %}
+{% set recentActivity = THIS.getRecentActivity() %}
+{% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
+
+{% set adminChatsEnabled = MODULES.isLoaded('FCom_AdminChat') %}
+
+<header class="f-admin-header">
+  <nav class="navbar navbar-default">
+    <a class="toggle-nav btn pull-left" href="#">
+      <i class="icon-reorder"></i>
+    </a>
+    <a class="navbar-brand" href="{{ APP.href() }}">
+      <img class="logo" alt="{{ storeName }}" height="20" src="{{ APP.src('@FCom_Core/img/logo.svg') }}" />
+      <img class="logo-xs" alt="{{ storeName }}" src="{{ APP.src('@FCom_Core/img/logo.svg') }}" />
+    </a>
+    <ul class="nav">
+
+      <li class="dropdown light only-icon">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-cog"></i>
+        </a>
+        <ul class="dropdown-menu color-settings">
+          <li class="color-settings-body-color">
+            <div class="color-title">Body color</div>
+            <a data-change-to="assets/stylesheets/light-theme.css" href="#">
+              Light
+              <small>(default)</small>
+            </a>
+            <a data-change-to="assets/stylesheets/dark-theme.css" href="#">
+              Dark
+            </a>
+            <a data-change-to="assets/stylesheets/dark-blue-theme.css" href="#">
+              Dark blue
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li class="color-settings-contrast-color">
+            <div class="color-title">Contrast color</div>
+              <a data-change-to="contrast-red" href="#"><i class="icon-cog text-red"></i>
+                Red
+                <small>(default)</small>
+                </a>
+
+              <a data-change-to="contrast-blue" href="#"><i class="icon-cog text-blue"></i>
+                Blue
+                </a>
+
+              <a data-change-to="contrast-orange" href="#"><i class="icon-cog text-orange"></i>
+                Orange
+                </a>
+
+              <a data-change-to="contrast-purple" href="#"><i class="icon-cog text-purple"></i>
+                Purple
+                </a>
+
+              <a data-change-to="contrast-green" href="#"><i class="icon-cog text-green"></i>
+                Green
+                </a>
+
+              <a data-change-to="contrast-muted" href="#"><i class="icon-cog text-muted"></i>
+                Muted
+                </a>
+
+              <a data-change-to="contrast-fb" href="#"><i class="icon-cog text-fb"></i>
+                Facebook
+                </a>
+
+              <a data-change-to="contrast-dark" href="#"><i class="icon-cog text-dark"></i>
+                Dark
+                </a>
+
+              <a data-change-to="contrast-pink" href="#"><i class="icon-cog text-pink"></i>
+                Pink
+                </a>
+
+              <a data-change-to="contrast-grass-green" href="#"><i class="icon-cog text-grass-green"></i>
+                Grass green
+                </a>
+
+              <a data-change-to="contrast-sea-blue" href="#"><i class="icon-cog text-sea-blue"></i>
+                Sea blue
+                </a>
+
+              <a data-change-to="contrast-banana" href="#"><i class="icon-cog text-banana"></i>
+                Banana
+                </a>
+
+              <a data-change-to="contrast-dark-orange" href="#"><i class="icon-cog text-dark-orange"></i>
+                Dark orange
+                </a>
+
+              <a data-change-to="contrast-brown" href="#"><i class="icon-cog text-brown"></i>
+                Brown
+                </a>
+
+          </li>
+        </ul>
+      </li>
+
+      {% if recentActivity %}
+        <li class="dropdown medium only-icon widget">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-rss"></i>
+            <div class="label">{{ notifications.count }}</div>
+          </a>
+          <ul class="dropdown-menu" >
+            {% for item in recentActivity %}
+              <li>
+                <a href="{{ item.href }}" title="{{ item.title }}">
+                  <div class="widget-body">
+                    <div class="pull-left icon">
+                      <i class="{{ item.class }}"></i>
+                    </div>
+                    <div class="pull-left text">
+                      {{ item.html | raw }}
+                      <small class="text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="divider"></li>
+            {% endfor %}
+            <li class="widget-footer">
+              <a href="#">{{ "All activity" }}</a>
+            </li>
+          </ul>
+        </li>
+      {% endif %}
+
+      {% if notifications.count %}
+        <li class="dropdown medium only-icon widget">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-bell"></i>
+            <div class="label">{{ notifications.count }}</div>
+          </a>
+          <ul class="dropdown-menu">
+            {% for group, items in notifications.groups %}
+              {% for item in items %}
+                <li>
+                  <a href="{{ item.href }}" title="{{ item.title }}">
+                    <div class="widget-body">
+                      <div class="pull-left icon">
+                        <i class="{{ item.class }}"></i>
+                      </div>
+                      <div class="pull-left text">
+                        {{ item.message }}
+                        <small class="text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li class="divider"></li>
+              {% endfor %}
+            {% endfor %}
+            <li class="widget-footer">
+              <a href="#">{{ "All notifications" }}</a>
+            </li>
+          </ul>
+        </li>
+      {% endif %}
+
+      {{ THIS.hook('header_toolbar') | raw }}
+
+      <li class="dropdown dark user-menu">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          <img width="23" height="23" alt="{{ user.fullname() }}" src="{{ UTIL.gravatar(user.get("email")) }}" />
+          <span class="user-name">{{ user.fullname() }}</span>
+          <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="{{ APP.href("my_account") }}">
+              <i class="icon-user"></i>
+              {{ "Profile" |_ }}
+            </a>
+          </li>
+          <li>
+            <a href="{{ APP.href("settings") }}">
+              <i class="icon-cog"></i>
+              {{ "Settings" |_ }}
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="{{ APP.href("logout") }}">
+              <i class="icon-signout"></i>
+              {{ "Sign out" |_ }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <form action="search_results.html" class="navbar-form navbar-right hidden-xs" method="get">
+      <button class="btn btn-link icon-search" name="button" type="submit"></button>
+      <div class="form-group">
+        <input value="" class="form-control" placeholder="Search..." autocomplete="off" id="q_header" name="q" type="text" />
+      </div>
+    </form>
+  </nav>
+</header>
+
+<script>
+  function setModalHeight() {
+    var h = $(window).height()-200;
+    if (h>0) {
+      $('.modal-body').css('max-height', h);
+    }
+  }
+
+  $(window).resize(function(ev) {
+    setModalHeight();
+  });
+
+  var g_vent;
+  require(['jquery','underscore','backbone'], function($, _, Backbone) {
+    g_vent = _.extend({}, Backbone.Events);
+  });
+
+</script>

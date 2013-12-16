@@ -1,0 +1,13 @@
+{% if THIS.getCrumbs() %}
+    <ol class="breadcrumb">
+{% for c in THIS.getCrumbs() %}
+        <li class="{{ c.li_class }} {{ c.active ? 'active' }}">
+{%- if c.href -%}
+            <a href="{{ c.href }}" {{ c.title ? 'title="' ~ c.title ~ '"' }}>{{ c.label }}</a>
+{%- else -%}
+            {{ c.label }}
+{%- endif -%}
+        </li>
+{% endfor %}
+    </ol>
+{% endif %}

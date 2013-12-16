@@ -1,5 +1,32 @@
 <?php
-
+/**
+ * Model class for table "fcom_product".
+ *
+ * The followings are the available columns in table 'fcom_product':
+ * @property string  $id
+ * @property string  $local_sku
+ * @property string  $product_name
+ * @property string  $short_description
+ * @property string  $description
+ * @property string  $url_key
+ * @property string  $cost
+ * @property string  $msrp
+ * @property string  $map
+ * @property string  $markup
+ * @property string  $base_price
+ * @property string  $sale_price
+ * @property string  $net_weight
+ * @property string  $ship_weight
+ * @property integer $is_hidden
+ * @property string  $notes
+ * @property string  $uom
+ * @property string  $thumb_url
+ * @property string  $create_at
+ * @property string  $update_at
+ * @property string  $data_serialized
+ * @property string  $avg_rating
+ * @property integer $num_reviews
+ */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -17,36 +44,28 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ),
     );
 
-	protected $_validationRules = array(
-		array('product_name', '@required'),
-		array('base_price', '@required'),
-		array('local_sku', '@required'),
+    protected $_validationRules = array(
+        array('product_name', '@required'),
+        array('base_price', '@required'),
+        array('local_sku', '@required'),
         //TODO validation fails on is_hidden field
-		/*array('is_hidden', '@required'),*/
-		/*array('uom', '@required'),*/
+        /*array('is_hidden', '@required'),*/
+        /*array('uom', '@required'),*/
 
-		/*array('is_hidden', '@integer'),*/
-		array('num_reviews', '@integer'),
+        /*array('is_hidden', '@integer'),*/
+        array('num_reviews', '@integer'),
 
         array('local_sku', '@string', null, array('max' => 100)),
-        array('cost', '@string', null, array('max' => 12)),
-        array('msrp', '@string', null, array('max' => 12)),
-        array('map', '@string', null, array('max' => 12)),
-        array('markup', '@string', null, array('max' => 12)),
-        array('base_price', '@string', null, array('max' => 12)),
-        array('sale_price', '@string', null, array('max' => 12)),
-        array('net_weight', '@string', null, array('max' => 12)),
-        array('ship_weight', '@string', null, array('max' => 12)),
 
-		array('cost', '@numeric'),
-		array('msrp', '@numeric'),
-		array('map', '@numeric'),
-		array('markup', '@numeric'),
-		array('sale_price', '@numeric'),
-		array('net_weight', '@numeric'),
-		array('ship_weight', '@numeric'),
-		array('avg_rating', '@numeric'),
-	);
+        array('cost', '@numeric'),
+        array('msrp', '@numeric'),
+        array('map', '@numeric'),
+        array('markup', '@numeric'),
+        array('sale_price', '@numeric'),
+        array('net_weight', '@numeric'),
+        array('ship_weight', '@numeric'),
+        array('avg_rating', '@numeric'),
+    );
 
     private $_importErrors = null;
     private $_dataImport = array();
@@ -102,28 +121,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onAfterLoad()
+    {
+        parent::onAfterLoad();
+        $thumbPath = FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl(), '/')).'&s=48x48';
+        $this->set('thumb_path', $thumbPath);
+
+    }
+
     public function onAfterSave()
     {
-        if($this->get('price_info')) {
-            $data = json_decode($this->get('price_info'), true);
-            $rows = $data['rows'];
-            $remove_ids = $data['remove_ids'];
-            $model = FCom_CustomerGroups_Model_TierPrice::i();
-
-            foreach($remove_ids as $id) {
-                $model->load($id)->delete();
-            }
-
-            foreach($rows as $row) {
-                if(isset($row['_new'])) {
-                    unset($row['_new']);
-                    unset($row['id']);
-                    $model->create($row)->save();
-                } else {
-                    $model->load($row['id'])->set($row)->save();
-                }
-            }
-        }
         if (!parent::onAfterSave()) return false;
 
         //todo: setup unique uniq_id
@@ -205,7 +212,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * Find all categories which belong to product
-     * @return type
+     * @param bool $includeAscendants
+     * @return mixed
      */
     public function categories($includeAscendants=false)
     {
@@ -287,7 +295,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
             //->select(array('pa.manuf_vendor_id'))
             ->join('FCom_Core_Model_MediaLibrary', array('a.id','=','pa.file_id'), 'a')
-            ->select(array('a.id', 'a.file_name', 'a.file_size'));
+            ->select(array('a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'))
+            ->order_by_asc('position');
     }
 
     public function media($type)
@@ -672,7 +681,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')
             ->join('FCom_Customer_Model_Customer', array('pr.customer_id','=','c.id'), 'c')
-            ->where('pr.product_id', $this->id())->order_by_expr('pr.create_at DESC')->find_many();
+            ->where(array('pr.product_id' => $this->id(), 'approved' => 1))->order_by_expr('pr.create_at DESC')->find_many();
 
         if ($incAvgRating) {
             $avgRating = $this->calcAverageRating($reviews);
@@ -701,13 +710,41 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $rs['rating3'] += $review->rating3;
             }
 
-            $rs['rating'] = $rs['rating'] / $numReviews;
-            $rs['rating1'] = $rs['rating1'] / $numReviews;
-            $rs['rating2'] = $rs['rating2'] / $numReviews;
-            $rs['rating3'] = $rs['rating3'] / $numReviews;
+            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
+            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
+            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
+            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
         }
 
         return $rs;
+    }
+
+    public function getRelatedProducts()
+    {
+        return array();
+    }
+
+    public function getUpsellProducts()
+    {
+        return array();
+    }
+
+    /**
+     * get options data to create options html in select
+     * @param bool $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $r->product_name : $r->product_name;
+            }
+        }
+
+        return $data;
     }
 }
 

@@ -1,6 +1,6 @@
 modules:
     FCom_Customer:
-        version: 0.1.6
+        version: 0.1.7
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0 } }
         translations: { de: de.php }
@@ -12,6 +12,7 @@ modules:
                     - [ get, /customers, FCom_Customer_Admin_Controller_Customers.index ]
                     - [ any, /customers/.action, FCom_Customer_Admin_Controller_Customers ]
                     - [ any, /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
+                    - [ any, /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

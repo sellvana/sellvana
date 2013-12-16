@@ -1,0 +1,7 @@
+modules:
+    FCom_CustomModule:
+        description: Your layout and template changes
+        load_after: ALL
+        areas:
+            FCom_Frontend:
+                auto_use: [ layout, views ]

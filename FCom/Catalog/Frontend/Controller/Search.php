@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
+class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Frontend_Controller_Abstract
 {
     public function action_category()
     {
@@ -35,6 +35,15 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
         $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
+
+        if ($category->layout_update) {
+            $layoutUpdate = BYAML::parse($category->layout_update);
+            if (!is_null($layoutUpdate)) {
+                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('cms_page');
+            } else {
+                BDebug::warning('Invalid layout update for CMS page');
+            }
+        }
 
         $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
