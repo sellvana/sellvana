@@ -120,6 +120,34 @@ class FCom_Promo_Model_Promo extends BModel
         $this->status    = 'pending';
     }
 
+    public function onBeforeSave()
+    {
+        parent::onBeforeSave();
+
+        $this->setDate( $this->get( "from_date" ), 'from_date' );
+        $this->setDate( $this->get( "to_date" ), 'to_date' );
+        $this->set('update_at', date('Y-m-d H:i:s'));
+        if(BUtil::isEmptyDate($this->get('create_at'))){
+            $this->set('create_at', date('Y-m-d H:i:s'));
+        }
+        return true;
+    }
+
+    /**
+     * Set date field
+     * By default dates are returned as strings, therefore we need to convert them for mysql
+     *
+     * @param $fieldDate
+     * @param $field
+     */
+    public function setDate( $fieldDate, $field )
+    {
+        $date = strtotime( $fieldDate );
+        if ( -1 != $date ) {
+            $this->set( $field, date( "Y-m-d", $date ) );
+        }
+    }
+
     public function onAfterSave()
     {
         parent::onAfterSave();
