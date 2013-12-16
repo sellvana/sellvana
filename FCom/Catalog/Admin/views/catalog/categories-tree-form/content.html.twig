@@ -1,23 +1,38 @@
 {% set m = THIS.get('model') %}
 
 <div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_content">{{ 'Show Content'|_ }}</label>
+    <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>
+    <div class="col-md-10">
+        <ol id="show-order">
+            <li>Custom Content</li>
+            <li>Page</li>
+            <li>Subcategories</li>
+            <li>Products</li>
+        </ol>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-show_content">{{ 'Show Custom Content'|_ }}</label>
     <div class="col-md-5">
         <input type="hidden" name="model[show_content]" value="0" />
         <input id="model-show_content" class="switch-cbx" name="model[show_content]" {% if m.get('show_content') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
 <div class="form-group">
-    <label class="col-md-2 control-label" for="main-content">{{ 'Content'|_ }}</label>
+    <label class="col-md-2 control-label" for="main-content">{{ 'Custom Content'|_ }}</label>
     <div class="col-md-10">
         <textarea id="main-content" class="form-control ckeditor" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
     </div>
 </div>
 <div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_products">{{ 'Show Products'|_ }}</label>
+    <label class="col-md-2 control-label" for="model-show_cms_page">{{ 'Show Page'|_ }}</label>
+    <div class="col-md-2">
+        <input type="hidden" name="model[show_cms_page]" value="0" />
+        <input id="model-show_cms_page" class="switch-cbx" name="model[show_cms_page]" {% if m.get('show_cms_page') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+    </div>
     <div class="col-md-5">
-        <input type="hidden" name="model[show_products]" value="0" />
-        <input id="model-show_products" class="switch-cbx" name="model[show_products]" {% if m.get('show_products') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <select name="model[cms_page]" class="form-control select2"/></select>
     </div>
 </div>
 <div class="form-group">
@@ -28,8 +43,21 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="col-md-2 control-label" for="main-layout_update">{{ 'Layout Update'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="main-layout_update" class="form-control" rows="5" name="model[layout_update]">{{ m.get('layout_update') }}</textarea>
+    <label class="col-md-2 control-label" for="model-show_products">{{ 'Show Products'|_ }}</label>
+    <div class="col-md-5">
+        <input type="hidden" name="model[show_products]" value="0" />
+        <input id="model-show_products" class="switch-cbx" name="model[show_products]" {% if m.get('show_products') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-show_sidebar">{{ 'Show Sidebar'|_ }}</label>
+    <div class="col-md-5">
+        <input type="hidden" name="model[show_sidebar]" value="0" />
+        <input id="model-show_products" class="switch-cbx" name="model[show_sidebar]" {% if m.get('show_sidebar') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+    </div>
+</div>
+<script>
+require(['jquery', 'jquery-ui'], function($) {
+    $('#show-order').sortable();
+})
+</script>
