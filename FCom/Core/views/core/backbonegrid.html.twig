@@ -190,9 +190,21 @@
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
-          print('<button class="btn btn-link btn-custom" type="button">');
-            print(col.data.custom.caption);
-          print('</button>');
+          if (col.data.custom.type === 'link') {
+              print('<a class="btn btn-link btn-custom" href="'+col.data.custom.href+rc.row[col.data.edit.col]+'" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
+                if (typeof(col.data.custom.icon) !== 'undefined') {
+                    print('<i class="' + col.data.custom.icon + '"></i>');
+                }
+                print(col.data.custom.caption);
+              print('</a>');
+          } else if (typeof(col.data.custom.type) === 'undefined' || col.data.custom.type === 'button') {
+              print('<button class="btn btn-link btn-custom" type="button" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
+              if (typeof(col.data.custom.icon) !== 'undefined') {
+                print('<i class="' + col.data.custom.icon + '"></i>');
+              }
+              print(col.data.custom.caption);
+              print('</button>');
+          }
         }
 
         print('&nbsp;&nbsp;');
