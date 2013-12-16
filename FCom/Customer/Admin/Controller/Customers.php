@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'customers';
@@ -13,20 +13,51 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-	        array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index'=>'c.id'),
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
+            array('name' => 'title', 'label'=>'Customer Group', 'index'=>'cg.title'),
+            array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
+                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
             array('name' => 'postcode', 'label'=>'Postal Code', 'index'=>'a.postcode'),
             array('name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
-            array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),
+            /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
+            array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+                  'data' => array(
+                      'custom' => array(
+                          'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                          'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
+                      'edit'   => array('href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
+                      'delete' => true
+                  )
+            ),
         );
-        $config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
+        $config['actions'] = array(
+            'export' => true,
+            'edit'   => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'email', 'type' => 'text'),
+            array('field' => 'country', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'select'),
+        );
+        //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
+        //todo: check this in FCom_Admin_Admin_Controller_Abstract_GridForm
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
         return $config;
     }
 
@@ -35,7 +66,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         parent::gridOrmConfig($orm);
 
         $orm->left_outer_join('FCom_Customer_Model_Address', array('a.id','=','c.default_billing_id'), 'a')
+            ->left_outer_join('FCom_CustomerGroups_Model_Group', array('cg.id','=','c.customer_group'), 'cg')
             ->select(array('a.street1', 'a.city', 'a.region', 'a.postcode', 'a.country'))
+            ->select(array('cg.title'))
         ;
     }
 
@@ -43,10 +76,27 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
+        $resize_url = FCom_Core_Main::i()->resizeUrl();
+        $imageNotFound = $resize_url.'?f='.urlencode(trim($media.'/image-not-found.jpg', '/')).'&s=98x98';
         $args['view']->set(array(
-            'sidebar_img' => BUtil::gravatar($m->email),
-            'title' => $m->id ? 'Edit Customer: '.$m->firstname.' '.$m->lastname : 'Create New Customer',
+            'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $imageNotFound),
+            //todo: add profile image, silhouette icon if empty profile image
+            'title' => $m->id ? $this->_('Edit Customer: ').$m->firstname.' '.$m->lastname : $this->_('Create New Customer'),
         ));
+    }
+
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
+    {
+        if ($model && $model->id) {
+            $view->addTab('addresses', array('label' => $this->_('Addresses'), 'pos' => 20));
+            $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
+            $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
+            $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
+            $view->addTab('lifetime-sales', array('label' => $this->_('Lifetime Sales'), 'pos' => 60));
+            $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostAfter($args)
@@ -74,5 +124,76 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                 FCom_Customer_Model_Address::i()->delete_many(array('id'=>$del, 'customer_id'=>$cust->id));
             }
         }
+    }
+
+    /**
+     * get config for grid: customers of group
+     * @param $group FCom_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getGroupCustomersConfig($group)
+    {
+        $class = $this->_modelClass;
+        $orm = $class::i()->orm()->table_alias('c')
+            ->select(array('c.id', 'c.firstname', 'c.lastname', 'c.email'))
+            ->join('FCom_CustomerGroups_Model_Group', array('c.customer_group','=','cg.id'), 'cg')
+            ->where('c.customer_group', $group ? $group->id : 0);
+
+        $config = parent::gridConfig();
+
+        // TODO for empty local grid, it throws exception
+        unset($config['orm']);
+        $config['data'] = $orm->find_many();
+        $config['id'] = 'group_customers_grid_'.$group->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
+            array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200),
+        );
+        $config['actions'] = array(
+            'add'=>array('caption'=>'Add customer'),
+        );
+        $config['filters'] = array(
+            array('field'=>'firstname', 'type'=>'text'),
+            array('field'=>'lastname', 'type'=>'text'),
+            array('field'=>'email', 'type'=>'text'),
+        );
+        $config['data_mode'] = 'local';
+        $config['events'] = array('init', 'add','mass-delete');
+
+        return array('config'=>$config);
+    }
+
+    /**
+     * get config for grid: all customer
+     * @param $group FCom_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getAllCustomersConfig($group)
+    {
+        $config            = parent::gridConfig();
+        $config['id']      = 'group_all_customers_grid_' . $group->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
+            array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200),
+        );
+        $config['actions'] = array(
+            'add' => array('caption' => 'Add selected customers')
+        );
+        $config['filters'] = array(
+            array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'lastname', 'type' => 'text'),
+            array('field' => 'email', 'type' => 'text'),
+            '_quick' => array('expr' => 'firstname like ? or lastname like ? or email like ? or c.id=?', 'args' => array('?%', '%?%', '?'))
+        );
+
+        $config['events'] = array('add');
+
+        return array('config' => $config);
     }
 }

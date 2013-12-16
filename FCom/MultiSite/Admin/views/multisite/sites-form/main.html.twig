@@ -1,4 +1,4 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 
 <fieldset>
@@ -11,7 +11,7 @@
     <div class="form-group">
         <label class="col-md-2 label-control">{{ "Domains"|_ }}</label>
         <div class="col-md-5">
-            <textarea class="form-control" name="model[domains]">{{ validator.fieldValue('domains') }}</textarea>
+            <textarea class="form-control" name="model[match_domains]">{{ validator.fieldValue('match_domains') }}</textarea>
         </div>
     </div>
     <div class="form-group">

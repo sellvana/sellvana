@@ -1,5 +1,5 @@
 {% set c = APP.instance('FCom_Catalog_ProductsImport').config() %}
-{% set start = REQEUST.get('start') %}
+{% set start = THIS.get('start') %}
 
 <div class="panel-body">
 {% if start or c.status == 'running' %}
@@ -13,7 +13,11 @@
     {% if start %}
         <script>
             require(['jquery'], function ($) {
-                $.post({{ APP.href('catalog/products/import/start') }})
+                $.post('{{ APP.href('catalog/products/import/start') }}', function(data) {
+                    var importReviewEle = $('#import-accordion-group3');
+                    importReviewEle.prev().find('a').trigger('click');
+                    importReviewEle.html(data);
+                });
             })
         </script>
     {% else %}
@@ -26,16 +30,8 @@
             });
         </script>
     {% endif %}
-{% else %}
-    <div class="form-actions form-actions-padding-sm">
-        <div class="row">
-            <div class="col-md-12 col-md-offset-2">
-                <button class="btn st1 sz2 btn btn-primary" id="step3-start"type="button">{{ 'Start Import with selected configuration'|_ }}</button>
-            </div>
-        </div>
-    </div>
-{% endif %}
-{% if c.status and c.rows_processed %}
+
+{% elseif c.status and c.rows_processed %}
     {% set pct = c.rows_processed / c.rows_total*100 %}
     <table class="data-table">
         <tr>
@@ -157,5 +153,13 @@
             </tr>
         {% endif %}
     </table>
+{% else %}
+    <div class="form-actions form-actions-padding-sm">
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2">
+                <button class="btn st1 sz2 btn btn-primary" id="step3-start"type="button">{{ 'Start Import with selected configuration'|_ }}</button>
+            </div>
+        </div>
+    </div>
 {% endif %}
 </div>

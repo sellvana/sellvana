@@ -1,8 +1,8 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set tabs = THIS.sortedTabs() %}
 {% set formId = THIS.get('form_id') %}
 {% set formUrl = THIS.get('form_url') %}
-{% set validator = THIS.validator(formId, THIS.model) %}
+{% set validator = THIS.validator(formId, THIS.get('model')) %}
 
 <script>
 require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {

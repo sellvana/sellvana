@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
+class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
 {
     public function action_manuf()
     {
@@ -13,8 +13,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $layout = BLayout::i();
         $crumbs = array('home');
-        $r = explode('/', BRequest::i()->params('product'));
-        $p = array_pop($r);
+        $p = BRequest::i()->params('product');
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             $this->forward(false);
@@ -24,9 +23,11 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BApp::i()->set('current_product', $product);
 
         $layout->view('catalog/product/details')->set('product', $product);
+        $head = $layout->view('head');
 
-        if ($r) {
-            $category = FCom_Catalog_Model_Category::i()->load(join('/', $r), 'url_path');
+        $categoryPath = BRequest::i()->params('category');
+        if ($categoryPath) {
+            $category = FCom_Catalog_Model_Category::i()->load($categoryPath, 'url_path');
             if (!$category) {
                 $this->forward(false);
                 return $this;
@@ -35,14 +36,18 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             BApp::i()->set('current_category', $category);
 
             $layout->view('catalog/product/details')->set('category', $category);
-            $layout->view('head')->canonical($product->url());
+            $head->canonical($product->url());
             foreach ($category->ascendants() as $c) {
                 if ($c->get('node_name')) {
                     $crumbs[] = array('label'=>$c->get('node_name'), 'href'=>$c->url());
+                    $head->addTitle($c->get('node_name'));
                 }
             }
+            $head->addTitle($category->get('node_name'));
             $crumbs[] = array('label'=>$category->get('node_name'), 'href'=>$category->url());
         }
+
+        $head->addTitle($product->get('product_name'));
         $crumbs[] = array('label'=>$product->get('product_name'), 'active'=>true);
 
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
@@ -54,6 +59,15 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('catalog/product/details')->set('user', $user);
 
         $this->layout('/catalog/product');
+
+        if ($product->layout_update) {
+            $layoutUpdate = BYAML::parse($product->layout_update);
+            if (!is_null($layoutUpdate)) {
+                BLayout::i()->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
+            } else {
+                BDebug::warning('Invalid layout update for CMS page');
+            }
+        }
     }
 
     public function action_product__POST()

@@ -1,11 +1,13 @@
-{% set c = THIS.model %}
+{% set c = THIS.get('model') %}
+
+<h2>{{ "MarketClient Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_MarketClient">
     <div class="panel panel-default">
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'API information'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_MarketClient-group0">
+        <div class="panel-collapse accordion-body in" id="settings-FCom_MarketClient-group0">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Auto-Login to marketplace'|_ }}</label>
@@ -21,9 +23,9 @@
         <div class="panel-heading">
             <a href="#" class="accordion-toggle">{{ 'FTP/SFTP settings: connection Information'|_ }}</a>
         </div>
-        <div class="panel-collapse collapse" id="settings-FCom_MarketClient-group1">
+        <div class="panel-collapse accordion-body" id="settings-FCom_MarketClient-group1">
             <div class="panel-body">
-                <small class="text-muted">Proin eu nibh ut urna tristique rhoncus. Sed euismod, quam sed dignissim imperdiet, nulla leo vehicula mi, a sagittis lacus augue nec sapien.</small>
+                <small class="text-muted"></small>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Enable FTP'|_ }}</label>
                     <div class="col-md-10">
@@ -57,8 +59,8 @@
                             FTP
                         </label>
                         <label class="radio radio-inline">
-                            <input type="radio" name="config[modules][FCom_MarketClient][ftp][type]" value="ftps" {% if c.get('modules/FCom_MarketClient/ftp/type') != 'ftps'%}checked="checked"{% endif %}/>
-                            FTPS
+                            <input type="radio" name="config[modules][FCom_MarketClient][ftp][type]" value="sftp" {% if c.get('modules/FCom_MarketClient/ftp/type') != 'ftp'%}checked="checked"{% endif %}/>
+                            SFTP
                         </label>
                     </div>
                 </div>

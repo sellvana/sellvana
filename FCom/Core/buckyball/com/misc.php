@@ -441,6 +441,31 @@ class BUtil extends BClass
     }
 
     /**
+     * Find index of array item that matches filter values
+     *
+     * @param array $array
+     * @param array $filter
+     * @return boolean|int
+     */
+    static public function arrayFind(array $array, array $filter)
+    {
+        foreach ($array as $i => $item) {
+            $found = true;
+            foreach ($filter as $k=>$v) {
+                if (!(isset($item[$k]) && $item[$k]===$v)) {
+                    $found = false;
+                    break;
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+            return $i;
+        }
+        return false;
+    }
+
+    /**
     * Clean array of ints from empty and non-numeric values
     *
     * If parameter is a string, splits by comma
@@ -1485,6 +1510,92 @@ class BUtil extends BClass
         $mult = array('G' => 1073741824, 'M' => 1048576, 'K' => 1024);
         return $val[1]*(!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
     }
+
+    /**
+     * convert image to jpeg, also resize if have width or height destination image
+     * @param string  $srcFile
+     * @param string  $dstFile
+     * @param integer $dw width destination image
+     * @param integer $dh height destination image
+     * @param string  $fileType
+     * @return boolean
+     */
+    static public function convertImage($srcFile, $dstFile, $dw = null, $dh = null, $fileType = 'jpg')
+    {
+        clearstatcache(true, $srcFile);
+
+        if (!file_exists($srcFile) || !filesize($srcFile)) {
+            return false;
+        }
+
+        list($sw, $sh, $type) = getimagesize($srcFile);
+        if (!$sw) {
+            return false;
+        }
+
+        if (!$dw) {
+            $dw = $sw;
+        }
+        if (!$dh) {
+            $dh = $sh;
+        }
+
+        //get image
+        switch ($type) {
+            case IMAGETYPE_GIF :
+                $srcImage = imagecreatefromgif($srcFile);
+                break;
+            case IMAGETYPE_BMP:
+                $srcImage = imagecreatefromwbmp($srcFile);
+                break;
+            case IMAGETYPE_PNG:
+                $srcImage = imagecreatefrompng($srcFile);
+                break;
+            case IMAGETYPE_JPEG:
+            default:
+                $srcImage = imagecreatefromjpeg($srcFile);
+                break;
+        }
+
+        if ($srcImage) {
+            $dstImage = imagecreatetruecolor($dw, $dh);
+            $color = imagecolorallocate($dstImage,
+                base_convert(substr('FFFFFF', 0, 2), 16, 10),
+                base_convert(substr('FFFFFF', 2, 2), 16, 10),
+                base_convert(substr('FFFFFF', 4, 2), 16, 10)
+            );
+            imagefill($dstImage, 0, 0, $color);
+            $scale = $sw > $sh ? $dw / $sw : $dh / $sh;
+            $dfw = $sw * $scale; //diff width
+            $dfh = $sh * $scale; //diff height
+            if ($sh < $dh) {
+                $dfh = $sh;
+            }
+            if ($sw < $dw) {
+                $dfw = $sw;
+            }
+            imagecopyresampled($dstImage, $srcImage, ($dw - $dfw) / 2, ($dh - $dfh) / 2, 0, 0, $dfw, $dfh, $sw, $sh);
+
+            //write image base on file_type
+            switch ($fileType) {
+                case 'gif':
+                    $success = imagegif($dstImage, $dstFile);
+                    break;
+                case 'png':
+                    $success = imagepng($dstImage, $dstFile, 7);
+                    break;
+                case 'jpg':
+                case 'jpeg':
+                default:
+                    $success = imagejpeg($dstImage, $dstFile, 90);
+                    break;
+            }
+            imagedestroy($dstImage);
+            @chmod($dstFile, 0664);
+            return $success;
+        }
+        return false;
+    }
 }
 
 class BHTML extends BClass
@@ -1564,9 +1675,13 @@ class BEmail extends BClass
         }
 
         $origBody = $body;
+
+        $this->_formatAlternative($headers, $body);
+        $body = trim(preg_replace('#<!--.*?-->#', '', $body));
+
         if ($files) {
             // $body and $headers will be updated
-            $this->_addAttachment($files, $headers, $body);
+            $this->_addAttachments($files, $headers, $body);
         }
 
         $emailData = array(
@@ -1615,6 +1730,26 @@ class BEmail extends BClass
         return $result;
     }
 
+    protected function _formatAlternative(&$headers, &$body)
+    {
+        if (!preg_match('#<!--=+-->#', $body)) {
+            return $body;
+        }
+        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
+
+        // headers for attachment
+        $headers['mime-version'] = "MIME-Version: 1.0";
+        $headers['content-type'] = "Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
+
+        $parts = preg_split('#<!--=+-->#', $body);
+        $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim($parts[0]);
+        $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim($parts[1]);
+        $message .= "\r\n--{$mimeBoundary}--";
+
+        $body = $message;
+        return true;
+    }
+
     /**
      * Add email attachment
      *
@@ -1622,39 +1757,34 @@ class BEmail extends BClass
      * @param $mailheaders
      * @param $body
      */
-    protected function _addAttachment($files, &$mailheaders, &$body)
+    protected function _addAttachments($files, &$headers, &$body)
     {
         $body = trim($body);
-        //$headers = array();
-        // boundary
-        $semi_rand     = md5(microtime());
-        $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
 
-        // headers for attachment
-        $headers   = $mailheaders;
-        $headers[] = "MIME-Version: 1.0";
-        $headers[] = "Content-Type: multipart/mixed;";
-        $headers[] = " boundary=\"{$mime_boundary}\"";
+        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
 
         //headers and message for text
-        $message = "--{$mime_boundary}\n\n" . $body . "\n\n";
+        $message = "--{$mimeBoundary}\r\n{$mailheaders['content-type']}\r\n\r\n{$body}\r\n\r\n";
+
+        // headers for attachment
+        $headers['mime-version'] = "MIME-Version: 1.0";
+        $headers['content-type'] = "Content-Type: multipart/mixed; boundary=\"{$mimeBoundary}\"";
 
         // preparing attachments
         foreach ($files as $file) {
             if (is_file($file)) {
                 $data = chunk_split(base64_encode(file_get_contents($file)));
                 $name = basename($file);
-                $message .= "--{$mime_boundary}\n" .
-                    "Content-Type: application/octet-stream; name=\"" . $name . "\"\n" .
-                    "Content-Description: " . $name . "\n" .
-                    "Content-Disposition: attachment;\n" . " filename=\"" . $name . "\"; size=" . filesize($files[$i]) . ";\n" .
-                    "Content-Transfer-Encoding: base64\n\n" . $data . "\n\n";
+                $message .= "--{$mimeBoundary}\r\n" .
+                    "Content-Type: application/octet-stream; name=\"{$name}\"\r\n" .
+                    "Content-Description: {$name}\r\n" .
+                    "Content-Disposition: attachment; filename=\"{$name}\"; size=".filesize($files[$i]).";\r\n" .
+                    "Content-Transfer-Encoding: base64\r\n\r\n{$data}\r\n\r\n";
             }
         }
-        $message .= "--{$mime_boundary}--";
+        $message .= "--{$mimeBoundary}--";
 
-        $body        = $message;
-        $mailheaders = $headers;
+        $body = $message;
         return true;
     }
 
@@ -2051,9 +2181,15 @@ class BDebug extends BClass
         static::$_logDir = $dir;
     }
 
-    public static function log($msg, $file='debug.log')
+    public static function log($msg, $file='debug.log', $backtrace=false)
     {
-        error_log($msg."\n", 3, static::$_logDir.'/'.$file);
+        $file = static::$_logDir.'/'.$file;
+        error_log($msg."\n", 3, $file);
+        if ($backtrace) {
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            error_log(ob_get_clean(), 3, $file);
+        }
     }
 
     public static function logException($e)
@@ -2429,12 +2565,13 @@ class BLocale extends BClass
     }
 
     /**
-    * Import translations to the tree
-    *
-    * @todo make more flexible with file location
-    * @todo YAML
-    * @param mixed $data array or file name string
-    */
+     * Import translations to the tree
+     *
+     * @todo make more flexible with file location
+     * @todo YAML
+     * @param mixed $data array or file name string
+     * @param array $params
+     */
     public static function importTranslations($data, $params=array())
     {
         $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::i()->currentModuleName();
@@ -2493,7 +2630,7 @@ class BLocale extends BClass
                         break;
                 }
             } else {
-                BDebug::warning('Could not load translation file: '.$data);
+                BDebug::info('Could not load translation file: '.$data);
                 return;
             }
         } elseif (is_array($data)) {
@@ -2547,7 +2684,7 @@ class BLocale extends BClass
                     continue;
                 }
                 if($func) {
-                    $token[1] = trim($token[1], "'");
+                    $token[1] = trim($token[1], "'\"");
                     $keys[$token[1]] = '';
                     $func = 0;
                     continue;
@@ -3296,7 +3433,7 @@ class BValidate extends BClass
             'message' => 'Invalid number: :field',
         ),
         'integer'   => array(
-            'rule'    => '/^[+-][0-9]+$/',
+            'rule'    => '/^[+-]?[0-9]+$/',
             'message' => 'Invalid integer: :field',
         ),
         'alphanum'  => array(
@@ -3369,7 +3506,7 @@ class BValidate extends BClass
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
-                $result = empty($data[$r['field']]) || preg_match($m[0], $data[$r['field']]);
+                $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
             } elseif($r['rule'] instanceof Closure){
                 $result = $r['rule']($data, $r['args']);
             } elseif (is_callable($r['rule'])) {
@@ -3589,7 +3726,7 @@ class Bcrypt extends BClass
         return strlen($hash) > 13 ? $hash : false;
     }
 
-    public function verify($input, $existingHash)
+    public static function verify($input, $existingHash)
     {
         // md5 for protection against timing side channel attack (needed)
         return md5(crypt($input, $existingHash)) === md5($existingHash);
@@ -3745,13 +3882,13 @@ class BRSA extends BClass
         return $this->_privateKey;
     }
 
-    public function setPublicKey()
+    public function setPublicKey($key)
     {
         $this->_publicKey = $key;
         return $this;
     }
 
-    public function setPrivateKey()
+    public function setPrivateKey($key)
     {
         $this->_privateKey = $key;
         return $this;
@@ -3844,8 +3981,9 @@ if (!function_exists('hash_hmac')) {
      *
      * @see http://www.php.net/manual/en/function.hash-hmac.php#93440
      *
-     * @param string  $data       Data to be hashed.
-     * @param string  $key        Hash key.
+     * @param         $algo
+     * @param string  $data Data to be hashed.
+     * @param string  $key Hash key.
      * @param boolean $raw_output Return raw or hex
      *
      * @access public
@@ -3937,8 +4075,8 @@ if (!function_exists('oath_hotp')) {
      *
      * @see http://www.php.net/manual/en/function.hash-hmac.php#108978
      *
-     * @param string $secret Shared secret
-     * @param string $crt Counter
+     * @param string  $secret Shared secret
+     * @param         $counter
      * @param integer $len OTP length
      * @return string
      */

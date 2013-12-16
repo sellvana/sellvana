@@ -315,32 +315,32 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             throw new BException('Either ORM or data is required');
         }
 
-	    if (isset($config['data']) && !empty($config['data'])) {
-		    $grid['result']['state'] = array(); //todo: add pagination for reserved data
-		    $grid['result']['rows'] = $config['data'];
-	    } elseif (!empty($config['orm'])) {
-		    $orm = $config['orm'];
-		    if (is_string($orm)) {
-			    $orm = $orm::i()->orm();
-		    }
-		    BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
+        if (isset($config['data']) && !empty($config['data'])) {
+            $grid['result']['state'] = array(); //todo: add pagination for reserved data
+            $grid['result']['rows'] = $config['data'];
+        } elseif (!empty($config['orm'])) {
+            $orm = $config['orm'];
+            if (is_string($orm)) {
+                $orm = $orm::i()->orm();
+            }
+            BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
-		    $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
-		    try {
-			    $grid['result'] = $orm->paginate($grid['request'], array(
-				    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
-				    'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
-				    'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
-				    'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
-			    ));
-		    } catch (Exception $e) {
-			    $this->_resetPersonalization();
-			    throw $e;
-		    }
-		    //var_dump($grid['result']);exit;
-		    $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
-		    BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
-	    }
+            $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
+            try {
+                $grid['result'] = $orm->paginate($grid['request'], array(
+                    's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
+                    'sd' => !empty($config['state']['sd']) ? $config['state']['sd'] : null,
+                    'p'  => !empty($config['state']['p'])  ? $config['state']['p']  : null,
+                    'ps' => !empty($config['state']['ps']) ? $config['state']['ps'] : $config['page_size_options'][0],
+                ));
+            } catch (Exception $e) {
+                $this->_resetPersonalization();
+                throw $e;
+            }
+            //var_dump($grid['result']);exit;
+            $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
+            BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
+        }
 
         $this->grid = $grid;
         return $grid;
@@ -364,7 +364,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         $data = array();
         foreach ($rows as $rowId => $row) {
-	        $data[] = (!is_array($row)) ? $row->as_array() : $row;
+            $data[] = (!is_array($row)) ? $row->as_array() : $row;
         }
 
         return json_encode(array('state' => $state, 'data' => $data));
@@ -558,7 +558,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            //BEvents::i()->fire('FCom_Admin_Admin_View_Grid::processORM', array('orm'=>$orm));
             BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
         }
 

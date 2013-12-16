@@ -1,11 +1,11 @@
 <?php
 
-class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
-	protected static $_origClass = __CLASS__;
+    protected static $_origClass = __CLASS__;
     protected $_gridHref = 'translations';
-	protected $_gridTitle = 'All translations';
-	protected $_recordName = 'Translation';
+    protected $_gridTitle = 'All translations';
+    protected $_recordName = 'Translation';
 
     /*public function gridConfig()
     {
@@ -50,33 +50,45 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         return $config;
     }*/
 
-	public function gridConfig()
-	{
-		$config = parent::gridConfig();
-		$config['columns'] = array(
-			array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-			array('name' => 'module', 'label'=>'Module', 'width'=>250, 'editable'=>true),
-			array('name' => 'locale', 'label'=>'Locale', 'width'=>50, 'editable'=>true),
-			array('name' => 'file', 'label'=>'File', 'width'=>60, 'editable'=>true),
-			array('name' => 'id', 'label'=>'Id', 'width'=>200)
-		);
+    public function gridConfig()
+    {
+        $config = parent::gridConfig();
+        $localeOptions = array();
+        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
+            $localeOptions[$iso] = $iso;
+        }
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'module', 'label' => 'Module', 'width' => 250),
+            array('name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select'),
+            array('name' => 'file', 'label' => 'File', 'width' => 60),
+            array('name' => 'id', 'label' => 'Id', 'width' => 200)
+        );
 
-		$data = array();
-		$modules = BModuleRegistry::i()->getAllModules();
-		foreach($modules as $module){
-			if (!empty($module->translations)) {
-				foreach($module->translations as $trlocale => $trfile) {
-					$data[] = array(
-						'module' => $module->name,
-						'locale' => $trlocale,
-						'file' => $trfile,
-						'id'=>$module->name.'/'.$trfile);
-				}
-			}
-		}
-		$config['data'] = $data;
-		return $config;
-	}
+        $data = array();
+        $modules = BModuleRegistry::i()->getAllModules();
+        foreach($modules as $module){
+            if (!empty($module->translations)) {
+                foreach($module->translations as $trlocale => $trfile) {
+                    $data[] = array(
+                        'module' => $module->name,
+                        'locale' => strtoupper($trlocale),
+                        'file' => $trfile,
+                        'id'=>$module->name.'/'.$trfile);
+                }
+            }
+        }
+        $config['data'] = $data;
+        //todo: just show buttons, need add event and process for this controller
+        $config['actions'] = array(
+            'delete' => true,
+        );
+        $config['filters'] = array(
+            array('field' => 'module', 'type' => 'text'),
+            array('field' => 'locale', 'type' => 'select'),
+        );
+        return $config;
+    }
 
     public function action_form()
     {

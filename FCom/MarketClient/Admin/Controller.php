@@ -7,7 +7,7 @@
  *  3. Install module
  */
 
-class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_MarketClient_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'market';

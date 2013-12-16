@@ -1,1 +1,0 @@
-%h1 = $this->_('Page not found')

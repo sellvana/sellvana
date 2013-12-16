@@ -1,5 +1,5 @@
 <?php
-class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_permission = 'promo';
@@ -7,21 +7,39 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridLayoutName = '/promo';
     protected $_gridHref = 'promo';
     protected $_gridTitle = 'Promotions';
-    protected $_formViewName = 'promo/form';
     protected $_recordName = 'Promotion';
     protected $_mainTableAlias = 'p';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] += array(
-            'id'=>array('label'=>'ID', 'index'=>'id', 'width'=>55, 'sorttype'=>'number'),
-            'description'=>array('label'=>'Description', 'index'=>'description', 'width'=>250),
-            'from_date'=>array('label'=>'Start Date', 'index'=>'from_date', 'formatter'=>'date'),
-            'to_date'=>array('label'=>'End Date', 'index'=>'to_date', 'formatter'=>'date'),
-            'status'=>array('label'=>'Status', 'index'=>'p.status', 'options'=>FCom_Promo_Model_Promo::i()->fieldOptions('status')),
-            'details'=>array('label'=>'Details', 'index'=>'details', 'hidden'=>true),
-            'attachments'=>array('label'=>'Attachments', 'sortable'=>false, 'hidden'=>false),
+
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'),
+            array('name' => 'description', 'label' => 'Description', 'index' => 'description', 'width' => 250),
+            array('name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'),
+            array('name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'),
+            array('name' => 'status', 'label' => 'Status', 'index' => 'p.status',
+                  'editable' => true, 'mass-editable' => true, 'options' => FCom_Promo_Model_Promo::i()->fieldOptions('status'), 'editor' => 'select'
+            ),
+            array('name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true),
+            array('name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false),
+            array(
+                'name'     => '_actions',
+                'label'    => 'Actions',
+                'sortable' => false,
+                'data'     => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)
+            ),
+        );
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'from_date', 'type' => 'date-range'),
+            array('field' => 'to_date', 'type' => 'date-range'),
+            array('field' => 'status', 'type' => 'select'),
         );
         return $config;
     }
@@ -50,6 +68,14 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
         $args['view']->title = $m->id ? 'Edit Promo: '.$m->description: 'Create New Promo';
         $args['view']->actions = BUtil::arrayMerge($args['view']->actions, $actions);
+    }
+
+    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
+    {
+        if ($model && $model->id) {
+            $view->addTab("history", array('label' => BLocale::_("History"), 'pos' => 40, 'async' => true));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostBefore($args)
@@ -247,7 +273,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ->select('pp.qty')
             ->join('FCom_Promo_Model_Promo', array('promo.id','=','pp.promo_id'), 'promo')
         ;
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
+        $data = FCom_Admin_Admin_View_Grid::i()->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
         BResponse::i()->json($data);
     }
 
@@ -286,26 +312,26 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ->save();
     }
 
-	public function attachmentGridConfig($model)
-	{
-		return array(
-			'grid' => array(
-				'id' => 'promo_attachments',
-				'caption' => 'Promotion Attachments',
-				'datatype' => 'local',
-				'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
-				'colModel' => array(
-					array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-					array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
-				),
-				'multiselect' => true,
-				'multiselectWidth' => 30,
-				'shrinkToFit' => true,
-				'forceFit' => true,
-			),
-			'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-			array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor'=>'pointer'),
-			array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor'=>'pointer'),
-		);
-	}
+    public function attachmentGridConfig($model)
+    {
+        return array(
+            'grid' => array(
+                'id' => 'promo_attachments',
+                'caption' => 'Promotion Attachments',
+                'datatype' => 'local',
+                'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+                'colModel' => array(
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
+                ),
+                'multiselect' => true,
+                'multiselectWidth' => 30,
+                'shrinkToFit' => true,
+                'forceFit' => true,
+            ),
+            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+            array('navButtonAdd', 'caption' => 'Add', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor'=>'pointer'),
+            array('navButtonAdd', 'caption' => 'Remove', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor'=>'pointer'),
+        );
+    }
 }

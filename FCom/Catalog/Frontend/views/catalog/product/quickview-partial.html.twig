@@ -1,20 +1,19 @@
 {% set m = THIS.get('model') %}
+{% set images = m.media('I') %}
 <div class="row">
   <!-- Product Image Column -->
   <div class="f-col-prod-img col-sm-6">
     <div class="f-rslides-container">
       <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
-        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt=""/></li>
-        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt=""/></li>
-        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt=""/></li>
-        <li><img class="f-prod-img img-responsive" src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt=""/></li>
+{% for img in images %}
+            <li><img class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
+{% endfor %}
       </ul>
     </div>
     <ul class="f-prod-more-view-imgs row" id="quickview-rslides-pager">
-      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb2.jpg') }}" alt="" title=""></a></li>
-      <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ APP.src('@FCom_FrontendThemeBootSimple/img/ph/ph_product_thumb3.jpg') }}" alt="" title=""></a></li>
+{% for img in images %}
+          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
+{% endfor %}
     </ul>
     <script>
       require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
@@ -105,7 +104,7 @@
     <!-- /.tab-pane -->
     <div class="tab-pane" id="f-tab-detail">
       <div class="f-prod-short-description">
-        <p>{{ m.get('description') }}</p>
+        <p>{{ m.get('description') | raw }}</p>
       </div>
     </div>
   </div>

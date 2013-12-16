@@ -3,92 +3,34 @@
 
 var g_vent;
     require(['jquery','underscore','backbone'], function($, _, Backbone) {
-        if (typeof(g_vent) === 'undefined') {
-            g_vent = _.extend({}, Backbone.Events);
-        }
-        var originIds = [];
+
+        var prices, submiting = true;
         var json = {
             rows: [],
             remove_ids: []
         }
-        function _setFormVal() {
+
+        $('#catalog-products-form').submit(function(ev) {
+            json.remove_ids = _.difference(json.remove_ids, prices.pluck('id'));
+            var rows = prices.toJSON();
+            for(var i in rows) {
+                rows[i] = _.pick(rows[i], 'id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new');
+            }
+            json.rows = rows;
 
             $("input[id='product_price_info']").val(JSON.stringify(json));
-            console.log(json);
-
-        }
-        function _getDbFields(row) {
-            var keys = ['id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new'];
-            var ret = {};
-            for(var i in keys) {
-                if(typeof(row[keys[i]]) !== 'undefined') {
-                    ret[keys[i]] = row[keys[i]];
-                }
-            }
-            return ret;
-        }
-        g_vent.bind('init', function(ev) {
-            if(ev.grid === 'tier-prices') {
-                originIds = ev.ids;
-            }
-        });
-        g_vent.bind('delete', function(ev) {
-            if(ev.grid === 'tier-prices') {
-                var rows = json.rows;
-                json.rows = _.filter(rows, function(row) {
-                    return row.id !== ev.id;
-                });
-
-                if (originIds.indexOf(ev.id) === -1)
-                    return;
-                var rIds = json.remove_ids;
-                if (rIds.indexOf(ev.id) === -1)
-                    rIds[rIds.length] = ev.id;
-                _setFormVal();
-            }
-        });
-        g_vent.bind('mass-delete', function(ev) {
-            if(ev.grid === 'tier-prices') {
-                var removeIds = _.pluck(ev.rows,'id');
-                var rows = json.rows;
-                json.rows = _.filter(rows, function(row) {
-                    return removeIds.indexOf(row.id) === -1;
-                });
-                json.remove_ids = _.union(removeIds,json.remove_ids);
-                json.remove_ids = _.intersection(json.remove_ids, originIds);
-                _setFormVal();
-            }
         });
 
 
-        g_vent.bind('edit', function(ev) {
+        g_vent.bind('init-detail', function(ev) {
             if(ev.grid === 'tier-prices') {
-                var rows = json.rows;
-                rows = _.reject(rows, function(row) {
-                    return row.id === ev.row.id;
-                });
-                rows[rows.length] = _getDbFields(ev.row);
-                json.rows = rows;
-                _setFormVal();
-            }
-        });
-
-        g_vent.bind('mass-edit', function(ev) {
-            if(ev.grid === 'tier-prices') {
-                var rows = json.rows;
-                _.each(ev.rows, function(r) {
-                    var selRow = _.findWhere(rows, {id: r.id});
-                    if (typeof(selRow) !== 'undefined')
-                        selRow = r;
-                    else
-                        rows[rows.length] = _getDbFields(r);
-                    });
-                _setFormVal();
+                json.remove_ids = ev.collection.pluck('id');
+                prices = ev.collection;
             }
         });
     });
 </script>
-
+<h3>{{ 'Price Chart'|_ }}</h3>
 <input type='hidden' name='model[price_info]' id='product_price_info'/>
 
 {{ THIS.view('core/backbonegrid').set('grid', ctrl.getTierPricesGrid(model)) | raw }}

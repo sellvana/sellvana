@@ -2,8 +2,8 @@
 $s = $this->state;
 ?>
 <div class="panel panel-filter">
-	<div class="panel-heading">
-	 <span class="panel-title">Narrow Results</span>
+    <div class="panel-heading">
+     <span class="panel-title">Narrow Results</span>
   </div>
   <form method="get" action="">
       <?=$this->view('indextank/product/_pager_categories')->set('s', $s)?>

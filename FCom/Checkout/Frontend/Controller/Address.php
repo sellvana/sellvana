@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
+class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Frontend_Controller_Abstract
 {
     public function action_address()
     {
@@ -84,7 +84,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$address) {
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
         }
-        if(!$address->validate($r)) {
+        if(!$address->validate($r, array(), 'address-form')) {
             BResponse::i()->redirect(BApp::href("checkout/address?t=". $atype));
         }
 
@@ -127,7 +127,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
         }
 
-        $href = BApp::href('checkout');
+        $href = BApp::href('checkout').'?guest=yes';
         BResponse::i()->redirect($href);
     }
 

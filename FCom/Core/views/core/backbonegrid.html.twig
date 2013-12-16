@@ -7,41 +7,44 @@
 {% set pageUrl = THIS.pageChangeHref() %}
 {% set filterData = config.filters %}
 
-
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
-<div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if filterData %}
-    <div class="row datatables-top  {{ config.id | raw }}">
-          <div class="col-sm-9">
-          {% if filterData[0] %}
-            <span><label>Filters:&nbsp;</label></span>
-            <span>
-              <!-- filter buttons here -->
-            </span>
-          {% endif %}
-          </div>
-          <div class="col-sm-3 text-right">
+    <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
+      <div class="f-col-filters-selection col-sm-2">
 
-              <div class="dataTables_filter">
-                  <label>
-                    Search:
-                  </label>
-                  <span><input type="text" style="width: 200px;" class="form-control input-sm" placeholder="Search" id="{{ config.id | raw }}-quick-search"></span>
+      <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
 
-              </div>
-
-          </div>
+      <span class="{{ config.id }} dropdown">
+        <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+          Filters
+          <b class="caret"></b>
+        </a>
+        <ul class="{{ config.id }} dd-list dropdown-menu filters">
+          <!--li calss="ui-state-default"-->
+          <!-- visibiility template -->
+          <!--/li -->
+        </ul>
+      </span>
+      </div>
+      <div class="col-sm-10">
+      {% if filterData[0] %}
+        <span class="{{ config.id }} f-filter-btns">
+          <!-- filter buttons here -->
+        </span>
+      {% endif %}
+      </div>
     </div>
   {% endif %}
 
-  <div class="fcom-htmlgrid__toolbar btn-toolbar {{ config.id | raw }} row" style="height:45px">
-      <div class="col-sm-7">
-        <span class="dropdown dd dd-nestable filter-span" style="display:inline;">
-            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#" style="margin-left: 20px;">
+  <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
+      <div class="col-sm-6">
+        <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
+            <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 Columns
                 <b class="caret"></b>
             </a>
-                <ol class="dd-list dropdown-menu" style="margin-left:20px;">
+                <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
                     <!--li calss="ui-state-default"-->
                     <!-- visibiility template -->
                     <!--/li -->
@@ -55,7 +58,8 @@
           {% endif %}
         {% endfor %}
       </div>
-      <div class="col-sm-5 text-right pagination" style='margin:0px;'>
+      <div class="col-sm-6 text-right pagination" style='margin:0px;'>
+        <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
             {% for ps in THIS.pageSizeOptions() %}
@@ -77,16 +81,14 @@
         {% endif %}
       </div>
   </div>
-  <div class='row'>
-    <div class="text-center {{ config.id }}-pagination"></div>
-  </div>
+
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
       {{ s.description|raw }}
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }} style='width:auto;'>
+    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
@@ -103,53 +105,70 @@
       </tbody>
     </table>
   </div>
-
-  <div class='modal fade' id='mass-edit' tabindex='-1'>
-    <div class='modal-dialog'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
-            </div>
-            <div class='modal-body'>
-                  <!-- mass edit form element template is here -->
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-default' data-dismiss='modal' type='button'>Close</button>
-                <button class='btn btn-primary save' type='button'>Save changes</button>
+</div>
+ <div id="{{ config.id }}-modal">
+      <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
+      <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                    <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+                </div>
+                <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
+                  <div class='modal-body'>
+                      <!-- mass edit form element template is here -->
+                  </div>
+                </form>
+                <div class='modal-footer'>
+                    <button class='btn btn-default' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
+                    <button class='btn btn-primary save' type='button'>{{ 'Save changes' |_ }}</button>
+                </div>
             </div>
         </div>
-    </div>
+      </div>
   </div>
 
-</div>
-
-
-
-<script type="template" id="{{ config.id }}-edit-template">
-
-    <label for="<%= rc.name %>"><%= rc.label%></label>
-    <% if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-      <input type="text" id="<%= rc.name %>" class="form-control">
-    <% } else if(rc.editor === 'select') { %>
-      <select id="<%= rc.name %>" class="form-control">
-        <% for(var key in rc.options) { %>
-          <option value="<%= key %>"><%= rc.options[key] %></option>
-        <% } %>
-      </select>
-    <% } %>
+<script type="template" id="{{ config.id }}-modal-element-template">
+    <div class="control-label col-sm-3">
+      <label for="<%- rc.name %>"><%- rc.label%></label>
+    </div>
+    <div class="controls col-sm-8">
+      <% if (typeof(rc.element_print) !== 'undefined') {
+        print(rc.element_print);
+      } else if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
+        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" class="form-control" <% print(validationRules(rc.validation));%> >
+      <% } else if(rc.editor === 'select') { %>
+        <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
+          <% for(var key in rc.options) { %>
+            <option value="<%- key %>"><%- rc.options[key] %></option>
+          <% } %>
+        </select>
+      <% } else if (rc.editor === 'textarea') { %>
+        <textarea name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" rows="5" <% print(validationRules(rc.validation));%>></textarea>
+      <% } %>
+    </div>
 </script>
 <script type="template" id="{{ config.id }}-col-template">
-  <div class="dd-handle dd3-handle">
-    &nbsp;
-  </div>
+  <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
   <div class="dd3-content">
     <label>
-        <input class="showhide_column" type="checkbox" datid=<%= rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
-        <%= rc.label %>
+        <input class="showhide_column" type="checkbox" datid=<%- rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%- rc.label %>
     </label>
   </div>
 </script>
+
+<script type="template" id="{{ config.id }}-filter-check-template">
+  <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+  <div class="dd3-content">
+    <label>
+        <input class="showhide_column" type="checkbox" datid=<%- rc.field %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%- rc.label %>
+    </label>
+  </div>
+</script>
+
 <script type="template" id="{{ config.id }}-row-template">
   <% for (var index in rc.colsInfo) {
     var col = rc.colsInfo[index];
@@ -160,58 +179,95 @@
     if(col.overflow) {
       overflow = ' style="overflow:hidden;"';
     }
-    print('<td data-col="' + col.name + '" ' + overflow +'>');
+    print('<td data-col="'+col.name+'" '+overflow +'>');
 
     if (col.cell === 'select-row') {
         var isSelected = '';
-        var isEditable = rc.row.editable ? '' : 'DISABLED';
-        if (rc.row.editable && rc.row.selected)
+        var isSelectable = rc.row._selectable ? '' : 'DISABLED';
+        if (rc.row._selectable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" ' + isSelected + ' ' + isEditable + ' >');
+        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
-        if (typeof (col.data.edit) != 'undefined') {
-          print('<a class="btn btn-success btn-xs btn-edit" href="' + col.data.edit.href + rc.row[col.data.edit.col] + '">');
-            print('<i class=" icon-edit-sign"></i>');
-          print('</a>');
+        if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
+          if (col.data.custom.type === 'link') {
+              print('<a class="btn btn-link btn-custom" href="'+col.data.custom.href+rc.row[col.data.edit.col]+'" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
+                if (typeof(col.data.custom.icon) !== 'undefined') {
+                    print('<i class="' + col.data.custom.icon + '"></i>');
+                }
+                print(col.data.custom.caption);
+              print('</a>');
+          } else if (typeof(col.data.custom.type) === 'undefined' || col.data.custom.type === 'button') {
+              print('<button class="btn btn-link btn-custom" type="button" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
+              if (typeof(col.data.custom.icon) !== 'undefined') {
+                print('<i class="' + col.data.custom.icon + '"></i>');
+              }
+              print(col.data.custom.caption);
+              print('</button>');
+          }
+        }
+
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.edit) != 'undefined') {
+            if (typeof(col.data.edit.href) !== 'undefined') {
+              print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
+            } else {
+              print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
+            }
         }
         print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
-          print('<a class="btn btn-danger btn-xs btn-delete" >');
-            print('<i class="icon-remove"></i>');
-          print('</a>');
+          print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
+          print('<i class="icon-remove"></i>');
+          print('</button>');
         }
+    } else {
+      if (typeof(col.print) !== 'undefined') {
+        eval('print('+col.print+');');
+      } else {
+        if (typeof(col.display) === 'undefined') {
+          if (typeof(col.editable) !== 'undefined') {
 
-    } else if (typeof(col.editor) !== 'undefined' && col.editor === 'select') {
-        print('<span style="display:none;">' + rc.row[col.name] + '</span>');
-        print('<select data-col="' + col.name +'" class="form-control">');
-          for(var val in col.options) {
-            print('<option value="' + val + '"'+ (rc.row[col.name] === val ? ' selected' : '') +'>' + col.options[val] + '</option>');
+            if (col.editor === 'select') {
+                if(col.editable === 'inline') {
+                print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
+                for(var key in col.options) {
+                    print('<option value="'+key+'">'+col.options[key]+'</option>');
+                }
+                print('</select>');
+                print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
+              } else {
+                print(col.options[rc.row[col.name]]);
+              }
+            }
+
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text' || col.editor === 'textarea') {
+              if(col.editable === 'inline') {
+                print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
+              } else {
+                print(rc.row[col.name]);
+              }
+            }
+
+          } else {
+            print(rc.row[col.name]);
           }
-        print('</select>');
-    } else if (typeof(col.editable) !== 'undefined') {
-        print('<span style="display:none;">' + rc.row[col.name] + '</span>');
-        print('<input data-col="' + col.name + '" value = "' + rc.row[col.name] + '" class="form-control"/>');
-    }
-    else {
-      if (typeof(col.display) === 'undefined')
-        print(rc.row[col.name]);
-      else if (col.display === 'file_size') {
-        var size = parseInt(rc.row[col.name]);
-        if (size/(1024*1024) > 1) {
-          size = size/(1024*1024);
-          size = size.toFixed(2) + ' MB';
-        } else if (size/1024 > 1) {
-          size = size/1024;
-          size = size.toFixed(2) + ' KB';
-        } else {
-          size = size + ' Byte';
+        } else if (col.display === 'file_size') {
+          var size = parseInt(rc.row[col.name]);
+          if (size/(1024*1024) > 1) {
+            size = size/(1024*1024);
+            size = size.toFixed(2)+' MB';
+          } else if (size/1024 > 1) {
+            size = size/1024;
+            size = size.toFixed(2)+' KB';
+          } else {
+            size = size+' Byte';
+          }
+          print(size);
         }
-        print(size);
-      }
-
-
     }
+  }
 
     print('</td>');
   } %>
@@ -219,12 +275,12 @@
 
 <script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
-    <a class="js-change-url" style="cursor: pointer;">
-      <%= rc.label %>
-    </a>
+    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
+      <%- rc.label %>
+    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %> </a> <% } %>
   <% } else if (rc.type === 'multiselect') { %>
    <% if (rc.selectedCount>0) { %>
-      <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+      <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
     <% } %>
     <select class="{{ config.id | raw }} js-sel">
       {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
@@ -232,18 +288,48 @@
   <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
-      <span><%= rc.label %>:</span>
-      <input type="hidden" id="multi_hidden" style="width:300px"/>
+      <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
+        </span>
+        <span class="caret"></span>
+    </button>
 
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;"/>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-primary update">
+                 {{ 'Update'|_ }}
+              </button>
+            </div>
+          </div>
+      </li>
+    </ul>
 </script>
+
+<script type='template' id="{{ config.id }}-select-filter-template">
+      <input type="hidden" id="select_hidden" style="width:auto;" value="<%= rc.val%>"/>
+</script>
+
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <%= rc.label %>:
-        <% if(rc.filterVal ==='') { %>
-            All
-        <%} else { %>
-            <%= rc.filterLabel %> "<%= rc.filterVal %>"
-        <% } %>
+        <span class='f-grid-filter-field'><%- rc.label %></span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
+        </span>
         <span class="caret"></span>
     </button>
 
@@ -252,38 +338,34 @@
           <div class="input-group">
             <div class="input-group-btn dropdown">
               <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
-                  <%= rc.filterLabel%>
+                  <%- rc.filterLabel%>
                   <span class='caret'></span>
               </button>
 
               <ul class='dropdown-menu filter-sub'>
                 <li>
-                    <a class='filter_op' data-id='contains' href='#'>contains</a>
+                    <a class='filter_op' data-id='contains' href='javascript:void()'>{{ 'contains'|_ }}</a>
                 </li>
                 <li>
-                   <a class='filter_op' data-id='not' href='#'>does not contain</a>
+                   <a class='filter_op' data-id='not' href='javascript:void()'>{{ 'does not contain'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='equal' href='#'>is equal to</a>
+                    <a class='filter_op' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
                 </li>
                 <li>
-                    <a  class='filter_op' data-id='start' href='#'>start with</a>
+                    <a  class='filter_op' data-id='start' href='javascript:void()'>{{ 'start with'|_ }}</a>
                 </li>
                 <li>
-                    <a class='filter_op' data-id='end' href='#'>end with</a>
+                    <a class='filter_op' data-id='end' href='javascript:void()'>{{ 'end with'|_ }}</a>
                 </li>
               </ul>
             </div>
 
-            <input type="text" class="form-control" value="<%= rc.filterVal  %>">
+            <input type="text" class="form-control" value="<%- rc.val  %>">
 
             <div class="input-group-btn">
-              <button type="button" class="btn btn-default clear">
-                  <i class=" icon-remove"></i>
-              </button>
-              <button type="submit" class="btn btn-primary update">
-                  <i class=" icon-check-sign"></i>
-                  Update
+              <button type="button" class="btn btn-primary update">
+                 {{ 'Update'|_ }}
               </button>
             </div>
           </div>
@@ -291,19 +373,161 @@
     </ul>
  </script>
 
+<script type='template' id="{{ config.id }}-date-range-filter-template">
+    <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
+        </span>
+        <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <div class="input-group-btn dropdown" >
+              <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
+                  <%- rc.filterLabel%>
+                  <span class='caret'></span>
+              </button>
+
+              <ul class='dropdown-menu filter-sub'>
+                <li>
+                    <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
+                </li>
+                <li>
+                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
+                </li>
+                <li>
+                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
+                </li>
+                <li>
+                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
+                </li>
+                <li>
+                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
+                <input type="text" placeholder="Select date range" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
+                <span id="daterange2" class="input-group-addon">
+                  <i class="icon-calendar"></i>
+                </span>
+            </div>
+            <div class="datepicker input-group not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
+                          <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" value="<%= !rc.range ? rc.val : '' %>">
+                          <span class="input-group-addon">
+                            <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
+                          </span>
+            </div>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  {{ 'Update'|_ }}
+              </button>
+            </div>
+          </div>
+      </li>
+    </ul>
+</script>
+
+<script type='template' id="{{ config.id }}-number-range-filter-template">
+    <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+        <span class='f-grid-filter-field'>
+          <%- rc.label %>
+        </span>:
+        <span class='f-grid-filter-value'>
+          <% if(rc.val ==='') { %>
+              {{ 'All'|_ }}
+          <%} else { %>
+              <%- rc.filterLabel %> "<%- rc.val %>"
+          <% } %>
+        </span>
+        <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu filter-box">
+      <li>
+          <div class="input-group">
+            <div class="input-group-btn dropdown" >
+              <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
+                  <%- rc.filterLabel%>
+                  <span class='caret'></span>
+              </button>
+
+              <ul class='dropdown-menu filter-sub'>
+                <li>
+                    <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
+                </li>
+                <li>
+                    <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
+                </li>
+                <li>
+                   <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'greater than'|_ }}</a>
+                </li>
+                <li>
+                    <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'less than'|_ }}</a>
+                </li>
+                <li>
+                    <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not between'|_ }}</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="input-group-btn range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
+                <% var vals = rc.val.split('~'); %>
+                <input type="text" placeholder="Input number1" class="form-control js-number1" style="width:45%;" value="<%= rc.range ? vals[0] : '' %>">
+                &nbsp;<i class="icon-resize-horizontal"></i>&nbsp;
+                <input type="text" placeholder="Input number2" class="form-control js-number2" style="width:45%;" value="<%= rc.range ? vals[1] : '' %>">
+
+            </div>
+
+            <div class="input-group-btn not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
+              <input type="text" placeholder="Input number" class="form-control js-number" value="<%= !rc.range ? rc.val : '' %>">
+            </div>
+
+            <div class="input-group-btn">
+              <button type="buttton" class="btn btn-primary update">
+                  <i class=" icon-check-sign"></i>
+                  {{ 'Update'|_ }}
+              </button>
+            </div>
+          </div>
+      </li>
+    </ul>
+</script>
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
+
+    if ($('#fcom_append_form').length > 0) {
+      $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');
+      var html = $("#{{ config.id }}-modal").html();
+
+      $("#{{ config.id }}-modal").remove();
+      $('form#{{ config.id }}-new-form').append(html);
+
+    }
     //$(function() {
         var grid = new FCom.BackboneGrid({
             id: "{{ config.id }}",
             personalize_url: "{{ APP.href('my_account/personalize') }}",
             data_url: "{{ config.data_url }}",
             edit_url: "{{ config.edit_url }}",
-            data: {{ THIS.getPageRowsData() | raw }},
-            columns: {{ THIS.getColumnsData() | raw }},
+            data: {{ THIS.getPageRowsData() | json_encode() | raw }},
+            columns: {{ config.columns | json_encode() | raw }},
             data_mode: "{{ config.data_mode }}",
-            filters: {{ THIS.getFilterData()  | raw }},
-            events: {{ THIS.getEventData() | raw }}
+            filters: {{ config.filters | json_encode() | raw}},
+            events: {{ config.events | json_encode() | raw}},
+            callbacks: {{ config.callbacks | json_encode() | raw }},
+            pageSizeOptions: {{ config.page_size_options | json_encode | raw }}
         });
     //});
 });

@@ -1,15 +1,14 @@
-{% set m = THIS.model %}
+{% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-{% set mediaLibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
+{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
+
 <script>
 
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
 
 require(['jquery', 'unique'], function($) {
-    var selectedRows = [], editedRows = [], removedIds = [], originRows = [];
+    var prod_img_rows = [], editedRows = [], removedIds = [], originRows = [];
     function _getAttachmentsDbFields(row) {
         var keys = ['id', 'file_id', 'label', 'position', '_new'];
         var ret = {};
@@ -48,14 +47,14 @@ require(['jquery', 'unique'], function($) {
 
     g_vent.bind('select-rows', function(ev) {
         if (ev.grid === 'all_attachments') {
-            selectedRows = ev.rows;
+            prod_img_rows = ev.rows;
             var caption = 'Add';
             var addButton = $('button.btn-add.prod-attachments-modal-add');
-            if(selectedRows.length>0) {
-                if (selectedRows.length==1) {
+            if(prod_img_rows.length>0) {
+                if (prod_img_rows.length==1) {
                     caption += ' a row';
                 } else {
-                    caption += (' ' + selectedRows.length + ' rows');
+                    caption += (' ' + prod_img_rows.length + ' rows');
                 }
                 addButton.removeClass('disabled');
             } else {
@@ -105,8 +104,9 @@ require(['jquery', 'unique'], function($) {
             _setFormVal();
         }
     });
+
     $('button.btn-add.prod-attachments-modal-add').click(function() {
-        var objs = _.clone(selectedRows);
+        var objs = _.clone(prod_img_rows);
         originFileIds = _.pluck(originRows, 'file_id');
         addedFileIds = _.pluck(editedRows, 'file_id');
         objs = _.filter(objs, function(row) {
@@ -121,7 +121,7 @@ require(['jquery', 'unique'], function($) {
             editedRows[editedRows.length] = row;
         }
 
-        g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: selectedRows});
+        g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: prod_img_rows});
         g_vent.trigger('clear_selection', {grid: 'all_attachments'});
         $(this).next().trigger('click');
         _setFormVal();
@@ -142,23 +142,22 @@ require(['jquery', 'unique'], function($) {
                     <div class='tabbable'>
                         <ul class='nav nav-tabs prod-type'>
                             <li class='active'>
-                                <a data-toggle='tab' href='#library'>
+                                <a data-toggle='tab' href='#attach_library'>
                                     Library
                                 </a>
                             </li>
                             <li>
-                                <a data-toggle='tab' href='#upload'>
+                                <a data-toggle='tab' href='#prod-attach-fileupload'>
                                     Upload
                                 </a>
                             </li>
                         </ul>
                         <div class='tab-content'>
-                            <div class='tab-pane active' id='library'>
-                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibConfig) | raw }}
+                            <div class='tab-pane active' id='attach_library'>
+                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
                             </div>
-                            <div class='tab-pane' id='upload'>
-                                <div class='box-content' id='fileupload'>
-
+                            <div class='tab-pane' id='prod-attach-fileupload'>
+                                <div class='box-content'>
                                         <div class='row fileupload-buttonbar'>
                                                           <div class='col-sm-12'>
                                                             <span class='btn btn-success fileinput-button'>
@@ -274,32 +273,31 @@ require(['jquery', 'unique'], function($) {
     </div>
 </div>
 <script>
-    if (typeof(g_vent) === 'undefined') {
-        g_vent = _.extend(Backbone.Event);
-    }
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        var selectedRows = [];
+
+
+        var prod_img_rows = [];
         $('#prod-attach-checkbox').change(function() {
-            selectedRows = [];
+            prod_img_rows = [];
         });
-        $('#fileupload').fileupload({
+        alert('fff');
+        $('#prod-attach-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
             multiple:true
         })
         .bind('fileuploadalways', function(e, data) {
+
             if(data.result.id) {
                 g_vent.trigger('add_row', {grid: 'all_attachments', row:data.result});
-                console.log($('td.name span').length);
                 $('td.name span').each(function(i) {
                     if($(this).html() === data.result.file_name)
                         $(this).parents('tr:first').remove();
                 });
 
                 if ($('#prod-attach-checkbox').is(':checked')) {
-                    console.log(data.result);
-                    selectedRows[selectedRows.length] = data.result;
+                    prod_img_rows[prod_img_rows.length] = data.result;
                     if ($('tr.template-upload').length === 0) {
-                        g_vent.trigger('select-rows', {grid: 'all_attachments', rows:selectedRows});
+                        g_vent.trigger('select-rows', {grid: 'all_attachments', rows:prod_img_rows});
                         $('button.btn-add.prod-attachments-modal-add').trigger('click');
                     }
                 }

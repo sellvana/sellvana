@@ -1,5 +1,5 @@
 base:
-	- { view: bottom_scripts, do: [[ js, @FCom_Wishlist/Frontend/js/fcom.wishlist.js ]] }
+    - { view: bottom_scripts, do: [[ js, @FCom_Wishlist/Frontend/js/fcom.wishlist.js ]] }
 
 customer_account_sidebar:
     - view: customer/account/sidebar
@@ -7,6 +7,6 @@ customer_account_sidebar:
             - [ addNavItem, wishlist, { label: Wishlist, position: 30, href: wishlist } ]
 
 /wishlist:
-	- { include: base }
-	- { hook: main, views: wishlist }
+    - { include: base }
+    - { hook: main, views: wishlist }
     - { include: customer_account_sidebar }

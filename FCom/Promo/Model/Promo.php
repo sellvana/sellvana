@@ -13,6 +13,7 @@ class FCom_Promo_Model_Promo extends BModel
             'one' => 'Single Group',
             'any' => 'ANY Group',
             'all' => 'ALL Groups',
+            'cat' => 'Categories',
         ),
         'get_type' => array(
             'qty' => 'Quantity',
@@ -33,15 +34,15 @@ class FCom_Promo_Model_Promo extends BModel
         ),
     );
 
-	protected $_validationRules = array(
-		array('description', '@required'),
-		array('manuf_vendor_id', '@required'),
+    protected $_validationRules = array(
+        array('description', '@required'),
+        array('manuf_vendor_id', '@required'),
 
         array('description', '@string', null, array('max' => 255)),
 
-		array('buy_amount', '@integer'),
-		array('get_amount', '@integer'),
-	);
+        array('buy_amount', '@integer'),
+        array('get_amount', '@integer'),
+    );
 
     public function getPromosByCart($cartId)
     {

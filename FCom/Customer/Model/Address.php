@@ -5,21 +5,25 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
 
-	protected $_validationRules = array(
-		array('customer_id', '@required'),
-		array('email', '@required'),
-		array('street1', '@required'),
-		array('city', '@required'),
-		array('country', '@required'),
+    protected $_validationRules = array(
+        /*array('customer_id', '@required'),
+        array('email', '@required'),*/
+        array('firstname', '@required'),
+        array('lastname', '@required'),
+        array('street1', '@required'),
+        array('city', '@required'),
+        array('country', '@required'),
+        array('region', '@required'),
+        array('postcode', '@required'),
 
-		array('email', '@email'),
+        array('email', '@email'),
 
-		array('customer_id', '@integer'),
-		array('lat', '@numeric'),
-		array('lng', '@numeric'),
-	);
+        array('customer_id', '@integer'),
+        array('lat', '@numeric'),
+        array('lng', '@numeric'),
+    );
 
-    public static function as_html($obj=null)
+    public function as_html($obj=null)
     {
         if (is_null($obj)) {
             $obj = $this;

@@ -1,0 +1,90 @@
+<div class="f-site-footer">
+  <div class="container">
+    <div class="row">
+      <dl class="col-md-3 col-sm-3">
+        <dt class="col-title">Customer Service</dt>
+        <dd><a href="#">Contact Us</a></dd>
+        <dd><a href="#">Return Policy</a></dd>
+        <dd><a href="#">Shipping Policy</a></dd>
+        <dd><a href="#">Help</a></dd>
+      </dl>
+      <dl class="col-md-3 col-sm-3">
+        <dt class="col-title">Customer Service</dt>
+        <dd><a href="#">Contact Us</a></dd>
+        <dd><a href="#">Return Policy</a></dd>
+        <dd><a href="#">Shipping Policy</a></dd>
+        <dd><a href="#">Help</a></dd>
+      </dl>
+      <dl class="col-md-3 col-sm-3">
+        <dt class="col-title">Customer Service</dt>
+        <dd><a href="#">Contact Us</a></dd>
+        <dd><a href="#">Return Policy</a></dd>
+        <dd><a href="#">Shipping Policy</a></dd>
+        <dd><a href="#">Help</a></dd>
+      </dl>
+      <form class="col-md-3 col-sm-3 f-mini-newsletter" role="form" action="{{ APP.href('email/subscribe') }}">
+        <div class="form-group">
+          <label for="newsletter-email" class="f-col-title">{{ "Subscribe to our newsletter"|_ }}</label>
+          <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="Enter your email">
+        </div>
+        <button type="submit" class="btn btn-default btn-sm">{{ "Subscribe"|_ }}</button>
+      </form>
+    </div>
+    <p class="f-copyright">&copy; {{ 'now'|date('Y') }} {{ CONFIG.get('modules/FCom_Core/copyright_message') }} {{ "All rights reserved."|_ }}
+      <a href="{{ APP.href('privacy') }}">{{ "Privacy Notice"|_ }}</a>
+      <a href="{{ APP.href('tnc') }}">{{ "Terms and Conditions"|_ }}</a>
+    </p>
+  </div>
+</div>
+
+<script>
+    //todo: put this function to common js
+    require(['jquery', 'jquery.validate', 'jquery.bootstrap-growl'], function($) {
+        var newsletterForm = $('form.f-mini-newsletter');
+        /*$(function() {
+            newsletterForm.validate();
+        });*/
+
+        newsletterForm.on('click', 'button', function(ev) {
+            newsletterForm.validate();
+            if (newsletterForm.valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: newsletterForm.attr('action'),
+                    data: newsletterForm.serialize(),
+                    success: function (data)
+                    {
+                        newsletterForm.find('label.error').remove();
+                        newsletterForm.find('label.alert-success').remove();
+                        var inputId = 'newsletter-email';
+                        var input = $('#' + inputId);
+                        var label = '<label for="' + inputId + '"';
+                        if (data.status == 'error') {
+                            label += ' class="error">' + data.message;
+                        } else if (data.status == 'success') {
+                            label += ' class="alert-success" style="background: none; margin-top: 5px;">' + data.message;
+                        } else {
+                            alert("Invalid data, please check again");
+                        }
+                        label += '</label>';
+                        input.after(label);
+
+                        setTimeout(function ()
+                        {
+                            newsletterForm.find('label.alert-success').remove();
+                        }, 2000);
+                    },
+                    error: function (xhr, textStatus, errorThrown)
+                    {
+                        alert("[ERROR]<br>" + textStatus);
+                    }
+                });
+            }
+
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            return false;
+        });
+    })
+</script>
