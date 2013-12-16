@@ -168,8 +168,9 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
             <div class="col-md-5">
-                <input type="hidden" name="model[status]" value="0" />
-                <input id="model-status" type="checkbox" class="switch-cbx" name="model[status]" value="1" {% if validator.fieldValue('status') == 1 %}checked="checked" {% endif %} />
+                <select class="form-control" name="model[status]" id="model-status">
+                    {{ UTIL.optionsHtml(m.fieldOptions('status'), validator.fieldValue('status'))|raw }}
+                </select>
             </div>
         </div>
     </fieldset>
@@ -185,7 +186,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
             <div class="col-md-5">
-                <input id="model-password_confirm" type="password" class="form-control" name="model[password_confirm]")
+                <input id="model-password_confirm" type="password" class="form-control" name="model[password_confirm]" />
             </div>
         </div>
     </fieldset>

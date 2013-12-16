@@ -139,4 +139,13 @@ class FCom_Customer_Migrate extends BClass
         );
     }
 
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                'status' => 'ENUM("review", "active", "disabled") NOT NULL DEFAULT "review"',
+        )));
+    }
+
 }

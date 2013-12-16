@@ -18,24 +18,37 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
+            array('name' => 'title', 'label'=>'Customer Group', 'index'=>'cg.title'),
+            array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
+                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
             array('name' => 'postcode', 'label'=>'Postal Code', 'index'=>'a.postcode'),
             array('name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
-            array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+            /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
+            array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+                  'data' => array(
+                      'custom' => array(
+                          'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                          'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
+                      'edit'   => array('href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
+                      'delete' => true
+                  )
+            ),
         );
         $config['actions'] = array(
             'export' => true,
+            'edit'   => true,
             'delete' => true
         );
         $config['filters'] = array(
             array('field' => 'firstname', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
             array('field' => 'country', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'select'),
         );
         //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         //todo: check this in FCom_Admin_Admin_Controller_Abstract_GridForm
@@ -53,7 +66,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         parent::gridOrmConfig($orm);
 
         $orm->left_outer_join('FCom_Customer_Model_Address', array('a.id','=','c.default_billing_id'), 'a')
+            ->left_outer_join('FCom_CustomerGroups_Model_Group', array('cg.id','=','c.customer_group'), 'cg')
             ->select(array('a.street1', 'a.city', 'a.region', 'a.postcode', 'a.country'))
+            ->select(array('cg.title'))
         ;
     }
 
