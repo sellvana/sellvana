@@ -12,6 +12,7 @@ modules:
                     - [ get, /customers, FCom_Customer_Admin_Controller_Customers.index ]
                     - [ any, /customers/.action, FCom_Customer_Admin_Controller_Customers ]
                     - [ any, /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
+                    - [ any, /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
