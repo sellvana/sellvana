@@ -13,7 +13,15 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-description">{{ 'Description'|_ }}</label>
         <div class="col-md-5">
-            <input class="form-control"id="model-description"  type="text" name="model[description]" value="{{ validator.fieldValue('description') }}"/>
+            <input class="form-control" id="model-description" type="text" name="model[description]" value="{{ validator.fieldValue('description') }}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-coupon">{{ 'Coupon code'|_ }}</label>
+
+        <div class="col-md-5">
+            <input class="form-control" id="model-coupon" type="text" name="model[coupon]"
+                   value="{{ validator.fieldValue('coupon') }}"/>
         </div>
     </div>
 
@@ -23,7 +31,8 @@
             {{ 'Start:'|_ }}
             <div>
                 <div class='datepicker input-group' id='model-from_date'>
-                    <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
+                    <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]"
+                           type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
                     <span class='input-group-addon'>
                         <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
                     </span>
@@ -33,7 +42,8 @@
             {{ ' End:'|_ }}
             <div>
                 <div class='datepicker input-group' id='model-from_date'>
-                    <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]" type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
+                    <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]"
+                           type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
                     <span class='input-group-addon'>
                         <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
                     </span>
@@ -51,16 +61,6 @@
             {{ 'FROM'|_ }}
             <select class="form-control" name="model[buy_group]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_group'), validator.fieldValue('buy_group'))|raw }}</select>
             <br />
-            {% if customerGroups is defined %}
-            {{ 'CUSTOMER GROUPS'|_ }}
-            <select class="form-control" name="model[customer_groups]" multiple size="4">{{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_groups'))|raw }}</select>
-            <br />
-            {% endif %}
-            {% if sites is defined %}
-            {{ 'Sites'|_ }}
-            <select class="form-control" name="model[sites]" multiple size="4">{{ UTIL.optionsHtml( sites, validator.fieldValue('sites') )|raw }}</select>
-            <br />
-            {% endif %}
             {{ 'GET'|_ }}
             <select class="form-control" name="model[get_type]">{{ UTIL.optionsHtml(promo.fieldOptions('get_type'), validator.fieldValue('get_type'))|raw }}</select>
             <br />
@@ -73,6 +73,18 @@
         <label class="col-md-2 control-label" for="model-details">{{ 'Details'|_ }}</label>
         <div class="col-md-5">
             <textarea class="form-control" id="model-details" name="model[details]" rows="5">{{ validator.fieldValue('details')  }}</textarea>
+            {% if customerGroups is defined %}
+                {{ 'CUSTOMER GROUPS'|_ }}
+                <select class="form-control" name="model[customer_groups]" multiple
+                        size="4">{{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_groups'))|raw }}</select>
+                <br/>
+            {% endif %}
+            {% if sites is defined %}
+                {{ 'Sites'|_ }}
+                <select class="form-control" name="model[sites]" multiple
+                        size="4">{{ UTIL.optionsHtml( sites, validator.fieldValue('sites') )|raw }}</select>
+                <br/>
+            {% endif %}
         </div>
     </div>
 

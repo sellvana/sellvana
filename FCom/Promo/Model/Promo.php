@@ -14,6 +14,7 @@ class FCom_Promo_Model_Promo extends BModel
             'any' => 'ANY Group',
             'all' => 'ALL Groups',
             'cat' => 'Categories',
+            'anyp'=> 'ANY Product'
         ),
         'get_type' => array(
             'qty' => 'Quantity',
@@ -36,7 +37,7 @@ class FCom_Promo_Model_Promo extends BModel
 
     protected $_validationRules = array(
         array('description', '@required'),
-        array('manuf_vendor_id', '@required'),
+//        array('manuf_vendor_id', '@required'),
 
         array('description', '@string', null, array('max' => 255)),
 
@@ -114,9 +115,9 @@ class FCom_Promo_Model_Promo extends BModel
     public function onAfterCreate()
     {
         parent::onAfterCreate();
-        $this->from_date = gmdate('Y-m-d');
-        $this->to_date = gmdate('Y-m-d', time()+30*86400);
-        $this->status = 'pending';
+        $this->from_date = gmdate( 'Y-m-d' );
+        $this->to_date   = gmdate( 'Y-m-d', time() + 30 * 86400 );
+        $this->status    = 'pending';
     }
 
     public function onAfterSave()
