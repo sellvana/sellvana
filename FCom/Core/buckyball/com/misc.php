@@ -1237,36 +1237,38 @@ class BUtil extends BClass
     }
 
     /**
-    * Strip html tags and shorten to specified length, to the whole word
-    *
-    * @param string $text
-    * @param integer $limit
-    */
-    public static function previewText($text, $limit)
+     * Strip html tags and shorten to specified length, to the whole word
+     *
+     * @param string  $text
+     * @param integer $limit
+     * @return string
+     */
+    public static function previewText( $text, $limit )
     {
-        $text = strip_tags($text);
-        if (strlen($text) < $limit) {
+        $text = strip_tags( $text );
+        if ( strlen( $text ) < $limit ) {
             return $text;
         }
-        preg_match('/^(.{1,'.$limit.'})\b/', $text, $matches);
-        return $matches[1];
+        preg_match( '/^(.{1,' . $limit . '})\b/', $text, $matches );
+        return $matches[ 1 ];
     }
 
-    public static function isEmptyDate($date)
+    public static function isEmptyDate( $date )
     {
-        return preg_replace('#[0 :-]#', '', (string)$date)==='';
+        return preg_replace( '#[0 :-]#', '', (string)$date ) === '';
     }
 
     /**
-    * Get gravatar image src by email
-    *
-    * @param string $email
-    * @param array $params
-    *   - size (default 80)
-    *   - rating (G, PG, R, X)
-    *   - default
-    *   - border
-    */
+     * Get gravatar image src by email
+     *
+     * @param string $email
+     * @param array  $params
+     *   - size (default 80)
+     *   - rating (G, PG, R, X)
+     *   - default
+     *   - border
+     * @return string
+     */
     public static function gravatar($email, $params=array())
     {
         if (empty($params['default'])) {
