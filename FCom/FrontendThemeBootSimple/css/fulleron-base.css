@@ -339,8 +339,10 @@ label.error {
 .f-widget {}
 .f-widget .f-widget-header {
   padding-bottom:7px;
+  text-align:right;
   }
 .f-widget .f-widget-header .f-widget-title {
+  float:left;
   font-weight:400;
   font-family:'Lato', sans-serif;
   text-transform:uppercase;
@@ -1457,12 +1459,12 @@ label.error {
    CLEARS
 \*------------------------------------*/
 
-.widget .widget-header:after,
+.f-widget .f-widget-header:after,
 .f-page-header:after,
 .f-tab-heading:after {
   clear: both;
   }
-.widget .widget-header:before, .widget .widget-header:after,
+.f-widget .f-widget-header:before, .f-widget .f-widget-header:after,
 .f-page-header:before, .f-page-header:after,
 .f-tab-heading:before, .f-tab-heading:after {
   display: table;
