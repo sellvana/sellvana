@@ -76,10 +76,27 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
+        $resize_url = FCom_Core_Main::i()->resizeUrl();
+        $imageNotFound = $resize_url.'?f='.urlencode(trim($media.'/image-not-found.jpg', '/')).'&s=98x98';
         $args['view']->set(array(
-            'sidebar_img' => BUtil::gravatar($m->email),
-            'title' => $m->id ? 'Edit Customer: '.$m->firstname.' '.$m->lastname : 'Create New Customer',
+            'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $imageNotFound),
+            //todo: add profile image, silhouette icon if empty profile image
+            'title' => $m->id ? $this->_('Edit Customer: ').$m->firstname.' '.$m->lastname : $this->_('Create New Customer'),
         ));
+    }
+
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
+    {
+        if ($model && $model->id) {
+            $view->addTab('addresses', array('label' => $this->_('Addresses'), 'pos' => 20));
+            $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
+            $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
+            $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
+            $view->addTab('lifetime-sales', array('label' => $this->_('Lifetime Sales'), 'pos' => 60));
+            $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostAfter($args)
