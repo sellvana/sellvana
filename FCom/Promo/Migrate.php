@@ -118,4 +118,17 @@ class FCom_Promo_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+
+        $table = FCom_Promo_Model_Promo::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                "coupon"          => "varchar(100)",
+                "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
+                "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one'"
+            ),
+        ));
+    }
 }
