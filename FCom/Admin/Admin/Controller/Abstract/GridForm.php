@@ -38,11 +38,8 @@ abstract class FCom_Admin_Admin_Controller_Abstract_GridForm extends FCom_Admin_
     public function gridView()
     {
         $view = $this->view($this->_gridViewName);
-        if (method_exists($this, 'gridConfig')) {
-            $config = $this->gridConfig();
-            $view->set('grid', array('config' => $config));
-        }
-        BEvents::i()->fire(static::$_origClass.'::gridView');
+        $view->set('grid', array('config' => $this->gridConfig()));
+        BEvents::i()->fire(static::$_origClass.'::gridView', array('view' => $view));
         return $view;
     }
 
