@@ -250,7 +250,7 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
-        $useCache = BDebug::is('DEVELOPMENT,STAGING,PRODUCTION');
+        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
         if ($useCache) {
             $data = BCache::i()->load($cacheKey);
         }
@@ -683,7 +683,7 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'LAYOUTS-'.BApp::i()->get('area'); //TODO: more flexible key
-        $useCache = BDebug::is('DEVELOPMENT,STAGING,PRODUCTION');
+        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
         if ($useCache) {
             $data = BCache::i()->load($cacheKey);
         }
