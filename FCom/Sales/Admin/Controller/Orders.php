@@ -243,10 +243,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
 
     /**
      * get grid config for all orders of customer
-     * @param $customer
+     * @param $customer FCom_Customer_Model_Customer
      * @return array
      */
-    public function customerOrdersConfig($customer)
+    public function customerOrdersGridConfig($customer)
     {
         $config = parent::gridConfig();
         $config['id'] = 'customer_grid_orders_'.$customer->id;

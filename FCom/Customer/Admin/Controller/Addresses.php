@@ -14,7 +14,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
      * @param $customer FCom_Customer_Model_Customer
      * @return array
      */
-    public function getCustomerAddressesConfig($customer)
+    public function getCustomerAddressesGridConfig($customer)
     {
         $config = parent::gridConfig();
         $config['id'] = 'customer_addresses_grid_' . $customer->id;
