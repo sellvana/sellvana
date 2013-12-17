@@ -5,7 +5,7 @@
 {% set validator = THIS.get('validator') %}
 {# APP.instance('FCom_Geo_Model_Country').options() | debug #}
 {# APP.instance('FCom_Geo_Model_Region').allOptions() | debug #}
-<script>
+{#<script>
 
 
     var regions={};
@@ -120,7 +120,7 @@
 
       });
     });
-</script>
+</script>#}
 
 <div class="col-md-12">
     <fieldset class="f-fieldset-group">
@@ -191,7 +191,7 @@
         </div>
     </fieldset>
 
-    <div class="col-customer-address">
+{#    <div class="col-customer-address">
         <fieldset class="f-fieldset-group">
             <h3 class="f-fieldset-group-title">{{ 'Addresses'|_ }}</h3>
             <div class="row">
@@ -226,7 +226,7 @@
                                     var val = regions[rc.country][key];
                                     print('<option value="'+key+'">'+val+'</option>');
                               } %>
-                              {# UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Region').allOptions()['US']) | raw #}
+                              &#123;&#35; UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Region').allOptions()['US']) | raw &#35;&#125;
                           </select>
                           <input data-name="region" type="text" class="form-control" style="display:<%= rc.edit_mode && !regions[rc.country] ? 'block' : 'none' %>;" value="<%=rc.region%>" placeholder="{{ 'Region/State'|_ }}"/>
                           <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.region %></span>
@@ -263,5 +263,5 @@
             <input type="hidden" name="address[data_json]" value="" />
             <input type="hidden" name="address[del_json]" value="" />
         </fieldset>
-    </div>
+    </div>#}
 </div>
