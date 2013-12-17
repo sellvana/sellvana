@@ -750,4 +750,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
         }
         return true;
     }
+
+    protected function gridColumns()
+    {
+        $config =  $this->gridConfig();
+
+        return isset($config['columns']) ? $config['columns'] : array();
+    }
 }

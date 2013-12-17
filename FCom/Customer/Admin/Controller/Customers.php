@@ -18,7 +18,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
-            array('name' => 'title', 'label'=>'Customer Group', 'index'=>'cg.title'),
+            array('name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 'editor' => 'select',
+                  'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
             array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
                   'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
@@ -79,10 +80,16 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
         $resize_url = FCom_Core_Main::i()->resizeUrl();
         $imageNotFound = $resize_url.'?f='.urlencode(trim($media.'/image-not-found.jpg', '/')).'&s=98x98';
+
+        $actions = array_merge($args['view']->get('actions'), array(
+                'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
+                                    href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
+            ));
         $args['view']->set(array(
             'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $imageNotFound),
             //todo: add profile image, silhouette icon if empty profile image
             'title' => $m->id ? $this->_('Edit Customer: ').$m->firstname.' '.$m->lastname : $this->_('Create New Customer'),
+            'actions' => $actions,
         ));
     }
 
@@ -93,7 +100,6 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
             $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
             $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
-            $view->addTab('lifetime-sales', array('label' => $this->_('Lifetime Sales'), 'pos' => 60));
             $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
@@ -195,5 +201,25 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         $config['events'] = array('add');
 
         return array('config' => $config);
+    }
+
+    public function action_create_order()
+    {
+        $id = BRequest::i()->param('id', true);
+        $redirectUrl = BApp::baseUrl();
+        try {
+            $model = FCom_Customer_Model_Customer::i()->load($id);
+            if (!$model) {
+                BSession::i()->addMessage($this->_('Cannot load this customer model'), 'error', 'admin');
+                $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
+            } else {
+                $model->login();
+            }
+        } catch (Exception $e) {
+            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
+        }
+
+        BResponse::i()->redirect($redirectUrl);
     }
 }
