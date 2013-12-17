@@ -37,6 +37,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_sessionCart;
     protected static $_totalRowHandlers = array();
 
+    protected static $_fieldOptions = array(
+        'status' => array(
+            'new'     => 'New',
+            'ordered' => 'Ordered',
+        ),
+    );
+
     public $addresses;
     public $items;
     public $totals;
