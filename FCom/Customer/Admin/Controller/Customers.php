@@ -93,7 +93,6 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
             $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
             $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
-            $view->addTab('lifetime-sales', array('label' => $this->_('Lifetime Sales'), 'pos' => 60));
             $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
