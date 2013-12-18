@@ -77,18 +77,22 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        /** @var $m FCom_Customer_Model_Customer */
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
         $resize_url = FCom_Core_Main::i()->resizeUrl();
-        $imageNotFound = $resize_url.'?f='.urlencode(trim($media.'/image-not-found.jpg', '/')).'&s=98x98';
+        $silhouetteImg = $resize_url.'?f='.urlencode(trim($media.'/silhouette.jpg', '/')).'&s=98x98';
 
         $actions = array_merge($args['view']->get('actions'), array(
                 'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
                                     href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
             ));
+        $saleStatistics = $m->saleStatistics();
+        $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime']) . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
         $args['view']->set(array(
-            'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $imageNotFound),
+            'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $silhouetteImg),
             //todo: add profile image, silhouette icon if empty profile image
             'title' => $m->id ? $this->_('Edit Customer: ').$m->firstname.' '.$m->lastname : $this->_('Create New Customer'),
+            'otherInfo' => $m->id ? $info : '',
             'actions' => $actions,
         ));
     }
