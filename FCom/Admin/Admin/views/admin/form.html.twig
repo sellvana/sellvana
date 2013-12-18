@@ -84,6 +84,9 @@
       <div class="btn-group">
           {{ THIS.get('actions') | join(' ') | raw }}
       </div>
+        {% if THIS.get('otherInfo') %}
+            <div style="clear: both;">{{ THIS.get('otherInfo') }}</div>
+        {% endif %}
     </div>
 
     {{ THIS.view('core/messages') | raw }}
