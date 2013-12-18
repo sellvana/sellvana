@@ -315,7 +315,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
     public function linkedProductGridConfig($model, $type)
     {
         $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
-            ->select(array('p.id', 'p.product_name', 'p.local_sku'));
+            ->select(array('p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price'));
 
         switch ($type) {
         case 'related': case 'similar':
@@ -342,7 +342,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
-                    array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>200)
+                    array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>200),
+                    array('name'=>'base_price', 'label'=>'Base Price', 'index'=>'p.base_price'),
+                    array('name'=>'sale_price', 'label'=>'Sale Price', 'index'=>'p.sale_price'),
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add products'),
@@ -747,5 +749,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             }
         }
         return true;
+    }
+
+    protected function gridColumns()
+    {
+        $config =  $this->gridConfig();
+
+        return isset($config['columns']) ? $config['columns'] : array();
     }
 }

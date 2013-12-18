@@ -1,0 +1,3 @@
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('FCom_Customer_Admin_Controller_Addresses') %}
+{{ THIS.view('core/backbonegrid').set('grid', hlp.getCustomerAddressesGridConfig(m)) | raw }}

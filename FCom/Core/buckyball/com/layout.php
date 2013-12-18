@@ -41,6 +41,27 @@ class BLayout extends BClass
     protected $_defaultTheme;
 
     /**
+     * Load these layout files after theme
+     *
+     * @var array
+     */
+    protected $_loadLayoutFiles = array();
+
+    /**
+     * Add view templates from these dirs after theme
+     *
+     * @var array
+     */
+    protected $_addViewsDirs = array();
+
+    /**
+     * Add view templates from these files after theme
+     *
+     * @var array
+     */
+    protected $_addViewsFiles = array();
+
+    /**
      * Layouts declarations registry
      *
      * @var array
@@ -112,22 +133,6 @@ class BLayout extends BClass
     public static function i($new = false, array $args = array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
-    }
-
-    /**
-     * Set root dir for view templates, relative to current module root
-     *
-     * @deprecated
-     * @param string $rootDir
-     * @return BLayout
-     */
-    public function viewRootDir($rootDir = null)
-    {
-        if (is_null($rootDir)) {
-            return $this->getViewRootDir();
-        }
-
-        return $this->setViewRootDir($rootDir);
     }
 
     /**
@@ -213,17 +218,86 @@ class BLayout extends BClass
         return !empty(static::$_renderers[$name]) ? static::$_renderers[$name] : null;
     }
 
-    /**
-     * Alias for addAllViews()
-     *
-     * @deprecated alias
-     * @param mixed $rootDir
-     * @param mixed $prefix
-     * @return BLayout
-     */
-    public function allViews($rootDir = null, $prefix = '')
+    public function addAllViewsDir($rootDir = null, $prefix = '', $curModule = null)
     {
-        return $this->addAllViews($rootDir, $prefix);
+        if (is_null($curModule)) {
+            $curModule = BModuleRegistry::i()->currentModule();
+        }
+        $this->_addViewsDirs[] = array($rootDir, $prefix, $curModule);
+        BEvents::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
+        return $this;
+    }
+
+    public function processRootDir($rootDir, $curModule = null)
+    {
+        if ($curModule && !BUtil::isPathAbsolute($rootDir)) {
+            $rootDir = $curModule->root_dir . '/' . $rootDir;
+        }
+        if (!is_dir($rootDir)) {
+            BDebug::warning('Not a valid directory: ' . $rootDir);
+
+            return $this;
+        }
+        $rootDir1 = realpath($rootDir);
+
+        if (!$rootDir1) {
+            BDebug::warning('Invalid root view dir: '.$rootDir);
+        }
+        return $rootDir1;
+    }
+
+    public function collectAllViewsFiles()
+    {
+        $t = BDebug::debug(__METHOD__);
+        $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
+        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
+        if ($useCache) {
+            $data = BCache::i()->load($cacheKey);
+        }
+        if (!empty($data)) {
+            $this->_addViewsFiles = $data;
+        } else {
+            foreach ($this->_addViewsDirs as $dirData) {
+                $rootDir = $this->processRootDir($dirData[0], $dirData[2]); // rootDir
+                if (!$rootDir) {
+                    continue;
+                }
+                $files = BUtil::globRecursive($rootDir . '/*');
+                if (!$files) {
+                    continue;
+                }
+                $prefix = $dirData[1]; // orefix
+                if ($prefix) {
+                    $prefix = rtrim($prefix, '/') . '/';
+                }
+                $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
+                foreach ($files as $file) {
+                    if (!is_file($file)) {
+                        continue;
+                    }
+                    if (preg_match($re, $file, $m)) {
+                        $this->_addViewsFiles[$prefix . $m[2]] = array(
+                            'template' => $file,
+                            'file_ext' => $m[3],
+                            'module_name' => $dirData[2]->name, // module
+                            'renderer' => static::$_extRenderers[$m[3]]['callback'],
+                        );
+                    }
+                }
+            }
+            $this->_addViewsDirs = array();
+            if ($useCache) {
+                BCache::i()->save($cacheKey, $this->_addViewsFiles);
+            } else {
+                BCache::i()->delete($cacheKey);
+            }
+        }
+        BDebug::profile($t);
+        foreach ($this->_addViewsFiles as $viewName => $viewParams) {
+            $this->addView($viewName, $viewParams);
+        }
+        $this->_addViewsFiles = array();
+        return $this;
     }
 
     /**
@@ -236,26 +310,16 @@ class BLayout extends BClass
      * @param string $prefix Optional: add prefix to view names
      * @return BLayout
      */
-    public function addAllViews($rootDir = null, $prefix = '', $curModule = null)
+    public function addAllViews($rootDir, $prefix = '', $curModule = null)
     {
-        if (is_null($rootDir)) {
-            return $this->_views;
-        }
         if (is_null($curModule)) {
-            $curModule = BModuleRegistry::i()->currentModule();
+            $curModule = BModuleRegistry::i()->currentModuleName();
         }
-        if ($curModule && !BUtil::isPathAbsolute($rootDir)) {
-            $rootDir = $curModule->root_dir . '/' . $rootDir;
-        }
-        if (!is_dir($rootDir)) {
-            BDebug::warning('Not a valid directory: ' . $rootDir);
-
+        $rootDir = $this->processRootDir($rootDir, $curModule);
+        if (!$rootDir) {
             return $this;
         }
-        $rootDir = realpath($rootDir);
-
         $this->setViewRootDir($rootDir);
-
         $files = BUtil::globRecursive($rootDir . '/*');
         if (!$files) {
             return $this;
@@ -264,7 +328,7 @@ class BLayout extends BClass
         if ($prefix) {
             $prefix = rtrim($prefix, '/') . '/';
         }
-        $re = '#^(' . preg_quote(realpath($rootDir) . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
+        $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
         foreach ($files as $file) {
             if (!is_file($file)) {
                 continue;
@@ -310,25 +374,13 @@ class BLayout extends BClass
     }
 
     /**
-     * Register or retrieve a view object
+     * Alias for getView()
      *
-     * @todo remove adding view from here
      * @param string  $viewName
-     * @param array   $params View parameters
-     *   - template: optional, for templated views
-     *   - view_class: optional, for custom views
-     *   - module_name: optional, to use template from a specific module
-     * @param boolean $reset update or reset view params //TODO
      * @return BView|BLayout
      */
-    public function view($viewName, $params = null, $reset = false)
+    public function view($viewName)
     {
-        if ($params) {
-            $this->addView($viewName, $params, $reset);
-
-            return $this;
-        }
-
         return $this->getView($viewName);
     }
 
@@ -352,6 +404,9 @@ class BLayout extends BClass
      *
      * @param string|array $viewName
      * @param string|array $params if string - view class name
+     *   - template: optional, for templated views
+     *   - view_class: optional, for custom views
+     *   - module_name: optional, to use template from a specific module
      * @param bool $reset
      * @return $this
      * @throws BException
@@ -524,9 +579,9 @@ class BLayout extends BClass
         if (is_array($viewName)) {
             $params   = $viewName;
             $viewName = array_shift($params);
-            BLayout::i()->addView($viewName, $params);
+            static::addView($viewName, $params);
         }
-        $view = BLayout::i()->getView($viewName);
+        $view = static::getView($viewName);
         if (!$view) {
             BDebug::warning('Invalid view name: ' . $viewName, 1);
 
@@ -591,7 +646,8 @@ class BLayout extends BClass
             case 'php': $layoutData = include($layoutFilename); break;
             default: throw new BException('Unknown layout file type: '.$layoutFilename);
         }
-        BLayout::i()->addLayout($layoutData);
+        //$this->_layoutDataCache[$layoutFilename] = $layoutData;
+        $this->addLayout($layoutData);
         return $this;
     }
 
@@ -601,7 +657,7 @@ class BLayout extends BClass
     * @param string $layoutFilename
     * @return BLayout
     */
-    public function loadLayoutAfterTheme($layoutFilename)
+    public function loadLayoutAfterTheme($layoutFilename, $first = false)
     {
         if (!BUtil::isPathAbsolute($layoutFilename)) {
             $mod = BModuleRegistry::i()->currentModule();
@@ -609,9 +665,42 @@ class BLayout extends BClass
                 $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
             }
         }
-        $this->onAfterTheme(function() use($layoutFilename) {
-            BLayout::i()->loadLayout($layoutFilename);
+        if ($first) {
+            array_unshift($this->_loadLayoutFiles, $layoutFilename);
+        } else {
+            $this->_loadLayoutFiles[] = $layoutFilename;
+        }
+        /*
+        $layout = $this;
+        $this->onAfterTheme(function() use($layout, $layoutFilename) {
+            $layout->loadLayout($layoutFilename);
         });
+        */
+        return $this;
+    }
+
+    public function loadLayoutFilesFromAllModules()
+    {
+        $t = BDebug::debug(__METHOD__);
+        $cacheKey = 'LAYOUTS-'.BApp::i()->get('area'); //TODO: more flexible key
+        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
+        if ($useCache) {
+            $data = BCache::i()->load($cacheKey);
+        }
+        if (!empty($data)) {
+            $this->_layouts = $data;
+        } else {
+            foreach ($this->_loadLayoutFiles as $layoutFile) {
+                $this->loadLayout($layoutFile);
+            }
+            $this->_loadLayoutFiles = array();
+            if ($useCache) {
+                BCache::i()->save($cacheKey, $this->_layouts);
+            } else {
+                BCache::i()->delete($cacheKey);
+            }
+        }
+        BDebug::profile($t);
         return $this;
     }
 
@@ -897,7 +986,10 @@ class BLayout extends BClass
         }
         BDebug::debug('THEME.APPLY ' . $themeName);
         BEvents::i()->fire('BLayout::applyTheme:before', array('theme_name' => $themeName));
+
         $this->loadTheme($themeName);
+        $this->loadLayoutFilesFromAllModules();
+
         BEvents::i()->fire('BLayout::applyTheme:after', array('theme_name' => $themeName));
 
         return $this;
@@ -930,10 +1022,10 @@ class BLayout extends BClass
 
         $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir.'/' : '';
         if (!empty($theme['layout'])) {
-            BLayout::i()->loadLayout($modRootDir.$theme['layout']);
+            $this->loadLayoutAfterTheme($modRootDir.$theme['layout'], true);
         }
         if (!empty($theme['views'])) {
-            BLayout::i()->addAllViews($modRootDir.$theme['views']);
+            $this->addAllViews($modRootDir.$theme['views']);
         }
         if (!empty($theme['callback'])) {
             BUtil::i()->call($theme['callback']);
