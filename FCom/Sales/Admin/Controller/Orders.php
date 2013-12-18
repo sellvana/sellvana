@@ -240,4 +240,40 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
         );
         return array('config' => $config);
     }
+
+    /**
+     * get grid config for all orders of customer
+     * @param $customer FCom_Customer_Model_Customer
+     * @return array
+     */
+    public function customerOrdersGridConfig($customer)
+    {
+        $config = parent::gridConfig();
+        $config['id'] = 'customer_grid_orders_'.$customer->id;
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70),
+            array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
+            array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'ab.billing_name'),
+            array('name' => 'billing_address', 'label'=>'Bill to Address', 'index'=>'ab.billing_address'),
+            array('name' => 'shipping_name', 'label'=>'Ship to Name', 'index'=>'as.shipping_name'),
+            array('name' => 'shipping_address', 'label'=>'Ship to Address', 'index'=>'as.shipping_address'),
+            array('name' => 'grandtotal', 'label'=>'Order Total', 'index'=>'o.grandtotal'),
+            array('name' => 'balance', 'label'=>'Paid', 'index'=>'o.balance'),
+            array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
+            array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
+        $config['filters'] = array(
+            array('field' => 'create_at', 'type' => 'date-range'),
+            array('field' => 'billing_name', 'type' => 'text'),
+            array('field' => 'shipping_name', 'type' => 'text'),
+            array('field' => 'grandtotal', 'type' => 'number-range'),
+            array('field' => 'status', 'type' => 'select'),
+        );
+        $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
+        $this->gridOrmConfig($config['orm']);
+
+        return array('config' => $config);
+    }
 }

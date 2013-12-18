@@ -10,5 +10,6 @@ modules:
 
         areas:
             FCom_Frontend:
-                observe:
-                    - [ BLayout::loadTheme:after, FCom_Disqus_Frontend::layout ]
+                auto_use: [ layout ]
+                #observe:
+                    #- [ BLayout::loadTheme:after, FCom_Disqus_Frontend::layout ]

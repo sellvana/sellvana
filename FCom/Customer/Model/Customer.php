@@ -16,6 +16,7 @@
  * @property string $payment_method
  * @property string $payment_details
  * @property string $customer_group
+ * @property string $status
  *
  * relations
  * @property FCom_Customer_Model_Address $default_billing
@@ -28,7 +29,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = array(
         'status' => array(
-            'new'      => 'New',
+            'review'   => 'Review',
             'active'   => 'Active',
             'disabled' => 'Disabled',
         ),

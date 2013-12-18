@@ -578,19 +578,24 @@ class BUtil extends BClass
             $rel = $w2[1];
             $f = $w2[2];
             $key = $w1[1];
+            $isAssoc = empty($array[0]);
             foreach ($array as $k=>$v) {
+                if (!isset($v[$f])) {
+                    if ($isAssoc) $result[$k] = $v; else $result[] = $v;
+                    continue;
+                }
                 if ($key===$v[$f]) {
                     if ($rel==='after') {
-                        $result[$k] = $v;
+                        if ($isAssoc) $result[$k] = $v; else $result[] = $v;
                     }
                     foreach ($items as $k1=>$v1) {
-                        $result[$k1] = $v1;
+                        if ($isAssoc) $result[$k1] = $v1; else $result[] = $v1;
                     }
                     if ($rel==='before') {
-                        $result[$k] = $v;
+                        if ($isAssoc) $result[$k] = $v; else $result[] = $v;
                     }
                 } else {
-                    $result[$k] = $v;
+                    if ($isAssoc) $result[$k] = $v; else $result[] = $v;
                 }
             }
             break;
@@ -1237,36 +1242,38 @@ class BUtil extends BClass
     }
 
     /**
-    * Strip html tags and shorten to specified length, to the whole word
-    *
-    * @param string $text
-    * @param integer $limit
-    */
-    public static function previewText($text, $limit)
+     * Strip html tags and shorten to specified length, to the whole word
+     *
+     * @param string  $text
+     * @param integer $limit
+     * @return string
+     */
+    public static function previewText( $text, $limit )
     {
-        $text = strip_tags($text);
-        if (strlen($text) < $limit) {
+        $text = strip_tags( $text );
+        if ( strlen( $text ) < $limit ) {
             return $text;
         }
-        preg_match('/^(.{1,'.$limit.'})\b/', $text, $matches);
-        return $matches[1];
+        preg_match( '/^(.{1,' . $limit . '})\b/', $text, $matches );
+        return $matches[ 1 ];
     }
 
-    public static function isEmptyDate($date)
+    public static function isEmptyDate( $date )
     {
-        return preg_replace('#[0 :-]#', '', (string)$date)==='';
+        return preg_replace( '#[0 :-]#', '', (string)$date ) === '';
     }
 
     /**
-    * Get gravatar image src by email
-    *
-    * @param string $email
-    * @param array $params
-    *   - size (default 80)
-    *   - rating (G, PG, R, X)
-    *   - default
-    *   - border
-    */
+     * Get gravatar image src by email
+     *
+     * @param string $email
+     * @param array  $params
+     *   - size (default 80)
+     *   - rating (G, PG, R, X)
+     *   - default
+     *   - border
+     * @return string
+     */
     public static function gravatar($email, $params=array())
     {
         if (empty($params['default'])) {
@@ -1299,6 +1306,51 @@ class BUtil extends BClass
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    public static function varSize($var)
+    {
+        /*
+        function varCopy($src)
+        {
+            if (is_string($src)) {
+                return str_replace('!@#$%^&*()', ')(*&^%$#@!', $src);
+            }
+
+            if (is_numeric($src)) {
+                return ($src + 0);
+            }
+
+            if (is_bool($src)) {
+                return ($src ? TRUE : FALSE);
+            }
+            if (is_null($src)) {
+                return NULL;
+            }
+
+            if (is_object($src)) {
+                $new = (object) array();
+                foreach ($src as $key => $val) {
+                    $new->$key = rec_copy($val);
+                }
+                return $new;
+            }
+
+            if (!is_array($src)) {
+                //print_r(gettype($src) . "\n");
+                return $src;
+            }
+
+            $new = array();
+            foreach ($src as $k=>$v) {
+                $new[$k] = varCopy($v);
+            }
+            return $new;
+        }
+        */
+        $old = memory_get_usage();
+        $dummy = unserialize(serialize($var));
+        return memory_get_usage()-$old;
     }
 
     public static function formatDateRecursive($source, $format='m/d/Y')
@@ -2264,6 +2316,7 @@ class BDebug extends BClass
 
         $l = self::$_level[self::MEMORY];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+            //$e['msg'] = substr($e['msg'], 0, 50); $e['file'] = ''; $e['line'] = '';
             self::$_events[] = $e;
             $id = sizeof(self::$_events)-1;
         }

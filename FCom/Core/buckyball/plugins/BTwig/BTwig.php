@@ -20,7 +20,10 @@ class BTwig extends BClass
             'file_ext' => array('.html.twig', '.twig.html'),
         ));
 
-        BEvents::i()->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews');
+        BEvents::i()
+            ->on('BLayout::addAllViews', 'BTwig::onLayoutAddAllViews')
+            ->on('BLayout::addAllViewsDir', 'BTwig::onLayoutAddAllViews')
+        ;
     }
 
     public static function init($path=null)

@@ -60,19 +60,22 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
     {
         parent::formViewBefore($args);
         $m = $args['model'];
+        /*
         $actions = array('<input type="hidden" id="save_as" name="save_as" value=""/>');
         if ($m->status==='template') {
             $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
         } else {
             $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
         }
-        $args['view']->title = $m->id ? 'Edit Promo: '.$m->description: 'Create New Promo';
         $args['view']->actions = BUtil::arrayMerge($args['view']->actions, $actions);
+        */
+        $args['view']->title = $m->id ? 'Edit Promo: '.$m->description: 'Create New Promo';
     }
 
     public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
     {
         if ($model && $model->id) {
+            $view->addTab("details", array('label' => BLocale::_("Details"), 'pos' => 20, 'async' => true));
             $view->addTab("history", array('label' => BLocale::_("History"), 'pos' => 40, 'async' => true));
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);

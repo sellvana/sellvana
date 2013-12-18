@@ -585,6 +585,7 @@ class BModuleRegistry extends BClass
             $mod->bootstrap();
             $this->popModule();
         }
+        BLayout::i()->collectAllViewsFiles(); // TODO: refactor, decide on a better place
         BEvents::i()->fire('BModuleRegistry::bootstrap:after');
         return $this;
     }
@@ -940,20 +941,21 @@ if ($args['name']==="FCom_Referrals") {
                 $this->bootstrap = array('callback' => $this->name.'::bootstrap');
             }
         }
+        $layout = BLayout::i();
         if (isset($auto['all']) || isset($auto['views'])) {
             if (is_dir($this->root_dir.'/views')) {
-                BLayout::i()->addAllViews($this->root_dir.'/views');
+                $layout->addAllViewsDir($this->root_dir.'/views');
             }
             if (is_dir($this->root_dir.'/'.$areaDir.'/views')) {
-                BLayout::i()->addAllViews($this->root_dir.'/'.$areaDir.'/views');
+                $layout->addAllViewsDir($this->root_dir.'/'.$areaDir.'/views');
             }
         }
         if (isset($auto['all']) || isset($auto['layout'])) {
             if (file_exists($this->root_dir.'/layout.yml')) {
-                BLayout::i()->loadLayoutAfterTheme($this->root_dir.'/layout.yml');
+                $layout->loadLayoutAfterTheme($this->root_dir.'/layout.yml');
             }
             if (file_exists($this->root_dir.'/'.$areaDir.'/layout.yml')) {
-                BLayout::i()->loadLayoutAfterTheme($this->root_dir.'/'.$areaDir.'/layout.yml');
+                $layout->loadLayoutAfterTheme($this->root_dir.'/'.$areaDir.'/layout.yml');
             }
         }
     }

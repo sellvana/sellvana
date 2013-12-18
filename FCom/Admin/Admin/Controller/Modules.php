@@ -92,11 +92,11 @@ class FCom_Admin_Admin_Controller_Modules extends FCom_Admin_Admin_Controller_Ab
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
             array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
-            array('name' => 'version', 'label' => 'Code', 'width' => 80, 'overflow' => true),
-            array('name' => 'schema_version', 'label' => 'Schema', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
+            array('name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true),
+            array('name' => 'schema_version', 'label' => 'DB Version', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
             array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
             array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
-             array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
+            array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
             array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true)
         );
