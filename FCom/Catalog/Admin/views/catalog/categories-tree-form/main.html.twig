@@ -104,20 +104,6 @@
         {% endverbatim %}
     </div>
 </div>
-<div class="modal fade in" id="image-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body" id="image-popup">
-                {% if image %}
-                    <img  src={{ "/resize.php?s=500x500&f=%s"|_(image) }}>
-                {% endif %}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default btn-close prod-images-modal-close" data-dismiss="modal" type="button">{{ 'Close'|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <div class="form-group">
