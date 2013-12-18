@@ -90,10 +90,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
             if (!$review) {
                 BResponse::i()->json(array('error' => 'Invalid id'));
             }
+            $mark = -1;
             if ($post['review_helpful'] == 'yes') {
                 $mark = 1;
-            } else {
-                $mark = -1;
             }
             $customer = FCom_Customer_Model_Customer::i()->sessionUser();
             $record = FCom_ProductReviews_Model_ReviewFlag::i()->load(array(
@@ -108,7 +107,11 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
             } elseif ($record->helpful != $mark) {
                 $review->helpful($mark);
                 $record->set('helpful', $mark)->save();
+            } else {
+                BResponse::i()->json(array('error' => "You've already rated this review"));
             }
+
+
         }
     }
 
