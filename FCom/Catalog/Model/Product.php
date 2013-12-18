@@ -679,7 +679,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function reviews($incAvgRating = true)
     {
-        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')
+        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')->select(array('pr.*', 'c.firstname', 'c.lastname'))
             ->join('FCom_Customer_Model_Customer', array('pr.customer_id','=','c.id'), 'c')
             ->where(array('pr.product_id' => $this->id(), 'approved' => 1))->order_by_expr('pr.create_at DESC')->find_many();
 

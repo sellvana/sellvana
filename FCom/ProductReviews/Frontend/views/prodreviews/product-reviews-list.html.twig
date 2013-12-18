@@ -70,14 +70,31 @@
                         <span class="f-empty-stars"></span>
                     </div>
                     {{ review.get('rating3') }}</dd>
+
+            </dl>
+            <dl>
+                <div id="block_review_helpful_{{ review.get('id') }}">
+                    <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
+                        <input type="hidden" name="pid" value="{{ prod.get('id') }}">
+                        <input type="hidden" name="rid" value="{{ review.get('id') }}">
+                        {{ "Was this review helpful to you" | _ }}?
+                        <button class="btn-info btn-small" type="submit" name="review_helpful" value="yes"
+                                onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                        <span class="badge">{{ review.get('helpful') }}</span>
+                    </form>
+                </div>
+                <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
             </dl>
         </div>
         <div class="col-md-7 col-sm-7 f-prod-review">
-            {{ review.get('text') }}
+            {{ review.get("text") }}
+
         </div>
+
     </article>
 {% endfor %}
 
 {% if (reviews.numReviews > 1) %}
     <p><a href="#"><strong>{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</strong></a></p>
 {% endif %}
+<script>require(['fcom.productreviews'])</script>
