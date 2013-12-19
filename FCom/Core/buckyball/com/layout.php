@@ -1679,10 +1679,8 @@ class BView extends BClass
 
         $body = $this->render($p, true);
 
-        $data = array_merge(
-            array_change_key_case($this->param('meta_data'), CASE_LOWER),
-            array_change_key_case($p, CASE_LOWER)
-        );
+        $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : array();
+        $data = array_merge($metaData, array_change_key_case($p, CASE_LOWER));
         $data['body'] = $body;
 
         return BEmail::i()->send($data);
