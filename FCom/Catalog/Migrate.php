@@ -315,4 +315,14 @@ class FCom_Catalog_Migrate extends BClass
         ));
         FCom_Catalog_Model_Category::i()->update_many(array('show_products' => 1, 'show_sidebar' => 1, 'is_enabled' => 1));
     }
+
+    public function upgrade__0_2_14__0_2_15()
+    {
+        $tCategory = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL'
+            )
+        ));
+    }
 }
