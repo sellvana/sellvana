@@ -298,7 +298,8 @@ class FCom_Core_Main extends BClass
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
         }
-        $useProductionCache = ('STAGING' === $mode || 'PRODUCTION' === $mode) && !$config->get('db/implicit_migration');
+        $useProductionCache = $config->get('core/force_dirfile_cache') ||
+            ('STAGING' === $mode || 'PRODUCTION' === $mode) && !$config->get('db/implicit_migration');
         if ($useProductionCache) {
             $manifestsLoaded = $modReg->loadManifestCache();
         } else {
