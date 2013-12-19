@@ -23,6 +23,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             array('name'=>'sale_price', 'label'=>'Sale Price',  'width'=>100,'hidden'=>true),
             array('name'=>'net_weight', 'label'=>'Net Weight',  'width'=>100,'hidden'=>true),
             array('name'=>'ship_weight', 'label'=>'Ship Weight',  'width'=>100,'hidden'=>true),
+            array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
             array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
@@ -345,6 +346,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
                     array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>200),
                     array('name'=>'base_price', 'label'=>'Base Price', 'index'=>'p.base_price'),
                     array('name'=>'sale_price', 'label'=>'Sale Price', 'index'=>'p.sale_price'),
+                    array('name' => 'position', 'label' => 'Position', 'index' => 'p.position'),
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add products'),
