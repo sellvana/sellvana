@@ -18,12 +18,12 @@
         </header>
         {% if category.get('show_sub_cat') %}
             {% set subCategories = category.children() %}
-            <div class="f-catalog-sub-categories">
+            <div class="row f-catalog-sub-categories">
             {% if subCategories|length %}
                 <ul>
                 {% for subCat in subCategories %}
                     {% set subCatImg = subCat.image() %}
-                    <li>
+                    <li class="col-md-6 list-unstyled">
                         <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">
                             <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ subCatImg ? subCatImg : 'media/image-not-found.jpg' }}"
                                  alt="{{ subCat.get('node_name') }}" />
