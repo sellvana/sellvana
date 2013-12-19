@@ -17,7 +17,7 @@
             <div class="col-md-10">
                 {% for g in m.groups() %}
                     {% if g.get('group_type') == 'buy' %}
-                        {{ THIS.view('jqgrid').set('config', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id')))|raw }}
+                        {#{{ THIS.view('jqgrid').set('config', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id'))) | raw }}#}
                     {% endif %}
                 {% endfor %}
             </div>
@@ -43,7 +43,7 @@
                 <div class="col-md-10">
                     {% for g in m.groups() %}
                         {% if g.get('group_type') == 'get' %}
-                            {{ THIS.view('jqgrid').set('config', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id'))) }}
+                            {#{{ THIS.view('jqgrid').set('config', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id'))) | raw }}#}
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -60,7 +60,7 @@
     <div class="ui-layout-center">
         <div class="form-group">
             <div class="col-md-12">
-                {{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('productLibrary'))|raw }}
+                {#{{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('productLibrary')) | raw }}#}
             </div>
         </div>
     </div>
