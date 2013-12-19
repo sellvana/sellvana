@@ -216,6 +216,7 @@ class BApp extends BClass
         // load session variables
         BSession::i()->open();
 
+#echo "<pre>"; var_dump(BConfig::i()->get('cookie'), $_SESSION); exit;
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
