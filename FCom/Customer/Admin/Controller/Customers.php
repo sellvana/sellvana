@@ -89,8 +89,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         $saleStatistics = $m->saleStatistics();
         $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime']) . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
         $args['view']->set(array(
-            'sidebar_img' => ($m->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $silhouetteImg),
-            //todo: add profile image, silhouette icon if empty profile image
+            'sidebar_img' => (BConfig::i()->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $silhouetteImg),
             'title' => $m->id ? $this->_('Edit Customer: ').$m->firstname.' '.$m->lastname : $this->_('Create New Customer'),
             'otherInfo' => $m->id ? $info : '',
             'actions' => $actions,
