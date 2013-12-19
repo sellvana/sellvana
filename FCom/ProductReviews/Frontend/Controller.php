@@ -19,7 +19,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
             return;
         }
 
-        $this->formMessages();
+        $this->formMessages($this->formId);
         $this->view('prodreviews/review-form')->set(array('prod' => $product, 'formId' => $this->formId));
         $this->layout('/prodreview/add');
     }
