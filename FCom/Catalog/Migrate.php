@@ -303,4 +303,16 @@ class FCom_Catalog_Migrate extends BClass
                     'show_sidebar' => 'TINYINT(1) UNSIGNED DEFAULT NULL'
                 )));
     }
+
+    public function upgrade__0_2_13__0_2_14()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 AFTER num_products',
+            ),
+            //TODO: figure out which keys are needed
+        ));
+        FCom_Catalog_Model_Category::i()->update_many(array('show_products' => 1, 'show_sidebar' => 1, 'is_enabled' => 1));
+    }
 }

@@ -57,6 +57,7 @@ class FCom_Core_Main extends BClass
         $localConfig = array();
         $localConfig['fs']['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
+        // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
         if ($rootDir) {
             $rootDir = realpath($rootDir);
@@ -289,8 +290,6 @@ class FCom_Core_Main extends BClass
         //FCom::i()->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
 
-        // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
-        $rootDir = $config->get('fs/root_dir');
         $dirConf = $config->get('fs');
         $modReg = BModuleRegistry::i();
 
