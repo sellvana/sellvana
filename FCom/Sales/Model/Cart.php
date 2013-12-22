@@ -58,7 +58,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $id;
     }
 
-    static public function sessionCart($reset = true)
+    static public function sessionCart($reset = false)
     {
         if ($reset || !static::$_sessionCart) {
             if ($reset instanceof FCom_Sales_Model_Cart) {
@@ -152,6 +152,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function recentItems($limit=3)
     {
+        if (!$this->id()) {
+            return array();
+        }
         $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id())
             ->order_by_desc('ci.update_at')->limit($limit);
         BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
@@ -208,7 +211,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function addProduct($productId, $params=array())
     {
         //save cart to DB on add first product
-        if (!$this->id) {
+        if (!$this->id()) {
             $this->item_qty = 1;
             $this->save();
         }

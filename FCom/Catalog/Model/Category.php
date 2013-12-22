@@ -108,6 +108,17 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return array_values($categories);
     }
 
+    public function onAfterCreate()
+    {
+        parent::onAfterCreate();
+
+        $this->set(array(
+            'show_products' => 1,
+            'show_sidebar' => 1,
+            'is_enabled' => 1,
+        ));
+    }
+
     public function onAfterSave()
     {
         parent::onAfterSave();

@@ -133,12 +133,31 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         if (!parent::onAfterSave()) return false;
 
+        $saveAgain = false;
+
         //todo: setup unique uniq_id
         if (!$this->get('local_sku')) {
             $this->set('local_sku', $this->id);
+            $saveAgain = true;
+        }
+        if (!$this->get('position')) {
+            $this->set('position', $this->calcPosition());
+        }
+        if ($saveAgain) {
             $this->save();
         }
         return true;
+    }
+
+    public function calcPosition()
+    {
+        $maxCurrentPosition = FCom_Catalog_Model_Product::i()->orm()->select_expr('max(position) as max_pos')->find_one();
+        if (!$maxCurrentPosition) {
+            $maxCurrentPosition = 1;
+        } else {
+            $maxCurrentPosition = $maxCurrentPosition->get('max_pos');
+        }
+        return $maxCurrentPosition + 1;
     }
 
     public function generateUrlKey()
@@ -679,7 +698,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function reviews($incAvgRating = true)
     {
-        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')
+        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')->select(array('pr.*', 'c.firstname', 'c.lastname'))
             ->join('FCom_Customer_Model_Customer', array('pr.customer_id','=','c.id'), 'c')
             ->where(array('pr.product_id' => $this->id(), 'approved' => 1))->order_by_expr('pr.create_at DESC')->find_many();
 
