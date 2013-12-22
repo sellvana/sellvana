@@ -598,8 +598,13 @@ class BRequest extends BClass
                 }
                 $p = parse_url($ref);
                 $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
-                $webRoot = $c->get('web/base_src');
-                if (!$webRoot) $webRoot = static::webRoot();
+                $webRoot = $c->get('web/csrf_web_root');
+                if (!$webRoot) {
+                    $webRoot = $c->get('web/base_src');
+                }
+                if (!$webRoot) {
+                    $webRoot = static::webRoot();
+                }
                 if ($p['host']!==static::httpHost(false) || $webRoot && strpos($p['path'], $webRoot)!==0) {
                     return true; // referrer host or doc root path do not match, high prob. csrf
                 }
