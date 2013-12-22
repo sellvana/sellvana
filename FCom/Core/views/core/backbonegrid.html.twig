@@ -1,15 +1,11 @@
-{# Logic provided by FCom_Core_View_Backgrid #}
+{# Logic provided by FCom_Core_View_BackboneGrid #}
 
-{% set data = THIS.getGridData() %}
-{% set grid = THIS.getGrid() %}
-{% set config = grid.config %}
-{% set s = data.result.state %}
-{% set pageUrl = THIS.pageChangeHref() %}
-{% set filterData = config.filters %}
+{% set config = THIS.getGridConfig() %}
+{% set s = config.data.result.state %}
 
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
-  {% if filterData %}
+  {% if config.filters %}
     <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
       <div class="f-col-filters-selection col-sm-2">
 
@@ -17,7 +13,7 @@
 
       <span class="{{ config.id }} dropdown">
         <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-          Filters
+          {{ 'Filters'|_ }}
           <b class="caret"></b>
         </a>
         <ul class="{{ config.id }} dd-list dropdown-menu filters">
@@ -28,7 +24,7 @@
       </span>
       </div>
       <div class="col-sm-10">
-      {% if filterData[0] %}
+      {% if config.filters[0] %}
         <span class="{{ config.id }} f-filter-btns">
           <!-- filter buttons here -->
         </span>
@@ -41,7 +37,7 @@
       <div class="col-sm-6">
         <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-                Columns
+                {{ 'Columns' |_ }}
                 <b class="caret"></b>
             </a>
                 <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
@@ -63,7 +59,7 @@
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
             {% for ps in THIS.pageSizeOptions() %}
-              <li {{ ps==s.ps ? 'class="active"' }}>
+              <li {{ ps == s.ps ? 'class="active"' }}>
                 <a class="js-change-url page-size" href="#">{{ ps }}</a>
               </li>
             {% endfor %}
@@ -113,11 +109,10 @@
             <div class='modal-content'>
                 <div class='modal-header'>
                     <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                    <h4 class='modal-title' id='myModalLabel'>Mass edit form</h4>
+                    <h4 class='modal-title' id='myModalLabel'>{{ 'Edit form'|_ }}</h4>
                 </div>
                 <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
                   <div class='modal-body'>
-                      <!-- mass edit form element template is here -->
                   </div>
                 </form>
                 <div class='modal-footer'>
@@ -172,7 +167,7 @@
 <script type="template" id="{{ config.id }}-row-template">
   <% for (var index in rc.colsInfo) {
     var col = rc.colsInfo[index];
-    if(col.hidden ) {
+    if(col.hidden || col.form_only) {
       continue;
     }
     var overflow = '';
@@ -484,14 +479,14 @@
 
             <div class="input-group-btn range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
                 <% var vals = rc.val.split('~'); %>
-                <input type="text" placeholder="Input number1" class="form-control js-number1" style="width:45%;" value="<%= rc.range ? vals[0] : '' %>">
+                <input type="text" placeholder="From" class="form-control js-number1" style="width:45%;" value="<%= rc.range ? vals[0] : '' %>">
                 &nbsp;<i class="icon-resize-horizontal"></i>&nbsp;
-                <input type="text" placeholder="Input number2" class="form-control js-number2" style="width:45%;" value="<%= rc.range ? vals[1] : '' %>">
+                <input type="text" placeholder="To" class="form-control js-number2" style="width:45%;" value="<%= rc.range ? vals[1] : '' %>">
 
             </div>
 
             <div class="input-group-btn not_range" <%= rc.range ? 'style="display:none;"' :'style="display:table;"' %>>
-              <input type="text" placeholder="Input number" class="form-control js-number" value="<%= !rc.range ? rc.val : '' %>">
+              <input type="text" placeholder="Number" class="form-control js-number" value="<%= !rc.range ? rc.val : '' %>">
             </div>
 
             <div class="input-group-btn">
@@ -515,20 +510,7 @@ require(['jquery', 'fcom.backbonegrid'], function($) {
       $('form#{{ config.id }}-new-form').append(html);
 
     }
-    //$(function() {
-        var grid = new FCom.BackboneGrid({
-            id: "{{ config.id }}",
-            personalize_url: "{{ APP.href('my_account/personalize') }}",
-            data_url: "{{ config.data_url }}",
-            edit_url: "{{ config.edit_url }}",
-            data: {{ THIS.getPageRowsData() | json_encode() | raw }},
-            columns: {{ config.columns | json_encode() | raw }},
-            data_mode: "{{ config.data_mode }}",
-            filters: {{ config.filters | json_encode() | raw}},
-            events: {{ config.events | json_encode() | raw}},
-            callbacks: {{ config.callbacks | json_encode() | raw }},
-            pageSizeOptions: {{ config.page_size_options | json_encode | raw }}
-        });
-    //});
+
+    var grid = new FCom.BackboneGrid({{ UTIL.toJson(config) | raw }});
 });
 </script>

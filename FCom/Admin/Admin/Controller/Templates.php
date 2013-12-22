@@ -18,10 +18,10 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
             array('name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true),
             array('name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50),
             array('name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array(
-                'edit' => true,
-                'revert' => array('caption' => 'Revert'),
-            ))
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array(
+                'edit' => array('href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
+                'delete' => array('caption' => 'Remove/Revert'),
+            )),
         );
 
         $config['state'] = array('s' => 'view_name');
@@ -74,16 +74,29 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
         return $layout;
     }
 
-    public function action_template()
+    public function action_form()
     {
-        $viewName = BRequest::i()->get('view_name');
-        $layout = $this->getAreaLayout();
-        $view = $layout->getView('view_name');
-        $viewFile = $view->getTemplateFileName();
+        $tplViewName = BRequest::i()->get('id');
+        $areaLayout = $this->getAreaLayout();
+        $tplView = $areaLayout->getView($tplViewName);
+        $tplViewFile = $tplView->getTemplateFileName();
+        $tplContents = file_get_contents($tplViewFile);
 
+        $model = new BData(array(
+            'view_name' => $tplViewName,
+            'view_contents' => $tplContents,
+        ));
+
+        $this->formMessages();
+        $view = $this->view($this->_formViewName)->set('model', $model);
+        $this->layout($this->_formLayoutName);
+        $this->processFormTabs($view, $model, 'edit');
+        if ($this->_formTitle && ($head = $this->view('head'))) {
+            $head->addTitle($this->_formTitle);
+        }
     }
 
-    public function action_template__POST()
+    public function action_form__POST()
     {
         $r = BRequest::i();
         $viewName = $r->get('view_name');
