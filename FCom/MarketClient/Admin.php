@@ -6,22 +6,17 @@ class FCom_MarketClient_Admin extends BClass
     {
     }
 
-    public function hookFindModulesForUpdates($args)
+    public static function hookFindModulesForUpdates($args)
     {
         $modulesNotification = &$args['modulesNotification'];
         //find modules which have updates
-        try {
-            if (!BDb::ddlFieldInfo(FCom_MarketClient_Model_Modules::table(), 'need_upgrade')) {
-                return;
-            }
-            $res = FCom_MarketClient_Model_Modules::orm()->where('need_upgrade', 1)->find_many();
-        } catch (Exception $e) {
-            return;
-        }
+        $res = FCom_MarketClient_Model_Modules::i()->orm('mm')
+            ->join('FCom_Core_Model_Module', array('m.id','=','mm.core_module_id'), 'm')
+            ->where('is_upgrade_available', 1)->find_many();
         $data = array();
         foreach($res as $r) {
             $obj = new stdClass();
-            $obj->url = 'marketclient/form?id='.$r->id;
+            $obj->url = 'marketclient/form?id='.$r->id();
             $obj->module = $r->mod_name;
             $obj->text = $r->mod_name . ' have a new version';
             $data[] = $obj;
@@ -51,4 +46,14 @@ class FCom_MarketClient_Admin extends BClass
 
     }
 
+    public static function onModuleGridView($args)
+    {
+        $grid = $args['view']->get('grid');
+
+        $grid['config']['columns'] = BUtil::arrayInsert($grid['config']['columns'], array(
+            array('name' => 'market_version', 'label' => 'Available', 'width' => 80, 'overflow' => true),
+        ), 'arr.before.name==version');
+
+        $args['view']->set('grid', $grid);
+    }
 }
