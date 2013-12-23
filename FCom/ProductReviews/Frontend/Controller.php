@@ -272,4 +272,22 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
             BResponse::i()->redirect($url);
         }
     }
+
+    public function action_ajax_review()
+    {
+        $post = BRequest::i()->post();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
+        $pr = FCom_ProductReviews_Model_Review::i()->load(
+            array(
+                'id'          => $post['pr'],
+                'customer_id' => $customerId
+            )
+        );
+        if (!$pr) {
+            BResponse::i()->json(array('status' => 'error', 'message' => 'Cannot load your review, please check again'));
+        } else {
+            BResponse::i()->json($pr->as_array() + array('status' => 'success'));
+        }
+
+    }
 }
