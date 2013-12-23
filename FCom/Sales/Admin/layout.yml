@@ -53,7 +53,7 @@ base:
             - [ addTabGroup, shipping_methods, { label: Shipping, pos: 110 } ]
             - [ addTabGroup, payment_methods, { label: Payment, pos: 120 } ]
             - [ addTabGroup, checkout_methods, { label: Checkout, pos: 130 } ]
-            - [ addTab, FCom_Sales, { label: Sales, group: sales, pos: 10 } ]
-            - [ addTab, FCom_SalesShipping, { label: General, group: shipping_methods, pos: 10 } ]
-            - [ addTab, FCom_SalesPayment, { label: General, group: payment_methods, pos: 10 } ]
+            - [ addTab, FCom_Sales, { label: Sales, group: sales, pos: 10, async: true } ]
+            - [ addTab, FCom_SalesShipping, { label: General, group: shipping_methods, pos: 10, async: true } ]
+            - [ addTab, FCom_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true } ]
 

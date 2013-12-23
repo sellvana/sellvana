@@ -20,4 +20,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, FCom_MultiSite, { label: Multi Site, group: catalog } ]
+            - [ addTab, FCom_MultiSite, { label: Multi Site, group: catalog, async: true } ]
