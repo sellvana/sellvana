@@ -25,7 +25,8 @@ base:
       - [ css, @FCom_Core/css/fcom.core.css ]
       #- [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
       #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
-      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
+      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
+      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
 
       #- [ js, @FCom_Core/js/lib/json2.js ]
       #- [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
@@ -76,6 +77,7 @@ base:
       - [ addNav, system/users, { label: Users, href: /users  } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
       - [ addNav, system/templates, { label: Templates, href: /templates  } ]
+      - [ addNav, system/backups, { label: Backups, href: /backups  } ]
       - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
 
   - view: admin/header
@@ -376,3 +378,19 @@ form:
         set: { tab_view_prefix: templates-form/ }
         do:
             - [ addTab, main, { label: Template, pos: 10 } ]
+
+/backups:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, system/backups ]] }
+
+/backups/form:
+    - { include: base }
+    - { include: form }
+    - { include: codemirror }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, system/backups ]] }
+    - view: admin/form
+        set: { tab_view_prefix: backups-form/ }
+        do:
+            - [ addTab, main, { label: Backup, pos: 10 } ]

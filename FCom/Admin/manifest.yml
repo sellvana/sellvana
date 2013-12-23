@@ -37,6 +37,8 @@ modules:
 
                     - [ any, /templates/?.action, FCom_Admin_Admin_Controller_Templates ]
 
+                    - [ any, /backups/?.action, FCom_Admin_Admin_Controller_Backups ]
+
                     - [ get, /users, FCom_Admin_Admin_Controller_Users.index ]
                     - [ any, /users/.action, FCom_Admin_Admin_Controller_Users ]
 
