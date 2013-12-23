@@ -6,7 +6,6 @@
 {% set min = config.min %}
 {% set step = config.step %}
 {% set action = THIS.get('action') ? THIS.get('action') : 'add' %}
-
 {% if pr is null %}
     {% set pr = APP.instance('FCom_ProductReviews_Model_Review').load({'product_id': prod.id(), 'customer_id': THIS.get('userId')}) %}
 {% endif %}
@@ -14,86 +13,87 @@
     {% set validator = THIS.validator(THIS.get('formId')) %}
 {% endif %}
 
-<form action="{{ APP.href('prodreviews/' ~ action) }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
-    <input type="hidden" name="pid" value="{{ prod.id() }}">
-    <input type="hidden" name="pr" value="{{ pr.id() }}" id="id-preview">
+{% if action == 'add' or (action == 'edit' and pr is not empty) %}
+    <form action="{{ APP.href('prodreviews/' ~ action) }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
+        <input type="hidden" name="pid" value="{{ prod.id() }}">
+        <input type="hidden" name="pr" value="{{ pr.id() }}" id="id-preview">
 
-    <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
+        <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
 
-    <div class="f-prod-review-attrs">
-        <dl class="dl-horizontal">
-            <dt><strong>{{ 'Overall'|_ }}</strong></dt>
-            <dd>
-                <input type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
-                        {% if pr %}
-                            value="{{ pr.get('rating')}}"
-                        {% else %}
-                            value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}"
-                        {% endif %}
-                       step="{{ step }}" />
-                <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
-            </dd>
-            <dt>{{ 'Value'|_ }}</dt>
-            <dd>
-                <input type="range" id="prodreview-rating1" name="review[rating1]" min="{{ min }}" max="{{ max }}"
-                        {% if pr %}
-                            value="{{ pr.get('rating1')}}"
-                        {% else %}
-                            value="{{ validator is defined and validator.fieldValue('rating1') ? validator.fieldValue('rating1') : min }}"
-                        {% endif %}
-                       step="{{ step }}" />
-                <div class="rateit" data-rateit-backingfld="#prodreview-rating1"></div>
-            </dd>
-            <dt>{{ 'Features'|_ }}</dt>
-            <dd>
-                <input type="range" id="prodreview-rating2" name="review[rating2]" min="{{ min }}" max="{{ max }}"
-                        {% if pr %}
-                            value="{{ pr.get('rating2')}}"
-                        {% else %}
-                            value="{{ validator is defined and validator.fieldValue('rating2') ? validator.fieldValue('rating2') : min }}"
-                        {% endif %}
-                       step="{{ step }}" />
-                <div class="rateit" data-rateit-backingfld="#prodreview-rating2"></div>
-            </dd>
-            <dt>{{ 'Quality'|_ }}</dt>
-            <dd>
-                <input type="range" id="prodreview-rating3" name="review[rating3]" min="{{ min }}" max="{{ max }}"
-                        {% if pr %}
-                            value="{{ pr.get('rating3')}}"
-                        {% else %}
-                            value="{{ validator is defined and validator.fieldValue('rating3') ? validator.fieldValue('rating3') : min }}"
-                        {% endif %}
-                       step="{{ step }}" />
-                <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
-            </dd>
-        </dl>
-    </div>
-    <div class="form-group">
-        <label for="review-title">{{ 'Review Title'|_ }}</label>
-        <div class="controls">
-            <input type="text" id="prodreview-title" name="review[title]" placeholder="{{"Title" | _ }}" class="form-control"
-                    {% if pr %}
-                        value="{{ pr.get('title')}}"
-                    {% else %}
-                        value="{{ validator is defined ? validator.fieldValue('title') : '' }}"
-                    {% endif %} />
+        <div class="f-prod-review-attrs">
+            <dl class="dl-horizontal">
+                <dt><strong>{{ 'Overall'|_ }}</strong></dt>
+                <dd>
+                    <input type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
+                            {% if pr %}
+                                value="{{ pr.get('rating')}}"
+                            {% else %}
+                                value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}"
+                            {% endif %}
+                           step="{{ step }}" />
+                    <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
+                </dd>
+                <dt>{{ 'Value'|_ }}</dt>
+                <dd>
+                    <input type="range" id="prodreview-rating1" name="review[rating1]" min="{{ min }}" max="{{ max }}"
+                            {% if pr %}
+                                value="{{ pr.get('rating1')}}"
+                            {% else %}
+                                value="{{ validator is defined and validator.fieldValue('rating1') ? validator.fieldValue('rating1') : min }}"
+                            {% endif %}
+                           step="{{ step }}" />
+                    <div class="rateit" data-rateit-backingfld="#prodreview-rating1"></div>
+                </dd>
+                <dt>{{ 'Features'|_ }}</dt>
+                <dd>
+                    <input type="range" id="prodreview-rating2" name="review[rating2]" min="{{ min }}" max="{{ max }}"
+                            {% if pr %}
+                                value="{{ pr.get('rating2')}}"
+                            {% else %}
+                                value="{{ validator is defined and validator.fieldValue('rating2') ? validator.fieldValue('rating2') : min }}"
+                            {% endif %}
+                           step="{{ step }}" />
+                    <div class="rateit" data-rateit-backingfld="#prodreview-rating2"></div>
+                </dd>
+                <dt>{{ 'Quality'|_ }}</dt>
+                <dd>
+                    <input type="range" id="prodreview-rating3" name="review[rating3]" min="{{ min }}" max="{{ max }}"
+                            {% if pr %}
+                                value="{{ pr.get('rating3')}}"
+                            {% else %}
+                                value="{{ validator is defined and validator.fieldValue('rating3') ? validator.fieldValue('rating3') : min }}"
+                            {% endif %}
+                           step="{{ step }}" />
+                    <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
+                </dd>
+            </dl>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="review-text">{{ 'Review Text'|_ }}</label>
-        <div class="controls">
-            <textarea name="review[text]" id="prodreview-text" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea><br/>
+        <div class="form-group">
+            <label for="review-title">{{ 'Review Title'|_ }}</label>
+            <div class="controls">
+                <input type="text" id="prodreview-title" name="review[title]" placeholder="{{"Title" | _ }}" class="form-control"
+                        {% if pr %}
+                            value="{{ pr.get('title')}}"
+                        {% else %}
+                            value="{{ validator is defined ? validator.fieldValue('title') : '' }}"
+                        {% endif %} />
+            </div>
         </div>
-    </div>
-    <input type="submit" class="btn btn-primary" id="review_save">
-    {% if (THIS.get('isModalBox')) %}
-        <input type="button" class="btn btn-link-cancel" data-dismiss="modal" value="{{ 'Cancel'|_ }}" />
-    {% endif %}
-    {% if (THIS.get('isModalBox') != 1) %}
-        <a href="{{ prod.url() }}" class="btn">{{ "Return product"|_ }}</a>
-    {% endif %}
-</form>
-
+        <div class="form-group">
+            <label for="review-text">{{ 'Review Text'|_ }}</label>
+            <div class="controls">
+                <textarea name="review[text]" id="prodreview-text" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea><br/>
+            </div>
+        </div>
+        <input type="submit" class="btn btn-primary" id="review_save">
+        {% if (THIS.get('isModalBox')) %}
+            <input type="button" class="btn btn-link-cancel" data-dismiss="modal" value="{{ 'Cancel'|_ }}" />
+        {% endif %}
+        {% if (THIS.get('isModalBox') != 1) %}
+            <a href="{{ prod.url() }}" class="btn">{{ "Return product"|_ }}</a>
+        {% endif %}
+    </form>
+{% endif %}
 <script>
     require(['jquery', 'jquery.rateit', 'jquery.bootstrap-growl'], function($) {
         {% if (THIS.get('isModalBox') == 1) %}
@@ -103,7 +103,6 @@
         {
             var parent = $(this).parents('.fade');
             var mainForm = parent.find('form');
-            console.log(mainForm.html());
             $.ajax({
                 type: "POST",
                 url: mainForm.attr('action'),
@@ -116,11 +115,7 @@
                         var message = data.message || "Saved";
                         $.bootstrapGrowl(message, { type: 'success', align: 'center', width: 'auto' });
                         parent.modal('hide');
-                        var reviewOpen = $("#f-prod-review-open");
-                        if (reviewOpen.attr('data-content') == 'new review') {
-                            reviewOpen.hide();
-                            reviewOpen.attr('id', 'f-hide')
-                        }
+                        $("#f-prod-review-open").hide();
                         mainForm[0].reset();
                         mainForm.find('.rateit-reset').trigger('click');
                         {% if needApprove == 0 %}
