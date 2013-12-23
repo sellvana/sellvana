@@ -48,6 +48,8 @@ class ImageResizer
         $this->default = !empty($_GET['d']) ? $_GET['d'] : 'media/image-not-found.jpg';
         $this->txt = !empty($p['t']) ? $p['t'] : null;
 
+        $this->useCache = isset($p['cache']) ? (bool)$p['cache'] : true;
+
         $this->size = !empty($p['s']) ? explode('x', $p['s']) : array();
         $this->dw = !empty($this->size[0]) ? $this->size[0] : 500;
         $this->dh = !empty($this->size[1]) ? $this->size[1] : $this->dw;

@@ -155,7 +155,6 @@ abstract class FCom_Admin_Admin_Controller_Abstract_GridForm extends FCom_Admin_
 
     public function action_form()
     {
-
         $class = $this->_modelClass;
         $id = BRequest::i()->param('id', true);
         if ($id && !($model = $class::i()->load($id))) {

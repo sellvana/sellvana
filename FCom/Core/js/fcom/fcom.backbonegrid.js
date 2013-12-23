@@ -879,7 +879,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this;
                 }
             });
-            BackboneGrid.Views.ColsVisibiltyView = Backbone.View.extend({
+            BackboneGrid.Views.ColsVisibilityView = Backbone.View.extend({
                 initialize: function () {
                     this.setElement('.' + BackboneGrid.id + '.dd-list.columns');
                     this.collection.on('render', this.render, this);
@@ -913,7 +913,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     //$('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
                 },
                 addLiTag: function (model) {
-                    if (model.get('label') !== '') {
+                    if (model.get('label') !== '' && !model.get('form_only')) {
                         var checkView = new BackboneGrid.Views.ColCheckView({model: model});
                         this.$el.append(checkView.render().el);
                     }
@@ -954,7 +954,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this;
                 }
             });
-            BackboneGrid.Views.FiltersVisibiltyView = Backbone.View.extend({
+            BackboneGrid.Views.FiltersVisibilityView = Backbone.View.extend({
                 initialize: function () {
                     this.setElement('.' + BackboneGrid.id + '.dd-list.filters');
                     this.collection.on('render', this.render, this);
@@ -1347,6 +1347,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalForm = Backbone.View.extend({
                 initialize: function () {
                     this.modalType = 'mass-editable';
+                    //this.collection.on('sort change reset', this.render, this);
+                    this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 _saveChanges: function (ev) {
                     modalForm.$el.find('input, select').each(function () {
@@ -1430,10 +1432,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(ev.target).prev().trigger('click');
                     BackboneGrid.modalElementVals = {};
 
-                },
-                initialize: function () {
-                    //this.collection.on('sort change reset', this.render, this);
-                    this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 render: function () {
                     console.log('render modal form');
@@ -1607,7 +1605,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             state.mp = parseInt(state.mp);
             BackboneGrid.currentState = state;
 
-            BackboneGrid.pageSizeOptions = config.pageSizeOptions;
+            BackboneGrid.pageSizeOptions = config.page_size_options;
 
             //check data mode
             if (config.data_mode) {
@@ -1631,7 +1629,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.FilterSelectCell.prototype.template = _.template($('#' + config.id + '-select-filter-template').html());
             BackboneGrid.Views.FilterMultiselectCell.prototype.template = _.template($('#' + config.id + '-multiselect-filter-template').html());
             BackboneGrid.Views.FilterNumberRangeCell.prototype.template = _.template($('#' + config.id + '-number-range-filter-template').html());
-            //column visiblity checkbox view
+            //column visibility checkbox view
             BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
             BackboneGrid.Views.FilterCheckView.prototype.template = _.template($('#' + config.id + '-filter-check-template').html());
             //mass edit modal view
@@ -1742,8 +1740,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             console.log(fCollection);
             headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
             headerView.render();
-            var colsVisibiltyView = new BackboneGrid.Views.ColsVisibiltyView({collection: columnsCollection});
-            colsVisibiltyView.render();
+            var colsVisibilityView = new BackboneGrid.Views.ColsVisibilityView({collection: columnsCollection});
+            colsVisibilityView.render();
 
             filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
             filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
@@ -1758,14 +1756,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             });
 
 
-            var filtersVisiblityView = new BackboneGrid.Views.FiltersVisibiltyView({collection: filtersCollection});
-            filtersVisiblityView.render();
+            var filtersVisibilityView = new BackboneGrid.Views.FiltersVisibilityView({collection: filtersCollection});
+            filtersVisibilityView.render();
 
             $("ul.filters." + BackboneGrid.id).sortable({
                 handle: '.dd-handle',
                 revert: true,
                 update: function (event, ui) {
-                    filtersVisiblityView.orderChanged();
+                    filtersVisibilityView.orderChanged();
                 }
             });
 
@@ -1773,7 +1771,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 handle: '.dd-handle',
                 revert: true,
                 update: function (event, ui) {
-                    colsVisibiltyView.orderChanged();
+                    colsVisibilityView.orderChanged();
                 }
             });
             if (BackboneGrid.multiselect_filter) {

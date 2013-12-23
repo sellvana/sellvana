@@ -75,6 +75,7 @@ base:
       - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
       - [ addNav, system/users, { label: Users, href: /users  } ]
       - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
+      - [ addNav, system/templates, { label: Templates, href: /templates  } ]
       - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
 
   - view: admin/header
@@ -364,3 +365,14 @@ form:
     - { include: base }
     - { hook: main, views: admin/grid }
     - { view: admin/nav, do: [[ setNav, system/templates ]] }
+
+/templates/form:
+    - { include: base }
+    - { include: form }
+    - { include: codemirror }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, system/templates ]] }
+    - view: admin/form
+        set: { tab_view_prefix: templates-form/ }
+        do:
+            - [ addTab, main, { label: Template, pos: 10 } ]
