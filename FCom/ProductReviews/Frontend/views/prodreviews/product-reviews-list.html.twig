@@ -1,6 +1,8 @@
 {% set reviews = THIS.get('reviews') %}
+{% set isLoggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
+{% set userId = THIS.get('userId') %}
+{% set pr = THIS.get('pr') %}
 {% set rate = APP.instance('FCom_ProductReviews_Model_Review').config() %}
-
 <div class="f-prod-review-avg clearfix">
     <h5>{{ "Avg. Customer Rating"|_ }} ({{ reviews.numReviews }} {{ "Reviews"|_ }}):</h5>
     <div class="glyphicon f-rating-stars f-lg-stars">
@@ -72,29 +74,59 @@
                     {{ review.get('rating3') }}</dd>
 
             </dl>
-            <dl>
-                <div id="block_review_helpful_{{ review.get('id') }}">
-                    <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
-                        <input type="hidden" name="pid" value="{{ prod.get('id') }}">
-                        <input type="hidden" name="rid" value="{{ review.get('id') }}">
-                        {{ "Was this review helpful to you" | _ }}?
-                        <button class="btn-info btn-small" type="submit" name="review_helpful" value="yes"
-                                onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
-                        <span class="badge">{{ review.get('helpful') }}</span>
-                    </form>
-                </div>
-                <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
-            </dl>
+            <div id="block_review_helpful_{{ review.get('id') }}" class="block_review_helpful">
+                <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
+                    <input type="hidden" name="pid" value="{{ prod.get('id') }}">
+                    <input type="hidden" name="rid" value="{{ review.get('id') }}">
+                    {{ "Was this review helpful to you" | _ }}?
+                    <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="yes"
+                            onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                    <span class="badge">{{ review.get('helpful') }}</span>
+                </form>
+            </div>
+            <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
         </div>
         <div class="col-md-7 col-sm-7 f-prod-review">
             {{ review.get("text") }}
-
+            {% if review.get('customer_id') == userId %}
+                <a data-toggle="modal" data-content="{{ review.get('id') }}" class="f-prod-review-edit" title="{{ 'Edit this review'|_ }}"
+                   href="{{ APP.href('prodreviews/edit?pr=') ~ review.get('id') }}">
+                    <i class="glyphicon glyphicon-pencil"></i>
+                </a>
+            {% endif %}
         </div>
-
     </article>
 {% endfor %}
 
 {% if (reviews.numReviews > 1) %}
     <p><a href="#"><strong>{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</strong></a></p>
 {% endif %}
+
+{#{% if isLoggedIn and pr %}
+    <!-- Modal -->
+    <div class="modal fade" id="f-prod-review-edit-form" tabindex="-1" role="dialog" aria-labelledby="f-prod-review-form-label" aria-hidden="true" data-backdrop="true">
+        <div class="modal-dialog f-prod-review-form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
+                </div>
+                <div class="modal-body">
+                    {{ THIS.view('prodreviews/review-form').set({'prod': THIS.get('prod'), 'isModalBox': 1, 'allowReview': false, 'pr': pr}) | raw }}
+                </div><!-- /.modal-body -->
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <script>
+        require(['jquery', 'jquery.rateit'], function($) {
+            $('#f-prod-review-open').attr('href', '#f-prod-review-edit-form');
+            $('#f-prod-review-edit-form').find('.rateit').each(function () {
+                var tmp = $(this).parent().children('input');
+                $(this).rateit();
+                $(this).rateit('value', tmp.val());
+                tmp.hide();
+            })
+        })
+    </script>
+{% endif %}#}
 <script>require(['fcom.productreviews'])</script>
