@@ -444,7 +444,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $rows = isset($grid['result']['rows']) ? $grid['result']['rows'] : array();
         //var_dump($state);
         $gridId = $grid['config']['id'];
-        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array();
+//        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array(); // overridden right after this section
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
