@@ -177,4 +177,30 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         return true;
     }
+
+    public function getPageParts($onlyEnabled = false)
+    {
+        $allParts = array(
+            'content' => 'Custom Content',
+            'view' => 'Block / Page',
+            'sub_cat' => 'Subcategories',
+            'products' => 'Products',
+        );
+        if ($onlyEnabled) {
+            foreach ($allParts as $k => $l) {
+                if (!$this->get('show_'.$k)) {
+                    unset($allParts[$k]);
+                }
+            }
+        }
+        if (!$this->get('page_parts')) {
+            return $allParts;
+        }
+        $parts = explode(',', $this->get('page_parts'));
+        $result = array();
+        foreach ($parts as $k) {
+            $result[$k] = $allParts[$k];
+        }
+        return $result;
+    }
 }

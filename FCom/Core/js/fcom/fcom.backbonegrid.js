@@ -1762,6 +1762,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             $("ul.filters." + BackboneGrid.id).sortable({
                 handle: '.dd-handle',
                 revert: true,
+                axis: 'y',
                 update: function (event, ui) {
                     filtersVisibilityView.orderChanged();
                 }
@@ -1770,6 +1771,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             $("ol.columns." + BackboneGrid.id).sortable({
                 handle: '.dd-handle',
                 revert: true,
+                axis: 'y',
                 update: function (event, ui) {
                     colsVisibilityView.orderChanged();
                 }

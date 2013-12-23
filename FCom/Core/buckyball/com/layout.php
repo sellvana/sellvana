@@ -123,6 +123,8 @@ class BLayout extends BClass
      */
     protected static $_extRegex = '\.php';
 
+    protected $_rememberOverrides = false;
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -246,6 +248,12 @@ class BLayout extends BClass
         return $rootDir1;
     }
 
+    public function rememberOverrides($flag)
+    {
+        $this->_rememberOverrides = $flag;
+        return $this;
+    }
+
     public function collectAllViewsFiles()
     {
         $t = BDebug::debug(__METHOD__);
@@ -276,12 +284,21 @@ class BLayout extends BClass
                         continue;
                     }
                     if (preg_match($re, $file, $m)) {
-                        $this->_addViewsFiles[$prefix . $m[2]] = array(
+                        $viewName = $prefix . $m[2];
+                        $viewParams = array(
                             'template' => $file,
                             'file_ext' => $m[3],
                             'module_name' => $dirData[2]->name, // module
                             'renderer' => static::$_extRenderers[$m[3]]['callback'],
+                            'overrides' => array(),
                         );
+                        if ($this->_rememberOverrides && !empty($this->_addViewsFiles[$viewName])) {
+                            $oldViewParams = $this->_addViewsFiles[$viewName];
+                            $viewParams['overrides'] = $oldViewParams['overrides'];
+                            unset($oldViewParams['overrides']);
+                            $viewParams['overrides'][] = $oldViewParams;
+                        }
+                        $this->_addViewsFiles[$viewName] = $viewParams;
                     }
                 }
             }
@@ -749,6 +766,12 @@ class BLayout extends BClass
         // collect callbacks
         $callbacks = array();
         foreach ($this->_layouts[$layoutName] as $d) {
+            $d['layout_name'] = $layoutName;
+            if (!empty($d['if'])) {
+                if (!BUtil::call($d['if'], $d)) {
+                    continue;
+                }
+            }
             if (empty($d['type'])) {
                 if (!is_array($d)) {
                     var_dump($layoutName, $d);

@@ -2,10 +2,9 @@
 {% set validator = THIS.get('validator') %}
 
 <fieldset>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-code">{{ 'Template Contents'|_ }}</label>
-        <div class="col-md-10">
-            <textarea id="model-view_contents" class="form-control ckeditor" type="text" name="model[view_contents]">{{ model.get('view_contents') }}</textarea>
+    <div class="form-group row">
+        <div class="col-md-12">
+            <textarea id="model-view_contents" class="form-control col-md-10" type="text" name="model[view_contents]" style="height:400px; font-family:Consolas,monospace">{{ model.get('view_contents') }}</textarea>
         </div>
     </div>
 </fieldset>

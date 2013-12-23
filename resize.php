@@ -159,11 +159,6 @@ class ImageResizer
             $this->outputFile();
             return true;
         }
-
-        $dir = dirname($this->outFile);
-        if (!file_exists($dir)) {
-            mkdir($dir, 0777, true);
-        }
         return false;
     }
 
@@ -211,6 +206,13 @@ class ImageResizer
 
     protected function exportImage()
     {
+        if ($this->outFile) {
+            $dir = dirname($this->outFile);
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
+            }
+        }
+
         switch ($this->outImgType) {
         case IMAGETYPE_GIF:
             imagegif($this->out, $this->outFile);
