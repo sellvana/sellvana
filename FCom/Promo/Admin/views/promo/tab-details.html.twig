@@ -17,7 +17,11 @@
             <div class="col-md-10">
                 {% for g in m.groups() %}
                     {% if g.get('group_type') == 'buy' %}
-                        {{ THIS.view('core/backbonegrid').set('grid', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id'))) | raw }}
+                        {% set buyGrid = promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id')) %}
+                        {% if buyGrid.caption %}
+                            {{ buyGrid.caption | raw }}
+                        {% endif %}
+                        {{ THIS.view('core/backbonegrid').set('grid', buyGrid) | raw }}
                     {% endif %}
                 {% endfor %}
             </div>
@@ -43,7 +47,11 @@
                 <div class="col-md-10">
                     {% for g in m.groups() %}
                         {% if g.get('group_type') == 'get' %}
-                            {#{{ THIS.view('jqgrid').set('config', promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id'))) | raw }}#}
+                            {% set getGrid = promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id')) %}
+                            {% if getGrid.caption %}
+                                {{ getGrid.caption | raw }}
+                            {% endif %}
+                            {{ THIS.view('core/backbonegrid').set('grid', getGrid) | raw }}
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -60,7 +68,7 @@
     <div class="ui-layout-center">
         <div class="form-group">
             <div class="col-md-12">
-                {#{{ THIS.view('jqgrid').set('config', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('productLibrary')) | raw }}#}
+                {{ THIS.view('core/backbonegrid').set('grid', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('productLibrary')) | raw }}
             </div>
         </div>
     </div>

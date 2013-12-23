@@ -224,41 +224,73 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
             }
 
         }
+
         $groupName = $model ? htmlspecialchars($groups[$model->id][$groupId]->group_name) : 'Group '.abs($groupId);
-        $gridId = 'promo_products_'.$type.$groupId;
-        $config = array(
-            'grid' => array(
-                'id'            => $gridId,
-                'data'          => !empty($groupData[$groupId]) ? $groupData[$groupId] : array(),
-                'datatype'      => 'local',
-                'caption'       =>
-                    "<input type='text' name='group[$groupId][group_name]' value='$groupName'>"
-                    ."<input type='hidden' name='group[$groupId][group_type]' value='$type'>"
-                    ."<input type='hidden' name='_group_id' value='$groupId'>"
-                    .($type==='buy' && !empty($model) && $model->buy_group!=='one'?" <button type='button' class='sz2 st2 btn' onclick=\"return removeGroup(this);\">Remove</button>":''),
-                'colModel'      => array(
-                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
-                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-                    array('name'=>'local_sku', 'label'=>'Mfr Part #', 'index'=>'local_sku', 'width'=>70),
-                ),
-                'rowNum'        => 10,
-                'sortname'      => 'p.product_name',
-                'sortorder'     => 'asc',
-                'autowidth'     => false,
-                'multiselect'   => true,
-                'multiselectWidth' => 30,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ),
-            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
-            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
+        $gridId = 'promo_products_' . $type . $groupId;
+        $config = parent::gridConfig();
+        unset( $config[ 'orm' ] );
+        $config[ 'id' ]        = $gridId;
+        $config[ 'data' ]      = !empty( $groupData[ $groupId ] ) ? $groupData[ $groupId ] : array();
+        $config[ 'data_mode' ] = 'local';
+        $config[ 'columns' ]   = array(
+            array( 'cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40 ),
+            array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true ),
+            array( 'name' => 'product_name', 'label' => 'Name', 'index' => 'product_name', 'width' => 450, 'addable' => true ),
+            array( 'name' => 'local_sku', 'label' => 'Mfr Part #', 'index' => 'local_sku', 'width' => 70 ),
+        );
+        $actions = array(
+            'add'    => array( 'caption' => 'Add products' ),
+            'delete'    => array( 'caption' => 'Remove products' ),
+        );
+        $config['actions'] = $actions;
+        $config['filters'] = array(
+            array('field'=>'product_name', 'type'=>'text')
+        );
+        $config['events'] = array('init', 'add','mass-delete');
+
+//        $config = array(
+//            'grid' => array(
+//                'id'            => $gridId,
+//                'data'          => !empty($groupData[$groupId]) ? $groupData[$groupId] : array(),
+//                'datatype'      => 'local',
+//                'caption'       =>
+//                    "<input type='text' name='group[$groupId][group_name]' value='$groupName'>"
+//                    ."<input type='hidden' name='group[$groupId][group_type]' value='$type'>"
+//                    ."<input type='hidden' name='_group_id' value='$groupId'>"
+//                    .($type==='buy' && !empty($model) && $model->buy_group!=='one'?" <button type='button' class='sz2 st2 btn' onclick=\"return removeGroup(this);\">Remove</button>":''),
+//                'colModel'      => array(
+//                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
+//                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
+//                    array('name'=>'local_sku', 'label'=>'Mfr Part #', 'index'=>'local_sku', 'width'=>70),
+//                ),
+//                'rowNum'        => 10,
+//                'sortname'      => 'p.product_name',
+//                'sortorder'     => 'asc',
+//                'autowidth'     => false,
+//                'multiselect'   => true,
+//                'multiselectWidth' => 30,
+//                'shrinkToFit' => true,
+//                'forceFit' => true,
+//            ),
+//            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
+//            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
+//            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
+//            'js' => array(
+//                "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
+//            ),
+//        );
+
+        $caption = "<input type='text' name='group[$groupId][group_name]' value='$groupName'>"
+                   . "<input type='hidden' name='group[$groupId][group_type]' value='$type'>"
+                   . "<input type='hidden' name='_group_id' value='$groupId'>"
+                   . ( $type === 'buy' && !empty( $model ) && $model->buy_group !== 'one' ? " <button type='button' class='sz2 st2 btn' onclick=\"return removeGroup(this);\">Remove</button>" : '' );
+        return array(
+            'config'  => $config,
+            'caption' => $caption,
             'js' => array(
                 "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
-            ),
+            )
         );
-
-        return $config;
     }
 
     public function action_form_group()

@@ -143,22 +143,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
 
     public function productLibraryGridConfig($gridId=false)
     {
-        $columns = $this->gridColumns();
-        unset($columns['product_name']['formatter'], $columns['product_name']['formatoptions']);
-        $columns['create_at']['hidden'] = true;
         $config = $this->gridConfig();
-        if ($gridId) {
-            $config['grid']['id'] = $gridId;
+        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
+        $config[ 'columns' ][ 'create_at' ][ 'hidden' ] = true;
+        if ( $gridId ) {
+            $config[ 'id' ] = $gridId;
         }
-        $config['grid']['autowidth'] = false;
-        $config['grid']['caption'] = 'All products';
-        $config['grid']['multiselect'] = true;
-        $config['grid']['height'] = '100%';
-        $config['grid']['columns'] = $columns;
-        $config['navGrid'] = array('add'=>false, 'edit'=>false, 'del'=>false);
-        $config['custom']['personalize'] = 'products';
+        $config[ 'caption' ] = 'All products';
         //$config['custom']['autoresize'] = '#linked-products-layout';
-        return $config;
+        return array( 'config' => $config );
     }
 
     public function productAttachmentsGridConfig($model)
