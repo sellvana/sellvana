@@ -2,9 +2,9 @@
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
 {
-    public function beforeDispatch($args)
+    public function beforeDispatch()
     {
-        if (!parent::beforeDispatch($args)) {
+        if (!parent::beforeDispatch()) {
             return false;
         }
         if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, array('login', 'register', 'password_recover'))) {

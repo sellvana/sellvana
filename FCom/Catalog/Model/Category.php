@@ -143,7 +143,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     /**
      * check this model have image or not, if yes, return dir or url base on type
-     * @param string $type (url|dir)
+     * @param string $type (url|dir|fulldir)
      * @return bool|string
      */
     public function image($type = 'url')
@@ -151,15 +151,26 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $dir = FCom_Core_Main::i()->dir($this->imagePath());
         $filename = $dir.$this->id.'.jpg';
         if (is_file($filename)) {
-            $str = ($type == 'url') ? BApp::href('/media/category/images/'.$this->id.'.jpg') : $filename;
-            return $str;
+            switch ($type) {
+                case 'url':
+                default:
+                    $return = BApp::href('/media/category/images/'.$this->id.'.jpg');
+                    break;
+                case 'dir': //usually use with resize.php
+                    $return = $this->imagePath().$this->id.'.jpg';
+                    break;
+                case 'fulldir':
+                    $return = $filename;
+                    break;
+            }
+            return $return;
         }
         return false;
     }
 
     public function deleteImage()
     {
-        $image = $this->image('dir');
+        $image = $this->image('fulldir');
         if ($image) {
             clearstatcache(true, $image);
             return unlink($image);

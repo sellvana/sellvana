@@ -14,7 +14,7 @@ catalog_product_form_tabs:
 
 /prodreviews:
     - { include: base }
-    - { hook: main, views: grid }
+    - { hook: main, views: prodreviews/grid }
     - { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
 
 /prodreviews/form:
