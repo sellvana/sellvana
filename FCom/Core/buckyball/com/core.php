@@ -324,7 +324,7 @@ class BApp extends BClass
         return $m->$method() . $url;
     }
 
-    public static function href( $url = '', $full = true, $method = self::USE_CONFIGs )
+    public static function href( $url = '', $full = true, $method = self::USE_CONFIG )
     {
         return BApp::baseUrl( $full, $method )
                . BRouting::processHref( $url );
