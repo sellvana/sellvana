@@ -13,8 +13,11 @@
         <label class="col-md-2 control-label" for="model-superadmin">{{ 'Super Admin'|_ }}</label>
         <div class="col-md-5">
             <input type="hidden" name="model[is_superadmin]" value="0" />
-            <input type="checkbox" id="model-superadmin" class="switch-cbx" name="model[is_superadmin]"
-                   value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
+            <div class="make-switch switch has-switch" data-off-label="<i class='icon-remove'></i>" data-on-label="<i class='icon-ok'></i>" data-on="primary">
+                <input type="checkbox" id="model-superadmin" name="model[is_superadmin]"
+                       value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
+            </div>
+
         </div>
     </div>
     <div class="form-group">
@@ -79,15 +82,25 @@
 </fieldset>
 
 <script>
-require(['jquery', 'jquery.validate'], function($) {
+require(['jquery', 'jquery.validate', 'switch'], function($) {
     $(function() {
         $('#users-form').validate();
-        $('#model-superadmin').change(function() {
-            var val = $(this).val();
-            if( val == 1) {
-                $('#model-role-id').attr("disabled", "disabled");
+        function init () {
+            if ($('#model-superadmin').is(':checked')) {
+                $('#model-role-id').attr('disabled', 'disabled');
+            }
+        }
+
+        $('.make-switch').on('switch-change', function (e, data) {
+            var val = data.value;
+            if (val) {
+                $('#model-role-id').attr('disabled', 'disabled');
+            } else {
+                $('#model-role-id').removeAttr('disabled', 'disabled');
             }
         });
+
+        init();
     })
 })
 </script>

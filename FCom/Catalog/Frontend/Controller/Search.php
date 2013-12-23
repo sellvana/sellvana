@@ -39,7 +39,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Frontend_Con
         if ($category->layout_update) {
             $layoutUpdate = BYAML::parse($category->layout_update);
             if (!is_null($layoutUpdate)) {
-                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('cms_page');
+                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
             } else {
                 BDebug::warning('Invalid layout update for CMS page');
             }

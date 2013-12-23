@@ -133,12 +133,31 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         if (!parent::onAfterSave()) return false;
 
+        $saveAgain = false;
+
         //todo: setup unique uniq_id
         if (!$this->get('local_sku')) {
             $this->set('local_sku', $this->id);
+            $saveAgain = true;
+        }
+        if (!$this->get('position')) {
+            $this->set('position', $this->calcPosition());
+        }
+        if ($saveAgain) {
             $this->save();
         }
         return true;
+    }
+
+    public function calcPosition()
+    {
+        $maxCurrentPosition = FCom_Catalog_Model_Product::i()->orm()->select_expr('max(position) as max_pos')->find_one();
+        if (!$maxCurrentPosition) {
+            $maxCurrentPosition = 1;
+        } else {
+            $maxCurrentPosition = $maxCurrentPosition->get('max_pos');
+        }
+        return $maxCurrentPosition + 1;
     }
 
     public function generateUrlKey()

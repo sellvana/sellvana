@@ -366,6 +366,16 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $grid;
     }
 
+    public function getGridConfig()
+    {
+        $grid = $this->getGrid();
+        $data = $this->getGridData(); // initialize data
+        $config = $grid['config'];
+        $config['data'] = $this->getPageRowsData();
+        $config['personalize_url'] = BApp::href('my_account/personalize');
+        return $config;
+    }
+
     public function getGridData(array $options=array())
     {
         // fetch grid configuration
@@ -434,7 +444,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $rows = isset($grid['result']['rows']) ? $grid['result']['rows'] : array();
         //var_dump($state);
         $gridId = $grid['config']['id'];
-        $persState = $grid['config']['state'];
+        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array();
         $pers = FCom_Admin_Model_User::i()->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
         $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');

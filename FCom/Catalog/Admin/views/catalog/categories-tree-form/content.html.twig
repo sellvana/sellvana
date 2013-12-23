@@ -1,13 +1,14 @@
 {% set m = THIS.get('model') %}
+{% set views = APP.instance('FCom_Catalog_Admin').getAvailableViews() %}
 
 <div class="form-group">
     <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>
-    <div class="col-md-10">
-        <ol id="show-order">
-            <li>Custom Content</li>
-            <li>Page</li>
-            <li>Subcategories</li>
-            <li>Products</li>
+    <div class="col-md-2">
+        <input type="hidden" id="model-page_parts" name="model[page_parts]" value="{{ m.get('page_parts') }}">
+        <ol id="show-order" class="dd-list columns ui-sortable" style="overflow:hidden">
+{% for k, label in m.getPageParts() %}
+            <li class="dd-item dd3-item" data-id="{{ k }}"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content"><label>{{ label|_ }}</label></div></li>
+{% endfor %}
         </ol>
     </div>
 </div>
@@ -20,19 +21,15 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="col-md-2 control-label" for="main-content">{{ 'Custom Content'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="main-content" class="form-control ckeditor" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_cms_page">{{ 'Show Page'|_ }}</label>
+    <label class="col-md-2 control-label" for="model-show_cms_page">{{ 'Show Block / Page'|_ }}</label>
     <div class="col-md-2">
         <input type="hidden" name="model[show_cms_page]" value="0" />
         <input id="model-show_cms_page" class="switch-cbx" name="model[show_cms_page]" {% if m.get('show_cms_page') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
     <div class="col-md-5">
-        <select name="model[cms_page]" class="form-control select2"/></select>
+        <select name="model[cms_page]" class="form-control select2"/>
+            {{ UTIL.optionsHtml(views) | raw }}
+        </select>
     </div>
 </div>
 <div class="form-group">
@@ -56,8 +53,25 @@
         <input id="model-show_products" class="switch-cbx" name="model[show_sidebar]" {% if m.get('show_sidebar') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-content">{{ 'Custom Content'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="main-content" class="form-control ckeditor" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
+    </div>
+</div>
 <script>
 require(['jquery', 'jquery-ui'], function($) {
-    $('#show-order').sortable();
+    $('#show-order').sortable({
+        scroll: false,
+        revert: true,
+        axis:'y',
+        update: function(event, ui) {
+            var pageParts = [];
+            $('#show-order li').each(function(idx, el) {
+                pageParts.push($(el).data('id'));
+            });
+            $('#model-page_parts').val(pageParts.join(','));
+        }
+    });
 })
 </script>

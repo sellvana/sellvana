@@ -671,6 +671,9 @@ label.error {
 .f-prod-reviews .f-prod-review-post  .f-prod-review-attrs dd {
   display:none;
   }
+.f-prod-reviews .f-prod-review-post  .f-prod-review-attrs .block_review_helpful {
+    margin-bottom: 20px;
+}
 .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dt:first-of-type,
 .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd:first-of-type {
   font-size:1.05em;

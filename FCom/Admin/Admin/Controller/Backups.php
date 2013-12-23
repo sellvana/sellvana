@@ -1,12 +1,12 @@
 <?php
 
-class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Admin_Admin_Controller_Backups extends FCom_Admin_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'system/templates';
+    protected $_permission = 'system/backups';
     protected static $_origClass = __CLASS__;
-    protected $_gridHref = 'templates';
-    protected $_gridTitle = 'Frontend Templates';
-    protected $_recordName = 'Template';
+    protected $_gridHref = 'backups';
+    protected $_gridTitle = 'Backups';
+    protected $_recordName = 'Backup';
 
     public function gridConfig()
     {
@@ -15,63 +15,31 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40, 'overflow' => true),
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
-            array('name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true),
-            array('name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50),
-            array('name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100),
+            array('name' => 'file_name', 'label' => 'File Name', 'index' => 'file_name', 'width' => 100, 'overflow' => true),
+            array('name' => 'create_at', 'label' => 'Created At', 'index' => 'create_at', 'width' => 100),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array(
-                'edit' => array('href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
                 'delete' => array('caption' => 'Remove/Revert'),
             )),
         );
 
-        $config['state'] = array('s' => 'view_name');
+        $config['state'] = array('s' => 'create_time', 'sd' => 'desc');
 
-        $layout = $this->getAreaLayout();
         $data = array();
-        foreach ($layout->getAllViews() as $view) {
-            $row = array(
-                'view_name' => $view->param('view_name'),
-                'file_ext' => $view->param('file_ext'),
-                'module_name' => $view->param('module_name'),
-            );
-            $data[] = $row;
-        }
+
         $config['data'] = $data;
         $config['data_mode'] = 'local';
+
         $config['filters'] = array(
-            array('field' => 'name', 'type' => 'text'),
-            array('field' => 'run_level_core', 'type' => 'multiselect')
+            array('field' => 'file_name', 'type' => 'text'),
+            array('field' => 'create_at', 'type' => 'date-range'),
         );
         $config['actions'] = array(
-            'delete' => array('caption'=>'Remove/Revert'),
+            'delete' => array('caption'=>'Delete'),
         );
         $config['events'] = array('delete', 'mass-delete');
 
         //$config['state'] =array(5,6,7,8);
         return $config;
-    }
-
-    public function getAreaLayout($area = 'FCom_Frontend')
-    {
-        $areaDir = str_replace('FCom_', '', $area);
-        $modules = BModuleRegistry::i()->getAllModules();
-        $viewDirs = array();
-        $layout = BLayout::i(true);
-        foreach ($modules as $mod) {
-            /** @var BModule $mod */
-            $auto = array_flip((array)$mod->auto_use);
-            if (isset($auto['all']) || isset($auto['views'])) {
-                $dir = $mod->root_dir.'/views';
-                if (is_dir($dir)) {
-                    $layout->addAllViews($dir, '', $mod);
-                }
-                $dir = $mod->root_dir.'/'.$areaDir.'/views';
-                if (is_dir($dir)) {
-                    $layout->addAllViews($dir, '', $mod);
-                }
-            }
-        }
-        return $layout;
     }
 
     public function action_form()
