@@ -1,6 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set image = m.image('dir') %}
-{% set imageDir = '/' ~ APP.instance('FCom_Catalog_Admin_Controller_Categories').imgDir ~ '/' %}
+{% set imageDir = APP.instance('FCom_Catalog_Model_Category').imagePath() %}
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
 <div class="form-group">
     <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
@@ -150,7 +150,7 @@
             acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
         }).bind('fileuploadalways', function(e, data) {
             if (data.result.type == 'success') {
-                var imageTag = '<img src="{{ resizeUrl }}?s=150x150&f={{ imageDir }}'+ data.result.filename +'" />';
+                var imageTag = '<img src="{{ resizeUrl }}?s=150x150&cache=0&f={{ imageDir }}'+ data.result.filename +'" />';
                 $('#current-image').html(imageTag);
             } else {
                 $('#current-image').append('<label class="error">'+ data.result.msg + '</label>');
