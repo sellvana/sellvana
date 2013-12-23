@@ -258,49 +258,51 @@ class BApp extends BClass
         return is_null($modName) ? $reg->currentModule() : $reg->module($modName);
     }
 
+    const USE_CONFIG = 1;
+    const USE_ENTRY_URI = 2;
     /**
      * Shortcut for base URL to use in views and controllers
      *
      * @param bool $full whether the URL should include schema and host
      * @param int  $method
-     *   1 : use config for full url
-     *   2 : use entry point for full url
+     *   1 : use config for full url - const USE_CONFIG
+     *   2 : use entry point for full url - const USE_ENTRY_URI
      * @return string
      */
-    public static function baseUrl($full=true, $method=1)
+    public static function baseUrl( $full = true, $method = self::USE_CONFIG )
     {
         static $baseUrl = array();
         $full = (int)$full;
-        $key = $full.'|'.$method;
-        if (empty($baseUrl[$key])) {
+        $key  = $full . '|' . $method;
+        if ( empty( $baseUrl[ $key ] ) ) {
             /** @var BRequest */
-            $r = BRequest::i();
-            $c = BConfig::i();
-            $scriptPath = pathinfo($r->scriptName());
-            switch ($method) {
-                case 1:
-                    $url = $c->get('web/base_href');
-                    if (!$url) {
-                        $url = $scriptPath['dirname'];
+            $r          = BRequest::i();
+            $c          = BConfig::i();
+            $scriptPath = pathinfo( $r->scriptName() );
+            switch ( $method ) {
+                case self::USE_CONFIG:
+                    $url = $c->get( 'web/base_href' );
+                    if ( !$url ) {
+                        $url = $scriptPath[ 'dirname' ];
                     }
                     break;
-                case 2:
-                    $url = $scriptPath['dirname'];
+                case self::USE_ENTRY_URI:
+                    $url = $scriptPath[ 'dirname' ];
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name'))) {
-                $url = rtrim($url, "\\"); //for windows installation
-                $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
+            if ( !( $r->modRewriteEnabled() && $c->get( 'web/hide_script_name' ) ) ) {
+                $url = rtrim( $url, "\\" ); //for windows installation
+                $url = rtrim( $url, '/' ) . '/' . $scriptPath[ 'basename' ];
             }
-            if ($full) {
-                $url = $r->scheme().'://'.$r->httpHost().$url;
+            if ( $full ) {
+                $url = $r->scheme() . '://' . $r->httpHost() . $url;
             }
 
-            $baseUrl[$key] = rtrim($url, '/').'/';
+            $baseUrl[ $key ] = rtrim( $url, '/' ) . '/';
         }
 
-        return $baseUrl[$key];
+        return $baseUrl[ $key ];
     }
 
     /**
@@ -322,20 +324,19 @@ class BApp extends BClass
         return $m->$method() . $url;
     }
 
-    public static function href($url='', $full=true, $method=1)
+    public static function href( $url = '', $full = true, $method = self::USE_CONFIGs )
     {
-        return BApp::baseUrl($full, $method)
-            . BRouting::processHref($url);
+        return BApp::baseUrl( $full, $method )
+               . BRouting::processHref( $url );
     }
 
     /**
-    * Shortcut to generate URL with base src (js, css, images, etc)
-    *)
-    * @param string $modName
-    * @param string $url
-    * @param string $method
-    * @return string
-    */
+     * Shortcut to generate URL with base src (js, css, images, etc)
+     *
+     * @param string $url
+     * @param string $method
+     * @return string
+     */
     public static function src($url='', $method='baseSrc')
     {
         if ($url[0]==='@') {
