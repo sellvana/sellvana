@@ -43,9 +43,9 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
             array('field' => 'run_level_core', 'type' => 'multiselect')
         );
         $config['actions'] = array(
-            'revert' => array('caption'=>'Revert'),
+            'delete' => array('caption'=>'Remove/Revert'),
         );
-        $config['events'] = array('revert', 'mass-revert');
+        $config['events'] = array('delete', 'mass-delete');
 
         //$config['state'] =array(5,6,7,8);
         return $config;
@@ -83,12 +83,19 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
         $tplContents = file_get_contents($tplViewFile);
 
         $model = new BData(array(
+            'id' => $tplViewName,
             'view_name' => $tplViewName,
             'view_contents' => $tplContents,
         ));
 
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
+        $this->formViewBefore(array('view'=>$view, 'model'=>$model));
+
+        $actions = $view->get('actions');
+        $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Remove/Revert') . '</span></button>';
+        $view->set('actions', $actions);
+
         $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
         if ($this->_formTitle && ($head = $this->view('head'))) {
@@ -104,8 +111,9 @@ class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_
         $view = $layout->getView('view_name');
         $viewFile = $view->getTemplateFileName();
 
-        if ($r->request('revert')) {
-            //unlink()
+        if ($r->post('do')==='DELETE') {
+            echo 'DELETE'; exit;
         }
+        var_dump($r->post()); exit;
     }
 }
