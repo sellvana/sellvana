@@ -218,15 +218,15 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
                 return;
             }
 
-            $this->view('prodreviews/review-form')->set(
-                array(
-                    'prod'   => $prod,
-                    'formId' => $this->formId,
-                    'pr'     => $pr,
-                    'action' => 'edit',
-                )
-            );
+            $this->view('prodreviews/review-form')->set(array(
+                    'prod' => $prod,
+                    'pr' => $pr,
+                ));
         }
+        $this->view('prodreviews/review-form')->set(array(
+                'formId' => $this->formId,
+                'action' => 'edit',
+            ));
         $this->formMessages($this->formId);
         $this->layout('/prodreview/add');
     }
