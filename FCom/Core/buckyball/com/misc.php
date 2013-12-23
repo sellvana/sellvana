@@ -2336,7 +2336,7 @@ class BDebug extends BClass
                 */
                 $file = self::$_logDir.'/'.self::$_logFile[$level];
                 if (is_writable(self::$_logDir) || is_writable($file)) {
-                    error_log("{$e['ts']} {$message}\n", 3, $file);
+                    error_log("{$e['ts']} {$e['mem']} {$e['t']} {$message}\n", 3, $file);
                 } else {
                     //TODO: anything needs to be done here?
                 }

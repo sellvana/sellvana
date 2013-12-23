@@ -22,4 +22,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, FCom_Email, { label: Emails, group: customers } ]
+            - [ addTab, FCom_Email, { label: Emails, group: customers, async: true } ]

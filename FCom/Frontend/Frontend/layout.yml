@@ -10,10 +10,11 @@ base:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
             - [ icon, @FCom_Core/favicon.ico ]
 
-    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-    - { callback: FCom_Frontend_Frontend::layout }
 
     - { include: common_js_libs }
+
+    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend::layout }
 
     #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
