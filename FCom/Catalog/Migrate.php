@@ -294,4 +294,47 @@ class FCom_Catalog_Migrate extends BClass
                     'meta_keywords' => 'TEXT DEFAULT NULL',
                 )));
     }
+
+    public function upgrade__0_2_12__0_2_13()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'show_sidebar' => 'TINYINT(1) UNSIGNED DEFAULT NULL'
+                )));
+    }
+
+    public function upgrade__0_2_13__0_2_14()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 AFTER num_products',
+            ),
+            //TODO: figure out which keys are needed
+        ));
+        FCom_Catalog_Model_Category::i()->update_many(array('show_products' => 1, 'show_sidebar' => 1, 'is_enabled' => 1));
+    }
+
+    public function upgrade__0_2_14__0_2_15()
+    {
+        $tCategory = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL'
+            )
+        ));
+    }
+
+    public function upgrade__0_2_15__0_2_16()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'show_view' => 'tinyint(1) unsigned default 0',
+                'view_name' => 'varchar(255)',
+                'page_parts' => 'varchar(50)',
+            ),
+        ));
+    }
 }

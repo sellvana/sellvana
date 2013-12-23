@@ -4,7 +4,6 @@
  * License info pending
  */
 /*
-  1. CUSTOM FONTS
   2. BOOTSTRAP RESET
     - Buttons
     - Breadcrumb
@@ -27,60 +26,6 @@
 
 
 /*------------------------------------*\
-  CUSTOM FONTS
-\*------------------------------------*/
-
-@font-face {
-  font-family:'Open Sans';
-  font-style:normal;
-  font-weight:300;
-  src:local('Open Sans Light'), local('OpenSans-Light'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/DXI1ORHCpsQm3Vp6mXoaTaRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:normal;
-  font-weight:400;
-  src:local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:normal;
-  font-weight:600;
-  src:local('Open Sans Semibold'), local('OpenSans-Semibold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/MTP_ySUJH_bn48VBG8sNSqRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:normal;
-  font-weight:700;
-  src:local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzKRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:italic;
-  font-weight:300;
-  src:local('Open Sans Light Italic'), local('OpenSansLight-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxvR_54zmj3SbGZQh3vCOwvY.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:italic;
-  font-weight:400;
-  src:local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:italic;
-  font-weight:600;
-  src:local('Open Sans Semibold Italic'), local('OpenSans-SemiboldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxuw_rQOTGi-AJs5XCWaKIhU.woff) format('woff');
-}
-@font-face {
-  font-family:'Open Sans';
-  font-style:italic;
-  font-weight:700;
-  src:local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxhbnBKKEOwRKgsHDreGcocg.woff) format('woff');
-}
-
-
-/*------------------------------------*\
    BOOTSTRAP RESETS
 \*------------------------------------*/
 
@@ -93,8 +38,6 @@ body {
   min-height:100%;
   background:#fff;
   color:#444;
-  font-family:'Open Sans', Arial, Helvetica, sans-serif;
-  font-weight:400;
   }
 a { color:#0452a1; }
 a:hover,
@@ -117,7 +60,7 @@ hr {
   border-bottom:1px solid white;
   }
 h1, h2, h3 {
-  font-family:'Open Sans', Arial, Helvetica, sans-serif;
+  font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight:500;
   }
 h1 { font-size:22px; }
@@ -134,10 +77,8 @@ h6 { font-size:10.5px; }
   background:#eee;
   padding:10px 15px;
   color:#555;
-  font-size:13px;
-  font-weight:600;
-  font-family:'Open Sans', Arial, Helvetica, sans-serif;
-  text-transform:uppercase;
+  font-size:12px;
+  font-weight:500;
   }
 .btn-xs {
   padding:5px 7px;
@@ -206,7 +147,7 @@ fieldset[disabled] .btn-danger.active {
   }
 .btn-link {
   background:none;
-  color:#0452a1;
+  color:#2880d9;
   padding:0;
   }
 a.btn-link {
@@ -276,6 +217,7 @@ fieldset[disabled] .btn {
 
 /* Table */
 .table { width:auto; }
+th, td { vertical-align:top ;}
 .table caption {
   padding:5px;
   color:#999;
@@ -288,15 +230,20 @@ fieldset[disabled] .btn {
 .table td,
 .table thead > tr > th,
 .table tbody > tr > th,
-.table tfoot > tr > th,
+.table tfoot > tr > th {
+  border-color:#eee;
+  font-size:.95em;
+  }
 .table thead > tr > td,
 .table tbody > tr > td,
 .table tfoot > tr > td {
   border-color:#eee;
-  font-size:.95em;
-  vertical-align:top;
   }
-.table th a { color:#4d657a; }
+.table th a { 
+  white-space:nowrap;
+  color:#4d657a;
+  text-overflow: ellipsis;
+  }
 
 /* Dropdown */
 .dropdown-menu {
@@ -799,13 +746,14 @@ h1 [class^="icon-"] { color:#aaa; }
 /* Headers */
 .f-admin-main-view .page-header { margin-top:0; }
 .page-header {
-  background:#f5f5f5;
-  border-bottom:1px solid #ddd;
-  padding:13px 17px;
+  background:#f4f4f4;
+  border-bottom:1px solid #e4e4e4;
+  padding:8px 15px;
   }
 .page-header .f-page-title {
-  margin:0;
-  font-size:22px;
+  margin:5px 0 0 0;
+  font-weight:400;
+  font-size:18px;
   vertical-align:middle;
   }
 .page-header .f-page-title [class^='icon-'] {
@@ -853,19 +801,19 @@ h1 [class^="icon-"] { color:#aaa; }
 /* Admin Header */
 .f-admin-header .navbar {
   margin:0;
-  padding:8px 10px;
+  padding:4px 10px 5px;
   background-color:#fff !important;
   border:none;
-  min-height:56px;
-  height:56px;
+  min-height:45px;
+  height:45px;
   -webkit-border-radius:0;
   -moz-border-radius:0;
   -ms-border-radius:0;
   -o-border-radius:0;
   border-radius:0;
+  border-bottom:1px solid rgba(0,0,0,0.20);
+  box-shadow:0 1px 0 rgba(0,0,0,0.05);
   z-index:99;
-  border-bottom:1px solid #e2e2e2;
-  box-shadow:0 1px 1px rgba(0,0,0,0.05);
   }
 
 /* Admin Header - Logo */
@@ -1068,7 +1016,7 @@ h1 [class^="icon-"] { color:#aaa; }
   width:200px;
   position:absolute;
   left:0;
-  top:56px;
+  top:45px;
   z-index:10;
   }
 .f-admin-nav.main-nav-fixed {
@@ -1102,13 +1050,14 @@ h1 [class^="icon-"] { color:#aaa; }
 .f-admin-nav .navigation > .nav > li > a {
   border-bottom:1px solid #343b42;
   display:block;
-  height:35px;
+  height:32px;
   background:#383f45;
   padding:0;
+  font-size:13px;
   overflow:hidden;
   *zoom:1;
   overflow:visible !important;
-  line-height:35px;
+  line-height:32px;
   }
 .f-admin-nav .navigation > .nav > li.active a {
   border-bottom:none;
@@ -1122,10 +1071,10 @@ h1 [class^="icon-"] { color:#aaa; }
 .f-admin-nav .navigation > .nav > li > a [class*=" icon-"] {
   float:left;
   width:35px;
-  height:35px;
+  height:v;
   color:#858c93;
-  font-size:18px;
-  line-height:35px;
+  font-size:16px;
+  line-height:32px;
   text-align:center;
   }
 .f-admin-nav .navigation > .nav > li > a [class^="icon-"].angle-down,
@@ -1135,15 +1084,14 @@ h1 [class^="icon-"] { color:#aaa; }
   }
 .f-admin-nav .navigation > .nav > li > a .icon-angle-down {
   float:right;
-  line-height:35px;
+  line-height:32px;
   margin-right:0;
   }
 .f-admin-nav .navigation > .nav > li > a span {
-  color:#c2c7cb;
   position:relative;
-  top:-1px;
-  font-size:.9em;
-  font-weight:600;
+  color:#c2c2c2;
+  top:0;
+  font-weight:500;
   text-transform:uppercase;
   }
 .f-admin-nav .navigation > .nav > li:hover > a span,
@@ -1156,10 +1104,10 @@ h1 [class^="icon-"] { color:#aaa; }
   background:#464d54;
   }
 .f-admin-nav .navigation > .nav > li .nav > li > a {
-  padding:5px 5px 5px 35px;
-  color:#c2c7cb;
-  font-size:.95em;
+  padding:6px 8px 6px 35px;
+  color:#c2c2c2;
   background:none;
+  font-size:13px;
   }
 .f-admin-nav .navigation > .nav > li .nav > li > a:hover {
   color:#fff;
@@ -1328,7 +1276,7 @@ body.without-footer .f-admin-footer {
   content:"\f078"; }
 .box.box-collapsed .box-content { display:none; }
 .box .box-header { overflow:hidden; *zoom:1; }
-.box .box-header .title { float:left; font-size:16px; }
+.box .box-header .title { float:left; font-size:15px; font-weight:500; color:#555; }
 .box .box-header .title [class^='icon'] { display:none; }
 .box .box-header .actions {
   margin-top:-3px;
@@ -1532,11 +1480,11 @@ body.without-footer .f-admin-footer {
   }
 .f-filter-btns .btn-group {
   float:left;
-  height:34px;
+  height:32px;
   margin-right:10px;
   }
 .f-filter-btns .btn-group .btn {
-  height:34px;
+  height:32px;
   padding:7px 10px 8px;
   }
 .f-filter-btns .btn-group .dropdown .btn.update {
@@ -2248,7 +2196,7 @@ body.without-footer .f-admin-footer {
       margin-top:-2px;
       left:-20px; }
   .timeline li .title {
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin-left:70px;
     padding:2px 0;
     font-size:16px; }
@@ -2298,7 +2246,7 @@ body.without-footer .f-admin-footer {
     text-align:center;
     padding:20px 0 50px 0;
     font-size:20px;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color:#ddd; }
   .pricing-tables .pricing-table .price {
     width:30%;
@@ -2313,7 +2261,7 @@ body.without-footer .f-admin-footer {
     text-align:center;
     color:white;
     margin-left:-15%;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif; }
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     .pricing-tables .pricing-table .price span {
       vertical-align:middle; }
   .pricing-tables .pricing-table .features {
@@ -2390,7 +2338,7 @@ body.error {
     font-size:100px;
     color:white;
     padding:30px 0 40px 0;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif; }
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
   body.error .error-container {
     background-color:white;
     position:relative;
@@ -2686,9 +2634,8 @@ a.dropdown-toggle {
   height:200px;
   }
 .f-content-dashboard { padding:0 15px; }
-.f-content-dashboard .box { border:none; }
+.f-content-dashboard .box { margin:0; border:none; }
 .f-content-dashboard .box-header { margin-bottom:3px; }
-.f-content-dashboard .box-header .title { font-size:18px; }
 .f-content-dashboard .box-content { border:1px solid #ddd; }
 
 /* Catalog > Categories */
@@ -3047,7 +2994,7 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
   padding:6px 10px;
   line-height:1.42857;
   color:#444;
-  font-size:13px;
+  font-size:12px;
   }
 .select2-container-active .select2-choice,
 .select2-container-active .select2-choices {

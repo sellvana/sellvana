@@ -57,6 +57,7 @@ class FCom_Core_Main extends BClass
         $localConfig = array();
         $localConfig['fs']['fcom_root_dir'] = FULLERON_ROOT_DIR;
 
+        // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
         $rootDir = $config->get('fs/root_dir');
         if ($rootDir) {
             $rootDir = realpath($rootDir);
@@ -289,8 +290,6 @@ class FCom_Core_Main extends BClass
         //FCom::i()->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
 
-        // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
-        $rootDir = $config->get('fs/root_dir');
         $dirConf = $config->get('fs');
         $modReg = BModuleRegistry::i();
 
@@ -298,7 +297,8 @@ class FCom_Core_Main extends BClass
         if (file_exists($configDir.'/db.php')) {
             $config->addFile('db.php', true);
         }
-        $useProductionCache = ('STAGING' === $mode || 'PRODUCTION' === $mode) && !$config->get('db/implicit_migration');
+        $useProductionCache = $config->get('core/force_dirfile_cache') ||
+            ('STAGING' === $mode || 'PRODUCTION' === $mode) && !$config->get('db/implicit_migration');
         if ($useProductionCache) {
             $manifestsLoaded = $modReg->loadManifestCache();
         } else {
@@ -394,7 +394,7 @@ class FCom_Core_Main extends BClass
     {
         static $url = array();
         if (empty($url[$full])) {
-            $url[$full] = rtrim(BConfig::i()->get('web/base_href'), '/').'/resize.php';
+            $url[$full] = rtrim(BConfig::i()->get('web/base_src'), '/').'/resize.php';
             if ($full) {
                 $r = BRequest::i();
                 $url[$full] = BApp::baseUrl(true).$url[$full];

@@ -4,6 +4,10 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Frontend_Contr
 {
     public function action_reindex()
     {
+        if (!BDebug::is('DEBUG,DEVELOPMENT')) {
+            echo "DENIED";
+            exit;
+        }
         BResponse::i()->startLongResponse();
         BDebug::mode('PRODUCTION');
         BORM::configure('logging', 0);
@@ -22,6 +26,10 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Frontend_Contr
 
     public function action_test()
     {
+        if (!BDebug::is('DEBUG,DEVELOPMENT')) {
+            echo "DENIED";
+            exit;
+        }
         BResponse::i()->startLongResponse();
         FCom_CatalogIndex_Main::i()->autoReindex(false);
 

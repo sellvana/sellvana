@@ -4,9 +4,6 @@ class FCom_Catalog_Admin extends BClass
 {
     static public function bootstrap()
     {
-        $module = BApp::m();
-        $module->base_src .= '/Admin';
-
         BEvents::i()
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
@@ -63,5 +60,14 @@ print_r($args); exit;
     public static function onNavTreeForm($args)
     {
         $args['node_types']['category'] = 'Category';
+    }
+
+    public function getAvailableViews()
+    {
+        return array(
+            '' => '',
+            '@CMS Pages' => array(),
+            '@Templates' => array(),
+        );
     }
 }

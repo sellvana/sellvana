@@ -36,9 +36,11 @@
             <% if (no_reorder!==true) { %>
                     <div class="draghandle" style='width:100%;height:18px;background-color:#eeeeee;'></div>
             <% } %>
-            <a class="js-change-url" style="cursor: pointer;">
+            <span class="f-th-title">
+              <a class="js-change-url" style="cursor: pointer;">
                 <%- label %>
-            </a>
+              </a>
+            </span>
         <% } else if (type === 'multiselect') { %>
             <select class="js-sel">
                 {{ UTIL.optionsHtml(gridView.multiselectToggleOptions(), gridView.multiselectCurrent()) | raw }}
