@@ -98,7 +98,7 @@
             });
 
             (function() {
-                var newId = 0, baseUrl = '{{ APP.href('promo/form' ~ m.get('id') ~ '/group') }}';
+                var newId = 0, baseUrl = '{{ APP.href('promo/form/' ~ m.get('id') ~ '/group') }}';
                 function addGroup(type) {
                     var url = baseUrl+'?type='+type+'&group_id='+(--newId);
                     $.get(url, function(data, status, xhr) {

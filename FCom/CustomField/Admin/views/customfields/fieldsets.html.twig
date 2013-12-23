@@ -6,46 +6,46 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     if (typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
 
-    g_vent.bind('custom_callback', function(ev) {
+    g_vent.bind('custom_callback', function (ev) {
         console.log(ev);
         if (ev.grid === 'fieldsets') {
             selFieldSetRow = ev.row;
             g_vent.trigger('fetch_rows', {
-                                            grid: 'fieldset-modal-selected-grid',
-                                            url: '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}'+ev.row.id,
-                                            callback: function() {
-                                                $('a#btn-fieldset-grid-modal').trigger('click');
-                                            }
-                                        }
+                        grid: 'fieldset-modal-selected-grid',
+                        url: '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}' + ev.row.id,
+                        callback: function () {
+                            $('a#btn-fieldset-grid-modal').trigger('click');
+                        }
+                    }
             );
         }
     });
 
-    g_vent.bind('add', function(ev) {
+    g_vent.bind('add', function (ev) {
         if (ev.grid === 'fieldset-modal-add-grid') {
             g_vent.trigger('silent_inject', {grid: 'fieldset-modal-selected-grid', rows: ev.rows});
             g_vent.trigger('clear_selection', {grid: 'fieldset-modal-add-grid'});
         }
     });
 
-    $('button.fieldset-modal-save').click(function() {
-        g_vent.trigger( 'get_rows',
-                       {
-                            grid: 'fieldset-modal-selected-grid',
-                            callback: function(rows) {
-                                $.post('{{ APP.href('customfields/fieldsets/set_field_grid_data') | raw }}',
-                                        {
-                                            set_id: selFieldSetRow.id,
-                                            field_ids: _.pluck(rows, 'id').join(',')
-                                        },
-                                        function (data) {
-                                            selFieldSetRow.num_fields = rows.length;
-                                            g_vent.trigger('update_row', {grid: 'fieldsets', row: selFieldSetRow});
-                                            $('button.fieldset-modal-close').trigger('click');
-                                        }
-                                );
-                            }
-                        }
+    $('button.fieldset-modal-save').click(function () {
+        g_vent.trigger('get_rows',
+                {
+                    grid: 'fieldset-modal-selected-grid',
+                    callback: function (rows) {
+                        $.post('{{ APP.href('customfields/fieldsets/set_field_grid_data') | raw }}',
+                                {
+                                    set_id: selFieldSetRow.id,
+                                    field_ids: _.pluck(rows, 'id').join(',')
+                                },
+                                function (data) {
+                                    selFieldSetRow.num_fields = rows.length;
+                                    g_vent.trigger('update_row', {grid: 'fieldsets', row: selFieldSetRow});
+                                    $('button.fieldset-modal-close').trigger('click');
+                                }
+                        );
+                    }
+                }
         );
     });
 
