@@ -122,6 +122,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Admin_Contro
 
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @return array
+     */
     public function frontendFieldGrid($model)
     {
         $data = $model->getData('frontend_fields');
@@ -140,6 +144,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Admin_Contro
                     array('name'=>'label', 'label'=>'Field Label', 'width'=>200),
                     array('name'=>'input_type', 'label'=>'Input Type', 'width'=>200),
                     array('name'=>'options', 'label'=>'Options', 'width'=>200),
+                    array('name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline', 'validation' => array('number' => true)),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
                 ),
                 'actions'=>array(
