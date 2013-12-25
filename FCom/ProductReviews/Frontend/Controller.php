@@ -205,7 +205,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
         $r = BRequest::i()->get();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->load(array(
-                'id'          => $r['pr'],
+                'id'          => $r['rid'],
                 'customer_id' => $customerId
             ));
         if (!$pr) {
@@ -235,12 +235,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
     {
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $pr = FCom_ProductReviews_Model_Review::i()->load(
-            array(
-                'id'          => $post['pr'],
+        $pr = FCom_ProductReviews_Model_Review::i()->load(array(
+                'id'          => $post['rid'],
                 'customer_id' => $customerId
-            )
-        );
+            ));
         $prod = FCom_Catalog_Model_Product::i()->load($pr->product_id);
         if (!$pr) {
             BSession::i()->addMessage(BLocale::_('Cannot load your review, please check again'), 'error', 'validator-errors:'.$this->formId);
@@ -277,12 +275,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
     {
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $pr = FCom_ProductReviews_Model_Review::i()->load(
-            array(
-                'id'          => $post['pr'],
+        $pr = FCom_ProductReviews_Model_Review::i()->load(array(
+                'id'          => $post['rid'],
                 'customer_id' => $customerId
-            )
-        );
+            ));
         if (!$pr) {
             BResponse::i()->json(array('status' => 'error', 'message' => 'Cannot load your review, please check again'));
         } else {

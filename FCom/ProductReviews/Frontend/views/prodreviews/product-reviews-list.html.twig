@@ -90,7 +90,7 @@
             {{ review.get("text") }}
             {% if review.get('customer_id') == userId %}
                 <a data-toggle="modal" data-content="{{ review.get('id') }}" class="f-prod-review-edit" title="{{ 'Edit this review'|_ }}"
-                   href="{{ APP.href('prodreviews/edit?pr=') ~ review.get('id') }}">
+                   href="{{ APP.href('prodreviews/edit?rid=') ~ review.get('id') }}">
                     <i class="glyphicon glyphicon-pencil"></i>
                 </a>
             {% endif %}
@@ -104,11 +104,11 @@
 <script>
     require(['jquery', 'fcom.productreviews'], function ($){
         $('.f-prod-review-edit').click(function () {
-            var pr = $(this).attr('data-content');
+            var rid = $(this).attr('data-content');
             $.ajax({
                 type: 'POST',
                 url: '{{ APP.href('prodreviews/ajax_review') }}',
-                data: {pr: pr},
+                data: {rid: rid},
                 success: function (data) {
                     if (data.status == 'error') {
                         $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
