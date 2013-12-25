@@ -6,9 +6,6 @@
 {% set min = config.min %}
 {% set step = config.step %}
 {% set action = THIS.get('action') ? THIS.get('action') : 'add' %}
-{% if pr is null %}
-    {% set pr = APP.instance('FCom_ProductReviews_Model_Review').load({'product_id': prod.id(), 'customer_id': THIS.get('userId')}) %}
-{% endif %}
 {% if (THIS.get('isModalBox') != 1) %}
     {% set validator = THIS.validator(THIS.get('formId')) %}
 {% endif %}
