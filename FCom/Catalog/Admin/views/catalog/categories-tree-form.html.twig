@@ -2,49 +2,52 @@
 {% set m = THIS.get('model') %}
 
 <script>
-    require(['fcom.admin'], function() {
+    require(['fcom.admin', 'jquery.validate'], function() {
         FCom.Admin.Tabs('.f-admin-main-container', {
             url_get: "{{ THIS.get('form_url') }}",
             cur_tab: "{{ THIS.get('cur_tab') }}"
         });
-    });
-
-    var mainForm = $('form#categories-tree-form');
-
-    $('button#category_save').click(function (ev)
-    {
-        //get value in ckeditor when submit ajax
-        if (CKEDITOR !== 'undefined') {
-            for (key in CKEDITOR.instances) {
-                $('#' + key).val(CKEDITOR.instances[key].getData());
-            }
-        }
-        $.ajax({
-            type: "POST",
-            url: mainForm.attr('action'),
-            data: mainForm.serialize(),
-            success: function (data)
-            {
-                if (data.status == 'error') {
-                    $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                } else {
-                    $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
-                    categoryProdMng.reset();
+        var mainForm = $('form#categories-tree-form');
+        mainForm.validate();
+        $('button#category_save').click(function (ev)
+        {
+            //get value in ckeditor when submit ajax
+            if (CKEDITOR !== 'undefined') {
+                for (key in CKEDITOR.instances) {
+                    $('#' + key).val(CKEDITOR.instances[key].getData());
                 }
-
-                console.log(self);
-            },
-            error: function (xhr, textStatus, errorThrown)
-            {
-                alert("[ERROR]<br>" + textStatus);
             }
+            if (mainForm.valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: mainForm.attr('action'),
+                    data: mainForm.serialize(),
+                    success: function (data)
+                    {
+                        if (data.status == 'error') {
+                            $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        } else {
+                            $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                            categoryProdMng.reset();
+                        }
+
+                        console.log(self);
+                    },
+                    error: function (xhr, textStatus, errorThrown)
+                    {
+                        alert("[ERROR]<br>" + textStatus);
+                    }
+                });
+            }
+
+
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            return false;
         });
-
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        return false;
     });
+
 </script>
 
 <div class="f-admin-main-content">
