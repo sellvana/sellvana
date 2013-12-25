@@ -67,7 +67,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $args['view']->set(array(
+        $this->view('admin/grid')->set(array(
             'actions' => array(
                 'new' => '',
             ),

@@ -209,7 +209,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
     public function action_create_order()
     {
         $id = BRequest::i()->param('id', true);
-        $redirectUrl = BApp::baseUrl();
+        $r = BRequest::i();
+        $baseSrc = BConfig::i()->get('web/base_src');
+        $redirectUrl = $r->scheme() . '://' . $r->httpHost() . $baseSrc;
         try {
             $model = FCom_Customer_Model_Customer::i()->load($id);
             if (!$model) {
