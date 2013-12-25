@@ -3,6 +3,6 @@ base:
         do:
             - [ requireJs, fcom.productreviews, @FCom_ProductReviews/Frontend/js/fcom.productreviews ]
 
-/prodreview/add:
+/prodreview/form:
     - { include: base }
-    - { hook: main, views: prodreviews/add }
+    - { hook: main, views: prodreviews/form }
