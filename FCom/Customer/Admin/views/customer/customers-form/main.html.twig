@@ -128,19 +128,19 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
             <div class="col-md-5">
-                <input id="model-firstname" class="form-control" type="text" name="model[firstname]" value="{{ validator.fieldValue('firstname') }}" />
+                <input id="model-firstname" class="form-control required" type="text" name="model[firstname]" value="{{ validator.fieldValue('firstname') }}" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
             <div class="col-md-5">
-                <input id="model-lastname" class="form-control" type="text" name="model[lastname]" value="{{ validator.fieldValue('lastname') }}" />
+                <input id="model-lastname" class="form-control required" type="text" name="model[lastname]" value="{{ validator.fieldValue('lastname') }}" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
             <div class="col-md-5">
-                <input id="model-email" class="form-control" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
+                <input id="model-email" class="form-control required" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
             </div>
         </div>
         {% if customerGroups is defined %}
@@ -265,3 +265,8 @@
         </fieldset>
     </div>#}
 </div>
+<script type="text/javascript">
+    require(['jquery', 'jquery.validate'], function ($) {
+        $('#customers-form').validate();
+    })
+</script>
