@@ -33,7 +33,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
                 'action' => 'add',
             )
         );
-        $this->layout('/prodreview/add');
+        $this->layout('/prodreview/form');
     }
 
     public function action_add__POST()
@@ -227,8 +227,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
                 'formId' => $this->formId,
                 'action' => 'edit',
             ));
+        $this->view('prodreviews/form')->set('abc', 'dat');
         $this->formMessages($this->formId);
-        $this->layout('/prodreview/add');
+        $this->layout('/prodreview/form');
     }
 
     public function action_edit__POST()
