@@ -3,40 +3,44 @@
 {% set formUrl = APP.href('cms/nav/tree_form/' ~ m.get('id')) %}
 
 <script>
-    require(['fcom.admin'], function() {
+    require(['fcom.admin', 'jquery.validate'], function() {
         FCom.Admin.Tabs('.fcom-admin-main-container', {
             url_get: "{{ THIS.get('form_url') }}",
             cur_tab: "{{ THIS.get('cur_tab') }}"
         });
-    });
+        var mainForm = $('form#cms-tree-form');
+        mainForm.validate()
+        $('button#cms_nav_save').click(function (ev)
+        {
+            if (mainForm.valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: mainForm.attr('action'),
+                    data: mainForm.serialize(),
+                    success: function (data)
+                    {
+                        if (data.status == 'error') {
+                            $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        } else {
+                            $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown)
+                    {
+                        alert("[ERROR]<br>" + textStatus);
+                    }
+                });
 
-    var mainForm = $('form#cms-tree-form');
-
-    $('button#cms_nav_save').click(function (ev)
-    {
-        $.ajax({
-            type: "POST",
-            url: mainForm.attr('action'),
-            data: mainForm.serialize(),
-            success: function (data)
-            {
-                if (data.status == 'error') {
-                    $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                } else {
-                    $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
-                }
-            },
-            error: function (xhr, textStatus, errorThrown)
-            {
-                alert("[ERROR]<br>" + textStatus);
             }
+
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            return false;
         });
-
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        return false;
     });
+
+
 </script>
 
 <div class="f-admin-main-content">
