@@ -768,7 +768,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.model.destroy();
                 },
                 render: function () {
-                    console.log('row-render');
+                    //console.log('row-render');
                     var colsInfo = columnsCollection.toJSON();
                     this.$el.html(this.template({row: this.model.toJSON(), colsInfo: colsInfo}));
 
@@ -815,7 +815,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return $('#' + BackboneGrid.id);
                 },
                 render: function () {
-                    console.log('gridview-render');
+                    //console.log('gridview-render');
                     this.setCss();
                     this.$el.html('');
                     this.collection.each(this.addRow, this);
@@ -1552,8 +1552,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 $('.' + BackboneGrid.id + '.pagination.page').html(html);
 
                 //update page size options
-                console.log('debug pagesize');
-                console.log(BackboneGrid.currentState.ps);
                 var pageSizeOpts = BackboneGrid.pageSizeOptions;
                 var pageSizeOptsRender = [];
                 for (var j = 0; j < pageSizeOpts.length; j++) {
@@ -1566,8 +1564,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         break;
                     }
                 }
-                console.log(pageSizeOptsRender);
-                console.log(BackboneGrid.currentState.ps);
                 //render page size options html
                 var pageSizeHtml = '';
                 for (j = 0; j < pageSizeOptsRender.length; j++) {
@@ -1576,7 +1572,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     pageSizeHtml += '</li>';
                 }
                 $('.pagination.pagesize').html(pageSizeHtml);
-                console.log('end debug pagesize');
 
                 var caption = '';
                 if (BackboneGrid.currentState.c > 0)
