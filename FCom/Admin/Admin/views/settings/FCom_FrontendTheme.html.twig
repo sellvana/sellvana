@@ -13,7 +13,7 @@
                     <label class="col-md-2 control-label">{{ "Select top menu"|_ }}</label>
                     <div class="col-md-5">
                         <select class="form-control" name="config[modules][FCom_Frontend][nav_top][type]">
-                            {{ UTIL.optionsHtml({'':'Select an option', 'cms':'CMS menu', 'categories_root':'Categories menu by root id', 'categories_custom':'Categories menu by custom selection'}, c.get('modules/FCom_Frontend/nav_top/type'))|raw }}
+                            {{ UTIL.optionsHtml({'':'Select an option', 'cms':'CMS menu', 'categories_root':'Categories menu by root id'}, c.get('modules/FCom_Frontend/nav_top/type'))|raw }}
                         </select>
                     </div>
                 </div>

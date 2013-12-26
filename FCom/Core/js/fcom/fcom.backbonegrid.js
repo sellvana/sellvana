@@ -821,7 +821,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.collection.each(this.addRow, this);
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_gridview_render']) !== 'undefined') {
-                        console.log('after_gridview_render');
+                        //console.log('after_gridview_render');
                         var func = BackboneGrid.callbacks['after_gridview_render'];
                         var script = func + '(this.$el,rowsCollection.toJSON());';
                         eval(script);
@@ -1510,7 +1510,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.currentRow) {
                             var name = model.get('name');
                             var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                            console.log(val);
+                            //console.log(val);
                             elementView.$el.find('#' + name).val(val);
                         }
                     }
@@ -1518,11 +1518,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             });
 
             function updatePageHtml(p, mp) {
-
-                console.log(BackboneGrid.currentState);
                 p = BackboneGrid.currentState.p;
                 mp = BackboneGrid.currentState.mp;
-                console.log(BackboneGrid.currentState.mp);
                 var html = '';
 
                 html += '<li class="first' + (p <= 1 ? ' disabled' : '') + '">';
@@ -1732,7 +1729,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 }
             }
-            console.log(fCollection);
+            //console.log(fCollection);
             headerView = new BackboneGrid.Views.HeaderView({collection: columnsCollection});
             headerView.render();
             var colsVisibilityView = new BackboneGrid.Views.ColsVisibilityView({collection: columnsCollection});
