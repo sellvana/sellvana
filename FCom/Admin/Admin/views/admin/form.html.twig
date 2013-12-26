@@ -36,17 +36,20 @@
                         }
                     }
 
-
                     $('ul#tabs').find('li a').each(function(index) {
                         var val = info[$(this).attr('href')];
                         if (typeof(val) !== 'undefined')
                          {
-                            if ($(this).find('span.badge').length === 0) {
-                                $(this).append('<span class="badge badge-important"></span>');
+//                            if ($(this).find('span.badge').length === 0) {
+//                                $(this).append('<span class="badge badge-important"></span>');
+//                            }
+//                            $(this).find('span.badge').html(val>0 ? val : '');
+                            if ($(this).find('i.error').length === 0) {
+                                $(this).append('<i class="icon-warning-sign error"></i>');
                             }
-                            $(this).find('span.badge').html(val>0 ? val : '');
                         } else {
-                            $(this).find('span.badge').remove();
+                            $(this).find('i.error').remove();
+//                            $(this).find('span.badge').remove();
                         }
                     });
 
@@ -57,7 +60,18 @@
 
                 }
             });
+            $("#{{ formId }}").find('input, textarea, select').on('change', function () {
+                $('ul#tabs').find('li.active').each(function () {
+                    if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                        if ($(this).children('a').children('i.error').length !== 0) {
+                            $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                        } else {
+                            $(this).children('a').append('<i class="icon-pencil"></i>');
+                        }
 
+                    }
+                })
+            })
 
             FCom.Admin.Tabs('.f-admin-main', {
                 url_get: "{{ formUrl }}",
