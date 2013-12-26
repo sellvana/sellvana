@@ -9,10 +9,50 @@
             cur_tab: "{{ THIS.get('cur_tab') }}"
         });
         var mainForm = $('form#cms-tree-form');
-        mainForm.validate()
-        $('button#cms_nav_save').click(function (ev)
-        {
-            if (mainForm.valid()) {
+        var elem = mainForm.find('input, textarea, select');
+        function processFlag (validator) {
+            var info = {};
+            for(key in validator.invalid) {
+                var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                if (element.length>0) {
+                    var tab = element.parents('div.tab-pane');
+                    var key = '#'+tab.attr('id');
+                    if (typeof(info[key]) === 'undefined')
+                        info[key] = 1;
+                    else
+                        info[key]++;
+                }
+            }
+            $('#cms-tree-form ul.nav-tabs').find('li a').each(function(index) {
+                var val = info[$(this).attr('href')];
+
+                if (typeof(val) !== 'undefined')
+                {
+                    if ($(this).find('i.error').length === 0) {
+                        $(this).append('<i class="icon-warning-sign error"></i>');
+                    }
+                } else {
+                    $(this).find('i.error').remove();
+                }
+            });
+
+            for (key in info) {
+                $('a[href="'+key+'"]').trigger('click');
+                break;
+            }
+        }
+        mainForm.validate({
+            ignore: [],
+            invalidHandler: function(event, validator) {
+                processFlag(validator);
+            },
+            submitHandler: function (form) {
+                processFlag({invalid: null});
+                if (CKEDITOR !== 'undefined') {
+                    for (key in CKEDITOR.instances) {
+                        $('#' + key).val(CKEDITOR.instances[key].getData());
+                    }
+                }
                 $.ajax({
                     type: "POST",
                     url: mainForm.attr('action'),
@@ -24,20 +64,27 @@
                         } else {
                             $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
                         }
+
+                        console.log(self);
                     },
                     error: function (xhr, textStatus, errorThrown)
                     {
                         alert("[ERROR]<br>" + textStatus);
                     }
                 });
-
             }
-
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            return false;
         });
+        elem.on('change', function () {
+            $('#cms-tree-form ul.nav-tabs').find('li.active').each(function () {
+                if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                    if ($(this).children('a').children('i.error').length !== 0) {
+                        $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                    } else {
+                        $(this).children('a').append('<i class="icon-pencil"></i>');
+                    }
+                }
+            })
+        })
     });
 
 
@@ -47,14 +94,14 @@
     <div class="page-header">
         <div class="f-page-title">{{ m.get('full_name')|replace('|', ' > ') }}</div>
         <div class="btn-group">
-            <button class="btn btn-primary btn-sm" id="cms_nav_save" type="button">{{ 'Save'|_ }}</button>
+            <button class="btn btn-primary btn-sm" id="cms_nav_save" type="submit">{{ 'Save'|_ }}</button>
         </div>
     </div>
     <div class="nav">
         <ul class="nav nav-tabs">
             {% for k, tab in tabs %}
                 <li>
-                    <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }}</a>
+                    <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }} </a>
                 </li>
             {% endfor %}
         </ul>
