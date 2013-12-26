@@ -82,10 +82,12 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         $resize_url = FCom_Core_Main::i()->resizeUrl();
         $silhouetteImg = $resize_url.'?f='.urlencode(trim($media.'/silhouette.jpg', '/')).'&s=98x98';
 
-        $actions = array_merge($args['view']->get('actions'), array(
-                'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
-                                    href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
-            ));
+        if ($m->id) {
+            $actions = array_merge($args['view']->get('actions'), array(
+                    'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
+                                        href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
+                ));
+        }
         $saleStatistics = $m->saleStatistics();
         $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime']) . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
         $args['view']->set(array(
