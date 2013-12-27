@@ -250,12 +250,15 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
         $post['review']['customer_id'] = $customerId;
         if ($valid = $pr->validate($post['review'], array(), $this->formId)) {
             if ($needApprove) {
-                $post['review']['approved'] = 1;
+                $post['review']['approved'] = 0;
             }
             $pr->set($post['review'])->save();
             //$pr->notify(); //todo: confirm about send notify
         }
-        $successMessage = BLocale::_('Edit successfully!');
+        $successMessage = BLocale::_('Edit review successfully!');
+        if ($needApprove) {
+            $successMessage = BLocale::_('Edit review successfully! We will check and approve this review in 24 hours.');
+        }
         if (BRequest::i()->xhr()) { //ajax request
             if ($valid) {
                 BResponse::i()->json(array('status' => 'success', 'message' => $successMessage));
