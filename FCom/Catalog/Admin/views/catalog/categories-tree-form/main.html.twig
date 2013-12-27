@@ -144,7 +144,6 @@
         $('#image-file').change(function () {
             $('#table-image').children('tbody').children('tr').remove();
         })
-
         $('#cat-image-fileupload').fileupload({
             url: '{{ APP.href("catalog/categories/upload?id=" ~ m.id()) }}',
             acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i

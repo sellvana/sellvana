@@ -10,7 +10,6 @@
     require(["jquery", "underscore", "fcom.admin", "bootstrap", "jquery.validate"], function($, _) {
 
         $(function() {
-
             window.adminForm = FCom.Admin.form({
                 form:     '{{ formId }}',
                 tabs:     '.adm-tabs-sidebar li',
@@ -52,7 +51,6 @@
 //                            $(this).find('span.badge').remove();
                         }
                     });
-
                     for(key in info) {
                         $('a[href="'+key+'"]').trigger('click');
                         break;
@@ -68,7 +66,6 @@
                         } else {
                             $(this).children('a').append('<i class="icon-pencil"></i>');
                         }
-
                     }
                 })
             })

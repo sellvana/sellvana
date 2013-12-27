@@ -1264,7 +1264,7 @@ body.without-footer .f-admin-footer {
   padding:5px 0;
   }
 .f-admin-sidebar-view .f-fieldset-group { padding-right:0; padding-left:0; }
-.nav-tabs > li > a > i.error{
+ul > li > a > i.error{
     color: #ca0000;
 }
 /* Box */

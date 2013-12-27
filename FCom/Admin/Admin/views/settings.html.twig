@@ -47,10 +47,71 @@
                 url_post: '{{ formUrl }}'
                 //on_tab_load: initTabs
             });
-            $('#settings-form').validate();
+//            $('#settings-form').validate();
             //initTabs.apply($('#settings-form'));
 
             //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
+            var mainForm = $('form#settings-form');
+            var elem = mainForm.find('input, textarea, select');
+            var text = '#settings-form ul.nav-tabs li.dropdown';
+            function processFlag (validator) {
+                var info = {};
+                for(key in validator.invalid) {
+                    var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                    if (element.length>0) {
+                        var tab = element.parents('div.tab-pane');
+                        var key = '#'+tab.attr('id');
+                        if (typeof(info[key]) === 'undefined')
+                            info[key] = 1;
+                        else
+                            info[key]++;
+                    }
+                }
+                $(text + ' ul.dropdown-menu').find('li a').each(function(index) {
+                    var val = info[$(this).attr('href')];
+
+                    if (typeof(val) !== 'undefined')
+                    {
+                        if ($(this).find('i.error').length === 0) {
+                            $(this).append('<i class="icon-warning-sign error"></i>');
+                        }
+                    } else {
+                        $(this).find('i.error').remove();
+                    }
+                });
+
+                for (key in info) {
+                    $('a[href="'+key+'"]').trigger('click');
+                    break;
+                }
+            }
+            mainForm.validate({
+                ignore: [],
+                invalidHandler: function(event, validator) {
+                    processFlag(validator);
+                },
+                submitHandler: function (form) {
+                    processFlag({invalid: null});
+//                    $('#settings-form').submit(function(ev) {
+//                        var $form = $(this);
+                        $.post(mainForm.attr('action'), mainForm.serializeArray(), function(data, status, xhr) {
+                            $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
+                        });
+//                        return false;
+//                    })
+                }
+            });
+            $( "body" ).delegate(elem,'change', function () {
+                $(text).find('li.active').each(function () {
+                    if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                        if ($(this).children('a').children('i.error').length !== 0) {
+                            $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                        } else {
+                            $(this).children('a').append('<i class="icon-pencil"></i>');
+                        }
+                    }
+                })
+            });
 
             FCom.Admin.Tabs('.f-admin-main-container', {
                 url_get: "{{ formUrl }}",
@@ -70,13 +131,7 @@
             // init switch buttons
             loadSwitchButtons();
 
-            $('#settings-form').submit(function(ev) {
-                var $form = $(this);
-                $.post($form.attr('action'), $form.serializeArray(), function(data, status, xhr) {
-                    $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
-                });
-                return false;
-            })
+
         });
     })
 </script>
@@ -90,7 +145,7 @@
           <span>{{ "Settings" |_ }}</span>
       </h1>
       <div class="btn-group">
-          <button class="btn btn-primary" type="submit" onclick="return adminForm.saveAll(this)">{{ "Save All" |_ }}</button>
+          <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>
       </div>
     </div>
     <div class="f-admin-main-container">
