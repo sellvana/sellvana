@@ -249,6 +249,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
         $post['review']['product_id'] = $pr->product_id;
         $post['review']['customer_id'] = $customerId;
         if ($valid = $pr->validate($post['review'], array(), $this->formId)) {
+            if ($needApprove) {
+                $post['review']['approved'] = 1;
+            }
             $pr->set($post['review'])->save();
             //$pr->notify(); //todo: confirm about send notify
         }

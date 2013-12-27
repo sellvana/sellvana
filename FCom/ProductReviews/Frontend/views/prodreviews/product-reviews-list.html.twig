@@ -113,21 +113,19 @@
                     if (data.status == 'error') {
                         $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                     } else {
-                        var i = 0;
-                        $('#f-prod-reviews-main-form .rateit').each(function () {
-                            if (i>0) {
-                                $(this).rateit('value', data['rating' + i]  );
-                            } else {
-                                $(this).rateit('value', data['rating']  );
+                        var reviewMainForm = $('#f-prod-reviews-main-form');
+                        reviewMainForm.attr('action', '{{ APP.href('prodreviews/edit') }}');
+                        reviewMainForm.find('.rateit').each(function(index) {
+                            var val = data['rating'];
+                            if (index > 0) {
+                                val = data['rating' + index];
                             }
-                            i++;
-                        })
+                            $(this).rateit('value', val);
+                        });
                         $('#prodreview-title').val(data.title);
                         $('#prodreview-text').val(data.text);
                         $('#id-preview').val(data.id);
-                        $('#f-prod-reviews-main-form').attr('action', '{{ APP.href('prodreviews/edit') }}');
                         $('#f-prod-review-form').modal('show');
-
                     }
                 },
                 error: function (xhr, textStatus, errorThrown)
