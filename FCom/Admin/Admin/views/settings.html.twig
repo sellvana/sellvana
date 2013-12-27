@@ -101,7 +101,7 @@
 //                    })
                 }
             });
-            $( "body" ).delegate(elem,'change', function () {
+            $( "body" ).on('change', elem, function () {
                 $(text).find('li.active').each(function () {
                     if ($(this).children('a').find('i.icon-pencil').length === 0) {
                         if ($(this).children('a').children('i.error').length !== 0) {
