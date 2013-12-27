@@ -17,11 +17,7 @@
             <div class="col-md-10">
                 {% for g in m.groups() %}
                     {% if g.get('group_type') == 'buy' %}
-                        {% set buyGrid = promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id')) %}
-                        {% if buyGrid.caption %}
-                            {{ buyGrid.caption | raw }}
-                        {% endif %}
-                        {{ THIS.view('core/backbonegrid').set('grid', buyGrid) | raw }}
+                        {{ THIS.view('promo/group').set({ 'm': m, 'g': g, 'p': promoCtrl }) | raw }}
                     {% endif %}
                 {% endfor %}
             </div>
@@ -47,11 +43,7 @@
                 <div class="col-md-10">
                     {% for g in m.groups() %}
                         {% if g.get('group_type') == 'get' %}
-                            {% set getGrid = promoCtrl.productGridConfig(m, g.get('group_type'), g.get('id')) %}
-                            {% if getGrid.caption %}
-                                {{ getGrid.caption | raw }}
-                            {% endif %}
-                            {{ THIS.view('core/backbonegrid').set('grid', getGrid) | raw }}
+                            {{ THIS.view('promo/group').set({ 'm': m, 'g': g, 'p': promoCtrl }) | raw }}
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -64,18 +56,40 @@
             </div>
         {% endif %}
     </div>
+    <a role="button" href="#promo-grid-modal" data-toggle="modal" style='display:none;'
+       id="btn-fieldset-grid-modal">{{ "Add"|_ }}</a>
 
-    <div class="ui-layout-center">
-        <div class="form-group">
-            <div class="col-md-12">
-                {{ THIS.view('core/backbonegrid').set('grid', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('productLibrary')) | raw }}
+    <div class="modal fade" id="promo-grid-modal" tabindex="-1">
+        <div class="modal-dialog" style="width:900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title" id="myModalLabel">{{ "Add products" | _ }}</h4>
+                </div>
+                <div class="modal-body">
+                    {{ THIS.view("core/backbonegrid").set("grid", APP.instance("FCom_Catalog_Admin_Controller_Products").productLibraryGridConfig("productLibrary")) | raw }}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default btn-close promo-prod-modal-close" data-dismiss="modal" type="button">{{ "Close"|_ }}</button>
+                </div>
             </div>
         </div>
     </div>
+    {#
+    <div class="ui-layout-center">
+        <div class="form-group">
+            <div class="col-md-12">
+                {{ THIS.view('core/backbonegrid').set('grid', APP.instance('FCom_Catalog_Admin_Controller_Products').productLibraryGridConfig('c')) | raw }}
+            </div>
+        </div>
+    </div>
+    #}
 </fieldset>
 
+{#
+
 <script>
-    require(['jquery', 'fcom.admin'], function($) {
+    require(["jquery", "fcom.admin"], function($) {
         $(function() {
             /*var layout = $('#details-layout').height($('.adm-wrapper').height()).layout({
                 useStateCookie: true,
@@ -91,9 +105,9 @@
                     });
                 }
             });*/
-            $(window).resize(function(ev) { $('#details-layout').height($('.adm-wrapper').height()); });
+            $(window).resize(function(ev) { $("#details-layout").height($(".adm-wrapper").height()); });
 
-            $('#details-layout .ui-layout-west .ui-jqgrid-btable').each(function(idx, el) {
+            $("#details-layout .ui-layout-west .ui-jqgrid-btable").each(function(idx, el) {
                 new FCom.Admin.TargetGrid({source:'#productLibrary', target:el});
             });
 
@@ -121,3 +135,4 @@
         })
     })
 </script>
+#}
