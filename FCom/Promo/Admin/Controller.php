@@ -227,7 +227,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
 
         $groupName = $model ? htmlspecialchars( $groups[ $model->id ][ $groupId ]->group_name )
                             : 'Group ' . abs( $groupId );
-        $gridId    = 'promo_products_' . $type . $groupId;
+        $gridId    = 'promo_products_' . $type . '_' . $groupId;
         $config    = parent::gridConfig();
         unset( $config[ 'orm' ] );
         $config[ 'id' ]        = $gridId;
@@ -282,15 +282,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
 //            ),
 //        );
 
-        $caption = "<input type='text' name='group[$groupId][group_name]' value='$groupName'>"
-                   . "<input type='hidden' name='group[$groupId][group_type]' value='$type'>"
-                   . "<input type='hidden' name='_group_id' value='$groupId'>"
-                   . ( $type === 'buy' && !empty( $model ) && $model->buy_group !== 'one' ?
-                    " <button type='button' class='sz2 st2 btn' onclick=\"return removeGroup(this);\">Remove</button>"
-                    : '' );
+
         return array(
             'config'  => $config,
-            'caption' => $caption,
+            "group_name" => $groupName,
             'js' => array(
                 "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
             )
@@ -319,16 +314,23 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
     public function onAttachmentsGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, array(
-            array('name'=>'promo_status', 'label'=>'Status', 'width'=>80, 'options'=>array(''=>'All', 'A'=>'Active', 'I'=>'Inactive'), 'editable'=>true, 'edittype'=>'select', 'searchoptions'=>array('defaultValue'=>'A')),
-        ));
+                array( 'name'          => 'promo_status',
+                       'label'         => 'Status',
+                       'width'         => 80,
+                       'options'       => array( '' => 'All', 'A' => 'Active', 'I' => 'Inactive' ),
+                       'editable'      => true,
+                       'edittype'      => 'select',
+                       'searchoptions' => array( 'defaultValue' => 'A' )
+                ),
+            )
+        );
     }
 
     public function onAttachmentsGridGetORM($args)
     {
         $args['orm']->join('FCom_Promo_Model_Media', array('pa.file_id','=','a.id',), 'pa')
             ->where_null('pa.promo_id')
-            ->select(array('pa.promo_status'))
-            ;
+            ->select(array('pa.promo_status'));
     }
 
     public function onAttachmentsGridUpload($args)

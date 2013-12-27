@@ -144,12 +144,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
     public function productLibraryGridConfig($gridId=false)
     {
         $config = $this->gridConfig();
-        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
-        $config[ 'columns' ][ 'create_at' ][ 'hidden' ] = true;
+        $config['columns'] = array(
+            array( 'cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40 ),
+            array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true ),
+            array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
+                   'width'=> 450, 'addable' => true ),
+            array( 'name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 70 ),
+        );
+
+//        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
+//        $config[ 'columns' ][ 'create_at' ][ 'hidden' ] = true;
         if ( $gridId ) {
             $config[ 'id' ] = $gridId;
         }
         $config[ 'caption' ] = 'All products';
+
+        $config[ 'actions' ] = array(
+            'add' => array( 'caption' => 'Add selected products' )
+        );
+        $config[ 'events' ]  = array( 'add' );
         //$config['custom']['autoresize'] = '#linked-products-layout';
         return array( 'config' => $config );
     }
@@ -746,12 +759,5 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             }
         }
         return true;
-    }
-
-    protected function gridColumns()
-    {
-        $config =  $this->gridConfig();
-
-        return isset($config['columns']) ? $config['columns'] : array();
     }
 }
