@@ -63,6 +63,15 @@
                             $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                         } else {
                             $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                            $('#categories-wrapper').find('a.jstree-clicked').each(function () {
+                                $(this).html('<ins class="jstree-icon">&nbsp;</ins>'+ $('#main-node_name').val());
+                                var arr = [];
+                                $(this).parent().parents('li.jstree-open').each(function () {
+                                    arr.push($(this).children('a').text());
+                                })
+                                arr.splice(arr.length-1, 1);
+                                $('.page-header .f-page-title').html((arr.reverse() +' '+ $('#main-node_name').val()).replace(',', ' '));
+                            })
                         }
 
                         console.log(self);
