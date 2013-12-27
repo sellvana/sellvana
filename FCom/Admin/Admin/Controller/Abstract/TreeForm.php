@@ -160,7 +160,7 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
 
                 $model->save();
                 $model->refreshDescendants(true, true);
-                $result = array('status'=>'success', 'message'=>'Node updated');
+                $result = array('status'=>'success', 'message'=>'Node updated', 'path' => $model->full_name);
             } else {
                 BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
                 $result = array('status'=>'error', 'message'=> $this->getErrorMessages());
