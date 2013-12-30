@@ -19,7 +19,7 @@
                     <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
                 </div>
                 <div class="modal-body">
-                    {{ THIS.view('prodreviews/review-form').set({'prod': prod, 'isModalBox': 1, 'userId': userId}) | raw }}
+                    {{ THIS.view('prodreviews/review-form').set({'prod': prod, 'isModalBox': 1, 'isAlreadyReviewed': isAlreadyReviewed, 'userId': userId}) | raw }}
                 </div><!-- /.modal-body -->
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -40,10 +40,6 @@
         {% endif %}
     </div>
     <div id="f-prod-reviews-container">
-        {% if (reviews.numReviews > 0) %}
-            {{ THIS.view('prodreviews/product-reviews-list').set({'reviews': reviews, 'userId': userId})|raw }}
-        {% else %}
-            <p>{{ "No reviews. Become first person review this products"|_ }}</p>
-        {% endif %}
+        {{ THIS.view('prodreviews/product-reviews-list').set({'reviews': reviews, 'userId': userId, 'prod': prod})|raw }}
     </div>
 </section>

@@ -126,7 +126,7 @@
                             $("#f-prod-review-open").hide();
                             mainForm[0].reset();
                             mainForm.find('.rateit-reset').trigger('click');
-                            {% if THIS.get('allowReview') is sameas(false) or needApprove == 0 %}
+                            {% if THIS.get('isAlreadyReviewed') or needApprove == 0 %}
                                 //update list previews
                                 $('#f-prod-reviews-container').load('{{ APP.href('prodreviews/reviews_list') }}?pid={{ prod.id() }}');
                             {% endif %}
