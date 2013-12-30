@@ -2,13 +2,13 @@
 {% set userId = APP.instance('FCom_Customer_Model_Customer').sessionUserId() %}
 {% set prod = THIS.get('prod') %}
 {% set reviews = prod.reviews() %}
-{% set allowReview = true %}
 {% set rate = APP.instance('FCom_ProductReviews_Model_Review').config() %}
-{% for review in reviews.items %}
+{% set isAlreadyReviewed = prod.isAlreadyReviewed(userId) %}
+{#{% for review in reviews.items %}
     {% if review.get('customer_id') == userId %}
         {% set allowReview = false %}
     {% endif %}
-{% endfor %}
+{% endfor %}#}
 {% if isLoggedIn %}
     <!-- Modal -->
     <div class="modal fade" id="f-prod-review-form" tabindex="-1" role="dialog" aria-labelledby="f-prod-review-form-label" aria-hidden="true" data-backdrop="true">
@@ -19,7 +19,7 @@
                     <h4 class="modal-title">{{ 'Review the Product'|_ }}</h4>
                 </div>
                 <div class="modal-body">
-                    {{ THIS.view('prodreviews/review-form').set({'prod': THIS.get('prod'), 'isModalBox': 1, 'allowReview': allowReview, 'userId': userId}) | raw }}
+                    {{ THIS.view('prodreviews/review-form').set({'prod': prod, 'isModalBox': 1, 'userId': userId}) | raw }}
                 </div><!-- /.modal-body -->
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -35,8 +35,8 @@
 <section class="tab-pane active f-prod-reviews" id="f-prod-tab-reviews">
     <div class="f-tab-heading">
         <h5 class="f-tab-title">{{ 'Customer Reviews'|_ }}</h5>
-        {% if allowReview  %}
-            <a data-toggle="modal" data-content="new review" href="{{ APP.href('prodreviews/add?pid=') ~ THIS.get('prod').id() }}" class="btn btn-sm btn-primary" id="f-prod-review-open">{{ 'Write your own review'|_ }}</a>
+        {% if isAlreadyReviewed is sameas(false) %}
+            <a data-toggle="modal" data-content="new review" href="{{ APP.href('prodreviews/add?pid=') ~ prod.id() }}" class="btn btn-sm btn-primary" id="f-prod-review-open">{{ 'Write your own review'|_ }}</a>
         {% endif %}
     </div>
     <div id="f-prod-reviews-container">
