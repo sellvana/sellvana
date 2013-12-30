@@ -151,6 +151,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 events: {
                     'click a': '_changesortState',
+                    'click ul#action li': '_checkAction',
                     'change select.js-sel': '_checkAction'
                 },
                 initialize: function () {
@@ -197,7 +198,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     gridView.$el.find('input.select-row:not([disabled])').prop('checked', flag);
                 },
                 _checkAction: function (ev) {
-
+                    console.log($(ev.target).val().indexOf('upd'));
                     if ($(ev.target).val().indexOf('upd') !== -1)
                         this._selectAction();
                     else
@@ -211,6 +212,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 //function to show All,Selected or Unselelected rows
                 _showAction: function () {
                     var key = this.$el.find('select.js-sel').val();
+//                    var key = this.$el.find('ul#action li').attr('data-content');
                     switch (key) {
                         case 'show_all':
                             console.log('show_all!!!');
@@ -328,6 +330,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.collection.on('sort', this.render, this);
                     this.collection.on('render', this.render, this);
                 },
+                className: function () {
+                    return this.model.get('cssClass');
+                },
+                events: {
+                    'click .select-all': '_selectAllRow'
+                },
                 render: function () {
                     //console.log('headerver_render');
                     this.$el.html('');
@@ -361,6 +369,35 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var th = new BackboneGrid.Views.ThView({model: ColModel});
                         this.$el.append(th.render().el);
                     }
+                },
+                _selectAllRow: function (ev) {
+                    var checked = $('.select-all').hasClass('active');
+                    if (checked) {
+//                        $('.select-all').removeAttr('checked', 'checked');
+                        $('.select-all').removeClass('active');
+                        gridView.collection.models.forEach(function (model, i) {
+                            $('#' + config.id).find('input[type="checkbox"]').removeAttr('checked', 'checked');
+                            selectedRows.remove(model, {silent: true});
+                            selectedRows.trigger('remove');
+
+                            if (BackboneGrid.showingSelected) {
+                                rowsCollection.remove(model, {silent: true});
+                                //gridView.render();
+                            }
+
+                        })
+
+                    } else {
+
+                        gridView.collection.models.forEach(function (model, i) {
+                            $('#' + config.id).find('input[type="checkbox"]').attr('checked', 'checked');
+                            selectedRows.add(model);
+                        })
+                        $('.select-all').children('input').attr('checked', 'checked');
+                        $('.select-all').addClass('active');
+                    }
+                    return true;
+
                 }
             });
             BackboneGrid.Models.Row = Backbone.Model.extend({
@@ -706,7 +743,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _selectRow: function (ev) {
                     var checked = $(ev.target).is(':checked');
                     this.model.set('selected', checked);
-
+                    console.log(this.model.set);
                     if (checked) {
                         selectedRows.add(this.model);
                     } else {
@@ -724,6 +761,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return;
 
                 },
+
                 _cellValChanged: function (ev) {
                     var val = $(ev.target).val();
                     var name = $(ev.target).attr('data-col');
@@ -795,12 +833,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             });
 
             BackboneGrid.Views.GridView = Backbone.View.extend({
-                //  el: 'table tbody',
+//                  el: 'body',
                 initialize: function () {
                     this.collection.on('reset', this.render, this);
                     this.collection.on('render', this.render, this);
                     this.collection.on('add', this.addRow, this);
                 },
+
                 updateColsAndRender: function () {
                     this.render();
                 },
@@ -835,6 +874,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.append(rowView.render().el);
                     rowView.setValidation();
                 }
+
             });
             BackboneGrid.Views.ColCheckView = Backbone.View.extend({
                 tagName: 'li',
@@ -1628,7 +1668,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " div.modal-body";
             BackboneGrid.Views.ModalElement.prototype.template = _.template($('#' + config.id + '-modal-element-template').html());
 
-
             /*if (BackboneGrid.data_mode === 'local') {
              state.mp = config.data.data.length;
              }*/
@@ -1968,6 +2007,45 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 });
             }*/
 
+            //action show all , show selected
+            $('#action li').click(function () {
+                var key = $(this).attr('data-content');
+                $('#action').find('i.icon-ok').remove();
+                $(this).children('a').prepend('<i class="icon-ok"></i>');
+                switch (key) {
+                    case 'show-all':
+                        if (BackboneGrid.showingSelected) {
+                            BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
+                            rowsCollection.originalRows = BackboneGrid.prev_originalRows;
+                            BackboneGrid.showingSelected = false;
+                            if (BackboneGrid.data_mode !== 'local') {
+                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'block');
+                                rowsCollection.fetch({reset: true});
+                            } else {
+                                rowsCollection.filter();
+                            }
+
+                        }
+                        break;
+                    case 'show-selected':
+                        if (!BackboneGrid.showingSelected) {
+                            //console.log('show_sel!');
+                            BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
+                            BackboneGrid.prev_originalRows = rowsCollection.originalRows;
+                            BackboneGrid.showingSelected = true;
+                            if (BackboneGrid.data_mode !== 'local') {
+                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                            }
+
+                            BackboneGrid.data_mode = 'local';
+                            rowsCollection.originalRows = selectedRows;
+                            rowsCollection.reset(selectedRows.models);
+                            //console.log(selectedRows);
+                        }
+                        break;
+                }
+            })
+
 
             //quick search
             var quickInputId = '#' + config.id + '-quick-search';
@@ -1986,6 +2064,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 }
                 return true;
             });
+
+
             var restricts = ['FCom/PushServer/index.php', 'media/grid/upload', 'my_account/personalize'];
             //ajax loading...
             $(document).ajaxSend(function (event, jqxhr, settings) {

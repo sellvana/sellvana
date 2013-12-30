@@ -34,7 +34,7 @@
   {% endif %}
 
   <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
-      <div class="col-sm-6">
+      <div class="col-sm-5">
         <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 {{ 'Columns' |_ }}
@@ -55,6 +55,8 @@
         {% endfor %}
       </div>
       <div class="col-sm-6 text-right pagination" style='margin:0px;'>
+
+
         <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
         {% if config['data_mode']!= 'local' %}
           <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
@@ -75,6 +77,18 @@
             #}
           </ul>
         {% endif %}
+
+      </div>
+      <div class="col-sm-1 pull-right">
+          <div class="btn-group pull-right text-left">
+              <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                  <i class="glyphicon glyphicon-align-justify"></i><span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" id="action">
+                  <li data-content="show-all"><a href="#"><i class="icon-ok"></i> Show All </a></li>
+                  <li data-content="show-selected"><a href="#"> Show Selected</a></li>
+              </ul>
+          </div>
       </div>
   </div>
 
@@ -277,9 +291,14 @@
    <% if (rc.selectedCount>0) { %>
       <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
     <% } %>
-    <select class="{{ config.id | raw }} js-sel">
-      {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-    </select>
+    <div class="select-all">
+        <input type="checkbox" >
+    </div>
+
+
+    {#<select class="{{ config.id | raw }} js-sel">#}
+      {#{{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}#}
+    {#</select>#}
   <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
@@ -500,7 +519,7 @@
     </ul>
 </script>
 <script>
-require(['jquery', 'fcom.backbonegrid'], function($) {
+require(['backbone','jquery', 'fcom.backbonegrid'], function(Backbone, $) {
 
     if ($('#fcom_append_form').length > 0) {
       $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');
