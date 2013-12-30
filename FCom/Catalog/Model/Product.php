@@ -765,5 +765,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         return $data;
     }
+
+    /**
+     * check customer has already reviewed this product
+     * @param  $customerId
+     * @return boolean|FCom_ProductReviews_Model_Review
+     */
+    public function isAlreadyReviewed($customerId)
+    {
+        return FCom_ProductReviews_Model_Review::i()->load(array('product_id' => $this->id, 'customer_id' => $customerId));
+    }
 }
 

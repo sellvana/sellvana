@@ -190,12 +190,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Frontend_Con
                 die;
             }
             $reviews = $product->reviews();
-            $pr = FCom_ProductReviews_Model_Review::i()->load($reviews['items'][0]->id);
             BResponse::i()->set($this->view('prodreviews/product-reviews-list')->set(array(
                         'reviews' => $reviews,
-                        'userId' => FCom_Customer_Model_Customer::i()->sessionUserId(),
-                        'pr' => $pr,
-                        'prod' => $product
+                        'userId'  => FCom_Customer_Model_Customer::i()->sessionUserId(),
+                        'prod'    => $product
                     )));
         }
     }
