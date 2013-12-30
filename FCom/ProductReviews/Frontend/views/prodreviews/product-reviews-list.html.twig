@@ -41,7 +41,7 @@
     <article class="f-prod-review-post clearfix">
         <h5>{{ review.get('title') }}</h5>
         <span class="meta">{{ "by"|_ }} {{ review.get('firstname') }} {{ review.get('lastname') }} {{ "on"|_ }} {{ review.get('created_at')|date('F j, Y') }}</span>
-        <div class="col-md-5 col-sm-5 f-prod-review-attrs">
+        <div class="col-md-12 col-sm-12 f-prod-review-attrs">
             <dl class="dl-horizontal">
                 <dt><strong>{{ "Overall"|_ }}</strong></dt>
                 <dd>
@@ -74,26 +74,27 @@
                     {{ review.get('rating3') }}</dd>
 
             </dl>
-            <div id="block_review_helpful_{{ review.get('id') }}" class="block_review_helpful">
-                <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
-                    <input type="hidden" name="pid" value="{{ prod.get('id') }}">
-                    <input type="hidden" name="rid" value="{{ review.get('id') }}">
-                    {{ "Was this review helpful to you" | _ }}?
-                    <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="yes"
-                            onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
-                    <span class="badge">{{ review.get('helpful') }}</span>
-                </form>
+            <div class="f-prod-review">
+                {{ review.get("text") }}
+                {% if review.get('customer_id') == userId %}
+                    <a data-toggle="modal" data-content="{{ review.get('id') }}" class="f-prod-review-edit" title="{{ 'Edit this review'|_ }}"
+                       href="{{ APP.href('prodreviews/edit?rid=') ~ review.get('id') }}">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </a>
+                {% else %}
+                    <div id="block_review_helpful_{{ review.get('id') }}" class="block_review_helpful">
+                        <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
+                            <input type="hidden" name="pid" value="{{ prod.get('id') }}">
+                            <input type="hidden" name="rid" value="{{ review.get('id') }}">
+                            {{ "Was this review helpful to you" | _ }}?
+                            <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="yes"
+                                    onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                            <span class="badge">{{ review.get('helpful') }}</span>
+                        </form>
+                    </div>
+                    <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
+                {% endif %}
             </div>
-            <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
-        </div>
-        <div class="col-md-7 col-sm-7 f-prod-review">
-            {{ review.get("text") }}
-            {% if review.get('customer_id') == userId %}
-                <a data-toggle="modal" data-content="{{ review.get('id') }}" class="f-prod-review-edit" title="{{ 'Edit this review'|_ }}"
-                   href="{{ APP.href('prodreviews/edit?rid=') ~ review.get('id') }}">
-                    <i class="glyphicon glyphicon-pencil"></i>
-                </a>
-            {% endif %}
         </div>
     </article>
 {% endfor %}
