@@ -39,7 +39,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('name'=>'group_id', 'label'=>'Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'addable'=>true,'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
+                    array('name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'addable'=>true,'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
                     array('name'=>'qty', 'label'=>'Min.Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150, 'validation'=>array('required'=>true, 'number'=>true)),
                     array('name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
                     array('name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),

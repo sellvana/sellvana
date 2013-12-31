@@ -48,6 +48,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         array('product_name', '@required'),
         array('base_price', '@required'),
         array('local_sku', '@required'),
+        array('local_sku', '@string', null, array('max' => 100)),
+        array('local_sku', 'FCom_Catalog_Model_Product::validateDupSku', 'Duplicate SKU'),
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
         /*array('uom', '@required'),*/
@@ -55,7 +57,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         /*array('is_hidden', '@integer'),*/
         array('num_reviews', '@integer'),
 
-        array('local_sku', '@string', null, array('max' => 100)),
 
         array('cost', '@numeric'),
         array('msrp', '@numeric'),
@@ -79,6 +80,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+    }
+
+    public static function validateDupSku($data, $args)
+    {
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $sku = $data[$args['field']];
+        $orm = static::orm()->where('local_sku', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equals('id', $data['id']);
+        }
+        return !$orm->find_one();
     }
 
     public static function stockStatusOptions($onlyAvailable=false)

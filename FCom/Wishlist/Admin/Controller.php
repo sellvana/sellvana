@@ -26,7 +26,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Admin_Controller_Abstrac
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'wishlist_id', 'label' => 'Wishlist ID'),
             array('name' => 'product_name', 'label' => 'Product Name'),
-            array('name' => 'local_sku', 'label' => 'Local SKU'),
+            array('name' => 'local_sku', 'label' => 'SKU'),
             array('name' => 'base_price', 'label' => 'Base Price'),
             array('name' => 'sale_price', 'label' => 'Sale Price'),
         );
