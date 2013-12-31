@@ -138,6 +138,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (this.model.get('sortState').length > 0) {
                         cssClass += (' sorting_' + this.model.get('sortState'));
                     }
+                    if (this.model.has('cell') && this.model.get('cell') == 'select-row') {
+                        cssClass += ' select-cell';
+                    }
                     return cssClass;
                 },
                 attributes: function () {
@@ -227,7 +230,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     rowsCollection.filter();
                                 }
 
-                            }Filter
+                            }
                             break;
                         case 'show_sel':
                             if (!BackboneGrid.showingSelected) {
@@ -340,7 +343,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     //console.log('headerver_render');
                     this.$el.html('');
                     this.collection.each(this.addTh, this);
-                    gridParent = $('#' + BackboneGrid.id).parent();
+                    var gridParent = $('#' + BackboneGrid.id).parent();
                     //this.$el.parents('table:first').colResizable();
                     $('thead th', gridParent).resizable({
                         handles: 'e',
@@ -354,7 +357,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     //console.log(response, status, xhr);
                                 }
                             );
-                            colModel = columnsCollection.findWhere({name: $el.data('id')});
+                            var colModel = columnsCollection.findWhere({name: $el.data('id')});
                             colModel.set('width', width);
                             //$(ev.target).append('<div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div>');
                             return true;
@@ -371,10 +374,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 },
                 _selectAllRow: function (ev) {
-                    var checked = $('.select-all').hasClass('active');
+                    var eleSelectAll = $('.select-all');
+                    var checked = eleSelectAll.hasClass('active');
                     if (checked) {
 //                        $('.select-all').removeAttr('checked', 'checked');
-                        $('.select-all').removeClass('active');
+                        eleSelectAll.removeClass('active');
                         gridView.collection.models.forEach(function (model, i) {
                             $('#' + config.id).find('input[type="checkbox"]').removeAttr('checked', 'checked');
                             selectedRows.remove(model, {silent: true});
@@ -388,13 +392,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         })
 
                     } else {
-
                         gridView.collection.models.forEach(function (model, i) {
                             $('#' + config.id).find('input[type="checkbox"]').attr('checked', 'checked');
                             selectedRows.add(model);
                         })
-                        $('.select-all').children('input').attr('checked', 'checked');
-                        $('.select-all').addClass('active');
+                        eleSelectAll.children('input').attr('checked', 'checked');
+                        eleSelectAll.addClass('active');
                     }
                     return true;
 
@@ -743,7 +746,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _selectRow: function (ev) {
                     var checked = $(ev.target).is(':checked');
                     this.model.set('selected', checked);
-                    console.log(this.model.set);
                     if (checked) {
                         selectedRows.add(this.model);
                     } else {
@@ -2008,12 +2010,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             }*/
 
             //action show all , show selected
-            $('#action li').click(function () {
+            $('#action li').on('click', function () {
                 var key = $(this).attr('data-content');
                 $('#action').find('i.icon-space').removeClass('icon-ok');
                 $(this).children('a').find('i.icon-space').addClass('icon-ok');
                 switch (key) {
                     case 'show-all':
+                        console.log('show-all');
                         if (BackboneGrid.showingSelected) {
                             BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                             rowsCollection.originalRows = BackboneGrid.prev_originalRows;
@@ -2028,6 +2031,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         }
                         break;
                     case 'show-selected':
+                        console.log('show-selected');
                         if (!BackboneGrid.showingSelected) {
                             //console.log('show_sel!');
                             BackboneGrid.prev_data_mode = BackboneGrid.data_mode;

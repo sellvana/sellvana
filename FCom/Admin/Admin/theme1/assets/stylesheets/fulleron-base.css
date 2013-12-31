@@ -2509,7 +2509,13 @@ body.login {
 .badge-inverse[href] {
   background-color:#232323; }
 
-.table-bordered th:first-child {min-width:100px;}
+.table-bordered th:first-child {
+    min-width: 100px;
+}
+.table-bordered th.select-cell, .table-bordered td.select-cell {
+    min-width: 65px;
+    text-align: center;
+}
 .ui-resizable-handle {
   float:right;
   width:15px;
