@@ -184,7 +184,11 @@
     if(col.overflow) {
       overflow = ' style="overflow:hidden;"';
     }
-    print('<td data-col="'+col.name+'" '+overflow +'>');
+    var cssClass = '';
+    if (col.cell === 'select-row') {
+      cssClass = ' class="select-cell"';
+    }
+    print('<td data-col="'+col.name+'" '+cssClass+' '+overflow +'>');
 
     if (col.cell === 'select-row') {
         var isSelected = '';
