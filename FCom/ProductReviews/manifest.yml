@@ -8,7 +8,7 @@ modules:
 
         auto_use: [ layout, views ]
         views:
-            - [ grid, { view_class: FCom_Core_View_BackboneGrid } ]
+            - [ prodreviews/grid, { view_class: FCom_Core_View_BackboneGrid } ]
 
         areas:
             FCom_Admin:

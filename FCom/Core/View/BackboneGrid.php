@@ -812,7 +812,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
             $fId = $f['field'];
 
-            if (isset($filters[$fId]) && !empty($f['type']) && !empty($filters[$fId]['val']) && $filters[$fId]['val'] !== '') {
+            if (isset($filters[$fId]) && !empty($f['type']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
 
                 switch ($f['type']) {
                     case 'text':
