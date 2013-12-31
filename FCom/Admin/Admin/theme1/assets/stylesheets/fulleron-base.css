@@ -1524,18 +1524,6 @@ ul > li > a > i.error{
   display:inline;
   margin-right:15px;
 }
-.pagination-wrapper {
-    display: inline-block;
-}
-.f-grid-display-type {
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-}
-.f-grid-display-type .icon-space {
-    width: 20px;
-    display: inline-block;
-}
 .f-grid-top-filters { margin:7px 0 0; }
 .f-grid-filter div.select2-container {
   font-weight:600;
@@ -2509,13 +2497,7 @@ body.login {
 .badge-inverse[href] {
   background-color:#232323; }
 
-.table-bordered th:first-child {
-    min-width: 100px;
-}
-.table-bordered th.select-cell, .table-bordered td.select-cell {
-    min-width: 65px;
-    text-align: center;
-}
+.table-bordered th:first-child {min-width:100px;}
 .ui-resizable-handle {
   float:right;
   width:15px;
