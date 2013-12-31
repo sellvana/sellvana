@@ -148,7 +148,10 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Admin_Controller_A
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('prodreviews/grid')->set(array('actions' => array('new' => '')));
+        $this->view('prodreviews/grid')->set(array(
+                'title' => $this->_gridTitle,
+                'actions' => array('new' => '')
+            ));
     }
 
     public function inputRatingHtml($name)
