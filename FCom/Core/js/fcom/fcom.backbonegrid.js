@@ -2010,8 +2010,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             //action show all , show selected
             $('#action li').click(function () {
                 var key = $(this).attr('data-content');
-                $('#action').find('i.icon-ok').remove();
-                $(this).children('a').prepend('<i class="icon-ok"></i>');
+                $('#action').find('i.icon-space').removeClass('icon-ok');
+                $(this).children('a').find('i.icon-space').addClass('icon-ok');
                 switch (key) {
                     case 'show-all':
                         if (BackboneGrid.showingSelected) {
@@ -2019,7 +2019,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                             BackboneGrid.showingSelected = false;
                             if (BackboneGrid.data_mode !== 'local') {
-                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'block');
+                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination-wrapper').css('display', 'inline-block');
                                 rowsCollection.fetch({reset: true});
                             } else {
                                 rowsCollection.filter();
@@ -2034,7 +2034,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                             BackboneGrid.showingSelected = true;
                             if (BackboneGrid.data_mode !== 'local') {
-                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                                $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' div.pagination-wrapper').css('display', 'none');
                             }
 
                             BackboneGrid.data_mode = 'local';
