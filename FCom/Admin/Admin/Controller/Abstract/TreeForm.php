@@ -149,7 +149,13 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
             $model->set(BRequest::i()->post('model'))
                 ->set(array('url_path'=>null, 'full_name'=>null));
 
-
+            if (BRequest::i()->post('action') === 'clone') {
+                $parent = $model->parent();
+                $cloneName = $model->get('node_name').'-1';
+                $cloned = $parent->createChild($cloneName);
+                $cloned->set(BUtil::arrayMask($model->as_array(), 'id,id_path,node_name,full_name,sort_order,url_key,url_path', true));
+                $model = $cloned;
+            }
 
             //TODO figure out why validation always return false
             //if ($model->validate()) {
