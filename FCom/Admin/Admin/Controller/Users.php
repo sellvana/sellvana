@@ -128,7 +128,7 @@ class FCom_Admin_Admin_Controller_Users extends FCom_Admin_Admin_Controller_Abst
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true),
             array('name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250),
-            array('name' => 'email', 'label' => 'Local SKU', 'index' => 'au.email', 'width' => 100),
+            array('name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100),
             array('name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100, 'editable' => true, 'mass-editable' => true,
                   'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status'))
         );

@@ -21,7 +21,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-2 control-label" for="model-local-sku">{{ 'Local SKU'|_ }}</label>
+        <label class="col-md-2 control-label" for="model-local-sku">{{ 'SKU'|_ }}</label>
         <div class="col-md-5">
             <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" data-rule-required="true" value="{{ validator.fieldValue('local_sku') }}" />
         </div>
@@ -302,7 +302,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = this.model.langFields.pluck('lang_code');
-            var html = 'Set Locale...'
+            var html = 'Translations...'
             if(langs.length>0) {
                 html = langs.join(',');
             }

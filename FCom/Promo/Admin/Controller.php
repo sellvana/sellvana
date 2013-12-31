@@ -238,7 +238,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'product_name',
                    'width'=> 450, 'addable' => true ),
-            array( 'name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'local_sku', 'width' => 70 ),
+            array( 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'local_sku', 'width' => 70 ),
         );
         $actions = array(
             'add'    => array( 'caption' => 'Add products' ),

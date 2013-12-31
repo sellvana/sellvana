@@ -227,7 +227,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true),
                     array('name' => 'product_name', 'label' => 'Name', 'width' => 400),
-                    array('name' => 'local_sku', 'label' => 'Local SKU', 'width' => 200),
+                    array('name' => 'local_sku', 'label' => 'SKU', 'width' => 200),
                     array('name' => 'price', 'label' => 'Price', 'width' => 100),
                     array('name' => 'qty', 'label' => 'Qty', 'width' => 100),
                     array('name' => 'total', 'label' => 'Total', 'width' => 150),

@@ -18,7 +18,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             array('name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
                 'print'=>'"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable'=>false),
             array('name'=>'product_name', 'label'=>'Name', 'width'=>250),
-            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
+            array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
             array('name'=>'short_description', 'label'=>'Description',  'width'=>200),
             array('name'=>'base_price', 'label'=>'Base Price',  'width'=>100,'hidden'=>true),
             array('name'=>'sale_price', 'label'=>'Sale Price',  'width'=>100,'hidden'=>true),
@@ -149,7 +149,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
                    'width'=> 450, 'addable' => true ),
-            array( 'name' => 'local_sku', 'label' => 'Local SKU', 'index' => 'p.local_sku', 'width' => 70 ),
+            array( 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 70 ),
         );
 
 //        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
@@ -264,7 +264,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250),
-            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>100),
+            array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
         );
         $config['actions'] = array(
             'add'=>array('caption'=>'Add selected products')
@@ -305,7 +305,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
             array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
-            array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>200)
+            array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200)
         );
         $config['actions'] = array(
             'add'=>array('caption'=>'Add products'),
@@ -351,7 +351,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
-                    array('name'=>'local_sku', 'label'=>'Local SKU', 'index'=>'p.local_sku', 'width'=>200),
+                    array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200),
                     array('name'=>'base_price', 'label'=>'Base Price', 'index'=>'p.base_price'),
                     array('name'=>'sale_price', 'label'=>'Sale Price', 'index'=>'p.sale_price'),
                     array('name' => 'position', 'label' => 'Position', 'index' => 'p.position'),
