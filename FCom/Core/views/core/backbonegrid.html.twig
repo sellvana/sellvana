@@ -283,12 +283,14 @@
                   <% if (rc.selectedCount>0) { %>
                     <i class="glyphicon glyphicon-check"></i>
                   <% } else { %>
-                    <i class="glyphicon glyphicon-align-justify"></i>
+                    <i class="glyphicon glyphicon-list"></i>
                   <% } %>
               </span>
               <span class="title">
                   <% if (rc.selectedCount>0) { %>
                     <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+                  <% } else { %>
+                    A
                   <% } %>
               </span>
               <span class="caret"></span>
