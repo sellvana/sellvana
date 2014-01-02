@@ -211,11 +211,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 //function to show All,Selected or Unselelected rows
                 _showAction: function (eleSelected) {
                     var key = $(eleSelected).attr('href').replace('#', '');
+                    var displayType = $('.f-grid-display-type');
                     switch (key) {
                         case 'show_all':
                             console.log('show_all!!!');
                             if (BackboneGrid.showingSelected) {
-                                $('.f-grid-display-type').find('span.title').html('A');
+                                displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-list"></i>');
+                                displayType.find('span.title').html('A');
                                 BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                                 rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                                 BackboneGrid.showingSelected = false;
@@ -229,7 +231,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             break;
                         case 'show_sel':
                             if (!BackboneGrid.showingSelected) {
-                                $('.f-grid-display-type').find('span.title').html('S');
+                                displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-th-list"></i>');
+                                displayType.find('span.title').html('S');
                                 //console.log('show_sel!');
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
                                 BackboneGrid.prev_originalRows = rowsCollection.originalRows;
