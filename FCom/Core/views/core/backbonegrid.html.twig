@@ -268,18 +268,37 @@
   } %>
 </script>
 
+{% set multiselectToggleOptions = THIS.multiselectToggleOptions() %}
+{% set multiselectCurrent = THIS.multiselectCurrent() %}
+
 <script type='template' id="{{ config.id | raw }}-header-template">
   <% if(rc.type === '' || rc.type === 'default') { %>
     <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
       <%- rc.label %>
     <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %> </a> <% } %>
   <% } else if (rc.type === 'multiselect') { %>
-   <% if (rc.selectedCount>0) { %>
-      <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
-    <% } %>
-    <select class="{{ config.id | raw }} js-sel">
-      {{ UTIL.optionsHtml(THIS.multiselectToggleOptions(), THIS.multiselectCurrent()) | raw }}
-    </select>
+      <div class="{{ config.id | raw }} dropdown f-grid-display-type">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+              <span class="icon-placeholder">
+                  <% if (rc.selectedCount>0) { %>
+                    <i class="glyphicon glyphicon-check"></i>
+                  <% } else { %>
+                    <i class="glyphicon glyphicon-align-justify"></i>
+                  <% } %>
+              </span>
+              <span class="title">
+                  <% if (rc.selectedCount>0) { %>
+                    <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+                  <% } %>
+              </span>
+              <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu js-sel">
+              {% for key, option in multiselectToggleOptions %}
+                <li><a href="#{{ key }}">{{ option }}</a></li>
+              {% endfor %}
+          </ul>
+      </div>
   <% } %>
 </script>
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
