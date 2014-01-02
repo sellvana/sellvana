@@ -53,7 +53,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function multiselectToggleOptions()
     {
         return array(
-            ''=>'',
             'show_all' => 'Show All',
             'show_sel' => 'Show Selected',
             'upd_sel' => 'Select Visible',

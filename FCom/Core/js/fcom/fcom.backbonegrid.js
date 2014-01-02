@@ -151,7 +151,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 events: {
                     'click a': '_changesortState',
-                    'change select.js-sel': '_checkAction'
+                    'change select.js-sel': '_checkAction',
+                    'click ul.dropdown-menu.js-sel>li>a': '_checkAction'
                 },
                 initialize: function () {
                     // this.model.on('change', this, this);
@@ -197,11 +198,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     gridView.$el.find('input.select-row:not([disabled])').prop('checked', flag);
                 },
                 _checkAction: function (ev) {
-
-                    if ($(ev.target).val().indexOf('upd') !== -1)
-                        this._selectAction();
+                    if ($(ev.target).attr('href').indexOf('upd') !== -1)
+                        this._selectAction(ev.target);
                     else
-                        this._showAction();
+                        this._showAction(ev.target);
 
                     ev.stopPropagation();
                     ev.preventDefault();
@@ -209,12 +209,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 //function to show All,Selected or Unselelected rows
-                _showAction: function () {
-                    var key = this.$el.find('select.js-sel').val();
+                _showAction: function (eleSelected) {
+                    var key = $(eleSelected).attr('href').replace('#', '');
                     switch (key) {
                         case 'show_all':
                             console.log('show_all!!!');
                             if (BackboneGrid.showingSelected) {
+                                $('.f-grid-display-type').find('span.title').html('A');
                                 BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                                 rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                                 BackboneGrid.showingSelected = false;
@@ -224,11 +225,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 } else {
                                     rowsCollection.filter();
                                 }
-
-                            }Filter
+                            }
                             break;
                         case 'show_sel':
                             if (!BackboneGrid.showingSelected) {
+                                $('.f-grid-display-type').find('span.title').html('S');
                                 //console.log('show_sel!');
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
                                 BackboneGrid.prev_originalRows = rowsCollection.originalRows;
@@ -258,8 +259,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(BackboneGrid.MassEditButton).addClass('disabled');
                 },
                 //function to select or unselect all rows of page and empty selected rows
-                _selectAction: function () {
-                    var key = this.$el.find('select.js-sel').val();
+                _selectAction: function (eleSelected) {
+                    var key = $(eleSelected).attr('href').replace('#', '');
                     switch (key) {
                         case 'upd_sel': //select all rows of a page
                             this._selectPageAction(true);
