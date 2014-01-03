@@ -15,6 +15,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=:id')),
+            array('name' => 'admin_name', 'index'=>'o.admin_id', 'label' => 'Assisted by'),
             array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
             array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'ab.billing_name'),
             array('name' => 'billing_address', 'label'=>'Bill to Address', 'index'=>'ab.billing_address'),
@@ -59,6 +60,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Admin_Controller_Abs
         $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
             ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)','shipping_name')
             ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)','shipping_address');
+
+        $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
+            ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)','admin_name');
 
         $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os')
             ->select(array('os_name' => 'os.name'));
