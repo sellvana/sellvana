@@ -27,9 +27,22 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controlle
             if ($customerModel->validate($r, array(), 'frontend')) {
                 $user = $customerModel->authenticate($r['email'], $r['password']);
                 if ($user) {
-                    $user->login();
+                    switch ($user->status) {
+                        case 'active':
+                            $user->login();
+                            break;
+                        case 'review':
+                            throw new Exception($this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.'));
+                            break;
+                        case 'disabled':
+                            throw new Exception($this->_('Your account is disabled. Please contact us for more details.'));
+                            break;
+                        default:
+                            throw new Exception($this->_('Your account status have problem. Please contact us for more details.'));
+                            break;
+                    }
                 } else {
-                    throw new Exception('Invalid email or password.');
+                    throw new Exception($this->_('Invalid email or password.'));
                 }
             } else {
                 $this->formMessages();
