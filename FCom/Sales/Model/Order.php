@@ -191,6 +191,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         $orderData                    = array();
         $orderData['cart_id']         = $cart->id();
+        $orderData['admin_id']        = $cart->admin_id;
         $orderData['customer_id']     = $cart->customer_id;
         $orderData['item_qty']        = $cart->item_qty;
         $orderData['subtotal']        = $cart->subtotal;

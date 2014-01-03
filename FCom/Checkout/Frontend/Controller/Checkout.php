@@ -135,6 +135,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Frontend_
             //$cart->coupon_code = $post['coupon_code'];
         }
 
+        //set assisted user
+        $adminUserId = FCom_Admin_Model_User::i()->sessionUserId();
+        if ($adminUserId) {
+            $cart->admin_id = $adminUserId;
+        }
+
         if (!empty($post['shipping'])) {
             $shipping = explode(":", $post['shipping']);
             $cart->setShippingMethod($shipping[0]);

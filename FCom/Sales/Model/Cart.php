@@ -25,6 +25,7 @@
  * @property string $update_at
  * @property string $data_serialized
  * @property string $last_calc_at
+ * @property string $admin_id
  *
  * other property
  * @property int shipping_same flag to know shipping is same as billing
