@@ -791,12 +791,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
-
-
         if (empty($config['filters'])) {
             return;
         }
-
+        $columnData = $this->findColumnDataForFilters($config);
         foreach ($config['filters'] as $fId=>$f) {
             $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
@@ -812,7 +810,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $fId = $f['field'];
 
             if (isset($filters[$fId]) && !empty($f['type']) && isset($filters[$fId]['val']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
-
+                if (isset($columnData[$f['field']]['index'])){
+                    $f['field'] = $columnData[$f['field']]['index'];
+                }
                 switch ($f['type']) {
                     case 'text':
                         $val = $filters[$fId];
