@@ -32,9 +32,9 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
                 'msg' => !empty($m['msg']) ? $m['msg'] : null,
                 'msgs' => !empty($m['msgs']) ? $m['msgs'] : null,
                 'class' => !empty($this->_classes[$m['type']]) ? $this->_classes[$m['type']] : $m['type'],
-                'title' => !empty($m['title']) ? $m['title'] :
+                'title' => isset($m['title']) ? $m['title'] :
                     (!empty($this->_titles[$m['type']]) ? BLocale::_($this->_titles[$m['type']]) : null),
-                'icon' => !empty($m['icon']) ? $m['icon'] :
+                'icon' => isset($m['icon']) ? $m['icon'] :
                     (!empty($this->_icons[$m['type']]) ? BLocale::_($this->_icons[$m['type']]) : $m['type']),
             );
         }

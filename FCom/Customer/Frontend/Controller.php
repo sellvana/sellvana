@@ -29,17 +29,27 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controlle
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
-                            $user->login();
+                            $allowLogin = true;
+                            $errorMessage = '';
                             break;
                         case 'review':
-                            throw new Exception($this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.'));
+                            $allowLogin = false;
+                            $errorMessage = $this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
                             break;
                         case 'disabled':
-                            throw new Exception($this->_('Your account is disabled. Please contact us for more details.'));
+                            $allowLogin = false;
+                            $errorMessage = $this->_('Your account is disabled. Please contact us for more details.');
                             break;
                         default:
-                            throw new Exception($this->_('Your account status have problem. Please contact us for more details.'));
+                            $allowLogin = false;
+                            $errorMessage = $this->_('Your account status have problem. Please contact us for more details.');
                             break;
+                    }
+                    if ($allowLogin) {
+                        $user->login();
+                    } else {
+                        BSession::i()->addMessage($errorMessage, 'error', 'frontend', array('title' => ''));
+                        BResponse::i()->redirect('login');
                     }
                 } else {
                     throw new Exception($this->_('Invalid email or password.'));
