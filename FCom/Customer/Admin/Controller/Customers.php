@@ -81,9 +81,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
         $resize_url = FCom_Core_Main::i()->resizeUrl();
         $silhouetteImg = $resize_url.'?f='.urlencode(trim($media.'/silhouette.jpg', '/')).'&s=98x98';
-
+        $actions = $args['view']->get('actions');
         if ($m->id) {
-            $actions = array_merge($args['view']->get('actions'), array(
+            $actions = array_merge($actions, array(
                     'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
                                         href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
                 ));
