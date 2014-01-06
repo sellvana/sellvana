@@ -23,7 +23,7 @@
                 }
             }
 
-            $('#categories-tree-form ul.nav-tabs').find('li a').each(function(index) {
+            mainForm.find('ul.nav-tabs').find('li a').each(function(index) {
                 var val = info[$(this).attr('href')];
 
                 if (typeof(val) !== 'undefined')
@@ -77,7 +77,7 @@
             }
         });
         elem.on('change', function () {
-            $('#categories-tree-form ul.nav-tabs').find('li.active').each(function () {
+            mainForm.find('ul.nav-tabs').find('li.active').each(function () {
                 if ($(this).children('a').find('i.icon-pencil').length === 0) {
                     if ($(this).children('a').children('i.error').length !== 0) {
                         $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
@@ -86,7 +86,36 @@
                     }
                 }
             })
-        })
+        });
+
+        var categoriesTree = FCom.Admin.load('trees', '#categories');
+        if (categoriesTree) {
+            $('.tree-action').find('a').on('click', function(){
+                var action = $(this).attr('rel');
+                var selected = categoriesTree.jstree('get_selected');
+                switch (action) {
+                    case 'create':
+                        categoriesTree.jstree('create', selected, 'inside', { data: 'New Node'}, false, false);
+                        break;
+                    case 'rename':
+                        categoriesTree.jstree('rename', selected);
+                        break;
+                    case 'remove':
+                        categoriesTree.jstree('remove', selected);
+                        break;
+                    case 'clone':
+                        var parentSelected = $.jstree._focused()._get_parent();
+                        categoriesTree.jstree('copy', selected);
+                        categoriesTree.jstree('paste', parentSelected);
+                        break;
+                    case 'reorder':
+                        categoriesTree.trigger('reorder.jstree', selected);
+                        break;
+                    case 'refresh':
+                        categoriesTree.jstree('refresh', selected);
+                }
+            });
+        }
     });
 
 </script>
@@ -97,6 +126,17 @@
     <div class="btn-group">
       <!--<button class="btn btn-default btn-sm" id="category_clone" type="submit" name="action" value="clone">{{ 'Clone'|_ }}</button>-->
       <button class="btn btn-primary btn-sm" id="category_save" type="submit" name="action" value="save">{{ 'Save'|_ }}</button>
+    </div>
+  </div>
+  <div class="tree-action">
+    <div class="btn-group">
+      <a href="#" rel="create" class="btn btn-primary">{{ 'Create' }}</a>
+      <a href="#" rel="rename" class="btn btn-primary">{{ 'Rename' }}</a>
+      <a href="#" rel="remove" class="btn btn-primary">{{ 'Delete' }}</a>
+      <a href="#" rel="clone" class="btn btn-primary">{{ 'Clone' }}</a>
+      <a href="#" rel="select" class="btn btn-primary">{{ 'Select' }}</a>
+      <a href="#" rel="reorder" class="btn btn-primary">{{ 'Reorder A-Z' }}</a>
+      <a href="#" rel="refresh" class="btn btn-primary">{{ 'Refresh' }}</a>
     </div>
   </div>
   <div class="nav">
