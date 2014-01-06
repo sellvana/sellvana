@@ -88,7 +88,7 @@ class FCom_Admin_Admin_Controller_Modules extends FCom_Admin_Admin_Controller_Ab
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40, 'overflow' => true),
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
             array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
