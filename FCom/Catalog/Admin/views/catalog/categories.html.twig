@@ -48,9 +48,9 @@
 
             FCom.Admin.tree('#categories', {
                 url:'{{ APP.href('catalog/categories/tree_data') }}',
-                on_click: function (n) { loadForm(n.attr('id')); } ,
+                on_click: function (n) { loadForm($(n).attr('id')); } ,
                 //, on_dblclick: function (n) { loadForm(n.attr('id')); }
-                on_select: function (n) { loadForm(n.attr('id')); },
+                on_select: function (n) { loadForm($(n).attr('id')); },
                 lock_flag: '#categories-tree-lock',
                 create_lock: true
             });

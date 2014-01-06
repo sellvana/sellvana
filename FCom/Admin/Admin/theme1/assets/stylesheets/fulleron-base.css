@@ -2686,6 +2686,14 @@ a.dropdown-toggle {
   background:#64a8ef !important;
   color:#fff;
   }
+.f-tree-layout .f-admin-main-content .tree-action {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+.f-tree-layout .f-admin-main-content .btn-group .btn {
+    padding: 10px 40px;
+}
 label[for="categories-tree-lock"],
 label[for="nav-tree-lock"] {
   color:#d40000;

@@ -406,12 +406,64 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
 
         if (!opt) return FCom.Admin.load('trees', el);
 
-        function checkLock(e) {
+        function checkLock() {
             if (opt.lock_flag && $(opt.lock_flag).get(0).checked) {
                 alert('Locked');
                 return false;
             }
             return true;
+        }
+
+        function reorder(node) {
+            console.log('node', node);
+            if (!checkLock()) return;
+            function postReorder(recursive) {
+                $.post(opt.url, {
+                    operation: 'reorderAZ',
+                    id: $(node).attr("id").replace("node_", ""),
+                    recursive: recursive ? 1 : ''
+                }, function (data) {
+                    el.jstree('refresh', node);
+                });
+            }
+
+            //use boostraps modal box
+            var reorderModalContent = '<div class="modal fade" id="jstree-reorder" tabindex="-1" role="dialog" aria-hidden="true">' +
+                '   <div class="modal-dialog">' +
+                '       <div class="modal-content">' +
+                '           <div class="modal-header">' +
+                '               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+                '               <h4 class="modal-title">Reorder A-Z</h4>' +
+                '           </div>' +
+                '           <div class="modal-body"></div>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>';
+            //trigger modal dialog
+            $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
+                .on('shown.bs.modal', function () {
+                    $('<button></button>', {
+                        type: 'button',
+                        click: function () {
+                            postReorder(false);
+                        },
+                        text: 'Only immediate children',
+                        'data-dismiss': 'modal',
+                        class: 'btn btn-default'
+                    }).button().appendTo('#jstree-reorder .modal-body');
+                    $('<button></button>', {
+                        type: 'button',
+                        click: function () {
+                            postReorder(true);
+                        },
+                        text: 'All descendants',
+                        'data-dismiss': 'modal',
+                        class: 'btn btn-default'
+                    }).button().appendTo('#jstree-reorder .modal-body');
+                })
+                .on('hidden.bs.modal', function () {
+                    $(this).remove()
+                });
         }
 
         var plugins = ["themes", "json_data", "ui", "crrm", "cookies", "dnd", "search", "types", "hotkeys", "contextmenu"];
@@ -451,62 +503,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         el.trigger('select.jstree', [n]);
                     }},
                     'reorder': {label: 'Reorder A-Z', separator_before: true, action: function (n) {
-                        if (!checkLock()) return;
-                        function reorder(recursive) {
-                            $.post(opt.url, {
-                                operation: 'reorderAZ',
-                                id: n.attr("id").replace("node_", ""),
-                                recursive: recursive ? 1 : ''
-                            }, function (data) {
-                                el.jstree('refresh', n);
-                            });
-                        }
-
-                        /*$('<div title="Reorder A-Z"></div>').dialog({
-                            resizable:false, height:140, modal:true, buttons: {
-                                'Only immediate children': function() { reorder(false); $(this).dialog( "close" ); },
-                                'All descendants': function() { reorder(true); $(this).dialog( "close" ); },
-                                'abc' : function() { alert('test'); $(this).dialog("close")}
-                            }
-                        });*/
-
-                        //use boostraps modal box
-                        var reorderModalContent = '<div class="modal fade" id="jstree-reorder" tabindex="-1" role="dialog" aria-hidden="true">' +
-                            '   <div class="modal-dialog">' +
-                            '       <div class="modal-content">' +
-                            '           <div class="modal-header">' +
-                            '               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                            '               <h4 class="modal-title">Reorder A-Z</h4>' +
-                            '           </div>' +
-                            '           <div class="modal-body"></div>' +
-                            '       </div>' +
-                            '   </div>' +
-                            '</div>';
-                        //trigger modal dialog
-                        $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
-                            .on('shown.bs.modal', function () {
-                                $('<button></button>', {
-                                    type: 'button',
-                                    click: function () {
-                                        reorder(false);
-                                    },
-                                    text: 'Only immediate children',
-                                    'data-dismiss': 'modal',
-                                    class: 'btn btn-default'
-                                }).button().appendTo('#jstree-reorder .modal-body');
-                                $('<button></button>', {
-                                    type: 'button',
-                                    click: function () {
-                                        reorder(true);
-                                    },
-                                    text: 'All descendants',
-                                    'data-dismiss': 'modal',
-                                    class: 'btn btn-default'
-                                }).button().appendTo('#jstree-reorder .modal-body');
-                            })
-                            .on('hidden.bs.modal', function () {
-                                $(this).remove()
-                            });
+                        reorder(n);
                     }},
                     'refresh': {label: 'Refresh', separator_before: true, action: function (n) {
                         el.jstree('refresh', n);
@@ -622,6 +619,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             .bind("select.jstree", function (ev, node) {
                 console.log(ev, node);
                 if (typeof opt.on_select !== 'undefined') opt.on_select(node);
+            })
+            .bind("reorder.jstree", function(ev, node) {
+                reorder(node);
             })
             /*    .bind("check_node.jstree", function (e, data) {
                     data.rslt.obj.each(function () {
