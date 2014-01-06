@@ -1905,9 +1905,10 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
     * @param string $msg
     * @param string $type
     * @param string $tag
+    * @param array $options
     * @return BSession
     */
-    public function addMessage($msg, $type='info', $tag='_')
+    public function addMessage($msg, $type='info', $tag='_', $options = array())
     {
         $this->setDirty();
         $message = array('type' => $type);
@@ -1915,6 +1916,12 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
             $message['msgs'] = $msg;
         } else {
             $message['msg'] = $msg;
+        }
+        if (isset($options['title'])) {
+            $message['title'] = $options['title'];
+        }
+        if (isset($options['icon'])) {
+            $message['icon'] = $options['icon'];
         }
         $this->data['_messages'][$tag][] = $message;
         return $this;
