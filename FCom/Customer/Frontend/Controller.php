@@ -156,9 +156,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controlle
                 if ($a) {
                     FCom_Customer_Model_Address::i()->import($a, $customer);
                 }
-                $customer->login();
-                BSession::i()->addMessage($this->_('Thank you for your registration'), 'success', 'frontend');
-                BResponse::i()->redirect(BApp::href('customer/myaccount'));
+//                $customer->login();
+                BSession::i()->addMessage($this->_('Thank you for your registration. Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.'), 'success', 'frontend');
+//                BSession::i()->addMessage($this->_('Thank you for your registration'), 'success', 'frontend');
+//                BResponse::i()->redirect(BApp::href('customer/myaccount'));
+                BResponse::i()->redirect(BApp::href('customer/register'));
             } else {
                 BSession::i()->addMessage($this->_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
                 $this->formMessages($formId);
