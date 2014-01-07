@@ -125,9 +125,11 @@
   </div>
 
 <script type="template" id="{{ config.id }}-modal-element-template">
+    <% if (typeof(rc.form_hidden_label) === 'undefined' || !rc.form_hidden_label) { %>
     <div class="control-label col-sm-3">
       <label for="<%- rc.name %>"><%- rc.label%></label>
     </div>
+    <% } %>
     <div class="controls col-sm-8">
       <% if (typeof(rc.element_print) !== 'undefined') {
         print(rc.element_print);
