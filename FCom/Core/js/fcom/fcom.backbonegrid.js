@@ -5,6 +5,9 @@ function validationRules(rules) {
             case 'required':
                 str += 'data-rule-required="true" ';
                 break;
+            case 'email':
+                str += 'data-rule-email="true" ';
+                break;
             case 'number':
                 str += 'data-rule-number="true" ';
                 break;
