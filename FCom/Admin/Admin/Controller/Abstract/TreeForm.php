@@ -21,25 +21,25 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
         $r = BRequest::i();
         $result = null;
         switch ($r->get('operation')) {
-        case 'get_children':
-            if ($r->get('id')=='NULL') {
-                $result = $this->_nodeChildren(null, 1);
-                /*
-                $rootNodes = $class::i()->orm()->where_null('parent_id')->find_many();
-                $result = array(
-                    'data' => $node->node_name?$node->node_name:'ROOT',
-                    'attr' => array('id'=>$node->id),
-                    'state' => 'open',
-                    'rel' => 'root',
-                    'children' => $this->_nodeChildren($node, $r->get('expanded')=='true'?10:0),
-                );
-                */
-            } else {
-                $node = $class::i()->load($r->get('id'));
-                $node->descendants();
-                $result = $this->_nodeChildren($node, 100);
-            }
-            break;
+            case 'get_children':
+                if ($r->get('id')=='NULL') {
+                    $result = $this->_nodeChildren(null, 1);
+                    /*
+                    $rootNodes = $class::i()->orm()->where_null('parent_id')->find_many();
+                    $result = array(
+                        'data' => $node->node_name?$node->node_name:'ROOT',
+                        'attr' => array('id'=>$node->id),
+                        'state' => 'open',
+                        'rel' => 'root',
+                        'children' => $this->_nodeChildren($node, $r->get('expanded')=='true'?10:0),
+                    );
+                    */
+                } else {
+                    $node = $class::i()->load($r->get('id'));
+                    $node->descendants();
+                    $result = $this->_nodeChildren($node, 100);
+                }
+                break;
         }
         BResponse::i()->json($result);
     }
@@ -72,52 +72,72 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
             if (!($node = $class::i()->load($r->post('id')))) {
                 throw new BException('Invalid ID');
             }
+            /** @var $node FCom_Core_Model_TreeAbstract */
             $result = array('status'=>1);
 
             $eventName = static::$_origClass.'::action_tree_data__POST.'.$r->post('operation');
             BEvents::i()->fire($eventName.'.before', $r->post());
 
             switch ($r->post('operation')) {
-            case 'create_node':
-                $child = $node->createChild($r->post('title'));
-                $node->cacheSaveDirty();
-                $result['id'] = $child->id;
-                break;
-
-            case 'rename_node':
-                if ($node->id<2) throw new BException("Can't rename root");
-                $node->rename($r->post('title'), true);
-                $node->cacheSaveDirty();
-                break;
-
-            case 'move_node':
-                if ($node->id<2) throw new BException("Can't move root");
-                if ($r->post('ref')!=$node->parent()->id) $node->move($r->post('ref'));
-                if ($r->post('position')!==null) $node->reorder($r->post('position')+1);
-                $node->cacheSaveDirty();
-                break;
-
-            case 'remove_node':
-                if ($node->id<2) throw new BException("Can't remove root");
-                $node->delete();
-                break;
-
-           /* case 'check_node': case 'uncheck_node':
-                $product_id = $r->get('id');
-                if (!$product_id) {
+                case 'create_node':
+                    if ($node->validateNodeName($r->post('title'), true)) {
+                        $child = $node->createChild($r->post('title'));
+                        $node->cacheSaveDirty();
+                        $result['id'] = $child->id;
+                    } else {
+                        $result = array('status' => 0, 'message'=> $this->_("Can't create node duplicate name node."));
+                    }
                     break;
-                }
 
-                break;*/
-            default:
-                if (!BEvents::i()->fire($eventName, $r->post())) {
-                    throw new BException('Not implemented');
-                }
+                case 'rename_node':
+                    if ($node->id < 2) {
+                        throw new BException($this->_("Can't rename root"));
+                    }
+                    if ($node->validateNodeName($r->post('title'))) {
+                        $node->rename($r->post('title'), true);
+                        $node->cacheSaveDirty();
+                    } else {
+                        $result = array('status' => 0, 'message'=> $this->_("Can't rename duplicate name node."));
+                    }
+
+                    break;
+
+                case 'move_node':
+                    if ($node->id < 2) {
+                        throw new BException("Can't move root");
+                    }
+                    if ($r->post('ref') != $node->parent()->id) {
+                        $node->move($r->post('ref'));
+                    }
+                    if ($r->post('position') !== null) {
+                        $node->reorder($r->post('position') + 1);
+                    }
+                    $node->cacheSaveDirty();
+                    break;
+
+                case 'remove_node':
+                    if ($node->id < 2) {
+                        throw new BException("Can't remove root");
+                    }
+                    $node->delete();
+                    break;
+
+                /* case 'check_node': case 'uncheck_node':
+                     $product_id = $r->get('id');
+                     if (!$product_id) {
+                         break;
+                     }
+
+                     break;*/
+                default:
+                    if (!BEvents::i()->fire($eventName, $r->post())) {
+                        throw new BException('Not implemented');
+                    }
             }
 
             BEvents::i()->fire($eventName.'.after', $r->post());
         } catch (Exception $e) {
-            $result = array('status'=>0, 'message'=>$e->getMessage());
+            $result = array('status' => 0, 'message' => $e->getMessage());
         }
         BResponse::i()->json($result);
     }
