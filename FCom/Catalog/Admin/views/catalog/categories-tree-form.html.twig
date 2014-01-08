@@ -104,9 +104,7 @@
                         categoriesTree.jstree('remove', selected);
                         break;
                     case 'clone':
-                        var parentSelected = $.jstree._focused()._get_parent();
-                        categoriesTree.jstree('copy', selected);
-                        categoriesTree.jstree('paste', parentSelected);
+                        categoriesTree.trigger('clone.jstree', selected);
                         break;
                     case 'reorder':
                         categoriesTree.trigger('reorder.jstree', selected);

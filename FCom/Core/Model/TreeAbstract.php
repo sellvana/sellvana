@@ -152,14 +152,28 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function onBeforeSave()
     {
-        if (!parent::onBeforeSave()) return false;
+        if (!parent::onBeforeSave()) {
+            return false;
+        }
 
-        if (!$this->id()) $this->_new = true;
-        if (!$this->get('sort_order')) $this->generateSortOrder();
-        if (!$this->get('url_key')) $this->generateUrlKey();
-        if (!$this->get('url_path') || $this->is_dirty('url_key')) $this->generateUrlPath();
-        if (!$this->get('full_name') || $this->is_dirty('node_name')) $this->generateFullName();
-        if ($this->is_dirty('id_path')) $this->set('level', sizeof(explode('/', $this->get('id_path')))-1);
+        if (!$this->id()) {
+            $this->_new = true;
+        }
+        if (!$this->get('sort_order')) {
+            $this->generateSortOrder();
+        }
+        if (!$this->get('url_key')) {
+            $this->generateUrlKey();
+        }
+        if (!$this->get('url_path') || $this->is_dirty('url_key')) {
+            $this->generateUrlPath();
+        }
+        if (!$this->get('full_name') || $this->is_dirty('node_name')) {
+            $this->generateFullName();
+        }
+        if ($this->is_dirty('id_path')) {
+            $this->set('level', sizeof(explode('/', $this->get('id_path'))) - 1);
+        }
 
         return true;
     }
@@ -387,5 +401,37 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             return true;
         }
         return false;
+    }
+
+    /**
+     * clone current node
+     * @return bool|FCom_Core_Model_TreeAbstract
+     */
+    public function cloneMe()
+    {
+        if (!$this->id()) {
+            return false;
+        }
+        $data = $this->as_array();
+        unset($data['id']);
+        unset($data['full_name']);
+        unset($data['sort_order']);
+        unset($data['url_key']);
+        unset($data['url_path']);
+        unset($data['full_name']);
+        //get number suffix
+        $numberSuffix = 1;
+        while($numberSuffix <= 10) {
+            $result = static::i()->orm()->where(array('node_name' => $this->get('node_name').'-'.$numberSuffix, 'parent_id' => $this->get('parent_id')))->find_one();
+            if (!$result) {
+                break;
+            }
+            $numberSuffix++;
+        }
+        $data['id_path'] = '';
+        $data['node_name'] = $this->get('node_name').'-'.$numberSuffix;
+        $cloneNode = static::i()->create($data)->save(true); /** @var FCom_Core_Model_TreeAbstract $cloneNode */
+        $cloneNode->set('id_path', $cloneNode->parent()->get('id_path').'/'.$cloneNode->id())->save();
+        return $cloneNode;
     }
 }

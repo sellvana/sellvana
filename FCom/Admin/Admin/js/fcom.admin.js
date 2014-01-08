@@ -414,6 +414,14 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             return true;
         }
 
+        function checkRoot(node, errorText) {
+            if (parseInt($(node).attr('id')) <= 1) {
+                alert(errorText);
+                return false;
+            }
+            return true;
+        }
+
         function reorder(node) {
             console.log('node', node);
             if (!checkLock()) return;
@@ -464,6 +472,21 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 .on('hidden.bs.modal', function () {
                     $(this).remove()
                 });
+        }
+
+        function clone(node) {
+            if (!checkLock()) return;
+            if (!checkRoot(node, 'Cannot clone ROOT')) return false;
+            $.post(opt.url, {
+                operation: 'clone',
+                id: $(node).attr("id").replace("node_", "")
+            }, function(r){
+                if (!r.status) {
+                    $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                } else {
+                    el.jstree('refresh', $.jstree._focused()._get_parent());
+                }
+            });
         }
 
         var plugins = ["themes", "json_data", "ui", "crrm", "cookies", "dnd", "search", "types", "hotkeys", "contextmenu"];
@@ -636,8 +659,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             .bind("reorder.jstree", function(ev, node) {
                 reorder(node);
             })
-            .bind("copy.jstree", function (e, data) {
-                console.log(data);
+            .bind("clone.jstree", function (e, node) {
+                clone(node);
             })
             /*    .bind("check_node.jstree", function (e, data) {
                     data.rslt.obj.each(function () {
