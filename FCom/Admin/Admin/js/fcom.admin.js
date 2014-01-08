@@ -570,6 +570,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 });
             })
             .bind("rename.jstree", function (e, data) {
+                data.rslt.obj.children("a").addClass("jstree-loading");
                 $.post(opt.url, {
                         "operation": "rename_node",
                         "id": data.rslt.obj.attr("id").replace("node_", ""),
@@ -578,6 +579,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         if (!r.status) {
                             alert(r.message);
                             $.jstree.rollback(data.rlbk);
+                        } else {
+                            el.trigger('select.jstree', data.rslt.obj);
                         }
                     }
                 );
@@ -617,7 +620,6 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 if (typeof opt.on_dblclick !== 'undefined') opt.on_dblclick(node);
             })
             .bind("select.jstree", function (ev, node) {
-                console.log(ev, node);
                 if (typeof opt.on_select !== 'undefined') opt.on_select(node);
             })
             .bind("reorder.jstree", function(ev, node) {

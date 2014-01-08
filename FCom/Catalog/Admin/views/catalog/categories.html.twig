@@ -48,9 +48,8 @@
 
             FCom.Admin.tree('#categories', {
                 url:'{{ APP.href('catalog/categories/tree_data') }}',
-                on_click: function (n) { loadForm($(n).attr('id')); } ,
-                //, on_dblclick: function (n) { loadForm(n.attr('id')); }
-                on_select: function (n) { loadForm($(n).attr('id')); },
+                on_click: function (n) { loadForm(n); } ,
+                on_select: function (n) { loadForm(n); },
                 lock_flag: '#categories-tree-lock',
                 create_lock: true
             });
@@ -60,7 +59,9 @@
                 categoriesLayoutEl.css('min-height', categoriesLayoutEl.find(':first-child').height());
             });
 
-            function loadForm(id) {
+            function loadForm(node) {
+                var id = $(node).attr('id');
+                $(node).find("a").addClass("jstree-loading");
                 var url = '{{ formUrl }}?id='+id;
                 $('#categories-form-container').load(url, function() {
                     $('#categories-tree-form').attr('action', url);
@@ -76,6 +77,7 @@
                     }
                     adminForm.createSwitchButton();
                     adminForm.wysiwygInit();
+                    $(node).find("a").removeClass("jstree-loading");
                 });
             }
 
