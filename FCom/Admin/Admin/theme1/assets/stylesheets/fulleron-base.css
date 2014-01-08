@@ -2691,7 +2691,7 @@ a.dropdown-toggle {
     border-bottom: 1px solid #ddd;
     text-align: center;
 }
-.f-tree-layout .f-admin-main-content .btn-group .btn {
+.f-tree-layout .f-admin-main-content .tree-action .btn-group .btn {
     padding: 10px 40px;
 }
 label[for="categories-tree-lock"],
