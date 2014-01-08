@@ -122,6 +122,13 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
                     $node->delete();
                     break;
 
+                case 'clone':
+                    if ($node->id < 2) {
+                        throw new BException("Can't clone root");
+                    }
+                    $node->cloneMe();
+                    break;
+
                 /* case 'check_node': case 'uncheck_node':
                      $product_id = $r->get('id');
                      if (!$product_id) {
