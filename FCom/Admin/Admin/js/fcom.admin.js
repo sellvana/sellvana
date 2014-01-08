@@ -1,10 +1,10 @@
 define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'], function ($, angular) {
     /*
-        var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
-            $interpolateProvider.startSymbol("<%");
-            $interpolateProvider.endSymbol("%>");
-        });
-    */
+     var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
+     $interpolateProvider.startSymbol("<%");
+     $interpolateProvider.endSymbol("%>");
+     });
+     */
     FCom.Admin.Accordion = function (containerId, options) {
         var $container = $('#' + containerId);
         $container.find('.accordion-toggle').each(function (i, headingEl) {
@@ -481,6 +481,16 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 //dots: false,
                 //icons: false
             },
+            "dnd" : {
+                "copy_modifier" : true,
+                "drag_check" : function (data) {
+                    return {
+                        after : true ,
+                        before : true ,
+                        inside : true
+                    };
+                }
+            },
             "json_data": {
                 "ajax": {"url": opt.url, "data": function (n) {
                     return {
@@ -544,8 +554,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                             $(data.rslt.obj).attr("id", "node_" + r.id);
                         }
                         else {
-                            alert(r.message);
-                            $.jstree.rollback(data.rlbk);
+                            $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+//                            $.jstree.rollback(data.rlbk);
+                            data.rslt.obj.remove();
                         }
                     }
                 );
@@ -577,7 +588,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         "title": data.rslt.new_name
                     }, function (r) {
                         if (!r.status) {
-                            alert(r.message);
+                            $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                             $.jstree.rollback(data.rlbk);
                         } else {
                             el.trigger('select.jstree', data.rslt.obj);
@@ -598,7 +609,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         },
                         success: function (r) {
                             if (!r.status) {
-                                alert(r.message);
+                                $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                                 $.jstree.rollback(data.rlbk);
                             }
                             else {
@@ -624,6 +635,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             })
             .bind("reorder.jstree", function(ev, node) {
                 reorder(node);
+            })
+            .bind("copy.jstree", function (e, data) {
+                console.log(data);
             })
             /*    .bind("check_node.jstree", function (e, data) {
                     data.rslt.obj.each(function () {
