@@ -122,8 +122,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.on('remove', this._removeDefault, this);
                 },
                 _addDefault: function (c) {
-                    if (typeof(c.get('default')) !== 'undefined')
+                    if (typeof(c.get('default')) !== 'undefined') {
                         BackboneGrid.Models.Row.prototype.defaults[c.get('name')] = c.get('default');
+                    }
                 },
                 _removeDefault: function (c) {
                     if (typeof(BackboneGrid.Models.Row.prototype.defaults[c.get('name')]) !== 'undefined')
@@ -143,10 +144,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 attributes: function () {
                     var hash = {};
                     hash['data-id'] = this.model.get('name');
-                    if (this.model.has('width'))
+                    if (this.model.has('width')) {
                         hash['style'] = "width: " + this.model.get('width') + 'px;';
-                    if (this.model.has('overflow'))
-                        hash['style'] += hash['style'] + 'overflow:hidden;'
+                    }
+                    /*
+                    if (this.model.has('overflow')) {
+                        hash['style'] += 'overflow:hidden;'
+                    }
+                    */
                     return hash;
                 },
                 events: {

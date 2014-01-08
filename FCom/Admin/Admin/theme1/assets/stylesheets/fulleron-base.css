@@ -239,7 +239,7 @@ th, td { vertical-align:top ;}
 .table tfoot > tr > td {
   border-color:#eee;
   }
-.table th a { 
+.table th a {
   white-space:nowrap;
   color:#4d657a;
   text-overflow: ellipsis;
@@ -1343,7 +1343,7 @@ ul > li > a > i.error{
   }
 .responsive-table .scrollable-area {
   width:100%;
-  overflow:scroll;
+  overflow:auto;
   overflow-y:hidden;
   }
 .responsive-table table td {
