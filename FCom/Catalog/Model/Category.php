@@ -203,4 +203,15 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         return $result;
     }
+
+    public function onAfterClone(&$cloneNode)
+    {
+        //after clone categories, add products associate
+        $products = $this->products();
+        foreach ($products as $product) {
+            /** @var FCom_Catalog_Model_Product */
+            $product->addToCategories($cloneNode->id);
+        }
+        return $this;
+    }
 }
