@@ -406,7 +406,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
 
         if (!opt) return FCom.Admin.load('trees', el);
 
-        function checkLock() {
+        function checkLock()
+        {
             if (opt.lock_flag && $(opt.lock_flag).get(0).checked) {
                 alert('Locked');
                 return false;
@@ -414,12 +415,28 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             return true;
         }
 
-        function checkRoot(node, errorText) {
+        function checkRoot(node, errorText)
+        {
             if (parseInt($(node).attr('id')) <= 1) {
                 alert(errorText);
                 return false;
             }
             return true;
+        }
+
+        function bsModalHtml(id, title)
+        {
+            return '<div class="modal fade" id="' + id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                '   <div class="modal-dialog">' +
+                '       <div class="modal-content">' +
+                '           <div class="modal-header">' +
+                '               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+                '               <h4 class="modal-title">' + title +'</h4>' +
+                '           </div>' +
+                '           <div class="modal-body"></div>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>';
         }
 
         function reorder(node) {
@@ -436,17 +453,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             }
 
             //use boostraps modal box
-            var reorderModalContent = '<div class="modal fade" id="jstree-reorder" tabindex="-1" role="dialog" aria-hidden="true">' +
-                '   <div class="modal-dialog">' +
-                '       <div class="modal-content">' +
-                '           <div class="modal-header">' +
-                '               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                '               <h4 class="modal-title">Reorder A-Z</h4>' +
-                '           </div>' +
-                '           <div class="modal-body"></div>' +
-                '       </div>' +
-                '   </div>' +
-                '</div>';
+            var reorderModalContent = bsModalHtml('jstree-reorder', 'Reorder A-Z');
             //trigger modal dialog
             $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
                 .on('shown.bs.modal', function () {
@@ -476,17 +483,56 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
 
         function clone(node) {
             if (!checkLock()) return;
-            if (!checkRoot(node, 'Cannot clone ROOT')) return false;
-            $.post(opt.url, {
-                operation: 'clone',
-                id: $(node).attr("id").replace("node_", "")
-            }, function(r){
-                if (!r.status) {
-                    $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                } else {
-                    el.jstree('refresh', $.jstree._focused()._get_parent());
-                }
-            });
+            if (!checkRoot(node, 'Cannot clone ROOT')) return;
+
+            function postClone(recursive) {
+                $.post(opt.url, {
+                    operation: 'clone',
+                    id: $(node).attr("id").replace("node_", ""),
+                    recursive: recursive
+                }, function(r){
+                    if (!r.status) {
+                        $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    } else {
+                        el.jstree('refresh', $.jstree._focused()._get_parent());
+                    }
+                });
+            }
+
+            var reorderModalContent = bsModalHtml('jstree-clone', 'Clone');
+            $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
+                .on('shown.bs.modal', function () {
+                    $('<button></button>', {
+                        type: 'button',
+                        click: function () {
+                            postClone(0);
+                        },
+                        text: 'Clone only this node',
+                        'data-dismiss': 'modal',
+                        class: 'btn btn-default'
+                    }).button().appendTo('#jstree-clone .modal-body');
+                    $('<button></button>', {
+                        type: 'button',
+                        click: function () {
+                            postClone(1);
+                        },
+                        text: 'Clone this node and immediately children',
+                        'data-dismiss': 'modal',
+                        class: 'btn btn-default'
+                    }).button().appendTo('#jstree-clone .modal-body');
+                    $('<button></button>', {
+                        type: 'button',
+                        click: function () {
+                            postClone(2);
+                        },
+                        text: 'Clone this node and all descendant',
+                        'data-dismiss': 'modal',
+                        class: 'btn btn-default'
+                    }).button().appendTo('#jstree-clone .modal-body');
+                })
+                .on('hidden.bs.modal', function () {
+                    $(this).remove()
+                });
         }
 
         var plugins = ["themes", "json_data", "ui", "crrm", "cookies", "dnd", "search", "types", "hotkeys", "contextmenu"];

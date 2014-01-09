@@ -404,10 +404,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
-     * clone current node
+     * clone current node, also move cloned-node to another node
+     * @param bool $move2node
+     * @param string $newParentNodeId
      * @return bool|FCom_Core_Model_TreeAbstract
+     * @throws BException
      */
-    public function cloneMe()
+    public function cloneMe($move2node = false, $newParentNodeId = '')
     {
         if (!$this->id()) {
             return false;
@@ -419,10 +422,18 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         unset($data['url_key']);
         unset($data['url_path']);
         unset($data['full_name']);
+        if ($move2node) {
+            $newParent = static::load($newParentNodeId);
+            if ($newParent) {
+                $data['parent_id'] = (int)$newParentNodeId;
+            } else {
+                throw new BException('Cannot load target node');
+            }
+        }
         //get number suffix
         $numberSuffix = 1;
-        while($numberSuffix <= 10) {
-            $result = static::i()->orm()->where(array('node_name' => $this->get('node_name').'-'.$numberSuffix, 'parent_id' => $this->get('parent_id')))->find_one();
+        while($numberSuffix <= 20) {
+            $result = static::i()->orm()->where(array('node_name' => $this->get('node_name').'-'.$numberSuffix, 'parent_id' => $data['parent_id']))->find_one();
             if (!$result) {
                 break;
             }
@@ -432,6 +443,46 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $data['node_name'] = $this->get('node_name').'-'.$numberSuffix;
         $cloneNode = static::i()->create($data)->save(true); /** @var FCom_Core_Model_TreeAbstract $cloneNode */
         $cloneNode->set('id_path', $cloneNode->parent()->get('id_path').'/'.$cloneNode->id())->save();
+
+        $this->onAfterClone($cloneNode);
         return $cloneNode;
+    }
+
+    public function onAfterClone(&$cloneNode)
+    {
+        BEvents::i()->fire($this->_origClass() . '::onAfterClone', array('node' => $this, 'cloneNode' => $cloneNode));
+        return $this;
+    }
+
+    /**
+     * clone immediate children of current node to clone node
+     * @param $cloneNode FCom_Core_Model_TreeAbstract
+     * @return bool
+     */
+    public function cloneImmediateChildren($cloneNode)
+    {
+        $children = $this->children();
+        if ($children) {
+            foreach ($children as $child) {
+                $child->cloneMe(true, $cloneNode->id);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * clone all descendant of current code to clone node
+     * @param $cloneNode FCom_Core_Model_TreeAbstract
+     * @return bool
+     */
+    public function cloneDescendant($cloneNode)
+    {
+        $descendant = $this->descendants();
+        if ($descendant) {
+            foreach ($descendant as $item) {
+                $item->cloneMe(true, $cloneNode->id);
+            }
+        }
+        return true;
     }
 }

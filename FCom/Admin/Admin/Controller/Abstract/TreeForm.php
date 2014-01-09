@@ -126,7 +126,7 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
                     if ($node->id < 2) {
                         throw new BException("Can't clone root");
                     }
-                    $node->cloneMe();
+                    $this->cloneNode($node, $r->post('recursive'));
                     break;
 
                 /* case 'check_node': case 'uncheck_node':
@@ -221,5 +221,37 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
     protected function _prepareTreeForm($model)
     {
 
+    }
+
+    /**
+     * @param FCom_Core_Model_TreeAbstract $node
+     * @param string $recursiveType 0: only this node, 1: plus immediately children, 2: plus all descendant
+     * @return bool|FCom_Core_Model_TreeAbstract
+     * @throws BException
+     */
+    public function cloneNode($node, $recursiveType)
+    {
+        if (!$node->id()) {
+            throw new BException('Cannot clone unavailable node');
+        }
+
+        $cloneNode = $node->cloneMe();
+        if ($cloneNode) {
+            switch($recursiveType) {
+                case 0:
+                default:
+                    $result = true;
+                    break;
+                case 1:
+                    $result = $node->cloneImmediateChildren($cloneNode);
+                    break;
+                case 2:
+                    $result = $node->cloneDescendant($cloneNode);
+                    break;
+            }
+            if ($result) {
+                return $cloneNode;
+            }
+        }
     }
 }
