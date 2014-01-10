@@ -417,6 +417,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         }
         $data = $this->as_array();
         unset($data['id']);
+        //unset data and generate this data in function onBeforeSave
         unset($data['full_name']);
         unset($data['sort_order']);
         unset($data['url_key']);
@@ -439,10 +440,30 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             }
             $numberSuffix++;
         }
+
         $data['id_path'] = '';
         $data['node_name'] = $this->get('node_name').'-'.$numberSuffix;
         $cloneNode = static::i()->create($data)->save(true); /** @var FCom_Core_Model_TreeAbstract $cloneNode */
-        $cloneNode->set('id_path', $cloneNode->parent()->get('id_path').'/'.$cloneNode->id())->save();
+        $cloneNode->set(
+            array(
+                'id_path' => $cloneNode->parent()->get('id_path').'/'.$cloneNode->id(),
+                'num_children' => 0,
+                'num_descendants' => 0,
+                'is_enabled' => 0
+            ))->save();
+
+        //update num_children and num_descendant of ascendant node
+        $saveObjects = array();
+        $saveObjects[$cloneNode->id()] = $cloneNode;
+        foreach ($cloneNode->ascendants() as $c) {
+            $c->add('num_descendants');
+            $saveObjects[$c->id()] = $c;
+        }
+        if ($saveObjects) {
+            foreach ($saveObjects as $saveObj) {
+                $saveObj->save();
+            }
+        }
 
         $this->onAfterClone($cloneNode);
         return $cloneNode;
@@ -477,10 +498,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function cloneDescendant($cloneNode)
     {
-        $descendant = $this->descendants();
-        if ($descendant) {
-            foreach ($descendant as $item) {
-                $item->cloneMe(true, $cloneNode->id);
+        $children = $this->children();
+        if ($children) {
+            foreach ($children as $item) {
+                $node = $item->cloneMe(true, $cloneNode->id);
+                if ($item->get('num_children') > 0) {
+                    $item->cloneDescendant($node);
+                }
             }
         }
         return true;
