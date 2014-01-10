@@ -243,10 +243,10 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
                     $result = true;
                     break;
                 case 1:
-                    $result = $node->cloneImmediateChildren($cloneNode);
+                    $result = $node->cloneChildren($cloneNode);
                     break;
                 case 2:
-                    $result = $node->cloneDescendant($cloneNode);
+                    $result = $node->cloneChildren($cloneNode, true);
                     break;
             }
             if ($result) {

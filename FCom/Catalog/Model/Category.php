@@ -208,9 +208,14 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     {
         //after clone categories, add products associate
         $products = $this->products();
-        foreach ($products as $product) {
-            /** @var FCom_Catalog_Model_Product */
-            $product->addToCategories($cloneNode->id);
+        if ($products) {
+            $sql = "INSERT INTO fcom_category_product (product_id, category_id) VALUES";
+            foreach ($products as $product) {
+                /** @var FCom_Catalog_Model_Product */
+                $sql .= ' ('.$product->get('id').', '.$cloneNode->id.'),';
+            }
+            $sql = substr($sql, 0, strlen($sql) - 1);
+            FCom_Catalog_Model_CategoryProduct::i()->orm()->raw_query($sql)->execute();
         }
         return $this;
     }
