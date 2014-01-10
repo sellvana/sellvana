@@ -578,6 +578,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 }},
             "contextmenu": {
                 'items': {
+                    'ccp': {label: 'Clone', submenu: '', separator_before: true, action: function (n) {
+                        el.trigger('clone.jstree', [n]);
+                    }},
                     'select': {label: 'Select', separator_before: true, action: function (n) {
                         el.trigger('select.jstree', [n]);
                     }},
@@ -587,6 +590,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     'refresh': {label: 'Refresh', separator_before: true, action: function (n) {
                         el.jstree('refresh', n);
                     }}
+
                 }
             },
             'cookies': { auto_save: false, save_opened: false, save_selected: false},
