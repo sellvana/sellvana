@@ -624,7 +624,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
                 unset($data['id']);
                 $newModel = FCom_Catalog_Model_Product::i()->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
-                $number = $this->getDuplicatePrefixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
+                $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
                 $newModel->product_name = $newModel->product_name . '-' . $number;
                 $newModel->url_key = $newModel->url_key . '-' . $number;
                 $newModel->local_sku = $newModel->local_sku . '-' . $number;
@@ -651,21 +651,39 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
         BResponse::i()->redirect($redirectUrl);
     }
 
-    public function getDuplicatePrefixNumber($oldName, $oldSku, $oldUrlKey)
+    public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
-        $i = 1;
-        while($i <= 9) {
-            $sql = 'SELECT * FROM `fcom_product`
-                WHERE `product_name` = "'.$oldName.'-'.$i.'"
-                OR `local_sku` = "'.$oldSku.'-'.$i.'"
-                OR `url_key` = "'.$oldUrlKey.'-'.$i.'"';
-            $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
-            if (!$result) {
-                return $i;
+        $sql = 'SELECT * FROM fcom_product WHERE product_name REGEXP "'.$oldName.'-[0-9]$"
+                OR local_sku REGEXP "'.$oldSku.'-[0-9]$" OR url_key REGEXP"'.$oldUrlKey.'-[0-9]$" ORDER BY id DESC';
+        $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+        $numberSuffix = 1;
+        $maxName = 0;
+        $maxSku = 0;
+        $maxKey = 0;
+        if ($result) {
+            foreach ($result as $arr) {
+                $tmpName = explode($oldName.'-', $arr->get('product_name'));
+                $tmpSku = explode($oldSku.'-', $arr->get('local_sku'));
+                $tmpKey = explode($oldUrlKey.'-', $arr->get('url_key'));
+                if ($maxName < $tmpName[1]) {
+                    $maxName = $tmpName[1];
+                }
+                if ($maxSku < $tmpSku[1]) {
+                    $maxSku = $tmpSku[1];
+                }
+                if ($maxKey < $tmpKey[1]) {
+                    $maxKey = $tmpKey[1];
+                }
             }
-            $i++;
+            if ($maxName < $maxKey) {
+                $maxName = $maxKey;
+            }
+            if ($maxName < $maxSku) {
+                $maxName = $maxSku;
+            }
+            $numberSuffix = $maxName + 1;
         }
-        return 10;
+        return $numberSuffix;
     }
 
     /**

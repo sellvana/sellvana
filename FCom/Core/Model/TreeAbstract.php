@@ -381,11 +381,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function validateNodeName($newName, $create = false)
     {
-        $childName = ($this->get('full_name') ? $this->get('full_name') : '');
-        if (strripos($childName, '|')) {
-            $oldName = substr($childName, strripos($childName, '|') + 1, strlen($childName));
-            $childName = str_replace($oldName, $newName, $childName);
-        }
+        $fullName = ($this->get('full_name') ? $this->get('full_name') : '');
+        $childName = str_replace($this->get('node_name'), $newName , $fullName);
         if ($newName == $childName || (isset($oldName) && $oldName == $newName )) {
             return true;
         }
@@ -441,12 +438,18 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 //            $numberSuffix++;
 //        }
         $tmpName = $this->get('node_name').'-';
-        $sql = 'SELECT node_name FROM '.static::$_table.' WHERE node_name LIKE "'.$tmpName.'%" AND parent_id ='.$data['parent_id'].' ORDER BY id DESC';
-        $result = static::i()->orm()->raw_query($sql)->find_one();
+        $sql = 'SELECT node_name FROM '.static::$_table.' WHERE node_name REGEXP "'.$tmpName.'[0-9]$" AND parent_id ='.$data['parent_id'].' ORDER BY id DESC';
+        $result = static::i()->orm()->raw_query($sql)->find_many();
         $numberSuffix = 1;
         if ($result) {
-            $tmp = explode($tmpName, $result->get('node_name'));
-            $numberSuffix = $tmp[1] + 1;
+            $max = 0;
+            foreach ($result as $arr) {
+                $tmp = explode($tmpName, $arr->get('node_name'));
+                if ($max < $tmp[1]) {
+                    $max = $tmp[1];
+                }
+            }
+            $numberSuffix = $max + 1;
         }
         $data['id_path'] = '';
         $data['node_name'] = $tmpName.$numberSuffix;

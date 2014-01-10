@@ -88,9 +88,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return true;
         }
         $sku = $data[$args['field']];
-        $orm = static::orm()->where('local_sku', $data[$args['field']]);
+        $orm = static::orm('p')->where('local_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
-            $orm->where_not_equals('id', $data['id']);
+            $orm->where_not_equal('p.id', $data['id']);
         }
         return !$orm->find_one();
     }
