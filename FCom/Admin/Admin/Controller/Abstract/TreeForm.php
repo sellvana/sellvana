@@ -136,6 +136,10 @@ abstract class FCom_Admin_Admin_Controller_Abstract_TreeForm extends FCom_Admin_
                      }
 
                      break;*/
+                case 'reorderAZ':
+                    $recursive = ($r->post('recursive')) ? true : false;
+                    $node->reorderChildrenAZ($recursive);
+                    break;
                 default:
                     if (!BEvents::i()->fire($eventName, $r->post())) {
                         throw new BException('Not implemented');

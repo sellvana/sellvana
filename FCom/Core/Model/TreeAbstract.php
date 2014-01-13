@@ -141,11 +141,19 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function reorderChildrenAZ($recursive=false)
     {
         $children = $this->children();
-        uasort($children, function($a, $b) { return strcmp($a->get('node_name'), $b->get('node_name')); });
+        uasort(
+            $children,
+            function ($a, $b) {
+                return strcmp($a->get('node_name'), $b->get('node_name'));
+            }
+        );
         $i = 0;
         foreach ($children as $c) {
             $c->set('sort_order', ++$i);
-            if ($recursive) $c->reorderChildrenAZ(true);
+            $c->cacheSaveDirty();
+            if ($recursive) {
+                $c->reorderChildrenAZ(true);
+            }
         }
         return $this;
     }
@@ -382,16 +390,16 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function validateNodeName($newName, $create = false)
     {
         $fullName = ($this->get('full_name') ? $this->get('full_name') : '');
-        $childName = str_replace($this->get('node_name'), $newName , $fullName);
-        if ($newName == $childName || (isset($oldName) && $oldName == $newName )) {
-            return true;
-        }
+        $childName = rtrim( $fullName, $this->get('node_name')).$newName;
         if ($create) {
             $sep = static::$_separator;
             if (is_string($newName)) {
                 $newName = preg_split('#\s*'.preg_quote($sep).'\s*#', $newName, 0, PREG_SPLIT_NO_EMPTY);
             }
             $childName = ($this->get('full_name') ? $this->get('full_name').$sep : '').$newName[0];
+        }
+        if ($newName == $this->get('node_name')) {
+            return true;
         }
         $child = $this->load($childName, 'full_name');
         if (!$child) {
