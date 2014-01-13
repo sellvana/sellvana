@@ -74,7 +74,6 @@ function($, Backbone) {
             $('.select2').select2({width: 'other values', minimumResultsForSearch: 20, dropdownAutoWidth: true});
         }
     })
-
 });
 
 function partial(el, options) {
