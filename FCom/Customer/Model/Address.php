@@ -13,7 +13,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         array('street1', '@required'),
         array('city', '@required'),
         array('country', '@required'),
-        array('region', '@required'),
+//        array('region', '@required'),
         array('postcode', '@required'),
 
         array('email', '@email'),

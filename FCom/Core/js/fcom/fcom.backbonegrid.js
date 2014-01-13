@@ -1411,6 +1411,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (modalForm.modalType === 'addable') {
+                        console.log('Hash value',BackboneGrid.modalElementVals);
                         var hash = BackboneGrid.modalElementVals;
                         if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                             hash.oper = 'add';
@@ -1473,8 +1474,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     this.formEl = this.$el.parents('form:first');
                     this.formEl.validate({});
-                    //setValidateForm(this.formEl);
-
+                    if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
+                        var func = BackboneGrid.callbacks['after_modalForm_render'];
+                        var script = func + '(this.$el,rowsCollection.toJSON());';
+                        eval(script);
+                    }
                     this.collection.each(function (col) {
 
                         if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
@@ -1514,11 +1518,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (model.has(this.modalType) && model.get(this.modalType)) {
                         var elementView = new BackboneGrid.Views.ModalElement({model: model});
                         this.$el.append(elementView.render().el);
-
+                        if (this.modalType == 'addable') {
+                            var country = this.$el.find('select#country');
+                            if (country) {
+                                country.val('US').prop('selected', true);
+                            }
+                        }
                         if (this.modalType === 'mass-editable') {
                             elementView.$el.find('#' + model.get('name')).removeAttr('data-rule-required');
                         }
-
                         if (BackboneGrid.currentRow) {
                             var name = model.get('name');
                             var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
