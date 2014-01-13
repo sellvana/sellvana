@@ -657,31 +657,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
                 OR local_sku REGEXP "'.$oldSku.'-[0-9]$" OR url_key REGEXP"'.$oldUrlKey.'-[0-9]$" ORDER BY id DESC';
         $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
         $numberSuffix = 1;
-        $maxName = 0;
-        $maxSku = 0;
-        $maxKey = 0;
         if ($result) {
             foreach ($result as $arr) {
                 $tmpName = explode($oldName.'-', $arr->get('product_name'));
                 $tmpSku = explode($oldSku.'-', $arr->get('local_sku'));
                 $tmpKey = explode($oldUrlKey.'-', $arr->get('url_key'));
-                if ($maxName < $tmpName[1]) {
-                    $maxName = $tmpName[1];
-                }
-                if ($maxSku < $tmpSku[1]) {
-                    $maxSku = $tmpSku[1];
-                }
-                if ($maxKey < $tmpKey[1]) {
-                    $maxKey = $tmpKey[1];
-                }
+                $max = $tmpName[1];
+                $tmpSku[1] = ($tmpSku[1] < $tmpKey[1]) ? $tmpKey[1] : $tmpSku[1];
+                $max = ($max < $tmpSku[1]) ? $tmpSku[1] : $max;
             }
-            if ($maxName < $maxKey) {
-                $maxName = $maxKey;
-            }
-            if ($maxName < $maxSku) {
-                $maxName = $maxSku;
-            }
-            $numberSuffix = $maxName + 1;
+            $numberSuffix = $max + 1;
         }
         return $numberSuffix;
     }

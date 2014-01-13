@@ -448,7 +448,11 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     id: $(node).attr("id").replace("node_", ""),
                     recursive: recursive ? 1 : ''
                 }, function (data) {
-                    el.jstree('refresh', node);
+                    if (!data.status) {
+                        $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    } else {
+                        el.jstree('refresh', node);
+                    }
                 });
             }
 
@@ -662,7 +666,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     }, function (r) {
                         if (!r.status) {
                             $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                            $.jstree.rollback(data.rlbk);
+                            el.jstree('refresh', $.jstree._focused()._get_parent(data.rslt.obj) );
                         } else {
                             el.trigger('select.jstree', data.rslt.obj);
                         }
