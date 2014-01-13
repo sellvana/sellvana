@@ -75,8 +75,8 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
             function getState (country) {
                 $.post('".BApp::i()->href('addresses/get_state')."', {country: country}).done(function (data) {
                             var region = $('#region');
-                            region.html('');
                             if (!$.isEmptyObject(data)) {
+                                region.html('');
                                 region.parents('div.form-group').show();
                                 for (var i in data ) {
                                     var option = '<option value='+ i +'>' + data[i] + '</option>';
