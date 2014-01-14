@@ -410,9 +410,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     console.log('save');
                     var self = this;
                     var id = this.get('id');
-                    var hash = this.changedAttributes();
+//                    var hash = this.changedAttributes(); //todo: check why sometimes cannot detect attributes is changed
+                    var hash = this.attributes;
                     hash.id = id;
                     hash.oper = 'edit';
+
                     if (typeof(g_vent) !== 'undefined' && BackboneGrid.events && _.indexOf(BackboneGrid.events, "edit") !== -1) {
                         var row = this.toJSON();
                         var ev = {grid: BackboneGrid.id, row: row};
@@ -1363,12 +1365,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 _saveChanges: function (ev) {
-                    modalForm.$el.find('input, select').each(function () {
+                    modalForm.$el.find('textarea, input, select').each(function () {
                         var key = $(this).attr('id');
                         var val = $(this).val();
                         BackboneGrid.modalElementVals[key] = val;
                     });
-
+                    modalForm.formEl.validate();
                     if (!modalForm.formEl.valid())
                         return;
 
@@ -1437,6 +1439,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     if (modalForm.modalType === 'editable') {
                         for (key in BackboneGrid.modalElementVals) {
+                            console.log('key', key);
+                            console.log('Modal', BackboneGrid.modalElementVals);
                             BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key]);
                         }
                         BackboneGrid.currentRow.save();
