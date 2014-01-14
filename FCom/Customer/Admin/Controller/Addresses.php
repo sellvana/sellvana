@@ -39,7 +39,8 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
                   'validation' => array('required' => true)),
             array('name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region', 'addable' => true, 'editable' => true, 'editor' => 'select',
                 'options' => FCom_Geo_Model_Region::i()->options('US'),
-                'validation' => array('required' => true)),
+//                'validation' => array('required' => true)),
+            ),
             array('name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true, 'editable' => true,
                   'validation' => array('required' => true)),
             array('name' => 'postcode', 'label' => 'Zip/Postal Code', 'index' => 'a.postcode', 'addable' => true, 'editable' => true,
@@ -83,6 +84,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
                                     region.append(option);
                                 }
                             } else {
+                                region.html('<option value=\" \"></option>');
                                 region.parents('div.form-group').hide();
                             };
                     });
