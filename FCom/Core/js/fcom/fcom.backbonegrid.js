@@ -1478,11 +1478,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         $(BackboneGrid.modalFormId).find('select').val('');*/
                     if (this.modalType === 'mass-editable')
                         $(BackboneGrid.modalFormId).find('select').val('');
-                    if (this.modalType == 'mass-editable' || this.modalType == 'editable') {
-                        modalForm.$el.find('select').each(function () {
-                            $(this).prepend('<option value=""></option>');
-                        });
-                    }
                     this.formEl = this.$el.parents('form:first');
                     this.formEl.validate({});
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
