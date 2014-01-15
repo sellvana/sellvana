@@ -55,7 +55,6 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
         );
         $config['actions'] = array(
             'new'    => array('caption' => 'Add New Address', 'modal' => true),
-            'edit'   => true,
             'delete' => true
         );
         $config['filters'] = array(
