@@ -525,6 +525,23 @@
       </li>
     </ul>
 </script>
+
+<script type="template" id="{{ config.id }}-add-set-fields">
+    <div class="well">
+        <div class="row">
+            <input type="hidden" id="custom_fields" name="custom_fields"/>
+            <div class="col-sm-12">
+                <select id="{{ config.id }}-sel_sets" class="select2 form-control" style="width:150px;">
+                    <option value=""></option>
+                    <% for (var index in rc) {
+                    print('<option value="'+rc[index].name+'">'+ rc[index].label+ '</option>');
+                     }%>
+                </select>
+                <button class="btn btn-primary btn-sm add-field-mass-grid" id="{{ config.id }}-btn_add_set" type="button">{{ 'Add a Field Set' }}</button>
+            </div>
+        </div>
+    </div>
+</script>
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {
 

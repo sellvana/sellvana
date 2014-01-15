@@ -1353,6 +1353,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalElement = Backbone.View.extend({
                 className: 'form-group',
                 render: function () {
+                    console.log(this.model)
                     this.$el.html(this.template(this.model.toJSON()));
 
                     return this;
@@ -1472,8 +1473,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     $(BackboneGrid.modalFormId).find('h4').html(header);
                     BackboneGrid.modalElementVals = {};
-                    this.collection.each(this.addElementDiv, this);
-
+                    if (this.modalType == 'mass-editable') {
+                        var elementView = new BackboneGrid.Views.ModalMassGridElement({collection: this.collection});
+                        $(BackboneGrid.modalFormId).find('.well').parent().remove();
+                        $(BackboneGrid.modalFormId).find('.modal-header').after(elementView.render({ modalType: this.modalType}).el);
+                        $(BackboneGrid.modalFormId).find('.well select').select2({
+                            placeholder: "Select a Field",
+                            allowClear: true
+                        });
+                    } else {
+                        this.collection.each(this.addElementDiv, this);
+                    }
                     /*if (this.modalType === 'addable' || this.modalType ==='mass-editable')
                         $(BackboneGrid.modalFormId).find('select').val('');*/
                     if (this.modalType === 'mass-editable')
@@ -1486,31 +1496,32 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         eval(script);
                     }
                     this.collection.each(function (col) {
-
                         if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
                             var url = col.get('validation').unique;
-                            modalForm.$el.find('#' + col.get('name')).rules("add", {
-                                onfocusout: false,
-                                onkeyup: false,
-                                remote: {
-                                    url: url,
-                                    type: 'post',
-                                    data: {
-                                        _name: col.get('name')
+                            if (modalForm.$el.find('#' + col.get('name')).length) {
+                                modalForm.$el.find('#' + col.get('name')).rules("add", {
+                                    onfocusout: false,
+                                    onkeyup: false,
+                                    remote: {
+                                        url: url,
+                                        type: 'post',
+                                        data: {
+                                            _name: col.get('name')
+                                        },
+                                        dataFilter: function (responseString) {
+                                            var response = jQuery.parseJSON(responseString);
+                                            currentMessage = response.Message;
+                                            if (modalForm.modalType === 'editable' && BackboneGrid.currentRow.get('id') === response.id)
+                                                return true;
+                                            return response.unique;
+                                        }
+                                        //async:false
                                     },
-                                    dataFilter: function (responseString) {
-                                        var response = jQuery.parseJSON(responseString);
-                                        currentMessage = response.Message;
-                                        if (modalForm.modalType === 'editable' && BackboneGrid.currentRow.get('id') === response.id)
-                                            return true;
-                                        return response.unique;
+                                    messages: {
+                                        remote: "This " + col.get('label') + " is already taken place"
                                     }
-                                    //async:false
-                                },
-                                messages: {
-                                    remote: "This " + col.get('label') + " is already taken place"
-                                }
-                            });
+                                });
+                            }
                         }
                     });
 
@@ -1530,9 +1541,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 country.val('US').prop('selected', true);
                             }
                         }
-                        if (this.modalType === 'mass-editable') {
-                            elementView.$el.find('#' + model.get('name')).removeAttr('data-rule-required');
-                        }
+//                        if (this.modalType === 'mass-editable') {
+//                            elementView.$el.find('#' + model.get('name')).removeAttr('data-rule-required');
+//                        }
                         if (BackboneGrid.currentRow) {
                             var name = model.get('name');
                             var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
@@ -1542,7 +1553,42 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 }
             });
+            BackboneGrid.Views.ModalMassGridElement = Backbone.View.extend({
+                render: function (data) {
+                    var mod = [];
+                    console.log(data.modalType);
+                    this.collection.each(function (model) {
+                        console.log(model);
 
+                        if (model.has(data.modalType) && model.get(data.modalType)) {
+                           mod.push({name: model.get('name'), label: model.get('label')});
+                        }
+                    });
+                    this.$el.html(this.template(mod));
+                    return this;
+                },
+                events: {
+                    'click .add-field-mass-grid': 'addField'
+                },
+                addField: function () {
+                    var field = $(BackboneGrid.modalFormId).find('select#'+ config.id + '-sel_sets').val();
+                    if (field != '') {
+                        this.collection.each(function (model) {
+                            if (model.get('name') == field) {
+                                var elementView = new BackboneGrid.Views.ModalElement({model: model});
+                                var button = '<button  class="btn box-remove btn-xs btn-link btn-remove remove-field" type="button"><i class="icon-remove"></i></button>';
+                                if ($(BackboneGrid.Views.ModalForm.prototype.el).find('#' + field).length == 0) {
+                                    $(BackboneGrid.Views.ModalForm.prototype.el).append($(elementView.render().el).append(button));
+                                }
+
+                            }
+                        });
+                    }
+                }
+            });
+            $('body').on('click', 'button.remove-field', function () {
+                $(this).parent().remove();
+            })
             function updatePageHtml(p, mp) {
                 p = BackboneGrid.currentState.p;
                 mp = BackboneGrid.currentState.mp;
@@ -1653,7 +1699,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             //mass edit modal view
             BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " div.modal-body";
             BackboneGrid.Views.ModalElement.prototype.template = _.template($('#' + config.id + '-modal-element-template').html());
-
+            BackboneGrid.Views.ModalMassGridElement.prototype.template = _.template($('#'+ config.id + '-add-set-fields').html());
 
             /*if (BackboneGrid.data_mode === 'local') {
              state.mp = config.data.data.length;
