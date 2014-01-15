@@ -1353,9 +1353,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalElement = Backbone.View.extend({
                 className: 'form-group',
                 render: function () {
-                    console.log(this.model)
                     this.$el.html(this.template(this.model.toJSON()));
-
                     return this;
                 }
             });
@@ -1408,18 +1406,20 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             delete BackboneGrid.modalElementVals.id;
                             delete BackboneGrid.modalElementVals.oper;
                         }
-
                         selectedRows.each(function (model) {
                             for (var key in BackboneGrid.modalElementVals) {
-                                model.set(key, BackboneGrid.modalElementVals[key]);
-                                model.trigger('render');
+                                rowsCollection.each(function (rows) {
+                                    if (rows.get('id') == model.get('id')) {
+                                        rows.set(key, BackboneGrid.modalElementVals[key]);
+                                        rows.trigger('render');
+                                    }
+                                })
                             }
                         });
 
                     }
 
                     if (modalForm.modalType === 'addable') {
-                        console.log('Hash value',BackboneGrid.modalElementVals);
                         var hash = BackboneGrid.modalElementVals;
                         if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                             hash.oper = 'add';
@@ -1558,8 +1558,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     var mod = [];
                     console.log(data.modalType);
                     this.collection.each(function (model) {
-                        console.log(model);
-
                         if (model.has(data.modalType) && model.get(data.modalType)) {
                            mod.push({name: model.get('name'), label: model.get('label')});
                         }
