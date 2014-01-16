@@ -2,11 +2,15 @@ base:
     - view: admin/nav
         do:
             - [ addNav, cms/blog, { label: Blog Posts, href: /blog/post, pos: 100 } ]
+            - [ addNav, cms/category, { label: Blog Categories, href: /blog/category, pos: 100 } ]
 
 /blog/post:
     - { include: base }
     - { hook: main, views: admin/grid }
 
+/blog/category:
+    - { include: base }
+    - { hook: main, views: admin/grid }
 /blog/post/form:
     - { include: base }
     - { include: form }
@@ -18,3 +22,15 @@ base:
         set: { tab_view_prefix: blog/post-form/ }
         do:
             - [ addTab, main, { label: Blog Post, pos: 10 } ]
+/blog/category/form:
+    - { include: base }
+    - { include: form }
+    - { include: lib_tokeninput }
+    - { include: lib_wysihtml5 }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, cms/category ]] }
+    - view: admin/form
+        set: { tab_view_prefix: blog/category-form/ }
+        do:
+            - [ addTab, main, { label: Blog Category, pos: 10 } ]
+            - [ addTab, post, { label: Blog Posts, pos: 20, async: true } ]
