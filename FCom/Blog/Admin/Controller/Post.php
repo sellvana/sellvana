@@ -58,4 +58,92 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $this->view('blog/post-form/main')->set('tag_options_json', $tagOptionsJson);
     }
 
+    /**
+     * modal grid on blog/post tab
+     */
+    public function getAllPostConfig()
+    {
+
+        $config = parent::gridConfig();
+        //$config['id'] = 'category_all_prods_grid-'.$model->id;
+        $config['id'] = 'category_all_post_grid';
+        $config['columns'] = array(
+            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55),
+            array('name' => 'author', 'label'=>'Author'),
+            array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
+            array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
+        );
+        $config['actions'] = array(
+            'add'=>array('caption'=>'Add selected posts')
+        );
+        $config['filters'] = array(
+            array('field' => 'title', 'type' => 'text'),
+            array('field' => 'status', 'type' => 'select'),
+        );
+        $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
+            ->select('p.*')
+            ->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
+            ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
+        $config['events'] = array('add');
+        /*$config['_callbacks'] = "{
+            'add':'categoryProdsMng.addSelectedProds'
+        }";*/
+
+
+        return array('config' =>$config);
+    }
+
+    public function postGridConfig($model)
+    {
+        $orm = FCom_Blog_Model_Post::i()->orm()->table_alias('p')
+            ->select(array('p.id', 'p.author_user_id', 'p.status', 'p.title'));
+        $orm->join('FCom_Admin_Model_User', array('p.author_user_id','=','u.id'), 'u')
+            ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
+        $orm->join('FCom_Blog_Model_CategoryPost', array('p.id','=','cp.post_id'), 'cp')
+            ->where('category_id', $model->id);
+        $config = array(
+            'id'           => 'post_category',
+            'data'         =>null,
+            'data_mode'     =>'local',
+            //'caption'      =>$caption,
+            'columns'      =>array(
+                array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
+                array('name' => 'author', 'label'=>'Author', 'index' => 'u.author_user_id'),
+                array('name' => 'title', 'label'=>'Title'),
+                array('name' => 'status', 'label' => 'Status'),
+            ),
+            'actions'=>array(
+                'add'=>array('caption'=>'Add Posts'),
+                'delete'=>array('caption'=>'Remove')
+            ),
+            'filters'=>array(
+                array('field' => 'title', 'type' => 'text'),
+                array('field' => 'status', 'type' => 'select'),
+            ),
+            'events'=>array('init', 'add','mass-delete')
+        );
+
+
+        //BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        $data = BDb::many_as_array($orm->find_many());
+        //unset unused columns
+        /*$columnKeys = array_keys($config['columns']);
+        foreach($data as &$prod){
+            foreach($prod as $k=>$p) {
+                if (!in_array($k, $columnKeys)) {
+                    unset($prod[$k]);
+                }
+            }
+        }*/
+
+        $config['data'] = $data;
+
+        //BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        return array('config'=>$config);
+    }
+
+
 }

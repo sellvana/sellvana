@@ -105,80 +105,74 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function processGroupsPost($model, $data)
     {
-        $groups = $model->groups();
-        $groupData = array();
-        $groupProds = FCom_Promo_Model_Product::i()->orm()->where('promo_id', $model->id)->find_many();
-        foreach ($groupProds as $gp) {
-            $groupData[$gp->group_id][$gp->product_id] = 1;
+        $groups     = $model->groups();
+        $groupData  = array();
+        $groupProds = FCom_Promo_Model_Product::i()->orm()->where( 'promo_id', $model->id )->find_many();
+        foreach ( $groupProds as $gp ) {
+            $groupData[ $gp->group_id ][ $gp->product_id ] = 1;
         }
-        if (!empty($data['_del_group_ids'])) {
-            $deleteGroups = explode(',', trim($data['_del_group_ids'], ','));
+        if ( !empty( $data[ '_del_group_ids' ] ) ) {
+            $deleteGroups = explode( ',', trim( $data[ '_del_group_ids' ], ',' ) );
             FCom_Promo_Model_Group::i()->delete_many(array(
-                'id' => $deleteGroups,
-                'promo_id' => $model->id,
-            ));
-            foreach ($deleteGroups as $gId) {
-                unset($groups[$gId], $groupData[$gId]);
+                  'id'       => $deleteGroups,
+                  'promo_id' => $model->id,
+                )
+            );
+            foreach ( $deleteGroups as $gId ) {
+                unset( $groups[ $gId ], $groupData[ $gId ] );
             }
         }
         $gIdMap = array();
-        if (!empty($data['group'])) {
-            foreach ($data['group'] as $gId=>$g) {
-                if ($gId<0) {
-                    $group = FCom_Promo_Model_Group::i()->create(array(
-                        'promo_id'   => $model->id,
-                        'group_type' => $g['group_type'],
-                        'group_name' => $g['group_name'],
-                    ))->save();
-                    $gIdMap[$gId] = $group->id;
-                    $groups[$group->id] = $group;
-                } elseif (!empty($groups[$gId])) {
-                    $groups[$gId]->set('group_name', $g['group_name'])->save();
+        if ( !empty( $data[ 'group' ] ) ) {
+            foreach ( $data[ 'group' ] as $gId => $g ) {
+                if ( $gId < 0 ) {
+                    $group  = FCom_Promo_Model_Group::i()->create(array(
+                              'promo_id'   => $model->id,
+                              'group_type' => $g[ 'group_type' ],
+                              'group_name' => $g[ 'group_name' ],
+                        ))->save();
+                    $gIdMap[ $gId ]       = $group->id;
+                    $groups[ $group->id ] = $group;
+                } elseif ( !empty( $groups[ $gId ] ) ) {
+                    $groups[ $gId ]->set( 'group_name', $g[ 'group_name' ] )->save();
                 }
-            }
-        }
-        if (!empty($data['grid'])) {
-            foreach ($data['grid'] as $gridId=>$gp) {
-                if (!preg_match('#^promo_products_(buy|get)([-0-9]+)$#', $gridId, $m)) {
-                    continue;
-                }
-                $gId = $m[2];
-                if (!empty($gIdMap[$gId])) {
-                    $gId = $gIdMap[$gId];
-                }
-                if (!empty($gp['add'])) {
-                    foreach (explode(',', $gp['add']) as $pId) {
-                        if (!$pId) {
+
+                if ( !empty( $g[ 'product_ids_add' ] ) ) {
+                    foreach ( explode( ',', $g[ 'product_ids_add' ] ) as $pId ) {
+                        if ( !$pId ) {
                             continue;
                         }
                         //list($gId, $pId) = explode(':', $gp);
-                        if (!empty($groupData[$gId][$pId])) {
+                        if ( !empty( $groupData[ $gId ][ $pId ] ) ) {
                             continue;
                         }
                         FCom_Promo_Model_Product::i()->create(array(
-                            'promo_id' => $model->id,
-                            'group_id' => $gId,
-                            'product_id' => $pId,
-                        ))->save();
-                        $groupData[$gId][$pId] = 1;
+                                'promo_id'   => $model->id,
+                                'group_id'   => $gId,
+                                'product_id' => $pId,
+                            ))->save();
+                        $groupData[ $gId ][ $pId ] = 1;
                     }
                 }
-                if (!empty($gp['del'])) {
+
+                if ( !empty( $g[ 'product_ids_remove' ] ) ) {
                     $pIds = array();
-                    foreach (explode(',', $gp['del']) as $pId) {
-                        if (!empty($groupData[$gId][$pId])) {
-                            $pIds[] = $pId;
-                            unset($groupData[$gId][$pId]);
+                    foreach ( explode( ',', $g[ 'product_ids_remove' ] ) as $pId ) {
+                        if ( !empty( $groupData[ $gId ][ $pId ] ) ) {
+                            $pIds[ ] = $pId;
+                            unset( $groupData[ $gId ][ $pId ] );
                         }
                     }
-                    if ($pIds) {
+                    if ( $pIds ) {
                         FCom_Promo_Model_Product::i()->delete_many(array(
-                            'promo_id' => $model->id,
-                            'group_id' => $gId,
-                            'product_id' => $pIds,
-                        ));
+                                'promo_id'   => $model->id,
+                                'group_id'   => $gId,
+                                'product_id' => $pIds,
+                            )
+                        );
                     }
                 }
+
             }
         }
 

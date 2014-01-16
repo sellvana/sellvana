@@ -77,4 +77,36 @@ SET FOREIGN_KEY_CHECKS=1;
         ");
         $this->install__0_1_1();
     }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tCategory = FCom_Blog_Model_Category::table();
+        $tPost = FCom_Blog_Model_Post::table();
+        $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
+        BDb::ddlTableDef($tCategoryPost, array(
+                'COLUMNS' => array(
+                    'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    'category_id'    => 'INT(10) UNSIGNED NOT NULL',
+                    'post_id'   => 'INT(10) UNSIGNED NOT NULL',
+                ),
+                'PRIMARY' => '(id)',
+                'KEYS' => array(
+                    'post_id' => 'UNIQUE (`post_id`,`category_id`)',
+                    'category_id__post_id' => '(`category_id`,`post_id`)',
+                ),
+                'CONSTRAINTS' => array(
+                    "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategoryPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "FK_{$tPost}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                ),
+            ));
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    'name'    => 'varchar(255) NOT NULL',
+                    'url_key'    => 'varchar(255) NOT NULL',
+                    'description'    => 'text NULL',
+                ),
+                'PRIMARY' => '(id)',
+            ));
+    }
 }
