@@ -1,6 +1,6 @@
 modules:
     FCom_Blog:
-        version: 0.1.1
+        version: 0.1.2
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Cms: 0.1.0 } }
         auto_use: [ bootstrap, layout, views ]
@@ -22,3 +22,4 @@ modules:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
                     - [ any, /blog/post/?.action, FCom_Blog_Admin_Controller_Post ]
+                    - [ any, /blog/category/?.action, FCom_Blog_Admin_Controller_Category ]
