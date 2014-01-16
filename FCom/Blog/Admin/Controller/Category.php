@@ -64,4 +64,11 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Admin_Controller_Ab
         }
     }
 
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
+    {
+        if ($model && $model->id) {
+            $view->addTab('post', array('label' => $this->_('Blog Posts'), 'pos' => 20));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
+    }
 }
