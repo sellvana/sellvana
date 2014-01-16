@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'addresses';
@@ -102,4 +102,4 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Admin_Controll
         }
         BResponse::i()->json($result);
     }
-} 
+}

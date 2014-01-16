@@ -186,7 +186,7 @@
         var isSelectable = rc.row._selectable ? '' : 'DISABLED';
         if (rc.row._selectable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
+        print('<input type="checkbox" name="{{ config.id }}[checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
         if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {

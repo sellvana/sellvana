@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Frontend_Frontend_View_Root extends FCom_Core_View_Root
+class FCom_Frontend_View_Root extends FCom_Core_View_Root
 {
     public function setLayoutClass($layout)
     {

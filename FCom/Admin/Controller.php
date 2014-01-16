@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract
+class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function authenticate($args=array())
     {
@@ -118,7 +118,7 @@ class FCom_Admin_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract
         if (!BRequest::i()->xhr()) {
             BResponse::i()->redirect('');
         }
-        $widgets = FCom_Admin_Admin_View_Dashboard::i()->getWidgets();
+        $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
         $widgetKeys = explode(',', BRequest::i()->get('widgets'));
         $result = array();
         foreach ($widgetKeys as $wKey) {

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abstract_GridForm
 {
 
     protected static $_origClass = __CLASS__;

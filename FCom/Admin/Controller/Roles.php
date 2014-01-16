@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_Controller_Roles extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_permission = 'system/roles';

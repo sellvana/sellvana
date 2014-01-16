@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
     public function action_category()
     {

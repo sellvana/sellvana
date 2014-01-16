@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'cms/blocks';
@@ -78,7 +78,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Admin_Controller_Abstr
         } else {
             $orm = FCom_Cms_Model_BlockHistory::i()->orm('bh')->select('bh.*')
                 ->where('block_id', $id);
-            $data = FCom_Admin_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
         }
         BResponse::i()->json($data);
     }

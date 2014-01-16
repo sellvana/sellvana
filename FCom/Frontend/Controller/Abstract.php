@@ -1,7 +1,7 @@
 <?php
 
 
-class FCom_Frontend_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
+class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
     public function action_unauthenticated()
     {

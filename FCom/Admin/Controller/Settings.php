@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_Controller_Settings extends FCom_Admin_Admin_Controller_Abstract
+class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'system/settings';
 

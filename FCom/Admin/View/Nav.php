@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_View_Nav extends FCom_Core_View_Abstract
+class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
 {
     protected static $_allPermissions;
 

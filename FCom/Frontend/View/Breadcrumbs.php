@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Frontend_Frontend_View_Breadcrumbs extends BView
+class FCom_Frontend_View_Breadcrumbs extends BView
 {
     public function getCrumbs()
     {

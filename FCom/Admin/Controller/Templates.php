@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_Controller_Templates extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/templates';
     protected static $_origClass = __CLASS__;

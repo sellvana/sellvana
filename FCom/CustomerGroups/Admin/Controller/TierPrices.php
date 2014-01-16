@@ -5,7 +5,7 @@
  */
 
 class FCom_CustomerGroups_Admin_Controller_TierPrices
-    extends FCom_Admin_Admin_Controller_Abstract_GridForm
+    extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
 
