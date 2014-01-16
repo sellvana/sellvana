@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_Controller_Modules extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';
     protected static $_origClass = __CLASS__;
@@ -98,7 +98,19 @@ class FCom_Admin_Admin_Controller_Modules extends FCom_Admin_Admin_Controller_Ab
             array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
             array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
-            array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true)
+            array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+                'data' => array(
+                    'required' => array(
+                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
+                    ),
+                    'ondemand' => array(
+                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
+                    ),
+                )
+            ),
         );
 
         $config['data'] = $this->getModulesData();
@@ -126,7 +138,7 @@ class FCom_Admin_Admin_Controller_Modules extends FCom_Admin_Admin_Controller_Ab
     {
         BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
         $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
-        BEvents::i()->fire('FCom_Admin_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
+        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->layout('/modules');
     }*/
 

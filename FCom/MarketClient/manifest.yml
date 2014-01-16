@@ -19,4 +19,4 @@ modules:
                     - [ any, /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
                 observe:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
-                    - [ FCom_Admin_Admin_Controller_Modules::gridView, FCom_MarketClient_Admin.onModuleGridView ]
+                    - [ FCom_Admin_Controller_Modules::gridView, FCom_MarketClient_Admin.onModuleGridView ]

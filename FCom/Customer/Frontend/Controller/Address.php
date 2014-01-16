@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
     public function authenticate($args=array())
     {

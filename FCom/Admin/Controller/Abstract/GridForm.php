@@ -1,6 +1,6 @@
 <?php
 
-abstract class FCom_Admin_Admin_Controller_Abstract_GridForm extends FCom_Admin_Admin_Controller_Abstract
+abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Controller_Abstract
 {
     // Required parameters
     protected $_modelClass;# = 'Model_Class_Name';

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_View_Abstract extends FCom_Core_View_Abstract
+class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
 {
     public function addTab($id, $params)
     {

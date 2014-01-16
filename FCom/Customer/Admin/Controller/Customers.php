@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'customers';
@@ -52,7 +52,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             array('field' => 'status', 'type' => 'select'),
         );
         //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
-        //todo: check this in FCom_Admin_Admin_Controller_Abstract_GridForm
+        //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
                 $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');

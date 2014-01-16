@@ -1,5 +1,5 @@
 <?php
-class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_permission = 'promo';
@@ -307,7 +307,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_G
             ->select('pp.qty')
             ->join('FCom_Promo_Model_Promo', array('promo.id','=','pp.promo_id'), 'promo')
         ;
-        $data = FCom_Admin_Admin_View_Grid::i()->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
+        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
         BResponse::i()->json($data);
     }
 

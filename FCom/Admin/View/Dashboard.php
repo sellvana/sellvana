@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Admin_Admin_View_Dashboard extends FCom_Admin_Admin_View_Abstract
+class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
 {
     public function addWidget($widgetKey, $widget)
     {
