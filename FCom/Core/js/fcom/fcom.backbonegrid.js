@@ -1364,6 +1364,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 _saveChanges: function (ev) {
+
                     modalForm.$el.find('textarea, input, select').each(function () {
                         var key = $(this).attr('id');
                         var val = $(this).val();
@@ -1394,15 +1395,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             var hash = BackboneGrid.modalElementVals;
                             hash.id = ids;
                             hash.oper = 'mass-edit';
-                            $.post(BackboneGrid.edit_url, hash)
-                                .done(function (data) {
-                                    if (data.success) {
-                                        $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-                                    } else {
-                                        $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
-                                    }
+                            if (BackboneGrid.data_mode != 'local') {
+                                $.post(BackboneGrid.edit_url, hash)
+                                    .done(function (data) {
+                                        if (data.success) {
+                                            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                                        } else {
+                                            $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
+                                        }
 
-                                });
+                                    });
+                            }
                             delete BackboneGrid.modalElementVals.id;
                             delete BackboneGrid.modalElementVals.oper;
                         }
