@@ -1370,13 +1370,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var val = $(this).val();
                         BackboneGrid.modalElementVals[key] = val;
                     });
+
                     modalForm.formEl.validate();
                     if (!modalForm.formEl.valid())
                         return;
 
                     for (var key in BackboneGrid.modalElementVals) {
-                        if (BackboneGrid.modalElementVals[key] === '')
+                        if (BackboneGrid.modalElementVals[key] === '' || BackboneGrid.modalElementVals[key] === null) {
                             delete BackboneGrid.modalElementVals[key];
+                        }
+
                     }
                     if (modalForm.modalType === 'mass-editable') {
                         var ids = selectedRows.pluck('id').join(",");
@@ -1419,7 +1422,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 })
                             }
                         });
-
                     }
 
                     if (modalForm.modalType === 'addable') {
@@ -1484,6 +1486,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             placeholder: "Select a Field",
                             allowClear: true
                         });
+
                     } else {
                         this.collection.each(this.addElementDiv, this);
                     }
@@ -1559,36 +1562,60 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalMassGridElement = Backbone.View.extend({
                 render: function (data) {
                     var mod = [];
+                    var show = [];
                     console.log(data.modalType);
                     this.collection.each(function (model) {
                         if (model.has(data.modalType) && model.get(data.modalType)) {
-                           mod.push({name: model.get('name'), label: model.get('label')});
+                            if (model.has('mass-editable-show') && model.get('mass-editable-show')) {
+                                show.push(model);
+                            } else {
+                                mod.push({name: model.get('name'), label: model.get('label')});
+                            }
                         }
                     });
-                    this.$el.html(this.template(mod));
+                    if (mod.length > 0) {
+                        this.$el.html(this.template(mod));
+                    }
+                    if (show.length > 0) {
+                        var formEl = BackboneGrid.Views.ModalForm.prototype.el;
+                        show.forEach(function (model) {
+                            var elementView = new BackboneGrid.Views.ModalElement({model: model});
+                            var tmp = elementView.render().el;
+                            elementView.$el.find('#' + model.get('name')).addClass('valid required');
+                            $(formEl).append(tmp);
+                        })
+                    }
                     return this;
                 },
                 events: {
-                    'click .add-field-mass-grid': 'addField'
+                    'change select': 'addField'
                 },
                 addField: function () {
-                    var field = $(BackboneGrid.modalFormId).find('select#'+ config.id + '-sel_sets').val();
+                    var select = $(BackboneGrid.modalFormId).find('select#'+ config.id + '-sel_sets');
+                    var field = select.val();
                     if (field != '') {
                         this.collection.each(function (model) {
                             if (model.get('name') == field) {
                                 var elementView = new BackboneGrid.Views.ModalElement({model: model});
-                                var button = '<button  class="btn box-remove btn-xs btn-link btn-remove remove-field" type="button"><i class="icon-remove"></i></button>';
+                                var button = '<button data-content="'+ model.get('name') +'" class="btn box-remove btn-xs btn-link btn-remove remove-field" type="button"><i class="icon-remove"></i></button>';
                                 if ($(BackboneGrid.Views.ModalForm.prototype.el).find('#' + field).length == 0) {
-                                    $(BackboneGrid.Views.ModalForm.prototype.el).append($(elementView.render().el).append(button));
+                                    var tmp = elementView.render().el;
+                                    elementView.$el.find('#' + model.get('name')).addClass('valid required');
+                                    $(BackboneGrid.Views.ModalForm.prototype.el).append($(tmp).append(button));
+                                    elementView.$el.find('select#' + model.get('name')).val('');
                                 }
-
                             }
                         });
+
                     }
+                    select.find(':selected').addClass('hide');
+                    select.select2('data', null);
                 }
             });
             $('body').on('click', 'button.remove-field', function () {
+                $(BackboneGrid.modalFormId).find('select#'+ config.id + '-sel_sets').find('option[value="'+ $(this).attr('data-content')+'"]').removeClass('hide');
                 $(this).parent().remove();
+
             })
             function updatePageHtml(p, mp) {
                 p = BackboneGrid.currentState.p;
