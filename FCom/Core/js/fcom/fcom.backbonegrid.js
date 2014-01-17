@@ -514,8 +514,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         }
                         switch (type) {
                             case 'text':
-                                var filterVal = filter_val.val + '';
-                                var op = filter_val.op;
+                                var filterVal = BackboneGrid.current_filters[filter_key].val + '';
+                                var op = BackboneGrid.current_filters[filter_key].op;
                                 var check = {};
                                 switch (op) {
                                     case 'contains':
