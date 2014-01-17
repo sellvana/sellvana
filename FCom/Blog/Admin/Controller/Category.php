@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'blog/category';
@@ -19,14 +19,35 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Admin_Controller_Ab
             array('name' => 'name', 'label'=>'Name'),
             array('name' => 'description', 'label'=>'Description'),
             array('name' => 'url_key', 'label'=>'Url Key'),
+            array('name' => 'post', 'label'=>'Posts'),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
                 'data' => array('edit' => array('href' => BApp::href('blog/category/form/?id='), 'col'=>'id'),'delete' => true)),
+        );
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
         );
         $config['filters'] = array(
             array('field' => 'name', 'type' => 'text'),
             array('field' => 'url_key', 'type' => 'text'),
         );
         return $config;
+    }
+
+    public function gridOrmConfig($orm)
+    {
+        parent::gridOrmConfig($orm);
+
+        $orm->left_outer_join('FCom_Blog_Model_CategoryPost', array($this->_mainTableAlias.'.id', '=', 'u.category_id'), 'u')
+            ->group_by($this->_mainTableAlias.'.id')
+            ->select_expr('COUNT(u.category_id)', 'post')
+        ;
     }
 
     public function formViewBefore($args)
@@ -70,5 +91,34 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Admin_Controller_Ab
             $view->addTab('post', array('label' => $this->_('Blog Posts'), 'pos' => 20));
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
+    }
+
+    public function action_category_tree()
+    {
+        $r = BRequest::i()->get();
+        $categoryPosts = FCom_Blog_Model_CategoryPost::i()->orm('p')
+                    ->select('p.category_id')
+                    ->join('FCom_Blog_Model_Post', array('p.post_id', '=', 'u.id'), 'u')
+                    ->where('p.post_id', $r['post-id'])->find_many();
+        $categories = FCom_Blog_Model_Category::i()->orm('c')->select('c.*')->find_many();
+        $result = array();
+        $arr_category_id = array();
+        foreach ($categoryPosts as $arr) {
+            array_push($arr_category_id, $arr->as_array()['category_id']);
+        }
+        foreach ($categories as $arr) {
+            $tmp = $arr->as_array();
+            $attr = (in_array($tmp['id'], $arr_category_id)) ? array('id' => $tmp['id'], "class" => "jstree-checked") : array('id' => $tmp['id']);
+            $tem = array(
+                'data' => $tmp['name'],
+                'attr' => $attr,
+                'state' => null,
+                'rel' => 'root',
+                'position' => $tmp['id'],
+                'children' => null
+            );
+            array_push($result, $tem);
+        }
+        BResponse::i()->json($result);
     }
 }

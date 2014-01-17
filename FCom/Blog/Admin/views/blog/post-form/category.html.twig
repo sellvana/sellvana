@@ -1,0 +1,61 @@
+{% set m = THIS.get('model') %}
+{% set categoryCtrl =  APP.instance('FCom_Blog_Admin_Controller_Category') %}
+<script>
+
+    require(['jquery', 'jstree',  "fcom.admin"], function($) {
+        $(function () {
+            var plugins = ["themes", "json_data", "ui", "checkbox"];
+            $('#categories').jstree({
+                'core': {
+                    animation: 0,
+                    'initially_open': true
+                },
+                "plugins": plugins,
+                'themes': {
+                    //dots: false,
+                    //icons: false
+                },
+                "json_data": {
+                    "ajax": {"url": '{{ APP.href('blog/category/category_tree') }}', "data": function (n) {
+                        return {
+                            "id": n.attr ? n.attr("id").replace("node_", "") : 'NULL',
+                            'expanded': 1,
+                            'refresh': 1,
+                            'post-id': '{{ m.id() }}'
+                        };
+                    }
+                    }},
+                // Configuring the search plugin
+                'checkbox': true/*{ real_checkboxes:true }*/
+            }).bind("change_state.jstree", function (e, data) {
+                var checked_ids = [];
+                $("#categories").jstree("get_checked",null,true).each
+                (function () {
+                    checked_ids.push(this.id);
+                });
+                $('#category-id').val(checked_ids.join(','));
+            })
+        })
+
+
+    });
+
+</script>
+<input type="hidden" name="category-id" id="category-id"/>
+<div class="f-tree-layout">
+    <div class="f-admin-main f-admin-sidebar-view clearfix" id="categories-layout" style="min-height: 900px;">
+        <div id="categories-wrapper" class="clearfix">
+                <div class="text-left">
+                    <h4>{{ "Add post to one or more categories" }}
+                    </h4>
+                </div>
+
+            <div class="f-admin-nav-sidebar f-admin-tree-sidebar" id="categories"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

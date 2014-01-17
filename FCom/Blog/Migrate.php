@@ -95,7 +95,7 @@ SET FOREIGN_KEY_CHECKS=1;
                     'category_id__post_id' => '(`category_id`,`post_id`)',
                 ),
                 'CONSTRAINTS' => array(
-                    "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategoryPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                     "FK_{$tPost}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 ),
             ));
@@ -108,5 +108,17 @@ SET FOREIGN_KEY_CHECKS=1;
                 ),
                 'PRIMARY' => '(id)',
             ));
+    }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tCategory = FCom_Blog_Model_Category::table();
+        $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
+        BDb::ddlTableDef($tCategoryPost, array(
+                'CONSTRAINTS' => array(
+                    "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                ),
+            ));
+
     }
 }

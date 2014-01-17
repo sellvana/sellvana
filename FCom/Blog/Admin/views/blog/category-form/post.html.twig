@@ -2,7 +2,7 @@
 {% set postCtrl =  APP.instance('FCom_Blog_Admin_Controller_Post') %}
 <script>
 
-    require(['jquery'], function($) {
+    require(['jquery', 'fcom.backbonegrid', 'backbone'], function($) {
         var modalGrid = 'category_all_post_grid';
         var data = {
             post : {
