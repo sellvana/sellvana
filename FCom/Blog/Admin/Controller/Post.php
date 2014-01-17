@@ -76,7 +76,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
                 'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
         );
         $config['actions'] = array(
-            'add'=>array('caption'=>'Add selected posts')
+            'add' => array('caption'=>'Add selected posts', 'modal' => true)
         );
         $config['filters'] = array(
             array('field' => 'title', 'type' => 'text'),
@@ -145,5 +145,33 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         return array('config'=>$config);
     }
 
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
+    {
+        if ($model && $model->id) {
+            $view->addTab('category', array('label' => $this->_('Categories'), 'pos' => 20));
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
+    }
 
+    public function formPostAfter($args)
+    {
+        parent::formPostAfter($args);
+        $r = BRequest::i()->post();
+        $model = $args['model'];
+        if ($r['category-id'] != '') {
+            $cp = FCom_Blog_Model_CategoryPost::i();
+            $tmp = explode(',', $r['category-id']);
+            $cp->delete_many(array(
+                    'post_id' => $model->id,
+                    'category_id' => $tmp,
+                ));
+
+            foreach ($tmp as $categoryId) {
+                $cp->create(array(
+                    'post_id' => $model->id,
+                    'category_id' => $categoryId,
+                ))->save();
+            }
+        }
+    }
 }
