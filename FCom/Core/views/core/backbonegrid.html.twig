@@ -251,7 +251,12 @@
             }
 
           } else {
-            print(rc.row[col.name]);
+            if (col.href !== '') {
+                print('<a class="btn-link" href="'+col.href+rc.row['id']+'" title="">' + rc.row[col.name]+'</a>');
+            } else {
+                print(rc.row[col.name]);
+            }
+
           }
         } else if (col.display === 'file_size') {
           var size = parseInt(rc.row[col.name]);

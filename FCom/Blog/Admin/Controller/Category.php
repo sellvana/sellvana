@@ -19,7 +19,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
             array('name' => 'name', 'label'=>'Name'),
             array('name' => 'description', 'label'=>'Description'),
             array('name' => 'url_key', 'label'=>'Url Key'),
-            array('name' => 'post', 'label'=>'Posts'),
+            array('name' => 'post', 'label'=>'Posts', 'href' => BApp::href('blog/post/?category=')),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
                 'data' => array('edit' => array('href' => BApp::href('blog/category/form/?id='), 'col'=>'id'),'delete' => true)),
         );
