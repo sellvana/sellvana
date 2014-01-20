@@ -13,13 +13,16 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     public function gridConfig()
     {
         $config = parent::gridConfig();
+
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'author', 'label'=>'Author'),
             array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
-                  'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
-            array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
+                  'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'), 'index' => $this->_mainTableAlias.'.status'),
+            array('name' => 'title', 'label'=>'Title',
+//                'href' => BApp::href('blog/post/form/?id=:id')
+            ),
             array('name' => 'url_key', 'label'=>'Url Key', 'hidden' => true),
             array('name' => 'meta_title', 'label'=>'Meta Title', 'hidden' => true),
             array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
@@ -30,10 +33,12 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
                   'data' => array('edit' => array('href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),'delete' => true)),
         );
-        $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
-            ->select('p.*')
-            ->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
-            ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
         $config['actions'] = array(
             'edit' => true,
             'delete' => true
@@ -42,7 +47,27 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('field' => 'title', 'type' => 'text'),
             array('field' => 'status', 'type' => 'select'),
         );
+
         return $config;
+    }
+
+    public function gridOrmConfig($orm)
+    {
+        parent::gridOrmConfig($orm);
+        $r = BRequest::i()->get();
+        $orm->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
+            ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
+        if (!BRequest::i()->xhr()) {
+            BSession::i()->pop('categoryBlogPost');
+        }
+        if (isset($r['category'])) {
+            BSession::i()->set('categoryBlogPost', $r['category']);
+        }
+        if (BSession::i()->get('categoryBlogPost')) {
+            $orm->join('FCom_Blog_Model_CategoryPost', array($this->_mainTableAlias.'.id', '=', 'c.post_id'), 'c')
+                ->where('c.category_id', BSession::i()->get('categoryBlogPost'))
+            ;
+        }
     }
 
     public function formViewBefore($args)
@@ -158,14 +183,12 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         parent::formPostAfter($args);
         $r = BRequest::i()->post();
         $model = $args['model'];
-        if ($r['category-id'] != '') {
+        if (isset($r['category-id']) && $r['category-id'] != '') {
             $cp = FCom_Blog_Model_CategoryPost::i();
             $tmp = explode(',', $r['category-id']);
             $cp->delete_many(array(
                     'post_id' => $model->id,
-                    'category_id' => $tmp,
                 ));
-
             foreach ($tmp as $categoryId) {
                 $cp->create(array(
                     'post_id' => $model->id,
