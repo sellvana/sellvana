@@ -30,12 +30,11 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
             $this->gridOrmConfig($config['orm']);
         }
         $config['actions'] = array(
-            'edit' => true,
+            //'edit' => true,
             'delete' => true
         );
         $config['filters'] = array(
             array('field' => 'name', 'type' => 'text'),
-            array('field' => 'url_key', 'type' => 'text'),
         );
         return $config;
     }
