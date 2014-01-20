@@ -104,7 +104,8 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
         $result = array();
         $arr_category_id = array();
         foreach ($categoryPosts as $arr) {
-            array_push($arr_category_id, $arr->as_array()['category_id']);
+            $tmp = $arr->as_array();
+            array_push($arr_category_id, $tmp['category_id']);
         }
         foreach ($categories as $arr) {
             $tmp = $arr->as_array();
