@@ -60,7 +60,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         if (!BRequest::i()->xhr()) {
             BSession::i()->pop('categoryBlogPost');
         }
-        if (isset($r['category'])) {
+        if (isset($r['category'])) {//@todo: find other solution instead use session?
             BSession::i()->set('categoryBlogPost', $r['category']);
         }
         if (BSession::i()->get('categoryBlogPost')) {
