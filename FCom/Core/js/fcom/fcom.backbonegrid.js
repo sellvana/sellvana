@@ -1887,7 +1887,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             var multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
             selectedRows.on('add remove reset', function () {
                 multiselectCol.set('selectedCount', selectedRows.length);
-                multiselectCol.trigger('render');
+                //@todo: fix loop forever when add selected items from inside form, need check this carefully and ask Boris other solutions, or need refactor this
+//                multiselectCol.trigger('render');
                 if (selectedRows.length > 0) {
                     $(BackboneGrid.MassDeleteButton).removeClass('disabled');
                     $(BackboneGrid.MassEditButton).removeClass('disabled');
