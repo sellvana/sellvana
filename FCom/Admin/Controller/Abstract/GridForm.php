@@ -214,7 +214,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 if ($model->validate($model->as_array(), array(), $formId)) {
                     $model->save();
                     BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', 'admin');
-                    if (isset($_POST['saveAndContinue'])) {
+                    if ($r->post('do') === 'saveAndContinue') {
                         $redirectUrl = BApp::href($this->_formHref).'?id='.$model->id;
                     }
                 } else {
