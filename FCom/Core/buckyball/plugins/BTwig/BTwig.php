@@ -93,7 +93,7 @@ class BTwig extends BClass
     {
         $moduleName = is_string($args['module']) ? $args['module'] :
             (is_object($args['module']) ? $args['module']->name : null);
-        static::addPath($args['root_dir'], $args['module']->name);
+        static::addPath($args['root_dir'], $moduleName);
     }
 
     public static function addPath($path, $namespace)

@@ -200,6 +200,7 @@ class BModuleRegistry extends BClass
         $data = array();
         foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
+            unset($data['run_level']);
         }
         #file_put_contents($cacheFile, '<'.'?php return '.var_export($data, 1).';');
         file_put_contents($cacheFile, serialize($data));
