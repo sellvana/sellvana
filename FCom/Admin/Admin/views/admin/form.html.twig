@@ -18,6 +18,14 @@
                 url_post: '{{ formUrl }}'
             });
 
+            //prevent enter to submit form to avoid filter issue
+            $('#{{ formId }} div.f-grid-wrapper').keypress(function (e) {
+                var charCode = e.charCode || e.keyCode || e.which;
+                if (charCode == 13) {
+                    return false;
+                }
+            });
+
             $("#{{ formId }}").validate({
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
