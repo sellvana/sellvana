@@ -355,7 +355,7 @@ class BLayout extends BClass
                 $viewParams = array(
                     'template' => $file,
                     'file_ext' => $m[3],
-                    'module_name' => $curModule->name,
+                    'module_name' => $curModule ? $curModule->name : '',
                     'renderer' => static::$_extRenderers[$m[3]]['callback'],
                 );
                 $this->addView($prefix . $m[2], $viewParams);
