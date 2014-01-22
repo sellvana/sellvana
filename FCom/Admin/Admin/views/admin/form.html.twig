@@ -19,9 +19,8 @@
             });
             var mainForm = '{{ formId }}';
 
-            $('#' + mainForm).keypress(function (e) {
+            $('#' + mainForm).on('keypress', 'input', function (e) {
                 var charCode = e.charCode || e.keyCode || e.which;
-                console.log('nuyen');
                 if (charCode == 13) {
                     //enter will submit instead call first input type submit
                     if ($(e.target).parents('div.f-grid-wrapper').length == 0) {
@@ -30,7 +29,6 @@
                     //prevent enter to submit form to avoid filter issue
                     return false;
                 }
-                return false;
             });
             $('#' + mainForm).validate({
                 ignore: [],//for invisible elements
