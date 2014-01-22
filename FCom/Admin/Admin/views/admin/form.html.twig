@@ -18,20 +18,19 @@
                 url_post: '{{ formUrl }}'
             });
             var mainForm = '{{ formId }}';
-            //prevent enter to submit form to avoid filter issue
-            $('#'+ mainForm + ' div.f-grid-wrapper').keypress(function (e) {
-                var charCode = e.charCode || e.keyCode || e.which;
-                if (charCode == 13) {
-                    return false;
-                }
-            });
-            //enter will submit instead call first input type submit
+
             $('#' + mainForm).keypress(function (e) {
                 var charCode = e.charCode || e.keyCode || e.which;
+                console.log('nuyen');
                 if (charCode == 13) {
-                    $("#{{ formId }}").submit();
+                    //enter will submit instead call first input type submit
+                    if ($(e.target).parents('div.f-grid-wrapper').length == 0) {
+                        $("#{{ formId }}").submit();
+                    }
+                    //prevent enter to submit form to avoid filter issue
                     return false;
                 }
+                return false;
             });
             $('#' + mainForm).validate({
                 ignore: [],//for invisible elements
