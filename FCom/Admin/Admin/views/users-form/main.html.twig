@@ -23,7 +23,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-role-id">{{ 'Role'|_ }}</label>
         <div class="col-md-5">
-            <select id="model-role-id" name="model[role_id]" class="form-control">
+            <select id="model-role-id" name="model[role_id]" class="form-control required">
                 <option></option>
                 {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_Role').options(), validator.fieldValue('role_id'))|raw }}
             </select>
