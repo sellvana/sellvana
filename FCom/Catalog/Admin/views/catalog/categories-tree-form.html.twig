@@ -87,7 +87,17 @@
                 }
             })
         });
-
+        mainForm.on('keypress', 'input', function (e) {
+            var charCode = e.charCode || e.keyCode || e.which;
+            if (charCode == 13) {
+                //enter will submit instead call first input type submit
+                if ($(e.target).parents('div.f-grid-wrapper').length == 0) {
+                    mainForm.submit();
+                }
+                //prevent enter to submit form to avoid filter issue
+                return false;
+            }
+        });
         var categoriesTree = FCom.Admin.load('trees', '#categories');
         if (categoriesTree) {
             $('.page-header').find('button.tree-action').on('click', function(){
