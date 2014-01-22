@@ -83,6 +83,16 @@ SET FOREIGN_KEY_CHECKS=1;
         $tCategory = FCom_Blog_Model_Category::table();
         $tPost = FCom_Blog_Model_Post::table();
         $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
+
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    'name'    => 'varchar(255) NOT NULL',
+                    'url_key'    => 'varchar(255) NOT NULL',
+                    'description'    => 'text NULL',
+                ),
+                'PRIMARY' => '(id)',
+            ));
         BDb::ddlTableDef($tCategoryPost, array(
                 'COLUMNS' => array(
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
@@ -98,15 +108,6 @@ SET FOREIGN_KEY_CHECKS=1;
                     "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                     "FK_{$tPost}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 ),
-            ));
-        BDb::ddlTableDef($tCategory, array(
-                'COLUMNS' => array(
-                    'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                    'name'    => 'varchar(255) NOT NULL',
-                    'url_key'    => 'varchar(255) NOT NULL',
-                    'description'    => 'text NULL',
-                ),
-                'PRIMARY' => '(id)',
             ));
     }
 

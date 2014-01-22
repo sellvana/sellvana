@@ -17,8 +17,23 @@
                 url_get:  '{{ formUrl }}',
                 url_post: '{{ formUrl }}'
             });
-
-            $("#{{ formId }}").validate({
+            var mainForm = '{{ formId }}';
+            //prevent enter to submit form to avoid filter issue
+            $('#'+ mainForm + ' div.f-grid-wrapper').keypress(function (e) {
+                var charCode = e.charCode || e.keyCode || e.which;
+                if (charCode == 13) {
+                    return false;
+                }
+            });
+            //enter will submit instead call first input type submit
+            $('#' + mainForm).keypress(function (e) {
+                var charCode = e.charCode || e.keyCode || e.which;
+                if (charCode == 13) {
+                    $("#{{ formId }}").submit();
+                    return false;
+                }
+            });
+            $('#' + mainForm).validate({
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
                     var info = {};
@@ -58,7 +73,7 @@
 
                 }
             });
-            $("#{{ formId }}").find('input, textarea, select').on('change', function () {
+            $('#' + mainForm).find('input, textarea, select').on('change', function () {
                 $('ul#tabs').find('li.active').each(function () {
                     if ($(this).children('a').find('i.icon-pencil').length === 0) {
                         if ($(this).children('a').children('i.error').length !== 0) {
