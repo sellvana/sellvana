@@ -43,7 +43,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('FCom_Blog_Model_CategoryPost', array($this->_mainTableAlias.'.id', '=', 'u.category_id'), 'u')
+        $orm->left_outer_join('FCom_Blog_Model_PostCategory', array($this->_mainTableAlias.'.id', '=', 'u.category_id'), 'u')
             ->group_by($this->_mainTableAlias.'.id')
             ->select_expr('COUNT(u.category_id)', 'post')
         ;
@@ -61,7 +61,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        $cp = FCom_Blog_Model_CategoryPost::i();
+        $cp = FCom_Blog_Model_PostCategory::i();
         $model = $args['model'];
         $data = BRequest::i()->post();
         if (!empty($data['grid']['post_category']['del'])) {
@@ -95,7 +95,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     public function action_category_tree()
     {
         $r = BRequest::i()->get();
-        $categoryPosts = FCom_Blog_Model_CategoryPost::i()->orm('p')
+        $categoryPosts = FCom_Blog_Model_PostCategory::i()->orm('p')
                     ->select('p.category_id')
                     ->join('FCom_Blog_Model_Post', array('p.post_id', '=', 'u.id'), 'u')
                     ->where('p.post_id', $r['post-id'])->find_many();

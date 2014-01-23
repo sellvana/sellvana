@@ -97,10 +97,21 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         if (!$this->tag_models) {
             $this->tag_models = FCom_Blog_Model_Tag::i()->orm('t')
                 ->join('FCom_Blog_Model_PostTag', array('pt.tag_id','=','t.id'), 'pt')
-                ->where('pt.post_id', $this->id)
-                ->find_many('t.id');
+                ->where('pt.post_id', $this->id())
+                ->find_many();
         }
         return $this->tag_models;
+    }
+
+    public function getCategories()
+    {
+        if (!$this->category_models) {
+            $this->category_models = FCom_Blog_Model_Category::i()->orm('c')
+                ->join('FCom_Blog_Model_PostCategory', array('pc.category_id','=','c.id'), 'pc')
+                ->where('pc.post_id', $this->id())
+                ->find_many();
+        }
+        return $this->category_models;
     }
 
     public function getTagsString()
