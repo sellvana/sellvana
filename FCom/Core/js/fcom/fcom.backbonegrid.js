@@ -660,7 +660,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     //'blur .form-control': '_validate',
                     'click button.btn-delete': '_deleteRow',
                     'click button.btn-edit._modal': '_editModal',
-                    'click button.btn-custom': '_callbackCustom'
+                    'click button.btn-custom': '_callbackCustom',
+                    'click button.btn-edit-inline': 'editInline',
+                    'click button.btn-save-inline': 'saveInline'
                 },
                 initialize: function () {
                     this.model.on('render', this.render, this);
@@ -758,8 +760,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }*/
                     //    return;
                     //}
-                    this.model.set(name, val);
-                    this.model.save(true);
+                    //@todo why change cell must be saved?
+//                    this.model.set(name, val);
+//                    this.model.save(true);
 
                 },
                 _deleteRow: function (ev) {
@@ -805,6 +808,72 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     });
 
 
+                },
+                editInline: function (ev) {
+                    var rows = this;
+                    var edit = false;
+                    BackboneGrid.currentRow = this.model;
+                    if ($(ev.target).parents('form').attr('id') != 'validate-inline') {
+                        $(ev.target).parents('table').wrap('<form id="validate-inline" action="#"></form>');
+                    }
+                    $(ev.target).parents('tr').find('td').each(function () {
+                        var self = this;
+                        columnsCollection.each(function (model) {
+                            if (model.get('name') == $(self).attr('data-col') && model.get('edit_inline')) {
+                                edit = true;
+                                if (model.get('editor') == 'select') {
+                                    $(self).html('<select name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'></select>');
+                                    var options = model.get('options');
+                                    for (var index in options) {
+                                        var selected = (options[index].toLowerCase() == rows.model.get(model.get('name').toLowerCase())) ? 'selected': '';
+                                        $(self).find('select').append('<option value="'+index+'"'+ selected+'>'+ options[index]+'</option>');
+                                    }
+                                    $(self).attr('data-edit', 'select');
+                                } else if (model.get('editor') == 'textarea')  {
+                                    $(self).html('<textarea name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'>' +rows.model.get(model.get('name'))+'</textarea>');
+                                    $(self).attr('data-edit', 'textarea');
+                                } else {
+                                    $(self).attr('data-edit', 'input');
+                                    $(self).html('<input name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" type="text" value="'+ rows.model.get(model.get('name')) +'" '+ validationRules(model.get('validation')) +'>');
+                                }
+
+                            }
+                        })
+                    })
+                    if (edit) {
+                        $(ev.target).parents('tr').find('button.btn-save-inline').removeClass('hide');
+                        $(ev.target).parent().addClass('hide');
+                        $(ev.target).parents('table').parent().validate();
+                    }
+
+                },
+                saveInline: function (ev) {
+                    var valid = true;
+                    $(ev.target).parents('tr').find('input, select, textarea').each(function () {
+                       if (!$(this).valid()) {
+                           valid = false;
+                       }
+                    })
+                    if (valid) {
+                        $(ev.target).parents('tr').find('td').each(function (index) {
+                            if ($(this).attr('data-edit') == 'select') {
+                                var tmp = $(this).children().find('option[value="'+ $(this).children().val()+'"]');
+                                $(this).html(tmp.html());
+                                BackboneGrid.currentRow.set($(this).attr('data-col'), tmp.val());
+                            }
+                            if ($(this).attr('data-edit') == 'input' || $(this).attr('data-edit') == 'textarea') {
+                                BackboneGrid.currentRow.set($(this).attr('data-col'), $(this).children().val());
+                                $(this).html($(this).children().val());
+                            }
+                        })
+                        var id = this.model.get('id');
+                        var hash = this.model.attributes;
+                        hash.id = id;
+                        hash.oper = 'edit';
+                        $.post(BackboneGrid.edit_url, hash);
+                        $(ev.target).parents('tr').find('button.btn-edit-inline').removeClass('hide');
+                        $(ev.target).parent().addClass('hide');
+                    }
                 }
             });
 
@@ -1353,6 +1422,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalElement = Backbone.View.extend({
                 className: 'form-group',
                 render: function () {
+
                     this.$el.html(this.template(this.model.toJSON()));
                     return this;
                 }
@@ -1462,6 +1532,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 render: function () {
                     console.log('render modal form');
                     this.$el.html('');
+
                     var header;
                     switch (this.modalType) {
                         case 'addable':
