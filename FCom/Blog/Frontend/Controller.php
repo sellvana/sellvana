@@ -28,6 +28,24 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->layout('/blog/tag');
     }
 
+    public function action_category()
+    {
+        $catName = BRequest::i()->param('category');
+        if ($catName) {
+            $cat = FCom_Blog_Model_Category::i()->load($catName, 'name');
+            if (!$cat) {
+                $this->forward(false);
+            }
+        }
+        $this->view('head')->rss($cat->getUrl().'/feed.rss');
+        $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
+            ->join('FCom_Blog_Model_CategoryPost', array('pc.post_id','=','p.id'), 'pc')
+            ->where('pc.category_id', $cat->id)
+            ->find_many();
+        $this->view('blog/posts')->set('posts', $posts);
+        $this->layout('/blog/category');
+    }
+
     public function action_author()
     {
         $userName = BRequest::i()->param('user');
@@ -96,15 +114,27 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             }
             $postsOrm
                 ->join('FCom_Blog_Model_PostTag', array('pt.post_id','=','p.id'), 'pt')
-                ->where('pt.tag_id', $tag->id);
+                ->where('pt.tag_id', $tag->id());
         }
+
+        $catKey = BRequest::i()->param('category');
+        if ($catKey) {
+            $cat = FCom_Blog_Model_Category::i()->load($catKey, 'url_key');
+            if (!$cat) {
+                $this->forward(false);
+            }
+            $postsOrm
+                ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
+                ->where('pc.category_id', $cat->id());
+        }
+
         $userName = BRequest::i()->param('user');
         if ($userName) {
             $user = FCom_Admin_Model_User::i()->load($userName, 'username');
             if (!$user) {
                 $this->forward(false);
             }
-            $postsOrm->where('author_user_id', $user->id);
+            $postsOrm->where('author_user_id', $user->id());
         }
         $data = array(
             'title' => BConfig::i()->get('modules/FCom_Blog/blog_title'),

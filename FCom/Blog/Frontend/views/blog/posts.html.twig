@@ -7,7 +7,7 @@
                 by <a class="author vcard" href="{{ APP.href('blog') ~ '/author/' ~ post.getAuthor().username }}">{{ post.getAuthorName() }}</a>
                 on <abbr class="published" title="{{ post.get('create_at') }}">{{ post.get('create_at') | date('F jS') }}</abbr>
             </p>
-            <p>{{ 'Tags:'|_ }} {% for tag in post.getTags() %}<a href="{{ tag.getUrl() }}" class="label">{{ tag.get('tag_name') }}</a>{% endfor %}</p>
+            <p>{{ 'Tags:'|_ }} {% for tag in post.getTags() %}<a href="{{ tag.getUrl() }}" class="label label-default">{{ tag.get('tag_name') }}</a>{% endfor %}</p>
             <div class="entry-preview">
                 {{ post.get('preview') | raw }}
             </div>
