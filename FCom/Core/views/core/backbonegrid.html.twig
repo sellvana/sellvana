@@ -231,6 +231,15 @@
           print('<i class="icon-remove"></i>');
           print('</button>');
         }
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.edit_inline) !== 'undefined') {
+            print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
+                print('<i class="icon-pencil"></i>');
+                print('</button>');
+            print('<button class="btn btn-link btn-save-inline hide '+col.data.editInline+'" type="button">');
+                print('<i class="icon-ok-sign"></i>');
+                print('</button>');
+        }
     } else {
       if (typeof(col.print) !== 'undefined') {
         eval('print('+col.print+');');
