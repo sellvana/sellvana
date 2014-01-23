@@ -32,14 +32,14 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $catName = BRequest::i()->param('category');
         if ($catName) {
-            $cat = FCom_Blog_Model_Category::i()->load($catName, 'name');
+            $cat = FCom_Blog_Model_Category::i()->load($catName, 'url_key');
             if (!$cat) {
                 $this->forward(false);
             }
         }
         $this->view('head')->rss($cat->getUrl().'/feed.rss');
         $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
-            ->join('FCom_Blog_Model_CategoryPost', array('pc.post_id','=','p.id'), 'pc')
+            ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
             ->where('pc.category_id', $cat->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
