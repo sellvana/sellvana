@@ -30,6 +30,25 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-md-2 control-label" for="model-meta-title">{{ 'Meta Title'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control " id="model-meta-title" name="model[meta_title]" cols="5">{{ validator.fieldValue('meta_title') }}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-meta-description">{{ 'Meta Description'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" id="model-meta-description" name="model[meta_description]" cols="5">{{ validator.fieldValue('meta_description') }}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-meta-keywords">{{ 'Meta Keywords'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" id="model-meta-keywords" name="model[meta_keywords]" cols="5">{{ validator.fieldValue('meta_keywords') }}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-md-2 control-label" for="model-preview">{{ 'Preview'|_ }}</label>
         <div class="col-md-10">
             <textarea class="form-control ckeditor" id="model-preview" name="model[preview]" cols="5">{{ validator.fieldValue('preview') }}</textarea>
@@ -41,4 +60,5 @@
             <textarea class="form-content ckeditor" id="model-content" name="model[content]" cols="5">{{ validator.fieldValue('content') }}</textarea>
         </div>
     </div>
+
 </fieldset>
