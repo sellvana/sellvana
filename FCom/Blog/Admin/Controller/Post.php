@@ -64,7 +64,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             BSession::i()->set('categoryBlogPost', $r['category']);
         }
         if (BSession::i()->get('categoryBlogPost')) {
-            $orm->join('FCom_Blog_Model_CategoryPost', array($this->_mainTableAlias.'.id', '=', 'c.post_id'), 'c')
+            $orm->join('FCom_Blog_Model_PostCategory', array($this->_mainTableAlias.'.id', '=', 'c.post_id'), 'c')
                 ->where('c.category_id', BSession::i()->get('categoryBlogPost'))
             ;
         }
@@ -126,7 +126,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             ->select(array('p.id', 'p.author_user_id', 'p.status', 'p.title'));
         $orm->join('FCom_Admin_Model_User', array('p.author_user_id','=','u.id'), 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
-        $orm->join('FCom_Blog_Model_CategoryPost', array('p.id','=','cp.post_id'), 'cp')
+        $orm->join('FCom_Blog_Model_PostCategory', array('p.id','=','cp.post_id'), 'cp')
             ->where('category_id', $model->id);
         $config = array(
             'id'           => 'post_category',
@@ -184,7 +184,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $r = BRequest::i()->post();
         $model = $args['model'];
         if (isset($r['category-id']) && $r['category-id'] != '') {
-            $cp = FCom_Blog_Model_CategoryPost::i();
+            $cp = FCom_Blog_Model_PostCategory::i();
             $tmp = explode(',', $r['category-id']);
             $cp->delete_many(array(
                     'post_id' => $model->id,

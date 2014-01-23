@@ -4,8 +4,7 @@
       {{ THIS.hook('blog_main') | raw }}
     </div>
     <div class="sidebar col-md-4 col-sm-4">
-        {{ THIS.view('blog/sidebar/tags') | raw }}
-        {{ THIS.view('blog/sidebar/categories') | raw }}
+        {{ THIS.hook('blog_sidebar') | raw }}
     </div>
   </div>
 </div>
