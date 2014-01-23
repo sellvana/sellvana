@@ -19,7 +19,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-tags">{{ 'Tags'|_ }}</label>
         <div class="col-md-5">
-            <textarea class="form-control" id="model-tags" name="model[tags">{{ validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString() }}</textarea>
+            <textarea class="form-control" id="model-tags" name="model[tags]">{{ validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString() }}</textarea>
             {#//todo: need update this textarea to suggest availble tags#}
         </div>
     </div>

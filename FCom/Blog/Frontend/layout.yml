@@ -1,20 +1,30 @@
 /blog/index:
     - { include: base }
     - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/posts }
 
 /blog/tag:
     - { include: base }
     - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/category:
+    - { include: base }
+    - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/posts }
 
 /blog/author:
     - { include: base }
     - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/posts }
 
 /blog/archive:
     - { include: base }
     - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/posts }
 
 /blog/post:
     - { include: base }
-    - { hook: main, views: blog/post }
+    - { hook: main, views: blog/index }
+    - { hook: blog_main, views: blog/post }
 

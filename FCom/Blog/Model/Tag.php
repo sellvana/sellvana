@@ -17,7 +17,7 @@ class FCom_Blog_Model_Tag extends FCom_Core_Model_Abstract
             ->join('FCom_Blog_Model_Post', array('p.id','=','pt.post_id'), 'p')
             ->where_in('p.status', array('published'))
             ->group_by('t.id')
-            ->select('t.id')->select('tag_name')->select('(count(*))', 'cnt')
+            ->select('t.id')->select('tag_name')->select('tag_key')->select('(count(*))', 'cnt')
             ->find_many_assoc('id');
     }
 

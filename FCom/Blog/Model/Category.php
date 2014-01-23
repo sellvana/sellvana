@@ -21,4 +21,21 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
         }
         return !$orm->find_one();
     }
+
+    public function getUrl()
+    {
+        return BApp::href('blog/category/' . $this->get('url_key'));
+    }
+
+    static public function getCategoryCounts()
+    {
+        return FCom_Blog_Model_Category::i()->orm('c')
+            ->join('FCom_Blog_Model_CategoryPost', array('pc.category_id','=','c.id'), 'pc')
+            ->join('FCom_Blog_Model_Post', array('p.id','=','pc.post_id'), 'p')
+            //->where_in('p.status', array('published'))
+            ->group_by('c.id')
+            ->select('c.id')->select('c.name')->select('c.url_key')->select('(count(*))', 'cnt')
+            ->find_many_assoc('c.id');
+    }
+
 }

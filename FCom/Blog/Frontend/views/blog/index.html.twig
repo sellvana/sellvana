@@ -1,4 +1,12 @@
-<div class="">
-    {{ THIS.view('blog/posts') | raw }}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-sm-8">
+      {{ THIS.hook('blog_main') | raw }}
+    </div>
+    <div class="sidebar col-md-4 col-sm-4">
+        {{ THIS.view('blog/sidebar/tags') | raw }}
+        {{ THIS.view('blog/sidebar/categories') | raw }}
+    </div>
+  </div>
 </div>
 {{ THIS.view('disqus/counts') | raw }}
