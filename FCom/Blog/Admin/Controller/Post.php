@@ -18,7 +18,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'author', 'label'=>'Author'),
-            array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+            array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
                   'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'), 'index' => $this->_mainTableAlias.'.status'),
             array('name' => 'title', 'label'=>'Title',
 //                'href' => BApp::href('blog/post/form/?id=:id')
@@ -27,7 +27,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'meta_title', 'label'=>'Meta Title', 'hidden' => true),
             array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
             array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
-            array('name' => 'create_ym', 'label'=>'Create ym'),
+            array('name' => 'create_ym', 'label'=>'Create ym' , 'hidden' => true),
             array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
             array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
