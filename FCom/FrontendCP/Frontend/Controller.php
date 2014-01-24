@@ -1,6 +1,6 @@
 <?php
 
-class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Admin_Controller_Abstract
+class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_upload()
     {

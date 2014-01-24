@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Blog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
     {
@@ -26,6 +26,24 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Ab
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
         $this->layout('/blog/tag');
+    }
+
+    public function action_category()
+    {
+        $catName = BRequest::i()->param('category');
+        if ($catName) {
+            $cat = FCom_Blog_Model_Category::i()->load($catName, 'url_key');
+            if (!$cat) {
+                $this->forward(false);
+            }
+        }
+        $this->view('head')->rss($cat->getUrl().'/feed.rss');
+        $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
+            ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
+            ->where('pc.category_id', $cat->id)
+            ->find_many();
+        $this->view('blog/posts')->set('posts', $posts);
+        $this->layout('/blog/category');
     }
 
     public function action_author()
@@ -78,6 +96,9 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Ab
         }
         $this->view('head')->canonical($post->getUrl());
         $this->view('blog/post')->set('post', $post);
+        $this->view('head')->addTitle($post->get('title'));
+        $this->view('head')->addMeta('description', $post->get('meta_description'));
+        $this->view('head')->addMeta('keywords', $post->get('meta_keywords'));
         $this->layout('/blog/post');
     }
 
@@ -93,15 +114,27 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Ab
             }
             $postsOrm
                 ->join('FCom_Blog_Model_PostTag', array('pt.post_id','=','p.id'), 'pt')
-                ->where('pt.tag_id', $tag->id);
+                ->where('pt.tag_id', $tag->id());
         }
+
+        $catKey = BRequest::i()->param('category');
+        if ($catKey) {
+            $cat = FCom_Blog_Model_Category::i()->load($catKey, 'url_key');
+            if (!$cat) {
+                $this->forward(false);
+            }
+            $postsOrm
+                ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
+                ->where('pc.category_id', $cat->id());
+        }
+
         $userName = BRequest::i()->param('user');
         if ($userName) {
             $user = FCom_Admin_Model_User::i()->load($userName, 'username');
             if (!$user) {
                 $this->forward(false);
             }
-            $postsOrm->where('author_user_id', $user->id);
+            $postsOrm->where('author_user_id', $user->id());
         }
         $data = array(
             'title' => BConfig::i()->get('modules/FCom_Blog/blog_title'),

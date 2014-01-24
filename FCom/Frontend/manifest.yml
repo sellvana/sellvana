@@ -15,13 +15,13 @@ modules:
         areas:
             FCom_Frontend:
                 views:
-                    - [ root, { view_class: FCom_Frontend_Frontend_View_Root } ]
-                    - [ breadcrumbs, { view_class: FCom_Frontend_Frontend_View_Breadcrumbs } ]
+                    - [ root, { view_class: FCom_Frontend_View_Root } ]
+                    - [ breadcrumbs, { view_class: FCom_Frontend_View_Breadcrumbs } ]
                 auto_use: [ bootstrap, views ]
                 routing:
-                    - [ route, _ /noroute, FCom_Frontend_Frontend_Controller.noroute, {}, null, false ]
-                    - [ get, /, FCom_Frontend_Frontend_Controller.index ]
-                    - [ get, /*view, FCom_Frontend_Frontend_Controller.static ]
+                    - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]
+                    - [ get, /, FCom_Frontend_Controller.index ]
+                    - [ get, /*view, FCom_Frontend_Controller.static ]
 
     FCom_Frontend_DefaultTheme:
         version: 0.1.0

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abstract
 {
     public function action_sitemap()
     {

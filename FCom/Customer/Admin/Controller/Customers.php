@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'customers';
@@ -18,9 +18,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
-            array('name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 'editor' => 'select',
+            array('name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 'editor' => 'select', 'mass-editable-show' => false,
                   'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
-            array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
+            array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select', 'mass-editable-show' => false,
                   'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
@@ -52,7 +52,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Admin_Controll
             array('field' => 'status', 'type' => 'select'),
         );
         //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
-        //todo: check this in FCom_Admin_Admin_Controller_Abstract_GridForm
+        //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
                 $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');

@@ -361,7 +361,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
         },
         messageSent: function (msg) {
             var itemModel = this.collection.findWhere({msg_id: msg.msg_id});
-            playDing();
+//            playDing();
             if (itemModel) {
                 itemModel.set('time', msg.time);
 

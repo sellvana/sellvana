@@ -5,7 +5,7 @@
  */
 
 class FCom_PaymentIdeal_Frontend_Controller
-    extends FCom_Frontend_Frontend_Controller_Abstract
+    extends FCom_Frontend_Controller_Abstract
 {
     public function action_report()
     {

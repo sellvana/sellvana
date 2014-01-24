@@ -46,7 +46,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
     }
     RowModelEx.prototype.save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Admin_Controller_Modules') {
+        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
         }
         var data = {
@@ -60,7 +60,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     }
 
     RowModelEx.prototype.mass_save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Admin_Controller_Modules') {
+        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
         }
         console.log(ev.rows);

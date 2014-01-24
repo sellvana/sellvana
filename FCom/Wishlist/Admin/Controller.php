@@ -1,5 +1,5 @@
 <?php
-class FCom_Wishlist_Admin_Controller extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'wishlist';
