@@ -815,6 +815,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if ($(ev.target).parents('form').attr('id') != 'validate-inline') {
                         $(ev.target).parents('table').wrap('<form id="validate-inline" action="#"></form>');
                     }
+                    $(ev.target).parents('table').parent().validate();
                     $(ev.target).parents('tr').find('td').each(function () {
                         var self = this;
                         columnsCollection.each(function (model) {
@@ -841,13 +842,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     default:
                                         break;
                                 }
+                                if (typeof(model.get('validation')) !== 'undefined' && model.get('validation').unique) {
+                                    validateUnique($(self).children(), model, true);
+                                }
                             }
                         })
                     })
                     if (edit) {
                         $(ev.target).parents('tr').find('button.btn-save-inline').removeClass('hide');
                         $(ev.target).parent().addClass('hide');
-                        $(ev.target).parents('table').parent().validate();
+
                         if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['before_edit_inline']) !== 'undefined') {
                             var func = BackboneGrid.callbacks['before_edit_inline'];
                             var script = func + '(this.$el,this.model.toJSON());';
@@ -1596,30 +1600,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     this.collection.each(function (col) {
                         if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
-                            var url = col.get('validation').unique;
                             if (modalForm.$el.find('#' + col.get('name')).length) {
-                                modalForm.$el.find('#' + col.get('name')).rules("add", {
-                                    onfocusout: false,
-                                    onkeyup: false,
-                                    remote: {
-                                        url: url,
-                                        type: 'post',
-                                        data: {
-                                            _name: col.get('name')
-                                        },
-                                        dataFilter: function (responseString) {
-                                            var response = jQuery.parseJSON(responseString);
-                                            currentMessage = response.Message;
-                                            if (modalForm.modalType === 'editable' && BackboneGrid.currentRow.get('id') === response.id)
-                                                return true;
-                                            return response.unique;
-                                        }
-                                        //async:false
-                                    },
-                                    messages: {
-                                        remote: "This " + col.get('label') + " is already taken place"
-                                    }
-                                });
+                                validateUnique(modalForm.$el.find('#' + col.get('name')), col, false);
                             }
                         }
                     });
@@ -1825,6 +1807,34 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             /*if (BackboneGrid.data_mode === 'local') {
              state.mp = config.data.data.length;
              }*/
+
+            function validateUnique(element, model ,editInline) {
+                var url = model.get('validation').unique;
+                element.rules("add", {
+                    onfocusout: false,
+                    onkeyup: false,
+                    remote: {
+                        url: url,
+                        type: 'post',
+                        data: {
+                            _name: model.get('name')
+                        },
+                        dataFilter: function (responseString) {
+                            var response = jQuery.parseJSON(responseString);
+                            currentMessage = response.Message;
+                            if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
+                                return true;
+                            }
+                            return response.unique;
+                        }
+                        //async:false
+                    },
+                    messages: {
+                        remote: "This " + model.get('label') + " is already taken place"
+                    }
+                });
+            }
+
             if (config.data_mode != 'local') {
                 $('ul.pagination.page').on('click', 'li', function (ev) {
                     var li = $(this);
