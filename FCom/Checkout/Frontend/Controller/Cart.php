@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
     {

@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Admin_Controller_Abstract_TreeForm
+class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract_TreeForm
 {
     protected static $_origClass = __CLASS__;
     protected $_permission = 'catalog/categories';

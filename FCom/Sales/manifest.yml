@@ -21,7 +21,7 @@ modules:
                     - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
                 observe:
-                    - [ FCom_Admin_Admin_View_Header::getNotifications, FCom_Sales_Main.checkDefaultShippingPayment ]
+                    - [ FCom_Admin_View_Header::getNotifications, FCom_Sales_Main.checkDefaultShippingPayment ]
 
             FCom_ApiServer:
                 routing:

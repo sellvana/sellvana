@@ -4,7 +4,7 @@
  * @project fulleron
  */
 
-class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
 

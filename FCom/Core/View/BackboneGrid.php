@@ -665,7 +665,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $this->_processGridFilters($config, $filters, $orm);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_Admin_View_Grid::processORM', array('orm'=>$orm));
+            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
             BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
         }
 
@@ -962,6 +962,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 //TODO: any faster solution?
                 BEvents::i()->fire($class.'::action_grid_data.data_row', array('row'=>$row, 'columns'=>$columns));
             }*/
+
+
         foreach($rows as $row) {
             $data = array();
 
@@ -972,9 +974,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $k = $col['name'];
 
                 $val = !empty($row->$k) ? $row->$k : '';
-                if (!empty($col['options'])) {
-                    $val = $col['options'][$row->$k];
-                }
+//                if (isset($col['options']) && !empty($col['options'])) {
+                    if (isset($col['options'][$row->$k])) {
+                        $val = $col['options'][$row->$k];
+                    }
+//                }
                 /*if (!empty($col['editoptions']['value'][$val])) {
                     $val = $col['editoptions']['value'][$val];
                 }*/

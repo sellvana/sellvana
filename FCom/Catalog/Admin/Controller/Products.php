@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller_Abstract_GridForm
+class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'FCom_Catalog_Model_Product';
@@ -97,7 +97,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Admin_Controller
         if ($m->id) {
             $newAction['duplicate'] = '<a href="'.BApp::href($this->_gridHref.'/duplicate?id='.$m->id).'" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_('Duplicate') . '</span></a>';
         }
-        $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="saveAndContinue" ><span>' .  BLocale::_('Save And Continue') . '</span></button>';
+        $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue" ><span>' .  BLocale::_('Save And Continue') . '</span></button>';
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set(array(
             'sidebar_img'=>$m->thumbUrl(98),

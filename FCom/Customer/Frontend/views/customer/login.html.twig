@@ -6,6 +6,7 @@
           <h1 class="f-page-title">{{ 'Login' |_ }}</h1>
         </header>
         {{ THIS.view('core/messages') | raw }}
+        <div id="login-cookie-message"></div>
         <div class="form-group">
             <label for="email" class="control-label">{{ "Email" | _ }}</label>
             <div class="controls">
@@ -33,9 +34,14 @@
   </div>
 </div>
 <script>
-require(['jquery', 'jquery.validate'], function($) {
+require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
     $(function() {
         $('#login-form').validate();
     })
+
+    $.cookie('check-cookies', true);
+    if (!$.cookie('check-cookies')) {
+        $("#login-cookie-message").html('<div class="alert alert-danger">{{ "This login form requires cookies enabled"|_ }}</div>');
+    }
 })
 </script>

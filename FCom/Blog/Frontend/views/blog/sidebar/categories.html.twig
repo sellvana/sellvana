@@ -1,0 +1,14 @@
+{% set categories = APP.instance('FCom_Blog_Model_Category').getCategoryCounts() %}
+
+{% if categories %}
+    <div class="widget">
+        <header class="widget-header">
+          <strong class="widget-title">{{ 'Categories'|_ }}</strong>
+        </header>
+        <ul class="blog-categories-list">
+        {% for cat in categories %}
+          <li><a href="{{ cat.getUrl() }}">{{ cat.get('name') }} ({{ cat.get('cnt') }})</a></li>
+        {% endfor %}
+        </ul>
+    </div><!-- /.widget -->
+{% endif %}

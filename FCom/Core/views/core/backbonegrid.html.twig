@@ -169,8 +169,26 @@
   </div>
 </script>
 
-<script type="template" id="{{ config.id }}-row-template">
-  <% for (var index in rc.colsInfo) {
+<script type="template" id="{{ config.id }}-row-template"> {
+  <%
+    function printCustomButton (obj, id) {
+        if (obj.type === 'link') {
+            print('<a class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
+            if (typeof(obj.icon) !== 'undefined') {
+                print('<i class="' + obj.icon + '"></i>');
+            }
+            print(obj.caption);
+            print('</a>');
+        } else if (typeof(obj.type) === 'undefined' || obj.type === 'button') {
+            print('<button class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
+            if (typeof(obj.icon) !== 'undefined') {
+                print('<i class="' + obj.icon + '"></i>');
+            }
+            print(obj.caption);
+            print('</button>');
+        }
+    }
+    for (var index in rc.colsInfo) {
     var col = rc.colsInfo[index];
     if(col.hidden || col.form_only) {
       continue;
@@ -186,25 +204,17 @@
         var isSelectable = rc.row._selectable ? '' : 'DISABLED';
         if (rc.row._selectable && rc.row.selected)
           isSelected = 'checked';
-        print('<input type="checkbox" name="[{{ config.id}}][checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
+        print('<input type="checkbox" name="{{ config.id }}[checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
         print('&nbsp;&nbsp;');
-        if (typeof(col.data.custom) !== 'undefined' && col.data.custom) {
-          if (col.data.custom.type === 'link') {
-              print('<a class="btn btn-link btn-custom" href="'+col.data.custom.href+rc.row[col.data.edit.col]+'" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
-                if (typeof(col.data.custom.icon) !== 'undefined') {
-                    print('<i class="' + col.data.custom.icon + '"></i>');
+        if (typeof(col.data.custom) !== 'undefined') {
+            if (typeof(col.data.custom[0]) ===  'object') {
+                for (var index in col.data.custom) {
+                    printCustomButton(col.data.custom[index], rc.row[col.data.edit.col]);
                 }
-                print(col.data.custom.caption);
-              print('</a>');
-          } else if (typeof(col.data.custom.type) === 'undefined' || col.data.custom.type === 'button') {
-              print('<button class="btn btn-link btn-custom" type="button" title="'+(col.data.custom.title ? col.data.custom.title : '')+'">');
-              if (typeof(col.data.custom.icon) !== 'undefined') {
-                print('<i class="' + col.data.custom.icon + '"></i>');
-              }
-              print(col.data.custom.caption);
-              print('</button>');
-          }
+            } else {
+                printCustomButton(col.data.custom, rc.row[col.data.edit.col]);
+            }
         }
 
         print('&nbsp;&nbsp;');
@@ -220,6 +230,15 @@
           print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
           print('</button>');
+        }
+        print('&nbsp;&nbsp;');
+        if (typeof(col.data.edit_inline) !== 'undefined') {
+            print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
+                print('<i class="icon-pencil"></i>');
+                print('</button>');
+            print('<button class="btn btn-link btn-save-inline hide '+col.data.editInline+'" type="button">');
+                print('<i class="icon-ok-sign"></i>');
+                print('</button>');
         }
     } else {
       if (typeof(col.print) !== 'undefined') {
@@ -251,7 +270,12 @@
             }
 
           } else {
-            print(rc.row[col.name]);
+            if (col.href !== '') {
+                print('<a class="btn-link" href="'+col.href+rc.row['id']+'" title="">' + rc.row[col.name]+'</a>');
+            } else {
+                print(rc.row[col.name]);
+            }
+
           }
         } else if (col.display === 'file_size') {
           var size = parseInt(rc.row[col.name]);
@@ -524,6 +548,21 @@
           </div>
       </li>
     </ul>
+</script>
+
+<script type="template" id="{{ config.id }}-add-set-fields">
+    <div class="well">
+        <div class="row">
+            <div class="col-sm-12">
+                <select id="{{ config.id }}-sel_sets" class="select2 form-control" style="width:150px;">
+                    <option value=""></option>
+                    <% for (var index in rc) {
+                    print('<option value="'+rc[index].name+'">'+ rc[index].label+ '</option>');
+                     }%>
+                </select>
+            </div>
+        </div>
+    </div>
 </script>
 <script>
 require(['jquery', 'fcom.backbonegrid'], function($) {

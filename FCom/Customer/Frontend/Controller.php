@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controller_Abstract
+class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
     {
@@ -150,7 +150,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Frontend_Controlle
             $a = BRequest::i()->post('address');
             $customerModel = FCom_Customer_Model_Customer::i();
             $formId = 'register-form';
-            $emailUniqueRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist'));
+            $emailUniqueRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists'));
             if ($customerModel->validate($r, $emailUniqueRules, $formId)) {
                 $customer = $customerModel->register($r);
                 if ($a) {

@@ -87,18 +87,25 @@
                 }
             })
         });
-
+        mainForm.on('keypress', 'input', function (e) {
+            var charCode = e.charCode || e.keyCode || e.which;
+            if (charCode == 13) {
+                //enter will submit instead call first input type submit
+                if ($(e.target).parents('div.f-grid-wrapper').length == 0) {
+                    mainForm.submit();
+                }
+                //prevent enter to submit form to avoid filter issue
+                return false;
+            }
+        });
         var categoriesTree = FCom.Admin.load('trees', '#categories');
         if (categoriesTree) {
-            $('.tree-action').find('a').on('click', function(){
-                var action = $(this).attr('rel');
+            $('.page-header').find('button.tree-action').on('click', function(){
+                var action = $(this).attr('data-action');
                 var selected = categoriesTree.jstree('get_selected');
                 switch (action) {
                     case 'create':
                         categoriesTree.jstree('create', selected, 'inside', { data: 'New Node'}, false, false);
-                        break;
-                    case 'rename':
-                        categoriesTree.jstree('rename', selected);
                         break;
                     case 'remove':
                         categoriesTree.jstree('remove', selected);
@@ -112,6 +119,7 @@
                     case 'refresh':
                         categoriesTree.jstree('refresh', selected);
                 }
+                return false;
             });
         }
     });
@@ -122,21 +130,19 @@
   <div class="page-header">
     <div class="f-page-title">{{ m.get('full_name')|replace('|', ' > ') }}</div>
     <div class="btn-group">
-      <!--<button class="btn btn-default btn-sm" id="category_clone" type="submit" name="action" value="clone">{{ 'Clone'|_ }}</button>-->
+      <button class="btn btn-primary btn-sm tree-action" data-action="create">{{ 'Create Subnode'|_ }}</button>
+      <button class="btn btn-primary btn-sm tree-action" data-action="clone">{{ 'Clone'|_ }}</button>
+      <button class="btn btn-primary btn-sm tree-action" data-action="reorder">{{ 'Reorder Subnodes A-Z'|_ }}</button>
+      <button class="btn btn-primary btn-sm tree-action" data-action="refresh">{{ 'Refresh Subnodes'|_ }}</button>
+      <button class="btn btn-primary btn-sm tree-action" data-action="remove">{{ 'Delete'|_ }}</button>
       <button class="btn btn-primary btn-sm" id="category_save" type="submit" name="action" value="save">{{ 'Save'|_ }}</button>
     </div>
   </div>
-  <div class="tree-action">
+  {#<div class="tree-action">
     <div class="btn-group">
-      <a href="#" rel="create" class="btn btn-primary">{{ 'Create' }}</a>
-      <a href="#" rel="rename" class="btn btn-primary">{{ 'Rename' }}</a>
-      <a href="#" rel="remove" class="btn btn-primary">{{ 'Delete' }}</a>
-      <a href="#" rel="clone" class="btn btn-primary">{{ 'Clone' }}</a>
-      <a href="#" rel="select" class="btn btn-primary">{{ 'Select' }}</a>
-      <a href="#" rel="reorder" class="btn btn-primary">{{ 'Reorder A-Z' }}</a>
-      <a href="#" rel="refresh" class="btn btn-primary">{{ 'Refresh' }}</a>
+
     </div>
-  </div>
+  </div>#}
   <div class="nav">
     <ul class="nav nav-tabs">
       {% for k, tab in tabs %}
