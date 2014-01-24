@@ -64,13 +64,13 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $resArr = FCom_PayPal_RemoteApi::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
         if (false===$resArr) {
-            BSession::i()->addMessage(FCom_PayPal_RemoteApi::i()->getError(), 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('checkout/checkout'));
+            $this->message(FCom_PayPal_RemoteApi::i()->getError(), 'error');
+            BResponse::i()->redirect('checkout/checkout');
         }
 
         if (empty($resArr['PAYERID'])) {
-            BSession::i()->addMessage('Payment action not initiated', 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('checkout'));
+            $this->message('Payment action not initiated', 'error');
+            BResponse::i()->redirect('checkout');
         }
         /*
         $cart->set(array(
@@ -124,8 +124,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             */
         $resArr = FCom_PayPal_RemoteApi::i()->call('DoExpressCheckoutPayment', $nvpArr);
         if (false===$resArr) {
-            BSession::i()->addMessage(FCom_PayPal_RemoteApi::i()->getError(), 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('checkout'));
+            $this->message(FCom_PayPal_RemoteApi::i()->getError(), 'error');
+            BResponse::i()->redirect('checkout');
         }
         /*
         $cart->set(array(

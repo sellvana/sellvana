@@ -84,7 +84,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
             //check this address is belong to this user
             if ($id && $address && $address->customer_id != $customer->id()) {
-                BSession::i()->addMessage($this->_('You don\'t have permission to update this address'), 'error', 'frontend');
+                $this->message('You don\'t have permission to update this address', 'error');
                 //$response->redirect('unauthorized');
             }
             if ($address->validate($post, array(), $formId)) {
@@ -97,16 +97,16 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                     $customer->default_billing_id = $address->id();
                 }
                 $customer->save();
-                BSession::i()->addMessage($this->_('Address saved successful'), 'success', 'frontend');
+                $this->message('Address saved successful');
                 $response->redirect(BApp::href('customer/address'));
             } else {
-                BSession::i()->addMessage($this->_('Invalid address data, please fix above errors.'), 'error', 'validator-errors:'.$formId);
+                $this->message('Invalid address data, please fix above errors.', 'error', 'validator-errors:'.$formId);
                 $this->formMessages($formId);
                 $response->redirect(BApp::href('customer/address/edit').($id ? '?id='.$id : ''));
             }
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $this->message($e->getMessage(), 'error');
             $response->redirect(BApp::href('customer/address/edit').($id ? '?id='.$id : ''));
         }
     }
@@ -122,16 +122,16 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address = FCom_Customer_Model_Address::i()->load($id);
             //you can't change address for empty cart
             if (!$cart) {
-                BResponse::i()->redirect(BApp::href('cart'));
+                BResponse::i()->redirect('cart');
             }
             if (!$address) {
-                BSession::i()->addMessage($this->_('Cannot find address you select, please try again'), 'error', 'frontend');
-                BResponse::i()->redirect(BApp::href('/customer/address/choose') . '?t=' . $type);
+                $this->message('Cannot find address you select, please try again', 'error');
+                BResponse::i()->redirect('customer/address/choose' . '?t=' . $type);
             }
             //you can't choose address which is not belongs to you
             if ($customer->id() != $address->get('customer_id')) {
-                BSession::i()->addMessage($this->_('You can\'t choose address which is not belongs to you'), 'error', 'frontend');
-                BResponse::i()->redirect(BApp::href('checkout'));
+                $this->message('You can\'t choose address which is not belongs to you', 'error');
+                BResponse::i()->redirect('checkout');
             }
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
@@ -146,7 +146,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
             $customer->save();
 
-            BResponse::i()->redirect(BApp::href('checkout'));
+            BResponse::i()->redirect('checkout');
         }
 
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();

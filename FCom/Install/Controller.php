@@ -34,9 +34,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
-            BResponse::i()->redirect(BApp::href('?error=1'));
+            BResponse::i()->redirect('?error=1');
         }
-        BResponse::i()->redirect(BApp::href('install/step1'));
+        BResponse::i()->redirect('install/step1');
     }
 
     public function action_step1()
@@ -61,7 +61,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->redirect('install/step2');
         } catch (Exception $e) {
             //print_r($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $this->message($e->getMessage(), 'error', 'install');
             BResponse::i()->redirect('install/step1');
         }
     }
@@ -97,7 +97,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ->login();
             BResponse::i()->redirect('install/step3');
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $this->message($e->getMessage(), 'error', 'install');
             BResponse::i()->redirect('install/step2');
         }
     }
