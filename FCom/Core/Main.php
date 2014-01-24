@@ -355,6 +355,7 @@ class FCom_Core_Main extends BClass
 
     public function writeConfigFiles($files = null)
     {
+        //TODO: make more flexible, to account for other (custom) file names
         if (is_null($files)) {
             $files = array('core', 'db', 'local');
         }
@@ -388,6 +389,15 @@ class FCom_Core_Main extends BClass
             $config->writeFile('local.php', $local);
         }
         return $this;
+    }
+
+    public function getConfigVersionHash()
+    {
+        $dir = BConfig::i()->get('fs/config_dir');
+        foreach (array('core', 'db', 'local') as $f) {
+            $hash += filemtime($dir.'/'.$f);
+        }
+        return $hash;
     }
 
     public function resizeUrl($full=false)
