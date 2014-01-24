@@ -96,8 +96,8 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
         $this->view('head')->canonical($post->getUrl());
         $this->view('blog/post')->set('post', $post);
-        $this->view('head')->addTitle($post->get('meta_tile'));
-        $this->view('head')->addMeta('description', $post->get('meta_keywords'));
+        $this->view('head')->addTitle($post->get('title'));
+        $this->view('head')->addMeta('description', $post->get('meta_description'));
         $this->view('head')->addMeta('keywords', $post->get('meta_keywords'));
         $this->layout('/blog/post');
     }
