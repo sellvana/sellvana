@@ -784,7 +784,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.model.destroy();
                 },
                 render: function () {
-                    console.log('row-render');
+//                    console.log('row-render');
                     var colsInfo = columnsCollection.toJSON();
 
                     this.$el.html(this.template({row: this.model.toJSON(), colsInfo: colsInfo}));
