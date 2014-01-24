@@ -62,6 +62,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    public function message($msg, $type='success', $tag='admin', $options=array())
+    {
+        $this->message(BLocale::_($msg), $type, $tag, $options);
+        return $this;
+    }
+
     public function initFormTabs($view, $model, $mode='view', $allowed=null)
     {
 
@@ -211,7 +217,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));
 
-        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
+        //BResponse::i()->redirect('fieldsets/grid_data');
         BResponse::i()->json($result);
     }
 

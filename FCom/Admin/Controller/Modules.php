@@ -165,23 +165,23 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 BConfig::i()->set('module_run_levels/'.$area, $levels[$area], false, true);
             }
             FCom_Core_Main::i()->writeConfigFiles('core');
-            BSession::i()->addMessage('Run levels updated', 'success', 'admin');
+            $this->message('Run levels updated');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect(BApp::href('modules'));
+        BResponse::i()->redirect('modules');
     }
 
     public function action_migrate__POST()
     {
         try {
             BMigrate::i()->migrateModules(true);
-            BSession::i()->addMessage('Migration complete', 'success', 'admin');
+            $this->message('Migration complete');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect(BApp::href('modules'));
+        BResponse::i()->redirect('modules');
     }
 }

@@ -34,13 +34,13 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                     BDb::connect();
                     //FCom_Core_Main::i()->writeConfigFiles('db');
                 } catch (Exception $e) {
-                    BSession::i()->addMessage('Invalid DB configuration, not saved: '.$e->getMessage(), 'error', 'admin');
+                    $this->message('Invalid DB configuration, not saved: '.$e->getMessage(), 'error');
                 }
             }
             FCom_Core_Main::i()->writeConfigFiles();
 
             if (!$xhr) {
-                BSession::i()->addMessage('Settings updated', 'success', 'admin');
+                $this->message('Settings updated');
             } else {
                 $result = array('message' => BLocale::_('Settings has been saved successfully'), 'status' => 'success');
             }
@@ -49,7 +49,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
             BDebug::logException($e);
             if (!$xhr) {
-                BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+                $this->message($e->getMessage(), 'error');
             } else {
                 $result = array('message' => BLocale::_($e->getMessage()), 'status' => 'error');
             }
@@ -60,7 +60,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             $tab = 'FCom_Admin';
         }
         if (!$xhr) {
-            BResponse::i()->redirect(BApp::href('settings').'?tab='.$tab);
+            BResponse::i()->redirect('settings'.'?tab='.$tab);
         } else {
             BResponse::i()->json($result);
         }

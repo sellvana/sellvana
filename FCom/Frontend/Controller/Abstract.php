@@ -38,6 +38,12 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         return true;
     }
 
+    public function message($msg, $type='success', $tag='frontend', $options=array())
+    {
+        $this->message(BLocale::_($msg), $type, $tag, $options);
+        return $this;
+    }
+
     /**
      * convert validate error messages to frontend messages to show
      */
@@ -50,7 +56,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
             foreach ($messages as $m) {
                 $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
             }
-            BSession::i()->addMessage($msg, 'error', 'frontend');
+            $this->message($msg, 'error');
         }
     }
 }

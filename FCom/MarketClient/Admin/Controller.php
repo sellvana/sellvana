@@ -96,8 +96,8 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 }
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error');
-            BResponse::i()->redirect(BApp::href("market"), 'error');
+            $this->message($e->getMessage(), 'error');
+            BResponse::i()->redirect("market", 'error');
         }
 
         $model = new stdClass();
@@ -154,19 +154,19 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             $modules = FCom_MarketClient_Main::i()->getModules(array($modName));
             $module = $modules[$modName];
         } catch(Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error');
+            $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         try {
             $moduleFile = FCom_MarketClient_Main::i()->downloadPackage($modName);
         } catch(Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error');
+            $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
         if (!$moduleFile) {
-            BSession::i()->addMessage("Permissions denied to write into file: ".$moduleFile, 'error');
+            $this->message("Permissions denied to write into file: ".$moduleFile, 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
         }
 
@@ -174,7 +174,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
             FCom_MarketClient_Main::i()->installFiles($modName, $moduleFile);
         } catch (Exception $e) {
             foreach (explode("\n", $e->getMessage()) as $error) {
-                BSession::i()->addMessage($error, 'error');
+                $this->message($error, 'error');
             }
             BResponse::i()->redirect("marketclient3/form?mod_name={$modName}");
         }
@@ -191,8 +191,8 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 FCom_MarketClient_Model_Modules::orm()->create($data)->save();
             }
         }
-        BSession::i()->addMessage("Module successfully uploaded.");
-        BResponse::i()->redirect(BApp::href("marketclient/form")."?mod_name={$modName}");
+        $this->message("Module successfully uploaded.");
+        BResponse::i()->redirect("marketclient/form"."?mod_name={$modName}");
         //BResponse::i()->redirect("index");
         //$this->forward('index');
     }

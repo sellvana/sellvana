@@ -297,8 +297,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         if ($id) {
             $model = FCom_CustomField_Model_Set::i()->load($id);
             if (empty($model)) {
-                BSession::i()->addMessage('Invalid field set ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::href('customfields/fieldsets'));
+                $this->message('Invalid field set ID', 'error');
+                BResponse::i()->redirect('customfields/fieldsets');
             }
         } else {
             $model = FCom_CustomField_Model_Set::i()->create();
@@ -341,13 +341,13 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 $id = $model->id;
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href('customfields/customfield/form/?id='.$id));
+            BResponse::i()->redirect('customfields/customfield/form/?id='.$id);
         }
     }
 
