@@ -19,3 +19,8 @@ Documentation
 -------------
 
 https://bitbucket.org/sellvana/fullerondoc
+
+Bug Reporting and Suggestions
+--------------------------
+
+https://fulleron.atlassian.net/browse/SCC
