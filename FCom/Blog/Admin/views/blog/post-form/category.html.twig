@@ -28,13 +28,42 @@
                 // Configuring the search plugin
                 'checkbox': true/*{ real_checkboxes:true }*/
             }).bind("change_state.jstree", function (e, data) {
+                var tab = $('a[href="#tab-category"]');
+                var html = '<i class="icon-pencil"></i>';
+                if (tab.find('i.icon-pencil').length === 0) {
+                    if (tab.find('i.error').length == 0) {
+                        tab.append(html);
+                    } else {
+                        $(html).insertBefore(tab.find('i.error'));
+                    }
+                }
+                var checked_ids = getCategoryChecked();
+                if (checked_ids.length) {
+                    $('#categories-layout').find('label.error').hide();
+                    tab.find('i.error').hide();
+                } else {
+                    if ($('#model-status').val() == 'published') {
+                        $('#categories-layout').find('label.error').show();
+                        tab.find('i.error').show();
+                    }
+                }
+                $('#categories-layout').find('label.error').show();
+            }).bind('loaded.jstree', function () {
+                getCategoryChecked();
+                var htmlLabel = '<label for="model-status"  class="error" style="display: none">You must choose one or more category.</label>';
+                var htmlIcon = '<i class="icon-warning-sign error" style="display: none"></i>';
+                $('#categories-layout').prepend(htmlLabel);
+                $('a[href="#tab-category"]').append(htmlIcon);
+            });
+            function getCategoryChecked () {
                 var checked_ids = [];
                 $("#categories").jstree("get_checked",null,true).each
                 (function () {
                     checked_ids.push(this.id);
                 });
                 $('#category-id').val(checked_ids.join(','));
-            })
+                return checked_ids;
+            }
         })
 
 

@@ -92,7 +92,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public static function validatePasswordSecurity($data, $args)
     {
         $password = $data[$args['field']];
-        if(strlen($password) > 0 &&!preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
+        if(strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
             return false;
         }
         return true;
