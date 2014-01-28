@@ -64,7 +64,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function message($msg, $type='success', $tag='admin', $options=array())
     {
-        BSession::i()->addMessage(BLocale::_($msg), $type, $tag, $options);
+        if (is_array($msg)) {
+            array_walk($msg, 'BLocale::_');
+        }
+        BSession::i()->addMessage($msg, $type, $tag, $options);
         return $this;
     }
 
