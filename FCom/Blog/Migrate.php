@@ -93,7 +93,7 @@ SET FOREIGN_KEY_CHECKS=1;
                 ),
                 'PRIMARY' => '(id)',
             ));
-        BDb::ddlTableDef($tCategoryPost, array(
+        BDb::ddlTableDef($tPostCategory, array(
                 'COLUMNS' => array(
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
