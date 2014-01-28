@@ -11,7 +11,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $product = FCom_Catalog_Model_Product::i()->load($r['pid']);
         if (!$product) {
             //TODO: add notification
-            BResponse::i()->redirect(BApp::href());
+            BResponse::i()->redirect('');
         }
 
         if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
@@ -80,10 +80,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 }
             } else {
                 if ($valid) {
-                    BSession::i()->addMessage($successMessage, 'success', 'frontend');
+                    $this->message($successMessage);
                     $url = $product->url();
                 } else {
-                    BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$this->formId);
+                    $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$this->formId);
                     $url = BApp::href('prodreviews/add?pid='.$product->id());
                 }
                 BResponse::i()->redirect($url);
@@ -207,7 +207,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 'customer_id' => $customerId
             ));
         if (!$pr) {
-            BSession::i()->addMessage(BLocale::_('Cannot find your review, please check again'), 'error', 'validator-errors:'.$this->formId);
+            $this->message('Cannot find your review, please check again', 'error', 'validator-errors:'.$this->formId);
         } else {
             $prod = FCom_Catalog_Model_Product::i()->load($pr->product_id);
 
@@ -239,8 +239,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             ));
         $prod = FCom_Catalog_Model_Product::i()->load($pr->product_id);
         if (!$pr) {
-            BSession::i()->addMessage(BLocale::_('Cannot load your review, please check again'), 'error', 'validator-errors:'.$this->formId);
-            BResponse::i()->redirect(BApp::href('prodreviews/edit?pr='.$pr->id()));
+            $this->message('Cannot load your review, please check again', 'error', 'validator-errors:'.$this->formId);
+            BResponse::i()->redirect('prodreviews/edit?pr='.$pr->id());
         }
         //$valid = $pr->set($post['review'])->save();
         $needApprove = BConfig::i()->get('modules/FCom_ProductReviews/need_approve');
@@ -265,10 +265,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
         } else {
             if ($valid) {
-                BSession::i()->addMessage($successMessage, 'success', 'frontend');
+                $this->message($successMessage);
                 $url = $prod->url();
             } else {
-                BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$this->formId);
+                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$this->formId);
                 $url = BApp::href('prodreviews/edit?pr='.$pr->id());
             }
             BResponse::i()->redirect($url);

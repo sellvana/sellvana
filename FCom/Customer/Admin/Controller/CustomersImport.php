@@ -38,20 +38,20 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
     public function action_config__POST()
     {
         FCom_Customer_Import::i()->config(BRequest::i()->post('config'));
-        BResponse::i()->redirect(BApp::href('customers/import/status'));
+        BResponse::i()->redirect('customers/import/status');
     }
 
     public function action_start()
     {
         FCom_Customer_Import::i()->run();
-        BResponse::i()->redirect(BApp::href('customers/import/status'));
+        BResponse::i()->redirect('customers/import/status');
         exit;
     }
 
     public function action_stop()
     {
         FCom_Customer_Import::i()->config(array('status'=>'stopped'), true);
-        BResponse::i()->redirect(BApp::href('customers/import/status'));
+        BResponse::i()->redirect('customers/import/status');
     }
 
     public function action_status()

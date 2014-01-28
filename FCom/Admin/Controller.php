@@ -47,15 +47,15 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 if ($user) {
                     $user->login();
                 } else {
-                    BSession::i()->addMessage('Invalid user name or password.', 'error', 'admin');
+                    $this->message('Invalid user name or password.', 'error');
                 }
             } else {
-                BSession::i()->addMessage('Username and password cannot be blank.', 'error', 'admin');
+                $this->message('Username and password cannot be blank.', 'error');
             }
             $url = BSession::i()->data('admin_login_orig_url');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
         BResponse::i()->redirect(!empty($url) ? $url : BApp::href());
     }
@@ -71,8 +71,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         if ($user) {
             $user->recoverPassword();
         }
-        BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.', 'success', 'admin');
-        BResponse::i()->redirect(BApp::href());
+        $this->message('If the email address was correct, you should receive an email shortly with password recovery instructions.');
+        BResponse::i()->redirect('');
     }
 
     public function action_password_reset()
@@ -83,8 +83,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         ) {
             $this->layout('/password/reset');
         } else {
-            BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'admin');
-            BResponse::i()->redirect(BApp::href());
+            $this->message('Invalid link. It is possible your recovery link has expired.', 'error');
+            BResponse::i()->redirect('');
         }
     }
 
@@ -99,10 +99,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             && $user->get('token') === $token
         ) {
             $user->resetPassword($password);
-            BSession::i()->addMessage('Password has been reset', 'success', 'admin');
-            BResponse::i()->redirect(BApp::href());
+            $this->message('Password has been reset');
+            BResponse::i()->redirect('');
         } else {
-            BSession::i()->addMessage('Invalid form data', 'error', 'admin');
+            $this->message('Invalid form data', 'error');
             BResponse::i()->redirect(BRequest::i()->currentUrl());
         }
     }
@@ -110,7 +110,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::href());
+        BResponse::i()->redirect('');
     }
 
     public function action_dashboard()
@@ -148,20 +148,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $r = BRequest::i();
         $data = $r->post('model');
         if (empty($data['password_current']) || !$model->validatePassword($data['password_current'])) {
-            BSession::i()->addMessage('Missing or invalid current password');
+            $this->message('Missing or invalid current password');
             BResponse::i()->redirect('my_account');
         }
         try {
             if (!empty($data['password'])) {
                 if (empty($data['password_confirm']) || $data['password'] !== $data['password_confirm']) {
-                    BSession::i()->addMessage('Missing or not matching password confirmation');
+                    $this->message('Missing or not matching password confirmation');
                     BResponse::i()->redirect('my_account');
                 }
             }
             $model->set($data)->save();
-            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+            $this->message('Changes have been saved');
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         BResponse::i()->redirect('my_account');
