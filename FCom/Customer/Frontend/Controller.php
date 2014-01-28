@@ -16,16 +16,28 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_login()
     {
         $this->layout('/customer/login');
+
+        $redirect = BRequest::i()->get('redirect_to');
+        if ($redirect==='CURRENT') {
+            $redirect = BRequest::i()->referrer();
+        }
+        if ($redirect) {
+            BSession::i()->data('login_orig_url', $redirect);
+        }
     }
 
     public function action_login__POST()
     {
         try {
+            $r = BRequest::i();
             $customerModel = FCom_Customer_Model_Customer::i();
-            $r = BRequest::i()->post('login');
+            $login = $r->post('login');
+            if (!$login) {
+                $login = $r->post();
+            }
             $customerModel->setLoginRules();
-            if ($customerModel->validate($r, array(), 'frontend')) {
-                $user = $customerModel->authenticate($r['email'], $r['password']);
+            if ($customerModel->validate($login, array(), 'frontend')) {
+                $user = $customerModel->authenticate($login['email'], $login['password']);
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
@@ -57,12 +69,15 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             } else {
                 $this->formMessages();
             }
-            if (BRequest::i()->post('backroute')) {
-                $url = BApp::href(BRequest::i()->post('backroute'));
+            if ($r->request('redirect_to')) {
+                $url = $r->request('redirect_to');
+                if ($url==='CURRENT') {
+                    $url = $r->referrer();
+                }
             } else {
                 $url = BSession::i()->data('login_orig_url');
             }
-            BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
+            BResponse::i()->redirect(!empty($url) ? $url : '');
         } catch (Exception $e) {
             BDebug::logException($e);
             BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
