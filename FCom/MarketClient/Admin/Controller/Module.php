@@ -21,14 +21,14 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
         foreach ($install as $modName => $modInfo) {
             $filename = FCom_MarketClient_RemoteApi::i()->downloadPackage($modName, $modInfo['version']);
             if (!$filename) {
-                BSession::i()->addMessage('Could not download module package file: '.$modName.' ('.$modInfo['version'].')');
+                $this->message('Could not download module package file: '.$modName.' ('.$modInfo['version'].')');
                 continue;
             }
             $modNameArr = explode('_', $modName);
             $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] .'/'. $modNameArr[1];
             BUtil::ensureDir($targetDir);
             if (!BUtil::zipExtract($filename, $targetDir)) {
-                BSession::i()->addMessage('Could not extract module package file: '.$modName.' ('.$modInfo['version'].')');
+                $this->message('Could not extract module package file: '.$modName.' ('.$modInfo['version'].')');
                 continue;
             }
             if (!empty($modInfo['enable'])) {

@@ -232,7 +232,7 @@
           print('</button>');
         }
         print('&nbsp;&nbsp;');
-        if (typeof(col.data.edit_inline) !== 'undefined') {
+        if (typeof(col.data.edit_inline) !== 'undefined' && col.data.edit_inline) {
             print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
                 print('<i class="icon-pencil"></i>');
                 print('</button>');

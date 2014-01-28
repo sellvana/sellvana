@@ -26,7 +26,7 @@ class FCom_AuthorizeNet_Frontend_Controller extends FCom_Core_Controller_Abstrac
 
             $response->render();
         } else {
-            BSession::i()->addMessage("Error -- not AuthorizeNet. Check your MD5 Setting.", 'error', 'frontend');
+            $this->message("Error -- not AuthorizeNet. Check your MD5 Setting.", 'error');
             $response->redirect('checkout/checkout');
         }
     }
