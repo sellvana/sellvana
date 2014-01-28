@@ -114,8 +114,8 @@ SET FOREIGN_KEY_CHECKS=1;
     public function upgrade__0_1_2__0_1_3()
     {
         $tCategory = FCom_Blog_Model_Category::table();
-        $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
-        BDb::ddlTableDef($tCategoryPost, array(
+        $tPostCategory = FCom_Blog_Model_PostCategory::table();
+        BDb::ddlTableDef($tPostCategory, array(
             'CONSTRAINTS' => array(
                 "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
