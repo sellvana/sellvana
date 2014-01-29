@@ -120,7 +120,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             if ($xhr) {
                 return;
             } else {
-                BSession::i()->addMessage('No products to compare');
+                $this->message('No products to compare');
                 BResponse::i()->redirect(FCom_Core_Main::i()->lastNav());
             }
         }

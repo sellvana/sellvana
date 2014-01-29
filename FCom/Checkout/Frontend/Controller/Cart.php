@@ -34,7 +34,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
                 if (!$p){
                     // todo add message to be displayed
-                    BResponse::i()->redirect(BApp::href('/'));
+                    BResponse::i()->redirect('/');
                     return;
                 }
                 $qty = !empty($post['qty']) ? $post['qty'] : 1;
@@ -44,7 +44,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     $cart->save();
                 }
                 $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-                BSession::i()->addMessage('The product has been added to your cart', 'success', 'frontend');
+                $this->message('The product has been added to your cart');
                 break;
             }
         } else {
@@ -73,7 +73,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     BSession::i()->data('shipping_estimate', $estimate);
                 }
                 $cart->calculateTotals()->save();
-                BSession::i()->addMessage('Your cart has been updated', 'success', 'frontend');
+                $this->message('Your cart has been updated');
             }
         }
         BResponse::i()->redirect($cartHref);
