@@ -2477,7 +2477,7 @@ class BModel extends Model
      */
     public function validate($data = array(), $rules = array(), $formName = 'admin')
     {
-        if (!$data) {
+        if (!$data && $this->orm) {
             $data = $this->as_array();
         }
         $rules = array_merge($this->_validationRules, $rules);
