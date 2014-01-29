@@ -24,5 +24,4 @@ Report bugs and request improvements at [Sellvana's Bug Tracker](https://sellvan
 Documentation
 -------------
 
-https://bitbucket.org/sellvana/sellvanadoc
-
+[https://bitbucket.org/sellvana/sellvanadoc](https://bitbucket.org/sellvana/sellvanadoc)
