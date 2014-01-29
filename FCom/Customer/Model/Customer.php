@@ -54,6 +54,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         array('default_shipping_id', '@integer'),
         array('default_billing_id', '@integer'),
+        array('password', 'FCom_Admin_Model_User::validatePasswordSecurity', 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.'),
         /*array('customer_group', '@integer'),*/
     );
     //todo: set rules password minimum length
@@ -210,6 +211,15 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $data = parent::as_array();
         unset($data['password_hash']);
         return $data;
+    }
+
+    public static function validatePasswordSecurity($data, $args)
+    {
+        $password = $data[$args['field']];
+        if(strlen($password) > 0 &&!preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
+            return false;
+        }
+        return true;
     }
 
     public function validatePassword($password)

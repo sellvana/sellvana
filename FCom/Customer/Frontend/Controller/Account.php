@@ -35,7 +35,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
                     $url = Bapp::href('customer/myaccount');
                     BResponse::i()->redirect($url);
                 } catch(Exception $e) {
-                    BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+                    $this->message($e->getMessage(), 'error');
                     $url = Bapp::href('customer/myaccount/edit');
                     BResponse::i()->redirect($url);
                 }
@@ -66,18 +66,18 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
             if ($customer->validate($r, $expandRules, $formId)) {
                 $customer->set($r)->save();
-                BSession::i()->addMessage($this->_('Your account info has been updated'), 'success', 'frontend');
-                BResponse::i()->redirect(BApp::href('customer/myaccount'));
+                $this->message('Your account info has been updated');
+                BResponse::i()->redirect('customer/myaccount');
             } else {
-                BSession::i()->addMessage($this->_('Cannot save data, please fix above errors'), 'error', 'validator-errors:' . $formId);
+                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);
-                BResponse::i()->redirect(BApp::href('customer/myaccount/edit'));
+                BResponse::i()->redirect('customer/myaccount/edit');
             }
 
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
-            BResponse::i()->redirect(Bapp::href('customer/myaccount/edit'));
+            $this->message($e->getMessage(), 'error');
+            BResponse::i()->redirect('customer/myaccount/edit');
         }
     }
 
@@ -102,7 +102,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
                 $url = Bapp::href('customer/myaccount');
                 BResponse::i()->redirect($url);
             } catch(Exception $e) {
-                BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+                $this->message($e->getMessage(), 'error');
                 $url = Bapp::href('customer/myaccount/editpassword');
                 BResponse::i()->redirect($url);
             }
@@ -127,19 +127,19 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
             if ($customer->validate($r, array(), $formId)) {
                 if (!Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
-                    BSession::i()->addMessage($this->_('Current password is not correct, please try again'), 'error', 'frontend');
-                    BResponse::i()->redirect(BApp::href('customer/myaccount/editpassword'));
+                    $this->message('Current password is not correct, please try again', 'error');
+                    BResponse::i()->redirect('customer/myaccount/editpassword');
                 } else {
                     $customer->set($r)->save();
-                    BSession::i()->addMessage($this->_('Your password has been updated'), 'success', 'frontend');
-                    BResponse::i()->redirect(BApp::href('customer/myaccount'));
+                    $this->message('Your password has been updated');
+                    BResponse::i()->redirect('customer/myaccount');
                 }
             } else {
                 $this->formMessages($formId);
-                BResponse::i()->redirect(BApp::href('customer/myaccount/editpassword'));
+                BResponse::i()->redirect('customer/myaccount/editpassword');
             }
         } catch(Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $this->message($e->getMessage(), 'error');
             $url = Bapp::href('customer/myaccount/editpassword');
             BResponse::i()->redirect($url);
         }

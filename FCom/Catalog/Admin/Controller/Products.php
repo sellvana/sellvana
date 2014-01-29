@@ -637,15 +637,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
                     $redirectUrl = BApp::href($this->_formHref).'?id='.$newModel->id;
-                    BSession::i()->addMessage($this->_('Duplicate successful'), 'success', 'admin');
+                    $this->message('Duplicate successful');
                 } else {
-                    BSession::i()->addMessage($this->_('An error occurred while creating model.'), 'error', 'admin');
+                    $this->message('An error occurred while creating model.', 'error');
                 }
             } else {
-                BSession::i()->addMessage($this->_('Cannot load model with id ' . $id), 'error', 'admin');
+                $this->message('Cannot load model with id ' . $id, 'error');
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         BResponse::i()->redirect($redirectUrl);
@@ -708,7 +708,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'linked_product_id' => $link->linked_product_id,
                 );
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product links.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product links.', 'error');
                     return false;
                 }
             }
@@ -732,7 +732,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $data['product_id'] = $new->id;
                 $data['create_at'] = $data['update_at'] = date('Y-m-d H:i:s');
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product medias.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product medias.', 'error');
                     return false;
                 }
             }
@@ -756,7 +756,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $data['product_id'] = $new->id;
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product reviews.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product reviews.', 'error');
                     return false;
                 }
             }
