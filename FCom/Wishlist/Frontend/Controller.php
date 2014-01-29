@@ -55,7 +55,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $id = BRequest::i()->get('id');
         $p = FCom_Catalog_Model_Product::i()->load($id);
         if (!$p) {
-            BSession::i()->addMessage(BLocale::_('Invalid product'), 'error', 'frontend');
+            $this->message('Invalid product', 'error');
         } else {
             $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
             if (!$wishlist) {
@@ -63,7 +63,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 return;
             }
             $wishlist->addItem($id);
-            BSession::i()->addMessage(BLocale::_('Product was added to wishlist'), 'success', 'frontend');
+            $this->message('Product was added to wishlist');
         }
         BResponse::i()->redirect('wishlist');
     }

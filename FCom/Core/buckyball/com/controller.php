@@ -1686,7 +1686,7 @@ class BRouting extends BClass
 
     public function redirectCallback($args)
     {
-        BResponse::i()->redirect(BApp::href($args['target']));
+        BResponse::i()->redirect($args['target']);
     }
 
     /**
