@@ -217,13 +217,13 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         try {
             $model = FCom_Customer_Model_Customer::i()->load($id);
             if (!$model) {
-                BSession::i()->addMessage($this->_('Cannot load this customer model'), 'error', 'admin');
+                $this->message('Cannot load this customer model', 'error');
                 $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
             } else {
                 $model->login();
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
         }
 

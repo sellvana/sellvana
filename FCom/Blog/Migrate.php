@@ -82,7 +82,7 @@ SET FOREIGN_KEY_CHECKS=1;
     {
         $tCategory = FCom_Blog_Model_Category::table();
         $tPost = FCom_Blog_Model_Post::table();
-        $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
+        $tPostCategory = FCom_Blog_Model_PostCategory::table();
 
         BDb::ddlTableDef($tCategory, array(
                 'COLUMNS' => array(
@@ -93,7 +93,7 @@ SET FOREIGN_KEY_CHECKS=1;
                 ),
                 'PRIMARY' => '(id)',
             ));
-        BDb::ddlTableDef($tCategoryPost, array(
+        BDb::ddlTableDef($tPostCategory, array(
                 'COLUMNS' => array(
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
@@ -105,7 +105,7 @@ SET FOREIGN_KEY_CHECKS=1;
                     'category_id__post_id' => '(`category_id`,`post_id`)',
                 ),
                 'CONSTRAINTS' => array(
-                    "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                     "FK_{$tPost}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 ),
             ));
@@ -114,10 +114,10 @@ SET FOREIGN_KEY_CHECKS=1;
     public function upgrade__0_1_2__0_1_3()
     {
         $tCategory = FCom_Blog_Model_Category::table();
-        $tCategoryPost = FCom_Blog_Model_CategoryPost::table();
-        BDb::ddlTableDef($tCategoryPost, array(
+        $tPostCategory = FCom_Blog_Model_PostCategory::table();
+        BDb::ddlTableDef($tPostCategory, array(
             'CONSTRAINTS' => array(
-                "FK_{$tCategoryPost}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
 
@@ -125,6 +125,6 @@ SET FOREIGN_KEY_CHECKS=1;
 
     public function upgrade__0_1_3__0_1_4()
     {
-        BDb::run("RENAME TABLE fcom_blog_category_post TO fcom_blog_post_category");
+        //BDb::run("RENAME TABLE fcom_blog_category_post TO fcom_blog_post_category");
     }
 }
