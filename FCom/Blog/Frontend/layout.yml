@@ -2,6 +2,7 @@ blog_default:
     - { hook: main, views: blog/index }
     - { hook: blog_sidebar, views: blog/sidebar/categories }
     - { hook: blog_sidebar, views: blog/sidebar/tags }
+    - { view: head, do: [[ title, Blog ]] }
 
 /blog/index:
     - { include: base }
