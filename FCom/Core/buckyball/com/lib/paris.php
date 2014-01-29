@@ -318,7 +318,10 @@
          */
         public function __get($property) {
 #$bt = debug_backtrace(); BDebug::log('__get: '.$bt[0]['file'].':'.$bt[0]['line']);
-if (!is_object($this->orm)) { echo "<pre>"; debug_print_backtrace(); echo "</pre>"; }
+if (!is_object($this->orm)) {
+    echo "Calling __get() without \$orm setup: ";
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+}
 //if (memory_get_usage()>500000000) { echo "<pre>"; debug_print_backtrace(); echo "</pre>"; }
             return $this->orm->get($property);
         }
@@ -328,6 +331,10 @@ if (!is_object($this->orm)) { echo "<pre>"; debug_print_backtrace(); echo "</pre
          */
         public function __set($property, $value) {
 #$bt = debug_backtrace(); BDebug::log('__set: '.$bt[0]['file'].':'.$bt[0]['line']);
+if (!is_object($this->orm)) {
+    echo "Calling __set() without \$orm setup: ";
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+}
             $this->orm->set($property, $value);
         }
 
@@ -344,7 +351,8 @@ if (!is_object($this->orm)) { echo "<pre>"; debug_print_backtrace(); echo "</pre
          */
         public function get($property) {
 if (!$this->orm) {
-    debug_print_backtrace();
+    echo "Calling get() without \$orm setup: ";
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
     return null;
 }
             return $this->orm->get($property);
@@ -355,7 +363,8 @@ if (!$this->orm) {
          */
         public function set($property, $value) {
 if (!$this->orm) {
-    debug_print_backtrace();
+    echo "Calling set() without \$orm setup: ";
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
             $this->orm->set($property, $value);
         }
@@ -371,6 +380,10 @@ if (!$this->orm) {
          * Wrapper for Idiorm's as_array method.
          */
         public function as_array() {
+if (!$this->orm) {
+    echo "Calling as_array() without \$orm setup: ";
+    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+}
             $args = func_get_args();
             return call_user_func_array(array($this->orm, 'as_array'), $args);
         }

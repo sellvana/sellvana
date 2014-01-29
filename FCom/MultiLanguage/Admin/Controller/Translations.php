@@ -151,6 +151,6 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             file_put_contents($filename, $_POST['source']);
         }
 
-        BResponse::i()->redirect(BApp::href($this->_gridHref));
+        BResponse::i()->redirect($this->_gridHref);
     }
 }
