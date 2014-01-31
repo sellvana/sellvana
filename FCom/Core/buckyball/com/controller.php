@@ -661,10 +661,10 @@ class BRequest extends BClass
         $scheme = static::scheme();
         $port = static::httpPort();
         $url = $scheme.'://'.static::httpHost();
-        if (!BConfig::i()->get('web/hide_script_name')) {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
-        } else {
+        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
             $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
+        } else {
+            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
         }
         $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
         return $url;
