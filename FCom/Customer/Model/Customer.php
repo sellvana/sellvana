@@ -215,8 +215,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public static function validatePasswordSecurity($data, $args)
     {
+echo 1; exit;
+        if (!BConfig::i()->get('modules/FCom_Customer/password_strength')) {
+            return true;
+        }
         $password = $data[$args['field']];
-        if(strlen($password) > 0 &&!preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
+        if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
             return false;
         }
         return true;
