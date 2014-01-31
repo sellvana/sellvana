@@ -36,11 +36,12 @@ class BTwig extends BClass
 
         static::$_cacheDir = $config->get('fs/cache_dir').'/twig';
         BUtil::ensureDir(static::$_cacheDir);
-
+        $isDev = BDebug::is('DEBUG,DEVELOPMENT');
         $options = array(
-            'cache' => static::$_cacheDir,
-            'debug' => 0,#$config->get('modules/BTwig/debug'),
-            'auto_reload' => 1,#$config->get('modules/BTwig/auto_reload'),
+            'cache' => static::$_cacheDir,#$isDev ? false : static::$_cacheDir,
+            'debug' => false,#$config->get('modules/BTwig/debug'),
+            'auto_reload' => $isDev ? true : false,#$config->get('modules/BTwig/auto_reload'),
+            'optimizations' => -1,
         );
 
         static::$_fileLoader = new Twig_Loader_Filesystem($path); //TODO: possible not to add path?
@@ -49,7 +50,7 @@ class BTwig extends BClass
         static::$_stringLoader = new Twig_Loader_String();
         static::$_stringTwig = new Twig_Environment(static::$_stringLoader, $options);
 
-        if ($options['debug']) {
+        if (!empty($options['debug'])) {
             static::$_fileTwig->addExtension(new Twig_Extension_Debug());
             static::$_stringTwig->addExtension(new Twig_Extension_Debug());
         }

@@ -2423,7 +2423,7 @@ class BModel extends Model
         }
     }
 
-    public function fieldOptions($field=null, $key=null)
+    public function fieldOptions($field=null, $key=null, $emptyValue=null)
     {
         if (is_null($field)) {
             return static::$_fieldOptions;
@@ -2439,6 +2439,17 @@ class BModel extends Model
                 return null;
             }
             return $options[$key];
+        }
+        if (!is_null($emptyValue) && false !== $emptyValue) {
+            if (true === $emptyValue) {
+                $emptyValue = 'Please select...';
+            }
+            if (is_scalar($emptyValue)) {
+                $emptyValue = array('' => $emptyValue);
+            }
+            if (is_array($emptyValue)) {
+                $options = $emptyValue + $options;
+            }
         }
         return $options;
     }
