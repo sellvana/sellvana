@@ -1180,7 +1180,7 @@ class BUtil extends BClass
     {
         $attrsHtmlArr = array();
         foreach ($attrs as $k => $v) {
-            if ('' === $v || is_null($v) || false === $v) {
+            if (is_null($v) || false === $v) {
                 continue;
             }
             if (true === $v) {
