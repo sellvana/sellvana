@@ -1,3 +1,6 @@
+<!--{ label: Customer Info }-->
+<!--{ pos: 10 }-->
+
 {% set m = THIS.get('model') %}
 {% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
@@ -271,7 +274,7 @@
             $('#model-password').parents('form').validate({
                 rules:{
                     'model[password]': {
-                        passwordSecurity: true
+                        passwordSecurity: {{ CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' }}
                     }
                 }
             });
