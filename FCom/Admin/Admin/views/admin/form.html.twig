@@ -1,13 +1,14 @@
-{% set tabs = THIS.sortedTabs() %}
+{% set tabs = THIS.get('tabs') %}
 {% set formUrl = THIS.get('form_url') %}
 {% set formId = THIS.get('form_id') %}
 {% set curTab = THIS.get('cur_tab') %}
-{% set validator = THIS.validator(formId, THIS.get('model')) %}
+{% set model = THIS.get('model') %}
+{% set validator = THIS.validator(formId, model) %}
 
 <script>
 
 
-    require(["jquery", "underscore", "fcom.admin", "bootstrap", "jquery.validate"], function($, _) {
+    require(["jquery", "underscore", "fcom.admin", "bootstrap", "jquery.validate", 'fcom.password'], function($, _) {
 
         $(function() {
             window.adminForm = FCom.Admin.form({
@@ -31,40 +32,6 @@
                 }
             });
 
-            $.validator.addMethod('passwordSecurity', validatePasswordSecurity, 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
-            function validatePasswordSecurity (value, element, param) {
-                var regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/;
-                if (value.length > 0 && !regex.test(value)) {
-                    return false;
-                }
-                return true;
-            }
-            $.fn.strengthLevelPassword = function () {
-                var html = '<div class="progress" style="margin-bottom: 0; margin-top: 5px">' +
-                        '<div id="progress-bar-password" class="progress-bar bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div></div>';
-                $(this).parent().append(html);
-                $(this).keyup(function () {
-                    var regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/;
-                    if (regex.test($(this).val())) {
-                        $('#progress-bar-password').css('width', '70%');
-                        if ($(this).val().length > 12) {
-                            $('#progress-bar-password').css('width', '70%');
-                        }
-                        $('#progress-bar-password').parent().removeClass('progress-warning');
-                    } else {
-
-                        if ($(this).val().length > 7) {
-                            $('#progress-bar-password').css('width', '50%');
-                        } else if ($(this).val().length == 0) {
-                            $('#progress-bar-password').css('width', '0%');
-                        } else {
-                            $('#progress-bar-password').css('width', '30%');
-                        }
-                        $('#progress-bar-password').parent().addClass('progress-warning');
-                    }
-                })
-            }
-            $('.has-progress-bar').strengthLevelPassword();
             $('#' + mainForm).validate({
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
@@ -170,7 +137,7 @@
             {% for k, tab in tabs %}
                 <div class="tab-pane js-main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
                     {% if not tab.async %}
-                        {{ THIS.view(tab.view).set('validator', validator) | raw }}
+                        {{ THIS.view(tab.view).set({validator: validator}) | raw }}
                     {% endif %}
                 </div>
             {% endfor %}

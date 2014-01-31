@@ -148,13 +148,13 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $r = BRequest::i();
         $data = $r->post('model');
         if (empty($data['password_current']) || !$model->validatePassword($data['password_current'])) {
-            $this->message('Missing or invalid current password');
+            $this->message('Missing or invalid current password', 'error');
             BResponse::i()->redirect('my_account');
         }
         try {
             if (!empty($data['password'])) {
                 if (empty($data['password_confirm']) || $data['password'] !== $data['password_confirm']) {
-                    $this->message('Missing or not matching password confirmation');
+                    $this->message('Missing or not matching password confirmation', 'error');
                     BResponse::i()->redirect('my_account');
                 }
             }

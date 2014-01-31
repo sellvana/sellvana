@@ -98,18 +98,6 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         ));
     }
 
-    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
-    {
-        if ($model && $model->id) {
-            $view->addTab('addresses', array('label' => $this->_('Addresses'), 'pos' => 20));
-            $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
-            $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
-            $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
-            $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
-        }
-        return parent::processFormTabs($view, $model, $mode, $allowed);
-    }
-
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);

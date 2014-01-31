@@ -102,7 +102,7 @@ require(['jquery', 'jquery.validate', 'switch'], function($) {
         $('#model-password').parents('form').validate({
             rules:{
                 'model[password]': {
-                    passwordSecurity: true
+                    passwordSecurity: {{ CONFIG.get('modules/FCom_Admin/password_strength') ? 'true' : 'false' }}
                 }
             }
         });

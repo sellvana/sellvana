@@ -170,7 +170,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     FCom_Customer_Model_Address::i()->import($a, $customer);
                 }
 //                $customer->login();
-                $this->message('Thank you for your registration. Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                $this->message('Thank you for your access request. We will be in touch shortly via email');
 //                $this->message('Thank you for your registration');
 //                BResponse::i()->redirect('customer/myaccount');
                 BResponse::i()->redirect('customer/register');

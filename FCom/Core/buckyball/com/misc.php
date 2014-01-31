@@ -1180,7 +1180,7 @@ class BUtil extends BClass
     {
         $attrsHtmlArr = array();
         foreach ($attrs as $k => $v) {
-            if ('' === $v || is_null($v) || false === $v) {
+            if (is_null($v) || false === $v) {
                 continue;
             }
             if (true === $v) {
@@ -1416,11 +1416,10 @@ class BUtil extends BClass
     /**
     * Remove directory recursively
     *
-    * DANGEROUS, I'm afraid to enable it
+    * DANGEROUS
     *
     * @param string $dir
     */
-    /*
     static public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first=true)
     {
         if ($first) {
@@ -1443,7 +1442,6 @@ class BUtil extends BClass
         }
         return rmdir($dir);
     }
-    */
 
     static public function topoSort(array $array, array $args=array())
     {
