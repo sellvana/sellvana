@@ -1,0 +1,17 @@
+modules:
+    FCom_Feedback:
+        version: 0.1.0
+        description: Enable your customers to report feedback about your site
+        require: { module: { FCom_Core: 0.1.0 } }
+        auto_use: [ layout, views ]
+
+        areas:
+            FCom_Frontend:
+                require: { module: { FCom_Frontend: 0.1.0 } }
+                routing:
+                    - [ any, /feedback/?.action, FCom_FeedbackTool_Frontend_Controller ]
+
+            FCom_Admin:
+                require: { module: { FCom_Admin: 0.1.0 } }
+                routing:
+                    - [ any, /feedback/?.action, FCom_FeedbackTool_Admin_Controller ]
