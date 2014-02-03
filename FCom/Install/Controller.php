@@ -174,7 +174,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         BConfig::i()->add(array(
             'install_status' => 'installed',
-            'db' => array('implicit_migration' => 1, 'currently_migrating' => 0),
+            'db' => array('implicit_migration' => 1/*, 'currently_migrating' => 0*/),
             'module_run_levels' => array('FCom_Core' => $runLevels),
             'mode_by_ip' => array(
                 'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'DEBUG',

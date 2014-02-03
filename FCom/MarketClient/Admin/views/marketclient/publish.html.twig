@@ -1,0 +1,15 @@
+<div class="container">
+{% for modName, mod in THIS.get('modules') %}
+    <div class="row">
+        <form method="post" action="{{ APP.href('marketclient/publish/module') }}">
+            {% if mod.status == 'available' %}
+                <input type="hidden" name="mod_name" value="{{ modName }}">
+                <button type="submit" class="btn btn-primary btn-small" onclick="return confirm('{{ 'Are you sure you want to publish %s ?'|_(modName) }}')">
+                    {{ 'Publish'|_ }}
+                </button>
+            {% endif %}
+            {{ modName }}
+        </form>
+    </div>
+{% endfor %}
+</div>

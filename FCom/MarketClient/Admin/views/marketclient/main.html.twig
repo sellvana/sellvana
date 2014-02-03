@@ -1,0 +1,59 @@
+{% set m = THIS.get('model') %}
+
+{% if m.messages %}
+    {% for message in m.messages %}
+        {% if 'error' == message.type %}
+            <span style="color:red">{{ message.msg }}</span><br/>
+        {% else %}
+            <span style="color:green">{{ message.msg }}</span><br/>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<h2>{{ m.module.name }} ({{ m.module.mod_name }})</h2>
+    <h3>{{ 'Version'|_ }}</h3> {{ m.module.version }}<br/><br/>
+    {% if m.module.require %}
+        <h3>{{ 'Require' |_ }}</h3>
+        {% for reqType, reqModules in m.module.require %}
+            <b>{{ reqType }}:</b>
+            <ul>
+            {% for reqMode in reqModules %}
+                {% if reqMod.error %}
+                    <li style="color:red">
+                {% else %}
+                    <li >
+                {% endif %}
+                    {{ reqMod.name }}
+                    {{ reqMod.version ? 'version' }}
+                    {{ reqMod.version.from ? '> ' ~ reqMod.version.from }}
+                    {{ reqMod.version.to ? '< ' ~reqMod.version.to }}
+                    {{ reqMod.error ? '(' ~ reqMod.error ~ ')' }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+        <br/>
+    {% endif %}
+
+    <h3>{{ 'Description'|_ }}</h3>
+    {{ m.module.description }}
+    <br/>
+    {% if m.local_version %}
+        {{ 'Local version is: %s'|_(m.local_version) }}<br/>
+        <a href="{{ APP.href('marketclient/install') }}?mod_name={{ m.id }}">{{ 'Re-upload'|_ }}</a>
+    {% else %}
+        <a href="{{ APP.href('marketclient/install') }}?mod_name={{ m.id }}">{{ 'Install'|_ }}</a>
+    {% endif %}
+
+    {% if m.need_upgrade %}
+        <br/>
+        <a href="{{ APP.href('marketclient/install') }}?mod_name={{ m.id }}">{{ 'Upgrade'|_ }}</a>
+    {% endif %}
+
+<script>
+require(['jquery', 'fcom.admin.form'], function($) {
+    $(function() {
+        //adminForm.wysiwygCreate('main-content');
+    });
+})
+</script>

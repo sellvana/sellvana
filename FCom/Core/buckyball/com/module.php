@@ -1422,12 +1422,12 @@ class BMigrate extends BClass
             static::migrateModules('FCom_Core,FCom_Admin');
             //return;
         }
-
+        /*
         if (!$force && BConfig::i()->get('core/currently_migrating')) {
             return;
         }
-
         BConfig::i()->set('core/currently_migrating', 1, false, true);
+        */
         if (class_exists('FCom_Core_Main')) {
             FCom_Core_Main::i()->writeConfigFiles('core');
         }
@@ -1495,17 +1495,19 @@ class BMigrate extends BClass
                     */
                 }
             }
-
+            /*
             BConfig::i()->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
-
+            */
         } catch (Exception $e) {
+            /*
             BConfig::i()->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
+            */
             throw $e;
         }
         $modReg->currentModule(null);

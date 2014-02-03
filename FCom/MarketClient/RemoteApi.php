@@ -4,7 +4,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
 {
     public function getUrl($path = '', $params = array())
     {
-        $url = 'http://127.0.0.1/fulleron/'; # 'https://fulleron.com/';
+        $url = 'https://www.sellvana.com/'; # 'https://fulleron.com/';
         $url .= ltrim($path, '/');
         if ($params) {
             $url = BUtil::setUrlQuery($url, $params);
@@ -15,17 +15,28 @@ final class FCom_MarketClient_RemoteApi extends BClass
     public function requestSiteNonce()
     {
         $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
-        $url = $this->getUrl('api/index.php/v1/market/site/nonce', array(
+        $url = $this->getUrl('api/v1/market/site/nonce', array(
             'admin_url' => BApp::href(),
             'site_key' => $siteKey,
         ));
         $response = BUtil::remoteHttp('GET', $url);
-        return BUtil::fromJson($response);
+        $result = BUtil::fromJson($response);
+        if (!empty($result['error']) && $result['error']==='not_found') {
+            // assigned site key is not found
+            BConfig::i()->set('modules/FCom_MarketClient/site_key', null, false, true);
+            FCom_Core_Main::i()->writeConfigFiles();
+            $url = $this->getUrl('api/v1/market/site/nonce', array(
+                'admin_url' => BApp::href(),
+            ));
+            $response = BUtil::remoteHttp('GET', $url);
+            $result = BUtil::fromJson($response);
+        }
+        return $result;
     }
 
     public function requestSiteKey($nonce)
     {
-        $url = $this->getUrl('api/index.php/v1/market/site/key', array(
+        $url = $this->getUrl('api/v1/market/site/key', array(
             'nonce' => $nonce,
         ));
         $response = BUtil::remoteHttp('GET', $url);
@@ -34,7 +45,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions($modules)
     {
-        $url = $this->getUrl('api/index.php/v1/market/module/version', array(
+        $url = $this->getUrl('api/v1/market/module/version', array(
             'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
@@ -43,7 +54,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModuleInstallInfo($modules)
     {
-        $url = $this->getUrl('api/index.php/v1/market/module/install_info', array(
+        $url = $this->getUrl('api/v1/market/module/install_info', array(
             'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
@@ -52,7 +63,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function downloadPackage($moduleName, $version = null)
     {
-        $url =  $this->getUrl('index.php/market/download/'.$moduleName.($version ? '/'.$version : ''));
+        $url =  $this->getUrl('market/download/'.$moduleName.($version ? '/'.$version : ''));
         $data = BUtil::remoteHttp("GET", $url);
         $dir = BConfig::i()->get('fs/storage_dir') . '/marketclient/download';
         BUtil::ensureDir($dir);
@@ -75,8 +86,8 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function publishModule($data)
     {
-        $siteKey = BConfig::i()->get('index.php/modules/FCom_MarketClient/site_key');
-        $url = $this->getUrl('api/index.php/v1/market/module/publish', array(
+        $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
+        $url = $this->getUrl('api/v1/market/module/publish', array(
             'site_key' => $siteKey,
         ));
         $response = BUtil::remoteHttp('POST', $url, $data);
@@ -91,7 +102,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
         BUtil::zipCreateFromDir($packageFilename, $mod->root_dir);
         $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
-        $url = $this->getUrl('api/index.php/v1/market/module/upload', array(
+        $url = $this->getUrl('api/v1/market/module/upload', array(
             'mod_name' => $moduleName,
             'site_key' => $siteKey,
         ));
