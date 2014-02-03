@@ -1,4 +1,4 @@
-{% set post = THIS.post %}
+{% set post = THIS.get('post') %}
 {% set tags = post.getTags() %}
 {% set categories = post.getCategories() %}
 
