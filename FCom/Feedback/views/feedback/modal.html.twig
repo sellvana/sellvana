@@ -1,7 +1,7 @@
 {% set c = CONFIG.get('modules/FCom_Feedback') %}
 {% if c['enable_' ~ APP.get('area')] %}
   <!-- Button trigger modal -->
-  <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#feedbackModal" style="position:fixed; bottom:0; right:0; z-index:9999">
+  <button class="btn-send-feedback btn btn-primary" data-toggle="modal" data-target="#feedbackModal" style="position:fixed; bottom:0; right:0; z-index:9999">
     {{ 'Send Feedback'|_ }}
   </button>
 
@@ -18,26 +18,28 @@
           </div>
 
           <div class="modal-body">
-
-            <div class="form-group">
-                <label class="col-md-2 control-label">{{ "Your Name"|_ }}</label>
-                <div class="col-md-5">
+          <div class="row">
+            <div class="form-group col-sm-6">
+                <label class="control-label">{{ "Your Name"|_ }}</label>
+                <div class="controls">
                    <input type="text" class="form-control required" name="feedback[name]" value="{{ c.default_name }}">
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">{{ "Your Email"|_ }}</label>
-                <div class="col-md-5">
+            <div class="form-group col-sm-6">
+                <label class="control-label">{{ "Your Email"|_ }}</label>
+                <div class="controls">
                    <input type="email" class="form-control required" name="feedback[email]" value="{{ c.default_email }}">
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">{{ "Comments"|_ }}</label>
-                <div class="col-md-5">
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12">
+                <label class="control-label">{{ "Comments"|_ }}</label>
+                <div class="controls">
                    <textarea class="form-control required" name="feedback[comments]"></textarea>
                 </div>
             </div>
-
+          </div>
           </div>
 
           <div class="modal-footer">

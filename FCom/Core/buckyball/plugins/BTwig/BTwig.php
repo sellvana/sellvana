@@ -38,7 +38,7 @@ class BTwig extends BClass
         BUtil::ensureDir(static::$_cacheDir);
         $isDev = BDebug::is('DEBUG,DEVELOPMENT');
         $options = array(
-            'cache' => static::$_cacheDir,#$isDev ? false : static::$_cacheDir,
+            'cache' => $isDev ? false : static::$_cacheDir,
             'debug' => false,#$config->get('modules/BTwig/debug'),
             'auto_reload' => $isDev ? true : false,#$config->get('modules/BTwig/auto_reload'),
             'optimizations' => -1,
