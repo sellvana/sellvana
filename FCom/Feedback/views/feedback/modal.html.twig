@@ -1,0 +1,59 @@
+{% set c = CONFIG.get('modules/FCom_Feedback') %}
+{% if c['enable_' ~ APP.get('area')] %}
+  <!-- Button trigger modal -->
+  <button class="btn-send-feedback btn btn-primary" data-toggle="modal" data-target="#feedbackModal" style="position:fixed; bottom:0; right:0; z-index:9999">
+    {{ 'Send Feedback'|_ }}
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <form method="post" id="feedback-form" role="form">
+
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="feedbackModalLabel">{{ 'Send Feedback'|_ }}</h4>
+          </div>
+
+          <div class="modal-body">
+          <div class="row">
+            <div class="form-group col-sm-6">
+                <label class="control-label">{{ "Your Name"|_ }}</label>
+                <div class="controls">
+                   <input type="text" class="form-control required" name="feedback[name]" value="{{ c.default_name }}">
+                </div>
+            </div>
+            <div class="form-group col-sm-6">
+                <label class="control-label">{{ "Your Email"|_ }}</label>
+                <div class="controls">
+                   <input type="email" class="form-control required" name="feedback[email]" value="{{ c.default_email }}">
+                </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12">
+                <label class="control-label">{{ "Comments"|_ }}</label>
+                <div class="controls">
+                   <textarea class="form-control required" name="feedback[comments]"></textarea>
+                </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-default" data-dismiss="modal">{{ 'Cancel'|_ }}</button>
+            <button type="submit" class="btn btn-primary">{{ 'Send Feedback'|_ }}</button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+  </script>
+{% endif %}
