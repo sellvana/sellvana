@@ -1034,6 +1034,10 @@ if ($args['name']==="FCom_Referrals") {
         if (!empty($this->override['class'])) {
             $hlp = BClassRegistry::i();
             foreach ($this->override['class'] as $o) {
+if (!isset($o[0]) || !isset($o[1])) {
+    BDebug::notice('Invalid override in module '.$this->name);
+    continue;
+}
                 $hlp->overrideClass($o[0], $o[1]);
             }
         }
