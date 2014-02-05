@@ -3,6 +3,7 @@
 class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
     protected $_name = 'Plain Shipping';
+    const FREE_SHIPPING = "free";
 
     public function getEstimate()
     {
@@ -46,6 +47,6 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
 
     public function getDescription()
     {
-        return 'Free standard Shipping';
+        return 'Standard Shipping';
     }
 }
