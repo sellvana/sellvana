@@ -99,10 +99,11 @@ class FeatureContext extends MinkContext
      */
     public function iClick( $element )
     {
-
-        echo $element;
         $page  = $this->getPage();
-        $field = $page->find( 'xpath', $element );
+        $field = $page->find( 'css', $element );
+        if ( !$field ) {
+            $field = $page->find( 'xpath', $element );
+        }
         if ( !$field ) {
             throw new ElementNotFoundException( $this->getSession(), null, null, $element );
         }
@@ -153,6 +154,10 @@ class FeatureContext extends MinkContext
         $link = $page->find( 'xpath', $path );
 
         if ( !$link ) {
+            $link = $page->find( 'css', $path );
+        }
+
+        if ( !$link ) {
             throw new ElementNotFoundException( $this->getSession(), null, null, $path );
         }
 
@@ -196,8 +201,8 @@ class FeatureContext extends MinkContext
      */
     public function iGoToFirstAvailableSubCategory()
     {
-        $path = "//section[contains(@class,'f-prod-listing-filter')]/form/dl/dd[1]/ul/li[2]/a";
-        $page = $this->getPage();
+        $path    = "//section[contains(@class,'f-prod-listing-filter')]/form/dl/dd[1]/ul/li[2]/a";
+        $page    = $this->getPage();
         $catLink = $page->find( 'xpath', $path );
 
         if ( !$catLink ) {
@@ -205,6 +210,24 @@ class FeatureContext extends MinkContext
         }
 
         $catLink->click();
+    }
+
+    /**
+     * @Then /^I should find "([^"]*)" products as result$/
+     */
+    public function iShouldFindProductsAsResult( $count )
+    {
+        $resultPath = "fieldset.f-prod-listing-toolbar span.hidden-xs";
+        $result     = $this->getPage()->find( 'css', $resultPath );
+        if ( !$result ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $resultPath );
+        }
+
+        $text = preg_replace('/\D/','', $result->getText());
+        echo "\t$text\n";
+        if($text != $count){
+            throw new ExpectationException("{$text} do not match {$count}", $this->getSession());
+        }
     }
 
     /**
