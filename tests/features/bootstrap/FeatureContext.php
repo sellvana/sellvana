@@ -224,7 +224,7 @@ class FeatureContext extends MinkContext
         }
 
         $text = preg_replace('/\D/','', $result->getText());
-        echo "\t$text\n";
+//        echo "\t$text\n";
         if($text != $count){
             throw new ExpectationException("{$text} do not match {$count}", $this->getSession());
         }
