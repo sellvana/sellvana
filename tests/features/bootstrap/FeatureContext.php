@@ -2,6 +2,8 @@
 
 use Behat\Behat\Exception\PendingException;
 
+use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 
 //
@@ -81,10 +83,10 @@ class FeatureContext extends MinkContext
     public function shouldBeDisabled( $element )
     {
         echo $element;
-        $page  = $this->getSession()->getPage();
+        $page  = $this->getPage();
         $field = $page->findField( $element );
         if ( !$field ) {
-            throw new \Behat\Mink\Exception\ElementNotFoundException( $element . " not found." );
+            throw new ElementNotFoundException( $this->getSession(), null, null, $element );
         }
         $attribute = $field->getAttribute( 'disabled' );
         if ( !$attribute ) {
@@ -99,10 +101,10 @@ class FeatureContext extends MinkContext
     {
 
         echo $element;
-        $page  = $this->getSession()->getPage();
+        $page  = $this->getPage();
         $field = $page->find( 'xpath', $element );
         if ( !$field ) {
-            throw new \Behat\Mink\Exception\ElementNotFoundException( $this->getSession(), null, null, $element );
+            throw new ElementNotFoundException( $this->getSession(), null, null, $element );
         }
         $field->click();
     }
@@ -114,28 +116,103 @@ class FeatureContext extends MinkContext
     {
         $cat = '//nav[contains(@class,"f-catalog-navbar")]//li[contains(@class,"dropdown")][1]/a';
 
-        $page  = $this->getSession()->getPage();
+        $page  = $this->getPage();
         $field = $page->find( 'xpath', $cat );
         if ( !$field ) {
-            throw new \Behat\Mink\Exception\ElementNotFoundException( $this->getSession(), null, null, $cat );
+            throw new ElementNotFoundException( $this->getSession(), null, null, $cat );
         }
         $this->firstCat = $field->getText();
         $field->click();
     }
+
+    protected $firstCat;
 
     /**
      * @Then /^I should see its name$/
      */
     public function iShouldSeeItsName()
     {
-        if(!isset($this->firstCat)){
-            throw new \Behat\Mink\Exception\ExpectationException("First cat name not found", $this->getSession());
+        if ( !isset( $this->firstCat ) ) {
+            throw new ExpectationException( "First cat name not found", $this->getSession() );
         }
-        $page = $this->getSession()->getPage();
-        if(strpos($page->find('css', 'div.f-page-title'), $this->firstCat) !== null){
+        $page = $this->getPage();
+        if ( strpos( $page->find( 'css', 'div.f-page-title' ), $this->firstCat ) !== null ) {
             echo "\t{$this->firstCat} found\n";
         } else {
-            throw new \Behat\Mink\Exception\ExpectationException("{$this->firstCat} text not found", $this->getSession());
+            throw new ExpectationException( "{$this->firstCat} text not found", $this->getSession() );
         }
+    }
+
+    /**
+     * @When /^I click first filter$/
+     */
+    public function iClickFirstFilter()
+    {
+        $path = "//section[contains(@class,'f-prod-listing-filter')]/form/dl/dd[2]/ul/li[1]/a";
+        $page = $this->getPage();
+        $link = $page->find( 'xpath', $path );
+
+        if ( !$link ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $path );
+        }
+
+        $count = $link->find( 'css', '.count' );
+
+        if ( !$count ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, '.count' );
+        }
+        $this->filterCount = trim( $count->getText(), '()' );
+        $link->click();
+        return $this->filterCount;
+    }
+
+    protected $filterCount;
+
+    /**
+     * @Then /^I should find correct product count$/
+     */
+    public function iShouldFindCorrectProductCount()
+    {
+        if ( !$this->filterCount ) {
+            throw new ExpectationException( "{$this->filterCount} text not found", $this->getSession() );
+        }
+        echo "\tLooking for {$this->filterCount} products\n";
+
+        $page     = $this->getPage();
+        $products = $page->findAll( 'css', '.f-prod-img' );
+        if ( !$products ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, '.f-prod-img' );
+        }
+        $cnt = count( $products );
+        if ( $cnt != $this->filterCount ) {
+            throw new ExpectationException( "{$this->filterCount} do not match {$cnt}", $this->getSession() );
+        } else {
+            echo "\t{$cnt} products found\n";
+        }
+    }
+
+    /**
+     * @Given /^I go to first available sub-category$/
+     */
+    public function iGoToFirstAvailableSubCategory()
+    {
+        $path = "//section[contains(@class,'f-prod-listing-filter')]/form/dl/dd[1]/ul/li[2]/a";
+        $page = $this->getPage();
+        $catLink = $page->find( 'xpath', $path );
+
+        if ( !$catLink ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $path );
+        }
+
+        $catLink->click();
+    }
+
+    /**
+     * @return \Behat\Mink\Element\DocumentElement
+     */
+    public function getPage()
+    {
+        return $this->getSession()->getPage();
+
     }
 }
