@@ -83,6 +83,13 @@
                     }
                 })
             })
+            // prevent validate when delete item
+            $('button[type="submit"]').click(function () {
+                if ($(this).val() == 'DELETE') {
+                    $('#' + mainForm).validate().currentForm = '';
+                    return true;
+                }
+            });
 
             FCom.Admin.Tabs('.f-admin-main', {
                 url_get: "{{ formUrl }}",
