@@ -33,7 +33,11 @@
           <div class="form-group col-sm-6">
             <label for="model-password" class="control-label required">{{ "Password" | _ }}</label>
             <div class="controls">
-              <input type="password" name="model[password]" class="required form-control has-progress-bar" id="model-password"/>
+              <input type="password" name="model[password]" class="required form-control
+              {% if (CONFIG.get('modules/FCom_Customer/password_strength'))  %}
+                {{ "has-progress-bar" }}
+              {% endif %}
+              " id="model-password"/>
             </div>
           </div>
           <div class="form-group col-sm-6">
@@ -43,11 +47,13 @@
             </div>
           </div>
         </div>
+          {% if (CONFIG.get('modules/FCom_Customer/password_strength')) %}
           <div class="row">
               <div class="form-group col-sm-12">
                   <span class="help-block f-required-notice">Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.</span>
               </div>
           </div>
+          {% endif %}
         <div class="form-group">
           <input type="submit" class="btn btn-primary btn-lg" value="{{ "Register" | _ }}"/>
           <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; Back to login</a>
@@ -58,23 +64,27 @@
   </div>
 </div>
 <script>
-require(['jquery', 'jquery.validate'], function($) {
+require(['jquery', 'jquery.validate', 'fcom.password'], function($) {
     $(function() {
 //        $('#register-form').validate();
-        $.validator.addMethod('passwordSecurity', validatePasswordSecurity, 'Incorrect password entry');
-        function validatePasswordSecurity (value, element, param) {
-            var regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/;
-            if (value.length > 0 && !regex.test(value)) {
-                return false;
-            }
-            return true;
-        }
-
+//        $.validator.addMethod('passwordSecurity', validatePasswordSecurity, 'Incorrect password entry');
+//        function validatePasswordSecurity (value, element, param) {
+//            var regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/;
+//            if (value.length > 0 && !regex.test(value)) {
+//                return false;
+//            }
+//            return true;
+//        }
         $('#register-form').validate({
             rules:{
                 'model[password]': {
                     required: true,
                     passwordSecurity: {{ CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' }}
+                }
+            },
+            messages: {
+                'model[password]': {
+                    passwordSecurity: 'Incorrect password entry'
                 }
             }
         });
