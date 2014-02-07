@@ -76,13 +76,16 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         $paymentMethodsHtml = array();
-        foreach ($paymentMethods as $code => $method) {
-            $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
-                                         ->set('cart', $cart)
-                                         ->set('method', $method)
-                                         ->set('code', $code)
-                                         ->render();
+        if (is_array($paymentMethods)) {
+            foreach ($paymentMethods as $code => $method) {
+                $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
+                    ->set('cart', $cart)
+                    ->set('method', $method)
+                    ->set('code', $code)
+                    ->render();
+            }
         }
+
 
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)

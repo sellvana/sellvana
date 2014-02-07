@@ -20,6 +20,7 @@ class FCom_Promo_Model_Promo extends BModel
             'qty' => 'Quantity',
             '$' => '$ AMT',
             '%' => '% OFF',
+            'free' => 'Free Shipping',
         ),
         'get_group' => array(
             'same_prod' => 'Same Product',

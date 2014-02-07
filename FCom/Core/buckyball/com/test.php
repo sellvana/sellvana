@@ -178,6 +178,7 @@ class BTestExpectation extends BClass
     protected $_params;
     protected $_not = false;
     public $x;
+    protected $_matchers;
 
     public function __construct($params)
     {
