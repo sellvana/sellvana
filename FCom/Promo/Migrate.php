@@ -131,4 +131,15 @@ class FCom_Promo_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+
+        $table = FCom_Promo_Model_Promo::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                "get_type"       => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
+            ),
+        ));
+    }
 }

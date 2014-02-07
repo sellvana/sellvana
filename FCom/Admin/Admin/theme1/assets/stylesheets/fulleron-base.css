@@ -297,7 +297,7 @@ th, td { vertical-align:top; }
   box-shadow:none;
   }
 select.form-control {
-  height:26px;
+  /*height:26px;*/
   }
 label.control-label.required:after {
   content:"*";
