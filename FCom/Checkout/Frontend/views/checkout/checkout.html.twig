@@ -7,6 +7,9 @@
     <div class="row">
       <form action="{{ APP.href('checkout') }}{{ REQUEST.get('guest') == 'yes' ? '?guest=yes' : '' }}" method="post">
       <div class="f-col-main col-sm-9">
+          <a  href='{{ APP.href('cart') }}'>
+              <strong>{{ 'Back to cart' |_ }}</strong>
+          </a>
           <div class="alert alert-info"><strong>{{ 'Review the information below then click "Place your order"!' |_ }}</strong></div>
 
           {{ THIS.view('core/messages') | raw }}
@@ -162,7 +165,7 @@
               </table>
             {% endif %}
             <ul class="f-cart-btn-group">
-                <li><input type="submit" name="place_order" value="new_order" class="btn btn-primary btn-lg">{{ "Place your order" |_ }}</li>
+                <li><input type="submit" name="place_order" value="Order" class="btn btn-primary btn-lg"></li>
             </ul>
         </div>
         <!-- /.f-col-sidebar -->

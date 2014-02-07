@@ -302,7 +302,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = this.model.langFields.pluck('lang_code');
-            var html = 'Translations...'
+            var html = 'Add Translations...'
             if(langs.length>0) {
                 html = langs.join(',');
             }
