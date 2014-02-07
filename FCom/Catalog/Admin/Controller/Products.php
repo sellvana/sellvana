@@ -388,19 +388,42 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function formPostAfter($args)
     {
-
         parent::formPostAfter($args);
         $model = $args['model'];
         $data = BRequest::i()->post();
-        $this->processCategoriesPost($model);
-        $this->processLinkedProductsPost($model, $data);
-        $this->processMediaPost($model, $data);
-        if (!isset($data['do']) || $data['do'] !== 'DELETE') {
+        if (isset($data['do']) && $data['do'] === 'DELETE') {
+            $this->deleteRelateInfo($model);
+        } else {
+            $this->processCategoriesPost($model);
+            $this->processLinkedProductsPost($model, $data);
+            $this->processMediaPost($model, $data);
             $this->processCustomFieldPost($model, $data);
             $this->processVariantPost($model, $data);
             $this->processSystemLangFieldsPost($model, $data);
             $this->processFrontendPost($model, $data);
+
         }
+    }
+
+    /**
+     * delete all associate info with this product
+     * @param $model
+     */
+    public function deleteRelateInfo($model)
+    {
+        //delete Categories
+        FCom_Catalog_Model_CategoryProduct::i()->delete_many(array(
+           'product_id' => $model->id
+        ));
+        //delete Product Link
+        FCom_Catalog_Model_ProductLink::i()->delete_many(array(
+            'product_id' => $model->id
+        ));
+        //delete Product Media
+        FCom_Catalog_Model_ProductMedia::i()->delete_many(array(
+            'product_id' => $model->id
+        ));
+        //todo: delete product reviews / wishlist
     }
 
     public function processCategoriesPost($model)
@@ -469,11 +492,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     }
                 }
             }
-        }
-        if (isset($data['do']) && $data['do'] === 'DELETE') {
-            $hlp->delete_many(array(
-                'product_id' => $model->id,
-            ));
         }
 //exit;
         return $this;
