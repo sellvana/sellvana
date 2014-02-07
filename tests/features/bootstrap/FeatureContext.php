@@ -321,6 +321,17 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * Fill input field with random email address
+     *
+     * @Given /^I fill "([^"]*)" with random email$/
+     */
+    public function iFillWithRandomEmail($fieldName)
+    {
+        $email = md5(microtime(true)) . "_test@email.com";
+        $this->fillField($fieldName, $email);
+    }
+
+    /**
      * Shortcut to get page object
      *
      * @return \Behat\Mink\Element\DocumentElement
