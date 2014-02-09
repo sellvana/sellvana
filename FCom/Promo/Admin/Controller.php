@@ -39,7 +39,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field' => 'from_date', 'type' => 'date-range'),
             array('field' => 'to_date', 'type' => 'date-range'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         return $config;
     }

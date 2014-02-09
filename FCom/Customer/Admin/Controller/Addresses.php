@@ -58,7 +58,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             'delete' => true
         );
         $config['filters'] = array(
-            array('field' => 'country', 'type' => 'select'),
+            array('field' => 'country', 'type' => 'multiselect'),
             array('field' => 'company', 'type' => 'text'),
             array('field' => 'postcode', 'type' => 'text'),
             array('field' => 'street1', 'type' => 'text'),
