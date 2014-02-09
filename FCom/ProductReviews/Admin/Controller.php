@@ -51,7 +51,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
-            array('field'=>'approved', 'type'=>'select'),
+            array('field'=>'approved', 'type' => 'multiselect'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
         $config['actions'] = array();
@@ -204,7 +204,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
-            array('field'=>'approved', 'type'=>'select'),
+            array('field'=>'approved', 'type' => 'multiselect'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
 

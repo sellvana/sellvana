@@ -34,8 +34,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field' => 'username', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field' => 'is_superadmin', 'type' => 'select'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'is_superadmin', 'type' => 'multiselect'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         return $config;
@@ -106,7 +106,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field'=>'username', 'type'=>'text'),
             array('field'=>'email', 'type'=>'text'),
-            array('field'=>'status', 'type'=>'select')
+            array('field'=>'status', 'type' => 'multiselect')
         );
         $config['data_mode'] = 'local';
         $config['events'] = array('init', 'add','mass-delete');
@@ -138,7 +138,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field' => 'username', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field'=>'status', 'type'=>'select'),
+            array('field'=>'status', 'type' => 'multiselect'),
             '_quick' => array('expr' => 'username like ? or email like ? or au.id=?', 'args' => array('?%', '%?%', '?'))
         );
         if ($filterAdmin) {
