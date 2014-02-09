@@ -45,7 +45,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
         $config['filters'] = array(
             array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         return $config;
@@ -105,7 +105,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
         $config['filters'] = array(
             array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
             ->select('p.*')
@@ -146,7 +146,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             ),
             'filters'=>array(
                 array('field' => 'title', 'type' => 'text'),
-                array('field' => 'status', 'type' => 'select'),
+                array('field' => 'status', 'type' => 'multiselect'),
             ),
             'events'=>array('init', 'add','mass-delete')
         );

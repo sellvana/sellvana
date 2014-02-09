@@ -52,14 +52,14 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $config['filters'] = array(
             array('field' => 'field_name', 'type' => 'text'),
             array('field' => 'field_label', 'type' => 'text'),
-            array('field' => 'field_type', 'type' => 'select'),
-            array('field' => 'filter_type', 'type' => 'select'),
-            array('field' => 'filter_multivalue', 'type' => 'select'),
-            array('field' => 'filter_counts', 'type' => 'select'),
-            array('field' => 'filter_show_empty', 'type' => 'select'),
-            array('field' => 'search_type', 'type' => 'select'),
-            array('field' => 'sort_type', 'type' => 'select'),
-            array('field' => 'source_type', 'type' => 'select'),
+            array('field' => 'field_type', 'type' => 'multiselect'),
+            array('field' => 'filter_type', 'type' => 'multiselect'),
+            array('field' => 'filter_multivalue', 'type' => 'multiselect'),
+            array('field' => 'filter_counts', 'type' => 'multiselect'),
+            array('field' => 'filter_show_empty', 'type' => 'multiselect'),
+            array('field' => 'search_type', 'type' => 'multiselect'),
+            array('field' => 'sort_type', 'type' => 'multiselect'),
+            array('field' => 'source_type', 'type' => 'multiselect'),
         );
         return $config;
     }

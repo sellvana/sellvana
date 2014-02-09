@@ -48,8 +48,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $config['filters'] = array(
             array('field' => 'firstname', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field' => 'country', 'type' => 'select'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'country', 'type' => 'multiselect'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
