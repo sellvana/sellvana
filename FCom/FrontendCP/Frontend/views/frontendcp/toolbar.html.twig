@@ -2,31 +2,15 @@
 {% set user = hlp.isLoggedIn() ? hlp.sessionUser() : null %}
 
 {% if user and user.getPermission('frontendcp') %}
-    <style>
-        .admin-toolbar-wrapper {
-            width:100%;
-            height:20px;
-            position:fixed;
-            top:0;
-            left:0;
-            z-index:5000
-        }
-        .admin-toolbar {
-            background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, rgb(198,198,198)), color-stop(1, rgb(226,225,226)));
-            border-bottom: 1px solid #727272;
-            padding: 3px;
-        }
-    </style>
-
     <div style="height:20px"></div>
     <div class="admin-toolbar-wrapper">
         <div class="admin-toolbar">
-            <div class="f-right">
-                <img src="{{ UTIL.gravatar(user.get('email')) }}" width="16" height="16" style="margin:3px 13px"/>
+            <div class="pull-right">
+                <img class="avatar" src="{{ UTIL.gravatar(user.get('email')) }}" width="25" height="25"/>
                 {{ user.fullName() }}
             </div>
             {% if user.getPermission('frontendcp/edit') %}
-                <button type="button" id="admin-toolbar--edit">{{ 'Edit Page Contents' |_ }}</button>
+                <button type="button" class="btn btn-default btn-xs" id="admin-toolbar--edit">{{ 'Edit Page Contents' |_ }}</button>
             {% endif %}
 
             {{ THIS.hook('frontendcp/toolbar') | raw }}

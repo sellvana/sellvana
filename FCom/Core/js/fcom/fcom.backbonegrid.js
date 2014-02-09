@@ -140,7 +140,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     var cssClass = this.model.get('cssClass');
                     if (this.model.get('sortState').length > 0) {
-                        cssClass += (' sorting_' + this.model.get('sortState'));
+                        cssClass += (' th-sorting-' + this.model.get('sortState'));
                     }
                     return cssClass;
                 },
