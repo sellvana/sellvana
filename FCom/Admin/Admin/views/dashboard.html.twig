@@ -29,11 +29,11 @@
           <div class="box-header js-sortable-handle {{ widget.header_class }}">
             <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
             <div class="actions">
-              <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
               <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
+              <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
             </div>
           </div>
-  
+
           {% if widget.async %}
             {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
           {% elseif widget.view %}
@@ -55,8 +55,8 @@
       <div class="box-header js-sortable-handle <%- widget.header_class %>">
         <div class="title"><i class="icon-<%- widget.icon %>"></i><%- widget.title %></div>
         <div class="actions">
-          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
           <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
+          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
         </div>
       </div>
       <%= widget.content %>
