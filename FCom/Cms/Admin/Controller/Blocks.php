@@ -35,7 +35,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         );
         $config['filters'] = array(
             array('field' => 'handle', 'type' => 'text'),
-            array('field' => 'page_enabled', 'type' => 'select'),
+            array('field' => 'page_enabled', 'type' => 'multiselect'),
         );
         return $config;
     }

@@ -33,7 +33,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'billing_name', 'type' => 'text'),
             array('field' => 'shipping_name', 'type' => 'text'),
             array('field' => 'grandtotal', 'type' => 'number-range'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
@@ -273,7 +273,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'billing_name', 'type' => 'text'),
             array('field' => 'shipping_name', 'type' => 'text'),
             array('field' => 'grandtotal', 'type' => 'number-range'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
         $this->gridOrmConfig($config['orm']);
