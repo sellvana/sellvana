@@ -206,7 +206,7 @@
           isSelected = 'checked';
         print('<input type="checkbox" name="{{ config.id }}[checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
-        print('&nbsp;&nbsp;');
+        print('<div class="table-actions-btns-group">');
         if (typeof(col.data.custom) !== 'undefined') {
             if (typeof(col.data.custom[0]) ===  'object') {
                 for (var index in col.data.custom) {
@@ -217,21 +217,18 @@
             }
         }
 
-        print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
             if (typeof(col.data.edit.href) !== 'undefined') {
-              print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
+              print('<a class="btn btn-link btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
             } else {
-              print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
+              print('<button type="button" class="btn btn-link btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
             }
         }
-        print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
           print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
           print('</button>');
         }
-        print('&nbsp;&nbsp;');
         if (typeof(col.data.edit_inline) !== 'undefined' && col.data.edit_inline) {
             print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
                 print('<i class="icon-pencil"></i>');
@@ -240,6 +237,7 @@
                 print('<i class="icon-ok-sign"></i>');
                 print('</button>');
         }
+        print('</div>');
     } else {
       if (typeof(col.print) !== 'undefined') {
         eval('print('+col.print+');');
