@@ -45,18 +45,16 @@ class FeatureContext extends MinkContext
 
 //        echo $this->baseUrl;
         if ( strpos( $content, "Forgot your password?" ) === false ) {
-            echo "Logged in\n";
-            return true;
+            echo "\tLogged in\n";
         } else {
-            echo "Have to login\n";
+            echo "\tHave to login\n";
+            $userName = $page->findField( 'login[username]' );
+            $login    = $page->findField( 'login[password]' );
+
+            $userName->setValue( 'admin' );
+            $login->setValue( 'admin123' );
+            $page->findButton( 'Sign in' )->press();
         }
-
-        $userName = $page->findField( 'login[username]' );
-        $login    = $page->findField( 'login[password]' );
-
-        $userName->setValue( 'admin' );
-        $login->setValue( 'admin123' );
-        $page->findButton( 'Sign in' )->press();
     }
 
     /**
@@ -223,14 +221,119 @@ class FeatureContext extends MinkContext
             throw new ElementNotFoundException( $this->getSession(), null, null, $resultPath );
         }
 
-        $text = preg_replace('/\D/','', $result->getText());
+        $text = preg_replace( '/\D/', '', $result->getText() );
 //        echo "\t$text\n";
-        if($text != $count){
-            throw new ExpectationException("{$text} do not match {$count}", $this->getSession());
+        if ( $text != $count ) {
+            throw new ExpectationException( "{$text} do not match {$count}", $this->getSession() );
         }
     }
 
     /**
+     * Click first product link on category page
+     *
+     * @Given /^I click first product link$/
+     */
+    public function iClickFirstProductLink()
+    {
+        $productLinkPath = 'div.f-prod-listing div.row div.col-md-4:first-child a.f-prod-name';
+        $page            = $this->getPage();
+        $productLink     = $page->find( 'css', $productLinkPath );
+        if ( !$productLink ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
+        }
+
+        $this->productName = $productLink->getText();
+        echo "\t{$this->productName}\n";
+        $productLink->click();
+    }
+
+    protected $productName;
+
+    /**
+     * Assert product name matches stored value
+     *
+     * @Then /^I should find correct product name$/
+     */
+    public function iShouldFindCorrectProductName()
+    {
+        $content = $this->getPage()->find( 'css', 'h1.f-prod-name' )->getText();
+        echo "\t{$content}\n";
+        if ( $content != $this->productName ) {
+            throw new ExpectationException( "{$content} does not match {$this->productName}", $this->getSession() );
+        }
+    }
+
+    /**
+     * Click first product image on category page
+     *
+     * @Given /^I click first product image$/
+     */
+    public function iClickFirstProductImage()
+    {
+        $productImageLinkPath = 'div.f-prod-listing div.row div.col-md-4:first-child a.f-prod-img';
+        $page                 = $this->getPage();
+        $productLink          = $page->find( 'css', $productImageLinkPath );
+        if ( !$productLink ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $productImageLinkPath );
+        }
+        $img = $productLink->find( 'css', 'img' );
+        if ( $img ) {
+            // alt text is same as product name
+            $this->productName = $img->getAttribute( 'alt' );
+            echo "\t{$this->productName}\n";
+        }
+        $productLink->click();
+    }
+
+    /**
+     * Click quick view button for first product on category page
+     *
+     * @Given /^I click first product quick view button$/
+     */
+    public function iClickFirstProductQuickViewButton()
+    {
+        $productQVLinkPath = 'div.f-prod-listing div.row div.col-md-4:first-child a.f-prod-quickview-btn';
+        $productLinkPath   = 'div.f-prod-listing div.row div.col-md-4:first-child a.f-prod-name';
+        $page              = $this->getPage();
+        $qvLink            = $page->find( 'css', $productQVLinkPath );
+        $prLink            = $page->find( 'css', $productLinkPath );
+        if ( !$qvLink ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $productQVLinkPath );
+        }
+        $this->productName = $prLink->getText();
+        echo "\t{$this->productName}\n";
+
+        $qvLink->click();
+    }
+
+    /**
+     * Assert quick view for product is displayed
+     *
+     * @Then /^I should see product quick view$/
+     */
+    public function iShouldSeeProductQuickView()
+    {
+        $content = $this->getPage()->find( 'css', 'h4.f-prod-name' )->getText();
+        echo "\t{$content}\n";
+        if ( $content != $this->productName ) {
+            throw new ExpectationException( "{$content} does not match {$this->productName}", $this->getSession() );
+        }
+    }
+
+    /**
+     * Fill input field with random email address
+     *
+     * @Given /^I fill "([^"]*)" with random email$/
+     */
+    public function iFillWithRandomEmail($fieldName)
+    {
+        $email = md5(microtime(true)) . "_test@email.com";
+        $this->fillField($fieldName, $email);
+    }
+
+    /**
+     * Shortcut to get page object
+     *
      * @return \Behat\Mink\Element\DocumentElement
      */
     public function getPage()
