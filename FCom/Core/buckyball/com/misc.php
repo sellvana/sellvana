@@ -982,15 +982,17 @@ class BUtil extends BClass
             ));
             if ($method==='POST' || $method==='PUT') {
                 $multipart = false;
-                foreach ($data as $k=>$v) {
-                    if (is_string($v) && $v[0]==='@') {
-                        $multipart = true;
-                        break;
+                if (is_array($data)) {
+                    foreach ($data as $k=>$v) {
+                        if (is_string($v) && $v[0]==='@') {
+                            $multipart = true;
+                            break;
+                        }
                     }
                 }
                 if (!$multipart) {
                     $contentType = 'application/x-www-form-urlencoded';
-                    $opts['http']['content'] = http_build_query($data);
+                    $opts['http']['content'] = is_array($data) ? http_build_query($data) : $data;
                 } else {
                     $boundary = '--------------------------'.microtime(true);
                     $contentType = 'multipart/form-data; boundary='.$boundary;
@@ -1024,10 +1026,10 @@ class BUtil extends BClass
                     );
                 }
             }
-            $response = file_get_contents($url, false, stream_context_create($opts));
+            $response = @file_get_contents($url, false, stream_context_create($opts));
 
             static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
-            $respHeaders = $http_response_header;
+            $respHeaders = isset($http_response_header) ? $http_response_header : array();
         }
         foreach ($respHeaders as $i => $line) {
             if ($i) {
