@@ -9,18 +9,31 @@
     <button class="btn">{{ '+ Add Widget'|_ }}</button>
   </div>
   <div class="pull-right btn-group">
-    <a class="btn btn-link hidden-xs" href="#">{{ 'Last month'|_ }}</a>
-    <a class="btn btn-link" href="#">{{ 'Last week'|_ }}</a>
-    <a class="btn btn-link" href="#">{{ 'Today'|_ }}</a>
-    <a class="btn btn-link" id="daterange" href="#">
-      <i class="icon-calendar"></i>
-      <span>{{ 'Custom'|_ }}</span>
-      <b class="caret"></b>
-    </a>
+    <button class="btn btn-default">{{ 'Last month'|_ }}</button>
+    <button class="btn btn-default">{{ 'Last week'|_ }}</button>
+    <button class="btn btn-default">{{ 'Today'|_ }}</button>
+    <div class="btn-group dropdown">
+      <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-calendar"></i>
+        <span>{{ 'Custom'|_ }}</span>
+        <b class="caret"></b>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <div class="input-group range">
+            <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
+            <span class="input-group-addon">
+              <i class="icon-calendar"></i>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
 <div class="f-content-dashboard">
   {{ THIS.view('core/messages')|raw }}
+
   <div class="row">
     <ul class="js-sortable-container">
   {% for widget in widgets %}

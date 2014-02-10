@@ -2448,7 +2448,7 @@ class BDebug extends BClass
 
     public static function dumpLog($return=false)
     {
-        if ((self::$_mode!==self::MODE_DEBUG && self::$_mode!==self::MODE_DEVELOPMENT)
+        if (!(self::$_mode===self::MODE_DEBUG || self::$_mode===self::MODE_DEVELOPMENT)
             || BResponse::i()->contentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
