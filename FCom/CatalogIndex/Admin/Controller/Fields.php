@@ -22,17 +22,18 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
                   'validation' => array('required' => true, 'maxlength' => 50)),
             array('name' => 'field_type', 'label' => 'Type', 'index' => 'idxf.field_type', 'width' => 80, 'editable' => true, 'addable' => true,
                   'editor' => 'select', 'options' => $fieldHlp->fieldOptions('field_type')),
-            array('name' => 'filter_type', 'label' => 'Filter', 'index' => 'idxf.filter_type', 'width' => 80, 'editable' => true, 'addable' => true,
+            array('name' => 'filter_type', 'label' => 'Facet', 'index' => 'idxf.filter_type', 'width' => 80, 'editable' => true, 'addable' => true,
                   'editor' => 'select', 'options' => $fieldHlp->fieldOptions('filter_type')),
-            array('name' => 'filter_multivalue', 'label' => 'MultiValue', 'index' => 'idxf.filter_multivalue', 'width' => 80,
+            array('name' => 'filter_multivalue', 'label' => 'Multi Value', 'index' => 'idxf.filter_multivalue', 'width' => 80,
                   'addable' => true, 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
                   'options' => $fieldHlp->fieldOptions('filter_multivalue')),
             array('name' => 'filter_counts', 'label' => 'Calc Counts', 'index' => 'idxf.filter_counts', 'width' => 80, 'addable' => true,
                   'editable' => true, 'editor' => 'select', 'options' => $fieldHlp->fieldOptions('filter_counts')),
             array('name' => 'filter_show_empty', 'label' => 'Show Empty', 'index' => 'idxf.filter_show_empty', 'width' => 80,
                   'editor' => 'select', 'addable' => true, 'editable' => true, 'options' => $fieldHlp->fieldOptions('filter_show_empty')),
-            array('name' => 'filter_order', 'label' => 'Filter Order', 'index' => 'idxf.filter_order', 'addable' => true, 'editable' => true),
-            array('name' => 'filter_custom_view', 'label' => 'Filter Custom View', 'index' => 'idxf.filter_custom_view', 'width' => 80, 'hidden' => true),
+            array('name' => 'filter_order', 'label' => 'Facet Order', 'index' => 'idxf.filter_order', 'addable' => true, 'editable' => true),
+            array('name' => 'filter_custom_view', 'label' => 'Facet Custom View', 'index' => 'idxf.filter_custom_view', 'width' => 80, 'hidden' => true,'editable' => true,
+                  'element_print' => '<input readonly name="filter_custom_view" id="filter_custom_view" type="text" class="form-control">'),
             array('name' => 'search_type', 'label' => 'Search', 'index' => 'idxf.search_type', 'editor' => 'select',
                   'options' => $fieldHlp->fieldOptions('search_type'), 'width' => 80, 'addable' => true, 'editable' => true),
             array('name' => 'sort_type', 'label' => 'Sort', 'index' => 'idxf.sort_type', 'editor' => 'select', 'addable' => true,
@@ -61,6 +62,14 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             array('field' => 'sort_type', 'type' => 'multiselect'),
             array('field' => 'source_type', 'type' => 'multiselect'),
         );
+        $callbacks = '$("#field_type").change(function (ev) {
+                        var parent = $(this).parent();
+                        if (parent.find("p.text-warning").length == 0 && modalForm.modalType == "editable") {
+                            parent.append("<p class=\"text-warning\">Are you sure to want change type?</p>")
+                        };
+                        return false;
+                    });';
+        $config['callbacks'] = array('after_modalForm_render' => $callbacks);
         return $config;
     }
 
