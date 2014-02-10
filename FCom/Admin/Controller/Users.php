@@ -49,18 +49,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             'sidebar_img' => BUtil::gravatar($m->email),
             'title' => $m->id ? 'Edit User: '.$m->username : 'Create New User',
         ));
-        /*$id = BRequest::i()->param('id', true);
-        if($id){
-            $args['view']->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
-        }*/
-    }
-
-    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
-    {
-        if ($model && $model->id) {
-            $view->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
-        }
-        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostBefore($args)
