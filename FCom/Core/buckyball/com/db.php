@@ -78,7 +78,7 @@ class BDb
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1332,7 +1332,7 @@ class BORM extends ORMWrapper
     public function _add_join_source($join_operator, $table, $constraint, $table_alias=null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
-                $class = BClassRegistry::i()->className($table);
+                $class = BClassRegistry::className($table);
                 self::$_classTableMap[$table] = $class::table();
             } else {
                 self::$_classTableMap[$table] = false;
@@ -1691,7 +1691,7 @@ class BModel extends Model
         if (is_null($class_name)) { // ADDED
             $class_name = get_called_class();
         }
-        $class_name = BClassRegistry::i()->className($class_name); // ADDED
+        $class_name = BClassRegistry::className($class_name); // ADDED
 
         static::readDb();
         $table_name = static::_get_table_name($class_name);
@@ -1741,7 +1741,7 @@ class BModel extends Model
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
+        return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
 
     /**
@@ -2223,7 +2223,7 @@ class BModel extends Model
     */
     public static function table()
     {
-        $class = BClassRegistry::i()->className(get_called_class());
+        $class = BClassRegistry::className(get_called_class());
         if (empty(static::$_tableNames[$class])) {
             static::$_tableNames[$class] = static::_get_table_name($class);
         }
@@ -2236,7 +2236,7 @@ class BModel extends Model
         $class = get_called_class();
         BDebug::debug('OVERRIDE TABLE: '.$class.' -> '.$table);
         static::$_tableNames[$class] = null;
-        $class = BClassRegistry::i()->className($class);
+        $class = BClassRegistry::className($class);
         static::$_tableNames[$class] = null;
     }
 
@@ -2503,12 +2503,12 @@ class BModel extends Model
 
     public function __call($name, $args)
     {
-        return BClassRegistry::i()->callMethod($this, $name, $args, static::$_origClass);
+        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
     }
 
     public static function __callStatic($name, $args)
     {
-        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 }
 

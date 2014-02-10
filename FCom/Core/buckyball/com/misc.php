@@ -78,7 +78,7 @@ class BUtil extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -2162,7 +2162,7 @@ class BDebug extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public static function registerErrorHandlers()
@@ -2574,7 +2574,7 @@ class BLocale extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -3239,7 +3239,7 @@ class BLoginThrottle extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function __construct()
@@ -3516,7 +3516,7 @@ class BValidate extends BClass
      */
     public static function i($new = false, array $args = array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function addValidator($name, $rule)

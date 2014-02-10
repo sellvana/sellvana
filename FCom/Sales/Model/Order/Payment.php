@@ -29,6 +29,6 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 }
