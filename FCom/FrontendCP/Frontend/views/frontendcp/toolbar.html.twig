@@ -24,7 +24,7 @@
             }
             // updated mercury_loader.js:59: var options = window.mercuryOptions || { ... }
             window.mercuryOptions = {
-                src: "{{ APP.src('FCom_FrontendCP', 'Frontend') }}",
+                src: "{{ APP.src('@FCom_FrontendCP/Frontend') }}",
                 pack: 'fcom'
             }
 
@@ -33,7 +33,7 @@
             var uploadUrl = "{{ APP.href('frontendcp/upload') }}";
             if (!currentlyEditing) {
                 $('#admin-toolbar--edit').click(function() {
-                    $.getScript("{{ APP.src('FCom_FrontendCP', 'Frontend/js/mercury_loader.js') }}", function() {
+                    $.getScript("{{ APP.src('@FCom_FrontendCP/Frontend/js/mercury_loader.js') }}", function() {
                         $(window).on('mercury:ready', function() {
                             window.Mercury.saveUrl = saveUrl;
                             window.Mercury.config.uploading.url = uploadUrl;
