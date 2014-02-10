@@ -67,7 +67,17 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_password_recover__POST()
     {
-        $user = FCom_Admin_Model_User::i()->load(BRequest::i()->request('email'), 'email');
+        $form = BRequest::i()->request('model');
+        if (empty($form) || empty($form['email'])) {
+            $this->message('Invalid or empty email', 'error');
+            BResponse::i()->redirect(BRequest::i()->referrer());
+        }
+        $user = FCom_Admin_Model_User::i()->orm()
+            ->where(array('OR' => array(
+                'email' => $form['email'],
+                'username' => $form['email'],
+            )))
+            ->find_one();
         if ($user) {
             $user->recoverPassword();
         }
@@ -92,19 +102,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $r = BRequest::i();
         $token = $r->request('token');
-        $password = $r->post('password');
-        $confirm = $r->post('password_confirm');
-        if ($token && $password && $confirm && $password === $confirm
-            && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
-            && $user->get('token') === $token
-        ) {
-            $user->resetPassword($password);
-            $this->message('Password has been reset');
-            BResponse::i()->redirect('');
-        } else {
-            $this->message('Invalid form data', 'error');
-            BResponse::i()->redirect(BRequest::i()->currentUrl());
+        $form = $r->post('model');
+        $password = !empty($form['password']) ? $form['password'] : null;
+        $confirm = !empty($form['password_confirm']) ? $form['password_confirm'] : null;
+        $returnUrl = BRequest::i()->referrer();
+        if (!($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token')) && $user->get('token') === $token)) {
+            $this->message('Invalid token', 'error');
+            BResponse::i()->redirect($returnUrl);
+        } elseif (!($password && $confirm && $password === $confirm)) {
+            $this->message('Invalid password or confirmation', 'error');
+            BResponse::i()->redirect($returnUrl);
         }
+        $user->resetPassword($password);
+        $this->message('Password has been reset');
+        BResponse::i()->redirect('');
     }
 
     public function action_logout()
