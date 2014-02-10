@@ -36,11 +36,12 @@ class BTwig extends BClass
 
         static::$_cacheDir = $config->get('fs/cache_dir').'/twig';
         BUtil::ensureDir(static::$_cacheDir);
-        $isDev = BDebug::is('DEBUG,DEVELOPMENT');
+        $cacheConfig = BConfig::i()->get('core/cache/twig');
+        $useCache = !$cacheConfig && BDebug::is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
         $options = array(
-            'cache' => $isDev ? false : static::$_cacheDir,
+            'cache' => $useCache ? static::$_cacheDir : false,
             'debug' => false,#$config->get('modules/BTwig/debug'),
-            'auto_reload' => $isDev ? true : false,#$config->get('modules/BTwig/auto_reload'),
+            'auto_reload' => true, #$useCache ? false : true, #$config->get('modules/BTwig/auto_reload'),
             'optimizations' => -1,
         );
 
