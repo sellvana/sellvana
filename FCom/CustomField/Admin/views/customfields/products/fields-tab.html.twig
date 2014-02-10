@@ -113,8 +113,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">Close</button>
-                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">Save changes</button>
+                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">{{ 'Close'|_ }}</button>
+                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">{{ 'Save changes'|_ }}</button>
                 </div>
             </div>
         </div>
@@ -127,17 +127,17 @@
   <div class="row">
     <input type="hidden" id="custom_fields" name="custom_fields"/>
     <div class="col-sm-6">
-      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose fieldset...'|_ }}'>
         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
       </select>
-      <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">Add a Field Set</button>
+      <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">{{ 'Add a Field Set'|_ }}</button>
     </div>
     <div class="col-sm-6">
-      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose field...'|_ }}'>
         {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
       </select>
-      <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">Add a Field</button>
-      <button class="btn btn-sm" type="button" id="btn_new_field">New Field</button>
+      <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
+      <button class="btn btn-sm" type="button" id="btn_new_field">{{ 'New Field'|_ }}</button>
     </div>
   </div>
 </div>
