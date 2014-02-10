@@ -134,7 +134,7 @@ class BLayout extends BClass
      */
     public static function i($new = false, array $args = array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1199,7 +1199,7 @@ class BView extends BClass
     {
         $params['view_name'] = $viewName;
         $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
-        $view                = BClassRegistry::i()->instance($className, $params);
+        $view                = BClassRegistry::instance($className, $params);
 
         return $view;
     }

@@ -73,11 +73,11 @@ class BModuleRegistry extends BClass
     {
         if (!$new) {
             if (!static::$_singleton) {
-                static::$_singleton = BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+                static::$_singleton = BClassRegistry::instance(__CLASS__, $args, !$new);
             }
             return static::$_singleton;
         }
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function getAllModules()
@@ -700,7 +700,7 @@ class BModule extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1032,13 +1032,12 @@ if ($args['name']==="FCom_Referrals") {
     protected function _processOverrides()
     {
         if (!empty($this->override['class'])) {
-            $hlp = BClassRegistry::i();
             foreach ($this->override['class'] as $o) {
 if (!isset($o[0]) || !isset($o[1])) {
     BDebug::notice('Invalid override in module '.$this->name);
     continue;
 }
-                $hlp->overrideClass($o[0], $o[1]);
+                BClassRegistry::overrideClass($o[0], $o[1]);
             }
         }
     }
@@ -1286,7 +1285,7 @@ class BMigrate extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**

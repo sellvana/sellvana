@@ -45,7 +45,7 @@ class BRequest extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -928,7 +928,7 @@ class BResponse extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1419,7 +1419,7 @@ class BRouting extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function __construct()
@@ -2020,7 +2020,7 @@ class BRouteObserver
         }
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
-        $controller = BClassRegistry::i()->instance($controllerName, array(), true);
+        $controller = BClassRegistry::instance($controllerName, array(), true);
         return $controller->dispatch($actionName, $this->args);
     }
 

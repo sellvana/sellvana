@@ -72,17 +72,17 @@ class BClass
         } else {
             $class = get_called_class();
         }
-        return BClassRegistry::i()->instance($class, $args, !$new);
+        return BClassRegistry::instance($class, $args, !$new);
     }
 
     public function __call($name, $args)
     {
-        return BClassRegistry::i()->callMethod($this, $name, $args, static::$_origClass);
+        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
     }
 
     public static function __callStatic($name, $args)
     {
-        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 
 
@@ -152,7 +152,7 @@ class BApp extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -443,7 +443,7 @@ class BConfig extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -659,42 +659,42 @@ class BClassRegistry extends BClass
     *
     * @var array
     */
-    protected $_classes = array();
-
-    /**
-    * Method overrides and augmentations
-    *
-    * @var array
-    */
-    protected $_methods = array();
-
-    /**
-    * Cache for method callbacks
-    *
-    * @var array
-    */
-    protected $_methodOverrideCache = array();
-
-    /**
-    * Classes that require decoration because of overridden methods
-    *
-    * @var array
-    */
-    protected $_decoratedClasses = array();
-
-    /**
-    * Property setter/getter overrides and augmentations
-    *
-    * @var array
-    */
-    protected $_properties = array();
+    static protected $_classes = array();
 
     /**
     * Registry of singletons
     *
     * @var array
     */
-    protected $_singletons = array();
+    static protected $_singletons = array();
+
+    /**
+    * Classes that require decoration because of overridden methods
+    *
+    * @var array
+    */
+    static protected $_decoratedClasses = array();
+
+    /**
+    * Method overrides and augmentations
+    *
+    * @var array
+    */
+    static protected $_methods = array();
+
+    /**
+    * Cache for method callbacks
+    *
+    * @var array
+    */
+    static protected $_methodOverrideCache = array();
+
+    /**
+    * Property setter/getter overrides and augmentations
+    *
+    * @var array
+    */
+    static protected $_properties = array();
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -704,7 +704,7 @@ class BClassRegistry extends BClass
     * @param bool $forceRefresh force the recreation of singleton
     * @return BClassRegistry
     */
-    public static function i($new=false, array $args=array(), $forceRefresh=false)
+    static public function i($new=false, array $args=array(), $forceRefresh=false)
     {
         if (!static::$_instance) {
             static::$_instance = new BClassRegistry;
@@ -719,10 +719,10 @@ class BClassRegistry extends BClass
     /**
     * Override a class
     *
-    * Usage: BClassRegistry::i()->overrideClass('BaseClass', 'MyClass');
+    * Usage: BClassRegistry::overrideClass('BaseClass', 'MyClass');
     *
     * Overridden class should be called one of the following ways:
-    * - BClassRegistry::i()->instance('BaseClass')
+    * - BClassRegistry::instance('BaseClass')
     * - BaseClass:i() -- if it extends BClass or has the shortcut defined
     *
     * Remembering the module that overrode the class for debugging
@@ -734,17 +734,16 @@ class BClassRegistry extends BClass
     * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
     * @return BClassRegistry
     */
-    public function overrideClass($class, $newClass, $replaceSingleton=false)
+    static public function overrideClass($class, $newClass, $replaceSingleton=false)
     {
-        $this->_classes[$class] = array(
+        static::$_classes[$class] = array(
             'class_name' => $newClass,
             'module_name' => BModuleRegistry::i()->currentModuleName(),
         );
         BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
-        if ($replaceSingleton && !empty($this->_singletons[$class]) && get_class($this->_singletons[$class])!==$newClass) {
-            $this->_singletons[$class] = $this->instance($newClass);
+        if ($replaceSingleton && !empty(static::$_singletons[$class]) && get_class(static::$_singletons[$class])!==$newClass) {
+            static::$_singletons[$class] = $this->instance($newClass);
         }
-        return $this;
     }
 
     /**
@@ -758,7 +757,7 @@ class BClassRegistry extends BClass
     * @param callback $callback
     * @return BClassRegistry
     */
-    public function addMethod($class, $method, $callback, $static=false)
+    static public function addMethod($class, $method, $callback, $static=false)
     {
         $arr = explode(' ', $class);
         if (!empty($arr[1])) {
@@ -767,11 +766,10 @@ class BClassRegistry extends BClass
         } else {
             $rel = 'is';
         }
-        $this->_methods[$method][$static ? 1 : 0]['override'][$rel][$class] = array(
+        static::$_methods[$method][$static ? 1 : 0]['override'][$rel][$class] = array(
             'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
         );
-        return $this;
     }
 
     /**
@@ -779,10 +777,10 @@ class BClassRegistry extends BClass
     *
     * Already existing instances of the class will not be affected.
     *
-    * Usage: BClassRegistry::i()->overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
+    * Usage: BClassRegistry::overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
     *
     * Overridden class should be called one of the following ways:
-    * - BClassRegistry::i()->instance('BaseClass')
+    * - BClassRegistry::instance('BaseClass')
     * - BaseClass:i() -- if it extends BClass or has the shortcut defined
     *
     * Callback method example (original method had 2 arguments):
@@ -808,11 +806,10 @@ class BClassRegistry extends BClass
     * @param bool $static Whether the static method call should be overridden
     * @return BClassRegistry
     */
-    public function overrideMethod($class, $method, $callback, $static=false)
+    static public function overrideMethod($class, $method, $callback, $static=false)
     {
         $this->addMethod($class, $method, $callback, $static);
-        $this->_decoratedClasses[$class] = true;
-        return $this;
+        static::$_decoratedClasses[$class] = true;
     }
 
     /**
@@ -845,21 +842,20 @@ class BClassRegistry extends BClass
     * @param boolean $static
     * @return BClassRegistry
     */
-    public function augmentMethod($class, $method, $callback, $static=false)
+    static public function augmentMethod($class, $method, $callback, $static=false)
     {
-        $this->_methods[$method][$static ? 1 : 0]['augment']['is'][$class][] = array(
+        static::$_methods[$method][$static ? 1 : 0]['augment']['is'][$class][] = array(
             'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
         );
-        $this->_decoratedClasses[$class] = true;
-        return $this;
+        static::$_decoratedClasses[$class] = true;
     }
 
     /**
     * Augment class property setter/getter
     *
-    * BClassRegistry::i()->augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
-    * BClassRegistry::i()->augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
+    * BClassRegistry::augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
+    * BClassRegistry::augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
     *
     * class MyClass {
     *   static public function newSetter($object, $property, $value)
@@ -880,7 +876,7 @@ class BClassRegistry extends BClass
     * @param mixed $callback
     * @return BClassRegistry
     */
-    public function augmentProperty($class, $property, $op, $type, $callback)
+    static public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op!=='set' && $op!=='get') {
              BDebug::error(BLocale::_('Invalid property augmentation operator: %s', $op));
@@ -893,49 +889,48 @@ class BClassRegistry extends BClass
             'callback' => $callback,
         );
         if ($type==='override') {
-            $this->_properties[$class][$property][$op.'_'.$type] = $entry;
+            static::$_properties[$class][$property][$op.'_'.$type] = $entry;
         } else {
-            $this->_properties[$class][$property][$op.'_'.$type][] = $entry;
+            static::$_properties[$class][$property][$op.'_'.$type][] = $entry;
         }
         //have to be added to redefine augmentProperty Setter/Getter methods
-        $this->_decoratedClasses[$class] = true;
-        return $this;
+        static::$_decoratedClasses[$class] = true;
     }
 
-    public function findMethodInfo($class, $method, $static=0, $type='override')
+    static public function findMethodInfo($class, $method, $static=0, $type='override')
     {
-        //$this->_methods[$method][$static ? 1 : 0]['override'][$rel][$class]
-        if (!empty($this->_methods[$method][$static][$type]['is'][$class])) {
+        //static::$_methods[$method][$static ? 1 : 0]['override'][$rel][$class]
+        if (!empty(static::$_methods[$method][$static][$type]['is'][$class])) {
             //return $class;
-            return $this->_methods[$method][$static][$type]['is'][$class];
+            return static::$_methods[$method][$static][$type]['is'][$class];
         }
         $cacheKey = $class.'|'.$method.'|'.$static.'|'.$type;
-        if (!empty($this->_methodOverrideCache[$cacheKey])) {
-            return $this->_methodOverrideCache[$cacheKey];
+        if (!empty(static::$_methodOverrideCache[$cacheKey])) {
+            return static::$_methodOverrideCache[$cacheKey];
         }
-        if (!empty($this->_methods[$method][$static][$type]['extends'])) {
+        if (!empty(static::$_methods[$method][$static][$type]['extends'])) {
             $parents = class_parents($class);
-#echo "<pre>"; echo $class.'::'.$method.';'; print_r($parents); print_r($this->_methods[$method][$static][$type]['extends']); echo "</pre><hr>";
-            foreach ($this->_methods[$method][$static][$type]['extends'] as $c=>$v) {
+#echo "<pre>"; echo $class.'::'.$method.';'; print_r($parents); print_r(static::$_methods[$method][$static][$type]['extends']); echo "</pre><hr>";
+            foreach (static::$_methods[$method][$static][$type]['extends'] as $c=>$v) {
                 if (isset($parents[$c])) {
 #echo ' * ';
-                    $this->_methodOverrideCache[$cacheKey] = $v;
+                    static::$_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }
             }
         }
-        if (!empty($this->_methods[$method][$static][$type]['implements'])) {
+        if (!empty(static::$_methods[$method][$static][$type]['implements'])) {
             $implements = class_implements($class);
-            foreach ($this->_methods[$method][$static][$type]['implements'] as $i=>$v) {
+            foreach (static::$_methods[$method][$static][$type]['implements'] as $i=>$v) {
                 if (isset($implements[$i])) {
-                    $this->_methodOverrideCache[$cacheKey] = $v;
+                    static::$_methodOverrideCache[$cacheKey] = $v;
                     return $v;
                 }
             }
         }
-        if (!empty($this->_methods[$method][$static][$type]['is']['*'])) {
-            $v = $this->_methods[$method][$static][$type]['is']['*'];
-            $this->_methodOverrideCache[$cacheKey] = $v;
+        if (!empty(static::$_methods[$method][$static][$type]['is']['*'])) {
+            $v = static::$_methods[$method][$static][$type]['is']['*'];
+            static::$_methodOverrideCache[$cacheKey] = $v;
             return $v;
         }
         return null;
@@ -947,7 +942,7 @@ class BClassRegistry extends BClass
     * @param mixed $cb
     * @return boolean
     */
-    public function isCallable($cb)
+    static public function isCallable($cb)
     {
         if (is_string($cb)) { // plain string callback?
             $cb = explode('::', $cb);
@@ -983,7 +978,7 @@ class BClassRegistry extends BClass
     * @param mixed $args
     * @return mixed
     */
-    public function callMethod($origObject, $method, array $args=array(), $origClass=null)
+    static public function callMethod($origObject, $method, array $args=array(), $origClass=null)
     {
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class($origObject);
@@ -1026,7 +1021,7 @@ class BClassRegistry extends BClass
     * @param string $method
     * @param array $args
     */
-    public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
+    static public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
         if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
@@ -1058,25 +1053,25 @@ class BClassRegistry extends BClass
     * @param string $property
     * @param mixed $value
     */
-    public function callSetter($origObject, $property, $value)
+    static public function callSetter($origObject, $property, $value)
     {
         $class = get_class($origObject);
-//print_r($this->_properties);exit;
-        if (!empty($this->_properties[$class][$property]['set_before'])) {
-            foreach ($this->_properties[$class][$property]['set_before'] as $entry) {
+//print_r(static::$_properties);exit;
+        if (!empty(static::$_properties[$class][$property]['set_before'])) {
+            foreach (static::$_properties[$class][$property]['set_before'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
 
-        if (!empty($this->_properties[$class][$property]['set_override'])) {
-            $callback = $this->_properties[$class][$property]['set_override']['callback'];
+        if (!empty(static::$_properties[$class][$property]['set_override'])) {
+            $callback = static::$_properties[$class][$property]['set_override']['callback'];
             call_user_func($callback, $origObject, $property, $value);
         } else {
             $origObject->$property = $value;
         }
 
-        if (!empty($this->_properties[$class][$property]['set_after'])) {
-            foreach ($this->_properties[$class][$property]['set_after'] as $entry) {
+        if (!empty(static::$_properties[$class][$property]['set_after'])) {
+            foreach (static::$_properties[$class][$property]['set_after'] as $entry) {
                 call_user_func($entry['callback'], $origObject, $property, $value);
             }
         }
@@ -1089,21 +1084,21 @@ class BClassRegistry extends BClass
     * @param string $property
     * @return mixed
     */
-    public function callGetter($origObject, $property)
+    static public function callGetter($origObject, $property)
     {
         $class = get_class($origObject);
 
         // get_before does not make much sense, so is not implemented
 
-        if (!empty($this->_properties[$class][$property]['get_override'])) {
-            $callback = $this->_properties[$class][$property]['get_override']['callback'];
+        if (!empty(static::$_properties[$class][$property]['get_override'])) {
+            $callback = static::$_properties[$class][$property]['get_override']['callback'];
             $result = call_user_func($callback, $origObject, $property);
         } else {
             $result = $origObject->$property;
         }
 
-        if (!empty($this->_properties[$class][$property]['get_after'])) {
-            foreach ($this->_properties[$class][$property]['get_after'] as $entry) {
+        if (!empty(static::$_properties[$class][$property]['get_after'])) {
+            foreach (static::$_properties[$class][$property]['get_after'] as $entry) {
                 $result = call_user_func($entry['callback'], $origObject, $property, $result);
             }
         }
@@ -1117,9 +1112,9 @@ class BClassRegistry extends BClass
     * @param mixed $class
     * @return mixed
     */
-    public function className($class)
+    static public function className($class)
     {
-        return !empty($this->_classes[$class]) ? $this->_classes[$class]['class_name'] : $class;
+        return !empty(static::$_classes[$class]) ? static::$_classes[$class]['class_name'] : $class;
     }
 
     /**
@@ -1132,34 +1127,34 @@ class BClassRegistry extends BClass
     * @param bool $singleton
     * @return object
     */
-    public function instance($class, array $args=array(), $singleton=false)
+    static public function instance($class, array $args=array(), $singleton=false)
     {
         // if singleton is requested and already exists, return the singleton
-        if ($singleton && !empty($this->_singletons[$class])) {
-            return $this->_singletons[$class];
+        if ($singleton && !empty(static::$_singletons[$class])) {
+            return static::$_singletons[$class];
         }
 
         // get original or overridden class instance
-        $className = $this->className($class);
+        $className = static::className($class);
         if (!class_exists($className, true)) {
             BDebug::error(BLocale::_('Invalid class name: %s', $className));
         }
         $instance = new $className($args);
 
         // if any methods are overridden or augmented, get decorator
-        if (!empty($this->_decoratedClasses[$class])) {
+        if (!empty(static::$_decoratedClasses[$class])) {
             $instance = $this->instance('BClassDecorator', array($instance));
         }
 
         // if singleton is requested, save
         if ($singleton) {
-            $this->_singletons[$class] = $instance;
+            static::$_singletons[$class] = $instance;
         }
 
         return $instance;
     }
 
-    public function unsetInstance()
+    static public function unsetInstance()
     {
         static::$_instance = null;
     }
@@ -1188,7 +1183,7 @@ class BClassDecorator
     {
 //echo '1: '; print_r($class);
         $class = array_shift($args);
-        $this->_decoratedComponent = is_string($class) ? BClassRegistry::i()->instance($class, $args) : $class;
+        $this->_decoratedComponent = is_string($class) ? BClassRegistry::instance($class, $args) : $class;
     }
 
     public function __destruct()
@@ -1205,7 +1200,7 @@ class BClassDecorator
     */
     public function __call($name, array $args)
     {
-        return BClassRegistry::i()->callMethod($this->_decoratedComponent, $name, $args);
+        return BClassRegistry::callMethod($this->_decoratedComponent, $name, $args);
     }
 
     /**
@@ -1217,7 +1212,7 @@ class BClassDecorator
     */
     public static function __callStatic($name, array $args)
     {
-        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args);
+        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args);
     }
 
     /**
@@ -1229,7 +1224,7 @@ class BClassDecorator
     public function __set($name, $value)
     {
         //$this->_decoratedComponent->$name = $value;
-        BClassRegistry::i()->callSetter($this->_decoratedComponent, $name, $value);
+        BClassRegistry::callSetter($this->_decoratedComponent, $name, $value);
     }
 
     /**
@@ -1241,7 +1236,7 @@ class BClassDecorator
     public function __get($name)
     {
         //return $this->_decoratedComponent->$name;
-        return BClassRegistry::i()->callGetter($this->_decoratedComponent, $name);
+        return BClassRegistry::callGetter($this->_decoratedComponent, $name);
     }
 
     /**
@@ -1382,7 +1377,7 @@ class BEvents extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1643,9 +1638,11 @@ class BSession extends BClass
     */
     protected $_dirty = false;
 
-    protected $_availableHandlers = array();
+    protected $_availableHandlers = array(
+        '' => 'Default',
+    );
 
-    protected $_defaultSessionCookieName = 'buckyball';
+    protected $_defaultSessionCookieName = 'fulleron';
     /**
     * Shortcut to help with IDE autocompletion
     *
@@ -1653,7 +1650,7 @@ class BSession extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function addHandler($name, $class)

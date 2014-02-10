@@ -79,7 +79,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public static function validateDupSku($data, $args)

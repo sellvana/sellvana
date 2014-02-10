@@ -4,19 +4,19 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
 {
     public function SetUp()
     {
-        BClassRegistry::i()->unsetInstance();
+        BClassRegistry::unsetInstance();
     }
 
     public function tearDown()
     {
-        BClassRegistry::i()->unsetInstance();
+        BClassRegistry::unsetInstance();
     }
 
     public function testOverrideClass()
     {
         $class = 'BClassRegistry_Test_A';
         $newClass = 'BClassRegistry_Test_B';
-        BClassRegistry::i()->overrideClass($class, $newClass);
+        BClassRegistry::overrideClass($class, $newClass);
         $a = $class::i();
         $this->assertEquals("B", $a->me());
     }
@@ -27,7 +27,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'sayA';
 
-        BClassRegistry::i()->overrideMethod($class, $method, array('BClassRegistry_Test_B', 'sayB'));
+        BClassRegistry::overrideMethod($class, $method, array('BClassRegistry_Test_B', 'sayB'));
 
         $a = $class::i();
 
@@ -40,7 +40,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'augmentA';
 
-        BClassRegistry::i()->augmentMethod($class, $method, array('BClassRegistry_Test_B', 'augmentB'));
+        BClassRegistry::augmentMethod($class, $method, array('BClassRegistry_Test_B', 'augmentB'));
 
         $a = $class::i();
 
@@ -50,7 +50,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
     //todo: why don't work
     public function testAugmentPropertySet()
     {
-        BClassRegistry::i()->augmentProperty('BClassRegistry_Test_A', 'foo', 'set',
+        BClassRegistry::augmentProperty('BClassRegistry_Test_A', 'foo', 'set',
                 'override', 'BClassRegistry_Test_AugmentProperty::newSetter');
 
         $a = BClassRegistry_Test_A::i();
@@ -63,7 +63,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
     //todo: why don't work
     public function testAugmentPropertyGet()
     {
-        BClassRegistry::i()->augmentProperty('BClassRegistry_Test_A', 'foo', 'get',
+        BClassRegistry::augmentProperty('BClassRegistry_Test_A', 'foo', 'get',
                 'after', 'BClassRegistry_Test_AugmentProperty::newGetter');
 
         $a = BClassRegistry_Test_A::i();
