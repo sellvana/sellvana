@@ -343,7 +343,12 @@ class BApp extends BClass
             list($modName, $url) = explode('/', substr($url, 1), 2);
         }
         if (empty($modName)) {
-            return BRequest::i()->webRoot() . '/' . $url;
+            $r = BRequest::i();
+            $webRoot = BConfig::i()->get('web/base_src');
+            if (!$webRoot) {
+                $webRoot = $r->webRoot();
+            }
+            return $r->scheme().'://'.$r->httpHost().$webRoot . '/' . $url;
         }
         $m = BApp::m($modName);
         if (!$m) {
