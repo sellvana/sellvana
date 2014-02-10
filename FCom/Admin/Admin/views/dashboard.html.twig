@@ -3,23 +3,24 @@
 <div class="page-header f-page-header-has-btns">
   <h1 class="f-page-title">
     <i class="icon-dashboard"></i>
-    Dashboard
+    {{ 'Dashboard'|_ }}
   </h1>
   <div class="btn-group">
-    <button class="btn">+ Add Widget</button>
+    <button class="btn">{{ '+ Add Widget'|_ }}</button>
   </div>
   <div class="pull-right btn-group">
-    <a class="btn btn-link hidden-xs" href="#">Last month</a>
-    <a class="btn btn-link" href="#">Last week</a>
-    <a class="btn btn-link" href="#">Today</a>
+    <a class="btn btn-link hidden-xs" href="#">{{ 'Last month'|_ }}</a>
+    <a class="btn btn-link" href="#">{{ 'Last week'|_ }}</a>
+    <a class="btn btn-link" href="#">{{ 'Today'|_ }}</a>
     <a class="btn btn-link" id="daterange" href="#">
       <i class="icon-calendar"></i>
-      <span>Custom</span>
+      <span>{{ 'Custom'|_ }}</span>
       <b class="caret"></b>
     </a>
   </div>
 </div>
 <div class="f-content-dashboard">
+  {{ THIS.view('core/messages')|raw }}
   <div class="row">
     <ul class="js-sortable-container">
   {% for widget in widgets %}
