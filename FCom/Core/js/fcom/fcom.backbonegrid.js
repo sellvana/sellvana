@@ -2054,7 +2054,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.MassDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
             BackboneGrid.AddButton = 'Div #' + config.id + ' button.grid-add';
             BackboneGrid.MassEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
-            BackboneGrid.NewButton = 'Div #' + config.id + ' button.grid-new';
+            BackboneGrid.NewButton = (typeof(config.new_button) !== 'undefined') ? config.new_button :'Div #' + config.id + ' button.grid-new';
             BackboneGrid.RefreshButton = 'Div #' + config.id + ' button.grid-refresh';
             BackboneGrid.ExportButton = 'Div #' + config.id + ' button.grid-export';
 
