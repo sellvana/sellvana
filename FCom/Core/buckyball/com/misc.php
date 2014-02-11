@@ -619,7 +619,7 @@ class BUtil extends BClass
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
-            array_walk($fields, 'trim');
+            @array_walk($fields, 'trim'); // LLVM BUG
         }
         $result = array();
         if (!$inverse) {
@@ -3769,7 +3769,7 @@ class Bcrypt extends BClass
 {
     public function __construct()
     {
-        if (CRYPT_BLOWFISH != 1) {
+        if (CRYPT_BLOWFISH != 1 && !function_exists('password_hash')) {
             throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
         }
     }

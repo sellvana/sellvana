@@ -24,14 +24,15 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'fields...'), 'edit'=>true, 'delete'=>true))
                 ),
                 'actions'=>array(
-                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
+//                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                             'delete'=>true
                 ),
                 'filters'=>array(
                             array('field'=>'set_name', 'type'=>'text'),
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
-                )
+                ),
+                'new_button' => '#add_new_field_set'
             )
         );
 
@@ -137,17 +138,25 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
                 ),
                 'filters'=>array(
+                            array('field'=>'field_code', 'type'=>'text'),
                             array('field'=>'field_name', 'type'=>'text'),
+                            array('field'=>'frontend_label', 'type'=>'text'),
+                            array('field'=>'frontend_show', 'type'=>'multiselect'),
                             array('field'=>'table_field_type', 'type'=>'multiselect'),
                             array('field'=>'admin_input_type', 'type'=>'multiselect'),
+                            array('field'=>'num_options', 'type'=>'text'),
+                            array('field'=>'system', 'type'=>'multiselect'),
+                            array('field'=>'multilanguage', 'type'=>'multiselect'),
+                            array('field'=>'required', 'type'=>'multiselect'),
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new'=>array('caption'=>'Add a field', 'modal'=>true),
+                                    //'new'=>array('caption'=>'Add a field', 'modal'=>true),
                                     'edit'=>true,
                                     'delete'=>true
                                 ),
-                'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid')
+                'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
+                'new_button' => '#add_new_field'
             )
         );
         return $config;
