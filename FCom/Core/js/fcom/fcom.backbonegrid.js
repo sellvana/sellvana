@@ -672,7 +672,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 _callbackCustom: function (ev) {
                     if (typeof(g_vent) !== 'undefined') {
-                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id, row: this.model.toJSON()});
+                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id, row: this.model.toJSON(), modalForm: modalForm});
                         ev.stopPropagation();
                         ev.preventDefault();
 
@@ -2129,10 +2129,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             g_vent.trigger('mass-delete', ev);
                         }
                         rowsCollection.remove(selectedRows.models, {silent: true});
+
+                        if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_mass_delete']) !== 'undefined') {
+                            var func = BackboneGrid.callbacks['after_mass_delete'];
+                            var script = func + '(this.$el,selectedRows.toJSON());';
+                            eval(script);
+                        }
                         selectedRows.reset();
                         $('select.' + config.id + '.js-sel').val('');
                         gridView.render();
-
                     }
                 });
             }

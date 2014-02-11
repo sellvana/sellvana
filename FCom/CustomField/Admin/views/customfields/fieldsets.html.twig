@@ -1,11 +1,11 @@
 {% set fieldSetsCtrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
 
 <script>
-require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
     var selFieldSetRow,selFieldRow,originOptionsId=[];
     if (typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
-
+    var formFieldSet = $('#field-set-modal-form');
     g_vent.bind('custom_callback', function (ev) {
         console.log(ev);
         if (ev.grid === 'fieldsets') {
@@ -13,8 +13,21 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
             g_vent.trigger('fetch_rows', {
                         grid: 'fieldset-modal-selected-grid',
                         url: '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}' + ev.row.id,
-                        callback: function () {
+                        callback: function (data) {
+                            $('#add_fields').find('tr').each(function () {
+                                $(this).show();
+                            })
+                            $('#selected_fields').find('tr').each(function () {
+                                removeField($(this).attr('id'));
+                            })
                             $('a#btn-fieldset-grid-modal').trigger('click');
+                            ev.modalForm.modalType = 'editable';
+                            ev.modalForm.render();
+                            formFieldSet.html(ev.modalForm.$el.html());
+                            formFieldSet.find('input, select, textarea').each(function () {
+                                $(this).val(ev.row[$(this).attr('id')]);
+                            });
+                            formFieldSet.validate();
                         }
                     }
             );
@@ -23,38 +36,63 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
 
     g_vent.bind('add', function (ev) {
         if (ev.grid === 'fieldset-modal-add-grid') {
+            console.log(ev.rows);
             g_vent.trigger('silent_inject', {grid: 'fieldset-modal-selected-grid', rows: ev.rows});
             g_vent.trigger('clear_selection', {grid: 'fieldset-modal-add-grid'});
+            ev.rows.forEach(function (data) {
+                removeField(data.id);
+            })
         }
     });
 
     $('button.fieldset-modal-save').click(function () {
-        g_vent.trigger('get_rows',
-                {
-                    grid: 'fieldset-modal-selected-grid',
-                    callback: function (rows) {
-                        $.post('{{ APP.href('customfields/fieldsets/set_field_grid_data') | raw }}',
-                                {
-                                    set_id: selFieldSetRow.id,
-                                    field_ids: _.pluck(rows, 'id').join(',')
-                                },
-                                function (data) {
-                                    selFieldSetRow.num_fields = rows.length;
-                                    g_vent.trigger('update_row', {grid: 'fieldsets', row: selFieldSetRow});
-                                    $('button.fieldset-modal-close').trigger('click');
-                                }
-                        );
+        if (formFieldSet.valid()) {
+            var dataForm = formFieldSet.serializeArray();
+            g_vent.trigger('get_rows',
+                    {
+                        grid: 'fieldset-modal-selected-grid',
+                        callback: function (rows) {
+                            $.post('{{ APP.href('customfields/fieldsets/set_field_grid_data') | raw }}',
+                                    {
+                                        set_id: selFieldSetRow.id,
+                                        field_ids: _.pluck(rows, 'id').join(',')
+                                    },
+                                    function (data) {
+                                        dataForm.forEach(function (data) {
+                                            selFieldSetRow[data.name] = data.value;
+                                        })
+                                        selFieldSetRow.num_fields = rows.length;
+                                        g_vent.trigger('update_row', {grid: 'fieldsets', row: selFieldSetRow});
+                                        $('button.fieldset-modal-close').trigger('click');
+                                    }
+                            );
+                        }
                     }
-                }
-        );
+            );
+        }
     });
 
 
 });
 
+function removeField (data) {
+    $('#add_fields').find('tr').each(function () {
+        if (data == $(this).attr('id')) {
+            $(this).hide();
+        }
+    })
+}
 /**
-* callback function for checking edit button disablity on fields grid
+* callback function for checking edit button disability on fields grid
 **/
+function afterDeleteLinkField(el, row) {
+    $('#add_fields').find('tr').each(function () {
+        $(this).show();
+    })
+    row.forEach(function (data) {
+        removeField(data.id)
+    })
+}
 </script>
 
 <div class="page-header">
@@ -95,6 +133,11 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
                                         Select Different Fields
                                     </a>
                                 </li>
+                                <li>
+                                    <a data-toggle='tab' href='#edit_field_set'>
+                                        Edit Field Sets
+                                    </a>
+                                </li>
                             </ul>
                             <div class='tab-content'>
                                 <div class='tab-pane active' id='selected_fields'>
@@ -103,14 +146,18 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
                                 <div class='tab-pane' id='add_fields'>
                                     {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
                                 </div>
+                                <div class='tab-pane' id='edit_field_set'>
+                                    <form class="form form-horizontal validate-form" id="field-set-modal-form" novalidate="novalidate">
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class='modal-footer'>
-                        <button class='btn btn-primary fieldset-modal-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
-                        <button class='btn btn-default btn-close fieldset-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-                    </div>
                 </div>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary fieldset-modal-save' type='button'>{{ "Save"|_ }}</button>
+                <button class='btn btn-default btn-close fieldset-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
