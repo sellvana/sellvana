@@ -210,10 +210,10 @@
         if (typeof(col.data.custom) !== 'undefined') {
             if (typeof(col.data.custom[0]) ===  'object') {
                 for (var index in col.data.custom) {
-                    printCustomButton(col.data.custom[index], rc.row[col.data.edit.col]);
+                    printCustomButton(col.data.custom[index], rc.row[col.data.custom[index].col]);
                 }
             } else {
-                printCustomButton(col.data.custom, rc.row[col.data.edit.col]);
+                printCustomButton(col.data.custom, rc.row[col.data.custom.col]);
             }
         }
 

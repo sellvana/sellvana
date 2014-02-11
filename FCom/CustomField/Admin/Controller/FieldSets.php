@@ -21,7 +21,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>BApp::href('customfields/fieldsets/unique_set'))),
                     array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true, 'editable'=>true , 'validation'=>array('required'=>true)),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'fields...'), 'edit'=>true, 'delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom' => array('icon' => 'icon-edit-sign', 'col'=>'id'), 'delete' => true))
                 ),
                 'actions'=>array(
 //                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
@@ -62,7 +62,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 ),
                 'actions'=>array(
                                     'delete' => array('caption' => 'Remove', 'confirm'=>false)
-                                )
+                                ),
+                'callbacks' => array('after_mass_delete' => 'afterDeleteLinkField')
             )
         );
 
@@ -272,8 +273,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $p = BRequest::i()->post();
         $model = FCom_CustomField_Model_SetField::i();
         $model->delete_many(array('set_id'=>$p['set_id']));
-        foreach (explode(',', $p['field_ids']) as $i=>$fId) {
-            $model->create(array('set_id'=>$p['set_id'], 'field_id'=>$fId, 'position'=>$i))->save();
+        if ($p['field_ids'] !== '') {
+            foreach (explode(',', $p['field_ids']) as $i=>$fId) {
+                $model->create(array('set_id'=>$p['set_id'], 'field_id'=>$fId, 'position'=>$i))->save();
+            }
         }
         BResponse::i()->json(array('success'=>true));
     }
