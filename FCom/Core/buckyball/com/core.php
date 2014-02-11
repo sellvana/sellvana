@@ -742,7 +742,7 @@ class BClassRegistry extends BClass
         );
         BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
         if ($replaceSingleton && !empty(static::$_singletons[$class]) && get_class(static::$_singletons[$class])!==$newClass) {
-            static::$_singletons[$class] = $this->instance($newClass);
+            static::$_singletons[$class] = static::instance($newClass);
         }
     }
 
@@ -808,7 +808,7 @@ class BClassRegistry extends BClass
     */
     static public function overrideMethod($class, $method, $callback, $static=false)
     {
-        $this->addMethod($class, $method, $callback, $static);
+        static::addMethod($class, $method, $callback, $static);
         static::$_decoratedClasses[$class] = true;
     }
 
@@ -962,9 +962,9 @@ class BClassRegistry extends BClass
             if (!$cb[0] instanceof BClass) { // regular class?
                 return false;
             }
-            return (bool)$this->findMethodInfo(get_class($cb[0]), $cb[1]);
+            return (bool)static::findMethodInfo(get_class($cb[0]), $cb[1]);
         } elseif (is_string($cb[0])) { // static?
-            return (bool)$this->findMethodInfo($cb[0], $cb[1], 1);
+            return (bool)static::findMethodInfo($cb[0], $cb[1], 1);
         } else { // unknown?
             return false;
         }
@@ -983,7 +983,7 @@ class BClassRegistry extends BClass
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class($origObject);
 
-        if (($info = $this->findMethodInfo($class, $method, 0, 'override'))) {
+        if (($info = static::findMethodInfo($class, $method, 0, 'override'))) {
             $callback = $info['callback'];
             array_unshift($args, $origObject);
             $overridden = true;
@@ -997,7 +997,7 @@ class BClassRegistry extends BClass
 
         $result = call_user_func_array($callback, $args);
 
-        if (($info = $this->findMethodInfo($class, $method, 0, 'augment'))) {
+        if (($info = static::findMethodInfo($class, $method, 0, 'augment'))) {
             if (!$overridden) {
                 array_unshift($args, $origObject);
             }
@@ -1023,7 +1023,7 @@ class BClassRegistry extends BClass
     */
     static public function callStaticMethod($class, $method, array $args=array(), $origClass=null)
     {
-        if (($info = $this->findMethodInfo($class, $method, 1, 'override'))) {
+        if (($info = static::findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
         } else {
             if (method_exists($class, $method)) {
@@ -1035,7 +1035,7 @@ class BClassRegistry extends BClass
 
         $result = call_user_func_array($callback, $args);
 
-        if (($info = $this->findMethodInfo($class, $method, 1, 'augment'))) {
+        if (($info = static::findMethodInfo($class, $method, 1, 'augment'))) {
             array_unshift($args, $result);
             foreach ($info as $augment) {
                 $result = call_user_func_array($augment['callback'], $args);
@@ -1143,7 +1143,7 @@ class BClassRegistry extends BClass
 
         // if any methods are overridden or augmented, get decorator
         if (!empty(static::$_decoratedClasses[$class])) {
-            $instance = $this->instance('BClassDecorator', array($instance));
+            $instance = static::instance('BClassDecorator', array($instance));
         }
 
         // if singleton is requested, save

@@ -1482,8 +1482,8 @@ class BORM extends ORMWrapper
             $r['sd'] = null;
         }
         $s = array( // state
-            'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (isset($d['p'])  ? $d['p']  : 1), // page
-            'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (isset($d['ps']) ? $d['ps'] : 100), // page size
+            'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (!empty($d['p']) && is_numeric($d['p'])  ? $d['p']  : 1), // page
+            'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (!empty($d['ps']) && is_numeric($d['ps']) ? $d['ps'] : 100), // page size
             's'  => !empty($r['s'])  ? $r['s']  : (isset($d['s'])  ? $d['s']  : ''), // sort by
             'sd' => !empty($r['sd']) ? $r['sd'] : (isset($d['sd']) ? $d['sd'] : 'asc'), // sort dir
             'rs' => !empty($r['rs']) ? $r['rs'] : null, // starting row
