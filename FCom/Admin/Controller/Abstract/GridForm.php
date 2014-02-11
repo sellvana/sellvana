@@ -158,7 +158,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $class = $this->_modelClass;
         $id = BRequest::i()->param('id', true);
         if ($id && !($model = $class::i()->load($id))) {
-            BDebug::error('Invalid ID: '.$id);
+            /*BDebug::error('Invalid ID: '.$id);*/
+            $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
             $model = $class::i()->create();

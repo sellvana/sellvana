@@ -23,7 +23,6 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
             );
         }
     });
-
     $('button.field-modal-save').click(function() {
         g_vent.trigger( 'get_rows',
                        {
@@ -59,21 +58,21 @@ function afterRowRenderFieldsGrid(el, row)
 }
 </script>
 
-<div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-file"></i>
-                <span>{{ "Fields" |_ }}</span>
-            </h1>
-        </div>
+<div class="page-header f-page-header-has-btns">
+    <h1 class="f-page-title">
+        {#<i class="icon-file"></i>#}
+        <span>{{ "Fields" |_ }}</span>
+    </h1>
+    {#<div class="page-header">#}
+        {##}
+    {#</div>#}
+    <div class="btn-group">
+        <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12">
-        {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
-    </div>
+<div class="f-admin-main">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
 </div>
 
 <div class='modal fade' id='field-grid-modal' tabindex='-1'>
@@ -84,11 +83,11 @@ function afterRowRenderFieldsGrid(el, row)
                 <h4 class='modal-title' id='myModalLabel'>Options</h4>
             </div>
             <div class='modal-body'>
-                <div class='row'>
+                {#<div class='row'>
                     <div class='col-sm-12'>
                         {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
                     </div>
-                </div>
+                </div>#}
             </div>
              <div class='modal-footer'>
                 <button class='btn btn-primary field-modal-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
