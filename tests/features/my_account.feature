@@ -90,23 +90,23 @@ Feature: Private pages
     And press "Save"
     Then I should see "Please enter a valid email address."
 
-    Scenario: Verify address page
-      Given I am on "/customer/address"
-      Then I should see "Address Book"
-      And "Add new address"
+  Scenario: Verify orders page
+    Given I am on "/wishlist"
+    Then I should see "Wishlist"
 
-    Scenario: Verify orders page
-      Given I am on "/customer/order"
-      Then I should see "Orders History"
+  Scenario: Verify address page
+    Given I am on "/customer/address"
+    Then I should see "Address Book"
+    And I should see "Add new address"
 
-    Scenario: Verify orders page
-      Given I am on "/wishlist"
-      Then I should see "Wishlist"
-      And I should see "Update Wishlist"
+  Scenario: Verify orders page
+    Given I am on "/customer/order"
+    Then I should see "Orders History"
 
-    Scenario: Verify change password page
-      Given I am on "/customer/myaccount/editpassword"
-      Then I should see "Change Password"
-      And I should see a "#model-current-password" element
-      And I should see an "#model-password" element
-      And I should see a "#edit-password_confirm" element
+
+  Scenario: Verify change password page
+    Given I am on "/customer/myaccount/editpassword"
+    Then I should see "Change Password"
+    And I should see a "#model-current-password" element
+    And I should see a "#model-password" element
+    And I should see a "#edit-password_confirm" element
