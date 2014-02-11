@@ -254,14 +254,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
-            if (confirm) {
+            //var confirm = window.confirm("Do you want to really remove?");
+            //if (confirm) {
                 this.parentSet.langFields.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
-            }
+            //}
         },
         getWYSIWYG: function() {
             var id = this.$el.find('textarea').attr('id');

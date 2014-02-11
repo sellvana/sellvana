@@ -148,7 +148,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function collectFormTabs($formView)
     {
-        $views = BLayout::i()->getAllViews('#^'.$formView->get('tab_view_prefix').'#');
+        $views = BLayout::i()->findViewsRegex('#^'.$formView->get('tab_view_prefix').'#');
         foreach ($views as $viewName => $view) {
             $id = basename($viewName);
             if (!empty($formView->tabs[$id])) {
