@@ -1,12 +1,24 @@
 {% set widgets = THIS.getWidgets() %}
+{% set availWidgets = [] %}
 {% set asyncWidgets = [] %}
+
+{% for widget in widgets %}
+  {% if not widget.state.closed %}
+    {% if widget.async %}
+      {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
+    {% endif %}
+  {% else %}
+    {% set availWidgets = availWidgets|merge([widget]) %}
+  {% endif %}
+{% endfor %}
+
 <div class="page-header f-page-header-has-btns">
   <h1 class="f-page-title">
     <i class="icon-dashboard"></i>
     {{ 'Dashboard'|_ }}
   </h1>
   <div class="btn-group">
-    <button class="btn">{{ '+ Add Widget'|_ }}</button>
+    <button class="btn" data-toggle="modal" data-target="#add-widget-modal">{{ '+ Add Widget'|_ }}</button>
   </div>
   <div class="pull-right btn-group">
     <button class="btn btn-default">{{ 'Last month'|_ }}</button>
@@ -31,73 +43,85 @@
     </div>
   </div>
 </div>
+
 <div class="f-content-dashboard">
   {{ THIS.view('core/messages')|raw }}
 
   <div class="row">
-    <ul class="js-sortable-container">
-  {% for widget in widgets %}
-  {% if not widget.state.closed %}
-      <li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
-        <div class="box {{ widget.state.collapsed ? 'box-collapsed' }}">
-          <div class="box-header js-sortable-handle {{ widget.header_class }}">
-            <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
-            <div class="actions">
-              <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
-              <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
-            </div>
-          </div>
-
-          {% if widget.async %}
-            {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
-          {% elseif widget.view %}
-            {{ THIS.view(widget.view) | raw }}
-          {% else %}
-            {{ widget.content | raw }}
-          {% endif %}
-        </div>
-      </li>
-  {% endif %}
-  {% endfor %}
+    <ul class="js-sortable-container" id="dashboard-widgets-container">
+    {% for widget in widgets %}
+      {% if not widget.state.closed %}
+        {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+      {% endif %}
+    {% endfor %}
     </ul>
   </div>
 </div>
 
-<script type="text/template" id="dashboard-widget-template">
-  <li class="col-sm-<%- widget.cols %>" id="dashboard-widget__<%- widget.key %>" data-id="<%- widget.key %>">
-    <div class="box">
-      <div class="box-header js-sortable-handle <%- widget.header_class %>">
-        <div class="title"><i class="icon-<%- widget.icon %>"></i><%- widget.title %></div>
-        <div class="actions">
-          <a class="btn box-collapse btn-xs btn-link js-collapse" href="#"><i></i></a>
-          <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+
+<!-- Modal -->
+<div class="modal fade" id="add-widget-modal" tabindex="-1" role="dialog" aria-labelledby="add-widget-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form id="add-widget-form" role="form">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="add-widget-modal-label">{{ 'Add A Widget'|_ }}</h4>
         </div>
-      </div>
-      <%= widget.html %>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="form-group col-sm-12">
+                <label class="control-label">{{ "Widget to add to dashboard"|_ }}</label>
+                <div class="controls">
+                  <select class="form-control required" name="widget" id="add-widget-selection">
+                    <option value="">{{ 'Select a widget...'|_ }}</option>
+                    {% for w in availWidgets %}
+                      <option value="{{ w.key }}">{{ w.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'Cancel'|_ }}</button>
+          <button type="button" class="btn btn-primary" id="add-widget-submit">{{ 'Add Widget'|_ }}</button>
+        </div>
+
+      </form>
+
     </div>
-  </li>
-</script>
+  </div>
+</div>
 
 <script>
 require(['jquery', 'jquery-ui'], function($) {
   var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+  //var widgetTemplate = _.template($('#dashboard-widget-template').html());
 
-  function load(widgets, wrapped) {
-    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped }, function(response, status, xhr) {
-console.log($('#dashboard-widget-template').html())
+  function load(widgets, wrapped, add) {
+    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped||'', add:add||'' }, function(response, status, xhr) {
       $.each(response.widgets, function(key, widget) {
-console.log(widget);
-        _.template($('dashboard-widget-template').html(), widget)
-        //$('dashboard-widget__'+widget.key+' > .box').append(widget.content);
+        if (wrapped) {
+          $('#dashboard-widgets-container').append(widget.html);
+        } else {
+          $('#dashboard-widget__'+widget.key+' .widget-contents').html(widget.html);
+        }
       });
     });
   }
-{% if asyncWidgets %}
-  load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
-{% endif %}
 
-  $('#dashboard-add-widget').change(function(ev) {
-    load($(this).val(), true);
+  {% if asyncWidgets %}
+    load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
+  {% endif %}
+
+  $('#add-widget-submit').click(function(ev) {
+    load($('#add-widget-selection').val(), true, true);
+    $('#add-widget-modal').modal('hide');
   });
 
   $('.js-sortable-container').sortable({

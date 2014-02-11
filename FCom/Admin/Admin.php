@@ -82,23 +82,27 @@ FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";
             'title' => 'Recent Orders',
             'icon' => 'inbox',
             'view' => 'dashboard/orders-list',
+            'async' => true,
         ));
         $view->addWidget('customers-list', array(
             'title' => 'Recent Customers',
             'icon' => 'group',
             'view' => 'dashboard/customers-list',
+            'async' => true,
         ));
         $view->addWidget('orders-totals', array(
             'title' => 'Order Totals',
             'icon' => 'inbox',
             'view' => 'dashboard/orders-totals',
             'cols' => 4,
+            'async' => true,
         ));
         $view->addWidget('visitors-totals', array(
             'title' => 'Visitors',
             'icon' => 'group',
             'view' => 'dashboard/visitors-totals',
             'cols' => 2,
+            'async' => true,
         ));
     }
 }
