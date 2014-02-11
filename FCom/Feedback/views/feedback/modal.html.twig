@@ -7,13 +7,15 @@
 
 /* Feedback button */
 .btn-send-feedback {
-  font: 12px Arial;
-  right:auto;
+  position:fixed;
+  bottom:0;
   left:-99px;
+  z-index:9999;
+  font: 12px Arial;
+  text-transform: none;
   bottom:10px !important;
   padding:4px 6px 6px 6px;
   border-radius:0 4px 4px 0;
-  text-transform: none;
   -webkit-transition: left .3s ease-in-out;
   -moz-transition: left .3s ease-in-out;
   -ms-transition: left .3s ease-in-out;
@@ -34,7 +36,7 @@
 </style>
 
   <!-- Button trigger modal -->
-  <button class="btn-send-feedback btn btn-primary" data-toggle="modal" data-target="#feedback-modal" style="position:fixed; bottom:0; right:0; z-index:9999">
+  <button class="btn-send-feedback btn btn-primary" data-toggle="modal" data-target="#feedback-modal">
     {{ 'Send Feedback'|_ }}
   </button>
 

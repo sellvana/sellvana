@@ -619,7 +619,7 @@ class BUtil extends BClass
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
-            array_walk($fields, 'trim');
+            @array_walk($fields, 'trim'); // LLVM BUG
         }
         $result = array();
         if (!$inverse) {
@@ -2461,6 +2461,7 @@ class BDebug extends BClass
 #buckyball-debug-console table { border-collapse: collapse; }
 #buckyball-debug-console th, #buckyball-debug-console td { font:normal 10px Verdana; border: solid 1px #ccc; padding:2px 5px;}
 #buckyball-debug-console th { font-weight:bold; }
+#buckuball-debug-console xmp { margin:0; }
 </style>
 <div id="buckyball-debug-trigger" onclick="var el=document.getElementById('buckyball-debug-console');el.style.display=el.style.display?'':'none'">[DBG]</div>
 <div id="buckyball-debug-console" style="display:none"><?php
@@ -2474,7 +2475,7 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
-            echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
+            echo "<tr><td>".nl2br(htmlspecialchars($e['msg']))."</td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
         $html = ob_get_clean();
@@ -3768,7 +3769,7 @@ class Bcrypt extends BClass
 {
     public function __construct()
     {
-        if (CRYPT_BLOWFISH != 1) {
+        if (CRYPT_BLOWFISH != 1 && !function_exists('password_hash')) {
             throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
         }
     }

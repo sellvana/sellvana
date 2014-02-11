@@ -291,7 +291,11 @@ class BRequest extends BClass
         if (empty($scriptName)) {
             return null;
         }
-        $root = rtrim(str_replace(array('//', '\\'), array('/', '/'), dirname($scriptName)), '/');
+        if (substr($scriptName, -1)!=='/') {
+            $scriptName = dirname($scriptName);
+        }
+        $root = rtrim(str_replace(array('//', '\\'), array('/', '/'), $scriptName), '/');
+
         if ($parentDepth) {
             $arr = explode('/', rtrim($root, '/'));
             $len = sizeof($arr)-$parentDepth;

@@ -371,22 +371,11 @@ class BLayout extends BClass
     /**
     * Get all views in this layout or filtered by pattern
     *
-    * @param string $pattern
-    *
     * @return array
     */
-    public function getAllViews($pattern = null)
+    public function getAllViews()
     {
-        if (is_null($pattern)) {
-            return $this->_views;
-        }
-        $views = array();
-        foreach ($this->_views as $viewName => $view) {
-            if (preg_match($pattern, $viewName)) {
-                $views[$viewName] = $view;
-            }
-        }
-        return $views;
+        return $this->_views;
     }
 
     /**
