@@ -278,7 +278,12 @@ class BApp extends BClass
             /** @var BRequest */
             $r          = BRequest::i();
             $c          = BConfig::i();
-            $scriptPath = pathinfo( $r->scriptName() );
+            $scriptName = $r->scriptName();
+            if (substr($scriptName, -1)==='/') {
+                $scriptPath = array('dirname' => $scriptName, 'basename' => basename($_SERVER['SCRIPT_FILENAME']));
+            } else {
+                $scriptPath = pathinfo( $r->scriptName() );
+            }
             switch ( $method ) {
                 case self::USE_CONFIG:
                     $url = $c->get( 'web/base_href' );
