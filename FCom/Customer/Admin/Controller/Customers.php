@@ -47,7 +47,15 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         );
         $config['filters'] = array(
             array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'lastname', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
+            array('field' => 'customer_group', 'type' => 'multiselect'),
+            array('field' => 'street1', 'type' => 'text'),
+            array('field' => 'city', 'type' => 'text'),
+            array('field' => 'region', 'type' => 'text'),
+            array('field' => 'postcode', 'type' => 'text'),
+            array('field' => 'create_at', 'type'=>'date-range'),
+            array('field' => 'last_login', 'type'=>'date-range'),
             array('field' => 'country', 'type' => 'multiselect'),
             array('field' => 'status', 'type' => 'multiselect'),
         );
