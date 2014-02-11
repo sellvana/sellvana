@@ -58,14 +58,17 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
 </script>
 
 <div class="page-header">
-  <h1 class="f-page-title">
-      <i class="icon-file"></i>
-      {{ "Field Sets" |_ }}
-  </h1>
+    <h1 class="f-page-title">
+        <i class="icon-file"></i>
+        {{ "Field Sets" |_ }}
+    </h1>
+    <div class="btn-group">
+        <button id="add_new_field_set" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a FieldSet" |_ }}</span></button>
+    </div>
 </div>
-
-{{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
-
+<div class="f-admin-main">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
+</div>
 <a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
 
 
@@ -80,32 +83,34 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
             <div class='modal-body'>
                 <div class='row'>
                     <div class='col-sm-12'>
-                    <div class='tabbable'>
-                        <ul class='nav nav-tabs prod-type'>
-                            <li class='active'>
-                                <a data-toggle='tab' href='#selected_fields'>
-                                    Linked Fields
-                                </a>
-                            </li>
-                            <li>
-                                <a data-toggle='tab' href='#add_fields'>
-                                    Select Different Fields
-                                </a>
-                            </li>
-                        </ul>
-                        <div class='tab-content'>
-                            <div class='tab-pane active' id='selected_fields'>
-                                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalSelectedGridConfig()) | raw }}
-                            </div>
-                            <div class='tab-pane' id='add_fields'>
-                                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
+                        <div class='tabbable'>
+                            <ul class='nav nav-tabs prod-type'>
+                                <li class='active'>
+                                    <a data-toggle='tab' href='#selected_fields'>
+                                        Linked Fields
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-toggle='tab' href='#add_fields'>
+                                        Select Different Fields
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class='tab-content'>
+                                <div class='tab-pane active' id='selected_fields'>
+                                    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalSelectedGridConfig()) | raw }}
+                                </div>
+                                <div class='tab-pane' id='add_fields'>
+                                    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
+                                </div>
                             </div>
                         </div>
                     </div>
-            </div>
-             <div class='modal-footer'>
-                <button class='btn btn-primary fieldset-modal-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
-                <button class='btn btn-default btn-close fieldset-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+                    <div class='modal-footer'>
+                        <button class='btn btn-primary fieldset-modal-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
+                        <button class='btn btn-default btn-close fieldset-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
