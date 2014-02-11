@@ -62,18 +62,18 @@ Feature: Private pages
     And the "edit-lastname" field should contain "User"
     And the "edit-email" field should contain "test@email.com"
     When I fill in the following:
-      | First Name | Test2 |
-      | Last Name  | User2 |
-      | Email  | test2@email.com |
+      | First Name | Test2           |
+      | Last Name  | User2           |
+      | Email      | test2@email.com |
     And press "Save"
     And go to "/customer/myaccount/edit"
     Then the "edit-firstname" field should contain "Test2"
     And the "edit-lastname" field should contain "User2"
     And the "edit-email" field should contain "test2@email.com"
     When I fill in the following:
-      | First Name | Test |
-      | Last Name  | User |
-      | Email  | test@email.com |
+      | First Name | Test           |
+      | Last Name  | User           |
+      | Email      | test@email.com |
     And press "Save"
     And go to "/customer/myaccount/edit"
     Then the "edit-firstname" field should contain "Test"
@@ -84,8 +84,29 @@ Feature: Private pages
   Scenario: Verify cannot submit wrong account data
     Given I am on "/customer/myaccount/edit"
     When I fill in the following:
-      | First Name | Test2 |
-      | Last Name  | User2 |
-      | Email  | test2email.com |
+      | First Name | Test2          |
+      | Last Name  | User2          |
+      | Email      | test2email.com |
     And press "Save"
     Then I should see "Please enter a valid email address."
+
+    Scenario: Verify address page
+      Given I am on "/customer/address"
+      Then I should see "Address Book"
+      And "Add new address"
+
+    Scenario: Verify orders page
+      Given I am on "/customer/order"
+      Then I should see "Orders History"
+
+    Scenario: Verify orders page
+      Given I am on "/wishlist"
+      Then I should see "Wishlist"
+      And I should see "Update Wishlist"
+
+    Scenario: Verify change password page
+      Given I am on "/customer/myaccount/editpassword"
+      Then I should see "Change Password"
+      And I should see a "#model-current-password" element
+      And I should see an "#model-password" element
+      And I should see a "#edit-password_confirm" element
