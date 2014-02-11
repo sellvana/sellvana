@@ -22,14 +22,14 @@ modules:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ get, /, FCom_Admin_Controller.index ]
                     - [ get, /*view, FCom_Admin_Controller.static ]
-                    - [ get, /test, FCom_Admin_Controller.test ]
                     - [ get, /blank, FCom_Admin_Controller.blank ]
-                    - [ post, /login, FCom_Admin_Controller.login ]
-                    - [ any, /password/recover, FCom_Admin_Controller.password_recover ]
-                    - [ any, /password/reset, FCom_Admin_Controller.password_reset ]
-                    - [ get, /logout, FCom_Admin_Controller.logout ]
 
-                    - [ get, /dashboard, FCom_Admin_Controller.dashboard ]
+                    - [ post, /login, FCom_Admin_Controller_Auth.login ]
+                    - [ any, /password/recover, FCom_Admin_Controller_Auth.password_recover ]
+                    - [ any, /password/reset, FCom_Admin_Controller_Auth.password_reset ]
+                    - [ get, /logout, FCom_Admin_Controller_Auth.logout ]
+
+                    - [ any, /dashboard/?.action, FCom_Admin_Controller_Dashboard ]
 
                     - [ any, /my_account, FCom_Admin_Controller.my_account ]
                     - [ get, /reports, FCom_Admin_Controller.reports ]
@@ -54,7 +54,6 @@ modules:
                     - [ any, /modules/.action, FCom_Admin_Controller_Modules ]
                     - [ post, /modules/migrate, FCom_Admin_Controller_Modules.migrate ]
 
-                    - [ get, /test, FCom_Admin_Controller.test ]
                     - [ get, /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
                 observe:
                     - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]

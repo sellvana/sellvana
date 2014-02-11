@@ -73,7 +73,7 @@
           <a class="btn box-remove btn-xs btn-link js-remove" href="#"><i class="icon-remove"></i></a>
         </div>
       </div>
-      <%= widget.content %>
+      <%= widget.html %>
     </div>
   </li>
 </script>
@@ -84,14 +84,16 @@ require(['jquery', 'jquery-ui'], function($) {
 
   function load(widgets, wrapped) {
     $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped }, function(response, status, xhr) {
+console.log($('#dashboard-widget-template').html())
       $.each(response.widgets, function(key, widget) {
+console.log(widget);
         _.template($('dashboard-widget-template').html(), widget)
         //$('dashboard-widget__'+widget.key+' > .box').append(widget.content);
       });
     });
   }
 {% if asyncWidgets %}
-  load({{ UTIL.toJson(asyncWidgets) }}.join(','));
+  load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
 {% endif %}
 
   $('#dashboard-add-widget').change(function(ev) {
