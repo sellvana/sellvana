@@ -12,10 +12,3 @@ modules:
                     send_mod_versions: true
         routing:
             - [ any, /core_feedback, FCom_Feedback_Controller.index ]
-
-        areas:
-            FCom_Frontend:
-                require: { module: { FCom_Frontend: 0.1.0 } }
-
-            FCom_Admin:
-                require: { module: { FCom_Admin: 0.1.0 } }
