@@ -38,5 +38,5 @@ Feature: Order process
     And I select "FL" from "region"
     And I press "Save address"
     And I should see "Review and Place Order"
-    When I press "Place your order"
+    When I press "Order"
     Then I should be on "/checkout/success"
