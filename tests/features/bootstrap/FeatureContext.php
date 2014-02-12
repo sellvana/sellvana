@@ -76,6 +76,22 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * Make sure not to be logged in as customer on frontend
+     *
+     * @Given /^I am not logged in front$/
+     */
+    public function iAmNotLoggedInFront()
+    {
+        $page = $this->getPage();
+        if(strpos($page->getContent(), "My Account") !== false){
+            echo "\t Logged in front\n";
+            $this->visit("/logout");
+        } else {
+            echo "\tNot logged in\n";
+        }
+    }
+
+    /**
      * @Then /^"(?P<element>[^"]*)" should be disabled$/
      */
     public function shouldBeDisabled( $element )
@@ -325,10 +341,10 @@ class FeatureContext extends MinkContext
      *
      * @Given /^I fill "([^"]*)" with random email$/
      */
-    public function iFillWithRandomEmail($fieldName)
+    public function iFillWithRandomEmail( $fieldName )
     {
-        $email = md5(microtime(true)) . "_test@email.com";
-        $this->fillField($fieldName, $email);
+        $email = md5( microtime( true ) ) . "_test@email.com";
+        $this->fillField( $fieldName, $email );
     }
 
     /**
