@@ -46,7 +46,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80, 'data' => array('edit' => true, 'delete' => true)),
         );
         $config['actions'] = array(
-            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),
+//            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),
             'edit'   => true,
             'delete' => true
         );
@@ -70,6 +70,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
                         return false;
                     });';
         $config['callbacks'] = array('after_modalForm_render' => $callbacks);
+        $config['new_button'] = '#add_new_index_field';
         return $config;
     }
 
@@ -82,7 +83,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $actions += array(
             'reindex_force' => ' <button class="btn btn-primary" onclick="location.href=\''.BApp::href('catalogindex/reindex?CLEAR=1').'\'"><span>'.BLocale::_('Force Reindex').'</span></button>',
         );
-        $actions['new'] = '';
+        $actions['new'] = '<button id="add_new_index_field" class="btn grid-new btn-primary _modal">'.BLocale::_('Add New Index Field').'</button>';
         $gridView->set('actions', $actions);
     }
 
