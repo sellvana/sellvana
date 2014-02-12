@@ -1,6 +1,7 @@
 {% set m = THIS.get('model') %}
 
 <fieldset name="main-product">
+  <div class="f-section">
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-cost">{{ 'Cost'|_ }}</label>
         <div class="col-md-5">
@@ -42,6 +43,7 @@
             <input class="form-control" type="text" id="model-markup" name="model[markup]" value="{{ validator.fieldValue('markup') }}" />
         </div>
     </div>
+  </div>
 </fieldset>
 
 {{ THIS.hook('catalog/products-form/prices', {'model' : m}) | raw }}
