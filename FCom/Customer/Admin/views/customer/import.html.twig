@@ -1,16 +1,12 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="page-header">
-            <h1 class="pull-left">
-                <i class="icon-file"></i>
-                <span>{{ "Upload and Import Customers" |_ }}</span>
-            </h1>
-        </div>
-    </div>
-</div>
 
-<div class="box col-sm-12">
-    <div class="box-content">
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+    <h1 class="f-page-title">
+        {{ "Upload and Import Customers" |_ }}
+    </h1>
+  </div>
+
+  <div class="f-admin-main">
         <div class="accordion accordion-blue panel-group" id="import-accordion">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -70,8 +66,8 @@
             </div>
         </div>
     </div>
-</div>
 
+</div>
 <script>
     require(['jquery', 'fcom.admin'], function($) {
         $(function() {

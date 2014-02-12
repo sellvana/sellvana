@@ -6,34 +6,26 @@
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if config.filters %}
-    <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
-      <div class="f-col-filters-selection col-sm-2">
-
-      <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
-
-      <span class="{{ config.id }} dropdown">
-        <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-          {{ 'Filters'|_ }}
-          <b class="caret"></b>
-        </a>
-        <ul class="{{ config.id }} dd-list dropdown-menu filters">
-          <!--li calss="ui-state-default"-->
-          <!-- visibiility template -->
-          <!--/li -->
-        </ul>
-      </span>
+    <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
+      <div class="f-col-filters-selection pull-left">
+        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+        <span class="{{ config.id }} dropdown">
+          <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+            {{ 'Filters'|_ }}
+            <b class="caret"></b>
+          </a>
+          <ul class="{{ config.id }} dd-list dropdown-menu filters"></ul>
+        </span>
       </div>
-      <div class="col-sm-10">
       {% if config.filters[0] %}
         <span class="{{ config.id }} f-filter-btns">
           <!-- filter buttons here -->
         </span>
       {% endif %}
-      </div>
     </div>
   {% endif %}
 
-  <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
+  <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
       <div class="col-sm-6">
         <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
