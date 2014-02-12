@@ -2129,15 +2129,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             g_vent.trigger('mass-delete', ev);
                         }
                         rowsCollection.remove(selectedRows.models, {silent: true});
-
+                        $('select.' + config.id + '.js-sel').val('');
+                        gridView.render();
                         if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_mass_delete']) !== 'undefined') {
                             var func = BackboneGrid.callbacks['after_mass_delete'];
                             var script = func + '(this.$el,selectedRows.toJSON());';
                             eval(script);
                         }
                         selectedRows.reset();
-                        $('select.' + config.id + '.js-sel').val('');
-                        gridView.render();
                     }
                 });
             }

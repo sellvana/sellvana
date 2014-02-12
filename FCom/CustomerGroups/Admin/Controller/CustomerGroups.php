@@ -28,20 +28,22 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
                   'data'=> array('edit' => true, 'delete' => true)),
         );
         $config['actions'] = array(
-            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
+//            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
             'edit' => true,
             'delete' => true
         );
         $config['filters'] = array(
+            array('field' => 'title', 'type' => 'text'),
             array('field' => 'code', 'type' => 'text'),
         );
+        $config['new_button'] = '#add_new_customer_group';
         return $config;
     }
 
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '')));
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '<button id="add_new_customer_group" class="btn grid-new btn-primary _modal">Add New Customer Group</button>')));
     }
 
     public function formViewBefore($args)
