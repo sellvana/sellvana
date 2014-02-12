@@ -1,11 +1,13 @@
 {% set fieldSetsCtrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
 
 <script>
+
 require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
     var selFieldSetRow,selFieldRow,originOptionsId=[];
     if (typeof(g_vent) === 'undefined')
         g_vent = _.extend({}, Backbone.Events);
     var formFieldSet = $('#field-set-modal-form');
+
     g_vent.bind('custom_callback', function (ev) {
         console.log(ev);
         if (ev.grid === 'fieldsets') {
@@ -104,9 +106,7 @@ function removeField (data, add) {
         }
     })
 }
-/**
-* callback function for checking edit button disability on fields grid
-**/
+
 function afterDeleteLinkField(el, row) {
     row.forEach(function (data) {
         removeField(data.id, true)

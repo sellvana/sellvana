@@ -53,7 +53,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'sortable'=>false),
                     array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'sortable'=>false),
                     array('name'=>'position', 'label'=>'Position', 'width'=>100, 'editable'=>true, 'valdiate'=>'number', 'default'=>'0', 'sortable'=>false),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
+//                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
                             array('field'=>'field_code', 'type'=>'text'),
