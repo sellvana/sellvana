@@ -400,10 +400,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
 
             $filters = array();
-            foreach ($config['filters'] as $k => $v) {
-                if (isset($v['field'])) {
-                    $filters[$v['field']] = $v;
+            if (!empty($config['filters'])) {
+                foreach ($config['filters'] as $k => $v) {
+                    if (isset($v['field'])) {
+                        $filters[$v['field']] = $v;
 
+                    }
                 }
             }
             $this->_processGridFilters($config, $filters, $orm);
