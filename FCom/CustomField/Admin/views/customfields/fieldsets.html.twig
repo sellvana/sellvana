@@ -113,21 +113,21 @@ function afterDeleteLinkField(el, row) {
     })
 }
 </script>
-
-<div class="page-header">
-    <h1 class="f-page-title">
-        <i class="icon-file"></i>
-        {{ "Field Sets" |_ }}
-    </h1>
-    <div class="btn-group">
-        <button id="add_new_field_set" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a FieldSet" |_ }}</span></button>
-    </div>
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+      <h1 class="f-page-title">
+          <i class="icon-file"></i>
+          {{ "Field Sets" |_ }}
+      </h1>
+      <div class="btn-group">
+          <button id="add_new_field_set" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a FieldSet" |_ }}</span></button>
+      </div>
+  </div>
+  <div class="f-admin-main">
+      {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
+  </div>
+  <a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
 </div>
-<div class="f-admin-main">
-    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldSetsGridConfig())| raw }}
-</div>
-<a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
-
 
 
 <div class='modal fade' id='fieldset-grid-modal' tabindex='-1'>
@@ -141,7 +141,7 @@ function afterDeleteLinkField(el, row) {
                 <div class='row'>
                     <div class='col-sm-12'>
                         <div class='tabbable'>
-                            <ul class='nav nav-tabs prod-type'>
+                            <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
                                 <li class='active'>
                                     <a data-toggle='tab' href='#edit_field_set'>
                                         Edit Field Sets
