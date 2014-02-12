@@ -52,13 +52,13 @@ input[type="checkbox"] {
   width:15px;
   height:15px;
   }
-hr {
+/*hr {
   position:relative;
   margin-left:-15px;
   margin-right:-15px;
   border-top:1px solid #eee;
   border-bottom:1px solid white;
-  }
+  }*/
 h1, h2, h3 {
   font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight:500;
@@ -410,7 +410,7 @@ label.error {
   }
 .f-horiz-nav-tabs > li > a:hover, 
 .f-horiz-nav-tabs > li > a:focus {
-  background:#f2f2f2;
+  background:#eee;
   color:#606269;
   }
 .f-horiz-nav-tabs > li.active > a, 
@@ -418,6 +418,9 @@ label.error {
 .f-horiz-nav-tabs > li.active > a:focus {
   border-width:0 1px;
   border-bottom:1px solid #fff;
+  }
+.f-horiz-nav-tabs > li:first-of-type > a {
+  border-left:none;
   }
 .f-horiz-nav-tabs .dropdown-menu > .active > a, 
 .f-horiz-nav-tabs .dropdown-menu > .active > a:hover, 
@@ -1265,7 +1268,21 @@ body.without-footer .f-admin-footer {
   vertical-align:top;
   }
 .f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane {
+  padding:0;
+  }
+.f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane > .well  {
+  border-radius:0;
+  border-width:1px 0;
+  }
+.f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane > .well:first-of-type {
+  border-top:none;
+  }
+.f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane .f-section {
   padding:20px;
+  }
+.f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane > .f-grid-wrapper .f-htmlgrid-toolbar {
+  margin-right:-5px;
+  margin-left:-5px;
   }
 .f-admin-sidebar-view .tabbable.tabs-left .tab-content + .tab-content .tab-pane {
   padding:5px 0;
@@ -1458,7 +1475,7 @@ ul > li > a > i.error{
   padding:5px 13px;
   }
 .f-htmlgrid-toolbar + .scrollable-area { margin-top:-1px; }
-.tab-pane .f-htmlgrid-toolbar { padding-right:0; padding-left:0; }
+.tab-pane .f-htmlgrid-toolbar { padding-right:5px; padding-left:5px; }
 .tab-pane .f-htmlgrid-toolbar .btn { font-size:12px; padding:5px 10px; }
 .f-htmlgrid-toolbar .dd-nestable { margin-right:15px; }
 .f-htmlgrid-toolbar .btn { padding:7px 15px; }
