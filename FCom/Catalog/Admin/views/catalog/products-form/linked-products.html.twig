@@ -91,7 +91,7 @@ require(['jquery'], function($) {
 <div class='row'>
     <div class='col-sm-10'>
     <div class='tabbable'>
-        <ul class='nav nav-tabs prod-type'>
+        <ul class='nav nav-tabs f-horiz-nav-tabs prod-type'>
             <li class='active'>
                 <a data-toggle='tab' href='#related'>
                     {{ "Related"|_ }}
@@ -116,7 +116,9 @@ require(['jquery'], function($) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
             </div>
             <div class='tab-pane' id='cross-sell'>
+              <div class="f-section">
                 NEED ADD DATA IN HERE
+              </div>
             </div>
         </div>
     </div>
