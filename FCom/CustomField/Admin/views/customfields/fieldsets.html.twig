@@ -16,10 +16,24 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                         callback: function (data) {
                             $('#add_fields').find('tr').each(function () {
                                 $(this).show();
-                            })
+                            });
                             $('#selected_fields').find('tr').each(function () {
-                                removeField($(this).attr('id'));
-                            })
+                                removeField($(this).attr('id'), false);
+                            });
+
+                            $('ul.nav-tabs').children().each(function (index) {
+                                $(this).removeClass('active');
+                                if (index == 0) {
+                                    $(this).addClass('active');
+                                }
+                            });
+
+                            $('div.tab-content').children().each(function (index) {
+                                $(this).removeClass('active');
+                                if (index == 0) {
+                                    $(this).addClass('active');
+                                }
+                            });
                             $('a#btn-fieldset-grid-modal').trigger('click');
                             ev.modalForm.modalType = 'editable';
                             ev.modalForm.render();
@@ -40,11 +54,14 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
             g_vent.trigger('silent_inject', {grid: 'fieldset-modal-selected-grid', rows: ev.rows});
             g_vent.trigger('clear_selection', {grid: 'fieldset-modal-add-grid'});
             ev.rows.forEach(function (data) {
-                removeField(data.id);
+                removeField(data.id, false);
             })
         }
     });
-
+    $('button.fieldset-modal-close').click(function () {
+        g_vent.trigger('clear_selection', {grid: 'fieldset-modal-add-grid'});
+        g_vent.trigger('clear_selection', {grid: 'fieldset-modal-selected-grid'});
+    });
     $('button.fieldset-modal-save').click(function () {
         if (formFieldSet.valid()) {
             var dataForm = formFieldSet.serializeArray();
@@ -75,10 +92,15 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
 
 });
 
-function removeField (data) {
+function removeField (data, add) {
     $('#add_fields').find('tr').each(function () {
         if (data == $(this).attr('id')) {
-            $(this).hide();
+            if (add) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+
         }
     })
 }
@@ -86,11 +108,8 @@ function removeField (data) {
 * callback function for checking edit button disability on fields grid
 **/
 function afterDeleteLinkField(el, row) {
-    $('#add_fields').find('tr').each(function () {
-        $(this).show();
-    })
     row.forEach(function (data) {
-        removeField(data.id)
+        removeField(data.id, true)
     })
 }
 </script>
@@ -124,6 +143,11 @@ function afterDeleteLinkField(el, row) {
                         <div class='tabbable'>
                             <ul class='nav nav-tabs prod-type'>
                                 <li class='active'>
+                                    <a data-toggle='tab' href='#edit_field_set'>
+                                        Edit Field Sets
+                                    </a>
+                                </li>
+                                <li>
                                     <a data-toggle='tab' href='#selected_fields'>
                                         Linked Fields
                                     </a>
@@ -133,22 +157,18 @@ function afterDeleteLinkField(el, row) {
                                         Select Different Fields
                                     </a>
                                 </li>
-                                <li>
-                                    <a data-toggle='tab' href='#edit_field_set'>
-                                        Edit Field Sets
-                                    </a>
-                                </li>
+
                             </ul>
                             <div class='tab-content'>
-                                <div class='tab-pane active' id='selected_fields'>
+                                <div class='tab-pane active' id='edit_field_set'>
+                                    <form class="form form-horizontal validate-form" id="field-set-modal-form" novalidate="novalidate">
+                                    </form>
+                                </div>
+                                <div class='tab-pane' id='selected_fields'>
                                     {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalSelectedGridConfig()) | raw }}
                                 </div>
                                 <div class='tab-pane' id='add_fields'>
                                     {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
-                                </div>
-                                <div class='tab-pane' id='edit_field_set'>
-                                    <form class="form form-horizontal validate-form" id="field-set-modal-form" novalidate="novalidate">
-                                    </form>
                                 </div>
                             </div>
                         </div>
