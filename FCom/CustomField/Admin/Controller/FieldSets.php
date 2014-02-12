@@ -32,7 +32,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
                 ),
-                'new_button' => '#add_new_field_set'
+//                'new_button' => '#add_new_field_set'
             )
         );
 
@@ -263,7 +263,24 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_grid_data__POST()
     {
-        $this->_processGridDataPost('FCom_CustomField_Model_Set');
+        $r = BRequest::i();
+        if ($r->post('oper') == 'add') {
+            $data = $r->post();
+            $field_ids = $data['field_ids'];
+            unset($data['id'], $data['oper'], $data['field_ids']);
+            $set = FCom_CustomField_Model_Set::i()->create($data)->save();
+            $result = $set->as_array();
+            if ($field_ids !== '') {
+                $model = FCom_CustomField_Model_SetField::i();
+                foreach (explode(',', $field_ids) as $i=>$fId) {
+                    $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+                }
+            }
+            BResponse::i()->json($result);
+        } else {
+            $this->_processGridDataPost('FCom_CustomField_Model_Set');
+        }
+
     }
 
     public function action_set_field_grid_data__POST()

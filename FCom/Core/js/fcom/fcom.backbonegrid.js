@@ -672,7 +672,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 _callbackCustom: function (ev) {
                     if (typeof(g_vent) !== 'undefined') {
-                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id, row: this.model.toJSON(), modalForm: modalForm});
+                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id,
+                            row: this.model.toJSON(), modalForm: modalForm,
+                            BackboneGrid: BackboneGrid, rowsCollection: rowsCollection
+                        });
                         ev.stopPropagation();
                         ev.preventDefault();
 
@@ -2273,6 +2276,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         ev.callback(selectedRows);
                     }
                 });
+
+                g_vent.bind('modal_create_form_custom', function (ev) {
+                    ev.callback({modalForm: modalForm, BackboneGrid: BackboneGrid, rowsCollection: rowsCollection});
+                });
+
+                g_vent.bind('reset_collection', function (ev) {
+                    if (ev.grid === config.id) {
+                        rowsCollection.reset();
+                    }
+                });
+
             }
 
             setModalHeight();
