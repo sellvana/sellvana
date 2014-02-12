@@ -15,8 +15,8 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         'filter_multivalue' => array(0 => 'No', 1 => 'Yes'),
         'filter_counts' => array(0 => 'No', 1 => 'Yes'),
         'filter_show_empty' => array(0 => 'No', 1 => 'Yes'),
-        'search_type' => array(0 => 'No', 1 => 'Yes', 'none' => 'None', 'terms' => 'Terms'),
-        'sort_type' => array(0 => 'No', 1 => 'Yes', 'none' => 'None', 'asc' => 'Ascending Only', 'desc' => 'Descending Only', 'both' => 'Both Directions'),
+        'search_type' => array('none' => 'None', 'terms' => 'Terms'),
+        'sort_type' => array('none' => 'None', 'asc' => 'Ascending Only', 'desc' => 'Descending Only', 'both' => 'Both Directions'),
     );
 
     static public function getFields($context='all', $where=null)

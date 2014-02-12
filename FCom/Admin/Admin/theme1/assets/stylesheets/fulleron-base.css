@@ -396,20 +396,48 @@ label.error {
 
 
 /* Tabs */
+.f-horiz-nav-tabs { background:#f6f6f6; }
+.f-horiz-nav-tabs > li { margin-bottom:0; }
+.f-horiz-nav-tabs > li.active { margin-bottom:-1px; }
 .f-horiz-nav-tabs > li > a {
+  border:none;
+  border-radius:0;
+  margin-right:0;
   padding:7px 15px;
   font-size:14px;
   font-weight:bold;
   color:#90939c;
   }
 .f-horiz-nav-tabs > li > a:hover, 
-.f-horiz-nav-tabs > li > a:focus {  
+.f-horiz-nav-tabs > li > a:focus {
   background:#f2f2f2;
+  color:#606269;
   }
 .f-horiz-nav-tabs > li.active > a, 
 .f-horiz-nav-tabs > li.active > a:hover, 
 .f-horiz-nav-tabs > li.active > a:focus {
-  color:#47484c;
+  border-width:0 1px;
+  border-bottom:1px solid #fff;
+  }
+.f-horiz-nav-tabs .dropdown-menu > .active > a, 
+.f-horiz-nav-tabs .dropdown-menu > .active > a:hover, 
+.f-horiz-nav-tabs .dropdown-menu > .active > a:focus {
+  background:none;
+  color:#444;
+  }
+.f-horiz-nav-tabs .dropdown-menu .active a:after {
+  display:inline-block;
+  background:#748ddd;
+  border-radius:15px;
+  width:10px;
+  height:10px;
+  left:-6px;
+  }
+.f-admin-main-content > .f-horiz-nav-tabs:first-child {
+  margin-top:-20px;  
+  }
+.f-admin-main-content > .f-horiz-nav-tabs + .tab-content {
+  padding:0 15px;
   }
 
 /* Icons:keeps Bootstrap styles with and without icons the same */
@@ -1198,7 +1226,6 @@ body.without-footer .f-admin-footer {
 .f-admin-main-view .page-header + .nav > li > a { padding:7px 12px; }
 
 /* Pages with sidebars */
-.f-admin-main-container { margin:-5px 15px 10px; }
 .f-admin-sidebar-view {
  margin:-20px 0 0 0;
  padding:0;
@@ -1237,11 +1264,10 @@ body.without-footer .f-admin-footer {
   width:100%;
   vertical-align:top;
   }
-.f-admin-sidebar-view .tabbable.tabs-left .tab-content > .tab-pane {
-  padding-top:20px;
-  padding-bottom:20px;
+.f-admin-sidebar-view .tabbable.tabs-left > .tab-content > .tab-pane {
+  padding:20px;
   }
-.f-admin-sidebar-view .tabbable.tabs-left .tab-content .tab-content {
+.f-admin-sidebar-view .tabbable.tabs-left .tab-content + .tab-content .tab-pane {
   padding:5px 0;
   }
 .f-admin-sidebar-view .f-fieldset-group { padding-right:0; padding-left:0; }
