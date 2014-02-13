@@ -368,9 +368,9 @@ class BRequest extends BClass
                 )
             );*/
 
-        // nginx fix
+        // nginx rewrite fix
         $basename = basename(static::scriptName());
-        $path = preg_replace('#^/'.preg_quote($basename).'#', '', $path);
+        $path = preg_replace('#^/.*?'.preg_quote($basename).'#', '', $path);
 
         return $path;
     }
