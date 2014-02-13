@@ -59,6 +59,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             unset($data['id'], $data['oper'], $data['bin_id']);
             $set = FCom_Stock_Model_Sku::i()->load($r->post('id'))->set($data)->save();
             $result = $set->as_array();
+
             BResponse::i()->json($result);
         } else {
             $this->_processGridDataPost($this->_modelClass);

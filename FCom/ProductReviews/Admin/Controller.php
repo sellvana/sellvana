@@ -73,6 +73,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'approve' => array('html' => '<button type="button" class="btn btn-primary disabled" id="prod-reviews-approve"><span>Approve</span></button>'),
             'deny'    => array('html' => '<button type="button" class="btn btn-warning disabled" id="prod-reviews-deny"><span>Deny</span></button>'),
         );
+
         $config['events'] = array('select-rows');
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
