@@ -174,7 +174,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false, 'validation' => array('required' => true)),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
