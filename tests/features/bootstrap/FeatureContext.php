@@ -357,6 +357,120 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * Fill in field with random css selector
+     *
+     * @When /^I fill in field "([^"]*)" with "([^"]*)"$/
+     */
+    public function iFillInFieldWith( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $field->setValue( $value );
+        }
+    }
+
+    /**
+     * Check a field value by css selector
+     *
+     * @Given /^the "([^"]*)" css field should contain "([^"]*)"$/
+     */
+    public function theCssFieldShouldContain( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $actual = $field->getValue( $value );
+            $regex  = '/^' . preg_quote( $value, '/' ) . '/ui';
+
+            if ( !preg_match( $regex, $actual ) ) {
+                $message = sprintf( 'The field "%s" value is "%s", but "%s" expected.', $field, $actual, $value );
+                throw new ExpectationException( $message, $this->getSession() );
+            }
+        }
+    }
+
+    /**
+     * Update qty field for first product in cart
+     *
+     * @When /^I fill in first product qty with "([^"]*)"$/
+     */
+    public function iFillInFirstProductQtyWith( $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $selector = '.f-input-qty';
+        $field = $this->getFieldsCss($selector);
+        if($field){
+            $field->setValue($value);
+        }
+    }
+
+    /**
+     * Update qty field for second product in cart
+     *
+     * @Given /^I fill in second product qty with "([^"]*)"$/
+     */
+    public function iFillInSecondProductQtyWith( $value )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert qty for first product in cart
+     *
+     * @Given /^first product qty field should contain "([^"]*)"$/
+     */
+    public function firstProductQtyFieldShouldContain( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert qty for second product in cart
+     *
+     * @Given /^second product qty field should contain "([^"]*)"$/
+     */
+    public function secondProductQtyFieldShouldContain( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Check element related to first product in cart
+     *
+     * @When /^I check first product "([^"]*)"$/
+     */
+    public function iCheckFirstProduct( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert only one product left in cart
+     *
+     * @Then /^I should see one product$/
+     */
+    public function iShouldSeeOneProduct()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @param string $selector
+     * @param bool   $single
+     * @return array|mixed
+     */
+    protected function getFieldsCss( $selector, $single = true )
+    {
+        $selector = $this->fixStepArgument( $selector );
+        $fields   = $this->getPage()->findAll( 'css', $selector );
+        if ( $fields && $single ) {
+            return current( $fields );
+        }
+        return $fields;
+    }
+
+    /**
      * Shortcut to get page object
      *
      * @return \Behat\Mink\Element\DocumentElement
