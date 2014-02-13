@@ -5,10 +5,8 @@
 <div class="f-admin-main-view">
   <div id="content-wrapper">
     <form id="my_account-form" class="form form-horizontal" method="post">
-      <div class="page-header with-breadcrumbs">
-        <h1 class="f-page-title">
-          <span>{{ m.fullname() }}</span>
-        </h1>
+      <div class="page-header f-admin-page-header f-has-breadcrumbs">
+        <h1 class="f-page-title">{{ m.fullname() }}</h1>
         <div class="btn-group">
           <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
           <button type="submit" class="btn btn-primary">

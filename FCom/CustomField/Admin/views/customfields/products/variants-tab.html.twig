@@ -2,7 +2,7 @@
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 <div class="well">
-  <select id="sel_var_field" style="width:150px;">
+  <select id="sel_var_field" class="form-control" style="width:150px;">
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
   </select>
   <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
