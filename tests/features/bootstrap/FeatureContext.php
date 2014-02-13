@@ -82,13 +82,7 @@ class FeatureContext extends MinkContext
      */
     public function iAmNotLoggedInFront()
     {
-        $page = $this->getPage();
-        if ( strpos( $page->getContent(), "My Account" ) !== false ) {
-            echo "\t Logged in front\n";
-            $this->visit( "/logout" );
-        } else {
-            echo "\tNot logged in\n";
-        }
+        $this->visit( "/logout" );
     }
 
     /**
@@ -277,9 +271,9 @@ class FeatureContext extends MinkContext
             throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
         }
 
-        $this->productName = $productLink[1]->getText();
+        $this->productName = $productLink[ 1 ]->getText();
         echo "\t{$this->productName}\n";
-        $productLink[1]->click();
+        $productLink[ 1 ]->click();
     }
 
     protected $productName;
@@ -291,7 +285,7 @@ class FeatureContext extends MinkContext
      */
     public function iShouldFindCorrectProductName()
     {
-        $this->assertPageContainsText($this->productName);
+        $this->assertPageContainsText( $this->productName );
     }
 
     /**
