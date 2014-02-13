@@ -1,7 +1,7 @@
 {% set config = THIS.get('config') %}
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': config.id, 'folder': config.folder}) %}
  <div class='tabbable'>
-                        <ul class='nav nav-tabs prod-type'>
+                        <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
                             <li class='active'>
                                 <a data-toggle='tab' href='#{{config.id}}-attach_library'>
                                     Library

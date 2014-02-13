@@ -11,50 +11,51 @@
     {% set availWidgets = availWidgets|merge([widget]) %}
   {% endif %}
 {% endfor %}
-
-<div class="page-header f-page-header-has-btns">
-  <h1 class="f-page-title">
-    <i class="icon-dashboard"></i>
-    {{ 'Dashboard'|_ }}
-  </h1>
-  <div class="btn-group">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#add-widget-modal">{{ '+ Add Widget'|_ }}</button>
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+    <h1 class="f-page-title">
+      <i class="icon-dashboard"></i>
+      {{ 'Dashboard'|_ }}
+    </h1>
+    <div class="btn-group">
+      <button class="btn btn-primary" data-toggle="modal" data-target="#add-widget-modal">{{ '+ Add Widget'|_ }}</button>
+    </div>
+    <div class="btn-group dropdown">
+      <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-calendar"></i>
+        <span>{{ 'Custom'|_ }}</span>
+        <b class="caret"></b>
+      </button>
+      <ul class="dropdown-menu pull-right dashboard-filter-range">
+        <li>
+          <div class="input-group range">
+            <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
+            <span class="input-group-addon">
+              <i class="icon-calendar"></i>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="pull-right btn-group">
+      <button class="btn btn-default">{{ 'Last month'|_ }}</button>
+      <button class="btn btn-default">{{ 'Last week'|_ }}</button>
+      <button class="btn btn-default">{{ 'Today'|_ }}</button>
+    </div>
   </div>
-  <div class="btn-group dropdown">
-    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      <i class="icon-calendar"></i>
-      <span>{{ 'Custom'|_ }}</span>
-      <b class="caret"></b>
-    </button>
-    <ul class="dropdown-menu pull-right dashboard-filter-range">
-      <li>
-        <div class="input-group range">
-          <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
-          <span class="input-group-addon">
-            <i class="icon-calendar"></i>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="pull-right btn-group">
-    <button class="btn btn-default">{{ 'Last month'|_ }}</button>
-    <button class="btn btn-default">{{ 'Last week'|_ }}</button>
-    <button class="btn btn-default">{{ 'Today'|_ }}</button>
-  </div>
-</div>
 
-<div class="f-content-dashboard">
-  {{ THIS.view('core/messages')|raw }}
-
-  <div class="row">
-    <ul class="js-sortable-container" id="dashboard-widgets-container">
-    {% for widget in widgets %}
-      {% if not widget.state.closed %}
-        {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
-      {% endif %}
-    {% endfor %}
-    </ul>
+  <div class="f-admin-main f-page-dashboard">
+    {{ THIS.view('core/messages')|raw }}
+  
+    <div class="row">
+      <ul class="js-sortable-container" id="dashboard-widgets-container">
+      {% for widget in widgets %}
+        {% if not widget.state.closed %}
+          {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
 

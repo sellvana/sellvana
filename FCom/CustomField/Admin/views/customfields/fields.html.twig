@@ -58,21 +58,23 @@ function afterRowRenderFieldsGrid(el, row)
 }
 </script>
 
-<div class="page-header f-page-header-has-btns">
-    <h1 class="f-page-title">
-        {#<i class="icon-file"></i>#}
-        <span>{{ "Fields" |_ }}</span>
-    </h1>
-    {#<div class="page-header">#}
-        {##}
-    {#</div>#}
-    <div class="btn-group">
-        <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
-    </div>
-</div>
-
-<div class="f-admin-main">
-    {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+      <h1 class="f-page-title">
+          {#<i class="icon-file"></i>#}
+          <span>{{ "Fields" |_ }}</span>
+      </h1>
+      {#<div class="page-header">#}
+          {##}
+      {#</div>#}
+      <div class="btn-group">
+          <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
+      </div>
+  </div>
+  
+  <div class="f-admin-main">
+      {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
+  </div>
 </div>
 
 <div class='modal fade' id='field-grid-modal' tabindex='-1'>

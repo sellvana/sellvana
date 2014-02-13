@@ -83,9 +83,9 @@ class FeatureContext extends MinkContext
     public function iAmNotLoggedInFront()
     {
         $page = $this->getPage();
-        if(strpos($page->getContent(), "My Account") !== false){
+        if ( strpos( $page->getContent(), "My Account" ) !== false ) {
             echo "\t Logged in front\n";
-            $this->visit("/logout");
+            $this->visit( "/logout" );
         } else {
             echo "\tNot logged in\n";
         }
@@ -263,6 +263,25 @@ class FeatureContext extends MinkContext
         $productLink->click();
     }
 
+    /**
+     * Click second product link on category page
+     *
+     * @Given /^I click second product link$/
+     */
+    public function iClickSecondProductLink()
+    {
+        $productLinkPath = 'div.f-prod-listing div.row div.col-md-4 a.f-prod-name';
+        $page            = $this->getPage();
+        $productLink     = $page->findAll( 'css', $productLinkPath );
+        if ( !$productLink ) {
+            throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
+        }
+
+        $this->productName = $productLink[1]->getText();
+        echo "\t{$this->productName}\n";
+        $productLink[1]->click();
+    }
+
     protected $productName;
 
     /**
@@ -272,11 +291,7 @@ class FeatureContext extends MinkContext
      */
     public function iShouldFindCorrectProductName()
     {
-        $content = $this->getPage()->find( 'css', 'h1.f-prod-name' )->getText();
-        echo "\t{$content}\n";
-        if ( $content != $this->productName ) {
-            throw new ExpectationException( "{$content} does not match {$this->productName}", $this->getSession() );
-        }
+        $this->assertPageContainsText($this->productName);
     }
 
     /**
