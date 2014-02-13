@@ -1182,7 +1182,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         html = this.model.get('val');
                     }
 
-                    this.$el.find('span.f-grid-filter-value').html(html);
+                    this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
                 }
             });
             BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
