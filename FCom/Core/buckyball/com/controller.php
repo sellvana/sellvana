@@ -340,11 +340,11 @@ class BRequest extends BClass
     */
     public static function path($offset, $length=null)
     {
-        $pathInfo = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-            (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
+        $pathInfo = static::rawPath();
         if (empty($pathInfo)) {
             return null;
         }
+
         $path = explode('/', ltrim($pathInfo, '/'));
         if (is_null($length)) {
             return isset($path[$offset]) ? $path[$offset] : null;
@@ -360,13 +360,19 @@ class BRequest extends BClass
     public static function rawPath()
     {
 #echo "<pre>"; print_r($_SERVER); exit;
-        return !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
+        $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
             (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
             /*
                 (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
                     (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
                 )
             );*/
+
+        // nginx fix
+        $basename = basename(static::scriptName());
+        $path = preg_replace('#^/'.preg_quote($basename).'#', '', $path);
+
+        return $path;
     }
 
     /**
