@@ -130,4 +130,20 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $rows = BDb::many_as_array(FCom_CatalogIndex_Model_Field::i()->orm()->where($data['key'], $data['value'])->find_many());
         BResponse::i()->json(array( 'unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])));
     }
+
+    public function action_grid_data__POST()
+    {
+        $r = BRequest::i();
+        if ($r->post('oper') == 'edit') {
+            $data = $r->post();
+            // avoid error when edit
+            unset($data['id'], $data['oper'], $data['fcom_field_id']);
+            $set = FCom_CatalogIndex_Model_Field::i()->load($r->post('id'))->set($data)->save();
+            $result = $set->as_array();
+
+            BResponse::i()->json($result);
+        } else {
+            $this->_processGridDataPost($this->_modelClass);
+        }
+    }
 }
