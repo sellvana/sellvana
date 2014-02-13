@@ -473,7 +473,7 @@ LAYOUT
   }
 .f-admin-page-header .f-page-title {
   margin:5px 0 4px;
-  font-weight:600;
+  font-weight:bold;
   font-size:18px;
   vertical-align:middle;
   }
@@ -1501,7 +1501,12 @@ FULLERON
   box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.05);
   -webkit-box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.05);
   }
-.f-grid-toolbar .f-filter-btns .dropdown.f-grid-filter-val > .dropdown-toggle { padding-left:28px; }
+.f-grid-toolbar .f-filter-btns .dropdown.f-grid-filter-val > .dropdown-toggle {  
+  background:#eaedf6;
+  padding-left:28px;
+  color:#444;
+  font-weight:bold;
+  }
 .f-grid-toolbar .f-filter-btns .dropdown.f-grid-filter-val > .dropdown-toggle:hover,
 .f-grid-toolbar .f-filter-btns .dropdown.open.f-grid-filter-val > .dropdown-toggle { padding-left:27px; }
 .f-grid-toolbar .f-filter-btns .dropdown.f-grid-filter-val .select2-search-choice-close {
@@ -1538,7 +1543,7 @@ FULLERON
   margin-right:15px;
   }
 .f-grid-filter div.select2-container {
-  font-weight:600;
+  font-weight:bold;
   color:#444444;
   padding:0px;
   margin:0px;
@@ -1570,10 +1575,6 @@ FULLERON
   width:150px;
   height:31px;
   margin-right:5px;
-  }
-.f-filter-btns .f-grid-filter-val .dropdown-toggle {
-  padding-left:20px;
-  color:#444444;
   }
 .f-filter-btns .f-grid-filter-val .dropdown-toggle .caret {
   border-top-color:#444444;
@@ -2627,7 +2628,7 @@ h1 [class^="icon-"] { color:#aaa; }
 .f-fieldset-group-title {
   margin-top:15px;
   margin-bottom:15px;
-  font-weight:600;
+  font-weight:bold;
   font-size:15px;
   color:#666;
   }
