@@ -650,8 +650,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         $persFilters = !empty($pers['grid'][$gridId]['filters']) ? $pers['grid'][$gridId]['filters'] : array();
         $filters = $r['filters'];
-        FCom_Admin_Model_User::i()->personalize(array('grid'=>array($gridId=>array('state'=>$r))));
-        FCom_Admin_Model_User::i()->personalize(array('grid'=>array($gridId=>array('filters'=>$filters))));
+        $persData = array('grid' => array($gridId => array('state' => $r, 'filters' => $filters)));
+        FCom_Admin_Model_User::i()->personalize($persData);
 
         if ($stateKey) {
             $sess =& BSession::i()->dataToUpdate();
@@ -851,7 +851,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             switch ($filters[$fId]['op']) {
                                 case 'between':
                                     $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
-                                    $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                                    if (isset($temp[1])) {
+                                        $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                                    }
 
                                     break;
                                 case 'from':
@@ -902,10 +904,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     protected function _processGridFiltersOne($filter, $op, $value, $orm)
     {
+        $section = !empty($filter['having']) ? 'having' : 'where';
         if (!empty($filter['raw'][$op])) {
-            $orm->where_raw($filter['raw'][$op], $value);
+            $method = $section.'_raw';
+            $orm->$method($filter['raw'][$op], $value);
         } else {
-            $method = 'where_'.$op;
+            $method = $section.'_'.$op;
             $orm->$method($filter['field'], $value);
         }
     }

@@ -30,8 +30,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                   'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
-            array('field' => 'billing_name', 'type' => 'text'),
-            array('field' => 'shipping_name', 'type' => 'text'),
+            array('field' => 'billing_name', 'type' => 'text', 'having' => true),
+            array('field' => 'shipping_name', 'type' => 'text', 'having' => true),
             array('field' => 'grandtotal', 'type' => 'number-range'),
             array('field' => 'status', 'type' => 'multiselect'),
         );
