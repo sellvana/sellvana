@@ -14,7 +14,7 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
+        return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
 
     public function addNew($data)

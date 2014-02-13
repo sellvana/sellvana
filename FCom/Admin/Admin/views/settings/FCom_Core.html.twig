@@ -171,11 +171,46 @@
                         <input class="switch-cbx" name="config[web][hide_script_name]" {% if c.get('web/hide_script_name') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Optimizations"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group4">
+            <div class="panel-body">
                 <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Force Dir/File Cache"|_ }}</label>
+                    <label class="col-md-2 control-label">{{ "Module Manifest Files Cache"|_ }}</label>
                     <div class="col-md-5">
-                        <input type="hidden" name="config[core][force_dirfile_cache]" value="0"/>
-                        <input class="switch-cbx" name="config[core][force_dirfile_cache]" {% if c.get('core/force_dirfile_cache') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+                        <select class="form-control" name="config[core][cache][manifest_files]">
+                            {{ UTIL.optionsHtml({'':'Enable in staging or production modes', 'enable':'Enable always', 'disable':'Disable always'}, c.get('core/cache/manifest_files'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Layout Files Cache"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[core][cache][layout_files]">
+                            {{ UTIL.optionsHtml({'':'Enable in staging or production modes', 'enable':'Enable always', 'disable':'Disable always'}, c.get('core/cache/layout_files'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "View Template Files Cache"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[core][cache][view_files]">
+                            {{ UTIL.optionsHtml({'':'Enable in staging or production modes', 'enable':'Enable always', 'disable':'Disable always'}, c.get('core/cache/view_files'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Twig Cache"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[core][cache][twig]">
+                            {{ UTIL.optionsHtml({'':'Enable in staging or production modes', 'enable':'Enable always', 'disable':'Disable always'}, c.get('core/cache/twig'))|raw }}
+                        </select>
                     </div>
                 </div>
             </div>
@@ -186,7 +221,7 @@
         <div class="panel-heading">
             <a class="accordion-toggle" href="#">{{ "CSRF Protection"|_ }}</a>
         </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group4">
+        <div class="panel-collapse accordion-body" id="settings-FCom_Core-group5">
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Check Method"|_ }}</label>

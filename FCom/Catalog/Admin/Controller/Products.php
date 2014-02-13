@@ -227,7 +227,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'product_id', 'hidden'=>true,'default'=>$model->id()),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
-                    array('name'=>'file_name',  'hidden'=>true),
+                    array('name'=>'file_name', 'label' => 'File Name', 'hidden'=>true),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
@@ -388,17 +388,42 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function formPostAfter($args)
     {
-
         parent::formPostAfter($args);
         $model = $args['model'];
         $data = BRequest::i()->post();
-        $this->processCategoriesPost($model);
-        $this->processLinkedProductsPost($model, $data);
-        $this->processMediaPost($model, $data);
-        $this->processCustomFieldPost($model, $data);
-        $this->processVariantPost($model, $data);
-        $this->processSystemLangFieldsPost($model, $data);
-        $this->processFrontendPost($model, $data);
+        if (isset($data['do']) && $data['do'] === 'DELETE') {
+            $this->deleteRelateInfo($model);
+        } else {
+            $this->processCategoriesPost($model);
+            $this->processLinkedProductsPost($model, $data);
+            $this->processMediaPost($model, $data);
+            $this->processCustomFieldPost($model, $data);
+            $this->processVariantPost($model, $data);
+            $this->processSystemLangFieldsPost($model, $data);
+            $this->processFrontendPost($model, $data);
+
+        }
+    }
+
+    /**
+     * delete all associate info with this product
+     * @param $model
+     */
+    public function deleteRelateInfo($model)
+    {
+        //delete Categories
+        FCom_Catalog_Model_CategoryProduct::i()->delete_many(array(
+           'product_id' => $model->id
+        ));
+        //delete Product Link
+        FCom_Catalog_Model_ProductLink::i()->delete_many(array(
+            'product_id' => $model->id
+        ));
+        //delete Product Media
+        FCom_Catalog_Model_ProductMedia::i()->delete_many(array(
+            'product_id' => $model->id
+        ));
+        //todo: delete product reviews / wishlist
     }
 
     public function processCategoriesPost($model)
@@ -637,15 +662,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
                     $redirectUrl = BApp::href($this->_formHref).'?id='.$newModel->id;
-                    BSession::i()->addMessage($this->_('Duplicate successful'), 'success', 'admin');
+                    $this->message('Duplicate successful');
                 } else {
-                    BSession::i()->addMessage($this->_('An error occurred while creating model.'), 'error', 'admin');
+                    $this->message('An error occurred while creating model.', 'error');
                 }
             } else {
-                BSession::i()->addMessage($this->_('Cannot load model with id ' . $id), 'error', 'admin');
+                $this->message('Cannot load model with id ' . $id, 'error');
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         BResponse::i()->redirect($redirectUrl);
@@ -708,7 +733,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'linked_product_id' => $link->linked_product_id,
                 );
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product links.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product links.', 'error');
                     return false;
                 }
             }
@@ -732,7 +757,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $data['product_id'] = $new->id;
                 $data['create_at'] = $data['update_at'] = date('Y-m-d H:i:s');
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product medias.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product medias.', 'error');
                     return false;
                 }
             }
@@ -756,7 +781,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $data['product_id'] = $new->id;
                 if (!$hlp->create($data)->save()) {
-                    BSession::i()->addMessage($this->_('An error occurred while duplicate product reviews.'), 'error', 'admin');
+                    $this->message('An error occurred while duplicate product reviews.', 'error');
                     return false;
                 }
             }

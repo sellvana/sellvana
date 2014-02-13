@@ -6,34 +6,26 @@
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
   {% if config.filters %}
-    <div class="row f-grid-top f-grid-top-filters {{ config.id | raw }}">
-      <div class="f-col-filters-selection col-sm-2">
-
-      <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
-
-      <span class="{{ config.id }} dropdown">
-        <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-          {{ 'Filters'|_ }}
-          <b class="caret"></b>
-        </a>
-        <ul class="{{ config.id }} dd-list dropdown-menu filters">
-          <!--li calss="ui-state-default"-->
-          <!-- visibiility template -->
-          <!--/li -->
-        </ul>
-      </span>
+    <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
+      <div class="f-col-filters-selection pull-left">
+        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+        <span class="{{ config.id }} dropdown">
+          <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+            {{ 'Filters'|_ }}
+            <b class="caret"></b>
+          </a>
+          <ul class="{{ config.id }} dd-list dropdown-menu filters"></ul>
+        </span>
       </div>
-      <div class="col-sm-10">
       {% if config.filters[0] %}
         <span class="{{ config.id }} f-filter-btns">
           <!-- filter buttons here -->
         </span>
       {% endif %}
-      </div>
     </div>
   {% endif %}
 
-  <div class="f-htmlgrid-toolbar btn-toolbar {{ config.id | raw }} row">
+  <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
       <div class="col-sm-6">
         <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
@@ -206,33 +198,30 @@
           isSelected = 'checked';
         print('<input type="checkbox" name="{{ config.id }}[checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
     } else if (col.name === '_actions') {
-        print('&nbsp;&nbsp;');
+        print('<div class="table-actions-btns-group">');
         if (typeof(col.data.custom) !== 'undefined') {
             if (typeof(col.data.custom[0]) ===  'object') {
                 for (var index in col.data.custom) {
-                    printCustomButton(col.data.custom[index], rc.row[col.data.edit.col]);
+                    printCustomButton(col.data.custom[index], rc.row[col.data.custom[index].col]);
                 }
             } else {
-                printCustomButton(col.data.custom, rc.row[col.data.edit.col]);
+                printCustomButton(col.data.custom, rc.row[col.data.custom.col]);
             }
         }
 
-        print('&nbsp;&nbsp;');
         if (typeof(col.data.edit) != 'undefined') {
             if (typeof(col.data.edit.href) !== 'undefined') {
-              print('<a class="btn btn-success btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
+              print('<a class="btn btn-link btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
             } else {
-              print('<button type="button" class="btn btn-success btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
+              print('<button type="button" class="btn btn-link btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
             }
         }
-        print('&nbsp;&nbsp;');
         if (typeof(col.data.delete) !== 'undefined') {
           print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
           print('<i class="icon-remove"></i>');
           print('</button>');
         }
-        print('&nbsp;&nbsp;');
-        if (typeof(col.data.edit_inline) !== 'undefined') {
+        if (typeof(col.data.edit_inline) !== 'undefined' && col.data.edit_inline) {
             print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
                 print('<i class="icon-pencil"></i>');
                 print('</button>');
@@ -240,6 +229,7 @@
                 print('<i class="icon-ok-sign"></i>');
                 print('</button>');
         }
+        print('</div>');
     } else {
       if (typeof(col.print) !== 'undefined') {
         eval('print('+col.print+');');
@@ -462,7 +452,7 @@
             </div>
 
             <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                <input type="text" placeholder="Select date range" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
+                <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>

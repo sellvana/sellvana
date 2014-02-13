@@ -1,3 +1,6 @@
+<!--{ label: Customer Info }-->
+<!--{ pos: 10 }-->
+
 {% set m = THIS.get('model') %}
 {% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
@@ -180,7 +183,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="model-password">{{ 'New Password'|_ }}</label>
             <div class="col-md-5">
-                <input id="model-password" type="password" class="form-control" name="model[password]" />
+                <input id="model-password" type="password" class="form-control has-progress-bar" name="model[password]" />
             </div>
         </div>
         <div class="form-group">
@@ -265,3 +268,16 @@
         </fieldset>
     </div>#}
 </div>
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('#model-password').parents('form').validate({
+                rules:{
+                    'model[password]': {
+                        passwordSecurity: {{ CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' }}
+                    }
+                }
+            });
+        })
+    })
+</script>

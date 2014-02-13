@@ -140,7 +140,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     var cssClass = this.model.get('cssClass');
                     if (this.model.get('sortState').length > 0) {
-                        cssClass += (' sorting_' + this.model.get('sortState'));
+                        cssClass += (' th-sorting-' + this.model.get('sortState'));
                     }
                     return cssClass;
                 },
@@ -672,7 +672,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 _callbackCustom: function (ev) {
                     if (typeof(g_vent) !== 'undefined') {
-                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id, row: this.model.toJSON()});
+                        g_vent.trigger('custom_callback', {grid: BackboneGrid.id,
+                            row: this.model.toJSON(), modalForm: modalForm,
+                            BackboneGrid: BackboneGrid, rowsCollection: rowsCollection
+                        });
                         ev.stopPropagation();
                         ev.preventDefault();
 
@@ -682,7 +685,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _editModal: function (ev) {
                     modalForm.modalType = 'editable';
                     BackboneGrid.currentRow = this.model;
-                    console.log(BackboneGrid.currentRow.toJSON());
                     modalForm.render();
                     $(BackboneGrid.modalShowBtnId).trigger('click');
                     return true;
@@ -785,10 +787,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.model.destroy();
                 },
                 render: function () {
-                    //console.log('row-render');
+//                    console.log('row-render');
                     var colsInfo = columnsCollection.toJSON();
-                    this.$el.html(this.template({row: this.model.toJSON(), colsInfo: colsInfo}));
 
+                    this.$el.html(this.template({row: this.model.toJSON(), colsInfo: colsInfo}));
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                         console.log('after_render');
                         var func = BackboneGrid.callbacks['after_render'];
@@ -810,45 +812,61 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 },
                 editInline: function (ev) {
-                    var rows = this;
+                    var row = this;
                     var edit = false;
                     BackboneGrid.currentRow = this.model;
                     if ($(ev.target).parents('form').attr('id') != 'validate-inline') {
                         $(ev.target).parents('table').wrap('<form id="validate-inline" action="#"></form>');
                     }
+                    $(ev.target).parents('table').parent().validate();
                     $(ev.target).parents('tr').find('td').each(function () {
                         var self = this;
                         columnsCollection.each(function (model) {
                             if (model.get('name') == $(self).attr('data-col') && model.get('edit_inline')) {
                                 edit = true;
-                                if (model.get('editor') == 'select') {
-                                    $(self).html('<select name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'></select>');
-                                    var options = model.get('options');
-                                    for (var index in options) {
-                                        var selected = (options[index].toLowerCase() == rows.model.get(model.get('name').toLowerCase())) ? 'selected': '';
-                                        $(self).find('select').append('<option value="'+index+'"'+ selected+'>'+ options[index]+'</option>');
-                                    }
-                                    $(self).attr('data-edit', 'select');
-                                } else if (model.get('editor') == 'textarea')  {
-                                    $(self).html('<textarea name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'>' +rows.model.get(model.get('name'))+'</textarea>');
-                                    $(self).attr('data-edit', 'textarea');
-                                } else {
-                                    $(self).attr('data-edit', 'input');
-                                    $(self).html('<input name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" type="text" value="'+ rows.model.get(model.get('name')) +'" '+ validationRules(model.get('validation')) +'>');
+                                switch (model.get('editor')) {
+                                    case 'select':
+                                        $(self).html('<select name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'></select>');
+                                        var options = model.get('options');
+                                        for (var index in options) {
+                                            var selected = (index.toLowerCase() == row.model.get(model.get('name')).toLowerCase()) ? 'selected': '';
+                                            $(self).find('select').append('<option value="'+index+'"'+ selected+'>'+ options[index]+'</option>');
+                                        }
+                                        $(self).attr('data-edit', 'select');
+                                        break;
+                                    case 'textarea':
+                                        $(self).html('<textarea name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" '+ validationRules(model.get('validation')) +'>' +row.model.get(model.get('name'))+'</textarea>');
+                                        $(self).attr('data-edit', 'textarea');
+                                        break;
+                                    case 'text':
+                                        $(self).attr('data-edit', 'input');
+                                        $(self).html('<input name="'+model.get('name')+'" id="'+model.get('name')+'" class="form-control" type="text" value="'+ row.model.get(model.get('name')) +'" '+ validationRules(model.get('validation')) +'>');
+                                        break;
+                                    default:
+                                        break;
                                 }
-
+                                if (typeof(model.get('validation')) !== 'undefined' && model.get('validation').unique) {
+                                    validateUnique($(self).children(), model, true);
+                                }
                             }
                         })
                     })
                     if (edit) {
                         $(ev.target).parents('tr').find('button.btn-save-inline').removeClass('hide');
                         $(ev.target).parent().addClass('hide');
-                        $(ev.target).parents('table').parent().validate();
+
+                        if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['before_edit_inline']) !== 'undefined') {
+                            var func = BackboneGrid.callbacks['before_edit_inline'];
+                            var script = func + '(this.$el,this.model.toJSON());';
+                            eval(script);
+                        }
                     }
 
                 },
                 saveInline: function (ev) {
                     var valid = true;
+                    var self = this;
+                    var previousAttributes = self.model.previousAttributes();
                     $(ev.target).parents('tr').find('input, select, textarea').each(function () {
                        if (!$(this).valid()) {
                            valid = false;
@@ -859,18 +877,29 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             if ($(this).attr('data-edit') == 'select') {
                                 var tmp = $(this).children().find('option[value="'+ $(this).children().val()+'"]');
                                 $(this).html(tmp.html());
-                                BackboneGrid.currentRow.set($(this).attr('data-col'), tmp.val());
+                                self.model.set($(this).attr('data-col'), tmp.val());
                             }
                             if ($(this).attr('data-edit') == 'input' || $(this).attr('data-edit') == 'textarea') {
-                                BackboneGrid.currentRow.set($(this).attr('data-col'), $(this).children().val());
+                                self.model.set($(this).attr('data-col'), $(this).children().val());
                                 $(this).html($(this).children().val());
                             }
+                            if ($(this).attr('data-edit') == 'input[range]') {
+                                self.model.set($(this).attr('data-col'), $(this).children().val());
+                            }
                         })
-                        var id = this.model.get('id');
-                        var hash = this.model.attributes;
+                        var id = self.model.get('id');
+                        var hash = self.model.attributes;
                         hash.id = id;
                         hash.oper = 'edit';
-                        $.post(BackboneGrid.edit_url, hash);
+                        $.post(BackboneGrid.edit_url, hash,function (data) {
+                            data.selected = false;
+                            self.model.attributes = data;
+                            self.render();
+                        }).fail(function(data) {
+                                self.model.attributes = previousAttributes;
+                                self.render();
+                                $.bootstrapGrowl('Error: cannot saved', { type: 'danger', align: 'center', width: 'auto' });
+                            });
                         $(ev.target).parents('tr').find('button.btn-edit-inline').removeClass('hide');
                         $(ev.target).parent().addClass('hide');
                     }
@@ -1153,7 +1182,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         html = this.model.get('val');
                     }
 
-                    this.$el.find('span.f-grid-filter-value').html(html);
+                    this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
                 }
             });
             BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
@@ -1574,30 +1603,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     this.collection.each(function (col) {
                         if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
-                            var url = col.get('validation').unique;
                             if (modalForm.$el.find('#' + col.get('name')).length) {
-                                modalForm.$el.find('#' + col.get('name')).rules("add", {
-                                    onfocusout: false,
-                                    onkeyup: false,
-                                    remote: {
-                                        url: url,
-                                        type: 'post',
-                                        data: {
-                                            _name: col.get('name')
-                                        },
-                                        dataFilter: function (responseString) {
-                                            var response = jQuery.parseJSON(responseString);
-                                            currentMessage = response.Message;
-                                            if (modalForm.modalType === 'editable' && BackboneGrid.currentRow.get('id') === response.id)
-                                                return true;
-                                            return response.unique;
-                                        }
-                                        //async:false
-                                    },
-                                    messages: {
-                                        remote: "This " + col.get('label') + " is already taken place"
-                                    }
-                                });
+                                validateUnique(modalForm.$el.find('#' + col.get('name')), col, false);
                             }
                         }
                     });
@@ -1803,6 +1810,34 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             /*if (BackboneGrid.data_mode === 'local') {
              state.mp = config.data.data.length;
              }*/
+
+            function validateUnique(element, model ,editInline) {
+                var url = model.get('validation').unique;
+                element.rules("add", {
+                    onfocusout: false,
+                    onkeyup: false,
+                    remote: {
+                        url: url,
+                        type: 'post',
+                        data: {
+                            _name: model.get('name')
+                        },
+                        dataFilter: function (responseString) {
+                            var response = jQuery.parseJSON(responseString);
+                            currentMessage = response.Message;
+                            if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
+                                return true;
+                            }
+                            return response.unique;
+                        }
+                        //async:false
+                    },
+                    messages: {
+                        remote: "This " + model.get('label') + " is already taken place"
+                    }
+                });
+            }
+
             if (config.data_mode != 'local') {
                 $('ul.pagination.page').on('click', 'li', function (ev) {
                     var li = $(this);
@@ -2022,7 +2057,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.MassDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
             BackboneGrid.AddButton = 'Div #' + config.id + ' button.grid-add';
             BackboneGrid.MassEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
-            BackboneGrid.NewButton = 'Div #' + config.id + ' button.grid-new';
+            BackboneGrid.NewButton = (typeof(config.new_button) !== 'undefined') ? config.new_button :'Div #' + config.id + ' button.grid-new';
             BackboneGrid.RefreshButton = 'Div #' + config.id + ' button.grid-refresh';
             BackboneGrid.ExportButton = 'Div #' + config.id + ' button.grid-export';
 
@@ -2097,10 +2132,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             g_vent.trigger('mass-delete', ev);
                         }
                         rowsCollection.remove(selectedRows.models, {silent: true});
-                        selectedRows.reset();
                         $('select.' + config.id + '.js-sel').val('');
                         gridView.render();
-
+                        if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_mass_delete']) !== 'undefined') {
+                            var func = BackboneGrid.callbacks['after_mass_delete'];
+                            var script = func + '(this.$el,selectedRows.toJSON());';
+                            eval(script);
+                        }
+                        selectedRows.reset();
                     }
                 });
             }
@@ -2237,6 +2276,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         ev.callback(selectedRows);
                     }
                 });
+
+                g_vent.bind('modal_create_form_custom', function (ev) {
+                    ev.callback({modalForm: modalForm, BackboneGrid: BackboneGrid, rowsCollection: rowsCollection});
+                });
+
+                g_vent.bind('reset_collection', function (ev) {
+                    if (ev.grid === config.id) {
+                        rowsCollection.reset();
+                    }
+                });
+
             }
 
             setModalHeight();

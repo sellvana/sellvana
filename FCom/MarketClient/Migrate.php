@@ -28,7 +28,7 @@ class FCom_MarketClient_Migrate extends BClass
         ));
     }
 
-    public function upgrade__0_2_0__0_2_1()
+    public function upgrade__0_2_1__0_2_2()
     {
         $tCoreModule = FCom_Core_Model_Module::table();
         BDb::ddlTableDef($tCoreModule, array(
@@ -41,9 +41,5 @@ class FCom_MarketClient_Migrate extends BClass
                 'market_upgrade_available' => 'DROP',
             ),
         ));
-
-        BDb::run("DROP TABLE IF EXISTS fcom_marketclient_modules; DROP TABLE IF EXISTS fcom_market_modules");
-
-        $this->install__0_2_1();
     }
 }

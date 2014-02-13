@@ -47,9 +47,17 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         );
         $config['filters'] = array(
             array('field' => 'firstname', 'type' => 'text'),
+            array('field' => 'lastname', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field' => 'country', 'type' => 'select'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'customer_group', 'type' => 'multiselect'),
+            array('field' => 'street1', 'type' => 'text'),
+            array('field' => 'city', 'type' => 'text'),
+            array('field' => 'region', 'type' => 'text'),
+            array('field' => 'postcode', 'type' => 'text'),
+            array('field' => 'create_at', 'type'=>'date-range'),
+            array('field' => 'last_login', 'type'=>'date-range'),
+            array('field' => 'country', 'type' => 'multiselect'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
@@ -96,18 +104,6 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             'otherInfo' => $m->id ? $info : '',
             'actions' => $actions,
         ));
-    }
-
-    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
-    {
-        if ($model && $model->id) {
-            $view->addTab('addresses', array('label' => $this->_('Addresses'), 'pos' => 20));
-            $view->addTab('orders', array('label' => $this->_('Orders'), 'pos' => 30));
-            $view->addTab('reviews', array('label' => $this->_('Reviews'), 'pos' => 40));
-            $view->addTab('shopping-cart', array('label' => $this->_('Shopping Cart'), 'pos' => 50));
-            $view->addTab('wishlist', array('label' => $this->_('Wishlist'), 'pos' => 70));
-        }
-        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostAfter($args)
@@ -217,13 +213,13 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         try {
             $model = FCom_Customer_Model_Customer::i()->load($id);
             if (!$model) {
-                BSession::i()->addMessage($this->_('Cannot load this customer model'), 'error', 'admin');
+                $this->message('Cannot load this customer model', 'error');
                 $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
             } else {
                 $model->login();
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
         }
 

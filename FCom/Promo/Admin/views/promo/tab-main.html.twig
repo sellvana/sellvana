@@ -24,6 +24,15 @@
                    value="{{ validator.fieldValue('coupon') }}"/>
         </div>
     </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
+
+        <div class="col-md-5">
+            <select class="form-control" name="model[status]">
+                {{ UTIL.optionsHtml(promo.fieldOptions('status'), validator.fieldValue('status'))|raw }}
+            </select>
+        </div>
+    </div>
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Date Range'|_ }}</label>

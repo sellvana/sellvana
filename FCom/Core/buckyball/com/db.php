@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright 2011 Unirgy LLC
+* Copyright 2014 Boris Gurvich
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 *
 * @package BuckyBall
 * @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@unirgy.com>
-* @copyright (c) 2010-2012 Boris Gurvich
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
@@ -78,7 +78,7 @@ class BDb
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1101,6 +1101,33 @@ class BORM extends ORMWrapper
         return $fragment;
     }
 
+    /**
+    * Added _build_having()
+    *
+    */
+    protected function _build_select() {
+        // If the query is raw, just set the $this->_values to be
+        // the raw query parameters and return the raw query
+        if ($this->_is_raw_query) {
+            $this->_values = $this->_raw_parameters;
+            return $this->_raw_query;
+        }
+
+        // Build and return the full SELECT statement by concatenating
+        // the results of calling each separate builder method.
+        return $this->_join_if_not_empty(" ", array(
+            $this->_build_select_start(),
+            $this->_build_join(),
+            $this->_build_where(),
+            $this->_build_group_by(),
+            $this->_build_having(),
+            $this->_build_order_by(),
+            $this->_build_limit(),
+            $this->_build_offset(),
+        ));
+    }
+
+
     protected function _add_result_column($expr, $alias=null) {
         if (!is_null($alias)) {
             $expr .= " AS " . $this->_quote_identifier($alias);
@@ -1332,7 +1359,7 @@ class BORM extends ORMWrapper
     public function _add_join_source($join_operator, $table, $constraint, $table_alias=null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
-                $class = BClassRegistry::i()->className($table);
+                $class = BClassRegistry::className($table);
                 self::$_classTableMap[$table] = $class::table();
             } else {
                 self::$_classTableMap[$table] = false;
@@ -1482,8 +1509,8 @@ class BORM extends ORMWrapper
             $r['sd'] = null;
         }
         $s = array( // state
-            'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (isset($d['p'])  ? $d['p']  : 1), // page
-            'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (isset($d['ps']) ? $d['ps'] : 100), // page size
+            'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (!empty($d['p']) && is_numeric($d['p'])  ? $d['p']  : 1), // page
+            'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (!empty($d['ps']) && is_numeric($d['ps']) ? $d['ps'] : 100), // page size
             's'  => !empty($r['s'])  ? $r['s']  : (isset($d['s'])  ? $d['s']  : ''), // sort by
             'sd' => !empty($r['sd']) ? $r['sd'] : (isset($d['sd']) ? $d['sd'] : 'asc'), // sort dir
             'rs' => !empty($r['rs']) ? $r['rs'] : null, // starting row
@@ -1525,27 +1552,85 @@ class BORM extends ORMWrapper
         return array('state'=>$s, 'rows'=>$rows);
     }
 
-    public function jqGridData($r=null, $d=array())
-    {
-        if (is_null($r)) {
-            $r = BRequest::i()->request();
+    const HAVING_FRAGMENT = 0;
+    const HAVING_VALUES = 1;
+    protected $_having_conditions = array();
+    public function having($column_name, $value) {
+        return $this->having_equal($column_name, $value);
+    }
+    public function having_equal($column_name, $value) {
+        return $this->_add_simple_having($column_name, '=', $value);
+    }
+    public function having_not_equal($column_name, $value) {
+        return $this->_add_simple_having($column_name, '!=', $value);
+    }
+    public function having_id_is($id) {
+        return $this->having($this->_get_id_column_name(), $id);
+    }
+    public function having_like($column_name, $value) {
+        return $this->_add_simple_having($column_name, 'LIKE', $value);
+    }
+    public function having_not_like($column_name, $value) {
+        return $this->_add_simple_having($column_name, 'NOT LIKE', $value);
+    }
+    public function having_gt($column_name, $value) {
+        return $this->_add_simple_having($column_name, '>', $value);
+    }
+    public function having_lt($column_name, $value) {
+        return $this->_add_simple_having($column_name, '<', $value);
+    }
+    public function having_gte($column_name, $value) {
+        return $this->_add_simple_having($column_name, '>=', $value);
+    }
+    public function having_lte($column_name, $value) {
+        return $this->_add_simple_having($column_name, '<=', $value);
+    }
+    public function having_in($column_name, $values) {
+        $column_name = $this->_quote_identifier($column_name);
+        $placeholders = $this->_create_placeholders(count($values));
+        return $this->_add_having("{$column_name} IN ({$placeholders})", $values);
+    }
+    public function having_not_in($column_name, $values) {
+        $column_name = $this->_quote_identifier($column_name);
+        $placeholders = $this->_create_placeholders(count($values));
+        return $this->_add_having("{$column_name} NOT IN ({$placeholders})", $values);
+    }
+    public function having_null($column_name) {
+        $column_name = $this->_quote_identifier($column_name);
+        return $this->_add_having("{$column_name} IS NULL");
+    }
+    public function having_not_null($column_name) {
+        $column_name = $this->_quote_identifier($column_name);
+        return $this->_add_having("{$column_name} IS NOT NULL");
+    }
+    public function having_raw($clause, $parameters=array()) {
+        return $this->_add_having($clause, $parameters);
+    }
+    protected function _add_having($fragment, $values=array()) {
+        if (!is_array($values)) {
+            $values = array($values);
         }
-        if (!empty($r['rows'])) { // without adapting jqgrid config
-            $data = $this->paginate(array(
-                'p'  => !empty($r['page']) ? $r['page'] : null,
-                'ps' => !empty($r['rows']) ? $r['rows'] : null,
-                's'  => !empty($r['sidx']) ? $r['sidx'] : null,
-                'sd' => !empty($r['sord']) ? $r['sord'] : null,
-            ), $d);
-        } else { // jqgrid config adapted
-            $data = $this->paginate($r, $d);
+        $this->_having_conditions[] = array(
+            static::HAVING_FRAGMENT => $fragment,
+            static::HAVING_VALUES => $values,
+        );
+        return $this;
+    }
+    protected function _add_simple_having($column_name, $separator, $value) {
+        $column_name = $this->_quote_identifier($column_name);
+        return $this->_add_having("{$column_name} {$separator} ?", $value);
+    }
+    protected function _build_having() {
+        if (count($this->_having_conditions) === 0) {
+            return '';
         }
-        $res = $data['state'];
-        $res['rows'] = $data['rows'];
-        if (empty($d['as_array'])) {
-            $res['rows'] = BDb::many_as_array($res['rows']);
+
+        $having_conditions = array();
+        foreach ($this->_having_conditions as $condition) {
+            $having_conditions[] = $condition[static::HAVING_FRAGMENT];
+            $this->_values = array_merge($this->_values, $condition[static::HAVING_VALUES]);
         }
-        return $res;
+        return "HAVING " . join(" AND ", $having_conditions);
     }
 
     public function __destruct()
@@ -1691,7 +1776,7 @@ class BModel extends Model
         if (is_null($class_name)) { // ADDED
             $class_name = get_called_class();
         }
-        $class_name = BClassRegistry::i()->className($class_name); // ADDED
+        $class_name = BClassRegistry::className($class_name); // ADDED
 
         static::readDb();
         $table_name = static::_get_table_name($class_name);
@@ -1741,7 +1826,7 @@ class BModel extends Model
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(get_called_class(), $args, !$new);
+        return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
 
     /**
@@ -2223,7 +2308,7 @@ class BModel extends Model
     */
     public static function table()
     {
-        $class = BClassRegistry::i()->className(get_called_class());
+        $class = BClassRegistry::className(get_called_class());
         if (empty(static::$_tableNames[$class])) {
             static::$_tableNames[$class] = static::_get_table_name($class);
         }
@@ -2236,7 +2321,7 @@ class BModel extends Model
         $class = get_called_class();
         BDebug::debug('OVERRIDE TABLE: '.$class.' -> '.$table);
         static::$_tableNames[$class] = null;
-        $class = BClassRegistry::i()->className($class);
+        $class = BClassRegistry::className($class);
         static::$_tableNames[$class] = null;
     }
 
@@ -2423,7 +2508,7 @@ class BModel extends Model
         }
     }
 
-    public function fieldOptions($field=null, $key=null)
+    public function fieldOptions($field=null, $key=null, $emptyValue=null)
     {
         if (is_null($field)) {
             return static::$_fieldOptions;
@@ -2439,6 +2524,17 @@ class BModel extends Model
                 return null;
             }
             return $options[$key];
+        }
+        if (!is_null($emptyValue) && false !== $emptyValue) {
+            if (true === $emptyValue) {
+                $emptyValue = 'Please select...';
+            }
+            if (is_scalar($emptyValue)) {
+                $emptyValue = array('' => $emptyValue);
+            }
+            if (is_array($emptyValue)) {
+                $options = $emptyValue + $options;
+            }
         }
         return $options;
     }
@@ -2477,7 +2573,7 @@ class BModel extends Model
      */
     public function validate($data = array(), $rules = array(), $formName = 'admin')
     {
-        if (!$data) {
+        if (!$data && $this->orm) {
             $data = $this->as_array();
         }
         $rules = array_merge($this->_validationRules, $rules);
@@ -2492,12 +2588,12 @@ class BModel extends Model
 
     public function __call($name, $args)
     {
-        return BClassRegistry::i()->callMethod($this, $name, $args, static::$_origClass);
+        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
     }
 
     public static function __callStatic($name, $args)
     {
-        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 }
 

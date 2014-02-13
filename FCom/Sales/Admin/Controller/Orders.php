@@ -17,10 +17,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=:id')),
             array('name' => 'admin_name', 'index'=>'o.admin_id', 'label' => 'Assisted by'),
             array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
-            array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'ab.billing_name'),
-            array('name' => 'billing_address', 'label'=>'Bill to Address', 'index'=>'ab.billing_address'),
-            array('name' => 'shipping_name', 'label'=>'Ship to Name', 'index'=>'as.shipping_name'),
-            array('name' => 'shipping_address', 'label'=>'Ship to Address', 'index'=>'as.shipping_address'),
+            array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'billing_name'),
+            array('name' => 'billing_address', 'label'=>'Bill to Address', 'index'=>'billing_address'),
+            array('name' => 'shipping_name', 'label'=>'Ship to Name', 'index'=>'shipping_name'),
+            array('name' => 'shipping_address', 'label'=>'Ship to Address', 'index'=>'shipping_address'),
             array('name' => 'grandtotal', 'label'=>'Order Total', 'index'=>'o.grandtotal'),
             array('name' => 'balance', 'label'=>'Paid', 'index'=>'o.balance'),
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
@@ -30,10 +30,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                   'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
-            array('field' => 'billing_name', 'type' => 'text'),
-            array('field' => 'shipping_name', 'type' => 'text'),
+            array('field' => 'billing_name', 'type' => 'text', 'having' => true),
+            array('field' => 'shipping_name', 'type' => 'text', 'having' => true),
             array('field' => 'grandtotal', 'type' => 'number-range'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
@@ -273,7 +273,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'billing_name', 'type' => 'text'),
             array('field' => 'shipping_name', 'type' => 'text'),
             array('field' => 'grandtotal', 'type' => 'number-range'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
         $this->gridOrmConfig($config['orm']);

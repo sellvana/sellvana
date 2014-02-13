@@ -18,7 +18,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'author', 'label'=>'Author'),
-            array('name' => 'status', 'label' => 'Status', 'edit_inline' => true, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
+            array('name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
                   'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'), 'index' => $this->_mainTableAlias.'.status'),
             array('name' => 'title', 'label'=>'Title','editable' => true, 'edit_inline' => true, 'validation' => array('required' => true)
 //                'href' => BApp::href('blog/post/form/?id=:id')
@@ -31,7 +31,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
             array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),'delete' => true, 'edit_inline' => true)),
+                  'data' => array('edit' => array('href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),'delete' => true, 'edit_inline' => false)),
         );
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -45,7 +45,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
         $config['filters'] = array(
             array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         return $config;
@@ -105,7 +105,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
         $config['filters'] = array(
             array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
         $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
             ->select('p.*')
@@ -146,7 +146,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             ),
             'filters'=>array(
                 array('field' => 'title', 'type' => 'text'),
-                array('field' => 'status', 'type' => 'select'),
+                array('field' => 'status', 'type' => 'multiselect'),
             ),
             'events'=>array('init', 'add','mass-delete')
         );
@@ -183,18 +183,23 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         parent::formPostAfter($args);
         $r = BRequest::i()->post();
         $model = $args['model'];
-        if (isset($r['category-id']) && $r['category-id'] != '') {
+        if (isset($r['category-id'])) {
             $cp = FCom_Blog_Model_PostCategory::i();
-            $tmp = explode(',', $r['category-id']);
+
             $cp->delete_many(array(
                     'post_id' => $model->id,
                 ));
-            foreach ($tmp as $categoryId) {
-                $cp->create(array(
-                    'post_id' => $model->id,
-                    'category_id' => $categoryId,
-                ))->save();
+
+            if ($r['category-id'] != '') {
+                $tmp = explode(',', $r['category-id']);
+                foreach ($tmp as $categoryId) {
+                    $cp->create(array(
+                            'post_id' => $model->id,
+                            'category_id' => $categoryId,
+                        ))->save();
+                }
             }
+
         }
     }
 }

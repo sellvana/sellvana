@@ -62,6 +62,17 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    public function message($msg, $type='success', $tag='admin', $options=array())
+    {
+        if (is_array($msg)) {
+            array_walk($msg, 'BLocale::_');
+        } else {
+            $msg = BLocale::_($msg);
+        }
+        BSession::i()->addMessage($msg, $type, $tag, $options);
+        return $this;
+    }
+
     public function initFormTabs($view, $model, $mode='view', $allowed=null)
     {
 
@@ -71,7 +82,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         if (is_string($allowed)) {
             $allowed = explode(',', $allowed);
         }
-        $tabs = $view->tabs;
+        #$formId = $this->get('form_id');
+        #$validator = $this->validator($formId, $model);
+        $this->collectFormTabs($view);
+
+        $tabs = $view->tab_groups ? $view->tabs : $view->sortedTabs();
         if ($tabs) {
             foreach ($tabs as $k=>&$tab) {
                 if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
@@ -90,6 +105,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     if ($tabView) {
                         $tabView->set(array(
                             'model' => $model,
+                            #'validator' => $validator,
                             'mode' => $mode,
                         ));
                     } else {
@@ -127,6 +143,30 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             'mode' => $mode,
             'cur_tab' => $curTab,
         ));
+        return $this;
+    }
+
+    public function collectFormTabs($formView)
+    {
+        $views = BLayout::i()->findViewsRegex('#^'.$formView->get('tab_view_prefix').'#');
+        foreach ($views as $viewName => $view) {
+            $id = basename($viewName);
+            if (!empty($formView->tabs[$id])) {
+                continue;
+            }
+            $view->collectMetaData();
+            $params = $view->getParam('meta_data');
+            if (!empty($params['disabled'])) {
+                continue;
+            }
+            if (!empty($params['model_new_hide'])) {
+                $model = $formView->get('model');
+                if (!$model || !$model->id()) {
+                    continue;
+                }
+            }
+            $formView->addTab($id, $params);
+        }
         return $this;
     }
 
@@ -211,7 +251,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));
 
-        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
+        //BResponse::i()->redirect('fieldsets/grid_data');
         BResponse::i()->json($result);
     }
 

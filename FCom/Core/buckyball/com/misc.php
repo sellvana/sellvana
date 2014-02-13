@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright 2011 Unirgy LLC
+* Copyright 2014 Boris Gurvich
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 *
 * @package BuckyBall
 * @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@unirgy.com>
-* @copyright (c) 2010-2012 Boris Gurvich
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
@@ -78,7 +78,7 @@ class BUtil extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -619,7 +619,7 @@ class BUtil extends BClass
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
-            array_walk($fields, 'trim');
+            @array_walk($fields, 'trim'); // LLVM BUG
         }
         $result = array();
         if (!$inverse) {
@@ -982,15 +982,17 @@ class BUtil extends BClass
             ));
             if ($method==='POST' || $method==='PUT') {
                 $multipart = false;
-                foreach ($data as $k=>$v) {
-                    if (is_string($v) && $v[0]==='@') {
-                        $multipart = true;
-                        break;
+                if (is_array($data)) {
+                    foreach ($data as $k=>$v) {
+                        if (is_string($v) && $v[0]==='@') {
+                            $multipart = true;
+                            break;
+                        }
                     }
                 }
                 if (!$multipart) {
                     $contentType = 'application/x-www-form-urlencoded';
-                    $opts['http']['content'] = http_build_query($data);
+                    $opts['http']['content'] = is_array($data) ? http_build_query($data) : $data;
                 } else {
                     $boundary = '--------------------------'.microtime(true);
                     $contentType = 'multipart/form-data; boundary='.$boundary;
@@ -1024,10 +1026,10 @@ class BUtil extends BClass
                     );
                 }
             }
-            $response = file_get_contents($url, false, stream_context_create($opts));
+            $response = @file_get_contents($url, false, stream_context_create($opts));
 
             static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
-            $respHeaders = $http_response_header;
+            $respHeaders = isset($http_response_header) ? $http_response_header : array();
         }
         foreach ($respHeaders as $i => $line) {
             if ($i) {
@@ -1180,7 +1182,7 @@ class BUtil extends BClass
     {
         $attrsHtmlArr = array();
         foreach ($attrs as $k => $v) {
-            if ('' === $v || is_null($v) || false === $v) {
+            if (is_null($v) || false === $v) {
                 continue;
             }
             if (true === $v) {
@@ -1416,11 +1418,10 @@ class BUtil extends BClass
     /**
     * Remove directory recursively
     *
-    * DANGEROUS, I'm afraid to enable it
+    * DANGEROUS
     *
     * @param string $dir
     */
-    /*
     static public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first=true)
     {
         if ($first) {
@@ -1443,7 +1444,6 @@ class BUtil extends BClass
         }
         return rmdir($dir);
     }
-    */
 
     static public function topoSort(array $array, array $args=array())
     {
@@ -2162,7 +2162,7 @@ class BDebug extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public static function registerErrorHandlers()
@@ -2448,7 +2448,7 @@ class BDebug extends BClass
 
     public static function dumpLog($return=false)
     {
-        if ((self::$_mode!==self::MODE_DEBUG && self::$_mode!==self::MODE_DEVELOPMENT)
+        if (!(self::$_mode===self::MODE_DEBUG || self::$_mode===self::MODE_DEVELOPMENT)
             || BResponse::i()->contentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
@@ -2461,6 +2461,7 @@ class BDebug extends BClass
 #buckyball-debug-console table { border-collapse: collapse; }
 #buckyball-debug-console th, #buckyball-debug-console td { font:normal 10px Verdana; border: solid 1px #ccc; padding:2px 5px;}
 #buckyball-debug-console th { font-weight:bold; }
+#buckuball-debug-console xmp { margin:0; }
 </style>
 <div id="buckyball-debug-trigger" onclick="var el=document.getElementById('buckyball-debug-console');el.style.display=el.style.display?'':'none'">[DBG]</div>
 <div id="buckyball-debug-console" style="display:none"><?php
@@ -2474,7 +2475,7 @@ class BDebug extends BClass
         foreach (self::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
-            echo "<tr><td><xmp style='margin:0'>".$e['msg']."</xmp></td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
+            echo "<tr><td>".nl2br(htmlspecialchars($e['msg']))."</td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
         }
 ?></table></div><?php
         $html = ob_get_clean();
@@ -2574,7 +2575,7 @@ class BLocale extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -3239,7 +3240,7 @@ class BLoginThrottle extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function __construct()
@@ -3516,7 +3517,7 @@ class BValidate extends BClass
      */
     public static function i($new = false, array $args = array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function addValidator($name, $rule)
@@ -3768,7 +3769,7 @@ class Bcrypt extends BClass
 {
     public function __construct()
     {
-        if (CRYPT_BLOWFISH != 1) {
+        if (CRYPT_BLOWFISH != 1 && !function_exists('password_hash')) {
             throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
         }
     }

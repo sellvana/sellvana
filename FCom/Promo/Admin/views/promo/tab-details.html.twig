@@ -33,7 +33,9 @@
         <div class="form-group">
             <div class="col-md-10">
                 {{ "GET"|_ }}
+                {% if m.get('get_type') != 'free' %}
                 <input type="text" name="model[get_amount]" value="{{ m.get('get_amount') }}" style="width:50px"/>
+                {% endif %}
                 {{ m.get('get_type') ? m.fieldOptions('get_type', m.get('get_type')) }}
             </div>
         </div>

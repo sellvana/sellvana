@@ -65,4 +65,21 @@
             </div>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Users"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group2">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Strong Password Security'|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="config[modules][FCom_Admin][password_strength]" value="0" />
+                        <input type="checkbox" class="switch-cbx" name="config[modules][FCom_Admin][password_strength]" value="1"
+                               {{ c.get('modules/FCom_Admin/password_strength') == '1' ? 'checked="checked"' : '' }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

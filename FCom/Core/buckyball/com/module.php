@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright 2011 Unirgy LLC
+* Copyright 2014 Boris Gurvich
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 *
 * @package BuckyBall
 * @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@unirgy.com>
-* @copyright (c) 2010-2012 Boris Gurvich
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
@@ -73,11 +73,11 @@ class BModuleRegistry extends BClass
     {
         if (!$new) {
             if (!static::$_singleton) {
-                static::$_singleton = BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+                static::$_singleton = BClassRegistry::instance(__CLASS__, $args, !$new);
             }
             return static::$_singleton;
         }
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function getAllModules()
@@ -700,7 +700,7 @@ class BModule extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1032,9 +1032,12 @@ if ($args['name']==="FCom_Referrals") {
     protected function _processOverrides()
     {
         if (!empty($this->override['class'])) {
-            $hlp = BClassRegistry::i();
             foreach ($this->override['class'] as $o) {
-                $hlp->overrideClass($o[0], $o[1]);
+if (!isset($o[0]) || !isset($o[1])) {
+    BDebug::notice('Invalid override in module '.$this->name);
+    continue;
+}
+                BClassRegistry::overrideClass($o[0], $o[1]);
             }
         }
     }
@@ -1282,7 +1285,7 @@ class BMigrate extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1422,12 +1425,12 @@ class BMigrate extends BClass
             static::migrateModules('FCom_Core,FCom_Admin');
             //return;
         }
-
+        /*
         if (!$force && BConfig::i()->get('core/currently_migrating')) {
             return;
         }
-
         BConfig::i()->set('core/currently_migrating', 1, false, true);
+        */
         if (class_exists('FCom_Core_Main')) {
             FCom_Core_Main::i()->writeConfigFiles('core');
         }
@@ -1495,17 +1498,19 @@ class BMigrate extends BClass
                     */
                 }
             }
-
+            /*
             BConfig::i()->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
-
+            */
         } catch (Exception $e) {
+            /*
             BConfig::i()->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
+            */
             throw $e;
         }
         $modReg->currentModule(null);

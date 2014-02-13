@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright 2011 Unirgy LLC
+* Copyright 2014 Boris Gurvich
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 *
 * @package BuckyBall
 * @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@unirgy.com>
-* @copyright (c) 2010-2012 Boris Gurvich
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
@@ -45,7 +45,7 @@ class BRequest extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -291,7 +291,11 @@ class BRequest extends BClass
         if (empty($scriptName)) {
             return null;
         }
-        $root = rtrim(str_replace(array('//', '\\'), array('/', '/'), dirname($scriptName)), '/');
+        if (substr($scriptName, -1)!=='/') {
+            $scriptName = dirname($scriptName);
+        }
+        $root = rtrim(str_replace(array('//', '\\'), array('/', '/'), $scriptName), '/');
+
         if ($parentDepth) {
             $arr = explode('/', rtrim($root, '/'));
             $len = sizeof($arr)-$parentDepth;
@@ -336,11 +340,11 @@ class BRequest extends BClass
     */
     public static function path($offset, $length=null)
     {
-        $pathInfo = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-            (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
+        $pathInfo = static::rawPath();
         if (empty($pathInfo)) {
             return null;
         }
+
         $path = explode('/', ltrim($pathInfo, '/'));
         if (is_null($length)) {
             return isset($path[$offset]) ? $path[$offset] : null;
@@ -356,13 +360,19 @@ class BRequest extends BClass
     public static function rawPath()
     {
 #echo "<pre>"; print_r($_SERVER); exit;
-        return !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
+        $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
             (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
             /*
                 (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
                     (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
                 )
             );*/
+
+        // nginx rewrite fix
+        $basename = basename(static::scriptName());
+        $path = preg_replace('#^/.*?'.preg_quote($basename).'#', '', $path);
+
+        return $path;
     }
 
     /**
@@ -661,10 +671,10 @@ class BRequest extends BClass
         $scheme = static::scheme();
         $port = static::httpPort();
         $url = $scheme.'://'.static::httpHost();
-        if (!BConfig::i()->get('web/hide_script_name')) {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
-        } else {
+        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
             $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
+        } else {
+            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
         }
         $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
         return $url;
@@ -928,7 +938,7 @@ class BResponse extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -1265,7 +1275,7 @@ class BResponse extends BClass
     * Redirect browser to another URL
     *
     * @param string $url URL to redirect
-    * @param int $status Default 302, another possible value 301
+    * @param int $status Default 302 (temporary), another possible value 301 (permanent)
     */
     public function redirect($url, $status=302)
     {
@@ -1419,7 +1429,7 @@ class BRouting extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function __construct()
@@ -1686,7 +1696,7 @@ class BRouting extends BClass
 
     public function redirectCallback($args)
     {
-        BResponse::i()->redirect(BApp::href($args['target']));
+        BResponse::i()->redirect($args['target']);
     }
 
     /**
@@ -2020,7 +2030,7 @@ class BRouteObserver
         }
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
-        $controller = BClassRegistry::i()->instance($controllerName, array(), true);
+        $controller = BClassRegistry::instance($controllerName, array(), true);
         return $controller->dispatch($actionName, $this->args);
     }
 

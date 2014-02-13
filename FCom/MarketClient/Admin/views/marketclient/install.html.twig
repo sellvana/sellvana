@@ -1,0 +1,14 @@
+<form action="{{ APP.href('marketclient/module/install') }}" method="post">
+    {% for modName, modInfo in THIS.get('install') %}
+        <div class="row">
+            {{ modName }}:
+            <select name="install[{{ modName }}][version]">
+                {% for cn, c in modInfo.channels %}
+                    <option value="{{ cn }}">{{ c.name ~ ': ' ~ c.version ~ ' (' ~ c.published_at ~ ')' }}</option>
+                {% endfor %}
+            </select>
+            <label>{{ 'Auto-enable:'|_ }} <input type="checkbox" name="install[{{ modName }}][enable]" value="1"/></label>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">{{ 'Install'|_ }}</button>
+</form>

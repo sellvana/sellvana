@@ -21,17 +21,18 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>BApp::href('customfields/fieldsets/unique_set'))),
                     array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true, 'editable'=>true , 'validation'=>array('required'=>true)),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'fields...'), 'edit'=>true, 'delete'=>true))
+                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom' => array('icon' => 'icon-edit-sign', 'col'=>'id'), 'delete' => true))
                 ),
                 'actions'=>array(
-                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
+//                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                             'delete'=>true
                 ),
                 'filters'=>array(
                             array('field'=>'set_name', 'type'=>'text'),
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
-                )
+                ),
+//                'new_button' => '#add_new_field_set'
             )
         );
 
@@ -52,7 +53,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'sortable'=>false),
                     array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'sortable'=>false),
                     array('name'=>'position', 'label'=>'Position', 'width'=>100, 'editable'=>true, 'valdiate'=>'number', 'default'=>'0', 'sortable'=>false),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
+//                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
                             array('field'=>'field_code', 'type'=>'text'),
@@ -61,7 +62,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 ),
                 'actions'=>array(
                                     'delete' => array('caption' => 'Remove', 'confirm'=>false)
-                                )
+                                ),
+                'callbacks' => array('after_mass_delete' => 'afterDeleteLinkField')
             )
         );
 
@@ -137,17 +139,25 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
                 ),
                 'filters'=>array(
+                            array('field'=>'field_code', 'type'=>'text'),
                             array('field'=>'field_name', 'type'=>'text'),
+                            array('field'=>'frontend_label', 'type'=>'text'),
+                            array('field'=>'frontend_show', 'type'=>'multiselect'),
                             array('field'=>'table_field_type', 'type'=>'multiselect'),
                             array('field'=>'admin_input_type', 'type'=>'multiselect'),
+                            array('field'=>'num_options', 'type'=>'text'),
+                            array('field'=>'system', 'type'=>'multiselect'),
+                            array('field'=>'multilanguage', 'type'=>'multiselect'),
+                            array('field'=>'required', 'type'=>'multiselect'),
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new'=>array('caption'=>'Add a field', 'modal'=>true),
+                                    //'new'=>array('caption'=>'Add a field', 'modal'=>true),
                                     'edit'=>true,
                                     'delete'=>true
                                 ),
-                'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid')
+                'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
+                'new_button' => '#add_new_field'
             )
         );
         return $config;
@@ -164,7 +174,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false),
+                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false, 'validation' => array('required' => true)),
                     array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ),
                 'filters'=>array(
@@ -253,7 +263,24 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_grid_data__POST()
     {
-        $this->_processGridDataPost('FCom_CustomField_Model_Set');
+        $r = BRequest::i();
+        if ($r->post('oper') == 'add') {
+            $data = $r->post();
+            $field_ids = $data['field_ids'];
+            unset($data['id'], $data['oper'], $data['field_ids']);
+            $set = FCom_CustomField_Model_Set::i()->create($data)->save();
+            $result = $set->as_array();
+            if ($field_ids !== '') {
+                $model = FCom_CustomField_Model_SetField::i();
+                foreach (explode(',', $field_ids) as $i=>$fId) {
+                    $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+                }
+            }
+            BResponse::i()->json($result);
+        } else {
+            $this->_processGridDataPost('FCom_CustomField_Model_Set');
+        }
+
     }
 
     public function action_set_field_grid_data__POST()
@@ -263,8 +290,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $p = BRequest::i()->post();
         $model = FCom_CustomField_Model_SetField::i();
         $model->delete_many(array('set_id'=>$p['set_id']));
-        foreach (explode(',', $p['field_ids']) as $i=>$fId) {
-            $model->create(array('set_id'=>$p['set_id'], 'field_id'=>$fId, 'position'=>$i))->save();
+        if ($p['field_ids'] !== '') {
+            foreach (explode(',', $p['field_ids']) as $i=>$fId) {
+                $model->create(array('set_id'=>$p['set_id'], 'field_id'=>$fId, 'position'=>$i))->save();
+            }
         }
         BResponse::i()->json(array('success'=>true));
     }
@@ -297,8 +326,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         if ($id) {
             $model = FCom_CustomField_Model_Set::i()->load($id);
             if (empty($model)) {
-                BSession::i()->addMessage('Invalid field set ID', 'error', 'admin');
-                BResponse::i()->redirect(BApp::href('customfields/fieldsets'));
+                $this->message('Invalid field set ID', 'error');
+                BResponse::i()->redirect('customfields/fieldsets');
             }
         } else {
             $model = FCom_CustomField_Model_Set::i()->create();
@@ -341,13 +370,13 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 $id = $model->id;
             }
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         if ($r->xhr()) {
             $this->forward('form_tab', null, array('id'=>$id));
         } else {
-            BResponse::i()->redirect(BApp::href('customfields/customfield/form/?id='.$id));
+            BResponse::i()->redirect('customfields/customfield/form/?id='.$id);
         }
     }
 

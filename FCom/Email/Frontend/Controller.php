@@ -25,9 +25,9 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $data['unsub_all'] = 0;
             }
             $pref->set($data)->save();
-            BSession::i()->addMessage('Your preferences have been saved', 'success', 'frontend');
+            $this->message('Your preferences have been saved');
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $this->message($e->getMessage(), 'error');
         }
         $url = BUtil::setUrlQuery($r->currentUrl(), array('token'=>$hlp->getToken($email)));
         BResponse::i()->redirect($url);
@@ -65,7 +65,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 BResponse::i()->json($result);
             } else {
                 if ($valid) {
-                    BSession::i()->addMessage($successMessage, 'success', 'frontend');
+                    $this->message($successMessage);
                 } else {
                     $this->formMessages('email-subscription');
                 }
@@ -76,7 +76,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             if ($r->xhr()) {
                 BResponse::i()->json(array('status' => 'error', 'message' => $e->getMessage()));
             } else {
-                BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+                $this->message($e->getMessage(), 'error');
                 BResponse::i()->redirect('email/subscribe');
             }
         }

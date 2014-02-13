@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright 2011 Unirgy LLC
+* Copyright 2014 Boris Gurvich
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 *
 * @package BuckyBall
 * @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@unirgy.com>
-* @copyright (c) 2010-2012 Boris Gurvich
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
@@ -34,7 +34,7 @@ class BTest extends BClass
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function __destruct()
@@ -178,6 +178,7 @@ class BTestExpectation extends BClass
     protected $_params;
     protected $_not = false;
     public $x;
+    protected $_matchers;
 
     public function __construct($params)
     {

@@ -22,6 +22,17 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         return true;
     }
 
+    public function message($msg, $type='success', $tag='install', $options=array())
+    {
+        if (is_array($msg)) {
+            array_walk($msg, 'BLocale::_');
+        } else {
+            $msg = BLocale::_($msg);
+        }
+        BSession::i()->addMessage($msg, $type, $tag, $options);
+        return $this;
+    }
+
     public function action_index()
     {
         BLayout::i()->applyLayout('/');
@@ -34,9 +45,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
-            BResponse::i()->redirect(BApp::href('?error=1'));
+            BResponse::i()->redirect('?error=1');
         }
-        BResponse::i()->redirect(BApp::href('install/step1'));
+        BResponse::i()->redirect('install/step1');
     }
 
     public function action_step1()
@@ -61,7 +72,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->redirect('install/step2');
         } catch (Exception $e) {
             //print_r($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $this->message($e->getMessage(), 'error', 'install');
             BResponse::i()->redirect('install/step1');
         }
     }
@@ -97,7 +108,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ->login();
             BResponse::i()->redirect('install/step3');
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'install');
+            $this->message($e->getMessage(), 'error', 'install');
             BResponse::i()->redirect('install/step2');
         }
     }
@@ -174,7 +185,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         BConfig::i()->add(array(
             'install_status' => 'installed',
-            'db' => array('implicit_migration' => 1, 'currently_migrating' => 0),
+            'db' => array('implicit_migration' => 1/*, 'currently_migrating' => 0*/),
             'module_run_levels' => array('FCom_Core' => $runLevels),
             'mode_by_ip' => array(
                 'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'DEBUG',

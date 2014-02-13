@@ -1,25 +1,25 @@
 <?php
 /**
- * Copyright 2011 Unirgy LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @package BuckyBall
- * @link http://github.com/unirgy/buckyball
- * @author Boris Gurvich <boris@unirgy.com>
- * @copyright (c) 2010-2012 Boris Gurvich
- * @license http://www.apache.org/licenses/LICENSE-2.0.html
- */
+* Copyright 2014 Boris Gurvich
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* @package BuckyBall
+* @link http://github.com/unirgy/buckyball
+* @author Boris Gurvich <boris@sellvana.com>
+* @copyright (c) 2010-2014 Boris Gurvich
+* @license http://www.apache.org/licenses/LICENSE-2.0.html
+*/
 
 /**
  * Layout facility to register views and render output from views
@@ -134,7 +134,7 @@ class BLayout extends BClass
      */
     public static function i($new = false, array $args = array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -258,7 +258,8 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
-        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
+        $cacheConfig = BConfig::i()->get('core/cache/view_files');
+        $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
             $data = BCache::i()->load($cacheKey);
         }
@@ -368,7 +369,7 @@ class BLayout extends BClass
     }
 
     /**
-    * Get all views in this layout
+    * Get all views in this layout or filtered by pattern
     *
     * @return array
     */
@@ -700,7 +701,8 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'LAYOUTS-'.BApp::i()->get('area'); //TODO: more flexible key
-        $useCache = BDebug::is('STAGING,PRODUCTION') || BConfig::i()->get('core/force_dirfile_cache');
+        $cacheConfig = BConfig::i()->get('core/cache/layout_files');
+        $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
             $data = BCache::i()->load($cacheKey);
         }
@@ -1186,7 +1188,7 @@ class BView extends BClass
     {
         $params['view_name'] = $viewName;
         $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
-        $view                = BClassRegistry::i()->instance($className, $params);
+        $view                = BClassRegistry::instance($className, $params);
 
         return $view;
     }

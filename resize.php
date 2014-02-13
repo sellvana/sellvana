@@ -44,6 +44,8 @@ class ImageResizer
 
     public function __construct($p)
     {
+        $this->validate();
+
         $this->file = !empty($p['f']) ? $p['f'] : null;
         $this->default = !empty($_GET['d']) ? $_GET['d'] : 'media/image-not-found.jpg';
         $this->txt = !empty($p['t']) ? $p['t'] : null;
@@ -84,6 +86,27 @@ class ImageResizer
         $this->importImage();
         $this->exportImage();
         $this->outputFile();
+    }
+
+    protected function validate()
+    {
+        if (empty($_SERVER['HTTP_REFERER'])) {
+            $this->restrict();
+        }
+        return;
+        $webFolder = preg_replace('#'.__FILE__.'$#', '', $_SERVER['SCRIPT_NAME']);
+        $re = '#^(http(s):)?//'.preg_quote($_SERVER['HTTP_HOST'].$webFolder, '#').'#';
+        if (!preg_match($re, $_SERVER['HTTP_REFERER'])) {
+            $this->restrict();
+        }
+    }
+
+    protected function restrict()
+    {
+        header('HTTP/1.0 403 Restricted');
+        header('Status: 403 Restricted');
+        echo '403 Restricted';
+        exit;
     }
 
     protected function outputEmptyImage()
@@ -152,8 +175,10 @@ class ImageResizer
             return;
         }
 
-        //$filename = preg_replace('#'.preg_quote(__DIR__).'[/\\\\](media[/\\\\])?#', '', $this->file);
-        $filename = ltrim(str_replace(__DIR__, '', $this->file), '/\\');
+        if (!preg_match('#^'.preg_quote(__DIR__, '#').'(.*)$#', $this->file, $m)) {
+            return false;
+        }
+        $filename = ltrim($m[1], '/\\');
         $this->outFile = $this->cacheDir . '/' . $this->dw . 'x' . $this->dh . '/' . $filename;
         if (file_exists($this->outFile) && filemtime($this->outFile) >= $this->mtime) {
             $this->outputFile();

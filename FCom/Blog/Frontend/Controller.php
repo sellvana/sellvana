@@ -25,6 +25,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->where('pt.tag_id', $tag->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
+        $this->view('head')->addTitle($tagName);
         $this->layout('/blog/tag');
     }
 
@@ -43,6 +44,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->where('pc.category_id', $cat->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
+        $this->view('head')->addTitle($cat->name);
         $this->layout('/blog/category');
     }
 
@@ -60,6 +62,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->rss(BApp::href('blog').'/author/'.$userName.'/feed.rss');
+        $this->view('head')->addTitle($user->firstname.' '.$user->lastname);
         $this->layout('/blog/author');
     }
 
@@ -75,8 +78,10 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $postsOrm = FCom_Blog_Model_Post::i()->getPostsOrm();
         if ($m) {
             $postsOrm->where('create_ym', $y.$m);
+            $this->view('head')->addTitle($y.'/'.$m);
         } else {
             $postsOrm->where_like('create_ym', $y.'%');
+            $this->view('head')->addTitle($y);
         }
         $this->view('blog/posts')->set('posts', $postsOrm->find_many());
         $this->layout('/blog/archive');
@@ -90,14 +95,15 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $postKey = $m[4];
         }
         $post = FCom_Blog_Model_Post::i()->load($postKey, 'url_key');
-        if (!$post) {
+        if (!$post || $post->get('status')!=='published') {
             $this->forward(false);
             return;
         }
         $this->view('head')->canonical($post->getUrl());
         $this->view('blog/post')->set('post', $post);
-        $this->view('head')->addTitle($post->get('meta_tile'));
-        $this->view('head')->addMeta('description', $post->get('meta_keywords'));
+        $this->view('head')->addTitle($post->get('title'));
+        $this->view('head')->addMeta('title', $post->get('meta_title'));
+        $this->view('head')->addMeta('description', $post->get('meta_description'));
         $this->view('head')->addMeta('keywords', $post->get('meta_keywords'));
         $this->layout('/blog/post');
     }

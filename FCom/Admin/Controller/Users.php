@@ -34,8 +34,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field' => 'username', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field' => 'is_superadmin', 'type' => 'select'),
-            array('field' => 'status', 'type' => 'select'),
+            array('field' => 'is_superadmin', 'type' => 'multiselect'),
+            array('field' => 'status', 'type' => 'multiselect'),
         );
 
         return $config;
@@ -49,18 +49,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             'sidebar_img' => BUtil::gravatar($m->email),
             'title' => $m->id ? 'Edit User: '.$m->username : 'Create New User',
         ));
-        /*$id = BRequest::i()->param('id', true);
-        if($id){
-            $args['view']->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
-        }*/
-    }
-
-    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
-    {
-        if ($model && $model->id) {
-            $view->addTab("history", array('label' => BLocale::_("History"), 'pos' => 20));
-        }
-        return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
     public function formPostBefore($args)
@@ -106,7 +94,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field'=>'username', 'type'=>'text'),
             array('field'=>'email', 'type'=>'text'),
-            array('field'=>'status', 'type'=>'select')
+            array('field'=>'status', 'type' => 'multiselect')
         );
         $config['data_mode'] = 'local';
         $config['events'] = array('init', 'add','mass-delete');
@@ -138,7 +126,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['filters'] = array(
             array('field' => 'username', 'type' => 'text'),
             array('field' => 'email', 'type' => 'text'),
-            array('field'=>'status', 'type'=>'select'),
+            array('field'=>'status', 'type' => 'multiselect'),
             '_quick' => array('expr' => 'username like ? or email like ? or au.id=?', 'args' => array('?%', '%?%', '?'))
         );
         if ($filterAdmin) {

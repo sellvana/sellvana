@@ -1,7 +1,7 @@
 base:
     - view: admin/nav
         do:
-            - [ addNav, modules/remote, { label: Install from Market, href: /marketclient/remote } ]
+            - [ addNav, modules/remote, { label: Install from Market, href: /marketclient/remote, target: MarketClient } ]
             - [ addNav, modules/publish, { label: Publish to Market, href: /marketclient/publish } ]
 
 /marketclient:
@@ -17,8 +17,9 @@ base:
 
 /marketclient/remote:
     - { include: base }
-    - { hook: main, views: marketclient/remote }
-    - { view: admin/nav, do: [[ setNav, modules ]] }
+    - { root: marketclient/remote }
+    #- { hook: main, views: marketclient/remote }
+    #- { view: admin/nav, do: [[ setNav, modules ]] }
 
 /marketclient/publish:
     - { include: base }

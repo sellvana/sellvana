@@ -32,7 +32,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
         );
         $config['filters'] = array(
             array('field' => 'email', 'type' => 'text'),
-            array('field' => 'sub_newsletter', 'type' => 'select'),
+            array('field' => 'sub_newsletter', 'type' => 'multiselect'),
         );
         return $config;
     }

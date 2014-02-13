@@ -2,6 +2,7 @@
 {% set validator = THIS.get('validator') %}
 
 <fieldset name="main-product">
+  <div class="f-section">
     <div class="form-group has-multilang">
         <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
         <div class="col-md-5">
@@ -73,6 +74,7 @@
     <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
     <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
     <input type='hidden' id='desc_lang_fields' name='desc_lang_fields'/>
+  </div>
 </fieldset>
 
 
@@ -82,7 +84,7 @@
     <div class="row multilang-field">
         <div class="col-md-2" />
         <div class="col-md-5">
-            <button type="button" style="margin-top: 5px;" class="btn btn-info btn-xs multilang">{{ 'Set Locale'|_ }}</button>
+            <button type="button" style="margin-top: 5px;" class="btn btn-xs multilang"></button>
         </div>
     </div>
 
@@ -96,23 +98,25 @@
                 </div>
 
                 <div class="modal-body">
-                    <table>
-                        <tr>
-                            <td>
-                                <select class="prod_sel_locale form-control" style="width:150px;">
-                                <% var langs = rc.avail_langs;
-                                   for(var i in langs) {
-                                    %>
-                                        <option value="<%=langs[i] %>"><%=langs[i] %></option>
-                                    <% } %>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="btn btn-primary save" type="button">{{ 'Add Locale' |_ }}</button>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="system_lang_fields">
+                    <div class="well">
+                      <table>
+                          <tr>
+                              <td>
+                                  <select class="prod_sel_locale form-control" style="width:150px;">
+                                  <% var langs = rc.avail_langs;
+                                     for(var i in langs) {
+                                      %>
+                                          <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                      <% } %>
+                                  </select>
+                              </td>
+                              <td>
+                                  <button class="btn btn-primary save" type="button">{{ 'Add Locale' |_ }}</button>
+                              </td>
+                          </tr>
+                      </table>
+                    </div>
+                    <div class="system-lang-fields">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -141,7 +145,7 @@
         } %>
     </div>
     <div class="col-md-3">
-        <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
+        <button class="btn btn-default btn-sm field-remove">
             <i class="icon-remove"></i>
         </button>
     </div>
@@ -241,10 +245,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     });
 
     SystemFields.Views.LangFieldView = Backbone.View.extend({
-        className: 'row',
-        attributes: {
-            style: 'margin-top:3px; margin-bottom:30px;'
-        },
+        className: 'form-group',
         events: {
             'click button.field-remove': '_remove',
             'change input[type="text"],textarea': '_changeVal'
@@ -255,14 +256,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
-            if (confirm) {
+            //var confirm = window.confirm("Do you want to really remove?");
+            //if (confirm) {
                 this.parentSet.langFields.remove(this.model);
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
                 delete this.model;
-            }
+            //}
         },
         getWYSIWYG: function() {
             var id = this.$el.find('textarea').attr('id');
@@ -302,11 +303,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = this.model.langFields.pluck('lang_code');
-            var html = 'Translations...'
-            if(langs.length>0) {
-                html = langs.join(',');
+            var html = '<i class="icon icon-globe"></i>'
+            var multilang = this.$el.find('.multilang');
+            if (langs.length>0) {
+                html += ' '+langs.join(', ');
+                multilang.addClass('btn-info');
+            } else {
+                html += ' {{ 'Translate'|_ }}';
             }
-            this.$el.find('.multilang').html(html);
+            multilang.html(html);
             this.$el.find('select.prod_sel_locale').select2();
             if(this.model.langFields.length === SystemFields.Langs.length ) {
                 this.$el.find('button.save').addClass('disabled');
@@ -331,7 +336,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _addLangView: function(langField) {
             var langView = new SystemFields.Views.LangFieldView({model: langField});
-            this.$el.find('div.system_lang_fields').append(langView.render().el);
+            this.$el.find('div.system-lang-fields').append(langView.render().el);
 
             if (langField.get('input_type') === 'wysiwyg') {
                 if (typeof(adminForm) !== 'undefined')

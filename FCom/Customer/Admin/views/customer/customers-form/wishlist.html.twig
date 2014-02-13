@@ -1,3 +1,0 @@
-{% set m = THIS.get('model') %}
-{% set hlp = APP.instance('FCom_Wishlist_Admin_Controller') %}
-{{ THIS.view('core/backbonegrid').set('grid', hlp.customerWishlistGridConfig(m)) | raw }}

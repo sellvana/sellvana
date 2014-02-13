@@ -51,12 +51,21 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
-            array('field'=>'approved', 'type'=>'select'),
+            array('field'=>'text', 'type'=>'text'),
+            array('field'=>'rating', 'type'=>'number-range'),
+            array('field'=>'rating1', 'type'=>'number-range'),
+            array('field'=>'rating2', 'type'=>'number-range'),
+            array('field'=>'rating3', 'type'=>'number-range'),
+            array('field'=>'helpful', 'type'=>'text'),
+            array('field'=>'approved', 'type' => 'multiselect'),
+            array('field'=>'product_id', 'type' => 'multiselect'),
+            array('field'=>'customer_id', 'type' => 'multiselect'),
+            array('field'=>'create_at', 'type' => 'date-range'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
         $config['actions'] = array();
         if (!$productModel) {
-            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
+//            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
         }
         $config['actions'] += array(
             'export'  => true,
@@ -64,6 +73,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'approve' => array('html' => '<button type="button" class="btn btn-primary disabled" id="prod-reviews-approve"><span>Approve</span></button>'),
             'deny'    => array('html' => '<button type="button" class="btn btn-warning disabled" id="prod-reviews-deny"><span>Deny</span></button>'),
         );
+
         $config['events'] = array('select-rows');
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
@@ -118,7 +128,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $callbacks = '$(".rateit").rateit();
                       $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
         $config['callbacks'] = array('after_gridview_render' => $callbacks);
-
+        $config['new_button'] = '#add_new_product_review';
         return $config;
     }
 
@@ -150,7 +160,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         parent::gridViewBefore($args);
         $this->view('prodreviews/grid')->set(array(
                 'title' => $this->_gridTitle,
-                'actions' => array('new' => '')
+                'actions' => array('new' => '<button id="add_new_product_review" class="btn grid-new btn-primary _modal" type="button">'.BLocale::_('New Product Review').'</button>')
             ));
     }
 
@@ -204,7 +214,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         $config['filters'] = array(
             array('field'=>'title', 'type'=>'text'),
-            array('field'=>'approved', 'type'=>'select'),
+            array('field'=>'approved', 'type' => 'multiselect'),
             '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
         );
 

@@ -2,20 +2,6 @@
 
 class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
-    public function authenticate($args=array())
-    {
-        if (in_array($this->_action, array('login', 'password_recover', 'password_reset'))) {
-            return true;
-        }
-        return parent::authenticate($args);
-    }
-
-    public function action_test()
-    {
-        FCom_Admin_Model_User::i()->sessionUser()->recoverPassword();
-        echo "DONE"; exit;
-    }
-
     public function action_index()
     {
         $this->layout('/');
@@ -38,103 +24,6 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         BResponse::i()->status(404);
     }
 
-    public function action_login__POST()
-    {
-        try {
-            $r = BRequest::i()->post('login');
-            if (!empty($r['username']) && !empty($r['password'])) {
-                $user = FCom_Admin_Model_User::i()->authenticate($r['username'], $r['password']);
-                if ($user) {
-                    $user->login();
-                } else {
-                    BSession::i()->addMessage('Invalid user name or password.', 'error', 'admin');
-                }
-            } else {
-                BSession::i()->addMessage('Username and password cannot be blank.', 'error', 'admin');
-            }
-            $url = BSession::i()->data('admin_login_orig_url');
-        } catch (Exception $e) {
-            BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
-        }
-        BResponse::i()->redirect(!empty($url) ? $url : BApp::href());
-    }
-
-    public function action_password_recover()
-    {
-        $this->layout('/password/recover');
-    }
-
-    public function action_password_recover__POST()
-    {
-        $user = FCom_Admin_Model_User::i()->load(BRequest::i()->request('email'), 'email');
-        if ($user) {
-            $user->recoverPassword();
-        }
-        BSession::i()->addMessage('If the email address was correct, you should receive an email shortly with password recovery instructions.', 'success', 'admin');
-        BResponse::i()->redirect(BApp::href());
-    }
-
-    public function action_password_reset()
-    {
-        $token = BRequest::i()->request('token');
-        if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
-            && ($user->get('token') === $token)
-        ) {
-            $this->layout('/password/reset');
-        } else {
-            BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'admin');
-            BResponse::i()->redirect(BApp::href());
-        }
-    }
-
-    public function action_password_reset__POST()
-    {
-        $r = BRequest::i();
-        $token = $r->request('token');
-        $password = $r->post('password');
-        $confirm = $r->post('password_confirm');
-        if ($token && $password && $confirm && $password === $confirm
-            && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
-            && $user->get('token') === $token
-        ) {
-            $user->resetPassword($password);
-            BSession::i()->addMessage('Password has been reset', 'success', 'admin');
-            BResponse::i()->redirect(BApp::href());
-        } else {
-            BSession::i()->addMessage('Invalid form data', 'error', 'admin');
-            BResponse::i()->redirect(BRequest::i()->currentUrl());
-        }
-    }
-
-    public function action_logout()
-    {
-        FCom_Admin_Model_User::i()->logout();
-        BResponse::i()->redirect(BApp::href());
-    }
-
-    public function action_dashboard()
-    {
-        if (!BRequest::i()->xhr()) {
-            BResponse::i()->redirect('');
-        }
-        $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
-        $widgetKeys = explode(',', BRequest::i()->get('widgets'));
-        $result = array();
-        foreach ($widgetKeys as $wKey) {
-            if (empty($widgets[$wKey])) {
-                continue;
-            }
-            if (!empty($widgets[$wKey]['view'])) {
-                $html = (string)$this->view($widgets[$wKey]['view']);
-            } else {
-                $html = $widgets[$wKey]['content'];
-            }
-            $result['widgets'][] = array('key' => $wKey, 'html' => $html);
-        }
-        BResponse::i()->json($result);
-    }
-
     public function action_my_account()
     {
         $model = FCom_Admin_Model_User::i()->sessionUser();
@@ -148,20 +37,20 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $r = BRequest::i();
         $data = $r->post('model');
         if (empty($data['password_current']) || !$model->validatePassword($data['password_current'])) {
-            BSession::i()->addMessage('Missing or invalid current password');
+            $this->message('Missing or invalid current password', 'error');
             BResponse::i()->redirect('my_account');
         }
         try {
             if (!empty($data['password'])) {
                 if (empty($data['password_confirm']) || $data['password'] !== $data['password_confirm']) {
-                    BSession::i()->addMessage('Missing or not matching password confirmation');
+                    $this->message('Missing or not matching password confirmation', 'error');
                     BResponse::i()->redirect('my_account');
                 }
             }
             $model->set($data)->save();
-            BSession::i()->addMessage('Changes have been saved', 'success', 'admin');
+            $this->message('Changes have been saved');
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
 
         BResponse::i()->redirect('my_account');

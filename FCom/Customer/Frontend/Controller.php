@@ -8,7 +8,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             return false;
         }
         if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, array('login', 'register', 'password_recover'))) {
-            BResponse::i()->redirect(BApp::href());
+            BResponse::i()->redirect('');
         }
         return true;
     }
@@ -16,16 +16,28 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_login()
     {
         $this->layout('/customer/login');
+
+        $redirect = BRequest::i()->get('redirect_to');
+        if ($redirect==='CURRENT') {
+            $redirect = BRequest::i()->referrer();
+        }
+        if ($redirect) {
+            BSession::i()->data('login_orig_url', $redirect);
+        }
     }
 
     public function action_login__POST()
     {
         try {
+            $r = BRequest::i();
             $customerModel = FCom_Customer_Model_Customer::i();
-            $r = BRequest::i()->post('login');
+            $login = $r->post('login');
+            if (!$login) {
+                $login = $r->post();
+            }
             $customerModel->setLoginRules();
-            if ($customerModel->validate($r, array(), 'frontend')) {
-                $user = $customerModel->authenticate($r['email'], $r['password']);
+            if ($customerModel->validate($login, array(), 'frontend')) {
+                $user = $customerModel->authenticate($login['email'], $login['password']);
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
@@ -48,7 +60,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     if ($allowLogin) {
                         $user->login();
                     } else {
-                        BSession::i()->addMessage($errorMessage, 'error', 'frontend', array('title' => ''));
+                        $this->message($errorMessage, 'error', 'frontend', array('title' => ''));
                         BResponse::i()->redirect('login');
                     }
                 } else {
@@ -57,15 +69,18 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             } else {
                 $this->formMessages();
             }
-            if (BRequest::i()->post('backroute')) {
-                $url = BApp::href(BRequest::i()->post('backroute'));
+            if ($r->request('redirect_to')) {
+                $url = $r->request('redirect_to');
+                if ($url==='CURRENT') {
+                    $url = $r->referrer();
+                }
             } else {
                 $url = BSession::i()->data('login_orig_url');
             }
-            BResponse::i()->redirect(!empty($url) ? $url : BApp::baseUrl());
+            BResponse::i()->redirect(!empty($url) ? $url : '');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect('login');
         }
     }
@@ -86,9 +101,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 if ($user) {
                     $user->recoverPassword();
                 }
-                BSession::i()->addMessage(
-                    $this->_('If the email address was correct, you should receive an email shortly with password recovery instructions.'),
-                    'success', 'frontend');
+                $this->message('If the email address was correct, you should receive an email shortly with password recovery instructions.');
                 BResponse::i()->redirect('login');
             } else {
                 $this->formMessages();
@@ -96,7 +109,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
+            $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect('customer/password/recover');
         }
     }
@@ -107,7 +120,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token===$token) {
             $this->layout('/customer/password/reset');
         } else {
-            BSession::i()->addMessage('Invalid link. It is possible your recovery link has expired.', 'error', 'frontend');
+            $this->message('Invalid link. It is possible your recovery link has expired.', 'error');
             BResponse::i()->redirect('login');
         }
     }
@@ -123,10 +136,10 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             && $user->get('token') === $token
         ) {
             $user->resetPassword($password);
-            BSession::i()->addMessage('Password has been reset', 'success', 'frontend');
+            $this->message('Password has been reset');
             BResponse::i()->redirect(BApp::baseUrl());
         } else {
-            BSession::i()->addMessage('Invalid form data', 'error', 'frontend');
+            $this->message('Invalid form data', 'error');
             BResponse::i()->redirect('login');
         }
     }
@@ -157,19 +170,19 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     FCom_Customer_Model_Address::i()->import($a, $customer);
                 }
 //                $customer->login();
-                BSession::i()->addMessage($this->_('Thank you for your registration. Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.'), 'success', 'frontend');
-//                BSession::i()->addMessage($this->_('Thank you for your registration'), 'success', 'frontend');
-//                BResponse::i()->redirect(BApp::href('customer/myaccount'));
-                BResponse::i()->redirect(BApp::href('customer/register'));
+                $this->message('Thank you for your access request. We will be in touch shortly via email');
+//                $this->message('Thank you for your registration');
+//                BResponse::i()->redirect('customer/myaccount');
+                BResponse::i()->redirect('customer/register');
             } else {
-                BSession::i()->addMessage($this->_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$formId);
                 $this->formMessages($formId);
-                BResponse::i()->redirect(BApp::href('customer/register'));
+                BResponse::i()->redirect('customer/register');
             }
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'frontend');
-            BResponse::i()->redirect(BApp::href('customer/register'));
+            $this->message($e->getMessage(), 'error');
+            BResponse::i()->redirect('customer/register');
         }
     }
 }

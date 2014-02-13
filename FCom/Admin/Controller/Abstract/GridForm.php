@@ -158,7 +158,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $class = $this->_modelClass;
         $id = BRequest::i()->param('id', true);
         if ($id && !($model = $class::i()->load($id))) {
-            BDebug::error('Invalid ID: '.$id);
+            /*BDebug::error('Invalid ID: '.$id);*/
+            $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
             $model = $class::i()->create();
@@ -207,18 +208,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->formPostBefore($args);
             if ($r->post('do')==='DELETE') {
                 $model->delete();
-                BSession::i()->addMessage(BLocale::_('The record has been deleted'), 'success', 'admin');
+                $this->message('The record has been deleted');
             } else {
                 $model->set($data);
 
                 if ($model->validate($model->as_array(), array(), $formId)) {
                     $model->save();
-                    BSession::i()->addMessage(BLocale::_('Changes have been saved'), 'success', 'admin');
+                    $this->message('Changes have been saved');
                     if ($r->post('do') === 'saveAndContinue') {
                         $redirectUrl = BApp::href($this->_formHref).'?id='.$model->id;
                     }
                 } else {
-                    BSession::i()->addMessage(BLocale::_('Cannot save data, please fix above errors'), 'error', 'validator-errors:'.$formId);
+                    $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$formId);
                     $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
                 }
 
@@ -226,7 +227,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->formPostAfter($args);
         } catch (Exception $e) {
             $this->formPostError($args);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
         }
         if ($r->xhr()) {
@@ -278,7 +279,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             foreach ($messages as $m) {
                 $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
             }
-            BSession::i()->addMessage($msg, 'error', 'admin');
+            $this->message($msg, 'error');
         }
     }
 }

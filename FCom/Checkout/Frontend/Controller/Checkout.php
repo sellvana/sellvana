@@ -7,9 +7,9 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $r = BRequest::i();
         $isLoggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
         if (!$isLoggedIn && $r->get('guest') != 'yes' && $r->rawPath() != '/checkout/login') {
-            BResponse::i()->redirect(BApp::href('/checkout/login'));
+            BResponse::i()->redirect('checkout/login');
         } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {
-            BResponse::i()->redirect(BApp::href('/checkout'));
+            BResponse::i()->redirect('checkout');
         }
         return parent::authenticate($args);
     }
@@ -39,7 +39,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (!$cart || !$cart->id) {
-            BResponse::i()->redirect(BApp::href('cart'));
+            BResponse::i()->redirect('cart');
         }
 
         $shipAddress = $cart->getAddressByType('shipping');
@@ -76,13 +76,16 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
         $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
         $paymentMethodsHtml = array();
-        foreach ($paymentMethods as $code => $method) {
-            $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
-                                         ->set('cart', $cart)
-                                         ->set('method', $method)
-                                         ->set('code', $code)
-                                         ->render();
+        if (is_array($paymentMethods)) {
+            foreach ($paymentMethods as $code => $method) {
+                $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
+                    ->set('cart', $cart)
+                    ->set('method', $method)
+                    ->set('code', $code)
+                    ->render();
+            }
         }
+
 
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
@@ -127,7 +130,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                     $cart->customer_id = $customer->id();
                     $cart->save();
                 } else {
-                    BResponse::i()->redirect(BApp::href('checkout?guest=yes'));
+                    BResponse::i()->redirect('checkout?guest=yes');
                 }
             } catch (Exception $e) {
                 //die($e->getMessage());
@@ -163,7 +166,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart->save();
 
         if (empty($post['place_order']) && empty($post['is_ajax'])) {
-            BResponse::i()->redirect(BApp::href('checkout'));
+            BResponse::i()->redirect('checkout');
         }
         $order = $cart->placeOrder();
         FCom_Sales_Model_Cart::i()->sessionCartId(false);
@@ -243,7 +246,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     {
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['last_order']['id'])) {
-            BResponse::i()->redirect(BApp::href('checkout'));
+            BResponse::i()->redirect('checkout');
         }
 
         $user = false;

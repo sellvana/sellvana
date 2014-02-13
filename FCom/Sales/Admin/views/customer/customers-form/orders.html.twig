@@ -1,0 +1,7 @@
+<!--{ label: Orders }-->
+<!--{ pos: 30 }-->
+<!--{ model_new_hide: true }-->
+
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('FCom_Sales_Admin_Controller_Orders') %}
+{{ THIS.view('core/backbonegrid').set('grid', hlp.customerOrdersGridConfig(m)) | raw }}

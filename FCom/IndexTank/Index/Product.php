@@ -60,7 +60,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -623,7 +623,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $callback = array($this, $field->source_value);
                     }
                     //check callback
-                    if (!BClassRegistry::i()->isCallable($callback)) {
+                    if (!BClassRegistry::isCallable($callback)) {
                         //BDebug::warning('Invalid IndexTank custom field callback: '.$field->source_value);
                         continue;
                     }

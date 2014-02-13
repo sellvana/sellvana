@@ -25,7 +25,7 @@ Options -Indexes +FollowSymLinks -MultiViews
     php_value output_buffering Off
     php_value zlib.output_compression Off
 
-    php_value memory_limit 2G
+    # php_value memory_limit 2G
     php_value upload_max_filesize 40M
     php_value post_max_size 40M
 </IfModule>
@@ -34,7 +34,7 @@ Options -Indexes +FollowSymLinks -MultiViews
     php_value output_buffering Off
     php_value zlib.output_compression Off
 
-    php_value memory_limit 2G
+    # php_value memory_limit 2G
     php_value upload_max_filesize 40M
     php_value post_max_size 40M
 </IfModule>
