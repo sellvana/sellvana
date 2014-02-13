@@ -82,13 +82,7 @@ class FeatureContext extends MinkContext
      */
     public function iAmNotLoggedInFront()
     {
-        $page = $this->getPage();
-        if ( strpos( $page->getContent(), "My Account" ) !== false ) {
-            echo "\t Logged in front\n";
-            $this->visit( "/logout" );
-        } else {
-            echo "\tNot logged in\n";
-        }
+        $this->visit( "/logout" );
     }
 
     /**
@@ -277,9 +271,9 @@ class FeatureContext extends MinkContext
             throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
         }
 
-        $this->productName = $productLink[1]->getText();
+        $this->productName = $productLink[ 1 ]->getText();
         echo "\t{$this->productName}\n";
-        $productLink[1]->click();
+        $productLink[ 1 ]->click();
     }
 
     protected $productName;
@@ -291,7 +285,7 @@ class FeatureContext extends MinkContext
      */
     public function iShouldFindCorrectProductName()
     {
-        $this->assertPageContainsText($this->productName);
+        $this->assertPageContainsText( $this->productName );
     }
 
     /**
@@ -360,6 +354,120 @@ class FeatureContext extends MinkContext
     {
         $email = md5( microtime( true ) ) . "_test@email.com";
         $this->fillField( $fieldName, $email );
+    }
+
+    /**
+     * Fill in field with random css selector
+     *
+     * @When /^I fill in field "([^"]*)" with "([^"]*)"$/
+     */
+    public function iFillInFieldWith( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $field->setValue( $value );
+        }
+    }
+
+    /**
+     * Check a field value by css selector
+     *
+     * @Given /^the "([^"]*)" css field should contain "([^"]*)"$/
+     */
+    public function theCssFieldShouldContain( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $actual = $field->getValue( $value );
+            $regex  = '/^' . preg_quote( $value, '/' ) . '/ui';
+
+            if ( !preg_match( $regex, $actual ) ) {
+                $message = sprintf( 'The field "%s" value is "%s", but "%s" expected.', $field, $actual, $value );
+                throw new ExpectationException( $message, $this->getSession() );
+            }
+        }
+    }
+
+    /**
+     * Update qty field for first product in cart
+     *
+     * @When /^I fill in first product qty with "([^"]*)"$/
+     */
+    public function iFillInFirstProductQtyWith( $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $selector = '.f-input-qty';
+        $field = $this->getFieldsCss($selector);
+        if($field){
+            $field->setValue($value);
+        }
+    }
+
+    /**
+     * Update qty field for second product in cart
+     *
+     * @Given /^I fill in second product qty with "([^"]*)"$/
+     */
+    public function iFillInSecondProductQtyWith( $value )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert qty for first product in cart
+     *
+     * @Given /^first product qty field should contain "([^"]*)"$/
+     */
+    public function firstProductQtyFieldShouldContain( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert qty for second product in cart
+     *
+     * @Given /^second product qty field should contain "([^"]*)"$/
+     */
+    public function secondProductQtyFieldShouldContain( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Check element related to first product in cart
+     *
+     * @When /^I check first product "([^"]*)"$/
+     */
+    public function iCheckFirstProduct( $arg1 )
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * Assert only one product left in cart
+     *
+     * @Then /^I should see one product$/
+     */
+    public function iShouldSeeOneProduct()
+    {
+        throw new PendingException();
+    }
+
+    /**
+     * @param string $selector
+     * @param bool   $single
+     * @return array|mixed
+     */
+    protected function getFieldsCss( $selector, $single = true )
+    {
+        $selector = $this->fixStepArgument( $selector );
+        $fields   = $this->getPage()->findAll( 'css', $selector );
+        if ( $fields && $single ) {
+            return current( $fields );
+        }
+        return $fields;
     }
 
     /**
