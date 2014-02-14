@@ -6,20 +6,13 @@
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
   </select>
   <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
-    <div class="row">
-        <div class="col-md-12" >
-            <div class="form-group" >
-                <ol id="field" class="ui-sortable" >
-
-                </ol>
-            </div>
-        </div>
-    </div>
+  <span id="field" class="ui-sortable">
+  </span>
+</div>
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
 </div>
 <div class="f-variants-col row">
-  <div class="col-sm-3 hidden">
-    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
-  </div>
   <div class="col-sm-12">
     {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
   </div>
@@ -57,7 +50,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
         mapField.forEach(function (obj) {
             $("#sel_var_field option[value='"+obj.id+"']").remove();
-            console.log(obj.name);
             var fields = '<label class="label label-success">'+ obj.name +' <button data-name="'+ obj.name +'" data-id="'+ obj.id +'" class="btn btn-link btn-delete-field" type="button"><i class="icon-remove"></i></button></label>';
             $('#field').append(fields);
         });
@@ -65,20 +57,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
             scroll: false,
             axis:'x',
             update: function(event, ui) {
-                arrField = Array();
-                $('#field').find('button').each(function () {
-                    var col = vColsCollection.findWhere({name: $(this).attr('data-name')});
-                    removeColumn(col.attributes);
-                    arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: col.get('options')});
-                });
-                arrField.forEach(function (data) {
-                    addColumn(data.name, data.options);
-                })
                 renderGrid();
-
             }
         });
-
         resetSelect();
     }
 
@@ -87,28 +68,34 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     $('form').submit(function(ev) {
 
         var variant_fields = [];
-        fieldCollection.each(function (f) {
-            variant_fields.push({id:f.get('id'), name: f.get('name')});
+        $('#field').find('button').each(function () {
+            variant_fields.push({id: $(this).attr('data-id'), name: $(this).attr('data-name')});
         });
         $('input[id="vfield_ids"]').val(JSON.stringify(variant_fields));
-
+        console.log(JSON.stringify(variant_fields));
         var variants = [];
         vRowsCollection.each(function (row) {
             var variant = {};
             variant.sku = row.get('sku');
             variant.price = row.get('price');
-
+            variant.qty = row.get('qty');
             var fvals = {};
             fieldCollection.each(function (f) {
                 var key = f.get('name');
                 fvals[key] = row.get(key);
+                console.log(row);
+            });
+            $('#field').find('button').each(function () {
+                var key = $(this).attr('data-name');
+                fvals[key] = row.get(key);
+                console.log(row.get(key));
             });
             variant.fields = fvals;
             variants.push(variant);
         });
         $('input[id="variants"]').val(JSON.stringify(variants));
-
-        return true;
+        console.log(JSON.stringify(variants));
+        return false;
     });
 
     $('#btn_add_var_field').click(function() {
@@ -130,9 +117,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
                         var fields = '<label class="label label-success">'+ text +' <button  data-name="'+ text +'" data-id="'+ val +'" class="btn btn-link btn-delete-field" type="button"><i class="icon-remove"></i></button></label>';
                         $('#field').append(fields);
-                        renderGrid()
-//                        vColsCollection.trigger('render');
-//                        vRowsCollection.trigger('render');
+                        renderGrid();
                     }
                 }
         );
@@ -156,7 +141,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
     }
 
-    function renderGrid() {
+    function renderGrid()
+    {
+        arrField = Array();
+        $('#field').find('button').each(function () {
+            var col = vColsCollection.findWhere({name: $(this).attr('data-name')});
+            removeColumn(col.attributes);
+            arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: col.get('options')});
+        });
+        arrField.forEach(function (data) {
+            addColumn(data.name, data.options);
+        });
         valueCurrentField = Array();
         $('#variant-grid tbody').find('tr').each(function () {
             var tmp = Array();
@@ -168,15 +163,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
                         obj = {col: data.name, val: $(self).children('select').val() };
                     }
                 });
-                if (obj) {
-                    tmp.push(obj);
-                }
+                obj = (obj) ? obj : {col: $(this).attr('data-col'), val: $(this).children('input').val()}
+                tmp.push(obj);
             });
             valueCurrentField.push(tmp);
         })
         vColsCollection.trigger('render');
         vRowsCollection.trigger('render');
-        console.log(valueCurrentField);
         $('#variant-grid tbody').find('tr').each(function (index) {
             $(this).find('td').each(function () {
                 var self = this;
@@ -224,10 +217,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         $('#sel_var_field').append(option);
         resetSelect();
         removeColumn(row);
-        renderGrid()
-//        vColsCollection.trigger('render');
-//        vRowsCollection.trigger('render');
         $(this).parent().remove();
+        renderGrid()
+
     });
 
    /* g_vent.bind('delete', function(ev) {
