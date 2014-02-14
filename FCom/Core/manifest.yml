@@ -5,7 +5,7 @@ modules:
         require: { module: { BHAML: 3.2, BTwig: 1.12.4 } }
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
-        description: "Base Fulleron classes and JS libraries"
+        description: "Base Sellvana classes and JS libraries"
         auto_use: [ layout, views ]
         override:
             class:
@@ -26,7 +26,7 @@ modules:
 
         default_config:
             db:
-                dbname: fulleron
+                dbname: sellvana
                 username: root
                 logging: false
                 implicit_migration: true
@@ -37,11 +37,11 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             modules:
                 FCom_Core:
-                    company_name: Fulleron
-                    site_title: Fulleron
-                    copyright_message: Fulleron
+                    company_name: Sellvana
+                    site_title: Sellvana
+                    copyright_message: Sellvana
                     admin_email: admin@example.com
-                    support_name: Fulleron Support
+                    support_name: Support
                     support_email: support@example.com
-                    sales_name: Fulleron Sales
+                    sales_name: Sales
                     sales_email: support@example.com
