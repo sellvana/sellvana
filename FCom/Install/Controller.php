@@ -55,7 +55,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         BLayout::i()->applyLayout('/step1');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['db'])) {
-            $sData['w']['db'] = array('host'=>'127.0.0.1', 'dbname'=>'fulleron', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
+            $sData['w']['db'] = array('host'=>'127.0.0.1', 'dbname'=>'sellvana', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
         }
     }
 
@@ -117,7 +117,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $this->view('step3')->set(array(
             'debug_modes' => array('DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */),
-            'run_level_bundles' => array('min' => 'Minimal', 'all' => 'All Bundled'),
+            'run_level_bundles' => array('all' => 'All Bundled', 'min' => 'Minimal'),
         ));
         BLayout::i()->applyLayout('/step3');
     }
