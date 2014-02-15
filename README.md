@@ -53,4 +53,4 @@ Contributing
 4. Once ready to commit your changes, create a pull request according to [BitBucket's Create a Pull Request](https://confluence.atlassian.com/display/BITBUCKET/Fork+a+Repo,+Compare+Code,+and+Create+a+Pull+Request).
 5. When received, Sellvana development team will review your contribution and if approved, will pull your request to the master branch.
 
-**NOTE**: Contributions will be accepted after a signed Contributor License Agreeement that will be provided soon.
+Note: You must agree to [Sellvana's Contributor License Agreement](http://sellvana.com/cla) before pulling any requests. You only need to sign the agreement once.
