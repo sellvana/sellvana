@@ -997,10 +997,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.collection.on('render', this.render, this);
                 },
                 orderChanged: function (ev) {
-
+                    var postData = [];
                     this.$el.find('li').each(function (index) {
                         var c = columnsCollection.findWhere({name: $(this).data('id')});
-                        c.set('position', index);
+                        c.set('position', index+1);
+                        postData.push({name:c.get('name'), position:c.get('position'), hidden:c.get('hidden')});
                     });
 
                     columnsCollection.sort();
@@ -1008,7 +1009,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     $.post(BackboneGrid.personalize_url, {
                         'do': 'grid.col.orders',
-                        'cols': columnsCollection.toJSON(),
+                        'cols': postData,//columnsCollection.toJSON(),
                         'grid': columnsCollection.grid
                     });
 
