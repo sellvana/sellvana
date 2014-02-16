@@ -93,7 +93,7 @@ class FCom_Cms_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
 
-        BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
+        //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade__0_1_0__0_1_1()
