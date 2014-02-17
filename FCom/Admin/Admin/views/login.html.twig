@@ -37,7 +37,8 @@
 require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
     $(function() {
         $('#login-form').validate();
-    })
+        $('#login-username').focus();
+    });
 
     $.cookie('check-cookies', true);
     if (!$.cookie('check-cookies')) {
