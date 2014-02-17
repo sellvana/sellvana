@@ -4,6 +4,7 @@ class FCom_Cms_Migrate extends BClass
 {
     public function install__0_1_0()
     {
+/*
         $tNav = FCom_Cms_Model_Nav::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tNav} (
@@ -26,7 +27,6 @@ class FCom_Cms_Migrate extends BClass
             CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
-/*
         $tPage = FCom_Cms_Model_Page::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPage} (
@@ -93,7 +93,7 @@ class FCom_Cms_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
 
-        BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
+        //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade__0_1_0__0_1_1()

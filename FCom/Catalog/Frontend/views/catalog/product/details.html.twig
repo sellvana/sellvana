@@ -131,19 +131,22 @@
             </div>
             <div class="checkbox">
               <label>
-                <input type="checkbox" name="#" value="#" checked> Checkbox label
+                <input type="checkbox" name="#1" value="#" checked> Checkbox label
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" name="#" id="#" value="#" checked> Radio label
+                <input type="radio" name="#2" value="#" checked> Radio label
               </label>
             </div>
             <div class="f-prod-add-cart">
               <p class="f-stock-notice f-in-stock">In Stock.</p>
-              <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>Add to Cart</button>
-              <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}" rel="nofollow">Add to Wishlist</a>
-              <a class="btn btn-link" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}" rel="nofollow">Add to Compare</a>
+              <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}">
+                  <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
+                <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
+                   rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+                <a class="btn btn-link" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}"
+                   rel="nofollow">{{ "Add to Compare"|_ }}</a>
             </div>
           </div> <!-- /.f-prod-select -->
         </form>

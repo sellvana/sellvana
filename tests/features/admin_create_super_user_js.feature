@@ -1,4 +1,4 @@
-@mink:sahi
+@javascript
 Feature: Admin super user create
   As I am creating new admin super user
   in admin Role drop-down

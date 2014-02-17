@@ -28,9 +28,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $url = BApp::href('/media/grid');
         $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
-                ->select(array('a.id', 'a.file_name', 'a.file_size'))
+                ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
                 ->order_by_expr('id asc');
             ;
+        $baseSrc = BConfig::i()->get('web/base_src') . '/';
         $config = array(
             'config' => array(
                 'id' => $id,
@@ -43,6 +44,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => array(
                     array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
@@ -68,7 +70,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $folder = $this->getFolder();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
-                ->select(array('a.id', 'a.file_name', 'a.file_size'))
+                ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
             ;
             $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
             BResponse::i()->json(array(

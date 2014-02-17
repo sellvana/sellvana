@@ -117,7 +117,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 if (empty($col['name']) || $col['name']==='cb') {
                     continue;
                 }
-                $columns[$col['name']] = array('position'=>$i, 'hidden'=>!empty($col['hidden']));
+                $columns[$col['name']] = array('position'=>$col['position'], 'hidden'=>!empty($col['hidden']));
             }
             $data = array('grid'=>array($r['grid']=>array('columns'=>$columns)));
 
