@@ -372,6 +372,10 @@ class BRequest extends BClass
         $basename = basename(static::scriptName());
         $path = preg_replace('#^/.*?'.preg_quote($basename).'#', '', $path);
 
+        if (!$path) {
+            $path = '/';
+        }
+
         return $path;
     }
 
