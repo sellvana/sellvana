@@ -1,4 +1,4 @@
-@mink:sahi
+@javascript
 Feature: Admin user edit
   As I am editing a user
   in admin

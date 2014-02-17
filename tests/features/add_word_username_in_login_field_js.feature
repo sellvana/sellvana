@@ -1,4 +1,4 @@
-@mink:sahi
+@javascript
 Feature: Add the word username in login field
   As a user,
   I should be able to login the backend

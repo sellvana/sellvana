@@ -1,4 +1,4 @@
-@mink:sahi
+@javascript
 Feature: Admin user create
   As I am creating new user
   in admin

@@ -76,6 +76,14 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @Given /^I am not logged in admin$/
+     */
+    public function iAmNotLoggedInAdmin()
+    {
+        $this->visit( "/admin/logout" );
+    }
+
+    /**
      * Make sure not to be logged in as customer on frontend
      *
      * @Given /^I am not logged in front$/
@@ -397,11 +405,11 @@ class FeatureContext extends MinkContext
      */
     public function iFillInFirstProductQtyWith( $value )
     {
-        $value = $this->fixStepArgument( $value );
+        $value    = $this->fixStepArgument( $value );
         $selector = '.f-input-qty';
-        $field = $this->getFieldsCss($selector);
-        if($field){
-            $field->setValue($value);
+        $field    = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $field->setValue( $value );
         }
     }
 
@@ -468,6 +476,14 @@ class FeatureContext extends MinkContext
             return current( $fields );
         }
         return $fields;
+    }
+
+    /**
+     * @When /^I restart browser$/
+     */
+    public function iRestartBrowser()
+    {
+        $this->getSession()->restart();
     }
 
     /**
