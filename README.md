@@ -1,5 +1,5 @@
-Sellvana Commerce
-=================
+Sellvana
+========
 
 Current state: private alpha, not ready for demonstration.
 
