@@ -6,8 +6,8 @@
     {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
   </select>
   <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
-  <span id="field" class="ui-sortable">
-  </span>
+    <ol id="field" class="dd-list columns dd-list-axis-x">
+    </ol>
 </div>
 <div class="hidden" id="grid-field-hidden">
     {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
@@ -48,10 +48,18 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         var mapField = fieldCollection.map(function (obj) {
             return {id: obj.id, name: obj.get('name')};
         });
-        mapField.forEach(function (obj) {
-            $("#sel_var_field option[value='"+obj.id+"']").remove();
-            var fields = '<label class="label label-success">'+ obj.name +' <button data-name="'+ obj.name +'" data-id="'+ obj.id +'" class="btn btn-link btn-delete-field" type="button"><i class="icon-remove"></i></button></label>';
-            $('#field').append(fields);
+        console.log(mapField.indexOf({id: 5, name: "nguyen"}));
+        $('#variant-grid thead tr').find('th').each(function () {
+            var self = this;
+            mapField.forEach(function (obj) {
+                if (obj.name == $(self).attr('data-id')) {
+                    $("#sel_var_field option[value='"+obj.id+"']").remove();
+
+                    var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
+                            '<label>'+ obj.name +'</label> <i data-name="'+ obj.name +'" data-id="'+ obj.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                    $('#field').append(fields);
+                }
+            });
         });
         $('#field').sortable({
             scroll: false,
@@ -68,34 +76,41 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     $('form').submit(function(ev) {
 
         var variant_fields = [];
+        var tmp_fields = [];
         $('#field').find('button').each(function () {
             variant_fields.push({id: $(this).attr('data-id'), name: $(this).attr('data-name')});
+            tmp_fields.push($(this).attr('data-name'));
         });
         $('input[id="vfield_ids"]').val(JSON.stringify(variant_fields));
-        console.log(JSON.stringify(variant_fields));
         var variants = [];
-        vRowsCollection.each(function (row) {
+        $('#variant-grid tbody').find('tr').each(function () {
             var variant = {};
-            variant.sku = row.get('sku');
-            variant.price = row.get('price');
-            variant.qty = row.get('qty');
             var fvals = {};
-            fieldCollection.each(function (f) {
-                var key = f.get('name');
-                fvals[key] = row.get(key);
-                console.log(row);
-            });
-            $('#field').find('button').each(function () {
-                var key = $(this).attr('data-name');
-                fvals[key] = row.get(key);
-                console.log(row.get(key));
-            });
-            variant.fields = fvals;
-            variants.push(variant);
+           $(this).find('td').each(function () {
+                switch ($(this).attr('data-col')) {
+                    case 'sku':
+                        variant.sku = $(this).find('[data-col="sku"]').val();
+                        break;
+                    case 'price':
+                        variant.price = $(this).find('[data-col="price"]').val();
+
+                        break;
+                    case 'qty':
+                        variant.qty = $(this).find('[data-col="qty"]').val();
+                        break;
+                    default :
+                        var key = $(this).attr('data-col');
+                        if (tmp_fields.indexOf(key) > -1) {
+                            var key = key;
+                            fvals[key] = $(this).find('[data-col="'+ key +'"]').val();
+                        }
+                }
+           });
+           variant.fields = fvals;
+           variants.push(variant);
         });
         $('input[id="variants"]').val(JSON.stringify(variants));
-        console.log(JSON.stringify(variants));
-        return false;
+        return true;
     });
 
     $('#btn_add_var_field').click(function() {
@@ -115,7 +130,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
                     if (response.success) {
                         addColumn(text, response.options);
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
-                        var fields = '<label class="label label-success">'+ text +' <button  data-name="'+ text +'" data-id="'+ val +'" class="btn btn-link btn-delete-field" type="button"><i class="icon-remove"></i></button></label>';
+                        var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
+                                '<label>'+ text +'</label> <i data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                         $('#field').append(fields);
                         renderGrid();
                     }
@@ -144,7 +160,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     function renderGrid()
     {
         arrField = Array();
-        $('#field').find('button').each(function () {
+        $('#field').find('i.icon-remove').each(function () {
             var col = vColsCollection.findWhere({name: $(this).attr('data-name')});
             removeColumn(col.attributes);
             arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: col.get('options')});
@@ -217,29 +233,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         $('#sel_var_field').append(option);
         resetSelect();
         removeColumn(row);
-        $(this).parent().remove();
+        $(this).parents('li').remove();
         renderGrid()
 
     });
 
-   /* g_vent.bind('delete', function(ev) {
-        if (ev.grid === 'variable-field-grid') {
-            removeColumn(ev.row);
-            console.log(ev.row);
-            vColsCollection.trigger('render');
-            vRowsCollection.trigger('render');
-        }
-    });*/
 
-    /*g_vent.bind('mass-delete', function(ev) {
-        if (ev.grid === 'variable-field-grid') {
-            for(var i in ev.rows)
-                removeColumn(ev.rows[i]);
-
-            vColsCollection.trigger('render');
-            vRowsCollection.trigger('render');
-        }
-    });*/
 
 });
 </script>

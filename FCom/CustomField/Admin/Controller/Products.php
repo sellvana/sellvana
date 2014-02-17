@@ -94,6 +94,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             $index = 0;
             foreach($variants as $v) {
                 $v['fields']['sku'] = $v['sku'];
+                $v['fields']['qty'] = $v['qty'];
                 $v['fields']['price'] = $v['price'];
                 $v['fields']['id'] = $index++;
                 $data[] = $v['fields'];
