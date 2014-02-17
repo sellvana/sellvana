@@ -388,15 +388,11 @@ class FeatureContext extends MinkContext
         $value = $this->fixStepArgument( $value );
         $field = $this->getFieldsCss( $selector );
         if ( $field ) {
-            $actual = $field->getValue( $value );
-            $regex  = '/^' . preg_quote( $value, '/' ) . '/ui';
-
-            if ( !preg_match( $regex, $actual ) ) {
-                $message = sprintf( 'The field "%s" value is "%s", but "%s" expected.', $field, $actual, $value );
-                throw new ExpectationException( $message, $this->getSession() );
-            }
+            $this->assertNodeValueMatchesValue( $value, $field );
         }
     }
+
+    protected $qty_input = '.f-input-qty';
 
     /**
      * Update qty field for first product in cart
@@ -406,10 +402,12 @@ class FeatureContext extends MinkContext
     public function iFillInFirstProductQtyWith( $value )
     {
         $value    = $this->fixStepArgument( $value );
-        $selector = '.f-input-qty';
+        $selector = $this->qty_input;
         $field    = $this->getFieldsCss( $selector );
         if ( $field ) {
             $field->setValue( $value );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
         }
     }
 
@@ -420,7 +418,20 @@ class FeatureContext extends MinkContext
      */
     public function iFillInSecondProductQtyWith( $value )
     {
-        throw new PendingException();
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+        if ( !empty( $fields ) && is_array( $fields ) ) {
+            if ( isset( $fields[ 1 ] ) ) {
+                /* @var $fieldInput \Behat\Mink\Element\NodeElement */
+                $fieldInput = $fields[ 1 ];
+                $fieldInput->setValue( $value );
+            } else {
+                throw new ElementNotFoundException( $this->getSession(), 'second qty input', 'css', $selector );
+            }
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
     }
 
     /**
@@ -428,9 +439,16 @@ class FeatureContext extends MinkContext
      *
      * @Given /^first product qty field should contain "([^"]*)"$/
      */
-    public function firstProductQtyFieldShouldContain( $arg1 )
+    public function firstProductQtyFieldShouldContain( $value )
     {
-        throw new PendingException();
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $field    = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $this->assertNodeValueMatchesValue( $value, $field );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
     }
 
     /**
@@ -438,19 +456,29 @@ class FeatureContext extends MinkContext
      *
      * @Given /^second product qty field should contain "([^"]*)"$/
      */
-    public function secondProductQtyFieldShouldContain( $arg1 )
+    public function secondProductQtyFieldShouldContain( $value )
     {
-        throw new PendingException();
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+        if ( !empty( $fields ) && is_array( $fields ) ) {
+            /* @var $fieldInput \Behat\Mink\Element\NodeElement */
+            $fieldInput = $fields[ 1 ];
+            $this->assertNodeValueMatchesValue( $value, $fieldInput );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
     }
 
     /**
-     * Check element related to first product in cart
+     * Check remove checkbox related to first product in cart
      *
      * @When /^I check first product "([^"]*)"$/
      */
-    public function iCheckFirstProduct( $arg1 )
+    public function iCheckFirstProduct( $checkBox )
     {
-        throw new PendingException();
+        $checkBox = $this->fixStepArgument( $checkBox );
+        $this->checkOption( $checkBox );
     }
 
     /**
@@ -460,13 +488,21 @@ class FeatureContext extends MinkContext
      */
     public function iShouldSeeOneProduct()
     {
-        throw new PendingException();
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+
+        if ( count( $fields ) != 1 ) {
+            throw new ExpectationException( sprintf(
+                "Expected to find exactly one product, found %d",
+                count( $fields )
+            ), $this->getSession() );
+        }
     }
 
     /**
      * @param string $selector
      * @param bool   $single
-     * @return array|mixed
+     * @return array|\Behat\Mink\Element\NodeElement|null
      */
     protected function getFieldsCss( $selector, $single = true )
     {
@@ -495,5 +531,21 @@ class FeatureContext extends MinkContext
     {
         return $this->getSession()->getPage();
 
+    }
+
+    /**
+     * @param                                $value
+     * @param Behat\Mink\Element\NodeElement $field
+     * @throws Behat\Mink\Exception\ExpectationException
+     */
+    public function assertNodeValueMatchesValue( $value, $field )
+    {
+        $actual = $field->getValue( $value );
+        $regex  = '/^' . preg_quote( $value, '/' ) . '/ui';
+
+        if ( !preg_match( $regex, $actual ) ) {
+            $message = sprintf( 'The field "%s" value is "%s", but "%s" expected.', $field->getTagName(), $actual, $value );
+            throw new ExpectationException( $message, $this->getSession() );
+        }
     }
 }
